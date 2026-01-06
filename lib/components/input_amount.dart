@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/select_token.dart';
@@ -88,9 +89,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     BigInt bigAmount,
     AppState appState,
   ) {
-    const double amountHeight = 40.0;
-    const double convertHeight = 20.0;
-
     final (_, converted) = formatingAmount(
       amount: bigAmount,
       symbol: token.symbol,
@@ -99,34 +97,32 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       appState: appState,
     );
 
+    final fontSize = _calculateAdaptiveFontSize(context, widget.amount);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          height: amountHeight,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              widget.amount,
-              style: theme.subtitle1.copyWith(
-                color: theme.textPrimary,
-                fontSize: _calculateFontSize(context, widget.amount),
-                // fontWeight is already w500 in subtitle1, but explicitly set if different
-              ),
-            ),
+        Text(
+          widget.amount,
+          style: theme.displayLarge.copyWith(
+            color: theme.textPrimary,
+            fontSize: fontSize,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        if (appState.wallet?.settings.currencyConvert != null)
-          SizedBox(
-            height: convertHeight,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                converted,
-                style: theme.bodyText1.copyWith(
-                  color: theme.textPrimary.withValues(alpha: 0.7),
-                ),
+        if (appState.wallet?.settings.currencyConvert != null &&
+            converted.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              converted,
+              style: theme.bodyText2.copyWith(
+                color: theme.textSecondary,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
       ],
@@ -170,7 +166,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               token.symbol,
               style: theme.bodyText1.copyWith(
                 color: theme.textPrimary,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -260,11 +255,10 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                 ),
                 child: Text(
                   'Max',
-                  style: theme.caption.copyWith(
+                  style: theme.labelSmall.copyWith(
                     color: isMax
                         ? theme.warning
                         : theme.textPrimary.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -274,14 +268,17 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
   }
 
-  double _calculateFontSize(BuildContext context, String text) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    const baseSize = 30.0;
-    const minSize = 13.0;
+  double _calculateAdaptiveFontSize(BuildContext context, String text) {
+    const baseSize = 32.0;
+    const minSize = 16.0;
 
-    if (text.length <= 8) return baseSize;
+    if (text.length <= 8) {
+      return AdaptiveSize.getAdaptiveFontSize(context, baseSize);
+    }
 
-    final fontSize = (screenWidth * 0.12) / ((text.length - 8) * 0.5);
-    return fontSize.clamp(minSize, baseSize);
+    final scaleFactor = 1 - ((text.length - 8) * 0.08);
+    final adjustedSize = (baseSize * scaleFactor).clamp(minSize, baseSize);
+
+    return AdaptiveSize.getAdaptiveFontSize(context, adjustedSize);
   }
 }

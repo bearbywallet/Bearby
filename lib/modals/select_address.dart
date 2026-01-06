@@ -252,55 +252,59 @@ class _AddressSelectModalContentState
         widget.onAddressSelected(params, entry.name);
       },
       child: Container(
-        height: 72,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Stack(
-              children: [
-                ClipOval(
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: _getAvatarWidget(entry, theme),
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: Stack(
+                children: [
+                  ClipOval(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: _getAvatarWidget(entry, theme),
+                    ),
                   ),
-                ),
-                if (_shouldShowNetworkIcon(appState, entry))
-                  Positioned(
-                    right: -2,
-                    bottom: -2,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: theme.background,
-                        shape: BoxShape.circle,
-                        border:
-                            Border.all(color: theme.cardBackground, width: 1),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(2),
-                        child: Center(
-                          child: SvgPicture.asset(
-                            _getNetworkIconPath(entry),
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textSecondary,
-                              BlendMode.srcIn,
+                  if (_shouldShowNetworkIcon(appState, entry))
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: theme.background,
+                          shape: BoxShape.circle,
+                          border:
+                              Border.all(color: theme.cardBackground, width: 1),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(2),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              _getNetworkIconPath(entry),
+                              width: 24,
+                              height: 24,
+                              colorFilter: ColorFilter.mode(
+                                theme.textSecondary,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
@@ -320,6 +324,7 @@ class _AddressSelectModalContentState
                       ..._buildTags(entry, isCurrentAccount, theme, l10n),
                     ],
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     shortenAddress(entry.address),
                     style: theme.bodyText2.copyWith(color: theme.textSecondary),
