@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/bip_purpose_selector.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/biometric_switch.dart';
@@ -61,6 +63,7 @@ class _WalletPageState extends State<WalletPage> {
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _biometricsAvailable = false;
   bool _isBiometricLoading = false;
+  int _selectedBipPurposeIndex = 1;
 
   @override
   void initState() {
@@ -302,6 +305,10 @@ class _WalletPageState extends State<WalletPage> {
                       _buildWalletNameInput(theme, appState),
                       const SizedBox(height: 32),
                       _buildPreferencesSection(appState),
+                      if (_isBitcoinWallet(appState)) ...[
+                        const SizedBox(height: 32),
+                        _buildBipPurposeSection(appState),
+                      ],
                     ]),
                   ),
                 ),
@@ -556,5 +563,34 @@ class _WalletPageState extends State<WalletPage> {
 
   void _handleBackup(AppTheme theme) {
     showSecretRecoveryModal(context: context, theme: theme);
+  }
+
+  bool _isBitcoinWallet(AppState appState) {
+    return appState.account?.slip44 == kBitcoinlip44;
+  }
+
+  Widget _buildBipPurposeSection(AppState appState) {
+    final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, bottom: 16),
+          child: Text(
+            l10n.bipPurposeSetupPageTitle,
+            style: theme.bodyLarge.copyWith(
+              color: theme.textSecondary,
+            ),
+          ),
+        ),
+        BipPurposeSelector(
+          selectedIndex: _selectedBipPurposeIndex,
+          onSelect: (index) => setState(() => _selectedBipPurposeIndex = index),
+          disabled: true,
+        ),
+      ],
+    );
   }
 }

@@ -62,27 +62,32 @@ class _TileButtonState extends State<TileButton>
 
     final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
 
+    final double buttonScale = AdaptiveSize.getAdaptiveButtonScale(context);
     final double baseIconSize = hasTitle ? 34.0 : 20.0;
-    final double iconSize = baseIconSize * scaleFactor;
-    final double borderRadius = 16.0 * scaleFactor;
+    final double iconSize = baseIconSize * buttonScale;
+    final double borderRadius = 16.0 * buttonScale;
 
     double containerSize;
 
     if (hasTitle) {
-      final double estimatedFontSize = (theme.caption.fontSize ?? 14.0) * scaleFactor;
+      final double estimatedFontSize =
+          (theme.caption.fontSize ?? 14.0) * scaleFactor;
       final double estimatedLineHeightFactor = theme.caption.height ?? 1.3;
       final double actualTextHeightForTwoLines =
           estimatedFontSize * 2 * estimatedLineHeightFactor;
-      final double padding = 12.0 * scaleFactor;
+      final double padding = 12.0 * buttonScale;
 
-      containerSize =
-          padding + iconSize + 4.0 * scaleFactor + actualTextHeightForTwoLines + padding;
+      containerSize = padding +
+          iconSize +
+          4.0 * buttonScale +
+          actualTextHeightForTwoLines +
+          padding;
     } else {
-      containerSize = 48.0 * scaleFactor;
+      containerSize = 48.0 * buttonScale;
     }
 
     Widget buttonContent;
-    final double padding = 12.0 * scaleFactor;
+    final double padding = 12.0 * buttonScale;
 
     if (hasTitle) {
       buttonContent = Padding(
@@ -97,11 +102,15 @@ class _TileButtonState extends State<TileButton>
               height: iconSize,
               child: Center(child: widget.icon),
             ),
-            SizedBox(height: 4 * scaleFactor),
+            SizedBox(height: 4 * buttonScale),
             Text(
               widget.title!,
               style: theme.caption.copyWith(
                 color: widget.textColor,
+                fontSize: AdaptiveSize.getAdaptiveFontSize(
+                  context,
+                  theme.caption.fontSize ?? 14.0,
+                ),
               ),
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,

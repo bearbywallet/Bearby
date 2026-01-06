@@ -32,6 +32,20 @@ class AdaptiveSize {
     return defaultSize * getScaleFactor(context);
   }
 
+  static double getAdaptiveFontSize(BuildContext context, double defaultSize) {
+    final scale = getScaleFactor(context);
+    return (defaultSize * scale).clamp(defaultSize * 0.85, defaultSize * 1.2);
+  }
+
+  static double getAdaptiveButtonScale(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth <= _smallScreenThreshold) {
+      return 1.0;
+    }
+    final scale = screenWidth / _baseWidth;
+    return scale.clamp(1.0, 1.15);
+  }
+
   static double getAdaptiveIconSize(BuildContext context, double defaultSize) {
     final scale = getScaleFactor(context);
     return (defaultSize * scale).clamp(defaultSize * 0.9, defaultSize * 1.3);
