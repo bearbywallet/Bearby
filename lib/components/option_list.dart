@@ -31,92 +31,147 @@ class OptionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-
-    bool hasSelectedOption = options.any((option) => option.isSelected);
+    final hasSelectedOption = options.any((option) => option.isSelected);
 
     return Column(
       children: options
-          .map((option) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6.0),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 200),
-                  opacity: disabled
-                      ? disabledOpacity
-                      : hasSelectedOption && !option.isSelected
-                          ? unselectedOpacity
-                          : 1.0,
-                  child: GestureDetector(
-                    onTap: disabled ? null : option.onSelect,
-                    child: TweenAnimationBuilder<double>(
-                      duration: const Duration(milliseconds: 300),
-                      tween:
-                          Tween(begin: 0.0, end: option.isSelected ? 1.0 : 0.0),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: theme.cardBackground,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Color.lerp(
-                                theme.cardBackground,
-                                disabled
-                                    ? theme.textSecondary
-                                    : theme.primaryPurple,
-                                value * 0.5,
-                              )!,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: option.child,
-                              ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: option.isSelected
-                                        ? disabled
-                                            ? theme.textSecondary
-                                            : theme.primaryPurple
-                                        : theme.textSecondary,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: AnimatedScale(
-                                    duration: const Duration(milliseconds: 200),
-                                    scale: option.isSelected ? 1.0 : 0.0,
-                                    child: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: disabled
-                                            ? theme.textSecondary
-                                            : theme.primaryPurple,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+          .asMap()
+          .entries
+          .map((entry) => _OptionItemWidget(
+                key: ValueKey(entry.key),
+                option: entry.value,
+                theme: theme,
+                disabled: disabled,
+                disabledOpacity: disabledOpacity,
+                unselectedOpacity: unselectedOpacity,
+                hasSelectedOption: hasSelectedOption,
               ))
           .toList(),
+    );
+  }
+}
+
+class _OptionItemWidget extends StatefulWidget {
+  final OptionItem option;
+  final dynamic theme;
+  final bool disabled;
+  final double disabledOpacity;
+  final double unselectedOpacity;
+  final bool hasSelectedOption;
+
+  const _OptionItemWidget({
+    super.key,
+    required this.option,
+    required this.theme,
+    required this.disabled,
+    required this.disabledOpacity,
+    required this.unselectedOpacity,
+    required this.hasSelectedOption,
+  });
+
+  @override
+  State<_OptionItemWidget> createState() => _OptionItemWidgetState();
+}
+
+class _OptionItemWidgetState extends State<_OptionItemWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: widget.disabled
+            ? widget.disabledOpacity
+            : widget.hasSelectedOption && !widget.option.isSelected
+                ? widget.unselectedOpacity
+                : 1.0,
+        child: MouseRegion(
+          onEnter: widget.disabled ? null : (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          cursor: widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: widget.disabled ? null : widget.option.onSelect,
+            child: TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 300),
+              tween: Tween(begin: 0.0, end: widget.option.isSelected ? 1.0 : 0.0),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return AnimatedScale(
+                  scale: _isHovered && !widget.disabled ? 1.02 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: _isHovered && !widget.disabled
+                          ? Color.lerp(
+                              widget.theme.cardBackground,
+                              widget.theme.primaryPurple,
+                              0.05,
+                            )
+                          : widget.theme.cardBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Color.lerp(
+                          widget.theme.cardBackground,
+                          widget.disabled
+                              ? widget.theme.textSecondary
+                              : widget.theme.primaryPurple,
+                          _isHovered && !widget.disabled ? value * 0.5 + 0.2 : value * 0.5,
+                        )!,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: widget.option.child,
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: widget.option.isSelected
+                                  ? widget.disabled
+                                      ? widget.theme.textSecondary
+                                      : widget.theme.primaryPurple
+                                  : widget.theme.textSecondary,
+                              width: 2,
+                            ),
+                          ),
+                          child: Center(
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 200),
+                              scale: widget.option.isSelected ? 1.0 : 0.0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: widget.disabled
+                                      ? widget.theme.textSecondary
+                                      : widget.theme.primaryPurple,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

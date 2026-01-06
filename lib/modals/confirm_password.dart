@@ -172,6 +172,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: false,
+                        autofocus: true,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         obscureText: _obscurePassword,
                         rightIconPath: _obscurePassword
@@ -182,6 +183,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                         onChanged: (_) => _errorMessage.isNotEmpty
                             ? setState(() => _errorMessage = '')
                             : null,
+                        onSubmitted: (_) => _handleConfirmPassword(context),
                       ),
                       if (_errorMessage.isNotEmpty) ...[
                         const SizedBox(height: 8),

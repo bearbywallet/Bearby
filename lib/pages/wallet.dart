@@ -135,6 +135,20 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
+  String _mapBipIndexToAddressType(int index) {
+    switch (index) {
+      case 0:
+        return "p2tr";
+      case 1:
+        return "p2wpkh";
+      case 2:
+        return "p2sh";
+      case 3:
+      default:
+        return "p2pkh";
+    }
+  }
+
   void _handleDappDisconnect(String url) async {
     AppState appState = Provider.of<AppState>(context, listen: false);
     await removeConnections(
@@ -249,6 +263,95 @@ class _WalletPageState extends State<WalletPage> {
     } finally {
       await appState.syncData();
     }
+  }
+
+  Future<void> _authenticateAndExecute({
+    required AppState appState,
+    required Future<void> Function(String password, List<String> identifiers) onAuthenticated,
+  }) async {
+    final wallet = appState.wallet;
+    if (wallet == null) return;
+
+    final device = DeviceInfoService();
+    final identifiers = await device.getDeviceIdentifiers();
+    final biometricEnabled = wallet.authType != AuthMethod.none.name;
+
+    if (biometricEnabled && mounted) {
+      final authenticated = await _authService.authenticate(
+        allowPinCode: true,
+        reason: AppLocalizations.of(context)!.walletPageBiometricReason,
+      );
+
+      if (!authenticated) return;
+
+      String? sessionCipher;
+      try {
+        sessionCipher = await _authGuard.getSession(
+          sessionKey: wallet.walletAddress,
+          requireAuth: false,
+        );
+      } catch (e) {
+        debugPrint("No session available: $e");
+      }
+
+      if (sessionCipher != null && sessionCipher.isNotEmpty) {
+        await onAuthenticated(sessionCipher, identifiers);
+      } else {
+        if (mounted) {
+          showConfirmPasswordModal(
+            context: context,
+            theme: appState.currentTheme,
+            onConfirm: (password) async {
+              try {
+                await onAuthenticated(password, identifiers);
+                return null;
+              } catch (e) {
+                return e.toString();
+              }
+            },
+          );
+        }
+      }
+    } else if (mounted) {
+      showConfirmPasswordModal(
+        context: context,
+        theme: appState.currentTheme,
+        onConfirm: (password) async {
+          try {
+            await onAuthenticated(password, identifiers);
+            return null;
+          } catch (e) {
+            return e.toString();
+          }
+        },
+      );
+    }
+  }
+
+  Future<void> _handleBipPurposeChange(int newIndex, AppState appState) async {
+    if (newIndex == _selectedBipPurposeIndex) return;
+
+    final newAddressType = _mapBipIndexToAddressType(newIndex);
+
+    await _authenticateAndExecute(
+      appState: appState,
+      onAuthenticated: (password, identifiers) async {
+        await bitcoinChangeAddressType(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          newAddressType: newAddressType,
+          identifiers: identifiers,
+          password: password,
+        );
+
+        await appState.syncData();
+
+        if (mounted) {
+          setState(() {
+            _selectedBipPurposeIndex = newIndex;
+          });
+        }
+      },
+    );
   }
 
   List<WalletPreferenceItem> _getPreferenceItems(AppState appState) {
@@ -623,8 +726,8 @@ class _WalletPageState extends State<WalletPage> {
         ),
         BipPurposeSelector(
           selectedIndex: _selectedBipPurposeIndex,
-          onSelect: (index) => setState(() => _selectedBipPurposeIndex = index),
-          disabled: true,
+          onSelect: (index) => _handleBipPurposeChange(index, appState),
+          disabled: false,
         ),
       ],
     );
