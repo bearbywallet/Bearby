@@ -39,13 +39,7 @@ pub async fn add_ledger_wallet(
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let provider = core.get_provider(params.chain_hash)?;
-        let net = if provider.config.testnet.unwrap_or(false) {
-            Some(bitcoin::Network::Bitcoin)
-        } else if provider.config.testnet.unwrap_or(false) == true {
-            Some(bitcoin::Network::Testnet)
-        } else {
-            None
-        };
+        let net = provider.config.bitcoin_network();
         let bip49 = DerivationPath::new(
             provider.config.slip_44,
             params.wallet_index,

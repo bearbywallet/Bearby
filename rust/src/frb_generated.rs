@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 239785179;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 133425561;
 
 // Section: executor
 
@@ -2149,40 +2149,6 @@ fn wire__crate__api__utils__intl_number_formating_impl(
         },
     )
 }
-fn wire__crate__api__methods__is_crypto_address_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "is_crypto_address",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_addr = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok =
-                        Result::<_, ()>::Ok(crate::api::methods::is_crypto_address(api_addr))?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
 fn wire__crate__api__backend__is_service_running_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2215,6 +2181,40 @@ fn wire__crate__api__backend__is_service_running_impl(
                     })()
                     .await,
                 )
+            }
+        },
+    )
+}
+fn wire__crate__api__utils__is_valid_address_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "is_valid_address",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_addr = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok =
+                        Result::<_, ()>::Ok(crate::api::utils::is_valid_address(api_addr))?;
+                    Ok(output_ok)
+                })())
             }
         },
     )
@@ -6031,8 +6031,8 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         53 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__api__methods__is_crypto_address_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        55 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        56 => wire__crate__api__utils__is_valid_address_impl(port, ptr, rust_vec_len, data_len),
         57 => wire__crate__api__methods__keypair_from_sk_impl(port, ptr, rust_vec_len, data_len),
         58 => wire__crate__api__ledger__ledger_split_path_impl(port, ptr, rust_vec_len, data_len),
         59 => wire__crate__api__backend__load_old_database_android_impl(

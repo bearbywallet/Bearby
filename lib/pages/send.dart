@@ -151,7 +151,9 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
                             ),
                             RoundedLoadingButton(
                               controller: _btnController,
-                              onPressed: !_isFormValid ? null : () => handleSubmit(appState),
+                              onPressed: !_isFormValid
+                                  ? null
+                                  : () => handleSubmit(appState),
                               color: theme.primaryPurple,
                               valueColor: theme.buttonText,
                               child: Text(

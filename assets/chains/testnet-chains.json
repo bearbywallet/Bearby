@@ -35,6 +35,31 @@
     ]
   },
   {
+    "name": "Bitcoin Bearby",
+    "chain": "BTC",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "ssl://btc-testnet.zilpay.io:60402"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "1111111111111111111114oLvT2",
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "decimals": 8
+      }
+    ],
+    "chainIds": [0, 2],
+    "infoURL": "https://bitcoin.org",
+    "testnet": true,
+    "shortName": "bitcoin",
+    "slip44": 0,
+    "explorers": []
+  },
+  {
     "name": "Zilliqa Test",
     "chain": "ZIL",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
