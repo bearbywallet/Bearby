@@ -330,102 +330,99 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
         systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: l10n.restoreWalletOptionsKeyStoreTitle,
-              onBackPressed: _disabled ? () {} : () => Navigator.pop(context),
-              actionIcon: SvgPicture.asset(
-                'assets/icons/reload.svg',
-                width: 24,
-                height: 24,
-                colorFilter:
-                    ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
-              ),
-              onActionPressed: _disabled ? null : _loadBackupFiles,
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 8),
-                      child: SmartInput(
-                        key: _passwordInputKey,
-                        controller: _passwordController,
-                        hint: l10n.keystorePasswordHint,
-                        height: 50.0,
-                        fontSize: 18,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        focusedBorderColor: theme.primaryPurple,
-                        disabled: _disabled || _selectedFile == null,
-                        obscureText: _obscurePassword,
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
-                        onRightIconTap: _disabled
-                            ? null
-                            : () {
-                                setState(
-                                    () => _obscurePassword = !_obscurePassword);
-                              },
-                        onChanged: _disabled
-                            ? null
-                            : (value) {
-                                setState(() {
-                                  _password = value;
-                                  if (_errorMessage.isNotEmpty) {
-                                    _errorMessage = '';
-                                  }
-                                });
-                              },
-                      ),
-                    ),
-                    BiometricSwitch(
-                      biometricType: _authMethods.first,
-                      value: _useDeviceAuth,
-                      disabled: _disabled,
-                      onChanged: (value) async {
-                        setState(() => _useDeviceAuth = value);
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 16),
-                      child: RoundedLoadingButton(
-                        color: theme.primaryPurple,
-                        valueColor: theme.buttonText,
-                        controller: _btnController,
-                        onPressed: (_password.isNotEmpty &&
-                                _selectedFile != null &&
-                                !_disabled)
-                            ? _restoreFromKeystore
-                            : () {},
-                        child: Text(
-                          l10n.keystoreRestoreButton,
-                          style: theme.titleSmall,
-                        ),
-                      ),
-                    ),
-                    if (_errorMessage.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(
-                          _errorMessage,
-                          style: theme.bodyText2.copyWith(
-                            color: theme.danger,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    _buildFileListHeader(theme),
-                    _buildFileList(theme),
-                  ],
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: l10n.restoreWalletOptionsKeyStoreTitle,
+                  onBackPressed: _disabled ? () {} : () => Navigator.pop(context),
+                  actionIcon: SvgPicture.asset(
+                    'assets/icons/reload.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                  ),
+                  onActionPressed: _disabled ? null : _loadBackupFiles,
                 ),
-              ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16, bottom: 8),
+                          child: SmartInput(
+                            key: _passwordInputKey,
+                            controller: _passwordController,
+                            hint: l10n.keystorePasswordHint,
+                            height: 50.0,
+                            fontSize: 18,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            disabled: _disabled || _selectedFile == null,
+                            obscureText: _obscurePassword,
+                            rightIconPath: _obscurePassword
+                                ? "assets/icons/close_eye.svg"
+                                : "assets/icons/open_eye.svg",
+                            onRightIconTap: _disabled
+                                ? null
+                                : () => setState(() => _obscurePassword = !_obscurePassword),
+                            onChanged: _disabled
+                                ? null
+                                : (value) {
+                                    setState(() {
+                                      _password = value;
+                                      if (_errorMessage.isNotEmpty) {
+                                        _errorMessage = '';
+                                      }
+                                    });
+                                  },
+                          ),
+                        ),
+                        BiometricSwitch(
+                          biometricType: _authMethods.first,
+                          value: _useDeviceAuth,
+                          disabled: _disabled,
+                          onChanged: (value) => setState(() => _useDeviceAuth = value),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 16),
+                          child: RoundedLoadingButton(
+                            color: theme.primaryPurple,
+                            valueColor: theme.buttonText,
+                            controller: _btnController,
+                            onPressed: (_password.isNotEmpty &&
+                                    _selectedFile != null &&
+                                    !_disabled)
+                                ? _restoreFromKeystore
+                                : () {},
+                            child: Text(
+                              l10n.keystoreRestoreButton,
+                              style: theme.titleSmall,
+                            ),
+                          ),
+                        ),
+                        if (_errorMessage.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(
+                              _errorMessage,
+                              style: theme.bodyText2.copyWith(color: theme.danger),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        _buildFileListHeader(theme),
+                        _buildFileList(theme),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,15 +1,14 @@
 import 'dart:io' show Platform;
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});
@@ -18,7 +17,7 @@ class InitialPage extends StatefulWidget {
   State<InitialPage> createState() => _InitialPageState();
 }
 
-class _InitialPageState extends State<InitialPage> {
+class _InitialPageState extends State<InitialPage> with StatusBarMixin {
   bool _isLoading = true;
   bool _isRestoreAvailable = false;
   String? _vaultJson;
@@ -30,185 +29,121 @@ class _InitialPageState extends State<InitialPage> {
     _loadingOldStorage();
   }
 
-  void _loadingOldStorage() async {
+  Future<void> _loadingOldStorage() async {
     try {
-      if (Platform.isAndroid) {
-        final (vaultJson, accountsJson) = await loadOldDatabaseAndroid();
+      final (vaultJson, accountsJson) = Platform.isAndroid
+          ? await loadOldDatabaseAndroid()
+          : Platform.isIOS
+              ? await loadOldDatabaseIos(
+                  baseDir: (await getApplicationSupportDirectory()).path)
+              : (null, null);
+
+      if (mounted) {
         setState(() {
           _vaultJson = vaultJson;
           _accountsJson = accountsJson;
-          _isRestoreAvailable = true;
-        });
-      } else if (Platform.isIOS) {
-        final appDocDir = await getApplicationSupportDirectory();
-        final (vaultJson, accountsJson) =
-            await loadOldDatabaseIos(baseDir: appDocDir.path);
-        setState(() {
-          _vaultJson = vaultJson;
-          _accountsJson = accountsJson;
-          _isRestoreAvailable = true;
+          _isRestoreAvailable = vaultJson != null && accountsJson != null;
         });
       }
     } catch (_) {
-      setState(() {
-        _isRestoreAvailable = false;
-      });
+      if (mounted) setState(() => _isRestoreAvailable = false);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Widget _buildButton(AppTheme theme) {
-    if (_isLoading) {
-      return const CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
-      );
-    } else if (_isRestoreAvailable) {
-      return CustomButton(
-        textColor: theme.buttonText,
-        backgroundColor: theme.primaryPurple,
-        text: AppLocalizations.of(context)!.initialPagerestoreZilPay,
-        onPressed: () {
-          Navigator.of(context).pushNamed(
-            '/rk_restore',
-            arguments: {
-              'vaultJson': _vaultJson,
-              'accountsJson': _accountsJson,
-            },
-          );
-        },
-      );
-    } else {
-      return CustomButton(
-        textColor: theme.buttonText,
-        backgroundColor: theme.primaryPurple,
-        text: AppLocalizations.of(context)?.initialPagegetStarted ?? "",
-        onPressed: () {
-          Navigator.of(context).pushNamed('/new_wallet_options');
-        },
-      );
-    }
+  Future<void> _toggleTheme() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final newAppearance = switch (appState.state.appearances) {
+      0 => PlatformDispatcher.instance.platformBrightness == Brightness.dark ? 2 : 1,
+      1 => 2,
+      _ => 1,
+    };
+    await appState.setAppearancesCode(newAppearance, appState.state.abbreviatedNumber);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-
-    final Color effectiveBgColor = theme.background;
-    final Brightness backgroundBrightness =
-        ThemeData.estimateBrightnessForColor(effectiveBgColor);
-    final Brightness statusBarIconBrightness =
-        backgroundBrightness == Brightness.light
-            ? Brightness.dark
-            : Brightness.light;
-    final Brightness statusBarBrightness = backgroundBrightness;
-
-    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: statusBarIconBrightness,
-      statusBarBrightness: statusBarBrightness,
-    );
+    final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth < 600 ? double.infinity : 600.0;
 
     return Scaffold(
-      extendBody: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         toolbarHeight: 0,
-        systemOverlayStyle: overlayStyle,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
-      backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/moon_sun.svg',
-                      colorFilter: ColorFilter.mode(
-                        theme.textPrimary,
-                        BlendMode.srcIn,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: SvgPicture.asset(
+                          'assets/icons/moon_sun.svg',
+                          width: 30,
+                          height: 30,
+                          colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                        ),
+                        onPressed: _toggleTheme,
                       ),
-                      width: 30.0,
-                      height: 30.0,
-                    ),
-                    onPressed: () async {
-                      final appState =
-                          Provider.of<AppState>(context, listen: false);
-
-                      switch (appState.state.appearances) {
-                        case 0:
-                          final Brightness systemBrightness =
-                              PlatformDispatcher.instance.platformBrightness;
-                          if (systemBrightness == Brightness.dark) {
-                            await appState.setAppearancesCode(
-                              2,
-                              appState.state.abbreviatedNumber,
-                            );
-                          } else {
-                            await appState.setAppearancesCode(
-                              1,
-                              appState.state.abbreviatedNumber,
-                            );
-                          }
-                          break;
-                        case 1:
-                          await appState.setAppearancesCode(
-                            2,
-                            appState.state.abbreviatedNumber,
-                          );
-                          break;
-                        case 2:
-                          await appState.setAppearancesCode(
-                            1,
-                            appState.state.abbreviatedNumber,
-                          );
-                          break;
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/language.svg',
-                      colorFilter:
-                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
-                      width: 34.0,
-                      height: 34.0,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/language');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/little_dragons.svg',
-                  width: 400.0,
-                  height: 400.0,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
+                      IconButton(
+                        icon: SvgPicture.asset(
+                          'assets/icons/language.svg',
+                          width: 34,
+                          height: 34,
+                          colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                        ),
+                        onPressed: () => Navigator.pushNamed(context, '/language'),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                Expanded(
+                  child: Center(
+                    child: SvgPicture.asset(
+                      'assets/icons/little_dragons.svg',
+                      width: 400,
+                      height: 400,
+                      colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+                  child: _isLoading
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                        )
+                      : CustomButton(
+                          textColor: theme.buttonText,
+                          backgroundColor: theme.primaryPurple,
+                          text: _isRestoreAvailable
+                              ? l10n.initialPagerestoreZilPay
+                              : l10n.initialPagegetStarted,
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            _isRestoreAvailable ? '/rk_restore' : '/new_wallet_options',
+                            arguments: _isRestoreAvailable
+                                ? {'vaultJson': _vaultJson, 'accountsJson': _accountsJson}
+                                : null,
+                          ),
+                          borderRadius: 30.0,
+                          height: 56.0,
+                        ),
+                ),
+              ],
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0),
-              child: _buildButton(theme),
-            ),
-          ],
+          ),
         ),
       ),
     );

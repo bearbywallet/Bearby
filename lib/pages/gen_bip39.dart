@@ -100,7 +100,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                                   index: index + 1,
                                   word: _mnemonicWords[index],
                                   isEditable: false,
-                                  opacity: 0.5,
+                                  opacity: 1.0,
                                 ),
                               );
                             },

@@ -94,10 +94,12 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
 
   int _getChunkSize(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final maxWidth = width > 480 ? 480.0 : width;
 
-    if (width < 600) return 6;
-    if (width < 905) return 8;
-    if (width < 1240) return 10;
+    if (maxWidth < 360) return 4;
+    if (maxWidth < 420) return 6;
+    if (maxWidth < 600) return 8;
+    if (maxWidth < 905) return 10;
 
     return 12;
   }
@@ -128,13 +130,14 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
     final chunks = _formatHexKey(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = Provider.of<AppState>(context).currentTheme;
-
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth > 480 ? 480.0 : screenWidth;
     final chunkSize = _getChunkSize(context);
-    final containerWidth = (45.0 * chunkSize) + adaptivePadding * 2;
+    final availableWidth = maxWidth - (adaptivePadding * 2);
+    final itemWidth = availableWidth / chunkSize;
 
     return Container(
       padding: EdgeInsets.all(adaptivePadding),
-      constraints: BoxConstraints(maxWidth: containerWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +155,7 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: chunkEntry.value.asMap().entries.map((pairEntry) {
                   final globalIndex =
                       chunkEntry.key * _getChunkSize(context) + pairEntry.key;
@@ -160,20 +163,17 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
                       ? animationStates[globalIndex]
                       : false;
 
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    width: 45,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                  return SizedBox(
+                    width: itemWidth,
                     child: Text(
                       pairEntry.value,
+                      textAlign: TextAlign.center,
                       style: theme.bodyText1.copyWith(
                         color: isAnimating
                             ? theme.secondaryPurple
                             : theme.textPrimary,
                         fontFamily: 'Courier',
+                        fontSize: itemWidth < 40 ? 14 : 16,
                       ),
                     ),
                   );

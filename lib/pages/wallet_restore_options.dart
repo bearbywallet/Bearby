@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/view_item.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
@@ -10,9 +13,8 @@ import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../components/view_item.dart';
 
-class RestoreWalletOptionsPage extends StatelessWidget {
+class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
   const RestoreWalletOptionsPage({super.key});
 
   void _handleBip39Restore(BuildContext context) {
@@ -131,111 +133,97 @@ class RestoreWalletOptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    final theme = appState.currentTheme;
-
-    final backIcon = SvgPicture.asset(
-      'assets/icons/back.svg',
-      width: 24,
-      height: 24,
-      colorFilter: ColorFilter.mode(
-        theme.secondaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
-
-    final documentIcon = SvgPicture.asset(
-      'assets/icons/document.svg',
-      width: 35,
-      height: 35,
-      colorFilter: ColorFilter.mode(
-        theme.primaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
-
-    final bincodeIcon = SvgPicture.asset(
-      'assets/icons/bincode.svg',
-      width: 35,
-      height: 35,
-      colorFilter: ColorFilter.mode(
-        theme.primaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
-
-    final fileIcon = SvgPicture.asset(
-      'assets/icons/file.svg',
-      width: 35,
-      height: 35,
-      colorFilter: ColorFilter.mode(
-        theme.primaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
-
-    final qrcodeIcon = SvgPicture.asset(
-      'assets/icons/qrcode.svg',
-      width: 35,
-      height: 35,
-      colorFilter: ColorFilter.mode(
-        theme.primaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
+    final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
-      backgroundColor: theme.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: StatusBarUtils.getOverlayStyle(context),
-        leading: IconButton(
-          icon: backIcon,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          AppLocalizations.of(context)!.restoreWalletOptionsTitle,
-          style: TextStyle(color: theme.textPrimary),
-        ),
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            WalletListItem(
-              title:
-                  AppLocalizations.of(context)!.restoreWalletOptionsBIP39Title,
-              subtitle: AppLocalizations.of(context)!
-                  .restoreWalletOptionsBIP39Subtitle,
-              icon: documentIcon,
-              onTap: () => _handleBip39Restore(context),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: l10n.restoreWalletOptionsTitle,
+                  onBackPressed: () => Navigator.pop(context),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        WalletListItem(
+                          title: l10n.restoreWalletOptionsBIP39Title,
+                          subtitle: l10n.restoreWalletOptionsBIP39Subtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/document.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => _handleBip39Restore(context),
+                        ),
+                        WalletListItem(
+                          title: l10n.restoreWalletOptionsPrivateKeyTitle,
+                          subtitle: l10n.restoreWalletOptionsPrivateKeySubtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/bincode.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => _handlePrivateKeyRestore(context),
+                        ),
+                        WalletListItem(
+                          title: l10n.restoreWalletOptionsKeyStoreTitle,
+                          subtitle: l10n.restoreWalletOptionsKeyStoreSubtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/file.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => _handleKeystoreResotre(context),
+                        ),
+                        WalletListItem(
+                          title: l10n.restoreWalletOptionsQRCodeTitle,
+                          subtitle: l10n.restoreWalletOptionsQRCodeSubtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/qrcode.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => _handleQRCodeScanning(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            WalletListItem(
-              title: AppLocalizations.of(context)!
-                  .restoreWalletOptionsPrivateKeyTitle,
-              subtitle: AppLocalizations.of(context)!
-                  .restoreWalletOptionsPrivateKeySubtitle,
-              icon: bincodeIcon,
-              onTap: () => _handlePrivateKeyRestore(context),
-            ),
-            WalletListItem(
-              title: AppLocalizations.of(context)!
-                  .restoreWalletOptionsKeyStoreTitle,
-              subtitle: AppLocalizations.of(context)!
-                  .restoreWalletOptionsKeyStoreSubtitle,
-              icon: fileIcon,
-              onTap: () => _handleKeystoreResotre(context),
-            ),
-            WalletListItem(
-              title:
-                  AppLocalizations.of(context)!.restoreWalletOptionsQRCodeTitle,
-              subtitle: AppLocalizations.of(context)!
-                  .restoreWalletOptionsQRCodeSubtitle,
-              icon: qrcodeIcon,
-              onTap: () => _handleQRCodeScanning(context),
-            ),
-          ],
+          ),
         ),
       ),
     );

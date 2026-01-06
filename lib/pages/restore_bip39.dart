@@ -104,7 +104,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
 
   void _handleWordChange(int index, String word) {
     if (word.trim().contains(' ')) {
-      _handlePhrasePaste(word);
+      _handlePhrasePaste(word, startIndex: index - 1);
       return;
     }
 
@@ -131,29 +131,42 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
     }
   }
 
-  void _handlePhrasePaste(String phrase) {
+  void _handlePhrasePaste(String phrase, {int startIndex = 0}) {
     final words = phrase
         .trim()
         .split(RegExp(r'\s+'))
         .where((word) => word.isNotEmpty)
+        .map((word) => word.toLowerCase().replaceAll(RegExp(r'[^a-z]'), ''))
+        .where((word) => word.isNotEmpty)
         .toList();
 
+    if (words.isEmpty) return;
+
     int targetCount = _allowedCounts.firstWhere(
-      (count) => count >= words.length,
+      (count) => count >= (startIndex + words.length),
       orElse: () => _allowedCounts.last,
     );
 
     if (targetCount != _count) {
-      _handleCountChanged(targetCount, autoAdjust: true);
+      setState(() {
+        _count = targetCount;
+        final newWords = List<String>.filled(targetCount, '');
+        for (var i = 0; i < math.min(_words.length, targetCount); i++) {
+          newWords[i] = _words[i];
+        }
+        _words = newWords;
+        _wordsErrorIndexes = [];
+      });
     }
 
-    for (var i = 0; i < words.length && i < targetCount; i++) {
-      _words[i] = words[i].toLowerCase();
+    for (var i = 0; i < words.length && (startIndex + i) < _words.length; i++) {
+      _words[startIndex + i] = words[i];
     }
 
     setState(() {
       _showChecksumWarning = false;
       _bypassChecksumValidation = false;
+      _words = List.from(_words);
     });
 
     _validateForm();
@@ -163,7 +176,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
     }
   }
 
-  void _handleCountChanged(int newCount, {bool autoAdjust = false}) {
+  void _handleCountChanged(int newCount) {
     if (mounted) {
       setState(() {
         _count = newCount;

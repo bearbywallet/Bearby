@@ -79,141 +79,137 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
         systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-              child: CustomAppBar(
-                title: l10n.secretKeyRestorePageTitle,
-                onBackPressed: () => Navigator.pop(context),
-                actionIcon: SvgPicture.asset(
-                  'assets/icons/paste.svg',
-                  width: 30,
-                  height: 30,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: l10n.secretKeyRestorePageTitle,
+                  onBackPressed: () => Navigator.pop(context),
+                  actionIcon: SvgPicture.asset(
+                    'assets/icons/paste.svg',
+                    width: 30,
+                    height: 30,
+                    colorFilter: ColorFilter.mode(
+                      theme.textPrimary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            SmartInput(
-                              controller: _privateKeyController,
-                              hint: l10n.secretKeyRestorePageHint,
-                              onChanged: _validatePrivateKey,
-                              keyboardType: TextInputType.text,
-                              leftIconPath: 'assets/icons/key.svg',
-                              rightIconPath: _isValidating
-                                  ? 'assets/icons/loading.svg'
-                                  : null,
-                              secondaryColor: theme.textSecondary,
-                              backgroundColor: theme.cardBackground,
-                              textColor: theme.textPrimary,
-                              focusedBorderColor: theme.primaryPurple,
-                              height: 64,
-                              fontSize: 16,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              iconPadding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                            ),
-                            if (_errorMessage != null)
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
                               Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Text(
-                                  _errorMessage!,
-                                  style: theme.bodyText2.copyWith(
-                                    color: theme.danger,
-                                  ),
+                                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                                child: SmartInput(
+                                  controller: _privateKeyController,
+                                  hint: l10n.secretKeyRestorePageHint,
+                                  onChanged: _validatePrivateKey,
+                                  keyboardType: TextInputType.text,
+                                  leftIconPath: 'assets/icons/key.svg',
+                                  rightIconPath: _isValidating
+                                      ? 'assets/icons/loading.svg'
+                                      : null,
+                                  secondaryColor: theme.textSecondary,
+                                  backgroundColor: theme.cardBackground,
+                                  textColor: theme.textPrimary,
+                                  focusedBorderColor: theme.primaryPurple,
+                                  height: 64,
+                                  fontSize: 16,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  iconPadding: const EdgeInsets.symmetric(horizontal: 12),
                                 ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: HexKeyDisplay(
+                              if (_errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: theme.bodyText2.copyWith(
+                                      color: theme.danger,
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 16),
+                              HexKeyDisplay(
                                 hexKey: _keyPair.sk.isNotEmpty
                                     ? _keyPair.sk
                                     : '0000000000000000000000000000000000000000000000000000000000000000',
                                 title: l10n.secretKeyRestorePageKeyTitle,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Theme(
-                              data: Theme.of(context).copyWith(
-                                splashFactory: NoSplash.splashFactory,
-                                highlightColor: Colors.transparent,
-                              ),
-                              child: CheckboxListTile(
-                                title: Text(
-                                  l10n.secretKeyRestorePageBackupLabel,
-                                  style: theme.bodyText2.copyWith(
-                                    color: theme.textSecondary,
-                                  ),
-                                ),
-                                value: _hasBackup,
-                                onChanged: (value) {
-                                  if (!_hasBackup) {
-                                    showBackupConfirmationModal(
-                                      context: context,
-                                      onConfirmed: (confirmed) {
-                                        setState(() {
-                                          _hasBackup = confirmed;
-                                        });
-                                      },
-                                    );
-                                  }
-                                },
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                                activeColor: theme.primaryPurple,
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            splashFactory: NoSplash.splashFactory,
+                            highlightColor: Colors.transparent,
+                          ),
+                          child: CheckboxListTile(
+                            title: Text(
+                              l10n.secretKeyRestorePageBackupLabel,
+                              style: theme.bodyText2.copyWith(
+                                color: theme.textSecondary,
                               ),
                             ),
-                            CustomButton(
-                              textColor: theme.buttonText,
-                              backgroundColor: theme.primaryPurple,
-                              text: l10n.secretKeyRestorePageNextButton,
-                              onPressed: _keyPair.sk.isNotEmpty && _hasBackup
-                                  ? () {
-                                      Navigator.of(context).pushNamed(
-                                        '/net_setup',
-                                        arguments: {'keys': _keyPair},
-                                      );
-                                    }
-                                  : null,
-                              borderRadius: 30.0,
-                              height: 56.0,
-                              disabled: !(_keyPair.sk.isNotEmpty && _hasBackup),
-                            ),
-                          ],
+                            value: _hasBackup,
+                            onChanged: (value) {
+                              if (!_hasBackup) {
+                                showBackupConfirmationModal(
+                                  context: context,
+                                  onConfirmed: (confirmed) {
+                                    setState(() {
+                                      _hasBackup = confirmed;
+                                    });
+                                  },
+                                );
+                              }
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            activeColor: theme.primaryPurple,
+                          ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: adaptivePadding,
+                          right: adaptivePadding,
+                          bottom: 16,
+                        ),
+                        child: CustomButton(
+                          textColor: theme.buttonText,
+                          backgroundColor: theme.primaryPurple,
+                          text: l10n.secretKeyRestorePageNextButton,
+                          onPressed: _keyPair.sk.isNotEmpty && _hasBackup
+                              ? () {
+                                  Navigator.of(context).pushNamed(
+                                    '/net_setup',
+                                    arguments: {'keys': _keyPair},
+                                  );
+                                }
+                              : null,
+                          borderRadius: 30.0,
+                          height: 56.0,
+                          disabled: !(_keyPair.sk.isNotEmpty && _hasBackup),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

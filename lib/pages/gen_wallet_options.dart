@@ -1,81 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/view_item.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../components/view_item.dart';
 
-class GenWalletOptionsPage extends StatelessWidget {
+class GenWalletOptionsPage extends StatelessWidget with StatusBarMixin {
   const GenWalletOptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
-      backgroundColor: theme.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: StatusBarUtils.getOverlayStyle(context),
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/back.svg',
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.secondaryPurple,
-              BlendMode.srcIn,
-            ),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(AppLocalizations.of(context)!.genWalletOptionsTitle,
-            style: TextStyle(color: theme.textPrimary)),
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WalletListItem(
-                title: AppLocalizations.of(context)!.genWalletOptionsBIP39Title,
-                subtitle:
-                    AppLocalizations.of(context)!.genWalletOptionsBIP39Subtitle,
-                icon: SvgPicture.asset(
-                  'assets/icons/document.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: l10n.genWalletOptionsTitle,
+                  onBackPressed: () => Navigator.pop(context),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        WalletListItem(
+                          title: l10n.genWalletOptionsBIP39Title,
+                          subtitle: l10n.genWalletOptionsBIP39Subtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/document.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => Navigator.of(context).pushNamed('/gen_bip39'),
+                        ),
+                        WalletListItem(
+                          title: l10n.genWalletOptionsPrivateKeyTitle,
+                          subtitle: l10n.genWalletOptionsPrivateKeySubtitle,
+                          icon: SvgPicture.asset(
+                            'assets/icons/bincode.svg',
+                            width: 35,
+                            height: 35,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          onTap: () => Navigator.of(context).pushNamed('/gen_sk'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/gen_bip39');
-                },
-              ),
-              WalletListItem(
-                title: AppLocalizations.of(context)!
-                    .genWalletOptionsPrivateKeyTitle,
-                subtitle: AppLocalizations.of(context)!
-                    .genWalletOptionsPrivateKeySubtitle,
-                icon: SvgPicture.asset(
-                  'assets/icons/bincode.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/gen_sk');
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

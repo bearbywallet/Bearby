@@ -40,20 +40,26 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
     _controller = TextEditingController(text: widget.word);
     _focusNode = FocusNode();
     _focusNode.addListener(_handleFocusChange);
+    _isObscured = widget.isEditable;
   }
 
   void _handleFocusChange() {
-    setState(() {
-      _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
-    });
+    if (widget.isEditable) {
+      setState(() {
+        _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
+      });
+    }
   }
 
   @override
   void didUpdateWidget(MnemonicWordInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_shouldUpdateText && widget.word != _controller.text) {
+    final shouldForceUpdate = widget.word != _controller.text &&
+        (_shouldUpdateText || !widget.word.contains(_controller.text));
+
+    if (shouldForceUpdate) {
       _controller.text = widget.word;
-      _isObscured = !_focusNode.hasFocus && widget.word.isNotEmpty;
+      _isObscured = widget.isEditable && !_focusNode.hasFocus && widget.word.isNotEmpty;
     }
     _shouldUpdateText = true;
   }
@@ -113,9 +119,11 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
               ),
               onChanged: (value) {
                 _shouldUpdateText = false;
-                setState(() {
-                  _isObscured = !_focusNode.hasFocus && value.isNotEmpty;
-                });
+                if (widget.isEditable) {
+                  setState(() {
+                    _isObscured = !_focusNode.hasFocus && value.isNotEmpty;
+                  });
+                }
                 if (widget.onChanged != null) {
                   widget.onChanged!(widget.index, value);
                 }

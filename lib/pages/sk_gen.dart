@@ -56,141 +56,130 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
         systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-              child: CustomAppBar(
-                title: l10n.secretKeyGeneratorPageTitle,
-                onBackPressed: () => Navigator.pop(context),
-                actionIcon: SvgPicture.asset(
-                  'assets/icons/reload.svg',
-                  width: 30,
-                  height: 30,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: l10n.secretKeyGeneratorPageTitle,
+                  onBackPressed: () => Navigator.pop(context),
+                  actionIcon: SvgPicture.asset(
+                    'assets/icons/reload.svg',
+                    width: 30,
+                    height: 30,
+                    colorFilter: ColorFilter.mode(
+                      theme.textPrimary,
+                      BlendMode.srcIn,
+                    ),
                   ),
+                  onActionPressed: _regenerateKeys,
                 ),
-                onActionPressed: _regenerateKeys,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: SingleChildScrollView(
-                        child: Column(
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              HexKeyDisplay(
+                                hexKey: _keyPair.sk,
+                                title: l10n.secretKeyGeneratorPagePrivateKey,
+                              ),
+                              const SizedBox(height: 16),
+                              HexKeyDisplay(
+                                hexKey: _keyPair.pk,
+                                title: l10n.secretKeyGeneratorPagePublicKey,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: Row(
                           children: [
-                            HexKeyDisplay(
-                              hexKey: _keyPair.sk,
-                              title: l10n.secretKeyGeneratorPagePrivateKey,
+                            Expanded(
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  splashFactory: NoSplash.splashFactory,
+                                  highlightColor: Colors.transparent,
+                                ),
+                                child: CheckboxListTile(
+                                  title: Text(
+                                    l10n.secretKeyGeneratorPageBackupCheckbox,
+                                    style: theme.bodyText2.copyWith(
+                                      color: theme.textSecondary,
+                                    ),
+                                  ),
+                                  value: _hasBackupWords,
+                                  onChanged: (_) {
+                                    if (!_hasBackupWords) {
+                                      showBackupConfirmationModal(
+                                        context: context,
+                                        onConfirmed: (confirmed) {
+                                          setState(() {
+                                            _hasBackupWords = confirmed;
+                                          });
+                                        },
+                                      );
+                                    }
+                                  },
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  activeColor: theme.primaryPurple,
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 16),
-                            HexKeyDisplay(
-                              hexKey: _keyPair.pk,
-                              title: l10n.secretKeyGeneratorPagePublicKey,
+                            TileButton(
+                              icon: SvgPicture.asset(
+                                isCopied
+                                    ? "assets/icons/check.svg"
+                                    : "assets/icons/copy.svg",
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(
+                                  theme.primaryPurple,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              disabled: false,
+                              onPressed: () => _handleCopy(_keyPair.sk),
+                              backgroundColor: theme.cardBackground,
+                              textColor: theme.primaryPurple,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            constraints: const BoxConstraints(maxWidth: 480),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Theme(
-                                        data: Theme.of(context).copyWith(
-                                          splashFactory: NoSplash.splashFactory,
-                                          highlightColor: Colors.transparent,
-                                        ),
-                                        child: CheckboxListTile(
-                                          title: Text(
-                                            l10n.secretKeyGeneratorPageBackupCheckbox,
-                                            style: theme.bodyText2.copyWith(
-                                              color: theme.textSecondary,
-                                            ),
-                                          ),
-                                          value: _hasBackupWords,
-                                          onChanged: (_) {
-                                            if (!_hasBackupWords) {
-                                              showBackupConfirmationModal(
-                                                context: context,
-                                                onConfirmed: (confirmed) {
-                                                  setState(() {
-                                                    _hasBackupWords = confirmed;
-                                                  });
-                                                },
-                                              );
-                                            }
-                                          },
-                                          controlAffinity:
-                                              ListTileControlAffinity.leading,
-                                          activeColor: theme.primaryPurple,
-                                        ),
-                                      ),
-                                    ),
-                                    TileButton(
-                                      icon: SvgPicture.asset(
-                                        isCopied
-                                            ? "assets/icons/check.svg"
-                                            : "assets/icons/copy.svg",
-                                        width: 24,
-                                        height: 24,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.primaryPurple,
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                                      disabled: false,
-                                      onPressed: () async {
-                                        await _handleCopy(_keyPair.sk);
-                                      },
-                                      backgroundColor: theme.cardBackground,
-                                      textColor: theme.primaryPurple,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                CustomButton(
-                                  textColor: theme.buttonText,
-                                  backgroundColor: theme.primaryPurple,
-                                  text: l10n.secretKeyGeneratorPageNextButton,
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                      '/net_setup',
-                                      arguments: {'keys': _keyPair},
-                                    );
-                                  },
-                                  borderRadius: 30.0,
-                                  height: 56.0,
-                                  disabled: !_hasBackupWords,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: adaptivePadding,
+                          right: adaptivePadding,
+                          bottom: 16,
+                        ),
+                        child: CustomButton(
+                          textColor: theme.buttonText,
+                          backgroundColor: theme.primaryPurple,
+                          text: l10n.secretKeyGeneratorPageNextButton,
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              '/net_setup',
+                              arguments: {'keys': _keyPair},
+                            );
+                          },
+                          borderRadius: 30.0,
+                          height: 56.0,
+                          disabled: !_hasBackupWords,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
