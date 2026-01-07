@@ -8,8 +8,8 @@ mod btc_wallet_tests {
     use zilpay::rpc::network_config::ChainConfig;
 
     use crate::api::wallet::{
-        add_bip39_wallet, add_next_bip39_account, bitcoin_change_address_type,
-        get_wallets, AddNextBip39AccountParams, Bip39AddWalletParams,
+        add_bip39_wallet, add_next_bip39_account, bitcoin_change_address_type, get_wallets,
+        AddNextBip39AccountParams, Bip39AddWalletParams,
     };
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
@@ -19,7 +19,7 @@ mod btc_wallet_tests {
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
 
     #[tokio::test]
-    async fn test_create_btc_wallet_bip44_legacy() {
+    async fn test_create_btc_wallet_bip44() {
         let dir = tempdir().unwrap();
         load_service(dir.path().to_str().unwrap()).await.unwrap();
 
@@ -141,7 +141,8 @@ mod btc_wallet_tests {
             0,
             "p2pkh".to_string(),
             identifiers.clone(),
-            PASSWORD.to_string(),
+            Some(PASSWORD.to_string()),
+            None,
             Some("".to_string()),
         )
         .await
@@ -165,7 +166,8 @@ mod btc_wallet_tests {
             0,
             "p2sh".to_string(),
             identifiers.clone(),
-            PASSWORD.to_string(),
+            Some(PASSWORD.to_string()),
+            None,
             Some("".to_string()),
         )
         .await
@@ -189,7 +191,8 @@ mod btc_wallet_tests {
             0,
             "p2wpkh".to_string(),
             identifiers.clone(),
-            PASSWORD.to_string(),
+            Some(PASSWORD.to_string()),
+            None,
             Some("".to_string()),
         )
         .await
@@ -213,7 +216,8 @@ mod btc_wallet_tests {
             0,
             "p2tr".to_string(),
             identifiers.clone(),
-            PASSWORD.to_string(),
+            Some(PASSWORD.to_string()),
+            None,
             Some("".to_string()),
         )
         .await
