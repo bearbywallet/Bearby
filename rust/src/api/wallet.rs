@@ -346,14 +346,20 @@ pub async fn bitcoin_change_address_type(
     wallet_index: usize,
     new_address_type: String,
     identifiers: Vec<String>,
-    password: String,
+    password: Option<String>,
+    session_cipher: Option<String>,
     passphrase: Option<String>,
 ) -> Result<(), String> {
     with_service(|core| {
         let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
             ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
         })?;
-        let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
+        let seed = if let Some(pass) = password {
+            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        } else {
+            let session = decode_session(session_cipher)?;
+            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+        }?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let mut wallet_data = wallet
             .get_wallet_data()

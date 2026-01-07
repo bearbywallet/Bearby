@@ -158,7 +158,8 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex,
       required String newAddressType,
       required List<String> identifiers,
-      required String password,
+      String? password,
+      String? sessionCipher,
       String? passphrase});
 
   Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
@@ -839,7 +840,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required BigInt walletIndex,
       required String newAddressType,
       required List<String> identifiers,
-      required String password,
+      String? password,
+      String? sessionCipher,
       String? passphrase}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -847,7 +849,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(newAddressType, serializer);
         sse_encode_list_String(identifiers, serializer);
-        sse_encode_String(password, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_opt_String(sessionCipher, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 12, port: port_);
@@ -862,6 +865,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         newAddressType,
         identifiers,
         password,
+        sessionCipher,
         passphrase
       ],
       apiImpl: this,
@@ -876,6 +880,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "newAddressType",
           "identifiers",
           "password",
+          "sessionCipher",
           "passphrase"
         ],
       );

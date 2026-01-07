@@ -504,7 +504,8 @@ fn wire__crate__api__wallet__bitcoin_change_address_type_impl(
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_new_address_type = <String>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_password = <String>::sse_decode(&mut deserializer);
+            let api_password = <Option<String>>::sse_decode(&mut deserializer);
+            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -515,6 +516,7 @@ fn wire__crate__api__wallet__bitcoin_change_address_type_impl(
                             api_new_address_type,
                             api_identifiers,
                             api_password,
+                            api_session_cipher,
                             api_passphrase,
                         )
                         .await?;

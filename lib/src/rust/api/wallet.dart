@@ -83,13 +83,15 @@ Future<void> bitcoinChangeAddressType(
         {required BigInt walletIndex,
         required String newAddressType,
         required List<String> identifiers,
-        required String password,
+        String? password,
+        String? sessionCipher,
         String? passphrase}) =>
     RustLib.instance.api.crateApiWalletBitcoinChangeAddressType(
         walletIndex: walletIndex,
         newAddressType: newAddressType,
         identifiers: identifiers,
         password: password,
+        sessionCipher: sessionCipher,
         passphrase: passphrase);
 
 Future<KeyPairInfo> revealKeypair(
