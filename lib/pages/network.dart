@@ -15,6 +15,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/config/web3_constants.dart';
 
 const String kTestnetEnabledKey = 'testnet_enabled';
 
@@ -155,13 +156,22 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     }
   }
 
-  List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks) {
-    if (_searchQuery.isEmpty) return networks;
-    return networks
-        .where((network) => network.configInfo.name
-            .toLowerCase()
-            .contains(_searchQuery.toLowerCase()))
-        .toList();
+  List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks, NetworkConfigInfo? currentChain) {
+    var filtered = networks;
+
+    if (currentChain != null && currentChain.slip44 == kBitcoinlip44) {
+      filtered = filtered.where((network) => network.configInfo.slip44 == kBitcoinlip44).toList();
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where((network) => network.configInfo.name
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    return filtered;
   }
 
   List<NetworkItem> _getSortedNetworks(
@@ -291,7 +301,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final filtered = _getFilteredNetworks(allNetworks)
+    final filtered = _getFilteredNetworks(allNetworks, chain)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
         .toList();
     final filteredNetworks = _getSortedNetworks(filtered, chain, wallet);
