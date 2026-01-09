@@ -67,5 +67,27 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.zilpay.wallet</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>zilpay</string>
+				<string>bitcoin</string>
+				<string>ethereum</string>
+				<string>zilliqa</string>
+				<string>zil</string>
+				<string>base</string>
+				<string>bnbchain</string>
+				<string>bnb</string>
+				<string>avalanche</string>
+				<string>avax</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

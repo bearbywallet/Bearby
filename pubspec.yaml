@@ -27,6 +27,7 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   file_picker: ^10.1.2
   shared_preferences: ^2.5.3
+  app_links: ^7.0.0
 
 dev_dependencies:
   flutter_test:

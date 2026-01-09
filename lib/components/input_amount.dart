@@ -37,7 +37,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final token = appState.wallet!.tokens[widget.tokenIndex];
     final bigAmount = toDecimalsWei(widget.amount.toString(), token.decimals);

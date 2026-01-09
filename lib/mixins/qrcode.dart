@@ -58,3 +58,34 @@ Map<String, String> parseQRSecretData(String qrData) {
 
   return result;
 }
+
+Map<String, String?> parseCryptoUrl(String url) {
+  final result = <String, String?>{};
+
+  final colonIndex = url.indexOf(':');
+  if (colonIndex == -1) return result;
+
+  result['chain'] = url.substring(0, colonIndex);
+
+  final afterColon = url.substring(colonIndex + 1);
+  final questionIndex = afterColon.indexOf('?');
+
+  if (questionIndex == -1) {
+    result['address'] = afterColon;
+    return result;
+  }
+
+  result['address'] = afterColon.substring(0, questionIndex);
+
+  final queryString = afterColon.substring(questionIndex + 1);
+  final params = queryString.split('&');
+
+  for (final param in params) {
+    final keyValue = param.split('=');
+    if (keyValue.length == 2) {
+      result[keyValue[0]] = keyValue[1];
+    }
+  }
+
+  return result;
+}
