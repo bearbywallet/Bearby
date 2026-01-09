@@ -159,8 +159,11 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks, NetworkConfigInfo? currentChain) {
     var filtered = networks;
 
-    if (currentChain != null && currentChain.slip44 == kBitcoinlip44) {
-      filtered = filtered.where((network) => network.configInfo.slip44 == kBitcoinlip44).toList();
+    if (currentChain != null) {
+      final isBitcoinChain = currentChain.slip44 == kBitcoinlip44;
+      filtered = filtered.where((network) =>
+        (network.configInfo.slip44 == kBitcoinlip44) == isBitcoinChain
+      ).toList();
     }
 
     if (_searchQuery.isNotEmpty) {
