@@ -18,6 +18,7 @@ use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
+use zilpay::network::btc::BtcOperations;
 use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
 use zilpay::proto::pubkey::PubKey;
@@ -428,8 +429,33 @@ pub async fn create_token_transfer(
         .token
         .try_into()
         .map_err(|e: zilpay::errors::token::TokenError| e.to_string())?;
+
+    let final_amount = if token.native && matches!(sender_account.addr, Address::Secp256k1Bitcoin(_)) {
+        let token_balance = token
+            .balances
+            .get(&params.account_index)
+            .copied()
+            .unwrap_or(U256::ZERO);
+
+        if amount >= token_balance && token_balance > U256::ZERO {
+            let provider = core
+                .get_provider(sender_account.chain_hash)
+                .map_err(ServiceError::BackgroundError)?;
+            let unspents = provider
+                .btc_list_unspent(&sender_account.addr)
+                .await
+                .map_err(ServiceError::NetworkErrors)?;
+            let actual_balance: u64 = unspents.iter().map(|u| u.value).sum();
+            U256::from(actual_balance)
+        } else {
+            amount
+        }
+    } else {
+        amount
+    };
+
     let mut tx = core
-        .build_token_transfer(&token, &sender_account, recipient, amount)
+        .build_token_transfer(&token, &sender_account, recipient, final_amount)
         .await
         .map_err(ServiceError::BackgroundError)?;
 
