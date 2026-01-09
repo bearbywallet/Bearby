@@ -64,14 +64,32 @@ pub fn secretkey_from_provider(
     secret_key: &str,
     bip49: DerivationPath,
 ) -> Result<SecretKey, ServiceError> {
-    let sk = secret_key.strip_prefix("0x").unwrap_or(secret_key);
-    let secret_key_bytes = decode_secret_key(&sk)?;
+    let trimmed = secret_key.trim();
 
     let sk = match bip49.slip44 {
         slip44::ETHEREUM | slip44::ZILLIQA => {
+            let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
+            let secret_key_bytes = decode_secret_key(&sk)?;
             SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes)
         }
-        _ => todo!(),
+        slip44::BITCOIN => {
+            let addr_type = bip49.get_address_type();
+
+            if let Ok(sk_from_wif) = SecretKey::from_wif(trimmed, addr_type) {
+                sk_from_wif
+            } else {
+                let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
+                let secret_key_bytes = decode_secret_key(&sk)?;
+                if let Some(net) = bip49.network {
+                    SecretKey::Secp256k1Bitcoin((secret_key_bytes, net, addr_type))
+                } else {
+                    return Err(ServiceError::DecodeSecretKey);
+                }
+            }
+        }
+        _ => {
+            return Err(ServiceError::AccountTypeNotValid);
+        }
     };
 
     Ok(sk)

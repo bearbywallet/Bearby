@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
@@ -33,25 +34,48 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
     super.dispose();
   }
 
+  String _normalizeInput(String input) {
+    final trimmed = input.trim();
+    if (trimmed.startsWith('0x') || trimmed.startsWith('0X')) {
+      return trimmed.substring(2).toLowerCase();
+    }
+    return trimmed;
+  }
+
+  Future<void> _handlePaste() async {
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData?.text != null) {
+      final normalizedText = _normalizeInput(clipboardData!.text!);
+      _privateKeyController.text = normalizedText;
+      _validatePrivateKey(normalizedText);
+    }
+  }
+
   void _validatePrivateKey(String input) async {
     final l10n = AppLocalizations.of(context)!;
+    final normalized = _normalizeInput(input);
+
     setState(() {
       _isValidating = true;
       _errorMessage = null;
       _keyPair = KeyPairInfo(sk: "", pk: "");
     });
 
-    if (input.isEmpty) {
+    if (normalized.isEmpty) {
       setState(() => _isValidating = false);
       return;
     }
 
     try {
-      if (input.length != 64 || !RegExp(r'^[a-fA-F0-9]+$').hasMatch(input)) {
+      final isValidHex = normalized.length == 64 && RegExp(r'^[a-f0-9]+$').hasMatch(normalized);
+      final isPossibleWif = normalized.length == 51 || normalized.length == 52;
+
+      if (!isValidHex && !isPossibleWif) {
         throw Exception('Invalid format');
       }
+
       setState(() {
-        _keyPair = KeyPairInfo(sk: input, pk: "");
+        _keyPair = KeyPairInfo(sk: normalized, pk: "");
         _errorMessage = null;
       });
     } catch (e) {
@@ -87,8 +111,9 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                 CustomAppBar(
                   title: l10n.secretKeyRestorePageTitle,
                   onBackPressed: () => Navigator.pop(context),
+                  onActionPressed: _handlePaste,
                   actionIcon: SvgPicture.asset(
-                    'assets/icons/paste.svg',
+                    'assets/icons/copy.svg',
                     width: 30,
                     height: 30,
                     colorFilter: ColorFilter.mode(
@@ -112,6 +137,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                                   hint: l10n.secretKeyRestorePageHint,
                                   onChanged: _validatePrivateKey,
                                   keyboardType: TextInputType.text,
+                                  autofocus: true,
                                   leftIconPath: 'assets/icons/key.svg',
                                   rightIconPath: _isValidating
                                       ? 'assets/icons/loading.svg'

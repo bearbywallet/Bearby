@@ -128,7 +128,8 @@ pub async fn add_sk_wallet(
             .map(TryFrom::try_from)
             .collect::<Result<Vec<FToken>, TokenError>>()?;
         let provider = core.get_provider(params.chain_hash)?;
-        let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, None);
+        let net = provider.config.bitcoin_network();
+        let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, net);
 
         let secret_key = secretkey_from_provider(&params.sk, bip49)?;
         let session = core.add_sk_wallet(BackgroundSKParams {
@@ -384,15 +385,12 @@ pub async fn bitcoin_change_address_type(
                 }
             };
 
-            let new_path = DerivationPath::new(
-                provider.config.slip_44,
-                index,
-                new_bip_purpose,
-                net,
-            );
+            let new_path =
+                DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, net);
 
-            let keypair = zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
-                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+            let keypair =
+                zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
+                    .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
 
             account.pub_key = keypair
                 .get_pubkey()
