@@ -46,7 +46,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
 
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
@@ -127,7 +127,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: theme.background,
@@ -250,7 +250,7 @@ class AccountItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),

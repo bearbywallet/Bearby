@@ -122,7 +122,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = state.currentTheme;
     final l10n = AppLocalizations.of(context)!;

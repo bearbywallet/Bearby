@@ -89,7 +89,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final primaryColor =
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;

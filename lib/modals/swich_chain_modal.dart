@@ -69,7 +69,7 @@ class _SwitchChainNetworkContentState
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final bottomPadding = MediaQuery.of(context).padding.bottom;

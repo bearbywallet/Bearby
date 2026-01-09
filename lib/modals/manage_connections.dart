@@ -56,8 +56,8 @@ class _ConnectedDappsModalContentState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
-    final appState = Provider.of<AppState>(context);
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final appState = Provider.of<AppState>(context, listen: false);
     final connectedDapps = appState.connections;
 
     final filteredDapps = connectedDapps

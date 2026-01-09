@@ -56,7 +56,7 @@ class _TileButtonState extends State<TileButton>
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final scaleFactor = AdaptiveSize.getScaleFactor(context);
 

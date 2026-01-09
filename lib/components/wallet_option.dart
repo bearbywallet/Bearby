@@ -29,8 +29,8 @@ class WalletOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context, listen: false);
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
     final wallet = appState.wallets[walletIndex];
     final chain = appState.getChain(wallet.defaultChainHash);
 

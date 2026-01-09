@@ -72,7 +72,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);

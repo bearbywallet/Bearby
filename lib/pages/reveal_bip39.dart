@@ -122,7 +122,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = state.currentTheme;
 

@@ -77,7 +77,7 @@ class TokenTransferInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
 
     final effectiveTextColor = textColor ?? theme.textPrimary;

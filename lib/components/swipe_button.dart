@@ -86,7 +86,7 @@ class _SwipeButtonState extends State<SwipeButton>
     });
   }
 
-  Widget _buildSwipeThumb(Color secColor, ColorFilter colorFilter) {
+  Widget _buildSwipeThumb(Color secColor, ColorFilter colorFilter, Color backgroundColor) {
     return Container(
       width: widget.height - 8,
       height: widget.height - 8,
@@ -95,10 +95,7 @@ class _SwipeButtonState extends State<SwipeButton>
         borderRadius: BorderRadius.circular((widget.height - 8) / 2),
         boxShadow: [
           BoxShadow(
-            color: Provider.of<AppState>(context)
-                .currentTheme
-                .background
-                .withValues(alpha: 0.3),
+            color: backgroundColor.withValues(alpha: 0.3),
             blurRadius: 4,
           ),
         ],
@@ -112,7 +109,7 @@ class _SwipeButtonState extends State<SwipeButton>
     );
   }
 
-  Widget _buildDragBackground(Color secColor) {
+  Widget _buildDragBackground(Color secColor, Color backgroundColor) {
     return Container(
       width: _isDragging ? _dragExtent + widget.height - 8 : widget.height - 8,
       height: widget.height - 8,
@@ -137,13 +134,11 @@ class _SwipeButtonState extends State<SwipeButton>
             secColor,
             ColorFilter.mode(
               widget.disabled
-                  ? Provider.of<AppState>(context)
-                      .currentTheme
-                      .background
-                      .withValues(alpha: 0.5)
-                  : Provider.of<AppState>(context).currentTheme.background,
+                  ? backgroundColor.withValues(alpha: 0.5)
+                  : backgroundColor,
               BlendMode.srcIn,
             ),
+            backgroundColor,
           ),
         ],
       ),
@@ -156,6 +151,7 @@ class _SwipeButtonState extends State<SwipeButton>
     final bgColor = widget.backgroundColor ?? theme.primaryPurple;
     final txtColor = widget.textColor ?? theme.textPrimary;
     final secColor = widget.secondaryColor ?? theme.secondaryPurple;
+    final backgroundColor = theme.background;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -199,7 +195,7 @@ class _SwipeButtonState extends State<SwipeButton>
                 margin: const EdgeInsets.all(4),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: _buildDragBackground(secColor),
+                  child: _buildDragBackground(secColor, backgroundColor),
                 ),
               ),
             ),

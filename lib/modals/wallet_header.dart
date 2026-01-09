@@ -38,7 +38,7 @@ class _WalletModalContent extends StatefulWidget {
 class _WalletModalContentState extends State<_WalletModalContent> {
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     if (appState.wallet == null) return const SizedBox.shrink();
 
     return PopScope(

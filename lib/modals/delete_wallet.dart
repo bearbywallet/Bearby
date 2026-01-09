@@ -111,7 +111,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = widget.state.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
