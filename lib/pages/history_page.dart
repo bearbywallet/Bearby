@@ -98,9 +98,15 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
     }
   }
 
-  List<HistoricalTransactionInfo> _getSortedAndFilteredHistory() {
+  List<HistoricalTransactionInfo> _getSortedAndFilteredHistory(
+      AppState appState) {
+    final currentChainHash = appState.chain?.chainHash;
     List<HistoricalTransactionInfo> filteredHistory =
         _history.where((transaction) {
+      if (currentChainHash != null &&
+          transaction.metadata.chainHash != currentChainHash) {
+        return false;
+      }
       final searchText = _searchController.text.toLowerCase();
       return [
         transaction.transactionHash,
@@ -173,7 +179,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
         ),
       );
     }
-    final sortedHistory = _getSortedAndFilteredHistory();
+    final sortedHistory = _getSortedAndFilteredHistory(appState);
     if (sortedHistory.isEmpty) {
       return Center(
         child: Column(
