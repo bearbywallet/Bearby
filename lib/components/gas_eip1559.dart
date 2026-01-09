@@ -446,7 +446,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final chain = appState.chain!;
     final token = appState.wallet!.tokens

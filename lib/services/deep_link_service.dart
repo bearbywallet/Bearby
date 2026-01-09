@@ -66,7 +66,8 @@ class DeepLinkService {
       }
 
       if (parsed.isEmpty || parsed['address'] == null) {
-        debugPrint('[DeepLinkService] Invalid parsed data, skipping navigation');
+        debugPrint(
+            '[DeepLinkService] Invalid parsed data, skipping navigation');
         return;
       }
 
@@ -79,8 +80,10 @@ class DeepLinkService {
       final appState = Provider.of<AppState>(context, listen: false);
 
       debugPrint('[DeepLinkService] Chain: $chainName');
-      debugPrint('[DeepLinkService] Current wallet: ${appState.selectedWallet}');
-      debugPrint('[DeepLinkService] Account exists: ${appState.account != null}');
+      debugPrint(
+          '[DeepLinkService] Current wallet: ${appState.selectedWallet}');
+      debugPrint(
+          '[DeepLinkService] Account exists: ${appState.account != null}');
 
       final walletIndex = _findWalletByChainName(appState, chainName);
       debugPrint('[DeepLinkService] Found wallet index: $walletIndex');
@@ -91,7 +94,8 @@ class DeepLinkService {
 
       final deepLinkData = {
         'route': '/send',
-        'wallet_index': walletIndex != -1 ? walletIndex : appState.selectedWallet,
+        'wallet_index':
+            walletIndex != -1 ? walletIndex : appState.selectedWallet,
         'arguments': {
           'recipient': parsed['address'],
           'amount': parsed['amount'],
@@ -109,10 +113,11 @@ class DeepLinkService {
 
       if (canNavigate) {
         debugPrint('[DeepLinkService] Navigating to /send directly');
-        Navigator.of(context).pushNamed('/send', arguments: deepLinkData['arguments']);
+        Navigator.of(context)
+            .pushNamed('/send', arguments: deepLinkData['arguments']);
       } else {
-        debugPrint('[DeepLinkService] Storing for later and navigating to /login');
-        appState.setPendingDeepLink(deepLinkData);
+        debugPrint(
+            '[DeepLinkService] Storing for later and navigating to /login');
         Navigator.of(context).pushReplacementNamed('/login');
       }
 

@@ -43,7 +43,7 @@ class _LanguagePageState extends State<LanguagePage> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 

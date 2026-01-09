@@ -23,7 +23,7 @@ class TokenSelectItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final (amount, converted) = formatingAmount(
       amount: balance,

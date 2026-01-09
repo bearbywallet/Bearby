@@ -376,7 +376,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
     final l10n = AppLocalizations.of(context)!;
 

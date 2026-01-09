@@ -228,7 +228,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;

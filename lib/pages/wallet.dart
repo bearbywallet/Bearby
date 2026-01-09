@@ -265,69 +265,6 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
-  Future<void> _authenticateAndExecute({
-    required AppState appState,
-    required Future<void> Function(String password, List<String> identifiers) onAuthenticated,
-  }) async {
-    final wallet = appState.wallet;
-    if (wallet == null) return;
-
-    final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers();
-    final biometricEnabled = wallet.authType != AuthMethod.none.name;
-
-    if (biometricEnabled && mounted) {
-      final authenticated = await _authService.authenticate(
-        allowPinCode: true,
-        reason: AppLocalizations.of(context)!.walletPageBiometricReason,
-      );
-
-      if (!authenticated) return;
-
-      String? sessionCipher;
-      try {
-        sessionCipher = await _authGuard.getSession(
-          sessionKey: wallet.walletAddress,
-          requireAuth: false,
-        );
-      } catch (e) {
-        debugPrint("No session available: $e");
-      }
-
-      if (sessionCipher != null && sessionCipher.isNotEmpty) {
-        await onAuthenticated(sessionCipher, identifiers);
-      } else {
-        if (mounted) {
-          showConfirmPasswordModal(
-            context: context,
-            theme: appState.currentTheme,
-            onConfirm: (password) async {
-              try {
-                await onAuthenticated(password, identifiers);
-                return null;
-              } catch (e) {
-                return e.toString();
-              }
-            },
-          );
-        }
-      }
-    } else if (mounted) {
-      showConfirmPasswordModal(
-        context: context,
-        theme: appState.currentTheme,
-        onConfirm: (password) async {
-          try {
-            await onAuthenticated(password, identifiers);
-            return null;
-          } catch (e) {
-            return e.toString();
-          }
-        },
-      );
-    }
-  }
-
   Future<void> _executeBitcoinAddressChange({
     required AppState appState,
     required String newAddressType,
@@ -454,7 +391,7 @@ class _WalletPageState extends State<WalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 

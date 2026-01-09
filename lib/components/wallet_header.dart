@@ -51,7 +51,7 @@ class _WalletHeaderState extends State<WalletHeader>
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
     final avatarSize = AdaptiveSize.getAdaptiveIconSize(context, 50);
     final gearSize = AdaptiveSize.getAdaptiveIconSize(context, 32);

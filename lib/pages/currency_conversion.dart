@@ -117,7 +117,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final bool isRateFetchEnabled =
         appState.wallet!.settings.ratesApiOptions != 0;

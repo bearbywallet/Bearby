@@ -356,7 +356,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   }
 
   Widget _buildQrCode(AppTheme theme) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final chain = state.chain!;
 

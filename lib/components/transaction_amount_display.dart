@@ -32,7 +32,7 @@ class TransactionAmountDisplay extends StatelessWidget {
   }
 
   Widget _buildAmountDisplay(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final nativeToken = appState.wallet?.tokens.first;
     final bool isNative = token.native;

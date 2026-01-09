@@ -294,7 +294,7 @@ class _HistoryItemState extends State<HistoryItem>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 

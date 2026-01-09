@@ -80,7 +80,7 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;

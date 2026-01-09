@@ -217,7 +217,7 @@ class _BrowserPageState extends State<BrowserPage>
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final urlBarTop = appState.browserUrlBarTop && _isWebViewVisible;
@@ -279,7 +279,7 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   Widget _buildWebView() {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     return Column(
       children: [
@@ -445,7 +445,7 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   Widget _buildSearchBar(AppTheme theme) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final searchEngineIndex = appState.state.browserSettings.searchEngineIndex;
     final searchEngine = baseSearchEngines[searchEngineIndex];
     final l10n = AppLocalizations.of(context)!;

@@ -296,7 +296,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final chain = appState.chain;
     final wallet = appState.wallet;

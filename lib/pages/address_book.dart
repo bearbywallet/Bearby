@@ -85,7 +85,7 @@ class _AddressBookPageState extends State<AddressBookPage>
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 

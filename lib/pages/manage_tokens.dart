@@ -95,7 +95,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     if ((appState.chain?.chainHash != _currentChainHash ||
             appState.account?.addrType != _currentAddrType) &&
         mounted) {
@@ -399,7 +399,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);

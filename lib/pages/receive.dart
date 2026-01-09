@@ -143,7 +143,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final chain = appState.chain!;
@@ -372,7 +372,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
     BuildContext context,
     String currentAddress,
   ) {
-    final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context, listen: false);
     final token = appState.wallet!.tokens[selectedToken];
     final account = appState.account;
 
