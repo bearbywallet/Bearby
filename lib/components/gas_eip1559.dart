@@ -75,6 +75,17 @@ class GasDetails extends StatelessWidget {
     this.secondaryColor,
   });
 
+  BigInt _getGasPriceForOption() {
+    switch (selectedOption) {
+      case GasFeeOption.low:
+        return BigInt.parse(txParamsInfo.slow);
+      case GasFeeOption.market:
+        return BigInt.parse(txParamsInfo.market);
+      case GasFeeOption.aggressive:
+        return BigInt.parse(txParamsInfo.fast);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final effectiveTextColor = textColor ?? theme.textPrimary;
@@ -101,7 +112,7 @@ class GasDetails extends StatelessWidget {
               _buildDetailRow(
                 AppLocalizations.of(context)!.gasDetailsGasPrice,
                 formatGasPriceDetail(
-                  calculateGasPrice(selectedOption, txParamsInfo.gasPrice),
+                  _getGasPriceForOption(),
                   token,
                 ),
                 effectiveTextColor,
@@ -290,7 +301,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       return BigInt.zero;
     }
 
-    return gasLimit * gasPriceForOption;
+    return gasPriceForOption;
   }
 
   void _handleOptionTap(GasFeeOption option) {

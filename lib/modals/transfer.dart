@@ -251,7 +251,8 @@ class _ConfirmTransactionContentState
   Future<void> _updateTxParams(RequiredTxParamsInfo params) async {
     try {
       final appState = context.read<AppState>();
-      final balance = widget.token.balances[appState.wallet!.selectedAccount] ?? '0';
+      final balance =
+          widget.token.balances[appState.wallet!.selectedAccount] ?? '0';
 
       final updatedTx = await updateTxWithParams(
         tx: _currentTx,

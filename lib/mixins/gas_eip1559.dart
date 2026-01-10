@@ -12,7 +12,8 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
       final multiplied = priorityFee * BigInt.from(kGasPriceMultiplierMarket);
       return multiplied ~/ BigInt.from(100);
     case GasFeeOption.aggressive:
-      final multiplied = priorityFee * BigInt.from(kGasPriceMultiplierAggressive);
+      final multiplied =
+          priorityFee * BigInt.from(kGasPriceMultiplierAggressive);
       return multiplied ~/ BigInt.from(100);
   }
 }
