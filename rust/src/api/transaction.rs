@@ -430,29 +430,30 @@ pub async fn create_token_transfer(
         .try_into()
         .map_err(|e: zilpay::errors::token::TokenError| e.to_string())?;
 
-    let final_amount = if token.native && matches!(sender_account.addr, Address::Secp256k1Bitcoin(_)) {
-        let token_balance = token
-            .balances
-            .get(&params.account_index)
-            .copied()
-            .unwrap_or(U256::ZERO);
+    let final_amount =
+        if token.native && matches!(sender_account.addr, Address::Secp256k1Bitcoin(_)) {
+            let token_balance = token
+                .balances
+                .get(&params.account_index)
+                .copied()
+                .unwrap_or(U256::ZERO);
 
-        if amount >= token_balance && token_balance > U256::ZERO {
-            let provider = core
-                .get_provider(sender_account.chain_hash)
-                .map_err(ServiceError::BackgroundError)?;
-            let unspents = provider
-                .btc_list_unspent(&sender_account.addr)
-                .await
-                .map_err(ServiceError::NetworkErrors)?;
-            let actual_balance: u64 = unspents.iter().map(|u| u.value).sum();
-            U256::from(actual_balance)
+            if amount >= token_balance && token_balance > U256::ZERO {
+                let provider = core
+                    .get_provider(sender_account.chain_hash)
+                    .map_err(ServiceError::BackgroundError)?;
+                let unspents = provider
+                    .btc_list_unspent(&sender_account.addr)
+                    .await
+                    .map_err(ServiceError::NetworkErrors)?;
+                let actual_balance: u64 = unspents.iter().map(|u| u.value).sum();
+                U256::from(actual_balance)
+            } else {
+                amount
+            }
         } else {
             amount
-        }
-    } else {
-        amount
-    };
+        };
 
     let mut tx = core
         .build_token_transfer(&token, &sender_account, recipient, final_amount)
@@ -589,11 +590,13 @@ pub async fn stop_history_worker() -> Result<(), String> {
 pub async fn update_tx_with_params(
     tx: TransactionRequestInfo,
     params: RequiredTxParamsInfo,
+    balance: String,
 ) -> Result<TransactionRequestInfo, String> {
     let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
     let params: RequiredTxParams = params.into();
+    let balance: U256 = balance.parse().unwrap_or_default();
 
-    update_tx_from_params(&mut tx, params).map_err(ServiceError::TransactionErrors)?;
+    update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
 
     Ok(tx.into())
 }

@@ -4222,13 +4222,17 @@ fn wire__crate__api__transaction__update_tx_with_params_impl(
             );
             let api_params =
                 <crate::models::gas::RequiredTxParamsInfo>::sse_decode(&mut deserializer);
+            let api_balance = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::transaction::update_tx_with_params(api_tx, api_params)
-                                .await?;
+                        let output_ok = crate::api::transaction::update_tx_with_params(
+                            api_tx,
+                            api_params,
+                            api_balance,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,

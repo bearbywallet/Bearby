@@ -139,9 +139,10 @@ Future<void> stopHistoryWorker() =>
 
 Future<TransactionRequestInfo> updateTxWithParams(
         {required TransactionRequestInfo tx,
-        required RequiredTxParamsInfo params}) =>
-    RustLib.instance.api
-        .crateApiTransactionUpdateTxWithParams(tx: tx, params: params);
+        required RequiredTxParamsInfo params,
+        required String balance}) =>
+    RustLib.instance.api.crateApiTransactionUpdateTxWithParams(
+        tx: tx, params: params, balance: balance);
 
 class Eip712Hashes {
   final Uint8List domainSeparator;
