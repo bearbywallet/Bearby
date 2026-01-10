@@ -400,8 +400,19 @@ pub async fn bitcoin_change_address_type(
                 .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
         }
 
+        let mut ftokens = wallet
+            .get_ftokens()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        ftokens.iter_mut().for_each(|t| {
+            t.balances.clear();
+        });
+
         wallet
             .save_wallet_data(wallet_data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        wallet
+            .save_ftokens(&ftokens)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())

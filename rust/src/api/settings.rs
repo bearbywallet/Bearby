@@ -78,6 +78,17 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: String) -> Result<(
 
         data.settings.features.currency_convert = currency;
 
+        let mut ftokens = wallet
+            .get_ftokens()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        ftokens.iter_mut().for_each(|t| {
+            t.rate = 0.0;
+        });
+
+        wallet
+            .save_ftokens(&ftokens)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         wallet
             .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
