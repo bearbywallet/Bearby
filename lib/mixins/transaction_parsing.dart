@@ -457,7 +457,32 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
       return inputTotal - outputTotal;
     }
-    return btcReceipt?.fee ?? evmReceipt?.fee ?? scillaReceipt?.fee ?? BigInt.zero;
+
+    if (evm != null) {
+      final receipt = evmReceipt;
+      if (receipt?.fee != null) return receipt!.fee!;
+
+      final gasUsed = receipt?.gasUsed;
+      final effectivePrice = receipt?.effectiveGasPrice ?? receipt?.gasPrice;
+
+      if (gasUsed != null && effectivePrice != null) {
+        return gasUsed * effectivePrice;
+      }
+    }
+
+    if (scilla != null) {
+      final receipt = scillaReceipt;
+      if (receipt?.fee != null) return receipt!.fee!;
+
+      final gasLimit = receipt?.gasLimit;
+      final gasPrice = receipt?.gasPrice;
+
+      if (gasLimit != null && gasPrice != null) {
+        return gasLimit * gasPrice;
+      }
+    }
+
+    return btcReceipt?.fee ?? BigInt.zero;
   }
 
   String? get sig {

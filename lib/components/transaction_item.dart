@@ -258,10 +258,7 @@ class _HistoryItemState extends State<HistoryItem>
       return const SizedBox.shrink();
     }
 
-    final decimals =
-        widget.transaction.chainType == "EVM" && baseToken.decimals < 18
-            ? 18
-            : baseToken.decimals;
+    final decimals = widget.transaction.chainType == "EVM" ? 18 : baseToken.decimals;
 
     final (formattedValue, convertedValue) = formatingAmount(
       amount: widget.transaction.fee,
