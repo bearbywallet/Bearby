@@ -64,8 +64,8 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
 
       final numAmount = double.parse(_amount);
       final token = wallet.tokens[_tokenIndex];
-      final bigBalance = BigInt.parse(
-          token.balances[wallet.selectedAccount] ?? '0');
+      final bigBalance =
+          BigInt.parse(token.balances[wallet.selectedAccount] ?? '0');
       final balance =
           fromWei(value: bigBalance.toString(), decimals: token.decimals);
 
@@ -296,6 +296,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       _btnController.error();
 
       String errorMessage = e.toString();
+      debugPrint(errorMessage);
 
       showDialog(
         context: context,
