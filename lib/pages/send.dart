@@ -54,10 +54,18 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     }
 
     try {
+      final wallet = _appState.wallet;
+      if (wallet == null ||
+          wallet.tokens.isEmpty ||
+          _tokenIndex < 0 ||
+          _tokenIndex >= wallet.tokens.length) {
+        return false;
+      }
+
       final numAmount = double.parse(_amount);
-      final token = _appState.wallet!.tokens[_tokenIndex];
+      final token = wallet.tokens[_tokenIndex];
       final bigBalance = BigInt.parse(
-          token.balances[_appState.wallet!.selectedAccount] ?? '0');
+          token.balances[wallet.selectedAccount] ?? '0');
       final balance =
           fromWei(value: bigBalance.toString(), decimals: token.decimals);
 
@@ -185,8 +193,12 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       final args =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       final int? argTokenIndex = args?['token_index'];
+      final wallet = _appState.wallet;
 
-      if (argTokenIndex != null) {
+      if (argTokenIndex != null &&
+          wallet != null &&
+          argTokenIndex >= 0 &&
+          argTokenIndex < wallet.tokens.length) {
         setState(() {
           _tokenIndex = argTokenIndex;
         });
@@ -245,8 +257,9 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     _btnController.start();
 
     try {
-      BigInt accountIndex = appState.wallet!.selectedAccount;
-      FTokenInfo token = appState.wallet!.tokens[_tokenIndex];
+      final wallet = appState.wallet!;
+      BigInt accountIndex = wallet.selectedAccount;
+      FTokenInfo token = wallet.tokens[_tokenIndex];
       TokenTransferParamsInfo params = TokenTransferParamsInfo(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: accountIndex,

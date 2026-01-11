@@ -39,10 +39,19 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens[widget.tokenIndex];
+    final wallet = appState.wallet;
+
+    if (wallet == null ||
+        wallet.tokens.isEmpty ||
+        widget.tokenIndex < 0 ||
+        widget.tokenIndex >= wallet.tokens.length) {
+      return Container();
+    }
+
+    final token = wallet.tokens[widget.tokenIndex];
     final bigAmount = toDecimalsWei(widget.amount.toString(), token.decimals);
     final bigBalance =
-        BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
+        BigInt.parse(token.balances[wallet.selectedAccount] ?? '0');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -98,6 +107,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
 
     final fontSize = _calculateAdaptiveFontSize(context, widget.amount);
+    final showConverted =
+        appState.wallet?.settings.currencyConvert != null &&
+            converted.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,8 +124,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        if (appState.wallet?.settings.currencyConvert != null &&
-            converted.isNotEmpty)
+        if (showConverted)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
