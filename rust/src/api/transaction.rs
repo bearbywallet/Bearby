@@ -446,6 +446,13 @@ pub async fn create_token_transfer(
                     .btc_list_unspent(&sender_account.addr)
                     .await
                     .map_err(ServiceError::NetworkErrors)?;
+
+                if unspents.is_empty() {
+                    return Err(ServiceError::BackgroundError(
+                        BackgroundError::BincodeError("No UTXOs available".to_string())
+                    ).into());
+                }
+
                 let actual_balance: u64 = unspents.iter().map(|u| u.value).sum();
                 U256::from(actual_balance)
             } else {
