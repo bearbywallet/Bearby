@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -35,28 +36,7 @@ class _WalletModalContent extends StatefulWidget {
   State<_WalletModalContent> createState() => _WalletModalContentState();
 }
 
-class _WalletModalContentState extends State<_WalletModalContent>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
+class _WalletModalContentState extends State<_WalletModalContent> {
 
   @override
   Widget build(BuildContext context) {
@@ -169,53 +149,22 @@ class _WalletModalContentState extends State<_WalletModalContent>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          GestureDetector(
-            onTapDown: (_) => _animationController.forward(),
-            onTapUp: (_) {
-              _animationController.reverse();
-              _lockWallet();
-            },
-            onTapCancel: () => _animationController.reverse(),
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      theme.primaryPurple.withValues(alpha: 0.2),
-                      theme.primaryPurple.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: theme.primaryPurple.withValues(alpha: 0.3),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.primaryPurple.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/icons/lock.svg',
-                    width: 32,
-                    height: 32,
-                    colorFilter: ColorFilter.mode(
-                      theme.primaryPurple,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
+          TileButton(
+            icon: SvgPicture.asset(
+              'assets/icons/lock.svg',
+              width: 32,
+              height: 32,
+              colorFilter: ColorFilter.mode(
+                theme.primaryPurple,
+                BlendMode.srcIn,
               ),
+            ),
+            onPressed: _lockWallet,
+            backgroundColor: theme.primaryPurple.withValues(alpha: 0.15),
+            textColor: theme.primaryPurple,
+            defaultBorderSide: BorderSide(
+              color: theme.primaryPurple.withValues(alpha: 0.3),
+              width: 2,
             ),
           ),
           const SizedBox(height: 16),
