@@ -225,6 +225,8 @@ class _ConfirmTransactionContentState
         accountIndex: appState.wallet!.selectedAccount,
       );
 
+      if (!mounted) return;
+
       final selectedValue = _getValueForOption(_userSelectedOption, gas);
       final updatedGas = RequiredTxParamsInfo(
         gasPrice: gas.gasPrice,
@@ -249,6 +251,8 @@ class _ConfirmTransactionContentState
   }
 
   Future<void> _updateTxParams(RequiredTxParamsInfo params) async {
+    if (!mounted) return;
+
     try {
       final appState = context.read<AppState>();
       final balance =
@@ -260,12 +264,12 @@ class _ConfirmTransactionContentState
         balance: balance,
       );
 
-      if (mounted) {
-        setState(() {
-          _txParamsInfo = params;
-          _currentTx = updatedTx;
-        });
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _txParamsInfo = params;
+        _currentTx = updatedTx;
+      });
     } catch (e) {
       debugPrint('Update tx params error: $e');
       if (mounted) {
@@ -274,8 +278,11 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Future<bool> _authenticate() async => _authService.authenticate(
-      allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
+  Future<bool> _authenticate() async {
+    if (!mounted) return false;
+    return _authService.authenticate(
+        allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
+  }
 
   Future<HistoricalTransactionInfo?> _signAndSendLedger(
     AppState appState,
@@ -701,8 +708,7 @@ class _ConfirmTransactionContentState
         ),
       );
     } catch (e) {
-      setState(() => _error = AppLocalizations.of(context)!
-          .confirmTransactionContentFailedLoadTransfer);
+      debugPrint('Transfer details error: $e');
       return const SizedBox.shrink();
     }
   }
