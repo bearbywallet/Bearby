@@ -61,6 +61,7 @@ class GasDetails extends StatelessWidget {
   final FTokenInfo token;
   final AppTheme theme;
   final bool disabled;
+  final bool isBitcoin;
   final Color? textColor;
   final Color? secondaryColor;
 
@@ -71,6 +72,7 @@ class GasDetails extends StatelessWidget {
     required this.token,
     required this.theme,
     required this.disabled,
+    this.isBitcoin = false,
     this.textColor,
     this.secondaryColor,
   });
@@ -114,6 +116,7 @@ class GasDetails extends StatelessWidget {
                 formatGasPriceDetail(
                   _getGasPriceForOption(),
                   token,
+                  isBitcoin: isBitcoin,
                 ),
                 effectiveTextColor,
                 effectiveSecondaryColor,
@@ -124,6 +127,7 @@ class GasDetails extends StatelessWidget {
                   formatGasPriceDetail(
                     txParamsInfo.feeHistory.baseFee,
                     token,
+                    isBitcoin: isBitcoin,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -134,6 +138,7 @@ class GasDetails extends StatelessWidget {
                   formatGasPriceDetail(
                     txParamsInfo.maxPriorityFee,
                     token,
+                    isBitcoin: isBitcoin,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -146,6 +151,7 @@ class GasDetails extends StatelessWidget {
                     txParamsInfo.feeHistory.baseFee +
                         txParamsInfo.maxPriorityFee,
                     token,
+                    isBitcoin: isBitcoin,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -342,7 +348,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         widget.secondaryColor ?? theme.textSecondary;
 
     final isSelected = _selectedOption == option;
-    final confirmationTime = option.confirmationTime(widget.timeDiffBlock);
 
     final totalGasFee = _calculateDisplayFee(option);
     final (normalizedGasFee, convertedGasFee) = formatingAmount(
@@ -387,24 +392,12 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           style: theme.bodyText1,
                         ),
                         const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              option.title(context),
-                              style: theme.bodyText1.copyWith(
-                                color: effectiveTextColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              confirmationTime,
-                              style: theme.caption.copyWith(
-                                color: effectiveSecondaryColor,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          option.title(context),
+                          style: theme.bodyText1.copyWith(
+                            color: effectiveTextColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Expanded(
                           child: Column(
@@ -441,6 +434,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           token: token,
                           theme: theme,
                           disabled: widget.disabled,
+                          isBitcoin: widget.isBitcoin,
                           textColor: effectiveTextColor,
                           secondaryColor: effectiveSecondaryColor,
                         ),

@@ -92,7 +92,11 @@ BigInt calculateTotalGasCost(
   }
 }
 
-String formatGasPriceDetail(BigInt price, FTokenInfo token) {
+String formatGasPriceDetail(BigInt price, FTokenInfo token, {bool isBitcoin = false}) {
+  if (isBitcoin) {
+    return '$price Sat';
+  }
+
   final gwei = price / BigInt.from(10).pow(9);
 
   if (gwei < 0.1) {
