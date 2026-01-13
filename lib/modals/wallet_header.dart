@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
+import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 void showWalletModal({
   required BuildContext context,
@@ -35,7 +35,29 @@ class _WalletModalContent extends StatefulWidget {
   State<_WalletModalContent> createState() => _WalletModalContentState();
 }
 
-class _WalletModalContentState extends State<_WalletModalContent> {
+class _WalletModalContentState extends State<_WalletModalContent>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
@@ -79,60 +101,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onManageWallet,
-          child: Column(
-            children: [
-              if (appState.chain != null)
-                Container(
-                  width: 50,
-                  height: 50,
-                  margin: const EdgeInsets.only(top: 8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: theme.primaryPurple.withValues(alpha: 0.1),
-                        width: 2),
-                  ),
-                  child: AsyncImage(
-                    url:
-                        viewChain(network: appState.chain!, theme: theme.value),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.contain,
-                    errorWidget: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.background,
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/icons/warning.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: ColorFilter.mode(
-                          theme.textSecondary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    loadingWidget:
-                        const CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              Text(
-                wallet.walletName,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
+        _buildHeader(appState, theme, wallet),
         ConstrainedBox(
           constraints: BoxConstraints(
               maxHeight: MediaQuery.sizeOf(context).height * 0.5),
@@ -193,6 +162,79 @@ class _WalletModalContentState extends State<_WalletModalContent> {
         SizedBox(height: MediaQuery.paddingOf(context).bottom),
       ],
     );
+  }
+
+  Widget _buildHeader(AppState appState, AppTheme theme, WalletInfo wallet) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTapDown: (_) => _animationController.forward(),
+            onTapUp: (_) {
+              _animationController.reverse();
+              _lockWallet();
+            },
+            onTapCancel: () => _animationController.reverse(),
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.primaryPurple.withValues(alpha: 0.2),
+                      theme.primaryPurple.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: theme.primaryPurple.withValues(alpha: 0.3),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryPurple.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/lock.svg',
+                    width: 32,
+                    height: 32,
+                    colorFilter: ColorFilter.mode(
+                      theme.primaryPurple,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            wallet.walletName,
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _lockWallet() {
+    Navigator.pop(context);
+    widget.onManageWallet?.call();
   }
 
   Future<void> _selectWallet(int index) async {

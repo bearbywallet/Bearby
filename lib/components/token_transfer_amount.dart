@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
 
 class TokenTransferInfo extends StatelessWidget {
   final String fromAddress;
   final String toAddress;
   final String? fromName;
   final String? toName;
-  final bool disabled;
   final Color? textColor;
   final Color? secondaryColor;
 
@@ -22,55 +19,44 @@ class TokenTransferInfo extends StatelessWidget {
     required this.toAddress,
     this.fromName,
     this.toName,
-    this.disabled = false,
     this.textColor,
     this.secondaryColor,
   });
 
-  Future<void> _copyToClipboard(BuildContext context, String text) async {
-    await Clipboard.setData(ClipboardData(text: text));
-  }
-
-  Widget _buildAddressButton(
+  Widget _buildAddressInfo(
     BuildContext context,
     String address,
     String? name,
-    AppTheme theme,
-    Color effectiveTextColor,
+    Color textColor,
   ) {
+    final state = Provider.of<AppState>(context, listen: false);
+    final theme = state.currentTheme;
+    final displayName = name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown;
+
     return Expanded(
       flex: 3,
-      child: TextButton(
-        onPressed: () => _copyToClipboard(context, address),
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          splashFactory: NoSplash.splashFactory,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown,
-              style: theme.overline.copyWith(
-                color: effectiveTextColor.withValues(alpha: 0.7),
-                fontSize: 8,
-              ),
-              overflow: TextOverflow.ellipsis,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            displayName,
+            style: theme.overline.copyWith(
+              color: textColor.withValues(alpha: 0.7),
+              fontSize: 8,
             ),
-            const SizedBox(height: 2),
-            Text(
-              shortenAddress(address),
-              style: theme.overline.copyWith(
-                color: effectiveTextColor.withValues(alpha: 0.7),
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            shortenAddress(address),
+            style: theme.overline.copyWith(
+              color: textColor.withValues(alpha: 0.7),
+              letterSpacing: 0.5,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -79,7 +65,6 @@ class TokenTransferInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
-
     final effectiveTextColor = textColor ?? theme.textPrimary;
     final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
 
@@ -92,13 +77,7 @@ class TokenTransferInfo extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildAddressButton(
-            context,
-            fromAddress,
-            fromName,
-            theme,
-            effectiveTextColor,
-          ),
+          _buildAddressInfo(context, fromAddress, fromName, effectiveTextColor),
           Expanded(
             flex: 4,
             child: Container(
@@ -118,13 +97,7 @@ class TokenTransferInfo extends StatelessWidget {
               ),
             ),
           ),
-          _buildAddressButton(
-            context,
-            toAddress,
-            toName,
-            theme,
-            effectiveTextColor,
-          ),
+          _buildAddressInfo(context, toAddress, toName, effectiveTextColor),
         ],
       ),
     );
