@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
@@ -32,11 +33,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with TickerProviderStateMixin, StatusBarMixin {
-  bool _isFirstLoad = true;
   String? _errorMessage;
   late AnimationController _animationController;
   late Animation<double> _heightAnimation;
   late Animation<double> _opacityAnimation;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
 
   @override
   void initState() {
@@ -63,11 +68,8 @@ class _HomePageState extends State<HomePage>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_isFirstLoad) {
-        _isFirstLoad = false;
-        final appState = Provider.of<AppState>(context, listen: false);
-        _refreshData(appState);
-      }
+      final appState = Provider.of<AppState>(context, listen: false);
+      _refreshData(appState);
     });
   }
 
@@ -239,7 +241,8 @@ class _HomePageState extends State<HomePage>
                 title: l10n.homePageSendButton,
                 onPressed: () {
                   if (filteredTokens.isNotEmpty) {
-                    final originalIndex = appState.wallet!.tokens.indexOf(filteredTokens[0]);
+                    final originalIndex =
+                        appState.wallet!.tokens.indexOf(filteredTokens[0]);
                     Navigator.of(context).pushNamed(
                       '/send',
                       arguments: {'token_index': originalIndex},

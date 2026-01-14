@@ -156,14 +156,16 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     }
   }
 
-  List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks, NetworkConfigInfo? currentChain) {
+  List<NetworkItem> _getFilteredNetworks(
+      List<NetworkItem> networks, NetworkConfigInfo? currentChain) {
     var filtered = networks;
 
     if (currentChain != null) {
       final isBitcoinChain = currentChain.slip44 == kBitcoinlip44;
-      filtered = filtered.where((network) =>
-        (network.configInfo.slip44 == kBitcoinlip44) == isBitcoinChain
-      ).toList();
+      filtered = filtered
+          .where((network) =>
+              (network.configInfo.slip44 == kBitcoinlip44) == isBitcoinChain)
+          .toList();
     }
 
     if (_searchQuery.isNotEmpty) {
@@ -177,8 +179,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     return filtered;
   }
 
-  List<NetworkItem> _getSortedNetworks(
-      List<NetworkItem> networks, NetworkConfigInfo? chain, WalletInfo? wallet) {
+  List<NetworkItem> _getSortedNetworks(List<NetworkItem> networks,
+      NetworkConfigInfo? chain, WalletInfo? wallet) {
     final sortedNetworks = List<NetworkItem>.from(networks);
 
     sortedNetworks.sort((a, b) {
