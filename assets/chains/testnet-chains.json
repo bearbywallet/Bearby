@@ -333,5 +333,41 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Kaia Kairos Testnet",
+    "chain": "KAIA",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://public-en-kairos.node.kaia.io",
+      "https://rpc.ankr.com/kaia_testnet"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/kaia/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Kaia",
+        "symbol": "KAIA",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [1001, 0],
+    "infoURL": "https://kaia.io",
+    "testnet": true,
+    "shortName": "kaia",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Kaiascan",
+        "url": "https://kairos.kaiascan.io",
+        "icon": "https://kaiascan.io/favicon.ico",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
