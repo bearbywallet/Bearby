@@ -214,7 +214,7 @@ class _SwitchChainNetworkContentState
     final filteredNetworks = <NetworkConfigInfo>[];
 
     for (final network in networks) {
-      if (network.chainIds.contains(widget.selectedChainId)) {
+      if (network.chainIds.first == widget.selectedChainId) {
         selectedNetwork = network;
         setState(() {
           _selectedNetwork = network;
