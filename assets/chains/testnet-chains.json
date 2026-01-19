@@ -252,5 +252,47 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Arbitrum Sepolia",
+    "chain": "ARB",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://sepolia-rollup.arbitrum.io/rpc",
+      "https://arbitrum-sepolia.drpc.org",
+      "https://arbitrum-sepolia-rpc.publicnode.com",
+      "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/arbitrum/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Arbitrum",
+        "symbol": "ARB",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [
+      421614,
+      0
+    ],
+    "infoURL": "https://arbitrum.io",
+    "testnet": true,
+    "shortName": "arbitrum",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Arbiscan",
+        "url": "https://sepolia.arbiscan.io",
+        "icon": "https://arbiscan.io/images/svg/logo.svg",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]

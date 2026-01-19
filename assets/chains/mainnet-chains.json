@@ -300,6 +300,56 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Arbitrum One",
+    "chain": "ARB",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://arb1.arbitrum.io/rpc",
+      "https://arbitrum.drpc.org",
+      "https://arbitrum-one.publicnode.com",
+      "https://arbitrum-one-mainnet.gateway.tatum.io",
+      "https://1rpc.io/arb",
+      "https://arbitrum.public.blockpi.network/v1/rpc/public",
+      "https://public-arb-mainnet.fastnode.io",
+      "https://arbitrum.lava.build",
+      "https://arb.leorpc.com/?api_key=FREE",
+      "https://arbitrum-one-public.nodies.app",
+      "https://arbitrum.api.onfinality.io/public",
+      "https://arb-one.api.pocket.network",
+      "https://arbitrum.rpc.subquery.network/public",
+      "https://arbitrum.gateway.tenderly.co",
+      "https://arbitrum.rpc.thirdweb.com"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/arbitrum/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [42161, 0],
+    "infoURL": "https://arbitrum.io",
+    "testnet": false,
+    "shortName": "arbitrum",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Arbiscan",
+        "url": "https://arbiscan.io",
+        "icon": "https://arbiscan.io/images/svg/logo.svg",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
 
