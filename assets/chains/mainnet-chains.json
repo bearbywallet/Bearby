@@ -431,6 +431,52 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Optimism",
+    "chain": "OP",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://mainnet.optimism.io",
+      "https://optimism.publicnode.com",
+      "https://optimism.drpc.org",
+      "https://1rpc.io/op",
+      "https://optimism.gateway.tenderly.co"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/optimism/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Optimism",
+        "symbol": "OP",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [10, 0],
+    "infoURL": "https://optimism.io",
+    "testnet": false,
+    "shortName": "optimism",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Optimism Explorer",
+        "url": "https://explorer.optimism.io",
+        "icon": "https://explorer.optimism.io/favicon.ico",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Etherscan",
+        "url": "https://optimistic.etherscan.io",
+        "icon": "https://optimistic.etherscan.io/images/svg/logo.svg",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
 

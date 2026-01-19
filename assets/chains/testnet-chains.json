@@ -369,5 +369,50 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Optimism Sepolia",
+    "chain": "OP",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://sepolia.optimism.io",
+      "https://optimism-sepolia.drpc.org",
+      "https://optimism-sepolia-rpc.publicnode.com",
+      "https://optimism-sepolia.gateway.tenderly.co"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/optimism/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Optimism",
+        "symbol": "OP",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [11155420, 0],
+    "infoURL": "https://optimism.io",
+    "testnet": true,
+    "shortName": "optimism",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Optimism Sepolia Explorer",
+        "url": "https://sepolia-optimism.etherscan.io",
+        "icon": "https://sepolia-optimism.etherscan.io/assets/opsepolia/images/favicon.ico",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Blockscout",
+        "url": "https://optimism-sepolia.blockscout.com",
+        "icon": "https://testnet-explorer.optimism.io/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
