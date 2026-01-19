@@ -294,5 +294,44 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Polygon Amoy Testnet",
+    "chain": "POL",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://rpc-amoy.polygon.technology",
+      "https://polygon-amoy-bor.publicnode.com",
+      "https://polygon-amoy.drpc.org",
+      "https://polygon-amoy.gateway.tenderly.co",
+      "https://polygon-amoy.publicnode.com"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/polygon/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Polygon",
+        "symbol": "POLt",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [80002, 0],
+    "infoURL": "https://polygon.technology",
+    "testnet": true,
+    "shortName": "polygon",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Polygonscan",
+        "url": "https://amoy.polygonscan.com",
+        "icon": "https://polygonscan.com/assets/generic/html/favicon.ico",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
