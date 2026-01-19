@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/network_card.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -130,27 +129,29 @@ class _SwitchChainNetworkContentState
   Widget _buildNetworkList(List<NetworkConfigInfo> networks, AppTheme theme,
       double padding, AppLocalizations l10n) {
     return Expanded(
-      child: ListView.separated(
+      child: ListView(
         padding: EdgeInsets.symmetric(
           horizontal: padding,
           vertical: padding / 2,
         ),
-        itemCount: networks.length,
-        separatorBuilder: (context, index) => Divider(
-          height: 1,
-          color: theme.textSecondary.withValues(alpha: 0.1),
-        ),
-        itemBuilder: (context, index) {
-          final network = networks[index];
+        children: networks.map((network) {
           final isSelected = _selectedNetwork?.chainId == network.chainId;
 
-          return _buildNetworkItem(
-            network: network,
+          return NetworkCard(
+            configInfo: network,
+            isAdded: true,
+            isDefault: false,
             isSelected: isSelected,
-            theme: theme,
-            l10n: l10n,
+            isTestnet: network.testnet ?? false,
+            iconUrl: viewChain(network: network, theme: theme.value),
+            onNetworkSelect: (config) {
+              setState(() {
+                _selectedNetwork = config;
+              });
+            },
+            onNetworkEdit: null,
           );
-        },
+        }).toList(),
       ),
     );
   }
@@ -228,151 +229,5 @@ class _SwitchChainNetworkContentState
     }
 
     return networks;
-  }
-
-  Widget _buildNetworkItem({
-    required NetworkConfigInfo network,
-    required bool isSelected,
-    required AppTheme theme,
-    required AppLocalizations l10n,
-  }) {
-    final isTestnet = network.testnet ?? false;
-
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedNetwork = network;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: isSelected
-              ? theme.primaryPurple.withValues(alpha: 0.1)
-              : Colors.transparent,
-        ),
-        child: Row(
-          children: [
-            _buildNetworkLogo(network, isSelected, theme),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildNetworkNameRow(
-                      network, isSelected, isTestnet, theme, l10n),
-                  const SizedBox(height: 4),
-                  _buildNetworkDetailsRow(network, theme, l10n),
-                ],
-              ),
-            ),
-            if (isSelected)
-              SvgPicture.asset(
-                'assets/icons/ok.svg',
-                width: 24,
-                height: 24,
-                colorFilter:
-                    ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNetworkLogo(
-      NetworkConfigInfo network, bool isSelected, AppTheme theme) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isSelected
-              ? theme.primaryPurple
-              : theme.textSecondary.withValues(alpha: 0.2),
-          width: 2,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: viewChain(network: network, theme: theme.value),
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          errorWidget: SvgPicture.asset(
-            'assets/icons/warning.svg',
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
-          ),
-          loadingWidget: Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: theme.primaryPurple,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNetworkNameRow(
-    NetworkConfigInfo network,
-    bool isSelected,
-    bool isTestnet,
-    AppTheme theme,
-    AppLocalizations l10n,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            network.name,
-            style: (isSelected ? theme.labelLarge : theme.bodyLarge).copyWith(color: theme.textPrimary),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (isTestnet)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            margin: const EdgeInsets.only(left: 4),
-            decoration: BoxDecoration(
-              color: theme.warning.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              l10n.switchChainNetworkContentTestnetLabel,
-              style: theme.labelSmall.copyWith(color: theme.warning),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildNetworkDetailsRow(
-      NetworkConfigInfo network, AppTheme theme, AppLocalizations l10n) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: theme.primaryPurple.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            network.shortName,
-            style: theme.labelSmall.copyWith(color: theme.primaryPurple),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          '${l10n.switchChainNetworkContentIdLabel} ${network.chainIds.join(", ")}',
-          style: theme.labelSmall.copyWith(color: theme.textSecondary),
-        ),
-      ],
-    );
   }
 }

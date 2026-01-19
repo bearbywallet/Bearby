@@ -12,7 +12,7 @@ class NetworkCard extends StatefulWidget {
   final bool isTestnet;
   final String iconUrl;
   final Function(NetworkConfigInfo) onNetworkSelect;
-  final Function(NetworkConfigInfo) onNetworkEdit;
+  final Function(NetworkConfigInfo)? onNetworkEdit;
 
   const NetworkCard({
     super.key,
@@ -24,7 +24,7 @@ class NetworkCard extends StatefulWidget {
     required this.isTestnet,
     required this.iconUrl,
     required this.onNetworkSelect,
-    required this.onNetworkEdit,
+    this.onNetworkEdit,
   });
 
   @override
@@ -36,7 +36,8 @@ class _NetworkCardState extends State<NetworkCard>
   @override
   void initState() {
     super.initState();
-    initPressAnimation(duration: const Duration(milliseconds: 100), scaleEnd: 0.97);
+    initPressAnimation(
+        duration: const Duration(milliseconds: 100), scaleEnd: 0.97);
   }
 
   @override
@@ -50,7 +51,9 @@ class _NetworkCardState extends State<NetworkCard>
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: buildPressable(
-        onTap: widget.disabled ? null : () => widget.onNetworkSelect(widget.configInfo),
+        onTap: widget.disabled
+            ? null
+            : () => widget.onNetworkSelect(widget.configInfo),
         disabled: widget.disabled,
         child: NetworkTile(
           iconUrl: widget.iconUrl,
@@ -61,7 +64,9 @@ class _NetworkCardState extends State<NetworkCard>
           isSelected: widget.isSelected,
           disabled: widget.disabled,
           onTap: null,
-          onEdit: () => widget.onNetworkEdit(widget.configInfo),
+          onEdit: widget.onNetworkEdit == null
+              ? null
+              : () => widget.onNetworkEdit!(widget.configInfo),
         ),
       ),
     );

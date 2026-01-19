@@ -42,7 +42,7 @@ class NetworkTile extends StatelessWidget {
         ? theme.textSecondary.withValues(alpha: 0.05)
         : isSelected
             ? theme.primaryPurple.withValues(alpha: 0.1)
-            : theme.textSecondary.withValues(alpha: 0.02);
+            : Colors.transparent;
     final borderColor = isSelected ? theme.primaryPurple : Colors.transparent;
 
     return Opacity(
