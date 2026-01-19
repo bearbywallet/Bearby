@@ -1607,6 +1607,10 @@ class Web3EIP1193Handler {
       final List<NetworkConfigInfo> providers = appState.state.providers;
 
       for (final provider in providers) {
+        if (provider.slip44 == kBitcoinlip44) {
+          continue;
+        }
+
         if (provider.chainId == chainId &&
             !(provider.slip44 == kZilliqaSlip44 &&
                 provider.chainId == kZilliqaChainId)) {
@@ -1658,45 +1662,31 @@ class Web3EIP1193Handler {
         }
       }
 
-      final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
-
-      if (connection != null) {
-        await selectAccountsChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          chainHash: targetNetwork.chainHash,
-        );
-        await appState.syncData();
-
-        _sendResponse(
-          type: kBearbyResponseType,
-          uuid: message.uuid,
-          result: null,
-        );
+      if (!context.mounted) {
         _removeActiveRequest(method);
-      } else {
-        if (!context.mounted) return;
-        showSwitchChainNetworkModal(
-          context: context,
-          selectedChainId: chainId,
-          onNetworkSelected: () {
-            _sendResponse(
-              type: kBearbyResponseType,
-              uuid: message.uuid,
-              result: null,
-            );
-            _removeActiveRequest(method);
-          },
-          onReject: () {
-            _returnError(
-              message.uuid,
-              Web3EIP1193ErrorCode.userRejectedRequest,
-              AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
-            );
-            _removeActiveRequest(method);
-          },
-        );
+        return;
       }
+
+      showSwitchChainNetworkModal(
+        context: context,
+        selectedChainId: chainId,
+        onNetworkSelected: () {
+          _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: null,
+          );
+          _removeActiveRequest(method);
+        },
+        onReject: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+      );
     } catch (e) {
       _removeActiveRequest(method);
       _returnError(
