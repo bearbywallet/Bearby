@@ -22,13 +22,15 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Our app needs Bluetooth access to find and connect to peripheral devices.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>ZilPay needs FaceID to secure your data</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Our app needs Bluetooth access to find and connect to peripheral devices.</string>
 </dict>
 </plist>
