@@ -3,7 +3,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';

@@ -481,6 +481,42 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Sonic",
+    "chain": "S",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://rpc.soniclabs.com",
+      "https://sonic.drpc.org"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/sonic/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Sonic",
+        "symbol": "S",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [146, 0],
+    "infoURL": "https://soniclabs.com",
+    "testnet": false,
+    "shortName": "sonic",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "SonicScan",
+        "url": "https://sonicscan.org",
+        "icon": "https://sonicscan.org/favicon.ico",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
 

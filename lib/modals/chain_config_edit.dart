@@ -278,16 +278,19 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   children: [
                     Text(
                       token.name,
-                      style: theme.labelLarge.copyWith(color: theme.textPrimary),
+                      style:
+                          theme.labelLarge.copyWith(color: theme.textPrimary),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       token.symbol,
-                      style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                      style:
+                          theme.bodyText2.copyWith(color: theme.textSecondary),
                     ),
                     Text(
                       '${l10n.chainInfoModalContentDecimalsLabel} ${token.decimals}',
-                      style: theme.labelSmall.copyWith(color: theme.textSecondary),
+                      style:
+                          theme.labelSmall.copyWith(color: theme.textSecondary),
                     ),
                   ],
                 ),
@@ -412,7 +415,8 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                     ),
                     Text(
                       explorer.url,
-                      style: theme.overline.copyWith(color: theme.textSecondary),
+                      style:
+                          theme.overline.copyWith(color: theme.textSecondary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
