@@ -13,6 +13,9 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class BiometricManager(private val context: Context) {
 
@@ -159,4 +162,31 @@ class BiometricManager(private val context: Context) {
 
         biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
     }
+
+    fun encryptKeyAsync(activity: FragmentActivity, data: ByteArray, callback: BiometricCallback) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val result = encryptKey(activity, data)
+            result.onSuccess { encryptedData ->
+                callback.onSuccess(encryptedData)
+            }.onFailure { error ->
+                callback.onError(error.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun decryptKeyAsync(activity: FragmentActivity, encryptedData: ByteArray, callback: BiometricCallback) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val result = decryptKey(activity, encryptedData)
+            result.onSuccess { decryptedData ->
+                callback.onSuccess(decryptedData)
+            }.onFailure { error ->
+                callback.onError(error.message ?: "Unknown error")
+            }
+        }
+    }
+}
+
+interface BiometricCallback {
+    fun onSuccess(data: ByteArray)
+    fun onError(message: String)
 }
