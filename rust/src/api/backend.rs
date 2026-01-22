@@ -151,7 +151,7 @@ pub fn try_restore_rkstorage(vault_json: String, password: String) -> Result<Str
 }
 
 pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
-    zilpay::init(); // init pq ssl
+    zilpay::init()?; // init pq ssl
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
         let bg = ServiceBackground::from_path(path)?;

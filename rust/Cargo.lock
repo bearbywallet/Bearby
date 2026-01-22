@@ -663,14 +663,13 @@ checksum = "84521a3cf562bc62942e294181d9eef17eb38ceb8c68677bc49f144e4c3d4f8d"
 
 [[package]]
 name = "android_logger"
-version = "0.13.3"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c494134f746c14dc653a35a4ea5aca24ac368529da5370ecf41fe0341c35772f"
+checksum = "05b07e8e73d720a1f2e4b6014766e6039fd2e96a4fa44e2a78d0e1fa2ff49826"
 dependencies = [
  "android_log-sys",
- "env_logger",
+ "env_filter",
  "log",
- "once_cell",
 ]
 
 [[package]]
@@ -1346,29 +1345,21 @@ name = "background"
 version = "0.1.0"
 dependencies = [
  "alloy",
- "android_logger 0.13.3",
  "async-trait",
  "bincode",
  "bitcoin",
  "cipher 0.1.0",
  "config",
- "core-foundation 0.10.1",
  "crypto",
  "errors",
  "hex",
  "history",
- "jni",
- "keyring",
- "log",
  "network",
  "pqbip39",
  "proto",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rpc",
- "secrecy",
- "security-framework 3.5.1",
- "security-framework-sys",
  "serde",
  "serde_json",
  "session",
@@ -1378,7 +1369,6 @@ dependencies = [
  "token",
  "tokio",
  "wallet",
- "zeroize",
 ]
 
 [[package]]
@@ -2417,16 +2407,6 @@ name = "env_filter"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1bf3c259d255ca70051b30e2e95b5446cdb8949ac4cd22c0d7fd634d89f568e2"
-dependencies = [
- "log",
- "regex",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cd405aab171cb85d6735e5c8d9db038c17d3ca007a4d2c25f337935c3d90580"
 dependencies = [
  "log",
  "regex",
@@ -3896,6 +3876,12 @@ dependencies = [
  "num-traits",
  "pxfm",
 ]
+
+[[package]]
+name = "ndk-context"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
 
 [[package]]
 name = "network"
@@ -5650,12 +5636,25 @@ dependencies = [
 name = "session"
 version = "0.1.0"
 dependencies = [
+ "android_logger 0.14.1",
  "cipher 0.1.0",
  "config",
+ "core-foundation 0.10.1",
  "errors",
+ "hex",
+ "jni",
+ "keyring",
+ "libc",
+ "log",
+ "ndk-context",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rust-argon2",
+ "secrecy",
+ "security-framework 3.5.1",
+ "security-framework-sys",
+ "storage",
+ "zeroize",
 ]
 
 [[package]]
@@ -7287,6 +7286,7 @@ dependencies = [
  "qrcodes",
  "rpc",
  "rustls",
+ "session",
  "settings",
  "token",
  "wallet",
@@ -7309,6 +7309,7 @@ dependencies = [
  "qrcodes",
  "rpc",
  "rustls",
+ "session",
  "settings",
  "token",
  "wallet",
