@@ -1188,7 +1188,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get counterMinValueError => 'Достигнуто минимальное значение';
 
   @override
+  String get biometricSwitchTouchId => 'Включить Touch ID';
+
+  @override
   String get biometricSwitchFaceId => 'Включить Face ID';
+
+  @override
+  String get biometricSwitchOpticId => 'Включить Optic ID';
 
   @override
   String get biometricSwitchFingerprint => 'Включить отпечаток пальца';

@@ -1573,9 +1573,17 @@
   "@counterMinValueError": {
     "description": "Error message displayed when the Counter widget reaches its minimum value"
   },
+  "biometricSwitchTouchId": "Enable Touch ID",
+  "@biometricSwitchTouchId": {
+    "description": "Text displayed for enabling Touch ID in the BiometricSwitch widget"
+  },
   "biometricSwitchFaceId": "Enable Face ID",
   "@biometricSwitchFaceId": {
     "description": "Text displayed for enabling Face ID in the BiometricSwitch widget"
+  },
+  "biometricSwitchOpticId": "Enable Optic ID",
+  "@biometricSwitchOpticId": {
+    "description": "Text displayed for enabling Optic ID in the BiometricSwitch widget"
   },
   "biometricSwitchFingerprint": "Enable Fingerprint",
   "@biometricSwitchFingerprint": {

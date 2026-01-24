@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -45,8 +44,6 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
-  late final AuthGuard _authGuard;
-
   bool _obscurePassword = true;
   bool _isDisabled = false;
   String _errorMessage = '';
@@ -62,7 +59,6 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
   @override
   void initState() {
     super.initState();
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
   }
 
   Future<void> _handleDeleteWallet(AppState appState) async {
@@ -77,15 +73,11 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
-      final session = await _authGuard.getSession(
-          sessionKey: appState.wallet?.walletAddress ?? "");
-
       await deleteWallet(
         walletIndex: BigInt.from(widget.state.selectedWallet),
         identifiers: identifiers,
         password:
             _passwordController.text.isEmpty ? null : _passwordController.text,
-        sessionCipher: session,
       );
       await widget.state.syncData();
       widget.state.setSelectedWallet(0);

@@ -1188,7 +1188,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get counterMinValueError => '最小値に達しました';
 
   @override
+  String get biometricSwitchTouchId => 'Touch IDを有効にする';
+
+  @override
   String get biometricSwitchFaceId => 'Face IDを有効にする';
+
+  @override
+  String get biometricSwitchOpticId => 'Optic IDを有効にする';
 
   @override
   String get biometricSwitchFingerprint => '指紋認証を有効にする';

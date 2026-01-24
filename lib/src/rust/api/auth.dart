@@ -21,3 +21,6 @@ Future<bool> tryUnlockWithPassword(
         required List<String> identifiers}) =>
     RustLib.instance.api.crateApiAuthTryUnlockWithPassword(
         password: password, walletIndex: walletIndex, identifiers: identifiers);
+
+Future<List<String>> getBiometricType() =>
+    RustLib.instance.api.crateApiAuthGetBiometricType();

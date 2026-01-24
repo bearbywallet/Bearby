@@ -16,7 +16,6 @@ import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
@@ -49,13 +48,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
 
-  late AuthGuard _authGuard;
-
   @override
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     final discoveredDevice =
         appState.ledgerViewController.discoveredDevices.firstOrNull;
     final productName = appState.ledgerViewController.connectedTransport
@@ -199,7 +195,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
 
-        final (session, walletAddress) = await addLedgerWallet(
+        await addLedgerWallet(
           params: LedgerParamsInput(
             pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
@@ -218,7 +214,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
         await appState.syncData();
         int currentWalletIndex = appState.wallets.length - 1;
-        await _authGuard.setSession(walletAddress, session);
         await appState.syncData();
         appState.setSelectedWallet(currentWalletIndex);
         await appState.startTrackHistoryWorker();

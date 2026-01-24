@@ -8,7 +8,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/token.dart';
@@ -29,7 +28,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _accountNameInputKey = GlobalKey<SmartInputState>();
-  final AuthService _authService = AuthService();
 
   bool _isCreating = false;
   bool _zilliqaLegacy = false;
@@ -39,12 +37,9 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   bool _useBiometrics = false;
   bool _initialized = false;
 
-  late AuthGuard _authGuard;
-
   @override
   void initState() {
     super.initState();
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     AppState appState = Provider.of<AppState>(context, listen: false);
     _bip39Index = appState.wallet!.accounts.length;
     _checkBiometricAvailability(appState);
@@ -114,22 +109,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
         defaultChain.slip44 == appState.chain?.slip44;
   }
 
-  Future<bool> _authenticateWithBiometrics() async {
-    try {
-      return await _authService.authenticate(
-        allowPinCode: true,
-        reason: AppLocalizations.of(context)!.addAccountPageBiometricReason,
-      );
-    } catch (e) {
-      debugPrint('Biometric authentication error: $e');
-      setState(() {
-        _errorMessage =
-            AppLocalizations.of(context)!.addAccountPageBiometricError(e);
-      });
-      return false;
-    }
-  }
-
   Future<void> _createAccount(AppState appState) async {
     final l10n = AppLocalizations.of(context)!;
     BigInt walletIndex = BigInt.from(appState.selectedWallet);
@@ -158,26 +137,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       _errorMessage = null;
     });
 
-    String? session;
-
-    if (_useBiometrics && _passwordController.text.isEmpty) {
-      bool authenticated = await _authenticateWithBiometrics();
-      if (!authenticated) {
-        setState(() {
-          _isCreating = false;
-          _errorMessage = l10n.addAccountPageBiometricFailed;
-        });
-        return;
-      }
-    }
-
-    try {
-      session = await _authGuard.getSession(
-          sessionKey: appState.wallet!.walletAddress);
-    } catch (e) {
-      debugPrint("getting session error: $e");
-    }
-
     try {
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
@@ -192,7 +151,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
           password: _passwordController.text.isEmpty
               ? null
               : _passwordController.text,
-          sessionCipher: session,
         );
 
         await addNextBip39Account(

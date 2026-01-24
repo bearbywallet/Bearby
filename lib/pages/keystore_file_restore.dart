@@ -12,11 +12,10 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -54,10 +53,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   List<KeystoreFile> _backupFiles = [];
   KeystoreFile? _selectedFile;
 
-  final AuthService _authService = AuthService();
-  late AuthGuard _authGuard;
   late AppState _appState;
-  List<AuthMethod> _authMethods = [AuthMethod.none];
+  List<String> _authMethods = [];
   bool _useDeviceAuth = true;
 
   final TextEditingController _passwordController = TextEditingController();
@@ -69,8 +66,6 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   void initState() {
     super.initState();
     _loadBackupFiles();
-
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
     _checkAuthMethods();
   }
@@ -83,10 +78,17 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   }
 
   Future<void> _checkAuthMethods() async {
-    final methods = await _authService.getAvailableAuthMethods();
-    setState(() {
-      _authMethods = methods;
-    });
+    try {
+      final methods = await getBiometricType();
+      setState(() {
+        _authMethods = methods;
+      });
+    } catch (e) {
+      debugPrint("Error checking auth methods: $e");
+      setState(() {
+        _authMethods = [];
+      });
+    }
   }
 
   Future<void> _loadBackupFiles() async {
@@ -251,42 +253,21 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     }
 
     try {
-      _btnController.start();
-
-      if (_useDeviceAuth) {
-        final authenticated = await _authService.authenticate(
-          allowPinCode: true,
-          reason: AppLocalizations.of(context)!.passwordSetupPageAuthReason,
-        );
-        setState(() => _useDeviceAuth = authenticated);
-        if (!authenticated) {
-          setState(() {
-            _disabled = false;
-          });
-          _btnController.reset();
-          return;
-        }
-      }
-
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
-      AuthMethod biometricType = AuthMethod.none;
-      if (_useDeviceAuth) {
+      String biometricType = "none";
+      if (_useDeviceAuth && _authMethods.isNotEmpty) {
         biometricType = _authMethods[0];
       }
 
       final fileBytes = await _selectedFile!.file.readAsBytes();
-      final (String, String) session = await restoreFromKeystore(
+      await restoreFromKeystore(
         keystoreBytes: fileBytes,
         deviceIndicators: identifiers,
         password: _passwordController.text,
-        biometricType: biometricType.name,
+        biometricType: biometricType,
       );
-
-      if (_useDeviceAuth) {
-        await _authGuard.setSession(session.$2, session.$1);
-      }
 
       await _appState.syncData();
       await _appState.startTrackHistoryWorker();
@@ -337,12 +318,14 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
               children: [
                 CustomAppBar(
                   title: l10n.restoreWalletOptionsKeyStoreTitle,
-                  onBackPressed: _disabled ? () {} : () => Navigator.pop(context),
+                  onBackPressed:
+                      _disabled ? () {} : () => Navigator.pop(context),
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',
                     width: 24,
                     height: 24,
-                    colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                    colorFilter:
+                        ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
                   ),
                   onActionPressed: _disabled ? null : _loadBackupFiles,
                 ),
@@ -369,7 +352,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                                 : "assets/icons/open_eye.svg",
                             onRightIconTap: _disabled
                                 ? null
-                                : () => setState(() => _obscurePassword = !_obscurePassword),
+                                : () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
                             onChanged: _disabled
                                 ? null
                                 : (value) {
@@ -386,7 +370,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                           biometricType: _authMethods.first,
                           value: _useDeviceAuth,
                           disabled: _disabled,
-                          onChanged: (value) => setState(() => _useDeviceAuth = value),
+                          onChanged: (value) =>
+                              setState(() => _useDeviceAuth = value),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8, bottom: 16),
@@ -410,7 +395,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Text(
                               _errorMessage,
-                              style: theme.bodyText2.copyWith(color: theme.danger),
+                              style:
+                                  theme.bodyText2.copyWith(color: theme.danger),
                               textAlign: TextAlign.center,
                             ),
                           ),

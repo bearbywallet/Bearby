@@ -1188,7 +1188,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get counterMinValueError => '已达到最小值';
 
   @override
+  String get biometricSwitchTouchId => '启用触控ID';
+
+  @override
   String get biometricSwitchFaceId => '启用面容ID';
+
+  @override
+  String get biometricSwitchOpticId => '启用光学ID';
 
   @override
   String get biometricSwitchFingerprint => '启用指纹';

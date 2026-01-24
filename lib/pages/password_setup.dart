@@ -11,9 +11,8 @@ import 'package:zilpay/config/bip_purposes.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/services/auth_guard.dart';
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -39,11 +38,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   KeyPairInfo? _keys;
   int _bipPurpose = kBip44Purpose;
 
-  final AuthService _authService = AuthService();
-  late AuthGuard _authGuard;
   late AppState _appState;
 
-  List<AuthMethod> _authMethods = [AuthMethod.none];
+  List<String> _authMethods = [];
   bool _useDeviceAuth = true;
   bool _zilLegacy = false;
   bool _bypassChecksumValidation = false;
@@ -112,7 +109,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   void initState() {
     super.initState();
 
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = '';
 
@@ -210,32 +206,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         chainHash = matches.first.chainHash;
       }
 
-      if (_useDeviceAuth) {
-        if (!mounted) return;
-        final authenticated = await _authService.authenticate(
-          allowPinCode: true,
-          reason: AppLocalizations.of(context)!.passwordSetupPageAuthReason,
-        );
-        setState(() => _useDeviceAuth = authenticated);
-        if (!authenticated) {
-          setState(() {
-            _disabled = true;
-          });
-          return;
-        }
-      }
-
       _btnController.start();
 
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
-      AuthMethod biometricType = AuthMethod.none;
-      if (_useDeviceAuth) {
+      String biometricType = "none";
+      if (_useDeviceAuth && _authMethods.isNotEmpty) {
         biometricType = _authMethods[0];
       }
-
-      (String, String) session;
 
       WalletSettingsInfo settings = WalletSettingsInfo(
         cipherOrders: _cipher!,
@@ -259,14 +238,14 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           accounts: [(BigInt.zero, l10n.addAccountPageDefaultName(0))],
           passphrase: "",
           walletName: _walletNameController.text,
-          biometricType: biometricType.name,
+          biometricType: biometricType,
           identifiers: identifiers,
           chainHash: chainHash,
           mnemonicCheck: !_bypassChecksumValidation,
           bipPurpose: _bipPurpose,
         );
 
-        session = await addBip39Wallet(
+        await addBip39Wallet(
           params: params,
           walletSettings: settings,
           additionalFtokens: ftokens,
@@ -276,13 +255,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           sk: _keys!.sk,
           password: _passwordController.text,
           walletName: _walletNameController.text,
-          biometricType: biometricType.name,
+          biometricType: biometricType,
           identifiers: identifiers,
           chainHash: chainHash,
           bipPurpose: _bipPurpose,
         );
 
-        session = await addSkWallet(
+        await addSkWallet(
           params: params,
           walletSettings: settings,
           ftokens: ftokens,
@@ -292,13 +271,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       }
 
       await _appState.syncData();
-
       _appState.setSelectedWallet(_appState.wallets.length - 1);
-
-      if (_useDeviceAuth) {
-        await _authGuard.setSession(session.$2, session.$1);
-      }
-
       await _appState.syncData();
 
       if (_zilLegacy && _chain?.slip44 == kZilliqaSlip44) {
@@ -536,12 +509,20 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   }
 
   Future<void> _checkAuthMethods() async {
-    final methods = await _authService.getAvailableAuthMethods();
-    setState(() {
-      _authMethods = methods;
-      if (_authMethods.isEmpty || _authMethods.first == AuthMethod.none) {
+    try {
+      final methods = await getBiometricType();
+      setState(() {
+        _authMethods = methods;
+        if (_authMethods.isEmpty || _authMethods.first == "none") {
+          _useDeviceAuth = false;
+        }
+      });
+    } catch (e) {
+      debugPrint("Error checking auth methods: $e");
+      setState(() {
+        _authMethods = [];
         _useDeviceAuth = false;
-      }
-    });
+      });
+    }
   }
 }

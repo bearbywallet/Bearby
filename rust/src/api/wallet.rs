@@ -371,7 +371,6 @@ pub async fn set_biometric(
         .core
         .set_biometric(
             &password,
-            Default::default(),
             &identifiers,
             wallet_index,
             new_biometric_type.into(),

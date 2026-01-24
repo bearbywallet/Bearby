@@ -29,7 +29,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
-  final AuthService _authService = AuthService();
 
   late final AuthGuard _authGuard;
   late final AppState _appState;
@@ -123,18 +122,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     return false;
   }
 
-  Future<bool> _authenticateWithBiometrics() async {
-    try {
-      return await _authService.authenticate(
-        allowPinCode: true,
-        reason: AppLocalizations.of(context)!.loginPageBiometricReason,
-      );
-    } catch (e) {
-      debugPrint('Biometric authentication error: $e');
-      return false;
-    }
-  }
-
   Future<void> _handleAuthentication() async {
     if (_selectedWallet == -1 || _appState.wallets.isEmpty) return;
 
@@ -157,16 +144,13 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         );
       } else if (wallet.authType != AuthMethod.none.name &&
           _passwordController.text.isEmpty) {
-        final biometricAuth = await _authenticateWithBiometrics();
-        if (biometricAuth) {
-          final session =
-              await _authGuard.getSession(sessionKey: wallet.walletAddress);
-          isAuthenticated = await _authenticateWithSession(
-            session ?? "",
-            _selectedWallet,
-            identifiers,
-          );
-        }
+        final session =
+            await _authGuard.getSession(sessionKey: wallet.walletAddress);
+        isAuthenticated = await _authenticateWithSession(
+          session ?? "",
+          _selectedWallet,
+          identifiers,
+        );
       } else if (_passwordController.text.isNotEmpty) {
         isAuthenticated = await _authenticateWithPassword(
           _passwordController.text,

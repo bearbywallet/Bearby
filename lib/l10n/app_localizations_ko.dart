@@ -1188,7 +1188,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get counterMinValueError => '최소값 도달';
 
   @override
+  String get biometricSwitchTouchId => 'Touch ID 활성화';
+
+  @override
   String get biometricSwitchFaceId => 'Face ID 활성화';
+
+  @override
+  String get biometricSwitchOpticId => 'Optic ID 활성화';
 
   @override
   String get biometricSwitchFingerprint => '지문 활성화';

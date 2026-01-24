@@ -16,7 +16,6 @@ import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
@@ -96,7 +95,7 @@ class _ConfirmTransactionContentState
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _authService = AuthService();
-  late final AuthGuard _authGuard;
+
   RequiredTxParamsInfo _txParamsInfo = RequiredTxParamsInfo(
     gasPrice: BigInt.zero,
     maxPriorityFee: BigInt.zero,
@@ -159,7 +158,6 @@ class _ConfirmTransactionContentState
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
-    _authGuard = context.read<AuthGuard>();
     _currentTx = widget.tx;
     _userSelectedOption = appState.selectedGasOption;
     _initGasPolling();
@@ -317,14 +315,11 @@ class _ConfirmTransactionContentState
 
     if (wallet.authType != AuthMethod.none.name) {
       if (!await _authenticate()) return null;
-      final session =
-          await _authGuard.getSession(sessionKey: wallet.walletAddress);
       return await signSendTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         identifiers: identifiers,
         tx: tx,
-        sessionCipher: session,
       );
     } else {
       return await signSendTransactions(

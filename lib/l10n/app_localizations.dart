@@ -2411,11 +2411,23 @@ abstract class AppLocalizations {
   /// **'Minimum value reached'**
   String get counterMinValueError;
 
+  /// Text displayed for enabling Touch ID in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Touch ID'**
+  String get biometricSwitchTouchId;
+
   /// Text displayed for enabling Face ID in the BiometricSwitch widget
   ///
   /// In en, this message translates to:
   /// **'Enable Face ID'**
   String get biometricSwitchFaceId;
+
+  /// Text displayed for enabling Optic ID in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Optic ID'**
+  String get biometricSwitchOpticId;
 
   /// Text displayed for enabling Fingerprint in the BiometricSwitch widget
   ///

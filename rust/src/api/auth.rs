@@ -3,6 +3,7 @@ use crate::{
     utils::{errors::ServiceError, utils::decode_session},
 };
 pub use zilpay::background::bg_wallet::WalletManagement;
+use zilpay::session;
 
 pub async fn try_unlock_with_session(
     session_cipher: Option<String>,
@@ -36,4 +37,12 @@ pub async fn try_unlock_with_password(
         .map_err(ServiceError::BackgroundError)?;
 
     Ok(true)
+}
+
+pub async fn get_biometric_type() -> Result<Vec<String>, String> {
+    Ok(session::keychain_store::device_biometric_type()
+        .map_err(|e| e.to_string())?
+        .into_iter()
+        .map(|v| v.into())
+        .collect())
 }

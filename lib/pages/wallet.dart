@@ -15,9 +15,9 @@ import 'package:zilpay/modals/confirm_password.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
-import 'package:zilpay/services/auth_guard.dart';
-import 'package:zilpay/services/biometric_service.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -53,15 +53,13 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-  late final AuthGuard _authGuard;
-  final AuthService _authService = AuthService();
   final TextEditingController _walletNameController = TextEditingController();
   static const double _avatarSize = 80.0;
   static const double _borderRadius = 12.0;
   static const double _iconSize = 24.0;
   static const double _fontSize = 16.0;
 
-  List<AuthMethod> _authMethods = [AuthMethod.none];
+  List<String> _authMethods = [];
   bool _biometricsAvailable = false;
   bool _isBiometricLoading = false;
   int _selectedBipPurposeIndex = 1;
@@ -69,7 +67,6 @@ class _WalletPageState extends State<WalletPage> {
   @override
   void initState() {
     super.initState();
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     final appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
     appState.syncConnections();
@@ -85,17 +82,16 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> _checkAuthMethods() async {
     try {
-      final methods = await _authService.getAvailableAuthMethods();
+      final methods = await getBiometricType();
 
       setState(() {
         _authMethods = methods;
-        _biometricsAvailable =
-            methods.isNotEmpty && methods.first != AuthMethod.none;
+        _biometricsAvailable = methods.isNotEmpty && methods.first != "none";
       });
     } catch (e) {
       debugPrint("Error checking auth methods: $e");
       setState(() {
-        _authMethods = [AuthMethod.none];
+        _authMethods = [];
         _biometricsAvailable = false;
       });
     }
@@ -190,27 +186,29 @@ class _WalletPageState extends State<WalletPage> {
           },
           onConfirm: (password) async {
             try {
-              final authenticated = await _authService.authenticate(
-                allowPinCode: true,
-                reason: AppLocalizations.of(context)!.walletPageBiometricReason,
+              final auth = LocalAuthentication();
+              final authenticated = await auth.authenticate(
+                localizedReason:
+                    AppLocalizations.of(context)!.walletPageBiometricReason,
+                options: const AuthenticationOptions(
+                  stickyAuth: true,
+                  biometricOnly: false,
+                  useErrorDialogs: true,
+                ),
               );
 
               if (!authenticated) {
                 return "Authorization declined for biometrics";
               }
 
-              final biometricType = _authMethods.first.name;
+              final biometricType = _authMethods.first;
 
-              final session = await setBiometric(
+              await setBiometric(
                 walletIndex: BigInt.from(appState.selectedWallet),
                 identifiers: identifiers,
                 password: password,
                 newBiometricType: biometricType,
               );
-
-              if (session != null) {
-                await _authGuard.setSession(wallet.walletAddress, session);
-              }
 
               await appState.syncData();
 
@@ -227,25 +225,12 @@ class _WalletPageState extends State<WalletPage> {
           },
         );
       } else {
-        String? sessionCipher;
-
-        try {
-          sessionCipher = await _authGuard.getSession(
-            sessionKey: wallet.walletAddress,
-            requireAuth: false,
-          );
-        } catch (e) {
-          debugPrint("No session available for disabling biometrics: $e");
-        }
-
         await setBiometric(
           walletIndex: BigInt.from(appState.selectedWallet),
           identifiers: identifiers,
           password: "",
-          sessionCipher: sessionCipher,
-          newBiometricType: AuthMethod.none.name,
+          newBiometricType: "none",
         );
-        await _authGuard.setSession(wallet.walletAddress, "");
 
         if (mounted) {
           setState(() {
@@ -271,14 +256,12 @@ class _WalletPageState extends State<WalletPage> {
     required List<String> identifiers,
     required int newIndex,
     String? password,
-    String? sessionCipher,
   }) async {
     await bitcoinChangeAddressType(
       walletIndex: BigInt.from(appState.selectedWallet),
       newAddressType: newAddressType,
       identifiers: identifiers,
       password: password,
-      sessionCipher: sessionCipher,
     );
 
     await appState.syncData();
@@ -299,36 +282,16 @@ class _WalletPageState extends State<WalletPage> {
 
     final device = DeviceInfoService();
     final identifiers = await device.getDeviceIdentifiers();
-    final biometricEnabled = wallet.authType != AuthMethod.none.name;
+    final biometricEnabled = wallet.authType != "none";
 
-    String? sessionCipher;
     if (biometricEnabled && mounted) {
-      final authenticated = await _authService.authenticate(
-        allowPinCode: true,
-        reason: AppLocalizations.of(context)!.walletPageBiometricReason,
+      await _executeBitcoinAddressChange(
+        appState: appState,
+        newAddressType: newAddressType,
+        identifiers: identifiers,
+        newIndex: newIndex,
       );
-
-      if (!authenticated) return;
-
-      try {
-        sessionCipher = await _authGuard.getSession(
-          sessionKey: wallet.walletAddress,
-          requireAuth: false,
-        );
-      } catch (e) {
-        debugPrint("No session available: $e");
-      }
-
-      if (sessionCipher != null && sessionCipher.isNotEmpty) {
-        await _executeBitcoinAddressChange(
-          appState: appState,
-          newAddressType: newAddressType,
-          identifiers: identifiers,
-          newIndex: newIndex,
-          sessionCipher: sessionCipher,
-        );
-        return;
-      }
+      return;
     }
 
     if (mounted) {
@@ -577,13 +540,13 @@ class _WalletPageState extends State<WalletPage> {
     final items = _getPreferenceItems(appState);
     final List<Widget> widgets = [];
 
-    if (_biometricsAvailable && _authMethods.first != AuthMethod.none) {
+    if (_biometricsAvailable && _authMethods.first != "none") {
       widgets.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: BiometricSwitch(
             biometricType: _authMethods.first,
-            value: AuthMethod.none.name != appState.wallet?.authType,
+            value: "none" != appState.wallet?.authType,
             disabled: false,
             isLoading: _isBiometricLoading,
             onChanged: (value) => _handleToggleBiometric(value, appState),

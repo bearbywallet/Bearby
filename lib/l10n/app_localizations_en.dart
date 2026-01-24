@@ -1188,7 +1188,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get counterMinValueError => 'Minimum value reached';
 
   @override
+  String get biometricSwitchTouchId => 'Enable Touch ID';
+
+  @override
   String get biometricSwitchFaceId => 'Enable Face ID';
+
+  @override
+  String get biometricSwitchOpticId => 'Enable Optic ID';
 
   @override
   String get biometricSwitchFingerprint => 'Enable Fingerprint';

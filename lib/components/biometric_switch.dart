@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class BiometricSwitch extends StatelessWidget {
-  final AuthMethod biometricType;
+  final String biometricType;
   final bool value;
   final bool disabled;
   final bool isLoading;
@@ -24,37 +23,47 @@ class BiometricSwitch extends StatelessWidget {
 
   String _authMethodText(BuildContext context) {
     switch (biometricType) {
-      case AuthMethod.faceId:
+      case "touchId":
+        return AppLocalizations.of(context)!.biometricSwitchTouchId;
+      case "faceId":
         return AppLocalizations.of(context)!.biometricSwitchFaceId;
-      case AuthMethod.fingerprint:
+      case "opticId":
+        return AppLocalizations.of(context)!.biometricSwitchOpticId;
+      case "fingerprint":
         return AppLocalizations.of(context)!.biometricSwitchFingerprint;
-      case AuthMethod.biometric:
+      case "biometric":
         return AppLocalizations.of(context)!.biometricSwitchBiometric;
-      case AuthMethod.pinCode:
+      case "password":
         return AppLocalizations.of(context)!.biometricSwitchPinCode;
-      case AuthMethod.none:
+      case "none":
+      default:
         return '';
     }
   }
 
   String get _iconPath {
     switch (biometricType) {
-      case AuthMethod.faceId:
-        return 'assets/icons/face_id.svg';
-      case AuthMethod.fingerprint:
+      case "touchId":
         return 'assets/icons/fingerprint.svg';
-      case AuthMethod.biometric:
+      case "faceId":
+        return 'assets/icons/face_id.svg';
+      case "opticId":
+        return 'assets/icons/face_id.svg';
+      case "fingerprint":
+        return 'assets/icons/fingerprint.svg';
+      case "biometric":
         return 'assets/icons/biometric.svg';
-      case AuthMethod.pinCode:
+      case "password":
         return 'assets/icons/pin.svg';
-      case AuthMethod.none:
+      case "none":
+      default:
         return '';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (biometricType == AuthMethod.none) {
+    if (biometricType == "none") {
       return const SizedBox.shrink();
     }
 
