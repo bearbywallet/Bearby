@@ -68,17 +68,16 @@ mod btc_wallet_tests {
             accounts: vec![(0, "BTC Account 0".to_string())],
             passphrase: "".to_string(),
             wallet_name: "Bitcoin Wallet".to_string(),
-            biometric_type: "faceId".to_string(),
+            biometric_type: "none".to_string(),
             chain_hash: btc_mainnet_provider.hash(),
             bip_purpose: DerivationPath::BIP84_PURPOSE,
             identifiers: vec![String::from("test btc")],
         };
 
-        let (session, wallet_address) = add_bip39_wallet(params, wallet_settings, vec![])
+        let wallet_address = add_bip39_wallet(params, wallet_settings, vec![])
             .await
             .unwrap();
 
-        assert!(!session.is_empty());
         assert!(!wallet_address.is_empty());
 
         // Add 2 more accounts
@@ -91,7 +90,6 @@ mod btc_wallet_tests {
             passphrase: "".to_string(),
             identifiers: identifiers.clone(),
             password: Some(PASSWORD.to_string()),
-            session_cipher: None,
         })
         .await
         .unwrap();
@@ -103,7 +101,6 @@ mod btc_wallet_tests {
             passphrase: "".to_string(),
             identifiers: identifiers.clone(),
             password: Some(PASSWORD.to_string()),
-            session_cipher: None,
         })
         .await
         .unwrap();
@@ -143,7 +140,6 @@ mod btc_wallet_tests {
             identifiers.clone(),
             Some(PASSWORD.to_string()),
             None,
-            Some("".to_string()),
         )
         .await
         .unwrap();
@@ -168,7 +164,6 @@ mod btc_wallet_tests {
             identifiers.clone(),
             Some(PASSWORD.to_string()),
             None,
-            Some("".to_string()),
         )
         .await
         .unwrap();
@@ -193,7 +188,6 @@ mod btc_wallet_tests {
             identifiers.clone(),
             Some(PASSWORD.to_string()),
             None,
-            Some("".to_string()),
         )
         .await
         .unwrap();
@@ -218,7 +212,6 @@ mod btc_wallet_tests {
             identifiers.clone(),
             Some(PASSWORD.to_string()),
             None,
-            Some("".to_string()),
         )
         .await
         .unwrap();

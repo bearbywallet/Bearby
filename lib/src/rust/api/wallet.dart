@@ -14,7 +14,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiWalletGetWallets();
 
-Future<(String, String)> addBip39Wallet(
+Future<String> addBip39Wallet(
         {required Bip39AddWalletParams params,
         required WalletSettingsInfo walletSettings,
         required List<FTokenInfo> additionalFtokens}) =>
@@ -23,7 +23,7 @@ Future<(String, String)> addBip39Wallet(
         walletSettings: walletSettings,
         additionalFtokens: additionalFtokens);
 
-Future<(String, String)> addSkWallet(
+Future<String> addSkWallet(
         {required AddSKWalletParams params,
         required WalletSettingsInfo walletSettings,
         required List<FTokenInfo> ftokens}) =>
@@ -53,30 +53,24 @@ Future<void> changeWalletName(
 Future<void> deleteWallet(
         {required BigInt walletIndex,
         required List<String> identifiers,
-        String? password,
-        String? sessionCipher}) =>
+        String? password}) =>
     RustLib.instance.api.crateApiWalletDeleteWallet(
-        walletIndex: walletIndex,
-        identifiers: identifiers,
-        password: password,
-        sessionCipher: sessionCipher);
+        walletIndex: walletIndex, identifiers: identifiers, password: password);
 
 Future<void> deleteAccount(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiWalletDeleteAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<String?> setBiometric(
+Future<void> setBiometric(
         {required BigInt walletIndex,
         required List<String> identifiers,
         required String password,
-        String? sessionCipher,
         required String newBiometricType}) =>
     RustLib.instance.api.crateApiWalletSetBiometric(
         walletIndex: walletIndex,
         identifiers: identifiers,
         password: password,
-        sessionCipher: sessionCipher,
         newBiometricType: newBiometricType);
 
 Future<void> bitcoinChangeAddressType(
@@ -84,14 +78,12 @@ Future<void> bitcoinChangeAddressType(
         required String newAddressType,
         required List<String> identifiers,
         String? password,
-        String? sessionCipher,
         String? passphrase}) =>
     RustLib.instance.api.crateApiWalletBitcoinChangeAddressType(
         walletIndex: walletIndex,
         newAddressType: newAddressType,
         identifiers: identifiers,
         password: password,
-        sessionCipher: sessionCipher,
         passphrase: passphrase);
 
 Future<KeyPairInfo> revealKeypair(
@@ -155,7 +147,7 @@ Future<Uint8List> makeKeystoreFile(
         password: password,
         deviceIndicators: deviceIndicators);
 
-Future<(String, String)> restoreFromKeystore(
+Future<String> restoreFromKeystore(
         {required List<int> keystoreBytes,
         required List<String> deviceIndicators,
         required String password,
@@ -173,7 +165,6 @@ class AddNextBip39AccountParams {
   final String passphrase;
   final List<String> identifiers;
   final String? password;
-  final String? sessionCipher;
 
   const AddNextBip39AccountParams({
     required this.walletIndex,
@@ -182,7 +173,6 @@ class AddNextBip39AccountParams {
     required this.passphrase,
     required this.identifiers,
     this.password,
-    this.sessionCipher,
   });
 
   @override
@@ -192,8 +182,7 @@ class AddNextBip39AccountParams {
       name.hashCode ^
       passphrase.hashCode ^
       identifiers.hashCode ^
-      password.hashCode ^
-      sessionCipher.hashCode;
+      password.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -205,8 +194,7 @@ class AddNextBip39AccountParams {
           name == other.name &&
           passphrase == other.passphrase &&
           identifiers == other.identifiers &&
-          password == other.password &&
-          sessionCipher == other.sessionCipher;
+          password == other.password;
 }
 
 class AddSKWalletParams {

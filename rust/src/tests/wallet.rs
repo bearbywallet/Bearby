@@ -254,7 +254,7 @@ mod wallet_tests {
             accounts: vec![(0, "Account 1".to_string())],
             passphrase: "".to_string(),
             wallet_name: "ZIlliqa Wallet".to_string(),
-            biometric_type: "faceId".to_string(),
+            biometric_type: "none".to_string(),
             chain_hash: zil_chain_config.hash(),
             bip_purpose: DerivationPath::BIP44_PURPOSE,
             identifiers: vec![String::from("test identifier")],
@@ -278,11 +278,10 @@ mod wallet_tests {
         };
         let ftokens = vec![];
 
-        let (session, wallet_address) = add_bip39_wallet(params, wallet_settings.clone(), ftokens)
+        let wallet_address = add_bip39_wallet(params, wallet_settings.clone(), ftokens)
             .await
             .unwrap();
 
-        assert!(!session.is_empty());
         assert!(!wallet_address.is_empty());
 
         let wallets = get_wallets().await.unwrap();
@@ -396,8 +395,7 @@ mod wallet_tests {
             name: "Second account".to_string(),
             passphrase: String::new(),
             identifiers: vec![String::from("test identifier")],
-            password: None,
-            session_cipher: Some(session.clone()),
+            password: Some(PASSWORD.to_string()),
         })
         .await
         .unwrap();
@@ -521,8 +519,7 @@ mod wallet_tests {
                 name: "account 3".to_string(),
                 passphrase: String::new(),
                 identifiers: vec![String::from("test identifier")],
-                password: None,
-                session_cipher: Some(session.clone()),
+                password: Some(PASSWORD.to_string()),
             })
             .await
             .unwrap();
@@ -634,8 +631,7 @@ mod wallet_tests {
             delete_wallet(
                 0,
                 vec![String::from("test identifier")],
-                None,
-                Some(session),
+                Some(PASSWORD.to_string()),
             )
             .await
             .unwrap();
@@ -644,11 +640,11 @@ mod wallet_tests {
 
             assert_eq!(wallets.len(), 0);
 
-            let (_, new_address) = restore_from_keystore(
+            let new_address = restore_from_keystore(
                 keystore_bytes,
                 vec![String::from("new identifier")],
                 PASSWORD.to_string(),
-                "fingerprint".to_string(),
+                "none".to_string(),
             )
             .await
             .unwrap();
@@ -711,7 +707,6 @@ mod wallet_tests {
             0,
             vec![String::from("new identifier")],
             Some(PASSWORD.to_string()),
-            None,
         )
         .await
         .unwrap();
@@ -733,7 +728,7 @@ mod wallet_tests {
             sk: SK.to_string(),
             password: PASSWORD.to_string(),
             wallet_name: "SK Wallet".to_string(),
-            biometric_type: "faceId".to_string(),
+            biometric_type: "none".to_string(),
             identifiers: vec![String::from("test sk identifier")],
             bip_purpose: DerivationPath::BIP44_PURPOSE,
             chain_hash: zil_chain_config.hash(),
@@ -756,10 +751,9 @@ mod wallet_tests {
             rates_api_options: 0,
         };
         let ftokens = vec![];
-        let (session, wallet_address) = add_sk_wallet(params, wallet_settings, ftokens)
+        let wallet_address = add_sk_wallet(params, wallet_settings, ftokens)
             .await
             .unwrap();
-        assert!(!session.is_empty());
         assert!(!wallet_address.is_empty());
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -922,8 +916,7 @@ mod wallet_tests {
         delete_wallet(
             0,
             vec![String::from("test sk identifier")],
-            None,
-            Some(session),
+            Some(PASSWORD.to_string()),
         )
         .await
         .unwrap();
@@ -931,11 +924,11 @@ mod wallet_tests {
         let wallets = get_wallets().await.unwrap();
         assert_eq!(wallets.len(), 0);
 
-        let (_session, _new_address) = restore_from_keystore(
+        let _new_address = restore_from_keystore(
             keystore_bytes,
             vec![String::from("test sk identifier")],
             PASSWORD.to_string(),
-            "fingerprint".to_string(),
+            "none".to_string(),
         )
         .await
         .unwrap();

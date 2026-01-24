@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use zilpay::{
     background::bg_provider::ProvidersManagement,
     crypto::bip49::{split_path, DerivationPath},
@@ -13,9 +15,10 @@ pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 
 use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
+    service::service::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        utils::{get_last_wallet, pubkey_from_provider, with_service, with_service_mut},
+        utils::{get_last_wallet, pubkey_from_provider, with_service},
     },
 };
 
@@ -36,50 +39,58 @@ pub async fn add_ledger_wallet(
     params: LedgerParamsInput,
     wallet_settings: WalletSettingsInfo,
     ftokens: Vec<FTokenInfo>,
-) -> Result<(String, String), String> {
-    with_service_mut(|core| {
-        let provider = core.get_provider(params.chain_hash)?;
-        let net = provider.config.bitcoin_network();
-        let bip49 = DerivationPath::new(
-            provider.config.slip_44,
-            params.wallet_index,
-            params.bip_purpose,
-            net,
-        );
-        let pub_keys = params
-            .pub_keys
-            .into_iter()
-            .map(|(ledger_index, pk)| {
-                pubkey_from_provider(&pk, bip49, params.zilliqa_legacy)
-                    .map(|pub_key| (ledger_index, pub_key))
-            })
-            .collect::<Result<Vec<(u8, PubKey)>, ServiceError>>()?;
-        let ftokens = ftokens
-            .into_iter()
-            .map(TryFrom::try_from)
-            .collect::<Result<Vec<FToken>, TokenError>>()?;
-        let identifiers = params.identifiers;
-        let params = BackgroundLedgerParams {
-            ftokens,
-            pub_keys,
-            chain_hash: params.chain_hash,
-            account_names: params.account_names,
-            wallet_index: params.wallet_index,
-            wallet_name: params.wallet_name,
-            ledger_id: params.ledger_id.as_bytes().to_vec(),
-            biometric_type: params.biometric_type.into(),
-            wallet_settings: wallet_settings.try_into()?,
-        };
+) -> Result<String, String> {
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
 
-        let session = core
-            .add_ledger_wallet(params, WalletSettings::default(), &identifiers)
-            .map_err(ServiceError::BackgroundError)?;
-        let wallet = get_last_wallet(core)?;
+    let provider = service
+        .core
+        .get_provider(params.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let net = provider.config.bitcoin_network();
+    let bip49 = DerivationPath::new(
+        provider.config.slip_44,
+        params.wallet_index,
+        params.bip_purpose,
+        net,
+    );
+    let pub_keys = params
+        .pub_keys
+        .into_iter()
+        .map(|(ledger_index, pk)| {
+            pubkey_from_provider(&pk, bip49, params.zilliqa_legacy)
+                .map(|pub_key| (ledger_index, pub_key))
+        })
+        .collect::<Result<Vec<(u8, PubKey)>, ServiceError>>()?;
+    let ftokens = ftokens
+        .into_iter()
+        .map(TryFrom::try_from)
+        .collect::<Result<Vec<FToken>, TokenError>>()
+        .map_err(ServiceError::TokenError)?;
+    let identifiers = params.identifiers;
+    let wallet_settings = wallet_settings
+        .try_into()
+        .map_err(ServiceError::SettingsError)?;
+    let params = BackgroundLedgerParams {
+        ftokens,
+        pub_keys,
+        wallet_settings,
+        chain_hash: params.chain_hash,
+        account_names: params.account_names,
+        wallet_index: params.wallet_index,
+        wallet_name: params.wallet_name,
+        ledger_id: params.ledger_id.as_bytes().to_vec(),
+        biometric_type: params.biometric_type.into(),
+    };
 
-        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
-    })
-    .await
-    .map_err(Into::into)
+    Arc::get_mut(&mut service.core)
+        .ok_or(ServiceError::CoreAccess)?
+        .add_ledger_wallet(params, WalletSettings::default(), &identifiers)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet = get_last_wallet(&service.core)?;
+
+    Ok(hex::encode(wallet.wallet_address))
 }
 
 pub async fn update_ledger_accounts(

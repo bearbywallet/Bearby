@@ -8,7 +8,7 @@ import '../models/ftoken.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<(String, String)> addLedgerWallet(
+Future<String> addLedgerWallet(
         {required LedgerParamsInput params,
         required WalletSettingsInfo walletSettings,
         required List<FTokenInfo> ftokens}) =>

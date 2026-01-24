@@ -1,8 +1,8 @@
 use std::str::FromStr;
+use std::sync::Arc;
 
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
-use zilpay::background::Background;
 use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
@@ -22,13 +22,11 @@ pub use zilpay::{
 use crate::models::ftoken::FTokenInfo;
 use crate::models::keypair::KeyPairInfo;
 use crate::models::settings::WalletSettingsInfo;
+use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::utils::{secretkey_from_provider, with_wallet};
 use crate::{
     models::wallet::WalletInfo,
-    utils::{
-        errors::ServiceError,
-        utils::{decode_session, with_service, with_service_mut},
-    },
+    utils::{errors::ServiceError, utils::with_service},
 };
 
 use super::provider::select_accounts_chain;
@@ -65,46 +63,57 @@ pub async fn add_bip39_wallet(
     params: Bip39AddWalletParams,
     wallet_settings: WalletSettingsInfo,
     additional_ftokens: Vec<FTokenInfo>,
-) -> Result<(String, String), String> {
-    with_service_mut(|core| {
-        let core_ref: &Background = &*core;
-        let provider = core_ref.get_provider(params.chain_hash)?;
-        let net = provider.config.bitcoin_network();
-        let accounts_bip49 = params
-            .accounts
-            .into_iter()
-            .map(|(i, name)| {
-                (
-                    DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, net),
-                    name,
-                )
-            })
-            .collect::<Vec<(DerivationPath, String)>>();
-        let ftokens = additional_ftokens
-            .into_iter()
-            .map(TryFrom::try_from)
-            .collect::<Result<Vec<FToken>, TokenError>>()?;
-        let session = core
-            .add_bip39_wallet(BackgroundBip39Params {
-                ftokens,
-                mnemonic_check: params.mnemonic_check,
-                wallet_settings: wallet_settings.try_into()?,
-                chain_hash: params.chain_hash,
-                password: &params.password,
-                mnemonic_str: &params.mnemonic_str,
-                accounts: &accounts_bip49,
-                passphrase: &params.passphrase,
-                wallet_name: params.wallet_name,
-                biometric_type: params.biometric_type.into(),
-                device_indicators: &params.identifiers,
-            })
-            .map_err(ServiceError::BackgroundError)?;
-        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
+) -> Result<String, String> {
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
 
-        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
-    })
-    .await
-    .map_err(Into::into)
+    let provider = service
+        .core
+        .get_provider(params.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let net = provider.config.bitcoin_network();
+    let accounts_bip49 = params
+        .accounts
+        .into_iter()
+        .map(|(i, name)| {
+            (
+                DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, net),
+                name,
+            )
+        })
+        .collect::<Vec<(DerivationPath, String)>>();
+    let ftokens = additional_ftokens
+        .into_iter()
+        .map(TryFrom::try_from)
+        .collect::<Result<Vec<FToken>, TokenError>>()
+        .map_err(ServiceError::TokenError)?;
+    let wallet_settings = wallet_settings
+        .try_into()
+        .map_err(ServiceError::SettingsError)?;
+    Arc::get_mut(&mut service.core)
+        .ok_or(ServiceError::CoreAccess)?
+        .add_bip39_wallet(BackgroundBip39Params {
+            ftokens,
+            wallet_settings,
+            mnemonic_check: params.mnemonic_check,
+            chain_hash: params.chain_hash,
+            password: &params.password,
+            mnemonic_str: &params.mnemonic_str,
+            accounts: &accounts_bip49,
+            passphrase: &params.passphrase,
+            wallet_name: params.wallet_name,
+            biometric_type: params.biometric_type.into(),
+            device_indicators: &params.identifiers,
+        })
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet = service
+        .core
+        .wallets
+        .last()
+        .ok_or(ServiceError::FailToSaveWallet)?;
+
+    Ok(hex::encode(wallet.wallet_address))
 }
 
 pub struct AddSKWalletParams {
@@ -121,18 +130,29 @@ pub async fn add_sk_wallet(
     params: AddSKWalletParams,
     wallet_settings: WalletSettingsInfo,
     ftokens: Vec<FTokenInfo>,
-) -> Result<(String, String), String> {
-    with_service_mut(|core| {
-        let ftokens = ftokens
-            .into_iter()
-            .map(TryFrom::try_from)
-            .collect::<Result<Vec<FToken>, TokenError>>()?;
-        let provider = core.get_provider(params.chain_hash)?;
-        let net = provider.config.bitcoin_network();
-        let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, net);
+) -> Result<String, String> {
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
 
-        let secret_key = secretkey_from_provider(&params.sk, bip49)?;
-        let session = core.add_sk_wallet(BackgroundSKParams {
+    let ftokens = ftokens
+        .into_iter()
+        .map(TryFrom::try_from)
+        .collect::<Result<Vec<FToken>, TokenError>>()
+        .map_err(ServiceError::TokenError)?;
+    let provider = service
+        .core
+        .get_provider(params.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let net = provider.config.bitcoin_network();
+    let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, net);
+
+    let secret_key = secretkey_from_provider(&params.sk, bip49)?;
+    let wallet_settings = wallet_settings
+        .try_into()
+        .map_err(ServiceError::SettingsError)?;
+    Arc::get_mut(&mut service.core)
+        .ok_or(ServiceError::CoreAccess)?
+        .add_sk_wallet(BackgroundSKParams {
             ftokens,
             chain_hash: params.chain_hash,
             secret_key,
@@ -140,14 +160,17 @@ pub async fn add_sk_wallet(
             biometric_type: params.biometric_type.into(),
             password: &params.password,
             device_indicators: &params.identifiers,
-            wallet_settings: wallet_settings.try_into()?,
-        })?;
-        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
+            wallet_settings,
+        })
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet = service
+        .core
+        .wallets
+        .last()
+        .ok_or(ServiceError::FailToSaveWallet)?;
 
-        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
-    })
-    .await
-    .map_err(Into::into)
+    Ok(hex::encode(wallet.wallet_address))
 }
 
 pub struct AddNextBip39AccountParams {
@@ -157,71 +180,84 @@ pub struct AddNextBip39AccountParams {
     pub passphrase: String,
     pub identifiers: Vec<String>,
     pub password: Option<String>,
-    pub session_cipher: Option<String>,
 }
 
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
-    with_service_mut(|core| {
-        let seed = if let Some(pass) = params.password {
-            core.unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
-        } else {
-            let session = decode_session(params.session_cipher)?;
-            core.unlock_wallet_with_session(session, &params.identifiers, params.wallet_index)
-        }?;
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
 
-        let wallet = core.get_wallet_by_index(params.wallet_index)?;
-        let wallet_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-        let selected_account = wallet_data
-            .get_selected_account()
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-        let default_chain = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = match selected_account.pub_key {
-            PubKey::Secp256k1Sha256(_)
-            | PubKey::Secp256k1Keccak256(_)
-            | PubKey::Ed25519Solana(_) => DerivationPath::new(
+    let seed = if let Some(pass) = params.password {
+        service
+            .core
+            .unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
+    } else {
+        service
+            .core
+            .unlock_wallet_with_session(
+                Default::default(),
+                &params.identifiers,
+                params.wallet_index,
+            )
+            .await
+    }
+    .map_err(ServiceError::BackgroundError)?;
+
+    let wallet = service
+        .core
+        .get_wallet_by_index(params.wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+    let selected_account = wallet_data
+        .get_selected_account()
+        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+    let default_chain = service
+        .core
+        .get_provider(wallet_data.default_chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let bip49 = match selected_account.pub_key {
+        PubKey::Secp256k1Sha256(_) | PubKey::Secp256k1Keccak256(_) | PubKey::Ed25519Solana(_) => {
+            DerivationPath::new(
                 default_chain.config.slip_44,
                 params.account_index,
                 DerivationPath::BIP44_PURPOSE,
                 None,
-            ),
-            PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
-                default_chain.config.slip_44,
-                params.account_index,
-                DerivationPath::bip_from_address_type(btc_addr_type),
-                Some(net),
-            ),
-        };
-
-        wallet
-            .add_next_bip39_account(
-                params.name,
-                &bip49,
-                &params.passphrase,
-                &seed,
-                &default_chain.config,
             )
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
-        let mut wallet_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
-        if let Some(added_account) = wallet_data.accounts.last_mut() {
-            added_account.slip_44 = selected_account.slip_44;
-            added_account.chain_hash = selected_account.chain_hash;
-            added_account.chain_id = selected_account.chain_id;
         }
+        PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
+            default_chain.config.slip_44,
+            params.account_index,
+            DerivationPath::bip_from_address_type(btc_addr_type),
+            Some(net),
+        ),
+    };
 
-        wallet
-            .save_wallet_data(wallet_data)
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+    wallet
+        .add_next_bip39_account(
+            params.name,
+            &bip49,
+            &params.passphrase,
+            &seed,
+            &default_chain.config,
+        )
+        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
-        Ok(())
-    })
-    .await
-    .map_err(Into::into)
+    let mut wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+
+    if let Some(added_account) = wallet_data.accounts.last_mut() {
+        added_account.slip_44 = selected_account.slip_44;
+        added_account.chain_hash = selected_account.chain_hash;
+        added_account.chain_id = selected_account.chain_id;
+    }
+
+    wallet
+        .save_wallet_data(wallet_data)
+        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+
+    Ok(())
 }
 
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
@@ -286,22 +322,28 @@ pub async fn delete_wallet(
     wallet_index: usize,
     identifiers: Vec<String>,
     password: Option<String>,
-    session_cipher: Option<String>,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
-        if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
-        } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
-        }?;
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
 
-        core.delete_wallet(wallet_index)?;
+    if let Some(pass) = password {
+        service
+            .core
+            .unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+    } else {
+        service
+            .core
+            .unlock_wallet_with_session(Default::default(), &identifiers, wallet_index)
+            .await
+    }
+    .map_err(ServiceError::BackgroundError)?;
 
-        Ok(())
-    })
-    .await
-    .map_err(Into::into)
+    Arc::get_mut(&mut service.core)
+        .ok_or(ServiceError::CoreAccess)?
+        .delete_wallet(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(())
 }
 
 pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
@@ -320,27 +362,24 @@ pub async fn set_biometric(
     wallet_index: usize,
     identifiers: Vec<String>,
     password: String,
-    session_cipher: Option<String>,
     new_biometric_type: String,
-) -> Result<Option<String>, String> {
-    with_service(|core| {
-        let mb_session = if session_cipher.is_some() {
-            Some(decode_session(session_cipher)?)
-        } else {
-            None
-        };
-        let session_bytes = core.set_biometric(
+) -> Result<(), String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+
+    service
+        .core
+        .set_biometric(
             &password,
-            mb_session,
+            Default::default(),
             &identifiers,
             wallet_index,
             new_biometric_type.into(),
-        )?;
+        )
+        .await
+        .map_err(ServiceError::BackgroundError)?;
 
-        Ok(session_bytes.map(|v| hex::encode(v)))
-    })
-    .await
-    .map_err(Into::into)
+    Ok(())
 }
 
 pub async fn bitcoin_change_address_type(
@@ -348,77 +387,87 @@ pub async fn bitcoin_change_address_type(
     new_address_type: String,
     identifiers: Vec<String>,
     password: Option<String>,
-    session_cipher: Option<String>,
     passphrase: Option<String>,
 ) -> Result<(), String> {
-    with_service(|core| {
-        let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
-            ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
-        })?;
-        let seed = if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
-        } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
-        }?;
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let mut wallet_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let provider = core.get_provider(wallet_data.default_chain_hash)?;
-        let new_bip_purpose = DerivationPath::bip_from_address_type(address_type);
-        let mnemonic = wallet
-            .reveal_mnemonic(&seed)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let mnemonic_seed = mnemonic
-            .to_seed(passphrase.as_deref().unwrap_or(""))
-            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-        for (index, account) in wallet_data.accounts.iter_mut().enumerate() {
-            let net = match account.pub_key {
-                PubKey::Secp256k1Bitcoin((_, net, _)) => Some(net),
-                _ => {
-                    return Err(ServiceError::WalletError(
-                        wallet_index,
-                        WalletErrors::InvalidAccountType,
-                    ));
-                }
-            };
+    let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
+        ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
+    })?;
+    let seed = if let Some(pass) = password {
+        service
+            .core
+            .unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+    } else {
+        service
+            .core
+            .unlock_wallet_with_session(Default::default(), &identifiers, wallet_index)
+            .await
+    }
+    .map_err(ServiceError::BackgroundError)?;
 
-            let new_path =
-                DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, net);
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let mut wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let provider = service
+        .core
+        .get_provider(wallet_data.default_chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let new_bip_purpose = DerivationPath::bip_from_address_type(address_type);
+    let mnemonic = wallet
+        .reveal_mnemonic(&seed)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let mnemonic_seed = mnemonic
+        .to_seed(passphrase.as_deref().unwrap_or(""))
+        .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
 
-            let keypair =
-                zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
-                    .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+    for (index, account) in wallet_data.accounts.iter_mut().enumerate() {
+        let net = match account.pub_key {
+            PubKey::Secp256k1Bitcoin((_, net, _)) => Some(net),
+            _ => {
+                return Err(ServiceError::WalletError(
+                    wallet_index,
+                    WalletErrors::InvalidAccountType,
+                )
+                .into());
+            }
+        };
 
-            account.pub_key = keypair
-                .get_pubkey()
+        let new_path = DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, net);
+
+        let keypair =
+            zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
                 .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
-            account.addr = keypair
-                .get_addr()
-                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
-        }
 
-        let mut ftokens = wallet
-            .get_ftokens()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        account.pub_key = keypair
+            .get_pubkey()
+            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+        account.addr = keypair
+            .get_addr()
+            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+    }
 
-        ftokens.iter_mut().for_each(|t| {
-            t.balances.clear();
-        });
+    let mut ftokens = wallet
+        .get_ftokens()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        wallet
-            .save_wallet_data(wallet_data)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        wallet
-            .save_ftokens(&ftokens)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    ftokens.iter_mut().for_each(|t| {
+        t.balances.clear();
+    });
 
-        Ok(())
-    })
-    .await
-    .map_err(Into::into)
+    wallet
+        .save_wallet_data(wallet_data)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    wallet
+        .save_ftokens(&ftokens)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    Ok(())
 }
 
 pub async fn reveal_keypair(
@@ -629,18 +678,26 @@ pub async fn restore_from_keystore(
     device_indicators: Vec<String>,
     password: String,
     biometric_type: String,
-) -> Result<(String, String), String> {
-    with_service_mut(|core| {
-        let session = core.load_keystore(
+) -> Result<String, String> {
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+
+    Arc::get_mut(&mut service.core)
+        .ok_or(ServiceError::CoreAccess)?
+        .load_keystore(
             keystore_bytes,
             &password,
             &device_indicators,
             biometric_type.into(),
-        )?;
-        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
+        )
+        .await
+        .map_err(ServiceError::BackgroundError)?;
 
-        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
-    })
-    .await
-    .map_err(Into::into)
+    let wallet = service
+        .core
+        .wallets
+        .last()
+        .ok_or(ServiceError::FailToSaveWallet)?;
+
+    Ok(hex::encode(wallet.wallet_address))
 }

@@ -87,7 +87,6 @@ pub async fn sign_send_transactions(
     account_index: usize,
     password: Option<String>,
     passphrase: Option<String>,
-    session_cipher: Option<String>,
     identifiers: Vec<String>,
     tx: TransactionRequestInfo,
 ) -> Result<HistoricalTransactionInfo, String> {
@@ -99,8 +98,8 @@ pub async fn sign_send_transactions(
         let seed_bytes = if let Some(pass) = password {
             core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
         } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+            core.unlock_wallet_with_session(Default::default(), &identifiers, wallet_index)
+                .await
         }
         .map_err(ServiceError::BackgroundError)?;
 
@@ -284,6 +283,7 @@ pub async fn sign_message(
         } else {
             let session = decode_session(session_cipher)?;
             core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+                .await
         }
         .map_err(ServiceError::BackgroundError)?;
         let signed = core
@@ -328,6 +328,7 @@ pub async fn sign_typed_data_eip712(
         } else {
             let session = decode_session(session_cipher)?;
             core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+                .await
         }
         .map_err(ServiceError::BackgroundError)?;
         let signed = core
@@ -448,9 +449,10 @@ pub async fn create_token_transfer(
                     .map_err(ServiceError::NetworkErrors)?;
 
                 if unspents.is_empty() {
-                    return Err(ServiceError::BackgroundError(
-                        BackgroundError::BincodeError("No UTXOs available".to_string())
-                    ).into());
+                    return Err(ServiceError::BackgroundError(BackgroundError::BincodeError(
+                        "No UTXOs available".to_string(),
+                    ))
+                    .into());
                 }
 
                 let actual_balance: u64 = unspents.iter().map(|u| u.value).sum();
