@@ -51,6 +51,20 @@ class AuthGuard extends ChangeNotifier {
     }
   }
 
+  Future<void> clearSession(String sessionKey) async {
+    try {
+      await _storage.delete(
+        key: sessionKey,
+      );
+
+      _enabled = true;
+
+      notifyListeners();
+    } catch (e) {
+      throw 'Failed to save session key: $e';
+    }
+  }
+
   Future<String?> getSession({
     required String sessionKey,
     bool requireAuth = true,

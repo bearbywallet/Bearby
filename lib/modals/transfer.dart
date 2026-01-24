@@ -94,7 +94,6 @@ class _ConfirmTransactionContentState
   late final bool _isLedgerWallet;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
-  final _authService = AuthService();
 
   RequiredTxParamsInfo _txParamsInfo = RequiredTxParamsInfo(
     gasPrice: BigInt.zero,
@@ -276,12 +275,6 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Future<bool> _authenticate() async {
-    if (!mounted) return false;
-    return _authService.authenticate(
-        allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
-  }
-
   Future<HistoricalTransactionInfo?> _signAndSendLedger(
     AppState appState,
     TransactionRequestInfo tx,
@@ -313,8 +306,7 @@ class _ConfirmTransactionContentState
     final walletIndex = BigInt.from(appState.selectedWallet);
     final accountIndex = wallet.selectedAccount;
 
-    if (wallet.authType != AuthMethod.none.name) {
-      if (!await _authenticate()) return null;
+    if (wallet.authType != "none") {
       return await signSendTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,

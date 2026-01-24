@@ -14,7 +14,6 @@ import '../components/wallet_option.dart';
 import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
 import '../services/auth_guard.dart';
-import '../services/biometric_service.dart';
 import '../services/device.dart';
 import '../state/app_state.dart';
 
@@ -36,6 +35,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   bool _obscurePassword = true;
   bool _obscureButton = true;
   int _selectedWallet = -1;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   Future<bool> _authenticateWithSession(
-    String session,
+    String? session,
     int walletIndex,
     List<String> identifiers,
   ) async {
@@ -130,6 +130,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     final identifiers = await device.getDeviceIdentifiers();
 
     _btnController.start();
+    setState(() {
+      _loading = true;
+    });
 
     try {
       bool isAuthenticated = false;
@@ -138,19 +141,21 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         final session =
             await _authGuard.getSession(sessionKey: wallet.walletAddress);
         isAuthenticated = await _authenticateWithSession(
-          session ?? "",
+          session,
           _selectedWallet,
           identifiers,
         );
-      } else if (wallet.authType != AuthMethod.none.name &&
+        await _authGuard.clearSession(wallet.walletAddress);
+      } else if (wallet.authType != "none" &&
           _passwordController.text.isEmpty) {
         final session =
             await _authGuard.getSession(sessionKey: wallet.walletAddress);
         isAuthenticated = await _authenticateWithSession(
-          session ?? "",
+          session,
           _selectedWallet,
           identifiers,
         );
+        await _authGuard.clearSession(wallet.walletAddress);
       } else if (_passwordController.text.isNotEmpty) {
         isAuthenticated = await _authenticateWithPassword(
           _passwordController.text,
@@ -181,6 +186,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       if (mounted) {
         _handleAuthenticationError();
       }
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+      _btnController.reset();
     }
   }
 
@@ -289,12 +299,13 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         'assets/icons/document.svg',
       if (wallet.walletType.contains(WalletType.SecretKey.name))
         'assets/icons/bincode.svg',
-      if (wallet.authType == AuthMethod.faceId.name) 'assets/icons/face_id.svg',
-      if (wallet.authType == AuthMethod.fingerprint.name)
-        'assets/icons/fingerprint.svg',
-      if (wallet.authType == AuthMethod.biometric.name)
-        'assets/icons/biometric.svg',
-      if (wallet.authType == AuthMethod.pinCode.name) 'assets/icons/pin.svg',
+      if (wallet.authType == "faceId") 'assets/icons/face_id.svg',
+      if (wallet.authType == "opticId") 'assets/icons/face_id.svg',
+      if (wallet.authType == "fingerprint") 'assets/icons/fingerprint.svg',
+      if (wallet.authType == "touchId") 'assets/icons/fingerprint.svg',
+      if (wallet.authType == "biometric") 'assets/icons/biometric.svg',
+      if (wallet.authType == "pinCode") 'assets/icons/pin.svg',
+      if (wallet.authType == "password") 'assets/icons/pin.svg',
     ];
   }
 
@@ -316,7 +327,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
             hint: l10n.loginPagePasswordHint,
             fontSize: 18,
             height: 50,
-            disabled: _selectedWallet == -1 || isLedgerWallet,
+            disabled: _selectedWallet == -1 || isLedgerWallet || _loading,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             focusedBorderColor: theme.currentTheme.primaryPurple,
             obscureText: _obscurePassword,
