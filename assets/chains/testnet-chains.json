@@ -34,7 +34,84 @@
       }
     ]
   },
+    {
+    "name": "Sepolia",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/chain/%{dark,light}%.svg",
+    "chain": "ETH",
+    "rpc": [
+      "https://rpc-sepolia.rockx.com",
+      "https://rpc.sepolia.dev",
+      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Ethereum",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
+        "symbol": "tETH",
+        "decimals": 18
+      }
+    ],
+    "testnet": true,
+    "infoURL": "https://sepolia.dev/",
+    "shortName": "ethereum",
+    "chainIds": [11155111, 0],
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Etherscan",
+        "url": "https://sepolia.etherscan.io/",
+        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
+        "standard": "EIP3091"
+      }
+    ]
+  },
   {
+    "name": "BSC Test",
+    "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://bsc-testnet.public.blastapi.io",
+      "https://bsc-testnet-dataseed.bnbchain.org",
+      "https://bsc-prebsc-dataseed.bnbchain.org",
+      "https://bsc-testnet.bnbchain.org"
+    ],
+    "features": [
+      "EIP1559",
+      "EIP155",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "BinanceCoin",
+        "symbol": "tBNB",
+        "decimals": 18
+      }
+    ],
+    "infoURL": "https://www.bnbchain.org",
+    "shortName": "bnbchain",
+    "testnet": true,
+    "chainIds": [97, 0],
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "BscScan",
+        "url": "https://testnet.bscscan.com",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+    {
     "name": "Zilliqa Test",
     "chain": "ZIL",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
@@ -79,83 +156,6 @@
         "name": "Otterscan",
         "icon": "https://otterscan.testnet.zilliqa.com/assets/otter-DYFeLtFi.png",
         "url": "https://otterscan.testnet.zilliqa.com/",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "BSC Test",
-    "chain": "BNB",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
-    "rpc": [
-      "https://bsc-testnet.public.blastapi.io",
-      "https://bsc-testnet-dataseed.bnbchain.org",
-      "https://bsc-prebsc-dataseed.bnbchain.org",
-      "https://bsc-testnet.bnbchain.org"
-    ],
-    "features": [
-      "EIP1559",
-      "EIP155",
-      "EIP4844"
-    ],
-    "ftokens": [
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "BinanceCoin",
-        "symbol": "tBNB",
-        "decimals": 18
-      }
-    ],
-    "infoURL": "https://www.bnbchain.org",
-    "shortName": "bnbchain",
-    "testnet": true,
-    "chainIds": [97, 0],
-    "slip44": 60,
-    "explorers": [
-      {
-        "name": "BscScan",
-        "url": "https://testnet.bscscan.com",
-        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Sepolia",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/chain/%{dark,light}%.svg",
-    "chain": "ETH",
-    "rpc": [
-      "https://rpc-sepolia.rockx.com",
-      "https://rpc.sepolia.dev",
-      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8"
-    ],
-    "features": [
-      "EIP155",
-      "EIP1559",
-      "EIP4844"
-    ],
-    "ftokens": [
-      {
-        "native": true,
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Ethereum",
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
-        "symbol": "tETH",
-        "decimals": 18
-      }
-    ],
-    "testnet": true,
-    "infoURL": "https://sepolia.dev/",
-    "shortName": "ethereum",
-    "chainIds": [11155111, 0],
-    "slip44": 60,
-    "explorers": [
-      {
-        "name": "Etherscan",
-        "url": "https://sepolia.etherscan.io/",
-        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
         "standard": "EIP3091"
       }
     ]

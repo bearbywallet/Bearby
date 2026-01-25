@@ -49,51 +49,7 @@
       }
     ]
   },
-  {
-    "name": "Binance",
-    "chain": "BNB",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
-    "rpc": [
-      "https://bsc-dataseed.bnbchain.org",
-      "https://bsc-dataseed.nariox.org",
-      "https://bsc-dataseed.defibit.io",
-      "https://bsc-dataseed.ninicoin.io",
-      "https://bsc.nodereal.io",
-      "https://bsc-dataseed-public.bnbchain.org",
-      "https://bnb.rpc.subquery.network/public"
-    ],
-    "features": [
-      "EIP155",
-      "EIP1559",
-      "EIP4844"
-    ],
-    "ftokens": [
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "BinanceCoin",
-        "symbol": "BNB",
-        "decimals": 18
-      }
-    ],
-    "chainIds": [
-      56,
-      0
-    ],
-    "infoURL": "https://bnbchain.org",
-    "shortName": "bnbchain",
-    "slip44": 60,
-    "explorers": [
-      {
-        "name": "Bscscan",
-        "url": "https://bscscan.com/",
-        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
+    {
     "name": "Ethereum",
     "chain": "ETH",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
@@ -140,6 +96,50 @@
         "name": "blockscout",
         "url": "https://eth.blockscout.com",
         "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Binance",
+    "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://bsc-dataseed.bnbchain.org",
+      "https://bsc-dataseed.nariox.org",
+      "https://bsc-dataseed.defibit.io",
+      "https://bsc-dataseed.ninicoin.io",
+      "https://bsc.nodereal.io",
+      "https://bsc-dataseed-public.bnbchain.org",
+      "https://bnb.rpc.subquery.network/public"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "BinanceCoin",
+        "symbol": "BNB",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [
+      56,
+      0
+    ],
+    "infoURL": "https://bnbchain.org",
+    "shortName": "bnbchain",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Bscscan",
+        "url": "https://bscscan.com/",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
         "standard": "EIP3091"
       }
     ]

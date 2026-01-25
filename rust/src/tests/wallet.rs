@@ -118,7 +118,7 @@ mod wallet_tests {
             .into_iter()
             .map(|c| c.try_into().unwrap())
             .collect();
-        let zilliqa_provider_mainnet = providers.get(2).unwrap();
+        let zilliqa_provider_mainnet = providers.get(3).unwrap();
 
         assert_eq!(zilliqa_provider_mainnet.name, "Zilliqa");
         assert_eq!(zilliqa_provider_mainnet.chain, "ZIL");
@@ -147,7 +147,7 @@ mod wallet_tests {
             .add_provider(zilliqa_provider_mainnet.clone())
             .unwrap();
 
-        let binance_provider_mainnet = &providers[0];
+        let binance_provider_mainnet = &providers[2];
 
         assert_eq!(binance_provider_mainnet.name, "Binance");
         assert_eq!(binance_provider_mainnet.chain, "BNB");
@@ -304,7 +304,7 @@ mod wallet_tests {
 
         assert_eq!(wallet.wallet_type, "SecretPhrase.false");
         assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
-        assert_eq!(wallet.auth_type, "faceId");
+        assert_eq!(wallet.auth_type, "none");
         assert_eq!(wallet.wallet_address, wallet_address);
         assert_eq!(&wallet.wallet_address, &wallet_address);
         assert_eq!(wallet.accounts.len(), 1);
@@ -377,15 +377,15 @@ mod wallet_tests {
         .await
         .unwrap();
 
-        let zil_testnet_chain_config = {
+        let zil_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
             let providers = service.core.get_providers();
 
-            providers[2].config.clone()
+            providers[0].config.clone()
         };
 
-        select_accounts_chain(0, zil_testnet_chain_config.hash())
+        select_accounts_chain(0, zil_chain_config.hash())
             .await
             .unwrap();
 
@@ -412,7 +412,7 @@ mod wallet_tests {
             let selected_account = data.get_selected_account().unwrap();
 
             assert_eq!(data.selected_account, 1);
-            assert_eq!(selected_account.chain_hash, zil_testnet_chain_config.hash());
+            assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
             assert_eq!(selected_account.name, "Second account");
             assert_eq!(selected_account.account_type.code(), 1);
             assert_eq!(
@@ -421,7 +421,7 @@ mod wallet_tests {
             );
             assert_eq!(
                 selected_account.chain_id,
-                *zil_testnet_chain_config.chain_ids.last().unwrap()
+                *zil_chain_config.chain_ids.last().unwrap()
             );
             assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
             assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
@@ -448,7 +448,7 @@ mod wallet_tests {
         assert_eq!(wallets.len(), 1);
         assert_eq!(wallet.wallet_type, "SecretPhrase.false");
         assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
-        assert_eq!(wallet.auth_type, "faceId");
+        assert_eq!(wallet.auth_type, "none");
         assert_eq!(wallet.wallet_address, wallet_address);
         assert_eq!(wallet.accounts.len(), 2);
         assert_eq!(wallet.selected_account, 1);
@@ -655,7 +655,7 @@ mod wallet_tests {
             assert_eq!(wallet.wallet_address, new_address);
             assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
             assert_eq!(wallet.wallet_type, "SecretPhrase.false");
-            assert_eq!(wallet.auth_type, "fingerprint");
+            assert_eq!(wallet.auth_type, "none");
             assert_eq!(wallet.selected_account, 0);
             assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
             assert_eq!(wallet.accounts.len(), 1);
@@ -762,7 +762,7 @@ mod wallet_tests {
             assert_eq!(wallets.len(), 1);
             assert_eq!(wallet.wallet_type, "SecretKey");
             assert_eq!(wallet.wallet_name, "SK Wallet");
-            assert_eq!(wallet.auth_type, "faceId");
+            assert_eq!(wallet.auth_type, "none");
             assert_eq!(wallet.wallet_address, wallet_address);
             assert_eq!(wallet.accounts.len(), 1);
             assert_eq!(wallet.selected_account, 0);
@@ -939,7 +939,7 @@ mod wallet_tests {
             assert_eq!(wallets.len(), 1);
             assert_eq!(wallet.wallet_type, "SecretKey");
             assert_eq!(wallet.wallet_name, "SK Wallet");
-            assert_eq!(wallet.auth_type, "fingerprint");
+            assert_eq!(wallet.auth_type, "none");
             assert!(!wallet.wallet_address.is_empty());
             assert_eq!(wallet.accounts.len(), 1);
             assert_eq!(wallet.selected_account, 0);
