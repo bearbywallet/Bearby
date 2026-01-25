@@ -1,5 +1,3 @@
-// ignore_for_file: constant_identifier_names
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,43 +28,35 @@ class RestoreKeystoreFilePage extends StatefulWidget {
 
 class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     with StatusBarMixin {
-  static const List<int> SIGNATURE = [
-    90,
-    73,
-    76,
-    80,
-    65,
-    89,
-    95,
-    66,
-    65,
-    67,
-    75,
-    85,
-    80
+  static const List<int> _signature = [
+    90, 73, 76, 80, 65, 89, 95, 66, 65, 67, 75, 85, 80
   ];
 
-  String _password = '';
-  bool _disabled = false;
-  String _errorMessage = '';
   bool _isLoading = true;
+  bool _isProcessing = false;
+  String _errorMessage = '';
   List<KeystoreFile> _backupFiles = [];
   KeystoreFile? _selectedFile;
-
-  late AppState _appState;
   List<String> _authMethods = [];
   bool _useDeviceAuth = true;
+  bool _obscurePassword = true;
 
+  late AppState _appState;
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
-  bool _obscurePassword = true;
+
+  bool get _canInteract => !_isProcessing;
+  bool get _canRestore =>
+      _selectedFile != null &&
+      _passwordController.text.isNotEmpty &&
+      _canInteract;
 
   @override
   void initState() {
     super.initState();
-    _loadBackupFiles();
     _appState = Provider.of<AppState>(context, listen: false);
+    _loadBackupFiles();
     _checkAuthMethods();
   }
 
@@ -80,14 +70,14 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   Future<void> _checkAuthMethods() async {
     try {
       final methods = await getBiometricType();
-      setState(() {
-        _authMethods = methods;
-      });
+      if (mounted) {
+        setState(() => _authMethods = methods);
+      }
     } catch (e) {
       debugPrint("Error checking auth methods: $e");
-      setState(() {
-        _authMethods = [];
-      });
+      if (mounted) {
+        setState(() => _authMethods = []);
+      }
     }
   }
 
@@ -100,26 +90,29 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
 
     try {
       final List<KeystoreFile> files = [];
-
       final tempDir = await getTemporaryDirectory();
-      await _loadFilesFromDirectory(tempDir.path, files);
-
       final docDir = await getApplicationDocumentsDirectory();
+
+      await _loadFilesFromDirectory(tempDir.path, files);
       await _loadFilesFromDirectory(docDir.path, files);
 
       if (Platform.isAndroid) {
         await _loadFilesFromDirectory('/storage/emulated/0/Download', files);
       }
 
-      setState(() {
-        _backupFiles = files;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _backupFiles = files;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = e.toString();
+        });
+      }
     }
   }
 
@@ -127,20 +120,20 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       String dirPath, List<KeystoreFile> files) async {
     try {
       final dir = Directory(dirPath);
-      if (await dir.exists()) {
-        final dirFiles = dir
-            .listSync()
-            .where((entity) => entity is File && entity.path.endsWith('.zp'))
-            .map((entity) => entity as File);
+      if (!await dir.exists()) return;
 
-        for (final file in dirFiles) {
-          try {
-            final keystoreFile = await _parseKeystoreFile(file);
-            if (keystoreFile != null) {
-              files.add(keystoreFile);
-            }
-          } catch (_) {}
-        }
+      final dirFiles = dir
+          .listSync()
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.zp'));
+
+      for (final file in dirFiles) {
+        try {
+          final keystoreFile = await _parseKeystoreFile(file);
+          if (keystoreFile != null) {
+            files.add(keystoreFile);
+          }
+        } catch (_) {}
       }
     } catch (_) {}
   }
@@ -148,36 +141,46 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   Future<KeystoreFile?> _parseKeystoreFile(File file) async {
     try {
       final bytes = await file.readAsBytes();
-      if (bytes.length < SIGNATURE.length + 1) {
-        return KeystoreFile(
-          file: file,
-          fileName: file.path.split('/').last,
-          filePath: file.path,
-          lastModified: file.lastModifiedSync(),
-          isValid: false,
-        );
+      final isValidLength = bytes.length >= _signature.length + 1;
+
+      if (!isValidLength) {
+        return _createKeystoreFile(file, isValid: false);
       }
 
-      final signatureBytes = bytes.sublist(0, SIGNATURE.length);
-      final signatureMatches =
-          _compareByteList(signatureBytes, Uint8List.fromList(SIGNATURE));
+      final signatureBytes = bytes.sublist(0, _signature.length);
+      final signatureMatches = _compareByteList(
+        signatureBytes,
+        Uint8List.fromList(_signature),
+      );
 
       int? version;
-      if (signatureMatches && bytes.length > SIGNATURE.length) {
-        version = bytes[SIGNATURE.length];
+      if (signatureMatches) {
+        version = bytes[_signature.length];
       }
 
-      return KeystoreFile(
-        file: file,
-        fileName: file.path.split('/').last,
-        filePath: file.path,
-        lastModified: file.lastModifiedSync(),
+      return _createKeystoreFile(
+        file,
         isValid: signatureMatches,
         version: version,
       );
     } catch (e) {
       return null;
     }
+  }
+
+  KeystoreFile _createKeystoreFile(
+    File file, {
+    required bool isValid,
+    int? version,
+  }) {
+    return KeystoreFile(
+      file: file,
+      fileName: file.path.split('/').last,
+      filePath: file.path,
+      lastModified: file.lastModifiedSync(),
+      isValid: isValid,
+      version: version,
+    );
   }
 
   bool _compareByteList(Uint8List a, Uint8List b) {
@@ -189,7 +192,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   }
 
   void _selectBackupFile(KeystoreFile file) {
-    if (_disabled) return;
+    if (!_canInteract) return;
 
     setState(() {
       _selectedFile = file;
@@ -198,70 +201,77 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
   }
 
   Future<void> _openFilePicker() async {
-    if (_disabled) return;
+    if (!_canInteract) return;
 
     try {
       final l10n = AppLocalizations.of(context)!;
       final result = await FilePicker.platform.pickFiles(type: FileType.any);
 
-      if (result != null &&
-          result.files.isNotEmpty &&
-          result.files.first.path != null) {
-        final path = result.files.first.path!;
-        if (path.toLowerCase().endsWith('.zp')) {
-          try {
-            final file = File(path);
-            final keystoreFile = await _parseKeystoreFile(file);
+      if (result == null || result.files.isEmpty || result.files.first.path == null) {
+        return;
+      }
 
-            if (keystoreFile != null) {
-              setState(() {
-                if (!_backupFiles
-                    .any((f) => f.filePath == keystoreFile.filePath)) {
-                  _backupFiles.add(keystoreFile);
-                }
-                _selectedFile = keystoreFile;
-                _errorMessage = '';
-              });
-            }
-          } catch (e) {
-            setState(() => _errorMessage = e.toString());
+      final path = result.files.first.path!;
+      if (!path.toLowerCase().endsWith('.zp')) {
+        setState(() => _errorMessage = l10n.keystoreRestoreExtError);
+        return;
+      }
+
+      final file = File(path);
+      final keystoreFile = await _parseKeystoreFile(file);
+
+      if (keystoreFile == null) {
+        setState(() => _errorMessage = 'Failed to parse keystore file');
+        return;
+      }
+
+      if (mounted) {
+        setState(() {
+          if (!_backupFiles.any((f) => f.filePath == keystoreFile.filePath)) {
+            _backupFiles.add(keystoreFile);
           }
-        } else {
-          setState(() => _errorMessage = l10n.keystoreRestoreExtError);
-        }
+          _selectedFile = keystoreFile;
+          _errorMessage = '';
+        });
       }
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      if (mounted) {
+        setState(() => _errorMessage = e.toString());
+      }
+    }
+  }
+
+  void _clearError() {
+    if (_errorMessage.isNotEmpty) {
+      setState(() => _errorMessage = '');
     }
   }
 
   Future<void> _restoreFromKeystore() async {
-    setState(() {
-      _disabled = true;
-      _errorMessage = '';
-    });
+    if (!_canRestore) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     if (_passwordController.text.isEmpty) {
-      setState(() {
-        _errorMessage =
-            AppLocalizations.of(context)!.passwordSetupPageShortPasswordError;
-        _disabled = false;
-      });
+      setState(() => _errorMessage = l10n.passwordSetupPageShortPasswordError);
       _passwordInputKey.currentState?.shake();
-      _btnController.reset();
       return;
     }
 
+    setState(() {
+      _isProcessing = true;
+      _errorMessage = '';
+    });
+
+    _btnController.start();
+
     try {
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
-
-      String biometricType = "none";
-      if (_useDeviceAuth && _authMethods.isNotEmpty) {
-        biometricType = _authMethods[0];
-      }
-
+      final device = DeviceInfoService();
+      final identifiers = await device.getDeviceIdentifiers();
+      final biometricType =
+          (_useDeviceAuth && _authMethods.isNotEmpty) ? _authMethods[0] : "none";
       final fileBytes = await _selectedFile!.file.readAsBytes();
+
       await restoreFromKeystore(
         keystoreBytes: fileBytes,
         deviceIndicators: identifiers,
@@ -283,7 +293,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       if (mounted) {
         setState(() {
           _errorMessage = e.toString();
-          _disabled = false;
+          _isProcessing = false;
         });
         _btnController.error();
         await Future.delayed(const Duration(seconds: 1));
@@ -292,8 +302,10 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     }
   }
 
-  String _getFormattedDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  String _formatDate(DateTime date) {
+    final hour = date.hour;
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '${date.day}/${date.month}/${date.year} $hour:$minute';
   }
 
   @override
@@ -319,7 +331,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                 CustomAppBar(
                   title: l10n.restoreWalletOptionsKeyStoreTitle,
                   onBackPressed:
-                      _disabled ? () {} : () => Navigator.pop(context),
+                      _canInteract ? () => Navigator.pop(context) : () {},
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',
                     width: 24,
@@ -327,7 +339,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                     colorFilter:
                         ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
                   ),
-                  onActionPressed: _disabled ? null : _loadBackupFiles,
+                  onActionPressed: _canInteract ? _loadBackupFiles : null,
                 ),
                 Expanded(
                   child: Padding(
@@ -345,45 +357,38 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                             fontSize: 18,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             focusedBorderColor: theme.primaryPurple,
-                            disabled: _disabled || _selectedFile == null,
+                            disabled: !_canInteract || _selectedFile == null,
                             obscureText: _obscurePassword,
                             rightIconPath: _obscurePassword
                                 ? "assets/icons/close_eye.svg"
                                 : "assets/icons/open_eye.svg",
-                            onRightIconTap: _disabled
-                                ? null
-                                : () => setState(
-                                    () => _obscurePassword = !_obscurePassword),
-                            onChanged: _disabled
-                                ? null
-                                : (value) {
-                                    setState(() {
-                                      _password = value;
-                                      if (_errorMessage.isNotEmpty) {
-                                        _errorMessage = '';
-                                      }
-                                    });
-                                  },
+                            onRightIconTap: _canInteract
+                                ? () => setState(() => _obscurePassword = !_obscurePassword)
+                                : null,
+                            onChanged: _canInteract
+                                ? (value) {
+                                    _clearError();
+                                    setState(() {});
+                                  }
+                                : null,
+                            onSubmitted: _canRestore ? (_) => _restoreFromKeystore() : null,
                           ),
                         ),
-                        BiometricSwitch(
-                          biometricType: _authMethods.first,
-                          value: _useDeviceAuth,
-                          disabled: _disabled,
-                          onChanged: (value) =>
-                              setState(() => _useDeviceAuth = value),
-                        ),
+                        if (_authMethods.isNotEmpty)
+                          BiometricSwitch(
+                            biometricType: _authMethods.first,
+                            value: _useDeviceAuth,
+                            disabled: !_canInteract,
+                            onChanged: (value) =>
+                                setState(() => _useDeviceAuth = value),
+                          ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8, bottom: 16),
                           child: RoundedLoadingButton(
                             color: theme.primaryPurple,
                             valueColor: theme.buttonText,
                             controller: _btnController,
-                            onPressed: (_password.isNotEmpty &&
-                                    _selectedFile != null &&
-                                    !_disabled)
-                                ? _restoreFromKeystore
-                                : () {},
+                            onPressed: _canRestore ? _restoreFromKeystore : () {},
                             child: Text(
                               l10n.keystoreRestoreButton,
                               style: theme.titleSmall,
@@ -400,8 +405,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                               textAlign: TextAlign.center,
                             ),
                           ),
-                        _buildFileListHeader(theme),
-                        _buildFileList(theme),
+                        _buildFileListHeader(theme, l10n),
+                        _buildFileList(theme, l10n),
                       ],
                     ),
                   ),
@@ -414,9 +419,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     );
   }
 
-  Widget _buildFileListHeader(AppTheme theme) {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildFileListHeader(AppTheme theme, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -430,13 +433,13 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
             ),
           ),
           IconButton(
-            onPressed: _disabled ? null : _openFilePicker,
+            onPressed: _canInteract ? _openFilePicker : null,
             icon: SvgPicture.asset(
               'assets/icons/plus.svg',
               width: 24,
               height: 24,
               colorFilter: ColorFilter.mode(
-                  _disabled ? theme.textSecondary : theme.textPrimary,
+                  _canInteract ? theme.textPrimary : theme.textSecondary,
                   BlendMode.srcIn),
             ),
             splashRadius: 20,
@@ -446,7 +449,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     );
   }
 
-  Widget _buildFileList(AppTheme theme) {
+  Widget _buildFileList(AppTheme theme, AppLocalizations l10n) {
     if (_isLoading) {
       return Expanded(
         child: Center(
@@ -455,38 +458,39 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       );
     }
 
-    final l10n = AppLocalizations.of(context)!;
+    if (_backupFiles.isEmpty) {
+      return Expanded(
+        child: Center(
+          child: Text(
+            l10n.keystoreRestoreNoFile,
+            style: theme.bodyLarge.copyWith(
+              color: theme.textSecondary,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Expanded(
-      child: _backupFiles.isEmpty
-          ? Center(
-              child: Text(
-                l10n.keystoreRestoreNoFile,
-                style: theme.bodyLarge.copyWith(
-                  color: theme.textSecondary,
-                ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: _backupFiles.length,
-              itemBuilder: (context, index) {
-                final file = _backupFiles[index];
-                final isSelected = _selectedFile?.filePath == file.filePath;
-                final formattedDate = _getFormattedDate(file.lastModified);
+      child: ListView.builder(
+        itemCount: _backupFiles.length,
+        itemBuilder: (context, index) {
+          final file = _backupFiles[index];
+          final isSelected = _selectedFile?.filePath == file.filePath;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: KeystoreFileCard(
-                    file: file,
-                    isSelected: isSelected,
-                    formattedDate: formattedDate,
-                    theme: theme,
-                    disabled: _disabled,
-                    onPressed: () => _selectBackupFile(file),
-                  ),
-                );
-              },
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: KeystoreFileCard(
+              file: file,
+              isSelected: isSelected,
+              formattedDate: _formatDate(file.lastModified),
+              theme: theme,
+              disabled: !_canInteract,
+              onPressed: () => _selectBackupFile(file),
             ),
+          );
+        },
+      ),
     );
   }
 }
@@ -528,7 +532,7 @@ class KeystoreFileCard extends StatelessWidget {
     this.disabled = false,
   });
 
-  String _formatFileSize() {
+  String get _fileSize {
     final sizeInKB = (file.fileSize / 1024).toStringAsFixed(1);
     return '$sizeInKB KB';
   }
@@ -588,7 +592,7 @@ class KeystoreFileCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _formatFileSize(),
+                            _fileSize,
                             style: theme.labelSmall.copyWith(
                               color: theme.textSecondary,
                             ),
@@ -658,19 +662,31 @@ class PressableCard extends StatefulWidget {
 class _PressableCardState extends State<PressableCard> {
   bool _isPressed = false;
 
+  void _handleTapDown(TapDownDetails details) {
+    if (!widget.disabled) {
+      setState(() => _isPressed = true);
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (!widget.disabled) {
+      setState(() => _isPressed = false);
+      widget.onPressed();
+    }
+  }
+
+  void _handleTapCancel() {
+    if (!widget.disabled) {
+      setState(() => _isPressed = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown:
-          widget.disabled ? null : (_) => setState(() => _isPressed = true),
-      onTapUp: widget.disabled
-          ? null
-          : (_) {
-              setState(() => _isPressed = false);
-              widget.onPressed();
-            },
-      onTapCancel:
-          widget.disabled ? null : () => setState(() => _isPressed = false),
+      onTapDown: widget.disabled ? null : _handleTapDown,
+      onTapUp: widget.disabled ? null : _handleTapUp,
+      onTapCancel: widget.disabled ? null : _handleTapCancel,
       child: AnimatedScale(
         scale: (_isPressed && !widget.disabled) ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
