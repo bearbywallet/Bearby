@@ -74,6 +74,12 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     Navigator.pushNamed(context, '/new_wallet_options');
   }
 
+  Future<void> _completeAuthentication(int walletIndex) async {
+    _appState.setSelectedWallet(walletIndex);
+    await _appState.syncData();
+    _authGuard.setEnabled(true);
+  }
+
   Future<bool> _authenticateWithSession(
     String? session,
     int walletIndex,
@@ -87,9 +93,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       );
 
       if (unlocked) {
-        _appState.setSelectedWallet(walletIndex);
-        await _appState.syncData();
-        _authGuard.setEnabled(true);
+        await _completeAuthentication(walletIndex);
         return true;
       }
     } catch (e) {
@@ -111,9 +115,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       );
 
       if (unlocked) {
-        _appState.setSelectedWallet(walletIndex);
-        await _appState.syncData();
-        _authGuard.setEnabled(true);
+        await _completeAuthentication(walletIndex);
         return true;
       }
     } catch (e) {
@@ -138,14 +140,8 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       bool isAuthenticated = false;
 
       if (wallet.walletType.contains(WalletType.ledger.name)) {
-        final session =
-            await _authGuard.getSession(sessionKey: wallet.walletAddress);
-        isAuthenticated = await _authenticateWithSession(
-          session,
-          _selectedWallet,
-          identifiers,
-        );
-        await _authGuard.clearSession(wallet.walletAddress);
+        await _completeAuthentication(_selectedWallet);
+        isAuthenticated = true;
       } else if (wallet.authType != "none" &&
           _passwordController.text.isEmpty) {
         final session =
@@ -187,10 +183,12 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         _handleAuthenticationError();
       }
     } finally {
-      setState(() {
-        _loading = false;
-      });
-      _btnController.reset();
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        _btnController.reset();
+      }
     }
   }
 

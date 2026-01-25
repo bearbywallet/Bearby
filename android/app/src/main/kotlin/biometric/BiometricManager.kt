@@ -137,6 +137,8 @@ class BiometricManager(private val context: Context) {
         activity: FragmentActivity,
         cipher: Cipher
     ): Cipher? = suspendCoroutine { continuation ->
+        var isResumed = false
+
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric Authentication")
             .setSubtitle("Authenticate to access secure data")
@@ -147,15 +149,21 @@ class BiometricManager(private val context: Context) {
             activity,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    continuation.resume(result.cryptoObject?.cipher)
+                    if (!isResumed) {
+                        isResumed = true
+                        continuation.resume(result.cryptoObject?.cipher)
+                    }
                 }
 
                 override fun onAuthenticationFailed() {
-                    continuation.resume(null)
+                    // Don't resume on individual failed attempts, only on final error
                 }
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    continuation.resume(null)
+                    if (!isResumed) {
+                        isResumed = true
+                        continuation.resume(null)
+                    }
                 }
             }
         )
