@@ -2,6 +2,7 @@ use crate::{
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::decode_session},
 };
+use secrecy::{zeroize::Zeroize, SecretString};
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::session;
 
@@ -30,11 +31,14 @@ pub async fn try_unlock_with_password(
 ) -> Result<bool, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut password = SecretString::new(password.into());
 
     service
         .core
         .unlock_wallet_with_password(&password, &identifiers, wallet_index)
         .map_err(ServiceError::BackgroundError)?;
+
+    password.zeroize();
 
     Ok(true)
 }

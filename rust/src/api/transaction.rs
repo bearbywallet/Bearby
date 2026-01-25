@@ -8,6 +8,8 @@ use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{decode_session, parse_address, with_service, with_wallet};
+use secrecy::zeroize::Zeroize;
+use secrecy::SecretString;
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;
@@ -93,10 +95,15 @@ pub async fn sign_send_transactions(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
+    let password = password.map(|p| SecretString::new(p.into()));
 
     let signed_tx = {
-        let seed_bytes = if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        let seed_bytes = if let Some(mut pass) = password {
+            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+
+            pass.zeroize();
+
+            key
         } else {
             core.unlock_wallet_with_session(Default::default(), &identifiers, wallet_index)
                 .await
@@ -276,10 +283,13 @@ pub async fn sign_message(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
+    let password = password.map(|p| SecretString::new(p.into()));
 
     let signed: (PubKey, Signature) = {
-        let seed_bytes = if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        let seed_bytes = if let Some(mut pass) = password {
+            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+            pass.zeroize();
+            key
         } else {
             let session = decode_session(session_cipher)?;
             core.unlock_wallet_with_session(session, &identifiers, wallet_index)
@@ -321,10 +331,12 @@ pub async fn sign_typed_data_eip712(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
-
+    let password = password.map(|p| SecretString::new(p.into()));
     let signed: (PubKey, Signature) = {
-        let seed_bytes = if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        let seed_bytes = if let Some(mut pass) = password {
+            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+            pass.zeroize();
+            key
         } else {
             let session = decode_session(session_cipher)?;
             core.unlock_wallet_with_session(session, &identifiers, wallet_index)

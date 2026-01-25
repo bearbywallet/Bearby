@@ -1,6 +1,8 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
+use secrecy::zeroize::Zeroize;
+use secrecy::SecretString;
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
 use zilpay::errors::background::BackgroundError;
@@ -90,6 +92,7 @@ pub async fn add_bip39_wallet(
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
+    let password = SecretString::new(params.password.into());
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
         .add_bip39_wallet(BackgroundBip39Params {
@@ -97,7 +100,7 @@ pub async fn add_bip39_wallet(
             wallet_settings,
             mnemonic_check: params.mnemonic_check,
             chain_hash: params.chain_hash,
-            password: &params.password,
+            password: &password,
             mnemonic_str: &params.mnemonic_str,
             accounts: &accounts_bip49,
             passphrase: &params.passphrase,
@@ -150,6 +153,7 @@ pub async fn add_sk_wallet(
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
+    let password = SecretString::new(params.password.into());
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
         .add_sk_wallet(BackgroundSKParams {
@@ -158,7 +162,7 @@ pub async fn add_sk_wallet(
             secret_key,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
-            password: &params.password,
+            password: &password,
             device_indicators: &params.identifiers,
             wallet_settings,
         })
@@ -185,11 +189,17 @@ pub struct AddNextBip39AccountParams {
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let password = params.password.map(|p| SecretString::new(p.into()));
 
-    let seed = if let Some(pass) = params.password {
-        service
-            .core
-            .unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
+    let seed = if let Some(mut pass) = password {
+        let key = service.core.unlock_wallet_with_password(
+            &pass,
+            &params.identifiers,
+            params.wallet_index,
+        );
+        pass.zeroize();
+
+        key
     } else {
         service
             .core
@@ -325,11 +335,16 @@ pub async fn delete_wallet(
 ) -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let password = password.map(|p| SecretString::new(p.into()));
 
-    if let Some(pass) = password {
-        service
+    if let Some(mut pass) = password {
+        let key = service
             .core
-            .unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+            .unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+
+        pass.zeroize();
+
+        key
     } else {
         service
             .core
@@ -361,22 +376,25 @@ pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result
 pub async fn set_biometric(
     wallet_index: usize,
     identifiers: Vec<String>,
-    password: String,
+    password: Option<String>,
     new_biometric_type: String,
 ) -> Result<(), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut password = password.map(|p| SecretString::new(p.into()));
 
     service
         .core
         .set_biometric(
-            &password,
+            password.as_ref(),
             &identifiers,
             wallet_index,
             new_biometric_type.into(),
         )
         .await
         .map_err(ServiceError::BackgroundError)?;
+
+    password.zeroize();
 
     Ok(())
 }
@@ -390,14 +408,16 @@ pub async fn bitcoin_change_address_type(
 ) -> Result<(), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-
+    let password = password.map(|p| SecretString::new(p.into()));
     let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
         ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
     })?;
-    let seed = if let Some(pass) = password {
-        service
+    let seed = if let Some(mut pass) = password {
+        let key = service
             .core
-            .unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+            .unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+        pass.zeroize();
+        key
     } else {
         service
             .core
@@ -477,11 +497,14 @@ pub async fn reveal_keypair(
     passphrase: Option<String>,
 ) -> Result<KeyPairInfo, String> {
     with_service(|core| {
+        let mut password = SecretString::new(password.into());
         let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let keypair = wallet
             .reveal_keypair(account_index, &seed, passphrase.as_deref())
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        password.zeroize();
 
         Ok(keypair.into())
     })
@@ -496,11 +519,14 @@ pub async fn reveal_bip39_phrase(
     _passphrase: Option<String>,
 ) -> Result<String, String> {
     with_service(|core| {
+        let mut password = SecretString::new(password.into());
         let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let m = wallet
             .reveal_mnemonic(&seed)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        password.zeroize();
 
         Ok(m.to_string())
     })
@@ -654,6 +680,7 @@ pub async fn make_keystore_file(
     password: String,
     device_indicators: Vec<String>,
 ) -> Result<Vec<u8>, String> {
+    let mut password = SecretString::new(password.into());
     let chain_hash = with_wallet(wallet_index, |wallet| {
         let data = wallet
             .get_wallet_data()
@@ -666,6 +693,7 @@ pub async fn make_keystore_file(
 
     with_service(|core| {
         let keystore_bytes = core.get_keystore(wallet_index, &password, &device_indicators)?;
+        password.zeroize();
         Ok(keystore_bytes)
     })
     .await
@@ -680,6 +708,7 @@ pub async fn restore_from_keystore(
 ) -> Result<String, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let mut password = SecretString::new(password.into());
 
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
@@ -697,6 +726,8 @@ pub async fn restore_from_keystore(
         .wallets
         .last()
         .ok_or(ServiceError::FailToSaveWallet)?;
+
+    password.zeroize();
 
     Ok(hex::encode(wallet.wallet_address))
 }

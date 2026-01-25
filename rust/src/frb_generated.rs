@@ -3140,7 +3140,7 @@ fn wire__crate__api__wallet__set_biometric_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_password = <String>::sse_decode(&mut deserializer);
+            let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_new_biometric_type = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {

@@ -24,6 +24,7 @@ sha2 = "0.10.8"
 aes = "0.8"
 base64 = "0.22"
 bitcoin = "0.32.8"
+secrecy = "0.10.3"
 
 [dev-dependencies]
 tempfile = "3.19.1"

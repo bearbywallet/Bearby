@@ -15,7 +15,6 @@ import 'package:zilpay/modals/confirm_password.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -164,90 +163,90 @@ class _WalletPageState extends State<WalletPage> {
     try {
       final wallet = appState.wallet;
       if (wallet == null) {
-        setState(() {
-          _isBiometricLoading = false;
-        });
+        _resetBiometricLoading();
         return;
       }
 
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
-      if (enable && mounted) {
-        showConfirmPasswordModal(
-          context: context,
-          theme: appState.currentTheme,
-          onDismiss: () {
-            if (mounted) {
-              setState(() {
-                _isBiometricLoading = false;
-              });
-            }
-          },
-          onConfirm: (password) async {
-            try {
-              final auth = LocalAuthentication();
-              final authenticated = await auth.authenticate(
-                localizedReason:
-                    AppLocalizations.of(context)!.walletPageBiometricReason,
-                options: const AuthenticationOptions(
-                  stickyAuth: true,
-                  biometricOnly: false,
-                  useErrorDialogs: true,
-                ),
-              );
-
-              if (!authenticated) {
-                return "Authorization declined for biometrics";
-              }
-
-              final biometricType = _authMethods.first;
-
-              await setBiometric(
-                walletIndex: BigInt.from(appState.selectedWallet),
-                identifiers: identifiers,
-                password: password,
-                newBiometricType: biometricType,
-              );
-
-              await appState.syncData();
-
-              if (mounted) {
-                setState(() {
-                  _isBiometricLoading = false;
-                });
-              }
-
-              return null;
-            } catch (e) {
-              return e.toString();
-            }
-          },
+      if (enable) {
+        await _showBiometricPasswordModal(
+          appState: appState,
+          identifiers: identifiers,
+          enable: true,
         );
       } else {
-        await setBiometric(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          identifiers: identifiers,
-          password: "",
-          newBiometricType: "none",
-        );
-
-        if (mounted) {
-          setState(() {
-            _isBiometricLoading = false;
-          });
-        }
+        await _disableBiometric(appState, identifiers);
       }
     } catch (e) {
       debugPrint("Error changing biometric: $e");
-      if (mounted) {
-        setState(() {
-          _isBiometricLoading = false;
-        });
-      }
+      _resetBiometricLoading();
     } finally {
       await appState.syncData();
     }
+  }
+
+  Future<void> _disableBiometric(
+    AppState appState,
+    List<String> identifiers,
+  ) async {
+    try {
+      await setBiometric(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        identifiers: identifiers,
+        newBiometricType: "none",
+      );
+      _resetBiometricLoading();
+    } catch (e) {
+      if (mounted) {
+        await _showBiometricPasswordModal(
+          appState: appState,
+          identifiers: identifiers,
+          enable: false,
+        );
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  void _resetBiometricLoading() {
+    if (mounted) {
+      setState(() {
+        _isBiometricLoading = false;
+      });
+    }
+  }
+
+  Future<void> _showBiometricPasswordModal({
+    required AppState appState,
+    required List<String> identifiers,
+    required bool enable,
+  }) async {
+    if (!mounted) return;
+
+    showConfirmPasswordModal(
+      context: context,
+      theme: appState.currentTheme,
+      onDismiss: _resetBiometricLoading,
+      onConfirm: (password) async {
+        try {
+          await setBiometric(
+            walletIndex: BigInt.from(appState.selectedWallet),
+            identifiers: identifiers,
+            password: password,
+            newBiometricType: enable ? _authMethods.first : "none",
+          );
+
+          _resetBiometricLoading();
+          await appState.syncData();
+          return null;
+        } catch (e) {
+          return e.toString();
+        }
+      },
+    );
   }
 
   Future<void> _executeBitcoinAddressChange({

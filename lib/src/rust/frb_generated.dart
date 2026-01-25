@@ -398,7 +398,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
       required List<String> identifiers,
-      required String password,
+      String? password,
       required String newBiometricType});
 
   Future<void> crateApiSettingsSetBrowserSettings(
@@ -2731,14 +2731,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
       required List<String> identifiers,
-      required String password,
+      String? password,
       required String newBiometricType}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_list_String(identifiers, serializer);
-        sse_encode_String(password, serializer);
+        sse_encode_opt_String(password, serializer);
         sse_encode_String(newBiometricType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 80, port: port_);
