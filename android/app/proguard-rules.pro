@@ -1,2 +1,4 @@
-        -keep class com.zilpaymobile.** { *; }
+-keep class com.zilpaymobile.** { *; }
         -keep interface com.zilpaymobile.** { *; }
+        -keep class biometric.** { *; }
+        -keep interface biometric.** { *; }

@@ -3,7 +3,8 @@ package biometric
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import androidx.biometric.BiometricManager
+import androidx.annotation.Keep
+import androidx.biometric.BiometricManager as AndroidBiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import java.security.KeyStore
@@ -17,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@Keep
 class BiometricManager(private val context: Context) {
 
     companion object {
@@ -29,22 +31,23 @@ class BiometricManager(private val context: Context) {
 
     private val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
 
+    @Keep
     fun biometricType(): String {
-        val biometricManager = BiometricManager.from(context)
+        val biometricManager = AndroidBiometricManager.from(context)
 
-        return when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
-                    BiometricManager.BIOMETRIC_SUCCESS -> "BIOMETRIC_STRONG"
+        return when (biometricManager.canAuthenticate(AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG)) {
+            AndroidBiometricManager.BIOMETRIC_SUCCESS -> {
+                when (biometricManager.canAuthenticate(AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG or AndroidBiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
+                    AndroidBiometricManager.BIOMETRIC_SUCCESS -> "BIOMETRIC_STRONG"
                     else -> "BIOMETRIC_WEAK"
                 }
             }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> "NO_HARDWARE"
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> "HARDWARE_UNAVAILABLE"
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> "NONE_ENROLLED"
-            BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> "SECURITY_UPDATE_REQUIRED"
-            BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> "UNSUPPORTED"
-            BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> "UNKNOWN"
+            AndroidBiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> "NO_HARDWARE"
+            AndroidBiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> "HARDWARE_UNAVAILABLE"
+            AndroidBiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> "NONE_ENROLLED"
+            AndroidBiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> "SECURITY_UPDATE_REQUIRED"
+            AndroidBiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> "UNSUPPORTED"
+            AndroidBiometricManager.BIOMETRIC_STATUS_UNKNOWN -> "UNKNOWN"
             else -> "UNKNOWN"
         }
     }
@@ -83,6 +86,7 @@ class BiometricManager(private val context: Context) {
         }
     }
 
+    @Keep
     fun deleteKey(): Boolean {
         return try {
             if (keyStore.containsAlias(KEY_ALIAS)) {
@@ -171,6 +175,7 @@ class BiometricManager(private val context: Context) {
         biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
     }
 
+    @Keep
     fun encryptKeyAsync(activity: FragmentActivity, data: ByteArray, callback: BiometricCallback) {
         CoroutineScope(Dispatchers.Main).launch {
             val result = encryptKey(activity, data)
@@ -182,6 +187,7 @@ class BiometricManager(private val context: Context) {
         }
     }
 
+    @Keep
     fun decryptKeyAsync(activity: FragmentActivity, encryptedData: ByteArray, callback: BiometricCallback) {
         CoroutineScope(Dispatchers.Main).launch {
             val result = decryptKey(activity, encryptedData)
@@ -194,6 +200,7 @@ class BiometricManager(private val context: Context) {
     }
 }
 
+@Keep
 interface BiometricCallback {
     fun onSuccess(data: ByteArray)
     fun onError(message: String)

@@ -1,5 +1,8 @@
 package biometric
 
+import androidx.annotation.Keep
+
+@Keep
 class RustBiometricCallback(private val callbackPtr: Long) : BiometricCallback {
     override fun onSuccess(data: ByteArray) {
         nativeOnSuccess(callbackPtr, data)
