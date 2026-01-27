@@ -297,7 +297,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       });
       _btnController.error();
       Timer(const Duration(seconds: 1), () {
-        _btnController.reset();
+        if (mounted) {
+          _btnController.reset();
+        }
       });
     }
   }
@@ -469,14 +471,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                                 ],
                               ),
                             ),
-                          BiometricSwitch(
-                            biometricType: _authMethods.first,
-                            value: _useDeviceAuth,
-                            disabled: _disabled,
-                            onChanged: (value) async {
-                              setState(() => _useDeviceAuth = value);
-                            },
-                          ),
+                          if (_authMethods.isNotEmpty)
+                            BiometricSwitch(
+                              biometricType: _authMethods.first,
+                              value: _useDeviceAuth,
+                              disabled: _disabled,
+                              onChanged: (value) async {
+                                setState(() => _useDeviceAuth = value);
+                              },
+                            ),
                           SizedBox(height: 80),
                         ],
                       ),
@@ -511,6 +514,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   Future<void> _checkAuthMethods() async {
     try {
       final methods = await getBiometricType();
+      if (!mounted) return;
       setState(() {
         _authMethods = methods;
         if (_authMethods.isEmpty || _authMethods.first == "none") {
@@ -519,6 +523,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       });
     } catch (e) {
       debugPrint("Error checking auth methods: $e");
+      if (!mounted) return;
       setState(() {
         _authMethods = [];
         _useDeviceAuth = false;

@@ -34,7 +34,7 @@
       }
     ]
   },
-    {
+  {
     "name": "Sepolia",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/chain/%{dark,light}%.svg",
     "chain": "ETH",
@@ -53,7 +53,7 @@
         "native": true,
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ethereum",
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/%{contract_address}%/%{dark,light}%.webp",
         "symbol": "tETH",
         "decimals": 18
       }

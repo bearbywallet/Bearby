@@ -7,12 +7,13 @@ use crate::{
     },
 };
 use serde::Deserialize;
+use serde_json::Value;
 use std::{collections::HashMap, sync::Arc};
 pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    crypto::slip44::ZILLIQA,
+    crypto::slip44::{BITCOIN, ETHEREUM, ZILLIQA},
     token::ft::FToken,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
@@ -109,21 +110,75 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
 pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-
     let wallet = service
         .core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
-
     let data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-    let currency = data.settings.features.currency_convert.to_lowercase();
-
+    let currency: &str = data.settings.features.currency_convert.as_ref();
     let mut ftokens = wallet
         .get_ftokens()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let selected_account = data
+        .get_selected_account()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let chain = service
+        .core
+        .get_provider(selected_account.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let native_token = chain
+        .config
+        .ftokens
+        .first()
+        .ok_or(ServiceError::TokenError(
+            zilpay::errors::token::TokenError::TokenParseError,
+        ))?;
+    let cryptocompare_url = format!(
+        "https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}",
+        native_token.symbol,
+        currency.to_uppercase()
+    );
+    let client = reqwest::Client::new();
+    let response = client
+        .get(&cryptocompare_url)
+        .send()
+        .await
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
+    let rate: Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
+    let convert_rate = rate
+        .get(currency.to_uppercase())
+        .and_then(|v| v.as_f64())
+        .unwrap_or_default();
+
+    dbg!(convert_rate);
+
+    match chain.config.slip_44 {
+        ZILLIQA => {
+            let zilstream_url = "https://io-cdn.zilstream.com/tokens";
+            let client = reqwest::Client::new();
+            let response = client
+                .get(zilstream_url)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+            let zilstream_shits: Value = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
+
+            dbg!(&zilstream_shits);
+        }
+        ETHEREUM => {}
+        BITCOIN => {}
+        _ => {}
+    }
+
+    return Ok(Vec::new());
 
     if ftokens.is_empty() {
         return Ok(Vec::new());
@@ -156,14 +211,14 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
         .await
         .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
 
-    for token in &mut ftokens {
-        let symbol_lower = token.symbol.to_lowercase();
-        if let Some(price_data) = rates.get(&symbol_lower) {
-            if let Some(&rate) = price_data.get(&currency) {
-                token.rate = rate;
-            }
-        }
-    }
+    // for token in &mut ftokens {
+    //     let symbol_lower = token.symbol.to_lowercase();
+    //     if let Some(price_data) = rates.get(&symbol_lower) {
+    //         if let Some(&rate) = price_data.get(&currency) {
+    //             token.rate = rate;
+    //         }
+    //     }
+    // }
 
     wallet
         .save_ftokens(&ftokens)
