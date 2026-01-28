@@ -35,11 +35,20 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final state = Provider.of<AppState>(context, listen: false);
       final currenciesTickets = await getCurrenciesTickets();
+      final availableCodes = currenciesTickets.map((p) => p.$1).toSet();
 
-      final currenciesList = currenciesTickets
-          .map((pair) =>
-              Currency(pair.$1, "${_getCurrencyName(pair.$1)} ${pair.$2}"))
+      final orderedList = _getOrderedCurrencies()
+          .where((c) => availableCodes.contains(c.code))
           .toList();
+
+      final codeToRate = {
+        for (final pair in currenciesTickets) pair.$1: pair.$2
+      };
+
+      final currenciesList = orderedList.map((c) {
+        final rate = codeToRate[c.code] ?? '';
+        return Currency(c.code, "${c.name} $rate");
+      }).toList();
 
       setState(() {
         _currencies = currenciesList;
@@ -77,35 +86,36 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     });
   }
 
-  String _getCurrencyName(String symbol) {
-    final Map<String, String> currencyNames = {
-      "BTC": "Bitcoin",
-      "RUB": "Russian Ruble",
-      "BRL": "Brazilian Real",
-      "AED": "United Arab Emirates Dirham",
-      "INR": "Indian Rupee",
-      "CNY": "Chinese Yuan",
-      "KRW": "South Korean Won",
-      "JPY": "Japanese Yen",
-      "ZAR": "South African Rand",
-      "EGP": "Egyptian Pound",
-      "ETB": "Ethiopian Birr",
-      "IRR": "Iranian Rial",
-      "SAR": "Saudi Riyal",
-      "USD": "United States Dollar",
-      "EUR": "Euro",
-      "GBP": "British Pound",
-      "CHF": "Swiss Franc",
-      "AUD": "Australian Dollar",
-      "CAD": "Canadian Dollar",
-      "MXN": "Mexican Peso",
-      "DOGE": "Dogecoin",
-      "GOLD": "Gold",
-      "SILVER": "Silver"
-    };
+  static const Map<String, String> _currencyNames = {
+    "BTC": "Bitcoin",
+    "RUB": "Russian Ruble",
+    "BRL": "Brazilian Real",
+    "AED": "United Arab Emirates Dirham",
+    "INR": "Indian Rupee",
+    "CNY": "Chinese Yuan",
+    "KRW": "South Korean Won",
+    "JPY": "Japanese Yen",
+    "ZAR": "South African Rand",
+    "EGP": "Egyptian Pound",
+    "ETB": "Ethiopian Birr",
+    "IRR": "Iranian Rial",
+    "SAR": "Saudi Riyal",
+    "USD": "United States Dollar",
+    "EUR": "Euro",
+    "GBP": "British Pound",
+    "CHF": "Swiss Franc",
+    "AUD": "Australian Dollar",
+    "CAD": "Canadian Dollar",
+    "MXN": "Mexican Peso",
+    "DOGE": "Dogecoin",
+    "GOLD": "Gold",
+    "SILVER": "Silver"
+  };
 
-    return currencyNames[symbol] ?? symbol;
-  }
+  List<Currency> _getOrderedCurrencies() =>
+      _currencyNames.entries.map((e) => Currency(e.key, e.value)).toList();
+
+  String _getCurrencyName(String symbol) => _currencyNames[symbol] ?? symbol;
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +346,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
         child: Row(
           children: [
             SizedBox(
-              width: 60,
+              width: 80,
               child: Text(
                 currency.code.toUpperCase(),
                 style: theme.labelLarge.copyWith(
