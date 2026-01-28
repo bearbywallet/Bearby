@@ -29,7 +29,8 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
+        super.configureFlutterEngine(flutterEngine)
+        // GeneratedPluginRegistrant.registerWith(flutterEngine)
         
         flutterEngine.plugins.add(HidPlugin())
         flutterEngine.plugins.add(LedgerBlePlugin())

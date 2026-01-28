@@ -115,8 +115,6 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
   List<Currency> _getOrderedCurrencies() =>
       _currencyNames.entries.map((e) => Currency(e.key, e.value)).toList();
 
-  String _getCurrencyName(String symbol) => _currencyNames[symbol] ?? symbol;
-
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);

@@ -1,4 +1,3 @@
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -26,29 +25,6 @@ class AuthGuard extends ChangeNotifier {
 
   void setEnabled(bool value) {
     _enabled = value;
-  }
-
-  Future<void> setSession(String sessionKey, String sessionValue) async {
-    final AuthService authService = AuthService();
-
-    try {
-      final authMethods = await authService.getAvailableAuthMethods();
-
-      if (authMethods.contains(AuthMethod.none)) {
-        throw 'Device does not support secure storage. Please enable device lock.';
-      }
-
-      await _storage.write(
-        key: sessionKey,
-        value: sessionValue,
-      );
-
-      _enabled = true;
-
-      notifyListeners();
-    } catch (e) {
-      throw 'Failed to save session key: $e';
-    }
   }
 
   Future<void> clearSession(String sessionKey) async {
