@@ -162,7 +162,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
         TokenQuotesAPIOptions::Coingecko => {
             let symbol_id = native_token.symbol.to_lowercase();
             let coingecko_url = format!(
-                "{}?ids={}&vs_currencies={}",
+                "{}?symbols={}&vs_currencies={}",
                 COINGECKO_API_URL,
                 symbol_id,
                 currency.to_lowercase()
@@ -170,6 +170,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             let client = reqwest::Client::new();
             let response = client
                 .get(&coingecko_url)
+                .header("User-Agent", "ZilPay-Wallet/1.0")
                 .send()
                 .await
                 .map_err(|e| format!("HTTP request failed: {}", e))?;
@@ -182,8 +183,6 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 .and_then(|v| v.get(currency.to_lowercase()))
                 .and_then(|v| v.as_f64())
                 .unwrap_or_default();
-
-            dbg!(&convert_rate);
 
             convert_rate
         }

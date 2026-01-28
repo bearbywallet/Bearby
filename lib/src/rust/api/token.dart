@@ -8,13 +8,13 @@ import '../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `fetch_zilliqa_tokens`
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `PortfolioBalance`, `PortfolioResponse`, `PortfolioToken`, `Portfolio`, `ProtectionInfo`, `TokenAmount`, `TokenMetadata`, `ZilliqaEvmTokenResponse`, `ZilliqaScillaApiResponse`, `ZilliqaScillaTokenResponse`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `PortfolioBalance`, `PortfolioResponse`, `PortfolioToken`, `Portfolio`, `ProtectionInfo`, `TokenAmount`, `TokenMetadata`, `ZilliqaEvmTokenResponse`, `ZilliqaScillaApiResponse`, `ZilliqaScillaTokenResponse`, `ZilstreamMarketData`, `ZilstreamToken`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 Future<void> syncBalances({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenSyncBalances(walletIndex: walletIndex);
 
-Future<List<FTokenInfo>> updateRates({required BigInt walletIndex}) =>
+Future<void> updateRates({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
 
 Future<FTokenInfo> fetchTokenMeta(

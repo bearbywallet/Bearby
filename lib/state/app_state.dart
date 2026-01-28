@@ -154,10 +154,15 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> syncRates({bool force = false}) async {
     if (chain?.testnet == true || wallet?.settings.ratesApiOptions == 0) return;
     final now = DateTime.now();
+    final tokens = wallet?.tokens;
 
-    // if (!force && now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
-    //   return;
-    // }
+    final hasZeroRate = tokens?.any((token) => token.rate == 0) ?? false;
+
+    if (!force &&
+        !hasZeroRate &&
+        now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
+      return;
+    }
 
     try {
       await updateRates(walletIndex: BigInt.from(_selectedWallet));

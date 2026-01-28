@@ -502,8 +502,7 @@ abstract class RustLibApi extends BaseApi {
       required List<(int, String, String)> accounts,
       required bool zilliqaLegacy});
 
-  Future<List<FTokenInfo>> crateApiTokenUpdateRates(
-      {required BigInt walletIndex});
+  Future<void> crateApiTokenUpdateRates({required BigInt walletIndex});
 
   Future<TransactionRequestInfo> crateApiTransactionUpdateTxWithParams(
       {required TransactionRequestInfo tx,
@@ -3539,8 +3538,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<FTokenInfo>> crateApiTokenUpdateRates(
-      {required BigInt walletIndex}) {
+  Future<void> crateApiTokenUpdateRates({required BigInt walletIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -3549,7 +3547,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 106, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_f_token_info,
+        decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTokenUpdateRatesConstMeta,
