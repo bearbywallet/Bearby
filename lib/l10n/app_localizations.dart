@@ -527,6 +527,24 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get securityPageUnknown;
 
+  /// Title for clear data section on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Data'**
+  String get securityPageClearData;
+
+  /// Title for clear image cache button on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Image Cache'**
+  String get securityPageClearImageCache;
+
+  /// Description for clear image cache on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all cached images from temporary storage'**
+  String get securityPageClearImageCacheDescription;
+
   /// Title for the SecretPhraseGeneratorPage
   ///
   /// In en, this message translates to:

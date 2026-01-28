@@ -224,6 +224,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityPageUnknown => 'Неизвестно';
 
   @override
+  String get securityPageClearData => 'Очистить данные';
+
+  @override
+  String get securityPageClearImageCache => 'Очистить кэш изображений';
+
+  @override
+  String get securityPageClearImageCacheDescription => 'Удалить все кэшированные изображения из временного хранилища';
+
+  @override
   String get secretPhraseGeneratorPageTitle => 'Новый кошелек';
 
   @override

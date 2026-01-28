@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -18,11 +20,48 @@ class SecurityPage extends StatefulWidget {
 
 class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
   final TextEditingController _ipfsController = TextEditingController(text: '');
+  final Set<String> _loading = {};
 
   @override
   void dispose() {
     _ipfsController.dispose();
     super.dispose();
+  }
+
+  void _setLoading(String operation, bool isLoading) {
+    setState(() {
+      if (isLoading) {
+        _loading.add(operation);
+      } else {
+        _loading.remove(operation);
+      }
+    });
+  }
+
+  Future<void> _clearImageCache(AppState appState) async {
+    final String operation = 'imageCache';
+    try {
+      _setLoading(operation, true);
+      final cacheDir = Directory(appState.cahceDir);
+
+      if (!await cacheDir.exists()) {
+        return;
+      }
+
+      final entries = cacheDir.listSync();
+
+      for (final entry in entries) {
+        if (entry is File) {
+          await entry.delete();
+        }
+      }
+
+      await appState.syncData();
+    } catch (e) {
+      debugPrint("Error clearing image cache: $e");
+    } finally {
+      _setLoading(operation, false);
+    }
   }
 
   @override
@@ -80,11 +119,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                           delegate: SliverChildListDelegate([
                             _buildNetworkSection(appState),
                             const SizedBox(height: 32),
-                            if (!appState.wallet!.walletType
-                                .contains(WalletType.ledger.name)) ...[
-                              // const SizedBox(height: 32)
-                            ],
-                            _buildEncryptionSection(appState),
+                            _buildClearDataSection(appState),
                             const SizedBox(height: 32),
                           ]),
                         ),
@@ -298,9 +333,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
     );
   }
 
-  Widget _buildEncryptionSection(AppState state) {
+  Widget _buildClearDataSection(AppState state) {
     final theme = state.currentTheme;
-    final algorithms = generateAlgorithms(state.wallet!.settings.cipherOrders);
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -309,216 +343,104 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            l10n.securityPageEncryptionLevel,
+            l10n.securityPageClearData,
             style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
             ),
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                for (int i = 0; i < algorithms.length; i++) ...[
-                  if (i > 0)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: SvgPicture.asset(
-                        'assets/icons/chevron_right.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: ColorFilter.mode(
-                          theme.textSecondary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  SizedBox(
-                    width: 250,
-                    child: _buildEncryptionCard(
-                      state,
-                      algorithms[i],
-                    ),
-                  ),
-                ],
-              ],
-            ),
+        Container(
+          decoration: BoxDecoration(
+            color: theme.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: _buildClearDataItem(
+            theme,
+            l10n.securityPageClearImageCache,
+            'assets/icons/cache.svg',
+            l10n.securityPageClearImageCacheDescription,
+            () => _clearImageCache(state),
+            _loading.contains('imageCache'),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEncryptionCard(
-    AppState state,
-    Algorithm algorithm,
+  Widget _buildClearDataItem(
+    AppTheme theme,
+    String title,
+    String iconPath,
+    String description,
+    VoidCallback onTap,
+    bool isLoading,
   ) {
-    final theme = state.currentTheme;
-    final cardWidth = MediaQuery.of(context).size.width > 480
-        ? 320.0
-        : MediaQuery.of(context).size.width * 0.7;
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      width: cardWidth,
+    return Padding(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.background,
-                  borderRadius: BorderRadius.circular(8),
+              SvgPicture.asset(
+                iconPath,
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.textPrimary,
+                  BlendMode.srcIn,
                 ),
-                child: SvgPicture.asset(
-                  algorithm.icon,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.bodyLarge.copyWith(
+                    color: theme.textPrimary,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Text(
-                algorithm.name,
-                style: theme.bodyLarge.copyWith(
-                  color: theme.textPrimary,
-                ),
-              ),
-              const Spacer(),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildProgressBar(
-            state,
-            l10n.securityPageProtection,
-            algorithm.protection,
-            theme.primaryPurple,
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 40),
+            child: Text(
+              description,
+              style: theme.bodyText2.copyWith(
+                color: theme.textSecondary,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
-          _buildProgressBar(
-            state,
-            l10n.securityPageCpuLoad,
-            algorithm.cpuLoad,
-            theme.warning,
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: isLoading ? null : onTap,
+              style: TextButton.styleFrom(
+                foregroundColor: theme.primaryPurple,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                      ),
+                    )
+                  : Text(l10n.browserSettingsClear),
+            ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildProgressBar(
-    AppState state,
-    String label,
-    double value,
-    Color color,
-  ) {
-    final theme = state.currentTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: theme.labelSmall.copyWith(
-                color: theme.textSecondary,
-              ),
-            ),
-            Text(
-              '${(value * 100).toInt()}%',
-              style: theme.labelSmall.copyWith(
-                color: theme.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Container(
-          height: 4,
-          decoration: BoxDecoration(
-            color: theme.background,
-            borderRadius: BorderRadius.circular(2),
-          ),
-          child: FractionallySizedBox(
-            widthFactor: value,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Algorithm> generateAlgorithms(List<int> algorithms) {
-    final l10n = AppLocalizations.of(context)!;
-    final Map<int, Algorithm> algorithmData = {
-      0: Algorithm(
-        name: l10n.securityPageAes256,
-        protection: 0.60,
-        cpuLoad: 0.3,
-        icon: 'assets/icons/lock.svg',
-      ),
-      1: Algorithm(
-        name: l10n.securityPageKuznechikGost,
-        protection: 0.70,
-        cpuLoad: 0.2,
-        icon: 'assets/icons/grasshopper.svg',
-      ),
-      2: Algorithm(
-        name: l10n.securityPageNtruPrime,
-        protection: 0.92,
-        cpuLoad: 0.9,
-        icon: 'assets/icons/atom.svg',
-      ),
-      3: Algorithm(
-        name: l10n.securityPageCyber,
-        protection: 0.70,
-        cpuLoad: 0.5,
-        icon: 'assets/icons/atom.svg',
-      ),
-    };
-
-    return algorithms.map((algo) {
-      return algorithmData[algo] ??
-          Algorithm(
-            name: l10n.securityPageUnknown,
-            protection: 0.0,
-            cpuLoad: 0.0,
-            icon: 'assets/icons/lock.svg',
-          );
-    }).toList();
-  }
-}
-
-class Algorithm {
-  final String name;
-  final double protection;
-  final double cpuLoad;
-  final String icon;
-
-  const Algorithm({
-    required this.name,
-    required this.protection,
-    required this.cpuLoad,
-    required this.icon,
-  });
 }

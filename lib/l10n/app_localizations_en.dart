@@ -224,6 +224,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageUnknown => 'Unknown';
 
   @override
+  String get securityPageClearData => 'Clear Data';
+
+  @override
+  String get securityPageClearImageCache => 'Clear Image Cache';
+
+  @override
+  String get securityPageClearImageCacheDescription => 'Delete all cached images from temporary storage';
+
+  @override
   String get secretPhraseGeneratorPageTitle => 'New Wallet';
 
   @override

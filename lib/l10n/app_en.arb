@@ -255,37 +255,17 @@
   "@securityPageNodeDescription": {
     "description": "Description for node ranking setting on SecurityPage"
   },
-  "securityPageEncryptionLevel": "Encryption Level",
-  "@securityPageEncryptionLevel": {
-    "description": "Section title for encryption level settings on SecurityPage"
+  "securityPageClearData": "Clear Data",
+  "@securityPageClearData": {
+    "description": "Title for clear data section on SecurityPage"
   },
-  "securityPageProtection": "Protection",
-  "@securityPageProtection": {
-    "description": "Label for protection progress bar in encryption card on SecurityPage"
+  "securityPageClearImageCache": "Clear Image Cache",
+  "@securityPageClearImageCache": {
+    "description": "Title for clear image cache button on SecurityPage"
   },
-  "securityPageCpuLoad": "CPU Load",
-  "@securityPageCpuLoad": {
-    "description": "Label for CPU load progress bar in encryption card on SecurityPage"
-  },
-  "securityPageAes256": "AES256",
-  "@securityPageAes256": {
-    "description": "Name of AES256 encryption algorithm on SecurityPage"
-  },
-  "securityPageKuznechikGost": "KUZNECHIK-GOST",
-  "@securityPageKuznechikGost": {
-    "description": "Name of KUZNECHIK-GOST encryption algorithm on SecurityPage"
-  },
-  "securityPageNtruPrime": "NTRUPrime",
-  "@securityPageNtruPrime": {
-    "description": "Name of NTRUPrime encryption algorithm on SecurityPage"
-  },
-  "securityPageCyber": "Cyber",
-  "@securityPageCyber": {
-    "description": "Name of Cyber encryption algorithm on SecurityPage"
-  },
-  "securityPageUnknown": "Unknown",
-  "@securityPageUnknown": {
-    "description": "Fallback name for unknown encryption algorithm on SecurityPage"
+  "securityPageClearImageCacheDescription": "Delete all cached images from temporary storage",
+  "@securityPageClearImageCacheDescription": {
+    "description": "Description for clear image cache on SecurityPage"
   },
   "secretPhraseGeneratorPageTitle": "New Wallet",
   "@secretPhraseGeneratorPageTitle": {

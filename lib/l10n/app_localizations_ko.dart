@@ -224,6 +224,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityPageUnknown => '알 수 없음';
 
   @override
+  String get securityPageClearData => '데이터 지우기';
+
+  @override
+  String get securityPageClearImageCache => '이미지 캐시 지우기';
+
+  @override
+  String get securityPageClearImageCacheDescription => '임시 저장소에서 캐시된 모든 이미지 삭제';
+
+  @override
   String get secretPhraseGeneratorPageTitle => '새 지갑';
 
   @override

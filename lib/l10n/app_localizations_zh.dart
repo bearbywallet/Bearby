@@ -224,6 +224,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageUnknown => '未知';
 
   @override
+  String get securityPageClearData => '清除数据';
+
+  @override
+  String get securityPageClearImageCache => '清除图像缓存';
+
+  @override
+  String get securityPageClearImageCacheDescription => '从临时存储中删除所有缓存的图像';
+
+  @override
   String get secretPhraseGeneratorPageTitle => '新钱包';
 
   @override

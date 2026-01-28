@@ -224,6 +224,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageUnknown => '不明';
 
   @override
+  String get securityPageClearData => 'データを消去';
+
+  @override
+  String get securityPageClearImageCache => '画像キャッシュをクリア';
+
+  @override
+  String get securityPageClearImageCacheDescription => '一時ストレージからキャッシュされた画像をすべて削除';
+
+  @override
   String get secretPhraseGeneratorPageTitle => '新しいウォレット';
 
   @override
