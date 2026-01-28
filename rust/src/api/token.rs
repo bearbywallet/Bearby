@@ -211,7 +211,53 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
 
             Ok(ftokens.into_iter().map(|t| t.into()).collect())
         }
-        ETHEREUM => Ok(Vec::new()),
+        ETHEREUM => {
+            let chain_id = chain.config.chain_ids[0];
+            let token_addresses: Vec<String> = ftokens
+                .iter()
+                .map(|token| token.addr.auto_format().to_lowercase())
+                .collect();
+
+            if token_addresses.is_empty() {
+                return Ok(Vec::new());
+            }
+
+            let addresses_param = token_addresses.join(",");
+            let metamask_url = format!(
+                "https://price.api.cx.metamask.io/v2/chains/{}/spot-prices?tokenAddresses={}&vsCurrency={}&includeMarketData=false",
+                chain_id, addresses_param, currency.to_uppercase()
+            );
+
+            dbg!(&metamask_url);
+
+            let client = reqwest::Client::new();
+            let response = client
+                .get(&metamask_url)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+            let prices: HashMap<String, HashMap<String, f64>> = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse MetaMask response: {}", e))?;
+
+            let currency_key = currency.to_lowercase();
+
+            for (token, addr) in ftokens.iter_mut().zip(token_addresses.iter()) {
+                if let Some(price_data) = prices.get(addr) {
+                    if let Some(&rate) = price_data.get(&currency_key) {
+                        token.rate = rate;
+                    }
+                }
+            }
+
+            wallet
+                .save_ftokens(&ftokens)
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+            Ok(ftokens.into_iter().map(|t| t.into()).collect())
+        }
         _ => Ok(Vec::new()),
     }
 }
