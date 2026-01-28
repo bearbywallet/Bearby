@@ -93,6 +93,17 @@ struct ZilliqaScillaApiResponse {
     list: Vec<ZilliqaScillaTokenResponse>,
 }
 
+#[derive(Debug, Deserialize)]
+struct ZilstreamMarketData {
+    rate_zil: f64,
+}
+
+#[derive(Debug, Deserialize)]
+struct ZilstreamToken {
+    symbol: String,
+    market_data: ZilstreamMarketData,
+}
+
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
         let core = Arc::clone(&service.core);
@@ -155,8 +166,6 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
         .and_then(|v| v.as_f64())
         .unwrap_or_default();
 
-    dbg!(convert_rate);
-
     match chain.config.slip_44 {
         ZILLIQA => {
             let zilstream_url = "https://io-cdn.zilstream.com/tokens";
@@ -166,67 +175,45 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
                 .send()
                 .await
                 .map_err(|e| format!("HTTP request failed: {}", e))?;
-            let zilstream_shits: Value = response
+            let zilstream_tokens: Vec<ZilstreamToken> = response
                 .json()
                 .await
-                .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
+                .map_err(|e| format!("Failed to parse zilstream response: {}", e))?;
 
-            dbg!(&zilstream_shits);
+            let rate_map: HashMap<String, f64> = zilstream_tokens
+                .into_iter()
+                .map(|token| (token.symbol.to_uppercase(), token.market_data.rate_zil))
+                .collect();
+
+            for token in &mut ftokens {
+                let symbol_upper = token.symbol.to_uppercase();
+                if let Some(&rate_zil) = rate_map.get(&symbol_upper) {
+                    token.rate = rate_zil * convert_rate;
+                } else if token.native {
+                    token.rate = convert_rate;
+                }
+            }
+
+            wallet
+                .save_ftokens(&ftokens)
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+            Ok(ftokens.into_iter().map(|t| t.into()).collect())
         }
-        ETHEREUM => {}
-        BITCOIN => {}
-        _ => {}
+        BITCOIN => {
+            if let Some(token) = ftokens.first_mut() {
+                token.rate = convert_rate;
+            }
+
+            wallet
+                .save_ftokens(&ftokens)
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+            Ok(ftokens.into_iter().map(|t| t.into()).collect())
+        }
+        ETHEREUM => Ok(Vec::new()),
+        _ => Ok(Vec::new()),
     }
-
-    return Ok(Vec::new());
-
-    if ftokens.is_empty() {
-        return Ok(Vec::new());
-    }
-
-    let symbols: String = ftokens
-        .iter()
-        .map(|t| t.symbol.to_lowercase())
-        .collect::<Vec<_>>()
-        .join(",");
-
-    let url = format!(
-        "{}?symbols={}&vs_currencies={}",
-        COINGECKO_API_URL, symbols, currency
-    );
-
-    let client = reqwest::Client::new();
-    let response = client
-        .get(&url)
-        .send()
-        .await
-        .map_err(|e| format!("HTTP request failed: {}", e))?;
-
-    if !response.status().is_success() {
-        return Err(format!("CoinGecko API error: {}", response.status()));
-    }
-
-    let rates: CoinGeckoResponse = response
-        .json()
-        .await
-        .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
-
-    // for token in &mut ftokens {
-    //     let symbol_lower = token.symbol.to_lowercase();
-    //     if let Some(price_data) = rates.get(&symbol_lower) {
-    //         if let Some(&rate) = price_data.get(&currency) {
-    //             token.rate = rate;
-    //         }
-    //     }
-    // }
-
-    wallet
-        .save_ftokens(&ftokens)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-    let updated_tokens = ftokens.into_iter().map(|t| t.into()).collect();
-
-    Ok(updated_tokens)
 }
 
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {

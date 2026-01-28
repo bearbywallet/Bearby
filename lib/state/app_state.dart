@@ -60,7 +60,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   bool get isTileView => _isTileView;
   bool get browserUrlBarTop => _browserUrlBarTop;
-  bool get showAddressesThroughTransactionHistory => _showAddressesThroughTransactionHistory;
+  bool get showAddressesThroughTransactionHistory =>
+      _showAddressesThroughTransactionHistory;
   GasFeeOption get selectedGasOption => _selectedGasOption;
   String get cahceDir => _cahceDir;
   bool get hideBalance => _hideBalance;
@@ -73,13 +74,17 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   AppTheme get currentTheme {
     switch (_state.appearances) {
       case 0:
-        return _systemBrightness == Brightness.dark ? DarkTheme() : LightTheme();
+        return _systemBrightness == Brightness.dark
+            ? DarkTheme()
+            : LightTheme();
       case 1:
         return DarkTheme();
       case 2:
         return LightTheme();
       default:
-        return _systemBrightness == Brightness.dark ? DarkTheme() : LightTheme();
+        return _systemBrightness == Brightness.dark
+            ? DarkTheme()
+            : LightTheme();
     }
   }
 
@@ -117,7 +122,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _hideBalance = _prefs.getHideBalance();
     _isTileView = _prefs.getIsTileView(_selectedWallet);
     _browserUrlBarTop = _prefs.getBrowserUrlBarTop();
-    _showAddressesThroughTransactionHistory = _prefs.getShowAddressesHistory(_selectedWallet);
+    _showAddressesThroughTransactionHistory =
+        _prefs.getShowAddressesHistory(_selectedWallet);
     _loadGasOption();
   }
 
@@ -140,7 +146,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncConnections() async {
-    _connections = await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
+    _connections =
+        await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
     notifyListeners();
   }
 
@@ -148,9 +155,9 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     if (chain?.testnet == true || wallet?.settings.ratesApiOptions == 0) return;
     final now = DateTime.now();
 
-    if (!force && now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
-      return;
-    }
+    // if (!force && now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
+    //   return;
+    // }
 
     try {
       await updateRates(walletIndex: BigInt.from(_selectedWallet));
@@ -162,7 +169,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> updateSelectedAccount(BigInt walletIndex, BigInt accountIndex) async {
+  Future<void> updateSelectedAccount(
+      BigInt walletIndex, BigInt accountIndex) async {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
     await syncData();
     notifyListeners();
@@ -219,7 +227,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> startTrackHistoryWorker() async {
     try {
-      Stream<String> stream = startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
+      Stream<String> stream =
+          startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
       stream.listen((event) async {
         notifyListeners();
       });
