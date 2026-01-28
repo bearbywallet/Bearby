@@ -1046,6 +1046,14 @@
   "@currencyConversionEngineCoingeckoSubtitle": {
     "description": "Subtitle for the 'Coingecko' engine option"
   },
+  "currencyConversionEngineCryptoCompare": "CryptoCompare",
+  "@currencyConversionEngineCryptoCompare": {
+    "description": "Title for the 'CryptoCompare' engine option"
+  },
+  "currencyConversionEngineCryptoCompareSubtitle": "Fetch rates from CryptoCompare",
+  "@currencyConversionEngineCryptoCompareSubtitle": {
+    "description": "Subtitle for the 'CryptoCompare' engine option"
+  },
   "restoreWalletOptionsTitle": "Restore Wallet",
   "@restoreWalletOptionsTitle": {
     "description": "Title for the Restore Wallet Options page"

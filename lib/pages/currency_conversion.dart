@@ -141,7 +141,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: AppLocalizations.of(context)!.currencyConversionTitle,
+                    title:
+                        AppLocalizations.of(context)!.currencyConversionTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -255,53 +256,68 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
   }
 
   Widget _buildEngineInfo(AppTheme theme, AppState appState) {
-    final engineText = selectedEngine == 0 ? 'None' : 'Coingecko';
-
     return ButtonItem(
       theme: theme,
       title: AppLocalizations.of(context)!.currencyConversionEngineTitle,
       iconPath: 'assets/icons/currency.svg',
       description:
           AppLocalizations.of(context)!.currencyConversionEngineDescription,
-      subtitleText: engineText,
+      subtitleText: _getEngineName(selectedEngine),
       onTap: () {
         _showEngineSelector(appState);
       },
     );
   }
 
-  void _showEngineSelector(AppState appState) {
-    final engines = [
-      ListItem(
-          title: AppLocalizations.of(context)!.currencyConversionEngineNone,
-          subtitle: AppLocalizations.of(context)!
-              .currencyConversionEngineNoneSubtitle),
-      ListItem(
-          title:
-              AppLocalizations.of(context)!.currencyConversionEngineCoingecko,
-          subtitle: AppLocalizations.of(context)!
-              .currencyConversionEngineCoingeckoSubtitle),
-    ];
+  String _getEngineName(int engineIndex) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (engineIndex) {
+      case 0:
+        return l10n.currencyConversionEngineNone;
+      case 1:
+        return l10n.currencyConversionEngineCryptoCompare;
+      case 2:
+        return l10n.currencyConversionEngineCoingecko;
+      default:
+        return l10n.currencyConversionEngineNone;
+    }
+  }
 
+  List<ListItem> _getEnginesList() {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      ListItem(
+        title: l10n.currencyConversionEngineNone,
+        subtitle: l10n.currencyConversionEngineNoneSubtitle,
+      ),
+      ListItem(
+        title: l10n.currencyConversionEngineCryptoCompare,
+        subtitle: l10n.currencyConversionEngineCryptoCompareSubtitle,
+      ),
+      ListItem(
+        title: l10n.currencyConversionEngineCoingecko,
+        subtitle: l10n.currencyConversionEngineCoingeckoSubtitle,
+      ),
+    ];
+  }
+
+  void _showEngineSelector(AppState appState) {
     showListSelectorModal(
       context: context,
       title:
           AppLocalizations.of(context)!.currencyConversionEngineSelectorTitle,
-      items: engines,
+      items: _getEnginesList(),
       selectedIndex: selectedEngine,
       onItemSelected: (index) async {
-        BigInt walletIndex = BigInt.from(appState.selectedWallet);
-
         setState(() {
           selectedEngine = index;
         });
 
         await setRateEngine(
-          walletIndex: walletIndex,
+          walletIndex: BigInt.from(appState.selectedWallet),
           engineCode: index,
         );
 
-        await appState.syncRates(force: true);
         await appState.syncData();
       },
     );

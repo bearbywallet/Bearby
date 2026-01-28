@@ -253,6 +253,8 @@
   "currencyConversionEngineNoneSubtitle": "エンジンが選択されていません",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Coingeckoからレートを取得",
+  "currencyConversionEngineCryptoCompare": "CryptoCompare",
+  "currencyConversionEngineCryptoCompareSubtitle": "CryptoCompareからレートを取得",
   "restoreWalletOptionsTitle": "ウォレットを復元",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "ニーモニックフレーズで復元",

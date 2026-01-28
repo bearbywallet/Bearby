@@ -253,6 +253,8 @@
   "currencyConversionEngineNoneSubtitle": "未选择引擎",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "从 Coingecko 获取汇率",
+  "currencyConversionEngineCryptoCompare": "CryptoCompare",
+  "currencyConversionEngineCryptoCompareSubtitle": "从 CryptoCompare 获取汇率",
   "restoreWalletOptionsTitle": "恢复钱包",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "使用助记词恢复",

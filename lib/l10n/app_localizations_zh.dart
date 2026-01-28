@@ -791,6 +791,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => '从 Coingecko 获取汇率';
 
   @override
+  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+
+  @override
+  String get currencyConversionEngineCryptoCompareSubtitle => '从 CryptoCompare 获取汇率';
+
+  @override
   String get restoreWalletOptionsTitle => '恢复钱包';
 
   @override

@@ -253,6 +253,8 @@
   "currencyConversionEngineNoneSubtitle": "엔진 선택 안 함",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Coingecko에서 환율 가져오기",
+  "currencyConversionEngineCryptoCompare": "CryptoCompare",
+  "currencyConversionEngineCryptoCompareSubtitle": "CryptoCompare에서 환율 가져오기",
   "restoreWalletOptionsTitle": "지갑 복원",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "Mnemonic 구문으로 복원",

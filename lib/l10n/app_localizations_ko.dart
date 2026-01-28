@@ -791,6 +791,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Coingecko에서 환율 가져오기';
 
   @override
+  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+
+  @override
+  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompare에서 환율 가져오기';
+
+  @override
   String get restoreWalletOptionsTitle => '지갑 복원';
 
   @override

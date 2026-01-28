@@ -791,6 +791,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Получать курсы из Coingecko';
 
   @override
+  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+
+  @override
+  String get currencyConversionEngineCryptoCompareSubtitle => 'Получать курсы из CryptoCompare';
+
+  @override
   String get restoreWalletOptionsTitle => 'Восстановить кошелек';
 
   @override

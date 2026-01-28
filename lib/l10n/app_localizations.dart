@@ -1625,6 +1625,18 @@ abstract class AppLocalizations {
   /// **'Fetch rates from Coingecko'**
   String get currencyConversionEngineCoingeckoSubtitle;
 
+  /// Title for the 'CryptoCompare' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'CryptoCompare'**
+  String get currencyConversionEngineCryptoCompare;
+
+  /// Subtitle for the 'CryptoCompare' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch rates from CryptoCompare'**
+  String get currencyConversionEngineCryptoCompareSubtitle;
+
   /// Title for the Restore Wallet Options page
   ///
   /// In en, this message translates to:

@@ -791,6 +791,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Coingeckoからレートを取得';
 
   @override
+  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+
+  @override
+  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompareからレートを取得';
+
+  @override
   String get restoreWalletOptionsTitle => 'ウォレットを復元';
 
   @override

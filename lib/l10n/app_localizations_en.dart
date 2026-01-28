@@ -791,6 +791,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Fetch rates from Coingecko';
 
   @override
+  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+
+  @override
+  String get currencyConversionEngineCryptoCompareSubtitle => 'Fetch rates from CryptoCompare';
+
+  @override
   String get restoreWalletOptionsTitle => 'Restore Wallet';
 
   @override

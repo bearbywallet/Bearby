@@ -253,6 +253,8 @@
   "currencyConversionEngineNoneSubtitle": "Источник не выбран",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Получать курсы из Coingecko",
+  "currencyConversionEngineCryptoCompare": "CryptoCompare",
+  "currencyConversionEngineCryptoCompareSubtitle": "Получать курсы из CryptoCompare",
   "restoreWalletOptionsTitle": "Восстановить кошелек",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "Восстановить с помощью мнемонической фразы",
