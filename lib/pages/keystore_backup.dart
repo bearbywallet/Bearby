@@ -51,6 +51,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
 
   void _onCreateBackup(BigInt walletIndex, String name) async {
     final l10n = AppLocalizations.of(context)!;
+    final state = Provider.of<AppState>(context, listen: false);
 
     if (_confirmPasswordController.text.isEmpty) {
       setState(() {
@@ -69,7 +70,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
 
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
 
       keystoreBytes = await makeKeystoreFile(
         walletIndex: walletIndex,

@@ -82,11 +82,12 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
     final l10n = AppLocalizations.of(context)!;
+    final state = Provider.of<AppState>(context, listen: false);
 
     _btnController.start();
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
 
       await tryUnlockWithPassword(
         password: _passwordController.text,

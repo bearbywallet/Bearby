@@ -71,7 +71,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       });
 
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
+      final wallet = widget.state.wallet!;
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
       await deleteWallet(
         walletIndex: BigInt.from(widget.state.selectedWallet),

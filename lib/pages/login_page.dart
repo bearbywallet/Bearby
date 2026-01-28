@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
     final wallet = _appState.wallets[_selectedWallet];
     final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers();
+    final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
     _btnController.start();
     setState(() {

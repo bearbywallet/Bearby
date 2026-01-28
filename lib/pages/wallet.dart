@@ -168,7 +168,7 @@ class _WalletPageState extends State<WalletPage> {
       }
 
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
       if (enable) {
         await _showBiometricPasswordModal(
@@ -280,7 +280,7 @@ class _WalletPageState extends State<WalletPage> {
     if (wallet == null) return;
 
     final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers();
+    final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
     final biometricEnabled = wallet.authType != "none";
 
     if (biometricEnabled && mounted) {

@@ -16,7 +16,6 @@ import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -300,9 +299,9 @@ class _ConfirmTransactionContentState
     AppState appState,
     TransactionRequestInfo tx,
   ) async {
-    final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers();
     final wallet = appState.wallet!;
+    final device = DeviceInfoService();
+    final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
     final walletIndex = BigInt.from(appState.selectedWallet);
     final accountIndex = wallet.selectedAccount;
 
@@ -527,8 +526,7 @@ class _ConfirmTransactionContentState
                         ],
                       ),
                     ),
-                    if (appState.wallet!.authType == AuthMethod.none.name &&
-                        !_isLedgerWallet)
+                    if (appState.wallet!.authType == "none" && !_isLedgerWallet)
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: SmartInput(

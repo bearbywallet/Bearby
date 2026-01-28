@@ -8,7 +8,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -64,10 +63,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
     if (appState.wallet != null) {
       final authType = appState.wallet!.authType;
       setState(() {
-        _useBiometrics = authType == AuthMethod.faceId.name ||
-            authType == AuthMethod.fingerprint.name ||
-            authType == AuthMethod.biometric.name ||
-            authType == AuthMethod.pinCode.name;
+        _useBiometrics = authType != "none";
       });
     }
   }
@@ -126,7 +122,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
     }
 
     if (_passwordController.text.isEmpty &&
-        appState.wallet!.authType == AuthMethod.none.name &&
+        appState.wallet!.authType == "none" &&
         !_useBiometrics) {
       _passwordInputKey.currentState?.shake();
       return;
@@ -138,10 +134,11 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
     });
 
     try {
+      final wallet = appState.wallet!;
       DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
+      List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
-      if (appState.wallet!.walletType.contains(WalletType.SecretPhrase.name)) {
+      if (wallet.walletType.contains(WalletType.SecretPhrase.name)) {
         AddNextBip39AccountParams params = AddNextBip39AccountParams(
           walletIndex: walletIndex,
           accountIndex: BigInt.from(_bip39Index),
@@ -340,8 +337,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                 ),
                               ),
                             ],
-                            if (appState.wallet!.authType ==
-                                AuthMethod.none.name) ...[
+                            if (appState.wallet!.authType == "none") ...[
                               SizedBox(height: adaptivePadding),
                               SmartInput(
                                 key: _passwordInputKey,

@@ -209,7 +209,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       _btnController.start();
 
       DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
+      List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: "");
 
       String biometricType = "none";
       if (_useDeviceAuth && _authMethods.isNotEmpty) {

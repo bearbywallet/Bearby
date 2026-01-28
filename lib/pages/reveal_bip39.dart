@@ -81,10 +81,11 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   }
 
   void _onPasswordSubmit(BigInt walletIndex) async {
+    final state = Provider.of<AppState>(context, listen: false);
     _btnController.start();
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
 
       await tryUnlockWithPassword(
         password: _passwordController.text,

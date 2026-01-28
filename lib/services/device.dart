@@ -1,16 +1,62 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:zilpay/services/biometric_service.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:zilpay/services/preferences_service.dart';
+
+enum AuthMethodOld { faceId, fingerprint, biometric, pinCode, none }
 
 class DeviceInfoService {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  final LocalAuthentication _auth = LocalAuthentication();
 
-  Future<List<String>> getDeviceIdentifiers() async {
+  Future<List<AuthMethodOld>> getAvailableAuthMethods() async {
+    try {
+      List<AuthMethodOld> methods = [];
+
+      final isSupported = await _auth.isDeviceSupported();
+      final canCheckBiometrics = await _auth.canCheckBiometrics;
+
+      if (isSupported && canCheckBiometrics) {
+        final availableBiometrics = await _auth.getAvailableBiometrics();
+
+        if (availableBiometrics.contains(BiometricType.face)) {
+          methods.add(AuthMethodOld.faceId);
+        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+          methods.add(AuthMethodOld.fingerprint);
+        } else if (availableBiometrics.contains(BiometricType.strong) ||
+            availableBiometrics.contains(BiometricType.weak)) {
+          methods.add(AuthMethodOld.biometric);
+        }
+      }
+
+      if (await _checkDevicePinCode()) {
+        methods.add(AuthMethodOld.pinCode);
+      }
+
+      return methods.isEmpty ? [AuthMethodOld.none] : methods;
+    } on PlatformException catch (_) {
+      return [AuthMethodOld.none];
+    }
+  }
+
+  Future<bool> _checkDevicePinCode() async {
+    try {
+      return await _auth.isDeviceSupported();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<List<String>> getDeviceIdentifiers(
+      {required String walletAddress}) async {
     final packageInfo = await PackageInfo.fromPlatform();
-    final AuthService authService = AuthService();
-    final methods =
-        (await authService.getAvailableAuthMethods()).map((e) => e.name);
+    final isLegacy = walletAddress.isNotEmpty &&
+        (await PreferencesService.getInstance()).isLegacyWallet(walletAddress);
+    final List<String> methods = isLegacy
+        ? (await getAvailableAuthMethods()).map((e) => e.name).toList()
+        : [];
 
     List<String> platformSpecificIdentifiers = [];
 

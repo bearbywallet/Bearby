@@ -16,7 +16,6 @@ import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
@@ -191,7 +190,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .toList();
 
         DeviceInfoService device = DeviceInfoService();
-        List<String> identifiers = await device.getDeviceIdentifiers();
+        List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: "");
 
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
 
@@ -202,7 +201,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             walletName: _walletNameController.text,
             ledgerId: model?.id ?? "",
             accountNames: accountNames,
-            biometricType: AuthMethod.none.name,
+            biometricType: "none",
             identifiers: identifiers,
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,

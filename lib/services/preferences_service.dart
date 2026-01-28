@@ -17,6 +17,7 @@ class PreferencesService {
   static const String _tokensCardStyleKey = "tokens_card_styles_key";
   static const String _showAddressesHistoryKey = "show_addresses_transaction_history_key";
   static const String _browserUrlBarTopKey = "browser_url_bar_top_key";
+  static const String _legacyWalletsKey = "legacy_wallets_key";
 
   bool getHideBalance() => _prefs?.getBool(_hideBalanceKey) ?? false;
   Future<void> setHideBalance(bool value) => _prefs!.setBool(_hideBalanceKey, value);
@@ -36,4 +37,34 @@ class PreferencesService {
 
   bool getBrowserUrlBarTop() => _prefs?.getBool(_browserUrlBarTopKey) ?? false;
   Future<void> setBrowserUrlBarTop(bool value) => _prefs!.setBool(_browserUrlBarTopKey, value);
+
+  bool isLegacyWallet(String walletAddress) {
+    final legacyWallets = _prefs?.getStringList(_legacyWalletsKey) ?? [];
+    return legacyWallets.contains(walletAddress.toLowerCase());
+  }
+
+  Future<void> markWalletAsLegacy(String walletAddress) async {
+    final legacyWallets = _prefs?.getStringList(_legacyWalletsKey) ?? [];
+    final addressLower = walletAddress.toLowerCase();
+    if (!legacyWallets.contains(addressLower)) {
+      legacyWallets.add(addressLower);
+      await _prefs!.setStringList(_legacyWalletsKey, legacyWallets);
+    }
+  }
+
+  Future<void> markMultipleWalletsAsLegacy(List<String> walletAddresses) async {
+    final legacyWallets = _prefs?.getStringList(_legacyWalletsKey) ?? [];
+    for (final address in walletAddresses) {
+      final addressLower = address.toLowerCase();
+      if (!legacyWallets.contains(addressLower)) {
+        legacyWallets.add(addressLower);
+      }
+    }
+    await _prefs!.setStringList(_legacyWalletsKey, legacyWallets);
+  }
+
+  bool hasLegacyWallets() {
+    final legacyWallets = _prefs?.getStringList(_legacyWalletsKey);
+    return legacyWallets != null && legacyWallets.isNotEmpty;
+  }
 }

@@ -29,7 +29,19 @@ class RestoreKeystoreFilePage extends StatefulWidget {
 class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     with StatusBarMixin {
   static const List<int> _signature = [
-    90, 73, 76, 80, 65, 89, 95, 66, 65, 67, 75, 85, 80
+    90,
+    73,
+    76,
+    80,
+    65,
+    89,
+    95,
+    66,
+    65,
+    67,
+    75,
+    85,
+    80
   ];
 
   bool _isLoading = true;
@@ -207,7 +219,9 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       final l10n = AppLocalizations.of(context)!;
       final result = await FilePicker.platform.pickFiles(type: FileType.any);
 
-      if (result == null || result.files.isEmpty || result.files.first.path == null) {
+      if (result == null ||
+          result.files.isEmpty ||
+          result.files.first.path == null) {
         return;
       }
 
@@ -267,9 +281,10 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
 
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers();
-      final biometricType =
-          (_useDeviceAuth && _authMethods.isNotEmpty) ? _authMethods[0] : "none";
+      final identifiers = await device.getDeviceIdentifiers(walletAddress: "");
+      final biometricType = (_useDeviceAuth && _authMethods.isNotEmpty)
+          ? _authMethods[0]
+          : "none";
       final fileBytes = await _selectedFile!.file.readAsBytes();
 
       await restoreFromKeystore(
@@ -363,7 +378,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                                 ? "assets/icons/close_eye.svg"
                                 : "assets/icons/open_eye.svg",
                             onRightIconTap: _canInteract
-                                ? () => setState(() => _obscurePassword = !_obscurePassword)
+                                ? () => setState(
+                                    () => _obscurePassword = !_obscurePassword)
                                 : null,
                             onChanged: _canInteract
                                 ? (value) {
@@ -371,7 +387,9 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                                     setState(() {});
                                   }
                                 : null,
-                            onSubmitted: _canRestore ? (_) => _restoreFromKeystore() : null,
+                            onSubmitted: _canRestore
+                                ? (_) => _restoreFromKeystore()
+                                : null,
                           ),
                         ),
                         if (_authMethods.isNotEmpty)
@@ -388,7 +406,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                             color: theme.primaryPurple,
                             valueColor: theme.buttonText,
                             controller: _btnController,
-                            onPressed: _canRestore ? _restoreFromKeystore : () {},
+                            onPressed:
+                                _canRestore ? _restoreFromKeystore : () {},
                             child: Text(
                               l10n.keystoreRestoreButton,
                               style: theme.titleSmall,
