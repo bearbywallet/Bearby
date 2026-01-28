@@ -36,11 +36,7 @@ class _HomePageState extends State<HomePage>
   late AnimationController _animationController;
   late Animation<double> _heightAnimation;
   late Animation<double> _opacityAnimation;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -65,11 +61,6 @@ class _HomePageState extends State<HomePage>
         curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
       ),
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appState = Provider.of<AppState>(context, listen: false);
-      _refreshData(appState);
-    });
   }
 
   @override
@@ -79,25 +70,26 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _refreshData(AppState appState) async {
-    BigInt index = BigInt.from(appState.selectedWallet);
+    if (_isRefreshing) return;
+
+    _isRefreshing = true;
 
     try {
-      await syncBalances(walletIndex: index);
+      await syncBalances(walletIndex: BigInt.from(appState.selectedWallet));
+
       if (_errorMessage != null) {
-        setState(() {
-          _errorMessage = null;
-        });
+        setState(() => _errorMessage = null);
         _animationController.reverse();
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      setState(() => _errorMessage = e.toString());
       _animationController.forward();
     }
 
     await appState.syncRates();
     await appState.syncData();
+
+    _isRefreshing = false;
   }
 
   void _dismissError() {

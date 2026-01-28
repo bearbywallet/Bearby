@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../components/bottom_nav_bar.dart';
+import '../src/rust/api/token.dart';
+import '../state/app_state.dart';
 import './home_page.dart';
 import './history_page.dart';
 import './browser_page.dart';
@@ -13,6 +16,7 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> {
+  static bool _hasInitialDataLoaded = false;
   int _selectedIndex = 0;
   bool _isInitialRoute = true;
 
@@ -37,6 +41,23 @@ class MainPageState extends State<MainPage> {
 
       _isInitialRoute = false;
     }
+
+    if (!_hasInitialDataLoaded) {
+      _hasInitialDataLoaded = true;
+      _loadInitialData();
+    }
+  }
+
+  Future<void> _loadInitialData() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final walletIndex = BigInt.from(appState.selectedWallet);
+
+    try {
+      await syncBalances(walletIndex: walletIndex);
+    } catch (_) {}
+
+    await appState.syncRates();
+    await appState.syncData();
   }
 
   void _onItemTapped(int index) {

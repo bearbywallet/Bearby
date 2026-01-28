@@ -285,7 +285,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             let prices: HashMap<String, HashMap<String, f64>> = response
                 .json()
                 .await
-                .map_err(|e| format!("Failed to parse MetaMask response: {}", e))?;
+                .map_err(|e| format!("Failed to parse eth response: {}", e))?;
 
             let currency_key = currency.to_lowercase();
 
