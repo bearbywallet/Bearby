@@ -14,6 +14,7 @@ pub use zilpay::proto::address::Address;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     crypto::slip44::{BITCOIN, ETHEREUM, ZILLIQA},
+    settings::wallet_settings::TokenQuotesAPIOptions,
     token::ft::FToken,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
@@ -24,8 +25,6 @@ const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
 const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
 const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
-
-type CoinGeckoResponse = HashMap<String, HashMap<String, f64>>;
 
 #[derive(Debug, Deserialize)]
 struct ProtectionInfo {
@@ -118,7 +117,7 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     }
 }
 
-pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
+pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let wallet = service
@@ -129,9 +128,6 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let currency: &str = data.settings.features.currency_convert.as_ref();
-    let mut ftokens = wallet
-        .get_ftokens()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let selected_account = data
         .get_selected_account()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -139,6 +135,21 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
         .core
         .get_provider(selected_account.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
+    let chain_hash = chain.config.hash();
+    let mut ftokens = wallet
+        .get_ftokens()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let ftokens_indices: Vec<usize> = ftokens
+        .iter()
+        .enumerate()
+        .filter_map(|(i, token)| {
+            if token.chain_hash == chain_hash {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .collect();
     let native_token = chain
         .config
         .ftokens
@@ -146,25 +157,61 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
         .ok_or(ServiceError::TokenError(
             zilpay::errors::token::TokenError::TokenParseError,
         ))?;
-    let cryptocompare_url = format!(
-        "https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}",
-        native_token.symbol,
-        currency.to_uppercase()
-    );
-    let client = reqwest::Client::new();
-    let response = client
-        .get(&cryptocompare_url)
-        .send()
-        .await
-        .map_err(|e| format!("HTTP request failed: {}", e))?;
-    let rate: Value = response
-        .json()
-        .await
-        .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
-    let convert_rate = rate
-        .get(currency.to_uppercase())
-        .and_then(|v| v.as_f64())
-        .unwrap_or_default();
+
+    let convert_rate = match data.settings.rates_api_options {
+        TokenQuotesAPIOptions::Coingecko => {
+            let symbol_id = native_token.symbol.to_lowercase();
+            let coingecko_url = format!(
+                "{}?ids={}&vs_currencies={}",
+                COINGECKO_API_URL,
+                symbol_id,
+                currency.to_lowercase()
+            );
+            let client = reqwest::Client::new();
+            let response = client
+                .get(&coingecko_url)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+            let rate: Value = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse coingecko response: {}", e))?;
+            let convert_rate = rate
+                .get(&symbol_id)
+                .and_then(|v| v.get(currency.to_lowercase()))
+                .and_then(|v| v.as_f64())
+                .unwrap_or_default();
+
+            dbg!(&convert_rate);
+
+            convert_rate
+        }
+        TokenQuotesAPIOptions::CryptoCompare => {
+            let cryptocompare_url = format!(
+                "https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}",
+                native_token.symbol,
+                currency.to_uppercase()
+            );
+            let client = reqwest::Client::new();
+            let response = client
+                .get(&cryptocompare_url)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+            let rate: Value = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse cryptocompare response: {}", e))?;
+            let convert_rate = rate
+                .get(currency.to_uppercase())
+                .and_then(|v| v.as_f64())
+                .unwrap_or_default();
+
+            convert_rate
+        }
+        _ => return Ok(()),
+    };
 
     match chain.config.slip_44 {
         ZILLIQA => {
@@ -185,7 +232,8 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
                 .map(|token| (token.symbol.to_uppercase(), token.market_data.rate_zil))
                 .collect();
 
-            for token in &mut ftokens {
+            for &idx in &ftokens_indices {
+                let token = &mut ftokens[idx];
                 let symbol_upper = token.symbol.to_uppercase();
                 if let Some(&rate_zil) = rate_map.get(&symbol_upper) {
                     token.rate = rate_zil * convert_rate;
@@ -198,41 +246,39 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
                 .save_ftokens(&ftokens)
                 .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-            Ok(ftokens.into_iter().map(|t| t.into()).collect())
+            Ok(())
         }
         BITCOIN => {
-            if let Some(token) = ftokens.first_mut() {
-                token.rate = convert_rate;
+            if let Some(&idx) = ftokens_indices.first() {
+                ftokens[idx].rate = convert_rate;
             }
 
             wallet
                 .save_ftokens(&ftokens)
                 .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-            Ok(ftokens.into_iter().map(|t| t.into()).collect())
+            Ok(())
         }
         ETHEREUM => {
-            let chain_id = chain.config.chain_ids[0];
-            let token_addresses: Vec<String> = ftokens
-                .iter()
-                .map(|token| token.addr.auto_format().to_lowercase())
-                .collect();
-
-            if token_addresses.is_empty() {
-                return Ok(Vec::new());
+            if ftokens_indices.is_empty() {
+                return Ok(());
             }
 
+            let chain_id = chain.config.chain_ids[0];
+            let token_addresses: Vec<String> = ftokens_indices
+                .iter()
+                .map(|&idx| ftokens[idx].addr.auto_format().to_lowercase())
+                .collect();
+
             let addresses_param = token_addresses.join(",");
-            let metamask_url = format!(
+            let endpoint_url = format!(
                 "https://price.api.cx.metamask.io/v2/chains/{}/spot-prices?tokenAddresses={}&vsCurrency={}&includeMarketData=false",
                 chain_id, addresses_param, currency.to_uppercase()
             );
 
-            dbg!(&metamask_url);
-
             let client = reqwest::Client::new();
             let response = client
-                .get(&metamask_url)
+                .get(&endpoint_url)
                 .send()
                 .await
                 .map_err(|e| format!("HTTP request failed: {}", e))?;
@@ -244,10 +290,10 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
 
             let currency_key = currency.to_lowercase();
 
-            for (token, addr) in ftokens.iter_mut().zip(token_addresses.iter()) {
+            for (&idx, addr) in ftokens_indices.iter().zip(token_addresses.iter()) {
                 if let Some(price_data) = prices.get(addr) {
                     if let Some(&rate) = price_data.get(&currency_key) {
-                        token.rate = rate;
+                        ftokens[idx].rate = rate;
                     }
                 }
             }
@@ -256,9 +302,9 @@ pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String
                 .save_ftokens(&ftokens)
                 .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-            Ok(ftokens.into_iter().map(|t| t.into()).collect())
+            Ok(())
         }
-        _ => Ok(Vec::new()),
+        _ => Ok(()),
     }
 }
 
