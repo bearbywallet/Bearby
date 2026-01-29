@@ -1,6 +1,8 @@
 package biometric
 
 import android.content.Context
+import android.os.Build
+import android.provider.Settings
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.Keep
@@ -50,6 +52,20 @@ class BiometricManager(private val context: Context) {
             AndroidBiometricManager.BIOMETRIC_STATUS_UNKNOWN -> "UNKNOWN"
             else -> "UNKNOWN"
         }
+    }
+
+    @Keep
+    fun getDeviceIdentifier(): Array<String> {
+        val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: ""
+
+        return listOf(
+            androidId,
+            Build.BOARD,
+            Build.HARDWARE,
+            Build.DEVICE,
+            Build.PRODUCT,
+            Build.MANUFACTURER
+        ).filter { it.isNotEmpty() }.distinct().toTypedArray()
     }
 
     suspend fun encryptKey(activity: FragmentActivity, data: ByteArray): Result<ByteArray> {
