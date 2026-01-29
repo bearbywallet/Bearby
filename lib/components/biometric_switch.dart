@@ -34,6 +34,7 @@ class BiometricSwitch extends StatelessWidget {
       case "biometric":
         return AppLocalizations.of(context)!.biometricSwitchBiometric;
       case "password":
+      case "pinCode":
         return AppLocalizations.of(context)!.biometricSwitchPinCode;
       case "none":
       default:
@@ -54,6 +55,7 @@ class BiometricSwitch extends StatelessWidget {
       case "biometric":
         return 'assets/icons/biometric.svg';
       case "password":
+      case "pinCode":
         return 'assets/icons/pin.svg';
       case "none":
       default:
