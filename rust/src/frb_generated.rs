@@ -4955,7 +4955,6 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_ledgerId = <String>::sse_decode(deserializer);
         let mut var_accountNames = <Vec<String>>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
-        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_zilliqaLegacy = <bool>::sse_decode(deserializer);
         let mut var_bipPurpose = <u32>::sse_decode(deserializer);
@@ -4966,7 +4965,6 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
             ledger_id: var_ledgerId,
             account_names: var_accountNames,
             biometric_type: var_biometricType,
-            identifiers: var_identifiers,
             chain_hash: var_chainHash,
             zilliqa_legacy: var_zilliqaLegacy,
             bip_purpose: var_bipPurpose,
@@ -6874,7 +6872,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
             self.ledger_id.into_into_dart().into_dart(),
             self.account_names.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
-            self.identifiers.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.zilliqa_legacy.into_into_dart().into_dart(),
             self.bip_purpose.into_into_dart().into_dart(),
@@ -7674,7 +7671,6 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.ledger_id, serializer);
         <Vec<String>>::sse_encode(self.account_names, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
-        <Vec<String>>::sse_encode(self.identifiers, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <bool>::sse_encode(self.zilliqa_legacy, serializer);
         <u32>::sse_encode(self.bip_purpose, serializer);

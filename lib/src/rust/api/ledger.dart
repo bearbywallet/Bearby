@@ -34,7 +34,6 @@ class LedgerParamsInput {
   final String ledgerId;
   final List<String> accountNames;
   final String biometricType;
-  final List<String> identifiers;
   final BigInt chainHash;
   final bool zilliqaLegacy;
   final int bipPurpose;
@@ -46,7 +45,6 @@ class LedgerParamsInput {
     required this.ledgerId,
     required this.accountNames,
     required this.biometricType,
-    required this.identifiers,
     required this.chainHash,
     required this.zilliqaLegacy,
     required this.bipPurpose,
@@ -60,7 +58,6 @@ class LedgerParamsInput {
       ledgerId.hashCode ^
       accountNames.hashCode ^
       biometricType.hashCode ^
-      identifiers.hashCode ^
       chainHash.hashCode ^
       zilliqaLegacy.hashCode ^
       bipPurpose.hashCode;
@@ -76,7 +73,6 @@ class LedgerParamsInput {
           ledgerId == other.ledgerId &&
           accountNames == other.accountNames &&
           biometricType == other.biometricType &&
-          identifiers == other.identifiers &&
           chainHash == other.chainHash &&
           zilliqaLegacy == other.zilliqaLegacy &&
           bipPurpose == other.bipPurpose;

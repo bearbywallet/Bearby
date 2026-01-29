@@ -10,7 +10,6 @@ import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -115,23 +114,18 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   Future<void> _signMessageNative(AppState appState) async {
     try {
       final wallet = appState.wallet!;
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
       final walletIndex = BigInt.from(appState.selectedWallet);
       final accountIndex = wallet.selectedAccount;
-      String? session;
 
       if (widget.typedData != null) {
         final typedDataJson = jsonEncode(widget.typedData!.toJson());
         final (pubkey, sig) = await signTypedDataEip712(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
-          identifiers: identifiers,
           typedDataJson: typedDataJson,
           password: _passwordController.text.isNotEmpty
               ? _passwordController.text
               : null,
-          sessionCipher: session,
           passphrase: "",
           title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
           icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,
@@ -141,12 +135,10 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         final (pubkey, sig) = await signMessage(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
-          identifiers: identifiers,
           message: widget.message!,
           password: _passwordController.text.isNotEmpty
               ? _passwordController.text
               : null,
-          sessionCipher: session,
           passphrase: "",
           title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
           icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,

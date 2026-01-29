@@ -189,7 +189,8 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     let seed = if let Some(mut pass) = password {
         let key = service
             .core
-            .unlock_wallet_with_password(&pass, None, params.wallet_index);
+            .unlock_wallet_with_password(&pass, None, params.wallet_index)
+            .await;
         pass.zeroize();
 
         key
@@ -325,7 +326,8 @@ pub async fn delete_wallet(wallet_index: usize, password: Option<String>) -> Res
     if let Some(mut pass) = password {
         let key = service
             .core
-            .unlock_wallet_with_password(&pass, None, wallet_index);
+            .unlock_wallet_with_password(&pass, None, wallet_index)
+            .await;
 
         pass.zeroize();
 
@@ -390,7 +392,8 @@ pub async fn bitcoin_change_address_type(
     let seed = if let Some(mut pass) = password {
         let key = service
             .core
-            .unlock_wallet_with_password(&pass, None, wallet_index);
+            .unlock_wallet_with_password(&pass, None, wallet_index)
+            .await;
         pass.zeroize();
         key
     } else {
@@ -467,20 +470,26 @@ pub async fn reveal_keypair(
     password: String,
     passphrase: Option<String>,
 ) -> Result<KeyPairInfo, String> {
-    with_service(|core| {
-        let mut password = SecretString::new(password.into());
-        let seed = core.unlock_wallet_with_password(&password, None, wallet_index)?;
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let keypair = wallet
-            .reveal_keypair(account_index, &seed, passphrase.as_deref())
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-        password.zeroize();
+    let mut password = SecretString::new(password.into());
+    let seed = service
+        .core
+        .unlock_wallet_with_password(&password, None, wallet_index)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let keypair = wallet
+        .reveal_keypair(account_index, &seed, passphrase.as_deref())
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        Ok(keypair.into())
-    })
-    .await
-    .map_err(Into::into)
+    password.zeroize();
+
+    Ok(keypair.into())
 }
 
 pub async fn reveal_bip39_phrase(
@@ -488,20 +497,26 @@ pub async fn reveal_bip39_phrase(
     password: String,
     _passphrase: Option<String>,
 ) -> Result<String, String> {
-    with_service(|core| {
-        let mut password = SecretString::new(password.into());
-        let seed = core.unlock_wallet_with_password(&password, None, wallet_index)?;
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let m = wallet
-            .reveal_mnemonic(&seed)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-        password.zeroize();
+    let mut password = SecretString::new(password.into());
+    let seed = service
+        .core
+        .unlock_wallet_with_password(&password, None, wallet_index)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let m = wallet
+        .reveal_mnemonic(&seed)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        Ok(m.to_string())
-    })
-    .await
-    .map_err(Into::into)
+    password.zeroize();
+
+    Ok(m.to_string())
 }
 
 pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Result<(), String> {
@@ -657,13 +672,16 @@ pub async fn make_keystore_file(wallet_index: usize, password: String) -> Result
     .await?;
     select_accounts_chain(wallet_index, chain_hash).await?;
 
-    with_service(|core| {
-        let keystore_bytes = core.get_keystore(wallet_index, &password)?;
-        password.zeroize();
-        Ok(keystore_bytes)
-    })
-    .await
-    .map_err(Into::into)
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+
+    let keystore_bytes = service
+        .core
+        .get_keystore(wallet_index, &password)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    password.zeroize();
+    Ok(keystore_bytes)
 }
 
 pub async fn restore_from_keystore(

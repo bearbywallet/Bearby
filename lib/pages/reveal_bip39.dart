@@ -85,7 +85,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
     _btnController.start();
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
+      final identifiers = await device.getDeviceIdentifiers(
+          walletAddress: state.wallet!.walletAddress);
 
       await tryUnlockWithPassword(
         password: _passwordController.text,
@@ -95,7 +96,6 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
 
       String phrase = await revealBip39Phrase(
         walletIndex: walletIndex,
-        identifiers: identifiers,
         password: _passwordController.text,
       );
 

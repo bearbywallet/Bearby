@@ -190,7 +190,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .toList();
 
         DeviceInfoService device = DeviceInfoService();
-        List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: "");
+        await device.getDeviceIdentifiers(walletAddress: "");
 
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
 
@@ -202,7 +202,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             ledgerId: model?.id ?? "",
             accountNames: accountNames,
             biometricType: "none",
-            identifiers: identifiers,
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
             bipPurpose: kBip44Purpose,

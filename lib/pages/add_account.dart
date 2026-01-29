@@ -8,7 +8,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -135,8 +134,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
 
     try {
       final wallet = appState.wallet!;
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
       if (wallet.walletType.contains(WalletType.SecretPhrase.name)) {
         AddNextBip39AccountParams params = AddNextBip39AccountParams(
@@ -144,7 +141,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
           accountIndex: BigInt.from(_bip39Index),
           name: _accountNameController.text,
           passphrase: "",
-          identifiers: identifiers,
           password: _passwordController.text.isEmpty
               ? null
               : _passwordController.text,

@@ -9,7 +9,6 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -51,7 +50,6 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
 
   void _onCreateBackup(BigInt walletIndex, String name) async {
     final l10n = AppLocalizations.of(context)!;
-    final state = Provider.of<AppState>(context, listen: false);
 
     if (_confirmPasswordController.text.isEmpty) {
       setState(() {
@@ -69,13 +67,9 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
     });
 
     try {
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
-
       keystoreBytes = await makeKeystoreFile(
         walletIndex: walletIndex,
         password: _confirmPasswordController.text,
-        deviceIndicators: identifiers,
       );
 
       final docPath = await _saveKeystoreToDocumentsDir(

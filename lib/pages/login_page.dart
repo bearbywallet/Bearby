@@ -15,6 +15,7 @@ import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
 import '../services/auth_guard.dart';
 import '../services/device.dart';
+import '../services/preferences_service.dart';
 import '../state/app_state.dart';
 
 class LoginPage extends StatefulWidget {
@@ -83,13 +84,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<bool> _authenticateWithSession(
     String? session,
     int walletIndex,
-    List<String> identifiers,
+    List<String>? identifiers,
   ) async {
     try {
       bool unlocked = await tryUnlockWithSession(
-        sessionCipher: session,
         walletIndex: BigInt.from(walletIndex),
-        identifiers: identifiers,
       );
 
       if (unlocked) {
@@ -105,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<bool> _authenticateWithPassword(
     String password,
     int walletIndex,
-    List<String> identifiers,
+    List<String>? identifiers,
   ) async {
     try {
       bool unlocked = await tryUnlockWithPassword(
@@ -129,7 +128,8 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
     final wallet = _appState.wallets[_selectedWallet];
     final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
+    final identifiers =
+        await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
     _btnController.start();
     setState(() {
@@ -158,6 +158,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
           _selectedWallet,
           identifiers,
         );
+
+        if (isAuthenticated && identifiers != null) {
+          final prefs = await PreferencesService.getInstance();
+          await prefs.removeLegacyWallet(wallet.walletAddress);
+        }
       } else {
         if (mounted) {
           _btnController.reset();

@@ -67,4 +67,12 @@ class PreferencesService {
     final legacyWallets = _prefs?.getStringList(_legacyWalletsKey);
     return legacyWallets != null && legacyWallets.isNotEmpty;
   }
+
+  Future<void> removeLegacyWallet(String walletAddress) async {
+    final legacyWallets = _prefs?.getStringList(_legacyWalletsKey) ?? [];
+    final addressLower = walletAddress.toLowerCase();
+    if (legacyWallets.remove(addressLower)) {
+      await _prefs!.setStringList(_legacyWalletsKey, legacyWallets);
+    }
+  }
 }

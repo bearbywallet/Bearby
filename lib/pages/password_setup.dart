@@ -11,7 +11,6 @@ import 'package:zilpay/config/bip_purposes.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -208,9 +207,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
       _btnController.start();
 
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers(walletAddress: "");
-
       String biometricType = "none";
       if (_useDeviceAuth && _authMethods.isNotEmpty) {
         biometricType = _authMethods[0];
@@ -239,7 +235,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           passphrase: "",
           walletName: _walletNameController.text,
           biometricType: biometricType,
-          identifiers: identifiers,
           chainHash: chainHash,
           mnemonicCheck: !_bypassChecksumValidation,
           bipPurpose: _bipPurpose,
@@ -256,7 +251,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           password: _passwordController.text,
           walletName: _walletNameController.text,
           biometricType: biometricType,
-          identifiers: identifiers,
           chainHash: chainHash,
           bipPurpose: _bipPurpose,
         );

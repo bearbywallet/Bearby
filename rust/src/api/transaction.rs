@@ -98,7 +98,9 @@ pub async fn sign_send_transactions(
 
     let signed_tx = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
+            let key = core
+                .unlock_wallet_with_password(&pass, None, wallet_index)
+                .await;
 
             pass.zeroize();
 
@@ -283,7 +285,9 @@ pub async fn sign_message(
 
     let signed: (PubKey, Signature) = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
+            let key = core
+                .unlock_wallet_with_password(&pass, None, wallet_index)
+                .await;
             pass.zeroize();
             key
         } else {
@@ -326,7 +330,9 @@ pub async fn sign_typed_data_eip712(
     let password = password.map(|p| SecretString::new(p.into()));
     let signed: (PubKey, Signature) = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
+            let key = core
+                .unlock_wallet_with_password(&pass, None, wallet_index)
+                .await;
             pass.zeroize();
             key
         } else {

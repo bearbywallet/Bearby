@@ -4183,8 +4183,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput dco_decode_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return LedgerParamsInput(
       pubKeys: dco_decode_list_record_u_8_string(arr[0]),
       walletIndex: dco_decode_usize(arr[1]),
@@ -4192,10 +4192,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ledgerId: dco_decode_String(arr[3]),
       accountNames: dco_decode_list_String(arr[4]),
       biometricType: dco_decode_String(arr[5]),
-      identifiers: dco_decode_list_String(arr[6]),
-      chainHash: dco_decode_u_64(arr[7]),
-      zilliqaLegacy: dco_decode_bool(arr[8]),
-      bipPurpose: dco_decode_u_32(arr[9]),
+      chainHash: dco_decode_u_64(arr[6]),
+      zilliqaLegacy: dco_decode_bool(arr[7]),
+      bipPurpose: dco_decode_u_32(arr[8]),
     );
   }
 
@@ -5469,7 +5468,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_ledgerId = sse_decode_String(deserializer);
     var var_accountNames = sse_decode_list_String(deserializer);
     var var_biometricType = sse_decode_String(deserializer);
-    var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_zilliqaLegacy = sse_decode_bool(deserializer);
     var var_bipPurpose = sse_decode_u_32(deserializer);
@@ -5480,7 +5478,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         ledgerId: var_ledgerId,
         accountNames: var_accountNames,
         biometricType: var_biometricType,
-        identifiers: var_identifiers,
         chainHash: var_chainHash,
         zilliqaLegacy: var_zilliqaLegacy,
         bipPurpose: var_bipPurpose);
@@ -6871,7 +6868,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.ledgerId, serializer);
     sse_encode_list_String(self.accountNames, serializer);
     sse_encode_String(self.biometricType, serializer);
-    sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_bool(self.zilliqaLegacy, serializer);
     sse_encode_u_32(self.bipPurpose, serializer);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/smart_input.dart';
@@ -70,13 +69,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
         _isDisabled = true;
       });
 
-      final device = DeviceInfoService();
-      final wallet = widget.state.wallet!;
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
-
       await deleteWallet(
         walletIndex: BigInt.from(widget.state.selectedWallet),
-        identifiers: identifiers,
         password:
             _passwordController.text.isEmpty ? null : _passwordController.text,
       );

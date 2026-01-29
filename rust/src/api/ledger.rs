@@ -29,7 +29,6 @@ pub struct LedgerParamsInput {
     pub ledger_id: String,
     pub account_names: Vec<String>,
     pub biometric_type: String,
-    pub identifiers: Vec<String>,
     pub chain_hash: u64,
     pub zilliqa_legacy: bool,
     pub bip_purpose: u32,
@@ -67,7 +66,6 @@ pub async fn add_ledger_wallet(
         .map(TryFrom::try_from)
         .collect::<Result<Vec<FToken>, TokenError>>()
         .map_err(ServiceError::TokenError)?;
-    let identifiers = params.identifiers;
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
@@ -85,7 +83,7 @@ pub async fn add_ledger_wallet(
 
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
-        .add_ledger_wallet(params, WalletSettings::default(), &identifiers)
+        .add_ledger_wallet(params, WalletSettings::default())
         .await
         .map_err(ServiceError::BackgroundError)?;
     let wallet = get_last_wallet(&service.core)?;

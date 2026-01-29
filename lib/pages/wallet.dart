@@ -15,7 +15,6 @@ import 'package:zilpay/modals/confirm_password.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
@@ -167,17 +166,13 @@ class _WalletPageState extends State<WalletPage> {
         return;
       }
 
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
-
       if (enable) {
         await _showBiometricPasswordModal(
           appState: appState,
-          identifiers: identifiers,
           enable: true,
         );
       } else {
-        await _disableBiometric(appState, identifiers);
+        await _disableBiometric(appState);
       }
     } catch (e) {
       debugPrint("Error changing biometric: $e");
@@ -189,12 +184,10 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> _disableBiometric(
     AppState appState,
-    List<String> identifiers,
   ) async {
     try {
       await setBiometric(
         walletIndex: BigInt.from(appState.selectedWallet),
-        identifiers: identifiers,
         newBiometricType: "none",
       );
       _resetBiometricLoading();
@@ -202,7 +195,6 @@ class _WalletPageState extends State<WalletPage> {
       if (mounted) {
         await _showBiometricPasswordModal(
           appState: appState,
-          identifiers: identifiers,
           enable: false,
         );
       } else {
@@ -221,7 +213,6 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> _showBiometricPasswordModal({
     required AppState appState,
-    required List<String> identifiers,
     required bool enable,
   }) async {
     if (!mounted) return;
@@ -234,7 +225,6 @@ class _WalletPageState extends State<WalletPage> {
         try {
           await setBiometric(
             walletIndex: BigInt.from(appState.selectedWallet),
-            identifiers: identifiers,
             password: password,
             newBiometricType: enable ? _authMethods.first : "none",
           );
@@ -252,14 +242,12 @@ class _WalletPageState extends State<WalletPage> {
   Future<void> _executeBitcoinAddressChange({
     required AppState appState,
     required String newAddressType,
-    required List<String> identifiers,
     required int newIndex,
     String? password,
   }) async {
     await bitcoinChangeAddressType(
       walletIndex: BigInt.from(appState.selectedWallet),
       newAddressType: newAddressType,
-      identifiers: identifiers,
       password: password,
     );
 
@@ -279,15 +267,12 @@ class _WalletPageState extends State<WalletPage> {
     final wallet = appState.wallet;
     if (wallet == null) return;
 
-    final device = DeviceInfoService();
-    final identifiers = await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
     final biometricEnabled = wallet.authType != "none";
 
     if (biometricEnabled && mounted) {
       await _executeBitcoinAddressChange(
         appState: appState,
         newAddressType: newAddressType,
-        identifiers: identifiers,
         newIndex: newIndex,
       );
       return;
@@ -302,7 +287,6 @@ class _WalletPageState extends State<WalletPage> {
             await _executeBitcoinAddressChange(
               appState: appState,
               newAddressType: newAddressType,
-              identifiers: identifiers,
               newIndex: newIndex,
               password: password,
             );

@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -421,7 +420,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               onPressed: isLoading ? null : onTap,
               style: TextButton.styleFrom(
                 foregroundColor: theme.primaryPurple,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

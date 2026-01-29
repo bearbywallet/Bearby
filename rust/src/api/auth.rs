@@ -28,6 +28,7 @@ pub async fn try_unlock_with_password(
     service
         .core
         .unlock_wallet_with_password(&password, identifiers.as_deref(), wallet_index)
+        .await
         .map_err(ServiceError::BackgroundError)?;
 
     password.zeroize();

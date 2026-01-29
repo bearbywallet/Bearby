@@ -87,7 +87,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
     _btnController.start();
     try {
       final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: state.wallet!.walletAddress);
+      final identifiers = await device.getDeviceIdentifiers(
+          walletAddress: state.wallet!.walletAddress);
 
       await tryUnlockWithPassword(
         password: _passwordController.text,
@@ -97,7 +98,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       KeyPairInfo keypair = await revealKeypair(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
-        identifiers: identifiers,
         password: _passwordController.text,
       );
 

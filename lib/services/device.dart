@@ -49,14 +49,18 @@ class DeviceInfoService {
     }
   }
 
-  Future<List<String>> getDeviceIdentifiers(
+  Future<List<String>?> getDeviceIdentifiers(
       {required String walletAddress}) async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    final isLegacy = walletAddress.isNotEmpty &&
+    if (walletAddress.isEmpty) return null;
+
+    final isLegacy =
         (await PreferencesService.getInstance()).isLegacyWallet(walletAddress);
-    final List<String> methods = isLegacy
-        ? (await getAvailableAuthMethods()).map((e) => e.name).toList()
-        : [];
+
+    if (!isLegacy) return null;
+
+    final packageInfo = await PackageInfo.fromPlatform();
+    final methods =
+        (await getAvailableAuthMethods()).map((e) => e.name).toList();
 
     List<String> platformSpecificIdentifiers = [];
 

@@ -14,7 +14,6 @@ import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -280,8 +279,6 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
     _btnController.start();
 
     try {
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(walletAddress: "");
       final biometricType = (_useDeviceAuth && _authMethods.isNotEmpty)
           ? _authMethods[0]
           : "none";
@@ -289,7 +286,6 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
 
       await restoreFromKeystore(
         keystoreBytes: fileBytes,
-        deviceIndicators: identifiers,
         password: _passwordController.text,
         biometricType: biometricType,
       );
