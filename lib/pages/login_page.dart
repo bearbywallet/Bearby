@@ -37,6 +37,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   bool _obscureButton = true;
   int _selectedWallet = -1;
   bool _loading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -95,8 +96,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         await _completeAuthentication(walletIndex);
         return true;
       }
+      setState(() => _errorMessage = 'Session authentication failed');
     } catch (e) {
-      debugPrint('Session authentication error: $e');
+      setState(() => _errorMessage = e.toString());
     }
     return false;
   }
@@ -117,8 +119,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         await _completeAuthentication(walletIndex);
         return true;
       }
+      setState(() => _errorMessage = 'Invalid password');
     } catch (e) {
-      debugPrint('Password authentication error: $e');
+      setState(() => _errorMessage = e.toString());
     }
     return false;
   }
@@ -134,6 +137,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     _btnController.start();
     setState(() {
       _loading = true;
+      _errorMessage = null;
     });
 
     try {
@@ -183,8 +187,8 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
       await _appState.startTrackHistoryWorker();
     } catch (e) {
-      debugPrint("unlock $e");
       if (mounted) {
+        setState(() => _errorMessage = e.toString());
         _handleAuthenticationError();
       }
     } finally {
@@ -286,7 +290,10 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         isSelected: _selectedWallet == index,
         padding: const EdgeInsets.all(16),
         onTap: () {
-          setState(() => _selectedWallet = index);
+          setState(() {
+            _selectedWallet = index;
+            _errorMessage = null;
+          });
           _handleAuthentication();
         },
         icons: _getWalletIcons(wallet),
@@ -312,6 +319,30 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     ];
   }
 
+  Widget? _buildErrorMessage(AppState theme) {
+    if (_errorMessage == null) return null;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: theme.currentTheme.danger.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.currentTheme.danger.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        _errorMessage!,
+        style: theme.currentTheme.bodyText2.copyWith(
+          color: theme.currentTheme.danger,
+        ),
+      ),
+    );
+  }
+
   Widget _buildLoginForm(AppState theme) {
     final isLedgerWallet = _selectedWallet != -1 &&
         _selectedWallet < _appState.wallets.length &&
@@ -324,6 +355,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_errorMessage != null) _buildErrorMessage(theme)!,
           SmartInput(
             key: _passwordInputKey,
             controller: _passwordController,
@@ -335,8 +367,10 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
             focusedBorderColor: theme.currentTheme.primaryPurple,
             obscureText: _obscurePassword,
             onSubmitted: (_) => _handleAuthentication(),
-            onFocusChanged: (isFocused) =>
-                setState(() => _obscureButton = !isFocused),
+            onFocusChanged: (isFocused) => setState(() {
+              _obscureButton = !isFocused;
+              if (isFocused) _errorMessage = null;
+            }),
             rightIconPath: _obscurePassword
                 ? "assets/icons/close_eye.svg"
                 : "assets/icons/open_eye.svg",
