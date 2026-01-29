@@ -7,7 +7,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{decode_session, parse_address, with_service, with_wallet};
+use crate::utils::utils::{parse_address, with_service, with_wallet};
 use secrecy::zeroize::Zeroize;
 use secrecy::SecretString;
 use tokio::sync::mpsc;
@@ -89,7 +89,6 @@ pub async fn sign_send_transactions(
     account_index: usize,
     password: Option<String>,
     passphrase: Option<String>,
-    identifiers: Vec<String>,
     tx: TransactionRequestInfo,
 ) -> Result<HistoricalTransactionInfo, String> {
     let guard = BACKGROUND_SERVICE.read().await;
@@ -99,14 +98,13 @@ pub async fn sign_send_transactions(
 
     let signed_tx = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
 
             pass.zeroize();
 
             key
         } else {
-            core.unlock_wallet_with_session(Default::default(), &identifiers, wallet_index)
-                .await
+            core.unlock_wallet_with_session(wallet_index).await
         }
         .map_err(ServiceError::BackgroundError)?;
 
@@ -274,8 +272,6 @@ pub async fn sign_message(
     account_index: usize,
     password: Option<String>,
     passphrase: Option<String>,
-    session_cipher: Option<String>,
-    identifiers: Vec<String>,
     message: String,
     title: Option<String>,
     icon: Option<String>,
@@ -287,13 +283,11 @@ pub async fn sign_message(
 
     let signed: (PubKey, Signature) = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
             pass.zeroize();
             key
         } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
-                .await
+            core.unlock_wallet_with_session(wallet_index).await
         }
         .map_err(ServiceError::BackgroundError)?;
         let signed = core
@@ -322,8 +316,6 @@ pub async fn sign_typed_data_eip712(
     account_index: usize,
     password: Option<String>,
     passphrase: Option<String>,
-    session_cipher: Option<String>,
-    identifiers: Vec<String>,
     typed_data_json: String,
     title: Option<String>,
     icon: Option<String>,
@@ -334,13 +326,11 @@ pub async fn sign_typed_data_eip712(
     let password = password.map(|p| SecretString::new(p.into()));
     let signed: (PubKey, Signature) = {
         let seed_bytes = if let Some(mut pass) = password {
-            let key = core.unlock_wallet_with_password(&pass, &identifiers, wallet_index);
+            let key = core.unlock_wallet_with_password(&pass, None, wallet_index);
             pass.zeroize();
             key
         } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
-                .await
+            core.unlock_wallet_with_session(wallet_index).await
         }
         .map_err(ServiceError::BackgroundError)?;
         let signed = core

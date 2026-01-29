@@ -71,7 +71,6 @@ mod btc_wallet_tests {
             biometric_type: "none".to_string(),
             chain_hash: btc_mainnet_provider.hash(),
             bip_purpose: DerivationPath::BIP84_PURPOSE,
-            identifiers: vec![String::from("test btc")],
         };
 
         let wallet_address = add_bip39_wallet(params, wallet_settings, vec![])
@@ -80,15 +79,11 @@ mod btc_wallet_tests {
 
         assert!(!wallet_address.is_empty());
 
-        // Add 2 more accounts
-        let identifiers = vec![String::from("test btc")];
-
         add_next_bip39_account(AddNextBip39AccountParams {
             wallet_index: 0,
             account_index: 1,
             name: "BTC Account 1".to_string(),
             passphrase: "".to_string(),
-            identifiers: identifiers.clone(),
             password: Some(PASSWORD.to_string()),
         })
         .await
@@ -99,7 +94,6 @@ mod btc_wallet_tests {
             account_index: 2,
             name: "BTC Account 2".to_string(),
             passphrase: "".to_string(),
-            identifiers: identifiers.clone(),
             password: Some(PASSWORD.to_string()),
         })
         .await
@@ -134,15 +128,9 @@ mod btc_wallet_tests {
 
         // Test BIP44 (Legacy P2PKH)
         println!("\n=== Testing BIP44 (Legacy P2PKH) ===");
-        bitcoin_change_address_type(
-            0,
-            "p2pkh".to_string(),
-            identifiers.clone(),
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
+        bitcoin_change_address_type(0, "p2pkh".to_string(), Some(PASSWORD.to_string()), None)
+            .await
+            .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -158,15 +146,9 @@ mod btc_wallet_tests {
 
         // Test BIP49 (Nested SegWit P2SH-P2WPKH)
         println!("\n=== Testing BIP49 (Nested SegWit P2SH-P2WPKH) ===");
-        bitcoin_change_address_type(
-            0,
-            "p2sh".to_string(),
-            identifiers.clone(),
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
+        bitcoin_change_address_type(0, "p2sh".to_string(), Some(PASSWORD.to_string()), None)
+            .await
+            .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -182,15 +164,9 @@ mod btc_wallet_tests {
 
         // Test BIP84 (Native SegWit Bech32 P2WPKH)
         println!("\n=== Testing BIP84 (Native SegWit Bech32 P2WPKH) ===");
-        bitcoin_change_address_type(
-            0,
-            "p2wpkh".to_string(),
-            identifiers.clone(),
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
+        bitcoin_change_address_type(0, "p2wpkh".to_string(), Some(PASSWORD.to_string()), None)
+            .await
+            .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -206,15 +182,9 @@ mod btc_wallet_tests {
 
         // Test BIP86 (Taproot Bech32m P2TR)
         println!("\n=== Testing BIP86 (Taproot Bech32m P2TR) ===");
-        bitcoin_change_address_type(
-            0,
-            "p2tr".to_string(),
-            identifiers.clone(),
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
+        bitcoin_change_address_type(0, "p2tr".to_string(), Some(PASSWORD.to_string()), None)
+            .await
+            .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();

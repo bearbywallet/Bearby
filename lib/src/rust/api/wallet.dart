@@ -50,12 +50,9 @@ Future<void> changeWalletName(
     RustLib.instance.api.crateApiWalletChangeWalletName(
         walletIndex: walletIndex, newName: newName);
 
-Future<void> deleteWallet(
-        {required BigInt walletIndex,
-        required List<String> identifiers,
-        String? password}) =>
+Future<void> deleteWallet({required BigInt walletIndex, String? password}) =>
     RustLib.instance.api.crateApiWalletDeleteWallet(
-        walletIndex: walletIndex, identifiers: identifiers, password: password);
+        walletIndex: walletIndex, password: password);
 
 Future<void> deleteAccount(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
@@ -64,51 +61,41 @@ Future<void> deleteAccount(
 
 Future<void> setBiometric(
         {required BigInt walletIndex,
-        required List<String> identifiers,
         String? password,
         required String newBiometricType}) =>
     RustLib.instance.api.crateApiWalletSetBiometric(
         walletIndex: walletIndex,
-        identifiers: identifiers,
         password: password,
         newBiometricType: newBiometricType);
 
 Future<void> bitcoinChangeAddressType(
         {required BigInt walletIndex,
         required String newAddressType,
-        required List<String> identifiers,
         String? password,
         String? passphrase}) =>
     RustLib.instance.api.crateApiWalletBitcoinChangeAddressType(
         walletIndex: walletIndex,
         newAddressType: newAddressType,
-        identifiers: identifiers,
         password: password,
         passphrase: passphrase);
 
 Future<KeyPairInfo> revealKeypair(
         {required BigInt walletIndex,
         required BigInt accountIndex,
-        required List<String> identifiers,
         required String password,
         String? passphrase}) =>
     RustLib.instance.api.crateApiWalletRevealKeypair(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
-        identifiers: identifiers,
         password: password,
         passphrase: passphrase);
 
 Future<String> revealBip39Phrase(
         {required BigInt walletIndex,
-        required List<String> identifiers,
         required String password,
         String? passphrase}) =>
     RustLib.instance.api.crateApiWalletRevealBip39Phrase(
-        walletIndex: walletIndex,
-        identifiers: identifiers,
-        password: password,
-        passphrase: passphrase);
+        walletIndex: walletIndex, password: password, passphrase: passphrase);
 
 Future<void> zilliqaSwapChain(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
@@ -139,22 +126,16 @@ Future<String> zilliqaGetNFormat(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
 Future<Uint8List> makeKeystoreFile(
-        {required BigInt walletIndex,
-        required String password,
-        required List<String> deviceIndicators}) =>
+        {required BigInt walletIndex, required String password}) =>
     RustLib.instance.api.crateApiWalletMakeKeystoreFile(
-        walletIndex: walletIndex,
-        password: password,
-        deviceIndicators: deviceIndicators);
+        walletIndex: walletIndex, password: password);
 
 Future<String> restoreFromKeystore(
         {required List<int> keystoreBytes,
-        required List<String> deviceIndicators,
         required String password,
         required String biometricType}) =>
     RustLib.instance.api.crateApiWalletRestoreFromKeystore(
         keystoreBytes: keystoreBytes,
-        deviceIndicators: deviceIndicators,
         password: password,
         biometricType: biometricType);
 
@@ -163,7 +144,6 @@ class AddNextBip39AccountParams {
   final BigInt accountIndex;
   final String name;
   final String passphrase;
-  final List<String> identifiers;
   final String? password;
 
   const AddNextBip39AccountParams({
@@ -171,7 +151,6 @@ class AddNextBip39AccountParams {
     required this.accountIndex,
     required this.name,
     required this.passphrase,
-    required this.identifiers,
     this.password,
   });
 
@@ -181,7 +160,6 @@ class AddNextBip39AccountParams {
       accountIndex.hashCode ^
       name.hashCode ^
       passphrase.hashCode ^
-      identifiers.hashCode ^
       password.hashCode;
 
   @override
@@ -193,7 +171,6 @@ class AddNextBip39AccountParams {
           accountIndex == other.accountIndex &&
           name == other.name &&
           passphrase == other.passphrase &&
-          identifiers == other.identifiers &&
           password == other.password;
 }
 
@@ -202,7 +179,6 @@ class AddSKWalletParams {
   final String password;
   final String walletName;
   final String biometricType;
-  final List<String> identifiers;
   final BigInt chainHash;
   final int bipPurpose;
 
@@ -211,7 +187,6 @@ class AddSKWalletParams {
     required this.password,
     required this.walletName,
     required this.biometricType,
-    required this.identifiers,
     required this.chainHash,
     required this.bipPurpose,
   });
@@ -222,7 +197,6 @@ class AddSKWalletParams {
       password.hashCode ^
       walletName.hashCode ^
       biometricType.hashCode ^
-      identifiers.hashCode ^
       chainHash.hashCode ^
       bipPurpose.hashCode;
 
@@ -235,7 +209,6 @@ class AddSKWalletParams {
           password == other.password &&
           walletName == other.walletName &&
           biometricType == other.biometricType &&
-          identifiers == other.identifiers &&
           chainHash == other.chainHash &&
           bipPurpose == other.bipPurpose;
 }
@@ -249,7 +222,6 @@ class Bip39AddWalletParams {
   final String walletName;
   final String biometricType;
   final BigInt chainHash;
-  final List<String> identifiers;
   final int bipPurpose;
 
   const Bip39AddWalletParams({
@@ -261,7 +233,6 @@ class Bip39AddWalletParams {
     required this.walletName,
     required this.biometricType,
     required this.chainHash,
-    required this.identifiers,
     required this.bipPurpose,
   });
 
@@ -275,7 +246,6 @@ class Bip39AddWalletParams {
       walletName.hashCode ^
       biometricType.hashCode ^
       chainHash.hashCode ^
-      identifiers.hashCode ^
       bipPurpose.hashCode;
 
   @override
@@ -291,6 +261,5 @@ class Bip39AddWalletParams {
           walletName == other.walletName &&
           biometricType == other.biometricType &&
           chainHash == other.chainHash &&
-          identifiers == other.identifiers &&
           bipPurpose == other.bipPurpose;
 }

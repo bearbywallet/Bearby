@@ -157,7 +157,6 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiWalletBitcoinChangeAddressType(
       {required BigInt walletIndex,
       required String newAddressType,
-      required List<String> identifiers,
       String? password,
       String? passphrase});
 
@@ -238,9 +237,7 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<void> crateApiWalletDeleteWallet(
-      {required BigInt walletIndex,
-      required List<String> identifiers,
-      String? password});
+      {required BigInt walletIndex, String? password});
 
   Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp(
       {required BigInt walletIndex,
@@ -336,9 +333,7 @@ abstract class RustLibApi extends BaseApi {
   Future<BackgroundState> crateApiBackendLoadService({required String path});
 
   Future<Uint8List> crateApiWalletMakeKeystoreFile(
-      {required BigInt walletIndex,
-      required String password,
-      required List<String> deviceIndicators});
+      {required BigInt walletIndex, required String password});
 
   Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr(
       {required String data});
@@ -363,20 +358,17 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String> crateApiWalletRestoreFromKeystore(
       {required List<int> keystoreBytes,
-      required List<String> deviceIndicators,
       required String password,
       required String biometricType});
 
   Future<String> crateApiWalletRevealBip39Phrase(
       {required BigInt walletIndex,
-      required List<String> identifiers,
       required String password,
       String? passphrase});
 
   Future<KeyPairInfo> crateApiWalletRevealKeypair(
       {required BigInt walletIndex,
       required BigInt accountIndex,
-      required List<String> identifiers,
       required String password,
       String? passphrase});
 
@@ -397,7 +389,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
-      required List<String> identifiers,
       String? password,
       required String newBiometricType});
 
@@ -442,8 +433,6 @@ abstract class RustLibApi extends BaseApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      String? sessionCipher,
-      required List<String> identifiers,
       required String message,
       String? title,
       String? icon});
@@ -453,7 +442,6 @@ abstract class RustLibApi extends BaseApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      required List<String> identifiers,
       required TransactionRequestInfo tx});
 
   Future<(String, String)> crateApiTransactionSignTypedDataEip712(
@@ -461,8 +449,6 @@ abstract class RustLibApi extends BaseApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      String? sessionCipher,
-      required List<String> identifiers,
       required String typedDataJson,
       String? title,
       String? icon});
@@ -490,12 +476,9 @@ abstract class RustLibApi extends BaseApi {
   Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
-      required List<String> identifiers});
+      List<String>? identifiers});
 
-  Future<bool> crateApiAuthTryUnlockWithSession(
-      {String? sessionCipher,
-      required BigInt walletIndex,
-      required List<String> identifiers});
+  Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex});
 
   Future<void> crateApiLedgerUpdateLedgerAccounts(
       {required BigInt walletIndex,
@@ -837,7 +820,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiWalletBitcoinChangeAddressType(
       {required BigInt walletIndex,
       required String newAddressType,
-      required List<String> identifiers,
       String? password,
       String? passphrase}) {
     return handler.executeNormal(NormalTask(
@@ -845,7 +827,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(newAddressType, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -856,13 +837,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletBitcoinChangeAddressTypeConstMeta,
-      argValues: [
-        walletIndex,
-        newAddressType,
-        identifiers,
-        password,
-        passphrase
-      ],
+      argValues: [walletIndex, newAddressType, password, passphrase],
       apiImpl: this,
     ));
   }
@@ -870,13 +845,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletBitcoinChangeAddressTypeConstMeta =>
       const TaskConstMeta(
         debugName: "bitcoin_change_address_type",
-        argNames: [
-          "walletIndex",
-          "newAddressType",
-          "identifiers",
-          "password",
-          "passphrase"
-        ],
+        argNames: ["walletIndex", "newAddressType", "password", "passphrase"],
       );
 
   @override
@@ -1397,14 +1366,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiWalletDeleteWallet(
-      {required BigInt walletIndex,
-      required List<String> identifiers,
-      String? password}) {
+      {required BigInt walletIndex, String? password}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_opt_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 31, port: port_);
@@ -1414,14 +1380,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletDeleteWalletConstMeta,
-      argValues: [walletIndex, identifiers, password],
+      argValues: [walletIndex, password],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta get kCrateApiWalletDeleteWalletConstMeta => const TaskConstMeta(
         debugName: "delete_wallet",
-        argNames: ["walletIndex", "identifiers", "password"],
+        argNames: ["walletIndex", "password"],
       );
 
   @override
@@ -2291,15 +2257,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<Uint8List> crateApiWalletMakeKeystoreFile(
-      {required BigInt walletIndex,
-      required String password,
-      required List<String> deviceIndicators}) {
+      {required BigInt walletIndex, required String password}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(password, serializer);
-        sse_encode_list_String(deviceIndicators, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 65, port: port_);
       },
@@ -2308,7 +2271,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletMakeKeystoreFileConstMeta,
-      argValues: [walletIndex, password, deviceIndicators],
+      argValues: [walletIndex, password],
       apiImpl: this,
     ));
   }
@@ -2316,7 +2279,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletMakeKeystoreFileConstMeta =>
       const TaskConstMeta(
         debugName: "make_keystore_file",
-        argNames: ["walletIndex", "password", "deviceIndicators"],
+        argNames: ["walletIndex", "password"],
       );
 
   @override
@@ -2508,14 +2471,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<String> crateApiWalletRestoreFromKeystore(
       {required List<int> keystoreBytes,
-      required List<String> deviceIndicators,
       required String password,
       required String biometricType}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_prim_u_8_loose(keystoreBytes, serializer);
-        sse_encode_list_String(deviceIndicators, serializer);
         sse_encode_String(password, serializer);
         sse_encode_String(biometricType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -2526,7 +2487,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletRestoreFromKeystoreConstMeta,
-      argValues: [keystoreBytes, deviceIndicators, password, biometricType],
+      argValues: [keystoreBytes, password, biometricType],
       apiImpl: this,
     ));
   }
@@ -2534,25 +2495,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletRestoreFromKeystoreConstMeta =>
       const TaskConstMeta(
         debugName: "restore_from_keystore",
-        argNames: [
-          "keystoreBytes",
-          "deviceIndicators",
-          "password",
-          "biometricType"
-        ],
+        argNames: ["keystoreBytes", "password", "biometricType"],
       );
 
   @override
   Future<String> crateApiWalletRevealBip39Phrase(
       {required BigInt walletIndex,
-      required List<String> identifiers,
       required String password,
       String? passphrase}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -2563,7 +2517,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletRevealBip39PhraseConstMeta,
-      argValues: [walletIndex, identifiers, password, passphrase],
+      argValues: [walletIndex, password, passphrase],
       apiImpl: this,
     ));
   }
@@ -2571,14 +2525,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletRevealBip39PhraseConstMeta =>
       const TaskConstMeta(
         debugName: "reveal_bip39_phrase",
-        argNames: ["walletIndex", "identifiers", "password", "passphrase"],
+        argNames: ["walletIndex", "password", "passphrase"],
       );
 
   @override
   Future<KeyPairInfo> crateApiWalletRevealKeypair(
       {required BigInt walletIndex,
       required BigInt accountIndex,
-      required List<String> identifiers,
       required String password,
       String? passphrase}) {
     return handler.executeNormal(NormalTask(
@@ -2586,7 +2539,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -2597,7 +2549,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletRevealKeypairConstMeta,
-      argValues: [walletIndex, accountIndex, identifiers, password, passphrase],
+      argValues: [walletIndex, accountIndex, password, passphrase],
       apiImpl: this,
     ));
   }
@@ -2605,13 +2557,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletRevealKeypairConstMeta =>
       const TaskConstMeta(
         debugName: "reveal_keypair",
-        argNames: [
-          "walletIndex",
-          "accountIndex",
-          "identifiers",
-          "password",
-          "passphrase"
-        ],
+        argNames: ["walletIndex", "accountIndex", "password", "passphrase"],
       );
 
   @override
@@ -2729,14 +2675,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
-      required List<String> identifiers,
       String? password,
       required String newBiometricType}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_String(newBiometricType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -2747,19 +2691,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletSetBiometricConstMeta,
-      argValues: [walletIndex, identifiers, password, newBiometricType],
+      argValues: [walletIndex, password, newBiometricType],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta get kCrateApiWalletSetBiometricConstMeta => const TaskConstMeta(
         debugName: "set_biometric",
-        argNames: [
-          "walletIndex",
-          "identifiers",
-          "password",
-          "newBiometricType"
-        ],
+        argNames: ["walletIndex", "password", "newBiometricType"],
       );
 
   @override
@@ -3074,8 +3013,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      String? sessionCipher,
-      required List<String> identifiers,
       required String message,
       String? title,
       String? icon}) {
@@ -3086,8 +3023,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
-        sse_encode_opt_String(sessionCipher, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_String(message, serializer);
         sse_encode_opt_String(title, serializer);
         sse_encode_opt_String(icon, serializer);
@@ -3104,8 +3039,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         accountIndex,
         password,
         passphrase,
-        sessionCipher,
-        identifiers,
         message,
         title,
         icon
@@ -3122,8 +3055,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "accountIndex",
           "password",
           "passphrase",
-          "sessionCipher",
-          "identifiers",
           "message",
           "title",
           "icon"
@@ -3136,7 +3067,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      required List<String> identifiers,
       required TransactionRequestInfo tx}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -3145,7 +3075,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 93, port: port_);
@@ -3155,14 +3084,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionSignSendTransactionsConstMeta,
-      argValues: [
-        walletIndex,
-        accountIndex,
-        password,
-        passphrase,
-        identifiers,
-        tx
-      ],
+      argValues: [walletIndex, accountIndex, password, passphrase, tx],
       apiImpl: this,
     ));
   }
@@ -3175,7 +3097,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "accountIndex",
           "password",
           "passphrase",
-          "identifiers",
           "tx"
         ],
       );
@@ -3186,8 +3107,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required BigInt accountIndex,
       String? password,
       String? passphrase,
-      String? sessionCipher,
-      required List<String> identifiers,
       required String typedDataJson,
       String? title,
       String? icon}) {
@@ -3198,8 +3117,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
-        sse_encode_opt_String(sessionCipher, serializer);
-        sse_encode_list_String(identifiers, serializer);
         sse_encode_String(typedDataJson, serializer);
         sse_encode_opt_String(title, serializer);
         sse_encode_opt_String(icon, serializer);
@@ -3216,8 +3133,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         accountIndex,
         password,
         passphrase,
-        sessionCipher,
-        identifiers,
         typedDataJson,
         title,
         icon
@@ -3234,8 +3149,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "accountIndex",
           "password",
           "passphrase",
-          "sessionCipher",
-          "identifiers",
           "typedDataJson",
           "title",
           "icon"
@@ -3451,13 +3364,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
-      required List<String> identifiers}) {
+      List<String>? identifiers}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(password, serializer);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
+        sse_encode_opt_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 103, port: port_);
       },
@@ -3478,16 +3391,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<bool> crateApiAuthTryUnlockWithSession(
-      {String? sessionCipher,
-      required BigInt walletIndex,
-      required List<String> identifiers}) {
+  Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_opt_String(sessionCipher, serializer);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 104, port: port_);
       },
@@ -3496,7 +3404,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiAuthTryUnlockWithSessionConstMeta,
-      argValues: [sessionCipher, walletIndex, identifiers],
+      argValues: [walletIndex],
       apiImpl: this,
     ));
   }
@@ -3504,7 +3412,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiAuthTryUnlockWithSessionConstMeta =>
       const TaskConstMeta(
         debugName: "try_unlock_with_session",
-        argNames: ["sessionCipher", "walletIndex", "identifiers"],
+        argNames: ["walletIndex"],
       );
 
   @override
@@ -3780,15 +3688,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return AddNextBip39AccountParams(
       walletIndex: dco_decode_usize(arr[0]),
       accountIndex: dco_decode_usize(arr[1]),
       name: dco_decode_String(arr[2]),
       passphrase: dco_decode_String(arr[3]),
-      identifiers: dco_decode_list_String(arr[4]),
-      password: dco_decode_opt_String(arr[5]),
+      password: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -3796,16 +3703,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return AddSKWalletParams(
       sk: dco_decode_String(arr[0]),
       password: dco_decode_String(arr[1]),
       walletName: dco_decode_String(arr[2]),
       biometricType: dco_decode_String(arr[3]),
-      identifiers: dco_decode_list_String(arr[4]),
-      chainHash: dco_decode_u_64(arr[5]),
-      bipPurpose: dco_decode_u_32(arr[6]),
+      chainHash: dco_decode_u_64(arr[4]),
+      bipPurpose: dco_decode_u_32(arr[5]),
     );
   }
 
@@ -3874,8 +3780,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return Bip39AddWalletParams(
       password: dco_decode_String(arr[0]),
       mnemonicStr: dco_decode_String(arr[1]),
@@ -3885,8 +3791,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       walletName: dco_decode_String(arr[5]),
       biometricType: dco_decode_String(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
-      identifiers: dco_decode_list_String(arr[8]),
-      bipPurpose: dco_decode_u_32(arr[9]),
+      bipPurpose: dco_decode_u_32(arr[8]),
     );
   }
 
@@ -5032,14 +4937,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_accountIndex = sse_decode_usize(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_passphrase = sse_decode_String(deserializer);
-    var var_identifiers = sse_decode_list_String(deserializer);
     var var_password = sse_decode_opt_String(deserializer);
     return AddNextBip39AccountParams(
         walletIndex: var_walletIndex,
         accountIndex: var_accountIndex,
         name: var_name,
         passphrase: var_passphrase,
-        identifiers: var_identifiers,
         password: var_password);
   }
 
@@ -5051,7 +4954,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_password = sse_decode_String(deserializer);
     var var_walletName = sse_decode_String(deserializer);
     var var_biometricType = sse_decode_String(deserializer);
-    var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_bipPurpose = sse_decode_u_32(deserializer);
     return AddSKWalletParams(
@@ -5059,7 +4961,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         password: var_password,
         walletName: var_walletName,
         biometricType: var_biometricType,
-        identifiers: var_identifiers,
         chainHash: var_chainHash,
         bipPurpose: var_bipPurpose);
   }
@@ -5136,7 +5037,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_walletName = sse_decode_String(deserializer);
     var var_biometricType = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
-    var var_identifiers = sse_decode_list_String(deserializer);
     var var_bipPurpose = sse_decode_u_32(deserializer);
     return Bip39AddWalletParams(
         password: var_password,
@@ -5147,7 +5047,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         walletName: var_walletName,
         biometricType: var_biometricType,
         chainHash: var_chainHash,
-        identifiers: var_identifiers,
         bipPurpose: var_bipPurpose);
   }
 
@@ -6559,7 +6458,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_usize(self.accountIndex, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_String(self.passphrase, serializer);
-    sse_encode_list_String(self.identifiers, serializer);
     sse_encode_opt_String(self.password, serializer);
   }
 
@@ -6571,7 +6469,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.password, serializer);
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.biometricType, serializer);
-    sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_u_32(self.bipPurpose, serializer);
   }
@@ -6632,7 +6529,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.biometricType, serializer);
     sse_encode_u_64(self.chainHash, serializer);
-    sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_32(self.bipPurpose, serializer);
   }
 

@@ -1,23 +1,15 @@
-use crate::{
-    service::service::BACKGROUND_SERVICE,
-    utils::{errors::ServiceError, utils::decode_session},
-};
+use crate::{service::service::BACKGROUND_SERVICE, utils::errors::ServiceError};
 use secrecy::{zeroize::Zeroize, SecretString};
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::session;
 
-pub async fn try_unlock_with_session(
-    session_cipher: Option<String>,
-    wallet_index: usize,
-    identifiers: Vec<String>,
-) -> Result<bool, String> {
-    let session = decode_session(session_cipher)?;
+pub async fn try_unlock_with_session(wallet_index: usize) -> Result<bool, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
     service
         .core
-        .unlock_wallet_with_session(session, &identifiers, wallet_index)
+        .unlock_wallet_with_session(wallet_index)
         .await
         .map_err(ServiceError::BackgroundError)?;
 
@@ -27,7 +19,7 @@ pub async fn try_unlock_with_session(
 pub async fn try_unlock_with_password(
     password: String,
     wallet_index: usize,
-    identifiers: Vec<String>,
+    identifiers: Option<Vec<String>>,
 ) -> Result<bool, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -35,7 +27,7 @@ pub async fn try_unlock_with_password(
 
     service
         .core
-        .unlock_wallet_with_password(&password, &identifiers, wallet_index)
+        .unlock_wallet_with_password(&password, identifiers.as_deref(), wallet_index)
         .map_err(ServiceError::BackgroundError)?;
 
     password.zeroize();

@@ -503,7 +503,6 @@ fn wire__crate__api__wallet__bitcoin_change_address_type_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_new_address_type = <String>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -513,7 +512,6 @@ fn wire__crate__api__wallet__bitcoin_change_address_type_impl(
                         let output_ok = crate::api::wallet::bitcoin_change_address_type(
                             api_wallet_index,
                             api_new_address_type,
-                            api_identifiers,
                             api_password,
                             api_passphrase,
                         )
@@ -1294,18 +1292,14 @@ fn wire__crate__api__wallet__delete_wallet_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::wallet::delete_wallet(
-                            api_wallet_index,
-                            api_identifiers,
-                            api_password,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::wallet::delete_wallet(api_wallet_index, api_password)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2526,17 +2520,13 @@ fn wire__crate__api__wallet__make_keystore_file_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_password = <String>::sse_decode(&mut deserializer);
-            let api_device_indicators = <Vec<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::wallet::make_keystore_file(
-                            api_wallet_index,
-                            api_password,
-                            api_device_indicators,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::wallet::make_keystore_file(api_wallet_index, api_password)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2836,7 +2826,6 @@ fn wire__crate__api__wallet__restore_from_keystore_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keystore_bytes = <Vec<u8>>::sse_decode(&mut deserializer);
-            let api_device_indicators = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -2845,7 +2834,6 @@ fn wire__crate__api__wallet__restore_from_keystore_impl(
                     (move || async move {
                         let output_ok = crate::api::wallet::restore_from_keystore(
                             api_keystore_bytes,
-                            api_device_indicators,
                             api_password,
                             api_biometric_type,
                         )
@@ -2881,7 +2869,6 @@ fn wire__crate__api__wallet__reveal_bip39_phrase_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <String>::sse_decode(&mut deserializer);
             let api__passphrase = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -2890,7 +2877,6 @@ fn wire__crate__api__wallet__reveal_bip39_phrase_impl(
                     (move || async move {
                         let output_ok = crate::api::wallet::reveal_bip39_phrase(
                             api_wallet_index,
-                            api_identifiers,
                             api_password,
                             api__passphrase,
                         )
@@ -2927,7 +2913,6 @@ fn wire__crate__api__wallet__reveal_keypair_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <String>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -2937,7 +2922,6 @@ fn wire__crate__api__wallet__reveal_keypair_impl(
                         let output_ok = crate::api::wallet::reveal_keypair(
                             api_wallet_index,
                             api_account_index,
-                            api_identifiers,
                             api_password,
                             api_passphrase,
                         )
@@ -3139,7 +3123,6 @@ fn wire__crate__api__wallet__set_biometric_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_new_biometric_type = <String>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -3148,7 +3131,6 @@ fn wire__crate__api__wallet__set_biometric_impl(
                     (move || async move {
                         let output_ok = crate::api::wallet::set_biometric(
                             api_wallet_index,
-                            api_identifiers,
                             api_password,
                             api_new_biometric_type,
                         )
@@ -3629,8 +3611,6 @@ fn wire__crate__api__transaction__sign_message_impl(
             let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
-            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_message = <String>::sse_decode(&mut deserializer);
             let api_title = <Option<String>>::sse_decode(&mut deserializer);
             let api_icon = <Option<String>>::sse_decode(&mut deserializer);
@@ -3643,8 +3623,6 @@ fn wire__crate__api__transaction__sign_message_impl(
                             api_account_index,
                             api_password,
                             api_passphrase,
-                            api_session_cipher,
-                            api_identifiers,
                             api_message,
                             api_title,
                             api_icon,
@@ -3684,7 +3662,6 @@ fn wire__crate__api__transaction__sign_send_transactions_impl(
             let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_tx = <crate::models::transactions::request::TransactionRequestInfo>::sse_decode(
                 &mut deserializer,
             );
@@ -3697,7 +3674,6 @@ fn wire__crate__api__transaction__sign_send_transactions_impl(
                             api_account_index,
                             api_password,
                             api_passphrase,
-                            api_identifiers,
                             api_tx,
                         )
                         .await?;
@@ -3735,8 +3711,6 @@ fn wire__crate__api__transaction__sign_typed_data_eip712_impl(
             let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
-            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_typed_data_json = <String>::sse_decode(&mut deserializer);
             let api_title = <Option<String>>::sse_decode(&mut deserializer);
             let api_icon = <Option<String>>::sse_decode(&mut deserializer);
@@ -3749,8 +3723,6 @@ fn wire__crate__api__transaction__sign_typed_data_eip712_impl(
                             api_account_index,
                             api_password,
                             api_passphrase,
-                            api_session_cipher,
-                            api_identifiers,
                             api_typed_data_json,
                             api_title,
                             api_icon,
@@ -4081,7 +4053,7 @@ fn wire__crate__api__auth__try_unlock_with_password_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_password = <String>::sse_decode(&mut deserializer);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_identifiers = <Option<Vec<String>>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -4122,19 +4094,13 @@ fn wire__crate__api__auth__try_unlock_with_session_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::auth::try_unlock_with_session(
-                            api_session_cipher,
-                            api_wallet_index,
-                            api_identifiers,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::auth::try_unlock_with_session(api_wallet_index).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -4534,14 +4500,12 @@ impl SseDecode for crate::api::wallet::AddNextBip39AccountParams {
         let mut var_accountIndex = <usize>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_passphrase = <String>::sse_decode(deserializer);
-        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_password = <Option<String>>::sse_decode(deserializer);
         return crate::api::wallet::AddNextBip39AccountParams {
             wallet_index: var_walletIndex,
             account_index: var_accountIndex,
             name: var_name,
             passphrase: var_passphrase,
-            identifiers: var_identifiers,
             password: var_password,
         };
     }
@@ -4554,7 +4518,6 @@ impl SseDecode for crate::api::wallet::AddSKWalletParams {
         let mut var_password = <String>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
-        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_bipPurpose = <u32>::sse_decode(deserializer);
         return crate::api::wallet::AddSKWalletParams {
@@ -4562,7 +4525,6 @@ impl SseDecode for crate::api::wallet::AddSKWalletParams {
             password: var_password,
             wallet_name: var_walletName,
             biometric_type: var_biometricType,
-            identifiers: var_identifiers,
             chain_hash: var_chainHash,
             bip_purpose: var_bipPurpose,
         };
@@ -4655,7 +4617,6 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
-        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_bipPurpose = <u32>::sse_decode(deserializer);
         return crate::api::wallet::Bip39AddWalletParams {
             password: var_password,
@@ -4666,7 +4627,6 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
             wallet_name: var_walletName,
             biometric_type: var_biometricType,
             chain_hash: var_chainHash,
-            identifiers: var_identifiers,
             bip_purpose: var_bipPurpose,
         };
     }
@@ -6391,7 +6351,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddNextBip39AccountPa
             self.account_index.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
             self.passphrase.into_into_dart().into_dart(),
-            self.identifiers.into_into_dart().into_dart(),
             self.password.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -6416,7 +6375,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddSKWalletParams {
             self.password.into_into_dart().into_dart(),
             self.wallet_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
-            self.identifiers.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.bip_purpose.into_into_dart().into_dart(),
         ]
@@ -6545,7 +6503,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::Bip39AddWalletParams 
             self.wallet_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
-            self.identifiers.into_into_dart().into_dart(),
             self.bip_purpose.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -7425,7 +7382,6 @@ impl SseEncode for crate::api::wallet::AddNextBip39AccountParams {
         <usize>::sse_encode(self.account_index, serializer);
         <String>::sse_encode(self.name, serializer);
         <String>::sse_encode(self.passphrase, serializer);
-        <Vec<String>>::sse_encode(self.identifiers, serializer);
         <Option<String>>::sse_encode(self.password, serializer);
     }
 }
@@ -7437,7 +7393,6 @@ impl SseEncode for crate::api::wallet::AddSKWalletParams {
         <String>::sse_encode(self.password, serializer);
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
-        <Vec<String>>::sse_encode(self.identifiers, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <u32>::sse_encode(self.bip_purpose, serializer);
     }
@@ -7500,7 +7455,6 @@ impl SseEncode for crate::api::wallet::Bip39AddWalletParams {
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
-        <Vec<String>>::sse_encode(self.identifiers, serializer);
         <u32>::sse_encode(self.bip_purpose, serializer);
     }
 }

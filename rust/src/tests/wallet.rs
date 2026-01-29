@@ -125,7 +125,8 @@ mod wallet_tests {
         assert_eq!(zilliqa_provider_mainnet.short_name, "zilliqa");
         assert_eq!(zilliqa_provider_mainnet.diff_block_time, 0);
         assert_eq!(zilliqa_provider_mainnet.rpc.len(), 2);
-        assert_eq!(zilliqa_provider_mainnet.rpc[0], "https://api.zilliqa.com");
+        assert_eq!(zilliqa_provider_mainnet.rpc[1], "https://api.zilliqa.com");
+        assert_eq!(zilliqa_provider_mainnet.rpc[0], "https://ssn.zilpay.io/api");
         assert_eq!(zilliqa_provider_mainnet.chain_ids, [32769, 1]);
         assert_eq!(zilliqa_provider_mainnet.slip_44, 313);
         assert_eq!(zilliqa_provider_mainnet.testnet, None);
@@ -207,7 +208,6 @@ mod wallet_tests {
             biometric_type: "faceid".to_string(),
             chain_hash: 0,
             bip_purpose: DerivationPath::BIP44_PURPOSE,
-            identifiers: vec![String::from("test identifier")],
         };
         let wallet_settings = WalletSettingsInfo {
             cipher_orders: vec![0, 1, 2],
@@ -257,7 +257,6 @@ mod wallet_tests {
             biometric_type: "none".to_string(),
             chain_hash: zil_chain_config.hash(),
             bip_purpose: DerivationPath::BIP44_PURPOSE,
-            identifiers: vec![String::from("test identifier")],
         };
         let wallet_settings = WalletSettingsInfo {
             cipher_orders: vec![0, 1, 2],
@@ -394,7 +393,6 @@ mod wallet_tests {
             account_index: 1,
             name: "Second account".to_string(),
             passphrase: String::new(),
-            identifiers: vec![String::from("test identifier")],
             password: Some(PASSWORD.to_string()),
         })
         .await
@@ -518,7 +516,6 @@ mod wallet_tests {
                 account_index: 2,
                 name: "account 3".to_string(),
                 passphrase: String::new(),
-                identifiers: vec![String::from("test identifier")],
                 password: Some(PASSWORD.to_string()),
             })
             .await
@@ -564,35 +561,18 @@ mod wallet_tests {
                 assert_eq!(account3.index, 2);
             }
 
-            let words = reveal_bip39_phrase(
-                0,
-                vec![String::from("test identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
+            let words = reveal_bip39_phrase(0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
             assert_eq!(words, VALID_MNEMONIC_STR);
 
-            let keypair2 = reveal_keypair(
-                0,
-                2,
-                vec![String::from("test identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
-            let keypair0 = reveal_keypair(
-                0,
-                0,
-                vec![String::from("test identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
+            let keypair2 = reveal_keypair(0, 2, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
+            let keypair0 = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
             assert_eq!(
                 keypair0.pk,
@@ -620,34 +600,18 @@ mod wallet_tests {
 
             assert_eq!(wallet.accounts.len(), 1);
 
-            let keystore_bytes = make_keystore_file(
-                0,
-                PASSWORD.to_string(),
-                vec![String::from("test identifier")],
-            )
-            .await
-            .unwrap();
+            let keystore_bytes = make_keystore_file(0, PASSWORD.to_string()).await.unwrap();
 
-            delete_wallet(
-                0,
-                vec![String::from("test identifier")],
-                Some(PASSWORD.to_string()),
-            )
-            .await
-            .unwrap();
+            delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
 
             let wallets = get_wallets().await.unwrap();
 
             assert_eq!(wallets.len(), 0);
 
-            let new_address = restore_from_keystore(
-                keystore_bytes,
-                vec![String::from("new identifier")],
-                PASSWORD.to_string(),
-                "none".to_string(),
-            )
-            .await
-            .unwrap();
+            let new_address =
+                restore_from_keystore(keystore_bytes, PASSWORD.to_string(), "none".to_string())
+                    .await
+                    .unwrap();
             let wallets = get_wallets().await.unwrap();
             let wallet = wallets.first().unwrap();
 
@@ -672,26 +636,15 @@ mod wallet_tests {
                 assert_eq!(wallet.accounts[0].index, 0);
             }
 
-            let words = reveal_bip39_phrase(
-                0,
-                vec![String::from("new identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
+            let words = reveal_bip39_phrase(0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
             assert_eq!(words, VALID_MNEMONIC_STR);
 
-            let keypair0 = reveal_keypair(
-                0,
-                0,
-                vec![String::from("new identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
+            let keypair0 = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
             assert_eq!(
                 keypair0.pk,
@@ -703,13 +656,7 @@ mod wallet_tests {
             );
         }
 
-        delete_wallet(
-            0,
-            vec![String::from("new identifier")],
-            Some(PASSWORD.to_string()),
-        )
-        .await
-        .unwrap();
+        delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
 
         GUARD.store(5, std::sync::atomic::Ordering::Relaxed);
     }
@@ -729,7 +676,6 @@ mod wallet_tests {
             password: PASSWORD.to_string(),
             wallet_name: "SK Wallet".to_string(),
             biometric_type: "none".to_string(),
-            identifiers: vec![String::from("test sk identifier")],
             bip_purpose: DerivationPath::BIP44_PURPOSE,
             chain_hash: zil_chain_config.hash(),
         };
@@ -833,25 +779,13 @@ mod wallet_tests {
 
         assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
         assert_eq!(
-            reveal_bip39_phrase(
-                0,
-                vec![String::from("test sk identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await,
+            reveal_bip39_phrase(0, PASSWORD.to_string(), None,).await,
             Err("Wallet error at index: 0: Invalid account type".to_string())
         );
 
-        let keypair = reveal_keypair(
-            0,
-            0,
-            vec![String::from("test sk identifier")],
-            PASSWORD.to_string(),
-            None,
-        )
-        .await
-        .unwrap();
+        let keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+            .await
+            .unwrap();
 
         assert_eq!(&keypair.sk, SK);
         assert_eq!(
@@ -905,33 +839,17 @@ mod wallet_tests {
 
         assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
 
-        let keystore_bytes = make_keystore_file(
-            0,
-            PASSWORD.to_string(),
-            vec![String::from("test sk identifier")],
-        )
-        .await
-        .unwrap();
+        let keystore_bytes = make_keystore_file(0, PASSWORD.to_string()).await.unwrap();
 
-        delete_wallet(
-            0,
-            vec![String::from("test sk identifier")],
-            Some(PASSWORD.to_string()),
-        )
-        .await
-        .unwrap();
+        delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
 
         let wallets = get_wallets().await.unwrap();
         assert_eq!(wallets.len(), 0);
 
-        let _new_address = restore_from_keystore(
-            keystore_bytes,
-            vec![String::from("test sk identifier")],
-            PASSWORD.to_string(),
-            "none".to_string(),
-        )
-        .await
-        .unwrap();
+        let _new_address =
+            restore_from_keystore(keystore_bytes, PASSWORD.to_string(), "none".to_string())
+                .await
+                .unwrap();
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
 
@@ -1004,15 +922,9 @@ mod wallet_tests {
 
             assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
 
-            let restored_keypair = reveal_keypair(
-                0,
-                0,
-                vec![String::from("test sk identifier")],
-                PASSWORD.to_string(),
-                None,
-            )
-            .await
-            .unwrap();
+            let restored_keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
             assert_eq!(&restored_keypair.sk, SK);
             assert_eq!(

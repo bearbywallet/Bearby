@@ -30,14 +30,12 @@ Future<HistoricalTransactionInfo> signSendTransactions(
         required BigInt accountIndex,
         String? password,
         String? passphrase,
-        required List<String> identifiers,
         required TransactionRequestInfo tx}) =>
     RustLib.instance.api.crateApiTransactionSignSendTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         password: password,
         passphrase: passphrase,
-        identifiers: identifiers,
         tx: tx);
 
 Future<EncodedRLPTx> encodeTxRlp(
@@ -67,8 +65,6 @@ Future<(String, String)> signMessage(
         required BigInt accountIndex,
         String? password,
         String? passphrase,
-        String? sessionCipher,
-        required List<String> identifiers,
         required String message,
         String? title,
         String? icon}) =>
@@ -77,8 +73,6 @@ Future<(String, String)> signMessage(
         accountIndex: accountIndex,
         password: password,
         passphrase: passphrase,
-        sessionCipher: sessionCipher,
-        identifiers: identifiers,
         message: message,
         title: title,
         icon: icon);
@@ -88,8 +82,6 @@ Future<(String, String)> signTypedDataEip712(
         required BigInt accountIndex,
         String? password,
         String? passphrase,
-        String? sessionCipher,
-        required List<String> identifiers,
         required String typedDataJson,
         String? title,
         String? icon}) =>
@@ -98,8 +90,6 @@ Future<(String, String)> signTypedDataEip712(
         accountIndex: accountIndex,
         password: password,
         passphrase: passphrase,
-        sessionCipher: sessionCipher,
-        identifiers: identifiers,
         typedDataJson: typedDataJson,
         title: title,
         icon: icon);
