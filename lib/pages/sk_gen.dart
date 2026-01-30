@@ -13,6 +13,7 @@ import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/utils/utils.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
   const SecretKeyGeneratorPage({super.key});
@@ -39,6 +40,12 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
       _hasBackupWords = false;
       _keyPair = keyPair;
     });
+  }
+
+  @override
+  void dispose() {
+    _keyPair = _keyPair.zeroize();
+    super.dispose();
   }
 
   @override
@@ -164,7 +171,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
                           backgroundColor: theme.primaryPurple,
                           text: l10n.secretKeyGeneratorPageNextButton,
                           onPressed: () {
-                            Navigator.of(context).pushNamed(
+                            Navigator.of(context).pushReplacementNamed(
                               '/net_setup',
                               arguments: {'keys': _keyPair},
                             );

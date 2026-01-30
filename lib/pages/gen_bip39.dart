@@ -13,6 +13,7 @@ import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/utils/utils.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
   const SecretPhraseGeneratorPage({
@@ -35,6 +36,12 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
   void initState() {
     super.initState();
     _regenerateMnemonicWords();
+  }
+
+  @override
+  void dispose() {
+    _mnemonicWords.zeroize();
+    super.dispose();
   }
 
   @override
@@ -169,7 +176,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                             backgroundColor: theme.primaryPurple,
                             text: l10n.secretPhraseGeneratorPageNextButton,
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/verify_bip39',
+                              Navigator.of(context).pushReplacementNamed('/verify_bip39',
                                   arguments: {'bip39': _mnemonicWords});
                             },
                             borderRadius: 30.0,

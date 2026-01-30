@@ -20,6 +20,7 @@ import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/utils/utils.dart';
 
 class PasswordSetupPage extends StatefulWidget {
   const PasswordSetupPage({super.key});
@@ -116,6 +117,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
   @override
   void dispose() {
+    _bip39List?.zeroize();
+    if (_keys != null) {
+      _keys = _keys!.zeroize();
+    }
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _walletNameController.dispose();
@@ -283,7 +288,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       _btnController.success();
 
       if (!mounted) return;
-      Navigator.of(context).pushNamed('/');
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       setState(() {
         _disabled = false;

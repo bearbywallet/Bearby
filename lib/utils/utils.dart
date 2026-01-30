@@ -1,4 +1,5 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
 
 const _hexChars = '0123456789abcdef';
 
@@ -49,4 +50,19 @@ List<String> filterByIndexes(List<String> addresses, Uint64List indexes) {
     for (var i = 0; i < indexes.length; i++)
       if (i < addresses.length) addresses[indexes[i].toInt()]
   ];
+}
+
+extension SecureListExtension on List<String> {
+  void zeroize() {
+    for (var i = 0; i < length; i++) {
+      this[i] = '';
+    }
+    clear();
+  }
+}
+
+extension SecureKeyPairExtension on KeyPairInfo {
+  KeyPairInfo zeroize() {
+    return KeyPairInfo(sk: "", pk: "");
+  }
 }

@@ -7,6 +7,7 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/utils/utils.dart';
 
 List<int> getRandomNumbers(int min, int max, int count) {
   final random = Random();
@@ -44,6 +45,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
         _indexes = getRandomNumbers(0, _bip39List!.length, maxNumbers);
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _bip39List?.zeroize();
+    _verifyWords.zeroize();
+    super.dispose();
   }
 
   @override
@@ -146,7 +154,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                                   text: AppLocalizations.of(context)!
                                       .secretPhraseVerifyPageNextButton,
                                   onPressed: () {
-                                    Navigator.of(context).pushNamed(
+                                    Navigator.of(context).pushReplacementNamed(
                                         '/net_setup',
                                         arguments: {'bip39': _bip39List});
                                   },
