@@ -4847,23 +4847,15 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
         let mut var_delegAmt = <String>::sse_decode(deserializer);
         let mut var_rewards = <String>::sse_decode(deserializer);
         let mut var_claimableAmount = <String>::sse_decode(deserializer);
-        let mut var_votePower = <Option<f64>>::sse_decode(deserializer);
         let mut var_apr = <Option<f64>>::sse_decode(deserializer);
         let mut var_commission = <Option<f64>>::sse_decode(deserializer);
-        let mut var_totalRewards = <Option<String>>::sse_decode(deserializer);
-        let mut var_totalStake = <Option<String>>::sse_decode(deserializer);
-        let mut var_totalNetworkStake = <Option<String>>::sse_decode(deserializer);
-        let mut var_version = <Option<String>>::sse_decode(deserializer);
-        let mut var_unbondingPeriod = <Option<u64>>::sse_decode(deserializer);
+        let mut var_unbondingPeriodSeconds = <Option<u64>>::sse_decode(deserializer);
+        let mut var_lstPriceChangePercent = <Option<f32>>::sse_decode(deserializer);
+        let mut var_avgBlockTimeMs = <Option<u64>>::sse_decode(deserializer);
         let mut var_tag = <String>::sse_decode(deserializer);
         let mut var_currentBlock = <Option<u64>>::sse_decode(deserializer);
         let mut var_pendingWithdrawals =
             <Vec<crate::models::stake::PendingWithdrawalInfo>>::sse_decode(deserializer);
-        let mut var_validators =
-            <Vec<crate::models::stake::ZilValidatorInfo>>::sse_decode(deserializer);
-        let mut var_hide_ = <bool>::sse_decode(deserializer);
-        let mut var_uptime = <u8>::sse_decode(deserializer);
-        let mut var_canStake = <bool>::sse_decode(deserializer);
         return crate::models::stake::FinalOutputInfo {
             name: var_name,
             address: var_address,
@@ -4871,21 +4863,14 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
             deleg_amt: var_delegAmt,
             rewards: var_rewards,
             claimable_amount: var_claimableAmount,
-            vote_power: var_votePower,
             apr: var_apr,
             commission: var_commission,
-            total_rewards: var_totalRewards,
-            total_stake: var_totalStake,
-            total_network_stake: var_totalNetworkStake,
-            version: var_version,
-            unbonding_period: var_unbondingPeriod,
+            unbonding_period_seconds: var_unbondingPeriodSeconds,
+            lst_price_change_percent: var_lstPriceChangePercent,
+            avg_block_time_ms: var_avgBlockTimeMs,
             tag: var_tag,
             current_block: var_currentBlock,
             pending_withdrawals: var_pendingWithdrawals,
-            validators: var_validators,
-            hide: var_hide_,
-            uptime: var_uptime,
-            can_stake: var_canStake,
         };
     }
 }
@@ -5306,20 +5291,6 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
     }
 }
 
-impl SseDecode for Vec<crate::models::stake::ZilValidatorInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<crate::models::stake::ZilValidatorInfo>::sse_decode(
-                deserializer,
-            ));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5414,6 +5385,17 @@ impl SseDecode for Option<crate::models::connection::ColorsInfo> {
             return Some(<crate::models::connection::ColorsInfo>::sse_decode(
                 deserializer,
             ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<f32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<f32>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -5925,22 +5907,6 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
             max_connections: var_maxConnections,
             request_timeout_secs: var_requestTimeoutSecs,
             rates_api_options: var_ratesApiOptions,
-        };
-    }
-}
-
-impl SseDecode for crate::models::stake::ZilValidatorInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_futureStake = <String>::sse_decode(deserializer);
-        let mut var_pendingWithdrawals = <String>::sse_decode(deserializer);
-        let mut var_rewardAddress = <String>::sse_decode(deserializer);
-        let mut var_status = <bool>::sse_decode(deserializer);
-        return crate::models::stake::ZilValidatorInfo {
-            future_stake: var_futureStake,
-            pending_withdrawals: var_pendingWithdrawals,
-            reward_address: var_rewardAddress,
-            status: var_status,
         };
     }
 }
@@ -6759,21 +6725,14 @@ impl flutter_rust_bridge::IntoDart for crate::models::stake::FinalOutputInfo {
             self.deleg_amt.into_into_dart().into_dart(),
             self.rewards.into_into_dart().into_dart(),
             self.claimable_amount.into_into_dart().into_dart(),
-            self.vote_power.into_into_dart().into_dart(),
             self.apr.into_into_dart().into_dart(),
             self.commission.into_into_dart().into_dart(),
-            self.total_rewards.into_into_dart().into_dart(),
-            self.total_stake.into_into_dart().into_dart(),
-            self.total_network_stake.into_into_dart().into_dart(),
-            self.version.into_into_dart().into_dart(),
-            self.unbonding_period.into_into_dart().into_dart(),
+            self.unbonding_period_seconds.into_into_dart().into_dart(),
+            self.lst_price_change_percent.into_into_dart().into_dart(),
+            self.avg_block_time_ms.into_into_dart().into_dart(),
             self.tag.into_into_dart().into_dart(),
             self.current_block.into_into_dart().into_dart(),
             self.pending_withdrawals.into_into_dart().into_dart(),
-            self.validators.into_into_dart().into_dart(),
-            self.hide.into_into_dart().into_dart(),
-            self.uptime.into_into_dart().into_dart(),
-            self.can_stake.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7270,29 +7229,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletSettingsIn
         self
     }
 }
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::stake::ZilValidatorInfo {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.future_stake.into_into_dart().into_dart(),
-            self.pending_withdrawals.into_into_dart().into_dart(),
-            self.reward_address.into_into_dart().into_dart(),
-            self.status.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::stake::ZilValidatorInfo
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::models::stake::ZilValidatorInfo>
-    for crate::models::stake::ZilValidatorInfo
-{
-    fn into_into_dart(self) -> crate::models::stake::ZilValidatorInfo {
-        self
-    }
-}
 
 impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7598,24 +7534,17 @@ impl SseEncode for crate::models::stake::FinalOutputInfo {
         <String>::sse_encode(self.deleg_amt, serializer);
         <String>::sse_encode(self.rewards, serializer);
         <String>::sse_encode(self.claimable_amount, serializer);
-        <Option<f64>>::sse_encode(self.vote_power, serializer);
         <Option<f64>>::sse_encode(self.apr, serializer);
         <Option<f64>>::sse_encode(self.commission, serializer);
-        <Option<String>>::sse_encode(self.total_rewards, serializer);
-        <Option<String>>::sse_encode(self.total_stake, serializer);
-        <Option<String>>::sse_encode(self.total_network_stake, serializer);
-        <Option<String>>::sse_encode(self.version, serializer);
-        <Option<u64>>::sse_encode(self.unbonding_period, serializer);
+        <Option<u64>>::sse_encode(self.unbonding_period_seconds, serializer);
+        <Option<f32>>::sse_encode(self.lst_price_change_percent, serializer);
+        <Option<u64>>::sse_encode(self.avg_block_time_ms, serializer);
         <String>::sse_encode(self.tag, serializer);
         <Option<u64>>::sse_encode(self.current_block, serializer);
         <Vec<crate::models::stake::PendingWithdrawalInfo>>::sse_encode(
             self.pending_withdrawals,
             serializer,
         );
-        <Vec<crate::models::stake::ZilValidatorInfo>>::sse_encode(self.validators, serializer);
-        <bool>::sse_encode(self.hide, serializer);
-        <u8>::sse_encode(self.uptime, serializer);
-        <bool>::sse_encode(self.can_stake, serializer);
     }
 }
 
@@ -7939,16 +7868,6 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
     }
 }
 
-impl SseEncode for Vec<crate::models::stake::ZilValidatorInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::models::stake::ZilValidatorInfo>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -8017,6 +7936,16 @@ impl SseEncode for Option<crate::models::connection::ColorsInfo> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::models::connection::ColorsInfo>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<f32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <f32>::sse_encode(value, serializer);
         }
     }
 }
@@ -8406,16 +8335,6 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);
         <u8>::sse_encode(self.rates_api_options, serializer);
-    }
-}
-
-impl SseEncode for crate::models::stake::ZilValidatorInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.future_stake, serializer);
-        <String>::sse_encode(self.pending_withdrawals, serializer);
-        <String>::sse_encode(self.reward_address, serializer);
-        <bool>::sse_encode(self.status, serializer);
     }
 }
 

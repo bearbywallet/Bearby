@@ -3865,6 +3865,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  double dco_decode_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
   double dco_decode_box_autoadd_f_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as double;
@@ -4103,8 +4109,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FinalOutputInfo dco_decode_final_output_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 21)
-      throw Exception('unexpected arr length: expect 21 but see ${arr.length}');
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
     return FinalOutputInfo(
       name: dco_decode_String(arr[0]),
       address: dco_decode_String(arr[1]),
@@ -4112,21 +4118,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       delegAmt: dco_decode_String(arr[3]),
       rewards: dco_decode_String(arr[4]),
       claimableAmount: dco_decode_String(arr[5]),
-      votePower: dco_decode_opt_box_autoadd_f_64(arr[6]),
-      apr: dco_decode_opt_box_autoadd_f_64(arr[7]),
-      commission: dco_decode_opt_box_autoadd_f_64(arr[8]),
-      totalRewards: dco_decode_opt_String(arr[9]),
-      totalStake: dco_decode_opt_String(arr[10]),
-      totalNetworkStake: dco_decode_opt_String(arr[11]),
-      version: dco_decode_opt_String(arr[12]),
-      unbondingPeriod: dco_decode_opt_box_autoadd_u_64(arr[13]),
-      tag: dco_decode_String(arr[14]),
-      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[15]),
-      pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[16]),
-      validators: dco_decode_list_zil_validator_info(arr[17]),
-      hide_: dco_decode_bool(arr[18]),
-      uptime: dco_decode_u_8(arr[19]),
-      canStake: dco_decode_bool(arr[20]),
+      apr: dco_decode_opt_box_autoadd_f_64(arr[6]),
+      commission: dco_decode_opt_box_autoadd_f_64(arr[7]),
+      unbondingPeriodSeconds: dco_decode_opt_box_autoadd_u_64(arr[8]),
+      lstPriceChangePercent: dco_decode_opt_box_autoadd_f_32(arr[9]),
+      avgBlockTimeMs: dco_decode_opt_box_autoadd_u_64(arr[10]),
+      tag: dco_decode_String(arr[11]),
+      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
+      pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[13]),
     );
   }
 
@@ -4370,12 +4369,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ZilValidatorInfo> dco_decode_list_zil_validator_info(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_zil_validator_info).toList();
-  }
-
-  @protected
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -4429,6 +4422,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_colors_info(raw);
+  }
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_32(raw);
   }
 
   @protected
@@ -4832,20 +4831,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ZilValidatorInfo dco_decode_zil_validator_info(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ZilValidatorInfo(
-      futureStake: dco_decode_String(arr[0]),
-      pendingWithdrawals: dco_decode_String(arr[1]),
-      rewardAddress: dco_decode_String(arr[2]),
-      status: dco_decode_bool(arr[3]),
-    );
-  }
-
-  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
@@ -5119,6 +5104,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  double sse_decode_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_32(deserializer));
+  }
+
+  @protected
   double sse_decode_box_autoadd_f_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_f_64(deserializer));
@@ -5372,22 +5363,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_delegAmt = sse_decode_String(deserializer);
     var var_rewards = sse_decode_String(deserializer);
     var var_claimableAmount = sse_decode_String(deserializer);
-    var var_votePower = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_apr = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
-    var var_totalRewards = sse_decode_opt_String(deserializer);
-    var var_totalStake = sse_decode_opt_String(deserializer);
-    var var_totalNetworkStake = sse_decode_opt_String(deserializer);
-    var var_version = sse_decode_opt_String(deserializer);
-    var var_unbondingPeriod = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_unbondingPeriodSeconds =
+        sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_lstPriceChangePercent =
+        sse_decode_opt_box_autoadd_f_32(deserializer);
+    var var_avgBlockTimeMs = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_tag = sse_decode_String(deserializer);
     var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_pendingWithdrawals =
         sse_decode_list_pending_withdrawal_info(deserializer);
-    var var_validators = sse_decode_list_zil_validator_info(deserializer);
-    var var_hide_ = sse_decode_bool(deserializer);
-    var var_uptime = sse_decode_u_8(deserializer);
-    var var_canStake = sse_decode_bool(deserializer);
     return FinalOutputInfo(
         name: var_name,
         address: var_address,
@@ -5395,21 +5381,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         delegAmt: var_delegAmt,
         rewards: var_rewards,
         claimableAmount: var_claimableAmount,
-        votePower: var_votePower,
         apr: var_apr,
         commission: var_commission,
-        totalRewards: var_totalRewards,
-        totalStake: var_totalStake,
-        totalNetworkStake: var_totalNetworkStake,
-        version: var_version,
-        unbondingPeriod: var_unbondingPeriod,
+        unbondingPeriodSeconds: var_unbondingPeriodSeconds,
+        lstPriceChangePercent: var_lstPriceChangePercent,
+        avgBlockTimeMs: var_avgBlockTimeMs,
         tag: var_tag,
         currentBlock: var_currentBlock,
-        pendingWithdrawals: var_pendingWithdrawals,
-        validators: var_validators,
-        hide_: var_hide_,
-        uptime: var_uptime,
-        canStake: var_canStake);
+        pendingWithdrawals: var_pendingWithdrawals);
   }
 
   @protected
@@ -5782,19 +5761,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ZilValidatorInfo> sse_decode_list_zil_validator_info(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ZilValidatorInfo>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_zil_validator_info(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   NetworkConfigInfo sse_decode_network_config_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -5885,6 +5851,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_colors_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_32(deserializer));
     } else {
       return null;
     }
@@ -6352,20 +6329,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ZilValidatorInfo sse_decode_zil_validator_info(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_futureStake = sse_decode_String(deserializer);
-    var var_pendingWithdrawals = sse_decode_String(deserializer);
-    var var_rewardAddress = sse_decode_String(deserializer);
-    var var_status = sse_decode_bool(deserializer);
-    return ZilValidatorInfo(
-        futureStake: var_futureStake,
-        pendingWithdrawals: var_pendingWithdrawals,
-        rewardAddress: var_rewardAddress,
-        status: var_status);
-  }
-
-  @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6598,6 +6561,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_32(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_f_64(self, serializer);
@@ -6805,22 +6774,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.delegAmt, serializer);
     sse_encode_String(self.rewards, serializer);
     sse_encode_String(self.claimableAmount, serializer);
-    sse_encode_opt_box_autoadd_f_64(self.votePower, serializer);
     sse_encode_opt_box_autoadd_f_64(self.apr, serializer);
     sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
-    sse_encode_opt_String(self.totalRewards, serializer);
-    sse_encode_opt_String(self.totalStake, serializer);
-    sse_encode_opt_String(self.totalNetworkStake, serializer);
-    sse_encode_opt_String(self.version, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.unbondingPeriod, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.unbondingPeriodSeconds, serializer);
+    sse_encode_opt_box_autoadd_f_32(self.lstPriceChangePercent, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.avgBlockTimeMs, serializer);
     sse_encode_String(self.tag, serializer);
     sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
     sse_encode_list_pending_withdrawal_info(
         self.pendingWithdrawals, serializer);
-    sse_encode_list_zil_validator_info(self.validators, serializer);
-    sse_encode_bool(self.hide_, serializer);
-    sse_encode_u_8(self.uptime, serializer);
-    sse_encode_bool(self.canStake, serializer);
   }
 
   @protected
@@ -7121,16 +7083,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_zil_validator_info(
-      List<ZilValidatorInfo> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_zil_validator_info(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7201,6 +7153,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_colors_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_32(self, serializer);
     }
   }
 
@@ -7553,15 +7515,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
     sse_encode_u_8(self.ratesApiOptions, serializer);
-  }
-
-  @protected
-  void sse_encode_zil_validator_info(
-      ZilValidatorInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.futureStake, serializer);
-    sse_encode_String(self.pendingWithdrawals, serializer);
-    sse_encode_String(self.rewardAddress, serializer);
-    sse_encode_bool(self.status, serializer);
   }
 }

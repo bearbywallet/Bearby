@@ -14,21 +14,14 @@ class FinalOutputInfo {
   final String delegAmt;
   final String rewards;
   final String claimableAmount;
-  final double? votePower;
   final double? apr;
   final double? commission;
-  final String? totalRewards;
-  final String? totalStake;
-  final String? totalNetworkStake;
-  final String? version;
-  final BigInt? unbondingPeriod;
+  final BigInt? unbondingPeriodSeconds;
+  final double? lstPriceChangePercent;
+  final BigInt? avgBlockTimeMs;
   final String tag;
   final BigInt? currentBlock;
   final List<PendingWithdrawalInfo> pendingWithdrawals;
-  final List<ZilValidatorInfo> validators;
-  final bool hide_;
-  final int uptime;
-  final bool canStake;
 
   const FinalOutputInfo({
     required this.name,
@@ -37,21 +30,14 @@ class FinalOutputInfo {
     required this.delegAmt,
     required this.rewards,
     required this.claimableAmount,
-    this.votePower,
     this.apr,
     this.commission,
-    this.totalRewards,
-    this.totalStake,
-    this.totalNetworkStake,
-    this.version,
-    this.unbondingPeriod,
+    this.unbondingPeriodSeconds,
+    this.lstPriceChangePercent,
+    this.avgBlockTimeMs,
     required this.tag,
     this.currentBlock,
     required this.pendingWithdrawals,
-    required this.validators,
-    required this.hide_,
-    required this.uptime,
-    required this.canStake,
   });
 
   @override
@@ -62,21 +48,14 @@ class FinalOutputInfo {
       delegAmt.hashCode ^
       rewards.hashCode ^
       claimableAmount.hashCode ^
-      votePower.hashCode ^
       apr.hashCode ^
       commission.hashCode ^
-      totalRewards.hashCode ^
-      totalStake.hashCode ^
-      totalNetworkStake.hashCode ^
-      version.hashCode ^
-      unbondingPeriod.hashCode ^
+      unbondingPeriodSeconds.hashCode ^
+      lstPriceChangePercent.hashCode ^
+      avgBlockTimeMs.hashCode ^
       tag.hashCode ^
       currentBlock.hashCode ^
-      pendingWithdrawals.hashCode ^
-      validators.hashCode ^
-      hide_.hashCode ^
-      uptime.hashCode ^
-      canStake.hashCode;
+      pendingWithdrawals.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -89,21 +68,14 @@ class FinalOutputInfo {
           delegAmt == other.delegAmt &&
           rewards == other.rewards &&
           claimableAmount == other.claimableAmount &&
-          votePower == other.votePower &&
           apr == other.apr &&
           commission == other.commission &&
-          totalRewards == other.totalRewards &&
-          totalStake == other.totalStake &&
-          totalNetworkStake == other.totalNetworkStake &&
-          version == other.version &&
-          unbondingPeriod == other.unbondingPeriod &&
+          unbondingPeriodSeconds == other.unbondingPeriodSeconds &&
+          lstPriceChangePercent == other.lstPriceChangePercent &&
+          avgBlockTimeMs == other.avgBlockTimeMs &&
           tag == other.tag &&
           currentBlock == other.currentBlock &&
-          pendingWithdrawals == other.pendingWithdrawals &&
-          validators == other.validators &&
-          hide_ == other.hide_ &&
-          uptime == other.uptime &&
-          canStake == other.canStake;
+          pendingWithdrawals == other.pendingWithdrawals;
 }
 
 class PendingWithdrawalInfo {
@@ -129,35 +101,4 @@ class PendingWithdrawalInfo {
           amount == other.amount &&
           withdrawalBlock == other.withdrawalBlock &&
           claimable == other.claimable;
-}
-
-class ZilValidatorInfo {
-  final String futureStake;
-  final String pendingWithdrawals;
-  final String rewardAddress;
-  final bool status;
-
-  const ZilValidatorInfo({
-    required this.futureStake,
-    required this.pendingWithdrawals,
-    required this.rewardAddress,
-    required this.status,
-  });
-
-  @override
-  int get hashCode =>
-      futureStake.hashCode ^
-      pendingWithdrawals.hashCode ^
-      rewardAddress.hashCode ^
-      status.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ZilValidatorInfo &&
-          runtimeType == other.runtimeType &&
-          futureStake == other.futureStake &&
-          pendingWithdrawals == other.pendingWithdrawals &&
-          rewardAddress == other.rewardAddress &&
-          status == other.status;
 }

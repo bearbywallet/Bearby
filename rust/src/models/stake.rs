@@ -1,4 +1,4 @@
-use zilpay::network::zil::{FinalOutput, LPToken, PendingWithdrawal, ZilValidator};
+use zilpay::network::zil::{FinalOutput, LPToken, PendingWithdrawal};
 
 use super::ftoken::FTokenInfo;
 
@@ -8,13 +8,6 @@ pub struct PendingWithdrawalInfo {
     pub claimable: bool,
 }
 
-pub struct ZilValidatorInfo {
-    pub future_stake: String,
-    pub pending_withdrawals: String,
-    pub reward_address: String,
-    pub status: bool,
-}
-
 pub struct FinalOutputInfo {
     pub name: String,
     pub address: String,
@@ -22,21 +15,14 @@ pub struct FinalOutputInfo {
     pub deleg_amt: String,
     pub rewards: String,
     pub claimable_amount: String,
-    pub vote_power: Option<f64>,
     pub apr: Option<f64>,
     pub commission: Option<f64>,
-    pub total_rewards: Option<String>,
-    pub total_stake: Option<String>,
-    pub total_network_stake: Option<String>,
-    pub version: Option<String>,
-    pub unbonding_period: Option<u64>,
+    pub unbonding_period_seconds: Option<u64>,
+    pub lst_price_change_percent: Option<f32>,
+    pub avg_block_time_ms: Option<u64>,
     pub tag: String,
     pub current_block: Option<u64>,
     pub pending_withdrawals: Vec<PendingWithdrawalInfo>,
-    pub validators: Vec<ZilValidatorInfo>,
-    pub hide: bool,
-    pub uptime: u8,
-    pub can_stake: bool,
 }
 
 impl From<PendingWithdrawal> for PendingWithdrawalInfo {
@@ -45,28 +31,6 @@ impl From<PendingWithdrawal> for PendingWithdrawalInfo {
             amount: value.amount.to_string(),
             withdrawal_block: value.withdrawal_block,
             claimable: value.claimable,
-        }
-    }
-}
-
-impl From<ZilValidator> for ZilValidatorInfo {
-    fn from(value: ZilValidator) -> Self {
-        Self {
-            future_stake: value.future_stake.to_string(),
-            pending_withdrawals: value.pending_withdrawals.to_string(),
-            reward_address: value.reward_address.to_string(),
-            status: value.status,
-        }
-    }
-}
-
-impl From<ZilValidatorInfo> for ZilValidator {
-    fn from(value: ZilValidatorInfo) -> Self {
-        Self {
-            future_stake: value.future_stake.parse().unwrap_or_default(),
-            pending_withdrawals: value.pending_withdrawals.parse().unwrap_or_default(),
-            reward_address: value.reward_address.parse().unwrap_or_default(),
-            status: value.status,
         }
     }
 }
@@ -86,6 +50,7 @@ impl From<FinalOutput> for FinalOutputInfo {
         FinalOutputInfo {
             name: stake.name,
             address: stake.address,
+            avg_block_time_ms: stake.avg_block_time_ms,
             token: stake.token.map(|t| FTokenInfo {
                 name: t.name,
                 symbol: t.symbol,
@@ -101,22 +66,14 @@ impl From<FinalOutput> for FinalOutputInfo {
             }),
             deleg_amt: stake.deleg_amt.to_string(),
             rewards: stake.rewards.to_string(),
-            vote_power: stake.vote_power,
             apr: stake.apr,
             commission: stake.commission,
+                        unbonding_period_seconds: stake.unbonding_period_seconds,
             tag: stake.tag,
             current_block: stake.current_block,
             pending_withdrawals: stake.pending_withdrawals.into_iter().map(Into::into).collect(),
-            hide: stake.hide,
-            uptime: stake.uptime,
-            can_stake: stake.can_stake,
             claimable_amount: stake.claimable_amount.to_string(),
-            total_rewards: stake.total_rewards.map(|v| v.to_string()),
-            total_stake: stake.total_stake.map(|v| v.to_string()),
-            total_network_stake: stake.total_network_stake.map(|v| v.to_string()),
-            version: stake.version,
-            unbonding_period: stake.unbonding_period,
-            validators: stake.validators.into_iter().map(Into::into).collect(),
+            lst_price_change_percent: stake.lst_price_change_percent,
         }
     }
 }
@@ -126,6 +83,7 @@ impl From<FinalOutputInfo> for FinalOutput {
         FinalOutput {
             name: stake.name,
             address: stake.address,
+            avg_block_time_ms: stake.avg_block_time_ms,
             token: stake.token.map(|t| LPToken {
                 name: t.name,
                 symbol: t.symbol,
@@ -136,25 +94,17 @@ impl From<FinalOutputInfo> for FinalOutput {
             deleg_amt: stake.deleg_amt.parse().unwrap_or_default(),
             rewards: stake.rewards.parse().unwrap_or_default(),
             claimable_amount: stake.claimable_amount.parse().unwrap_or_default(),
-            vote_power: stake.vote_power,
             apr: stake.apr,
+            unbonding_period_seconds: stake.unbonding_period_seconds,
             commission: stake.commission,
-            total_rewards: stake.total_rewards.and_then(|v| v.parse().ok()),
-            total_stake: stake.total_stake.and_then(|v| v.parse().ok()),
-            total_network_stake: stake.total_network_stake.and_then(|v| v.parse().ok()),
-            version: stake.version,
-            unbonding_period: stake.unbonding_period,
             tag: stake.tag,
+            lst_price_change_percent: stake.lst_price_change_percent,
             current_block: stake.current_block,
             pending_withdrawals: stake
                 .pending_withdrawals
                 .into_iter()
                 .map(Into::into)
                 .collect(),
-            validators: stake.validators.into_iter().map(Into::into).collect(),
-            hide: stake.hide,
-            uptime: stake.uptime,
-            can_stake: stake.can_stake,
         }
     }
 }
