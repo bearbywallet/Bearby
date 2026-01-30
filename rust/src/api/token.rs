@@ -93,14 +93,14 @@ struct ZilliqaScillaApiResponse {
 }
 
 #[derive(Debug, Deserialize)]
-struct ZilstreamMarketData {
-    rate_zil: f64,
+struct ZilstreamToken {
+    symbol: String,
+    price_eth: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct ZilstreamToken {
-    symbol: String,
-    market_data: ZilstreamMarketData,
+struct ZilstreamResponse {
+    data: Vec<ZilstreamToken>,
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -214,21 +214,25 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 
     match chain.config.slip_44 {
         ZILLIQA => {
-            let zilstream_url = "https://io-cdn.zilstream.com/tokens";
+            let zilstream_url = "https://api-v2.zilstream.com/tokens?page=1&per_page=500";
             let client = reqwest::Client::new();
             let response = client
                 .get(zilstream_url)
                 .send()
                 .await
                 .map_err(|e| format!("HTTP request failed: {}", e))?;
-            let zilstream_tokens: Vec<ZilstreamToken> = response
+            let zilstream_response: ZilstreamResponse = response
                 .json()
                 .await
                 .map_err(|e| format!("Failed to parse zilstream response: {}", e))?;
 
-            let rate_map: HashMap<String, f64> = zilstream_tokens
+            let rate_map: HashMap<String, f64> = zilstream_response
+                .data
                 .into_iter()
-                .map(|token| (token.symbol.to_uppercase(), token.market_data.rate_zil))
+                .filter_map(|token| {
+                    let rate = token.price_eth.parse::<f64>().ok()?;
+                    Some((token.symbol.to_uppercase(), rate))
+                })
                 .collect();
 
             for &idx in &ftokens_indices {
