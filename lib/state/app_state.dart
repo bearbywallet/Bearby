@@ -119,7 +119,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> migrateLegacyWalletsOnce() async {
-    if (_prefs.hasLegacyWallets() || _state.wallets.isEmpty) return;
+    if (_prefs.hasLegacyWallets()) return;
 
     final walletAddresses = _state.wallets.map((w) => w.walletAddress).toList();
     await _prefs.markMultipleWalletsAsLegacy(walletAddresses);

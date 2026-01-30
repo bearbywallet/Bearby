@@ -65,7 +65,7 @@ class PreferencesService {
 
   bool hasLegacyWallets() {
     final legacyWallets = _prefs?.getStringList(_legacyWalletsKey);
-    return legacyWallets != null && legacyWallets.isNotEmpty;
+    return legacyWallets != null;
   }
 
   Future<void> removeLegacyWallet(String walletAddress) async {
