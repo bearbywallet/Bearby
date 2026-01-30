@@ -16,6 +16,7 @@ import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/utils/stake_formatters.dart';
 
 enum StakeOperationType {
   stake,
@@ -284,6 +285,11 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   Widget _buildStakeInfo(AppTheme theme, AppLocalizations l10n) {
+    final aprValue = StakeFormatters.formatApr(widget.stake.apr);
+    final commissionValue = StakeFormatters.formatCommission(widget.stake.commission);
+    final hasApr = widget.stake.apr != null && widget.stake.apr! > 0;
+    final hasCommission = widget.stake.commission != null && widget.stake.commission! > 0;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -298,32 +304,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
           _buildStatItem(
             theme,
             "APR",
-            widget.stake.apr == null || widget.stake.apr == 0
-                ? 'N/A'
-                : '${widget.stake.apr?.toStringAsFixed(1)}%',
-            widget.stake.apr == null || widget.stake.apr == 0
-                ? theme.textSecondary
-                : theme.success,
+            aprValue,
+            hasApr ? theme.success : theme.textSecondary,
           ),
           _buildStatItem(
             theme,
             l10n.commissionLabel,
-            widget.stake.commission == null || widget.stake.commission == 0
-                ? 'N/A'
-                : '${widget.stake.commission?.toStringAsFixed(1)}%',
-            widget.stake.commission == null || widget.stake.commission == 0
-                ? theme.textSecondary
-                : theme.warning,
-          ),
-          _buildStatItem(
-            theme,
-            "VP",
-            widget.stake.votePower == null || widget.stake.votePower == 0
-                ? 'N/A'
-                : '${widget.stake.votePower?.toStringAsFixed(1)}%',
-            widget.stake.votePower == null || widget.stake.votePower == 0
-                ? theme.textSecondary
-                : theme.primaryPurple,
+            commissionValue,
+            hasCommission ? theme.warning : theme.textSecondary,
           ),
         ],
       ),
@@ -331,18 +319,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   Widget _buildAdditionalInfo(AppTheme theme, AppLocalizations l10n) {
-    String unbondingPeriodText;
-
-    if (widget.stake.unbondingPeriod != null &&
-        widget.stake.unbondingPeriod! > BigInt.zero) {
-      final periodInBlocks = widget.stake.unbondingPeriod!.abs();
-      final seconds = (periodInBlocks.toDouble() * 2.0).round();
-      final duration = Duration(seconds: seconds);
-      final formattedDuration = _formatDuration(duration, l10n);
-      unbondingPeriodText = '${periodInBlocks.toString()} ($formattedDuration)';
-    } else {
-      unbondingPeriodText = widget.stake.unbondingPeriod?.toString() ?? 'N/A';
-    }
+    final unbondingPeriodText = StakeFormatters.formatUnbondingPeriod(
+      widget.stake.unbondingPeriodSeconds,
+      l10n,
+    );
+    final lstPriceChangeText = StakeFormatters.formatLstPriceChange(
+      widget.stake.lstPriceChangePercent,
+    );
+    final hasLstPriceChange = widget.stake.lstPriceChangePercent != null;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -359,24 +343,28 @@ class _StakeModalContentState extends State<StakeModalContent> {
             l10n.unbondingPeriod,
             unbondingPeriodText,
           ),
-          const SizedBox(height: 8),
-          _buildInfoRow(
-            theme,
-            l10n.currentBlock,
-            widget.stake.currentBlock?.toString() ?? 'N/A',
-          ),
-          const SizedBox(height: 8),
-          _buildInfoRow(
-            theme,
-            l10n.version,
-            widget.stake.version ?? 'N/A',
-          ),
+          if (hasLstPriceChange) ...[
+            const SizedBox(height: 8),
+            _buildInfoRow(
+              theme,
+              'Growth Rate',
+              lstPriceChangeText,
+              valueColor: (widget.stake.lstPriceChangePercent ?? 0) >= 0
+                  ? theme.success
+                  : theme.danger,
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(AppTheme theme, String label, String value) {
+  Widget _buildInfoRow(
+    AppTheme theme,
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -389,7 +377,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
         Text(
           value,
           style: theme.bodyText2.copyWith(
-            color: theme.textPrimary,
+            color: valueColor ?? theme.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -600,18 +588,21 @@ class _StakeModalContentState extends State<StakeModalContent> {
           backgroundColor: appState.currentTheme.cardBackground,
           title: Text(
             "Error",
-            style: appState.currentTheme.bodyText1.copyWith(color: appState.currentTheme.textPrimary),
+            style: appState.currentTheme.bodyText1
+                .copyWith(color: appState.currentTheme.textPrimary),
           ),
           content: Text(
             err.toString(),
-            style: appState.currentTheme.bodyText2.copyWith(color: appState.currentTheme.danger),
+            style: appState.currentTheme.bodyText2
+                .copyWith(color: appState.currentTheme.danger),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 "OK",
-                style: appState.currentTheme.button.copyWith(color: appState.currentTheme.primaryPurple),
+                style: appState.currentTheme.button
+                    .copyWith(color: appState.currentTheme.primaryPurple),
               ),
             )
           ],
@@ -620,31 +611,4 @@ class _StakeModalContentState extends State<StakeModalContent> {
     }
   }
 
-  String _formatDuration(Duration duration, AppLocalizations l10n) {
-    duration = Duration(seconds: duration.inSeconds.abs());
-    final days = duration.inDays;
-    final hours = duration.inHours.remainder(24);
-    final minutes = duration.inMinutes.remainder(60);
-
-    final List<String> parts = [];
-    if (days > 0) {
-      parts.add('$days${l10n.durationDay}');
-    }
-    if (hours > 0) {
-      parts.add('$hours${l10n.durationHour}');
-    }
-    if (minutes > 0) {
-      parts.add('$minutes${l10n.durationMinute}');
-    }
-
-    if (parts.isEmpty && duration.inSeconds > 0) {
-      return l10n.durationLessThanAMinute;
-    }
-
-    if (parts.isEmpty) {
-      return l10n.durationNotAvailable;
-    }
-
-    return '~${parts.take(2).join(' ')}';
-  }
 }
