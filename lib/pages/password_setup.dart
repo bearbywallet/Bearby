@@ -220,14 +220,14 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       WalletSettingsInfo settings = WalletSettingsInfo(
         cipherOrders: _cipher!,
         argonParams: _argon2!,
-        currencyConvert: "BTC",
+        currencyConvert: detectDeviceCurrency(),
         ipfsNode: "dweb.link",
         ensEnabled: true,
         tokensListFetcher: true,
         nodeRankingEnabled: true,
         maxConnections: 5,
         requestTimeoutSecs: 30,
-        ratesApiOptions: 1, // CoinGecko
+        ratesApiOptions: 1,
       );
 
       List<FTokenInfo> ftokens = [];
@@ -288,6 +288,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       _btnController.success();
 
       if (!mounted) return;
+      _bip39List?.zeroize();
+      if (_keys != null) {
+        _keys = _keys!.zeroize();
+      }
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
       setState(() {

@@ -107,9 +107,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     "AUD": "Australian Dollar",
     "CAD": "Canadian Dollar",
     "MXN": "Mexican Peso",
-    "DOGE": "Dogecoin",
-    "GOLD": "Gold",
-    "SILVER": "Silver"
+    "XAUT": "Gold",
   };
 
   List<Currency> _getOrderedCurrencies() =>

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 
@@ -65,4 +66,114 @@ extension SecureKeyPairExtension on KeyPairInfo {
   KeyPairInfo zeroize() {
     return KeyPairInfo(sk: "", pk: "");
   }
+}
+
+String detectDeviceCurrency() {
+  final locale = Platform.localeName;
+  final langCode = locale.split('_').first.toLowerCase();
+  final countryCode =
+      locale.split('_').length > 1 ? locale.split('_')[1].toUpperCase() : '';
+
+  final countryCurrencyMap = {
+    'US': 'USD',
+    'GB': 'GBP',
+    'CA': 'CAD',
+    'AU': 'AUD',
+    'NZ': 'NZD',
+    'JP': 'JPY',
+    'CN': 'CNY',
+    'KR': 'KRW',
+    'RU': 'RUB',
+    'TR': 'TRY',
+    'IN': 'INR',
+    'TH': 'THB',
+    'VN': 'VND',
+    'ID': 'IDR',
+    'MY': 'MYR',
+    'SE': 'SEK',
+    'NO': 'NOK',
+    'DK': 'DKK',
+    'CZ': 'CZK',
+    'HU': 'HUF',
+    'RO': 'RON',
+    'BG': 'BGN',
+    'UA': 'UAH',
+    'IL': 'ILS',
+    'BR': 'BRL',
+    'MX': 'MXN',
+    'AR': 'ARS',
+    'SG': 'SGD',
+    'HK': 'HKD',
+    'ZA': 'ZAR',
+    'CH': 'CHF',
+    'IE': 'EUR',
+    'DE': 'EUR',
+    'FR': 'EUR',
+    'ES': 'EUR',
+    'IT': 'EUR',
+    'PT': 'EUR',
+    'NL': 'EUR',
+    'PL': 'EUR',
+    'FI': 'EUR',
+    'HR': 'EUR',
+    'SK': 'EUR',
+    'SI': 'EUR',
+    'LT': 'EUR',
+    'LV': 'EUR',
+    'EE': 'EUR',
+    'GR': 'EUR',
+    'AT': 'EUR',
+    'BE': 'EUR',
+    'CY': 'EUR',
+    'LU': 'EUR',
+    'MT': 'EUR',
+  };
+
+  if (countryCurrencyMap.containsKey(countryCode)) {
+    return countryCurrencyMap[countryCode]!;
+  }
+
+  final langCurrencyMap = {
+    'de': 'EUR',
+    'fr': 'EUR',
+    'es': 'EUR',
+    'it': 'EUR',
+    'pt': 'EUR',
+    'nl': 'EUR',
+    'pl': 'EUR',
+    'ja': 'JPY',
+    'zh': 'CNY',
+    'ko': 'KRW',
+    'ru': 'RUB',
+    'tr': 'TRY',
+    'ar': 'USD',
+    'hi': 'INR',
+    'th': 'THB',
+    'vi': 'VND',
+    'id': 'IDR',
+    'ms': 'MYR',
+    'sv': 'SEK',
+    'no': 'NOK',
+    'da': 'DKK',
+    'fi': 'EUR',
+    'cs': 'CZK',
+    'hu': 'HUF',
+    'ro': 'RON',
+    'bg': 'BGN',
+    'hr': 'EUR',
+    'sk': 'EUR',
+    'sl': 'EUR',
+    'lt': 'EUR',
+    'lv': 'EUR',
+    'et': 'EUR',
+    'uk': 'UAH',
+    'he': 'ILS',
+    'el': 'EUR',
+  };
+
+  if (langCurrencyMap.containsKey(langCode)) {
+    return langCurrencyMap[langCode]!;
+  }
+
+  return 'USD';
 }

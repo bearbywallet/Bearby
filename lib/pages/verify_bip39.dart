@@ -7,7 +7,6 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/utils/utils.dart';
 
 List<int> getRandomNumbers(int min, int max, int count) {
   final random = Random();
@@ -39,18 +38,21 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
   final List<String> _verifyWords =
       List<String>.filled(maxNumbers, '', growable: false);
 
-  void _generateIndexes() {
+  void _generateIndexes({bool useSetState = true}) {
     if (_bip39List != null && _bip39List!.isNotEmpty) {
-      setState(() {
-        _indexes = getRandomNumbers(0, _bip39List!.length, maxNumbers);
-      });
+      final newIndexes = getRandomNumbers(0, _bip39List!.length, maxNumbers);
+      if (useSetState) {
+        setState(() {
+          _indexes = newIndexes;
+        });
+      } else {
+        _indexes = newIndexes;
+      }
     }
   }
 
   @override
   void dispose() {
-    _bip39List?.zeroize();
-    _verifyWords.zeroize();
     super.dispose();
   }
 
@@ -67,7 +69,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
     } else {
       setState(() {
         _bip39List = args['bip39'];
-        _generateIndexes();
+        _generateIndexes(useSetState: false);
       });
     }
   }
@@ -93,13 +95,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: CustomAppBar(
-                    title:
-                        AppLocalizations.of(context)!.secretPhraseVerifyPageTitle,
+                    title: AppLocalizations.of(context)!
+                        .secretPhraseVerifyPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
                 Expanded(
-                  child: _bip39List == null
+                  child: _bip39List == null || _indexes.isEmpty
                       ? const Center(child: CircularProgressIndicator())
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),

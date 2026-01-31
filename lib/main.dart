@@ -27,7 +27,6 @@ Future<void> main() async {
   try {
     String appDocPath = await getStoragePath();
     final tempDir = await getTemporaryDirectory();
-
     final directory = Directory(tempDir.path);
 
     if (!await directory.exists()) {

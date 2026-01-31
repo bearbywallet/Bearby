@@ -1156,9 +1156,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-async"
-version = "1.2.9"
+version = "1.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e0e99800414b0c4cae85ed775a1559f8992f4e69f5ebafe9c936e29609eae78"
+checksum = "e39f47abe8641e434de98e047e85ced629862e7ab719b6914a846796ceb289e2"
 dependencies = [
  "futures-util",
  "pin-project-lite",
@@ -1197,18 +1197,18 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-observability"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "112e30b3c5379273de88c8cedfc96ce0211e9af22115ceb6975b5c072eccdfb9"
+checksum = "7764bc1dfdb71157bc481528a649e617ed8c9c8aa93c0e8b01087133677cfc8e"
 dependencies = [
  "aws-smithy-runtime-api",
 ]
 
 [[package]]
 name = "aws-smithy-query"
-version = "0.60.11"
+version = "0.60.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a57c5122eafc566cba4d3cbaacb53dd8a0cacd71155c728d1f4a9179cdd75ae"
+checksum = "786bbf4434ed3e3413c5a1741abf53a0372dd48124ddb2091e6bff1b1b2582b5"
 dependencies = [
  "aws-smithy-types",
  "urlencoding",
@@ -1239,9 +1239,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-runtime-api"
-version = "1.11.1"
+version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d09ba34c17c65a53b65b0ec0d80cf7a934947d407cb7c4fb7753f96de147663"
+checksum = "8b743e9aab0b8d50a9a40eebedf974fcfe3621032e07c6388d1c7821b155b7b0"
 dependencies = [
  "aws-smithy-async",
  "aws-smithy-types",
@@ -1256,9 +1256,9 @@ dependencies = [
 
 [[package]]
 name = "aws-smithy-types"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8169129deda9dc18731b7b160f75121507e02f45f2101e48f0252dcd997e9da1"
+checksum = "0828575b70da70406b4cdb5d4afe0afe725f72245f04d34f02e0fb5ebd6fc872"
 dependencies = [
  "base64-simd",
  "bytes",
@@ -1346,6 +1346,7 @@ dependencies = [
 [[package]]
 name = "background"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "async-trait",
@@ -1697,9 +1698,9 @@ checksum = "7575182f7272186991736b70173b0ea045398f984bf5ebbb3804736ce1330c9d"
 
 [[package]]
 name = "bytemuck"
-version = "1.24.0"
+version = "1.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fbdf580320f38b612e485521afda1ee26d10cc9884efaaa750d383e13e3c5f4"
+checksum = "c8efb64bd706a16a1bdde310ae86b351e4d21550d98d056f22f8a7f7a2183fec"
 
 [[package]]
 name = "byteorder"
@@ -1750,6 +1751,7 @@ dependencies = [
 [[package]]
 name = "cache"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "errors",
  "image",
@@ -1803,6 +1805,7 @@ dependencies = [
 [[package]]
 name = "cipher"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "aes-gcm",
  "config",
@@ -1890,6 +1893,7 @@ checksum = "75984efb6ed102a0d42db99afb6c1948f0380d1d91808d5529916e6c08b49d8d"
 [[package]]
 name = "config"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "serde",
 ]
@@ -2055,6 +2059,7 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 [[package]]
 name = "crypto"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "bitcoin",
  "config",
@@ -2468,6 +2473,7 @@ dependencies = [
 [[package]]
 name = "errors"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "bincode",
  "ntrulp",
@@ -3049,6 +3055,7 @@ dependencies = [
 [[package]]
 name = "history"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "errors",
@@ -3464,6 +3471,7 @@ dependencies = [
 [[package]]
 name = "intl"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "bigdecimal",
@@ -3901,6 +3909,7 @@ checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
 [[package]]
 name = "network"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "async-trait",
@@ -4668,6 +4677,7 @@ dependencies = [
 [[package]]
 name = "proto"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "bech32",
@@ -4713,6 +4723,7 @@ dependencies = [
 [[package]]
 name = "qrcodes"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "errors",
@@ -5181,6 +5192,7 @@ checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
 [[package]]
 name = "rpc"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "async-trait",
@@ -5701,6 +5713,7 @@ dependencies = [
 [[package]]
 name = "session"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "async-trait",
  "cipher 0.1.0",
@@ -5729,6 +5742,7 @@ dependencies = [
 [[package]]
 name = "settings"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -5904,6 +5918,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "config",
  "directories",
@@ -6172,6 +6187,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 [[package]]
 name = "token"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "bincode",
@@ -6688,6 +6704,7 @@ dependencies = [
 [[package]]
 name = "wallet"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "alloy",
  "async-trait",
@@ -7238,18 +7255,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.8.36"
+version = "0.8.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dafd85c832c1b68bbb4ec0c72c7f6f4fc5179627d2bc7c26b30e4c0cc11e76cc"
+checksum = "7456cf00f0685ad319c5b1693f291a650eaf345e941d082fc4e03df8a03996ac"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.8.36"
+version = "0.8.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cb7e4e8436d9db52fbd6625dbf2f45243ab84994a72882ec8227b99e72b439a"
+checksum = "1328722bbf2115db7e19d69ebcc15e795719e2d66b60827c6a69a117365e37a0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7333,6 +7350,7 @@ dependencies = [
 [[package]]
 name = "zilpay"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "background",
  "cache",
@@ -7356,6 +7374,7 @@ dependencies = [
 [[package]]
 name = "zilpay_core"
 version = "0.1.0"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#9b983f52d26ee893dc46a134d75d43e5da6870a0"
 dependencies = [
  "background",
  "cache",
@@ -7379,9 +7398,9 @@ dependencies = [
 
 [[package]]
 name = "zmij"
-version = "1.0.17"
+version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02aae0f83f69aafc94776e879363e9771d7ecbffe2c7fbb6c14c5e00dfe88439"
+checksum = "1966f8ac2c1f76987d69a74d0e0f929241c10e78136434e3be70ff7f58f64214"
 
 [[package]]
 name = "zune-core"
