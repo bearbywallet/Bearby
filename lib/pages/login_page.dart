@@ -96,6 +96,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       }
       setState(() => _errorMessage = 'Session authentication failed');
     } catch (e) {
+      debugPrint("session $e");
       setState(() => _errorMessage = e.toString());
     }
     return false;
