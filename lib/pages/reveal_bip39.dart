@@ -9,7 +9,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -81,17 +80,11 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   }
 
   void _onPasswordSubmit(BigInt walletIndex) async {
-    final state = Provider.of<AppState>(context, listen: false);
     _btnController.start();
     try {
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(
-          walletAddress: state.wallet!.walletAddress);
-
       await tryUnlockWithPassword(
         password: _passwordController.text,
         walletIndex: walletIndex,
-        identifiers: identifiers,
       );
 
       String phrase = await revealBip39Phrase(

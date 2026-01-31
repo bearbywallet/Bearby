@@ -13,7 +13,6 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -82,18 +81,12 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
     final l10n = AppLocalizations.of(context)!;
-    final state = Provider.of<AppState>(context, listen: false);
 
     _btnController.start();
     try {
-      final device = DeviceInfoService();
-      final identifiers = await device.getDeviceIdentifiers(
-          walletAddress: state.wallet!.walletAddress);
-
       await tryUnlockWithPassword(
         password: _passwordController.text,
         walletIndex: walletIndex,
-        identifiers: identifiers,
       );
       KeyPairInfo keypair = await revealKeypair(
         walletIndex: walletIndex,

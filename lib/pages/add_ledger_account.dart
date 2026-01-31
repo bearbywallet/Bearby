@@ -16,7 +16,6 @@ import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -188,10 +187,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         final accountNames = selectedAccounts
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
-
-        DeviceInfoService device = DeviceInfoService();
-        await device.getDeviceIdentifiers(walletAddress: "");
-
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
 
         await addLedgerWallet(

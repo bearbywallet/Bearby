@@ -15,7 +15,6 @@ import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
 import '../services/auth_guard.dart';
 import '../services/device.dart';
-import '../services/preferences_service.dart';
 import '../state/app_state.dart';
 
 class LoginPage extends StatefulWidget {
@@ -85,7 +84,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<bool> _authenticateWithSession(
     String? session,
     int walletIndex,
-    List<String>? identifiers,
   ) async {
     try {
       bool unlocked = await tryUnlockWithSession(
@@ -106,10 +104,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<bool> _authenticateWithPassword(
     String password,
     int walletIndex,
-    List<String>? identifiers,
   ) async {
-    try {
-      bool unlocked = await tryUnlockWithPassword(
+    Future<bool> attemptUnlock(List<String>? identifiers) async {
+      final unlocked = await tryUnlockWithPassword(
         password: password,
         walletIndex: BigInt.from(walletIndex),
         identifiers: identifiers,
@@ -117,12 +114,30 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
       if (unlocked) {
         await _completeAuthentication(walletIndex);
+      }
+
+      return unlocked;
+    }
+
+    try {
+      if (await attemptUnlock(null)) {
         return true;
       }
-      setState(() => _errorMessage = 'Invalid password');
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      debugPrint("1 attemp ${e.toString()}");
+      final device = DeviceInfoService();
+      final identifiers = await device.getDeviceIdentifiers();
+
+      try {
+        if (await attemptUnlock(identifiers)) {
+          return true;
+        }
+      } catch (e) {
+        debugPrint("2 attemp ${e.toString()}");
+      }
     }
+
+    setState(() => _errorMessage = 'Invalid password');
     return false;
   }
 
@@ -130,9 +145,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     if (_selectedWallet == -1 || _appState.wallets.isEmpty) return;
 
     final wallet = _appState.wallets[_selectedWallet];
-    final device = DeviceInfoService();
-    final identifiers =
-        await device.getDeviceIdentifiers(walletAddress: wallet.walletAddress);
 
     _btnController.start();
     setState(() {
@@ -153,20 +165,13 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         isAuthenticated = await _authenticateWithSession(
           session,
           _selectedWallet,
-          identifiers,
         );
         await _authGuard.clearSession(wallet.walletAddress);
       } else if (_passwordController.text.isNotEmpty) {
         isAuthenticated = await _authenticateWithPassword(
           _passwordController.text,
           _selectedWallet,
-          identifiers,
         );
-
-        if (isAuthenticated && identifiers != null) {
-          final prefs = await PreferencesService.getInstance();
-          await prefs.removeLegacyWallet(wallet.walletAddress);
-        }
       } else {
         if (mounted) {
           _btnController.reset();

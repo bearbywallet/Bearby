@@ -3,7 +3,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:zilpay/services/preferences_service.dart';
 
 enum AuthMethodOld { faceId, fingerprint, biometric, pinCode, none }
 
@@ -49,15 +48,7 @@ class DeviceInfoService {
     }
   }
 
-  Future<List<String>?> getDeviceIdentifiers(
-      {required String walletAddress}) async {
-    if (walletAddress.isEmpty) return null;
-
-    final isLegacy =
-        (await PreferencesService.getInstance()).isLegacyWallet(walletAddress);
-
-    if (!isLegacy) return null;
-
+  Future<List<String>> getDeviceIdentifiers() async {
     final packageInfo = await PackageInfo.fromPlatform();
     final methods =
         (await getAvailableAuthMethods()).map((e) => e.name).toList();

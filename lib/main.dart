@@ -42,8 +42,6 @@ Future<void> main() async {
       prefs: prefs,
     );
 
-    await appState.migrateLegacyWalletsOnce();
-
     final authGuard = AuthGuard(state: appState);
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));
