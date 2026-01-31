@@ -296,7 +296,11 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             for (&idx, addr) in ftokens_indices.iter().zip(token_addresses.iter()) {
                 if let Some(price_data) = prices.get(addr) {
                     if let Some(&rate) = price_data.get(&currency_key) {
-                        ftokens[idx].rate = rate;
+                        if ftokens[idx].native {
+                            ftokens[idx].rate = convert_rate;
+                        } else {
+                            ftokens[idx].rate = rate;
+                        }
                     }
                 }
             }
