@@ -210,7 +210,6 @@ class BiometricManager(private val context: Context) {
             KEYSTORE_PROVIDER
         )
 
-        val hasBiometric = isBiometricEnrolled()
         val keySpec = KeyGenParameterSpec.Builder(
             KEY_ALIAS,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -218,24 +217,16 @@ class BiometricManager(private val context: Context) {
             setBlockModes(KeyProperties.BLOCK_MODE_GCM)
             setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
             setUserAuthenticationRequired(true)
+            setInvalidatedByBiometricEnrollment(false)
 
-            if (hasBiometric) {
-                setInvalidatedByBiometricEnrollment(true)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    setUserAuthenticationParameters(
-                        0,
-                        KeyProperties.AUTH_BIOMETRIC_STRONG
-                    )
-                }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                setUserAuthenticationParameters(
+                    30,
+                    KeyProperties.AUTH_DEVICE_CREDENTIAL or KeyProperties.AUTH_BIOMETRIC_STRONG
+                )
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    setUserAuthenticationParameters(
-                        30,
-                        KeyProperties.AUTH_DEVICE_CREDENTIAL or KeyProperties.AUTH_BIOMETRIC_STRONG
-                    )
-                } else {
-                    setUserAuthenticationValidityDurationSeconds(30)
-                }
+                @Suppress("DEPRECATION")
+                setUserAuthenticationValidityDurationSeconds(30)
             }
         }.build()
 
