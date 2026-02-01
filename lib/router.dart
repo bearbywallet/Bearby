@@ -31,7 +31,6 @@ import 'package:zilpay/pages/verify_bip39.dart';
 import 'package:zilpay/pages/wallet.dart';
 import 'package:zilpay/pages/zil_stake.dart';
 
-import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
 import 'pages/main_page.dart';
@@ -45,10 +44,9 @@ import 'pages/wallet_restore_options.dart';
 import './pages/gen_bip39.dart';
 
 class AppRouter {
-  final AuthGuard authGuard;
   final AppState appState;
 
-  AppRouter({required this.authGuard, required this.appState});
+  AppRouter({required this.appState});
 
   Route<void> onGenerateRoute(RouteSettings settings) {
     return MaterialPageRoute(
@@ -59,11 +57,8 @@ class AppRouter {
 
   Widget _buildRoute(BuildContext context, RouteSettings settings) {
     Widget wrapWithProviders(Widget child) {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: authGuard),
-          ChangeNotifierProvider.value(value: appState),
-        ],
+      return ChangeNotifierProvider.value(
+        value: appState,
         child: child,
       );
     }
@@ -111,16 +106,16 @@ class AppRouter {
     }
 
     if (settings.name == '/' || settings.name == null) {
-      if (!authGuard.ready) {
+      if (appState.wallets.isEmpty) {
         return wrapWithProviders(const InitialPage());
-      } else if (!authGuard.enabled) {
+      } else if (appState.wallet == null) {
         return wrapWithProviders(const LoginPage());
       } else {
         return wrapWithProviders(const MainPage());
       }
     }
 
-    if (!authGuard.ready) {
+    if (appState.wallets.isEmpty) {
       if (setupRoutes.contains(settings.name)) {
         switch (settings.name) {
           case '/pass_setup':
@@ -166,7 +161,7 @@ class AppRouter {
       return wrapWithProviders(const InitialPage());
     }
 
-    if (!authGuard.enabled) {
+    if (appState.wallet == null) {
       if (settings.name == '/login') {
         return wrapWithProviders(const LoginPage());
       }

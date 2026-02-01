@@ -49,7 +49,8 @@ bool isDomainConnected(String domain, List<dynamic> connections) {
 List<String> filterByIndexes(List<String> addresses, Uint64List indexes) {
   return [
     for (var i = 0; i < indexes.length; i++)
-      if (i < addresses.length) addresses[indexes[i].toInt()]
+      if (indexes[i] >= BigInt.zero && indexes[i].toInt() < addresses.length)
+        addresses[indexes[i].toInt()]
   ];
 }
 

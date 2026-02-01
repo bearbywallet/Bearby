@@ -301,7 +301,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                                 child: MnemonicWordInput(
                                   key: ValueKey('word_$index'),
                                   index: index + 1,
-                                  word: _words[index],
+                                  word: _words.elementAtOrNull(index) ?? '',
                                   isEditable: true,
                                   onChanged: _handleWordChange,
                                   borderColor: theme.buttonText,

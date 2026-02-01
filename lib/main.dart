@@ -6,7 +6,6 @@ import 'package:zilpay/services/preferences_service.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 
-import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
 import 'package:zilpay/src/rust/frb_generated.dart';
@@ -42,9 +41,7 @@ Future<void> main() async {
       prefs: prefs,
     );
 
-    final authGuard = AuthGuard(state: appState);
-
-    runApp(ZilPayApp(authGuard: authGuard, appState: appState));
+    runApp(ZilPayApp(appState: appState));
   } catch (e) {
     debugPrint("try start, Error: $e");
   }

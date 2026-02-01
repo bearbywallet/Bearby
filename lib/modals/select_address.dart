@@ -242,7 +242,9 @@ class _AddressSelectModalContentState
     final theme = appState.currentTheme;
 
     final currentAccount = appState.wallet?.selectedAccount.toInt() ?? 0;
-    final currentAccountData = appState.wallet?.accounts[currentAccount];
+    final currentAccountData = currentAccount >= 0
+        ? appState.wallet?.accounts.elementAtOrNull(currentAccount)
+        : null;
     final isCurrentAccount = currentAccountData?.addr == entry.address;
 
     return InkWell(

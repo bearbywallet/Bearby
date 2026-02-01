@@ -158,9 +158,10 @@ class _ConfirmTransactionContentState
     _currentTx = widget.tx;
     _userSelectedOption = appState.selectedGasOption;
     _initGasPolling();
-    _isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
+    final wallet = appState.selectedWallet >= 0
+        ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+        : null;
+    _isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();

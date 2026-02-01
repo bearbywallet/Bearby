@@ -93,10 +93,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       _createWallet = createWallet ?? true;
 
       final appState = context.read<AppState>();
-      final isLedgerWallet = appState.selectedWallet != -1 &&
-          appState.wallets.isNotEmpty &&
-          appState.wallets[appState.selectedWallet].walletType
-              .contains(WalletType.ledger.name);
+      final wallet = appState.selectedWallet >= 0
+          ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+          : null;
+      final isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
       if (isLedgerWallet && !_createWallet) {
         final existingAccounts = appState.wallet?.accounts ?? [];

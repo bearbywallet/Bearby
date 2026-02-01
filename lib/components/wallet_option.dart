@@ -31,7 +31,12 @@ class WalletOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = Provider.of<AppState>(context, listen: false).currentTheme;
-    final wallet = appState.wallets[walletIndex];
+    final wallet = appState.wallets.elementAtOrNull(walletIndex);
+
+    if (wallet == null) {
+      return const SizedBox.shrink();
+    }
+
     final chain = appState.getChain(wallet.defaultChainHash);
 
     return GestureDetector(
@@ -67,7 +72,7 @@ class WalletOption extends StatelessWidget {
                       height: 32,
                       fit: BoxFit.contain,
                       errorWidget: Jazzicon(
-                        seed: appState.wallet!.walletAddress,
+                        seed: wallet.walletAddress,
                         diameter: 40,
                       ),
                       loadingWidget: const Center(

@@ -34,7 +34,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   late BackgroundState _state;
   late String _cahceDir;
   late PreferencesService _prefs;
-  int _selectedWallet = 0;
+  int _selectedWallet = -1;
   bool _hideBalance = false;
   bool _isTileView = false;
   bool _browserUrlBarTop = false;
@@ -55,6 +55,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   void setSelectedWallet(int index) {
     _selectedWallet = index;
+    notifyListeners();
+  }
+
+  void clearAuthentication() {
+    _selectedWallet = -1;
     notifyListeners();
   }
 
@@ -88,7 +93,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  WalletInfo? get wallet => _state.wallets[_selectedWallet];
+  WalletInfo? get wallet {
+    if (_selectedWallet < 0) return null;
+    return _state.wallets.elementAtOrNull(_selectedWallet);
+  }
 
   NetworkConfigInfo? get chain {
     BigInt? hash = account?.chainHash;
@@ -99,7 +107,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   AccountInfo? get account {
     if (wallet == null) return null;
     int index = wallet!.selectedAccount.toInt();
-    return wallet!.accounts[index];
+    if (index < 0) return null;
+    return wallet!.accounts.elementAtOrNull(index);
   }
 
   int get selectedWallet => _selectedWallet;

@@ -13,7 +13,6 @@ import '../components/smart_input.dart';
 import '../components/wallet_option.dart';
 import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
-import '../services/auth_guard.dart';
 import '../services/device.dart';
 import '../state/app_state.dart';
 
@@ -29,7 +28,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
-  late final AuthGuard _authGuard;
   late final AppState _appState;
 
   bool _obscurePassword = true;
@@ -45,7 +43,6 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   void _initializeServices() {
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
   }
 
@@ -78,11 +75,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<void> _completeAuthentication(int walletIndex) async {
     _appState.setSelectedWallet(walletIndex);
     await _appState.syncData();
-    _authGuard.setEnabled(true);
   }
 
   Future<bool> _authenticateWithSession(
-    String? session,
     int walletIndex,
   ) async {
     try {
@@ -143,9 +138,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   Future<void> _handleAuthentication() async {
-    if (_selectedWallet == -1 || _appState.wallets.isEmpty) return;
+    final wallet = _selectedWallet >= 0
+        ? _appState.wallets.elementAtOrNull(_selectedWallet)
+        : null;
 
-    final wallet = _appState.wallets[_selectedWallet];
+    if (wallet == null) return;
 
     _btnController.start();
     setState(() {
@@ -161,13 +158,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         isAuthenticated = true;
       } else if (wallet.authType != "none" &&
           _passwordController.text.isEmpty) {
-        final session =
-            await _authGuard.getSession(sessionKey: wallet.walletAddress);
         isAuthenticated = await _authenticateWithSession(
-          session,
           _selectedWallet,
         );
-        await _authGuard.clearSession(wallet.walletAddress);
       } else if (_passwordController.text.isNotEmpty) {
         isAuthenticated = await _authenticateWithPassword(
           _passwordController.text,
@@ -276,9 +269,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   Widget _buildWalletItem(int index, AppState theme) {
-    if (index >= _appState.wallets.length) return const SizedBox.shrink();
+    final wallet = _appState.wallets.elementAtOrNull(index);
 
-    final wallet = _appState.wallets[index];
+    if (wallet == null) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
 
     if (!_obscureButton && _selectedWallet != index) {
@@ -350,10 +343,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   Widget _buildLoginForm(AppState theme) {
-    final isLedgerWallet = _selectedWallet != -1 &&
-        _selectedWallet < _appState.wallets.length &&
-        _appState.wallets[_selectedWallet].walletType
-            .contains(WalletType.ledger.name);
+    final wallet = _selectedWallet >= 0
+        ? _appState.wallets.elementAtOrNull(_selectedWallet)
+        : null;
+    final isLedgerWallet =
+        wallet?.walletType.contains(WalletType.ledger.name) ?? false;
     final l10n = AppLocalizations.of(context)!;
 
     return Padding(

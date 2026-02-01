@@ -150,9 +150,8 @@ class DeepLinkService {
   int _findWalletByChainName(AppState appState, String chainName) {
     for (int i = 0; i < appState.wallets.length; i++) {
       final wallet = appState.wallets[i];
-      if (wallet.accounts.isEmpty) continue;
-
-      final firstAccount = wallet.accounts[0];
+      final firstAccount = wallet.accounts.elementAtOrNull(0);
+      if (firstAccount == null) continue;
       final chain = appState.getChain(firstAccount.chainHash);
 
       debugPrint('[DeepLinkService] Wallet $i: ${chain?.shortName}');

@@ -83,9 +83,10 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
-    _isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
+    final wallet = appState.selectedWallet >= 0
+        ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+        : null;
+    _isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();
@@ -159,7 +160,13 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     try {
       if (_isLedgerWallet) {
         final wallet = appState.wallet!;
-        final account = wallet.accounts[wallet.selectedAccount.toInt()];
+        final accountIndex = wallet.selectedAccount.toInt();
+        final account = accountIndex >= 0
+            ? wallet.accounts.elementAtOrNull(accountIndex)
+            : null;
+        if (account == null) {
+          throw Exception('Invalid account index');
+        }
 
         if (widget.message != null) {
           final sig = await appState.ledgerViewController.signMesage(

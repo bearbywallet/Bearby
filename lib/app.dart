@@ -3,22 +3,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'router.dart';
-import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
 class ZilPayApp extends StatelessWidget {
-  final AuthGuard authGuard;
   final AppState appState;
 
-  const ZilPayApp({super.key, required this.authGuard, required this.appState});
+  const ZilPayApp({super.key, required this.appState});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: authGuard),
-        ChangeNotifierProvider.value(value: appState),
-      ],
+    return ChangeNotifierProvider.value(
+      value: appState,
       child: Builder(
         builder: (context) {
           return Consumer<AppState>(
@@ -157,7 +152,6 @@ class ZilPayApp extends StatelessWidget {
                 ),
                 initialRoute: '/',
                 onGenerateRoute: AppRouter(
-                  authGuard: Provider.of<AuthGuard>(context, listen: false),
                   appState: Provider.of<AppState>(context, listen: false),
                 ).onGenerateRoute,
               );
