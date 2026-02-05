@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/biometric_switch.dart';
+import 'package:zilpay/components/bip_purpose_selector.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
@@ -36,7 +37,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   WalletArgonParamsInfo? _argon2;
   Uint8List? _cipher;
   KeyPairInfo? _keys;
-  int _bipPurpose = kBip44Purpose;
+  int _selectedPurposeIndex = 1; // Default to BIP84
 
   late AppState _appState;
 
@@ -75,7 +76,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     final cipher = args?['cipher'] as Uint8List?;
     final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
-    final bipPurpose = args?['bipPurpose'] as int?;
 
     if (bip39 == null && chain == null && cipher == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,7 +89,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         _cipher = cipher;
         _argon2 = argon2;
         _bypassChecksumValidation = bypassChecksumValidation ?? false;
-        _bipPurpose = bipPurpose ?? kBip44Purpose;
 
         if (_chain?.slip44 == kZilliqaSlip44) {
           _zilLegacy = true;
@@ -232,6 +231,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
       List<FTokenInfo> ftokens = [];
 
+      // Compute bipPurpose from selector for Bitcoin, default for others
+      final int bipPurpose;
+      if (_chain?.slip44 == kBitcoinlip44) {
+        final options = BipPurposeSelector.getBipPurposeOptions(l10n);
+        bipPurpose = options[_selectedPurposeIndex].purpose;
+      } else {
+        bipPurpose = kBip44Purpose;
+      }
+
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
@@ -242,7 +250,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           biometricType: biometricType,
           chainHash: chainHash,
           mnemonicCheck: !_bypassChecksumValidation,
-          bipPurpose: _bipPurpose,
+          bipPurpose: bipPurpose,
         );
 
         await addBip39Wallet(
@@ -257,7 +265,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           walletName: _walletNameController.text,
           biometricType: biometricType,
           chainHash: chainHash,
-          bipPurpose: _bipPurpose,
+          bipPurpose: bipPurpose,
         );
 
         await addSkWallet(
@@ -482,6 +490,16 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               onChanged: (value) async {
                                 setState(() => _useDeviceAuth = value);
                               },
+                            ),
+                          if (_chain?.slip44 == kBitcoinlip44)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: BipPurposeSelector(
+                                selectedIndex: _selectedPurposeIndex,
+                                onSelect: (index) =>
+                                    setState(() => _selectedPurposeIndex = index),
+                                disabled: _disabled,
+                              ),
                             ),
                           SizedBox(height: 80),
                         ],

@@ -5,7 +5,6 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
-import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -343,11 +342,8 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                             text: AppLocalizations.of(context)!
                                 .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
-                              final route = _chain!.slip44 == kBitcoinlip44
-                                  ? '/bip_purpose_setup'
-                                  : '/cipher_setup';
                               Navigator.of(context).pushNamed(
-                                route,
+                                '/cipher_setup',
                                 arguments: {
                                   'bip39': _words,
                                   'chain': _chain,

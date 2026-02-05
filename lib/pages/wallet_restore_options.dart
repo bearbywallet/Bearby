@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/view_item.dart';
-import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
@@ -98,11 +97,8 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                     .toList();
 
             if (errorIndexes.isEmpty && context.mounted) {
-              final route = _chain!.slip44 == kBitcoinlip44
-                  ? '/bip_purpose_setup'
-                  : '/cipher_setup';
               Navigator.of(context).pushNamed(
-                route,
+                '/cipher_setup',
                 arguments: {'bip39': words, 'chain': _chain},
               );
               return;
@@ -139,10 +135,8 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
     if (!context.mounted) return;
 
     if (errorIndexes.isEmpty) {
-      final route =
-          _chain!.slip44 == kBitcoinlip44 ? '/bip_purpose_setup' : '/cipher_setup';
       Navigator.of(context).pushNamed(
-        route,
+        '/cipher_setup',
         arguments: {'bip39': nonEmptyWords, 'chain': _chain},
       );
     } else {
@@ -156,10 +150,8 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
 
       if (!context.mounted) return;
 
-      final route =
-          _chain!.slip44 == kBitcoinlip44 ? '/bip_purpose_setup' : '/cipher_setup';
       Navigator.of(context).pushNamed(
-        route,
+        '/cipher_setup',
         arguments: {'keys': keys, 'chain': _chain},
       );
     } catch (e) {

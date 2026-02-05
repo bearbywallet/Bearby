@@ -6,7 +6,6 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
@@ -240,11 +239,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           text: l10n.secretKeyRestorePageNextButton,
                           onPressed: _keyPair.sk.isNotEmpty && _hasBackup
                               ? () {
-                                  final route = _chain!.slip44 == kBitcoinlip44
-                                      ? '/bip_purpose_setup'
-                                      : '/cipher_setup';
                                   Navigator.of(context).pushNamed(
-                                    route,
+                                    '/cipher_setup',
                                     arguments: {
                                       'keys': _keyPair,
                                       'chain': _chain,
