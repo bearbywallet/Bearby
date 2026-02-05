@@ -162,7 +162,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                                       .secretPhraseVerifyPageNextButton,
                                   onPressed: () {
                                     Navigator.of(context).pushReplacementNamed(
-                                      '/cipher_setup',
+                                      '/pass_setup',
                                       arguments: {
                                         'bip39': _bip39List,
                                         'chain': _chain,

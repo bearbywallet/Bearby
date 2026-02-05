@@ -98,7 +98,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
 
             if (errorIndexes.isEmpty && context.mounted) {
               Navigator.of(context).pushNamed(
-                '/cipher_setup',
+                '/pass_setup',
                 arguments: {'bip39': words, 'chain': _chain},
               );
               return;
@@ -136,7 +136,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
 
     if (errorIndexes.isEmpty) {
       Navigator.of(context).pushNamed(
-        '/cipher_setup',
+        '/pass_setup',
         arguments: {'bip39': nonEmptyWords, 'chain': _chain},
       );
     } else {
@@ -151,7 +151,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
       if (!context.mounted) return;
 
       Navigator.of(context).pushNamed(
-        '/cipher_setup',
+        '/pass_setup',
         arguments: {'keys': keys, 'chain': _chain},
       );
     } catch (e) {

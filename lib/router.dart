@@ -23,7 +23,6 @@ import 'package:zilpay/pages/reveal_bip39.dart';
 import 'package:zilpay/pages/reveal_sk.dart';
 import 'package:zilpay/pages/security.dart';
 import 'package:zilpay/pages/send.dart';
-import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
@@ -64,7 +63,6 @@ class AppRouter {
 
     final List<String> setupRoutes = [
       '/pass_setup',
-      '/cipher_setup',
       '/net_setup',
       '/gen_bip39',
       '/gen_sk',
@@ -128,8 +126,6 @@ class AppRouter {
             return wrapWithProviders(const RestoreRKStorage());
           case '/restore_bip39':
             return wrapWithProviders(const RestoreSecretPhrasePage());
-          case '/cipher_setup':
-            return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
             return wrapWithProviders(const SetupNetworkSettingsPage());
           case '/gen_bip39':
@@ -172,8 +168,6 @@ class AppRouter {
             return wrapWithProviders(const PasswordSetupPage());
           case '/rk_restore':
             return wrapWithProviders(const RestoreRKStorage());
-          case '/cipher_setup':
-            return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
             return wrapWithProviders(const SetupNetworkSettingsPage());
           case '/gen_sk':
@@ -244,8 +238,6 @@ class AppRouter {
         return wrapWithProviders(const CurrencyConversionPage());
       case '/pass_setup':
         return wrapWithProviders(const PasswordSetupPage());
-      case '/cipher_setup':
-        return wrapWithProviders(const CipherSettingsPage());
       case '/rk_restore':
         return wrapWithProviders(const RestoreRKStorage());
       case '/net_setup':

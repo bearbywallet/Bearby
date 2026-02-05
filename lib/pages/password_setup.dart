@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/bip_purpose_selector.dart';
@@ -8,10 +7,13 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/config/bip_purposes.dart';
+import 'package:zilpay/config/cipher.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/modals/encryption_settings.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -34,10 +36,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     with StatusBarMixin {
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
-  WalletArgonParamsInfo? _argon2;
-  Uint8List? _cipher;
   KeyPairInfo? _keys;
-  int _selectedPurposeIndex = 1; // Default to BIP84
+  int _selectedPurposeIndex = 0; // Default to BIP86 (Taproot)
+  int _selectedCipherIndex = CipherDefaults.defaultCipherIndex;
+  WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
 
   late AppState _appState;
 
@@ -73,11 +75,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     final bip39 = args?['bip39'] as List<String>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
     final keys = args?['keys'] as KeyPairInfo?;
-    final cipher = args?['cipher'] as Uint8List?;
-    final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
-    if (bip39 == null && chain == null && cipher == null && keys == null) {
+    if (bip39 == null && chain == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/initial');
       });
@@ -86,8 +86,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         _bip39List = bip39;
         _chain = chain;
         _keys = keys;
-        _cipher = cipher;
-        _argon2 = argon2;
         _bypassChecksumValidation = bypassChecksumValidation ?? false;
 
         if (_chain?.slip44 == kZilliqaSlip44) {
@@ -217,8 +215,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       }
 
       WalletSettingsInfo settings = WalletSettingsInfo(
-        cipherOrders: _cipher!,
-        argonParams: _argon2!,
+        cipherOrders: CipherDefaults.getCipherOrders(_selectedCipherIndex),
+        argonParams: _argonParams,
         currencyConvert: detectDeviceCurrency(),
         ipfsNode: "dweb.link",
         ensEnabled: true,
@@ -315,6 +313,20 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     }
   }
 
+  void _showEncryptionModal() {
+    showEncryptionSettingsModal(
+      context: context,
+      selectedCipherIndex: _selectedCipherIndex,
+      argonParams: _argonParams,
+      onSettingsChanged: (cipherIndex, argonParams) {
+        setState(() {
+          _selectedCipherIndex = cipherIndex;
+          _argonParams = argonParams;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -357,6 +369,24 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             ),
                           ),
                           SizedBox(height: adaptivePadding),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: _disabled ? null : _showEncryptionModal,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  AppLocalizations.of(context)!
+                                      .cipherSettingsPageAdvancedButton,
+                                  style: theme.bodyLarge.copyWith(
+                                    color: _disabled
+                                        ? theme.textSecondary
+                                        : theme.primaryPurple,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                           SmartInput(
                             controller: _walletNameController,
                             hint: AppLocalizations.of(context)!

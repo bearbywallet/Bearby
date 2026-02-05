@@ -343,7 +343,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                                 .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
                               Navigator.of(context).pushNamed(
-                                '/cipher_setup',
+                                '/pass_setup',
                                 arguments: {
                                   'bip39': _words,
                                   'chain': _chain,

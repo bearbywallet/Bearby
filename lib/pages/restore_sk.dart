@@ -240,7 +240,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           onPressed: _keyPair.sk.isNotEmpty && _hasBackup
                               ? () {
                                   Navigator.of(context).pushNamed(
-                                    '/cipher_setup',
+                                    '/pass_setup',
                                     arguments: {
                                       'keys': _keyPair,
                                       'chain': _chain,
