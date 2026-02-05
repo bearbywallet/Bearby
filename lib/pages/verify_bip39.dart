@@ -4,7 +4,9 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -34,6 +36,7 @@ class SecretPhraseVerifyPage extends StatefulWidget {
 class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
     with StatusBarMixin {
   List<String>? _bip39List;
+  NetworkConfigInfo? _chain;
   List<int> _indexes = [];
   final List<String> _verifyWords =
       List<String>.filled(maxNumbers, '', growable: false);
@@ -59,16 +62,19 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments
-        as Map<String, List<String>>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bip39 = args?['bip39'] as List<String>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
 
-    if (args == null || args['bip39'] == null || args['bip39']!.isEmpty) {
+    if (bip39 == null || bip39.isEmpty || chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/initial');
+        Navigator.of(context).pushReplacementNamed('/net_setup');
       });
-    } else {
+    } else if (_bip39List == null) {
       setState(() {
-        _bip39List = args['bip39'];
+        _bip39List = bip39;
+        _chain = chain;
         _generateIndexes(useSetState: false);
       });
     }
@@ -156,9 +162,16 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                                   text: AppLocalizations.of(context)!
                                       .secretPhraseVerifyPageNextButton,
                                   onPressed: () {
+                                    final route = _chain!.slip44 == kBitcoinlip44
+                                        ? '/bip_purpose_setup'
+                                        : '/cipher_setup';
                                     Navigator.of(context).pushReplacementNamed(
-                                        '/net_setup',
-                                        arguments: {'bip39': _bip39List});
+                                      route,
+                                      arguments: {
+                                        'bip39': _bip39List,
+                                        'chain': _chain,
+                                      },
+                                    );
                                   },
                                   borderRadius: 30.0,
                                   height: 56.0,

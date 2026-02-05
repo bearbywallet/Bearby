@@ -6,10 +6,12 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -27,6 +29,25 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
   bool _hasBackup = false;
   bool _isValidating = false;
   KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
+  NetworkConfigInfo? _chain;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -219,9 +240,15 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           text: l10n.secretKeyRestorePageNextButton,
                           onPressed: _keyPair.sk.isNotEmpty && _hasBackup
                               ? () {
+                                  final route = _chain!.slip44 == kBitcoinlip44
+                                      ? '/bip_purpose_setup'
+                                      : '/cipher_setup';
                                   Navigator.of(context).pushNamed(
-                                    '/net_setup',
-                                    arguments: {'keys': _keyPair},
+                                    route,
+                                    arguments: {
+                                      'keys': _keyPair,
+                                      'chain': _chain,
+                                    },
                                   );
                                 }
                               : null,

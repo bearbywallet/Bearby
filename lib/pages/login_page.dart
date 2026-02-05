@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   }
 
   void _navigateToNewWallet() {
-    Navigator.pushNamed(context, '/new_wallet_options');
+    Navigator.pushNamed(context, '/net_setup');
   }
 
   Future<void> _completeAuthentication(int walletIndex) async {

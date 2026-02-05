@@ -55,11 +55,14 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
   Future<void> _toggleTheme() async {
     final appState = Provider.of<AppState>(context, listen: false);
     final newAppearance = switch (appState.state.appearances) {
-      0 => PlatformDispatcher.instance.platformBrightness == Brightness.dark ? 2 : 1,
+      0 => PlatformDispatcher.instance.platformBrightness == Brightness.dark
+          ? 2
+          : 1,
       1 => 2,
       _ => 1,
     };
-    await appState.setAppearancesCode(newAppearance, appState.state.abbreviatedNumber);
+    await appState.setAppearancesCode(
+        newAppearance, appState.state.abbreviatedNumber);
   }
 
   @override
@@ -84,7 +87,8 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -93,7 +97,8 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                           'assets/icons/moon_sun.svg',
                           width: 30,
                           height: 30,
-                          colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              theme.textPrimary, BlendMode.srcIn),
                         ),
                         onPressed: _toggleTheme,
                       ),
@@ -102,9 +107,11 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                           'assets/icons/language.svg',
                           width: 34,
                           height: 34,
-                          colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              theme.textPrimary, BlendMode.srcIn),
                         ),
-                        onPressed: () => Navigator.pushNamed(context, '/language'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/language'),
                       ),
                     ],
                   ),
@@ -115,15 +122,18 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                       'assets/icons/little_dragons.svg',
                       width: 400,
                       height: 400,
-                      colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                      colorFilter:
+                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+                  padding:
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 32),
                   child: _isLoading
                       ? CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.primaryPurple),
                         )
                       : CustomButton(
                           textColor: theme.buttonText,
@@ -132,9 +142,14 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                               ? l10n.initialPagerestoreZilPay
                               : l10n.initialPagegetStarted,
                           onPressed: () => Navigator.of(context).pushNamed(
-                            _isRestoreAvailable ? '/rk_restore' : '/new_wallet_options',
+                            _isRestoreAvailable
+                                ? '/rk_restore'
+                                : '/net_setup',
                             arguments: _isRestoreAvailable
-                                ? {'vaultJson': _vaultJson, 'accountsJson': _accountsJson}
+                                ? {
+                                    'vaultJson': _vaultJson,
+                                    'accountsJson': _accountsJson
+                                  }
                                 : null,
                           ),
                           borderRadius: 30.0,

@@ -5,14 +5,11 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
-import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -28,12 +25,7 @@ class SetupNetworkSettingsPage extends StatefulWidget {
 
 class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
     with StatusBarMixin {
-  List<String>? _bip39List;
-  KeyPairInfo? _keys;
-  DiscoveredDevice? _ledger;
   String? _errorMessage;
-  String? _shortName;
-  bool _bypassChecksumValidation = false;
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -54,31 +46,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final bip39 = args?['bip39'] as List<String>?;
-    final keys = args?['keys'] as KeyPairInfo?;
-    final shortName = args?['shortName'] as String?;
-    final ledger = args?['ledger'] as DiscoveredDevice?;
-    final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
-
-    if (bip39 == null && keys == null && ledger == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/initial');
-      });
-    } else {
-      setState(() {
-        _bip39List = bip39;
-        _ledger = ledger;
-        _keys = keys;
-        _shortName = shortName;
-        _bypassChecksumValidation = bypassChecksumValidation ?? false;
-      });
-    }
-  }
 
   List<NetworkConfigInfo> get filteredNetworks {
     if (_searchQuery.isEmpty) {
@@ -104,14 +71,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
       setState(() {
         networks = _appendUniqueNetworks(storedProviders, mainnetChains);
-
-        if (_shortName != null) {
-          int foundIndex =
-              networks.indexWhere((network) => network.shortName == _shortName);
-          if (foundIndex > 0) {
-            selectedNetworkIndex = foundIndex;
-          }
-        }
       });
     } catch (e) {
       setState(() {
@@ -314,41 +273,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                         ? () {}
                         : () {
                             final chain = networks[selectedNetworkIndex];
-
-                            if (_ledger != null) {
-                              Navigator.of(context).pushNamed(
-                                '/add_ledger_account',
-                                arguments: {
-                                  'chain': chain,
-                                  'ledger': _ledger,
-                                },
-                              );
-                              return;
-                            } else {
-                              if (chain.slip44 == kBitcoinlip44) {
-                                Navigator.of(context).pushNamed(
-                                  '/bip_purpose_setup',
-                                  arguments: {
-                                    'bip39': _bip39List,
-                                    'keys': _keys,
-                                    'chain': chain,
-                                    'ignore_checksum':
-                                        _bypassChecksumValidation,
-                                  },
-                                );
-                              } else {
-                                Navigator.of(context).pushNamed(
-                                  '/cipher_setup',
-                                  arguments: {
-                                    'bip39': _bip39List,
-                                    'keys': _keys,
-                                    'chain': chain,
-                                    'ignore_checksum':
-                                        _bypassChecksumValidation,
-                                  },
-                                );
-                              }
-                            }
+                            Navigator.of(context).pushNamed(
+                              '/new_wallet_options',
+                              arguments: {'chain': chain},
+                            );
                           },
                     borderRadius: 30.0,
                     height: 56.0,

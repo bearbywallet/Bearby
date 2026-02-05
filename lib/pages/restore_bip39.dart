@@ -5,10 +5,12 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -30,11 +32,30 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
   bool _bypassChecksumValidation = false;
   bool _showChecksumWarning = false;
   bool _allWordsEntered = false;
+  NetworkConfigInfo? _chain;
 
   @override
   void initState() {
     super.initState();
     _words = List.filled(_count, '');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
   }
 
   Future<void> _handleCheckWords() async {
@@ -322,11 +343,17 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                             text: AppLocalizations.of(context)!
                                 .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
-                              Navigator.of(context)
-                                  .pushNamed('/net_setup', arguments: {
-                                'bip39': _words,
-                                'ignore_checksum': _bypassChecksumValidation,
-                              });
+                              final route = _chain!.slip44 == kBitcoinlip44
+                                  ? '/bip_purpose_setup'
+                                  : '/cipher_setup';
+                              Navigator.of(context).pushNamed(
+                                route,
+                                arguments: {
+                                  'bip39': _words,
+                                  'chain': _chain,
+                                  'ignore_checksum': _bypassChecksumValidation,
+                                },
+                              );
                             },
                             borderRadius: 30.0,
                             height: 56.0,

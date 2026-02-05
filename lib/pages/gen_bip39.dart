@@ -11,6 +11,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -29,12 +30,30 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
   var _count = 12;
   bool _hasBackupWords = false;
   bool _isCopied = false;
-  // final String _selectedLanguage = 'English';
+  NetworkConfigInfo? _chain;
 
   @override
   void initState() {
     super.initState();
     _regenerateMnemonicWords();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
   }
 
   @override
@@ -175,8 +194,12 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                             text: l10n.secretPhraseGeneratorPageNextButton,
                             onPressed: () {
                               Navigator.of(context).pushReplacementNamed(
-                                  '/verify_bip39',
-                                  arguments: {'bip39': _mnemonicWords});
+                                '/verify_bip39',
+                                arguments: {
+                                  'bip39': _mnemonicWords,
+                                  'chain': _chain,
+                                },
+                              );
                             },
                             borderRadius: 30.0,
                             height: 56.0,

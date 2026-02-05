@@ -6,16 +6,49 @@ import 'package:zilpay/components/view_item.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class GenWalletOptionsPage extends StatelessWidget with StatusBarMixin {
+class GenWalletOptionsPage extends StatefulWidget {
   const GenWalletOptionsPage({super.key});
+
+  @override
+  State<GenWalletOptionsPage> createState() => _GenWalletOptionsPageState();
+}
+
+class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
+    with StatusBarMixin {
+  NetworkConfigInfo? _chain;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else {
+      setState(() {
+        _chain = chain;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
+    if (_chain == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +86,10 @@ class GenWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed('/gen_bip39'),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/gen_bip39',
+                            arguments: {'chain': _chain},
+                          ),
                         ),
                         WalletListItem(
                           title: l10n.genWalletOptionsPrivateKeyTitle,
@@ -67,7 +103,10 @@ class GenWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed('/gen_sk'),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/gen_sk',
+                            arguments: {'chain': _chain},
+                          ),
                         ),
                       ],
                     ),

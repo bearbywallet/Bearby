@@ -1,32 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/view_item.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
-import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
+class RestoreWalletOptionsPage extends StatefulWidget {
   const RestoreWalletOptionsPage({super.key});
 
+  @override
+  State<RestoreWalletOptionsPage> createState() =>
+      _RestoreWalletOptionsPageState();
+}
+
+class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
+    with StatusBarMixin {
+  NetworkConfigInfo? _chain;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
+  }
+
   void _handleBip39Restore(BuildContext context) {
-    Navigator.of(context).pushNamed('/restore_bip39');
+    Navigator.of(context).pushNamed(
+      '/restore_bip39',
+      arguments: {'chain': _chain},
+    );
   }
 
   void _handlePrivateKeyRestore(BuildContext context) {
-    Navigator.of(context).pushNamed('/restore_sk');
+    Navigator.of(context).pushNamed(
+      '/restore_sk',
+      arguments: {'chain': _chain},
+    );
   }
 
   void _handleKeystoreResotre(BuildContext context) {
-    Navigator.of(context).pushNamed('/keystore_file_restore');
+    Navigator.of(context).pushNamed(
+      '/keystore_file_restore',
+      arguments: {'chain': _chain},
+    );
   }
 
   void _handleQRCodeScanning(BuildContext context) {
@@ -35,28 +71,22 @@ class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
       onScanned: (String qrData) async {
         try {
           final values = parseQRSecretData(qrData);
-          final String? shortName = values['chain'];
           final String? seed = values['seed'];
           final String? key = values['key'];
 
-          if (shortName != null && context.mounted) {
-            final mainnetJsonData = await rootBundle
-                .loadString('assets/chains/mainnet-chains.json');
-            final mainnetChains =
-                await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
-
-            if (mainnetChains.any((chain) => chain.shortName == shortName) &&
-                context.mounted) {
-              if (seed != null && context.mounted) {
-                await _processSeedFromQR(context, seed, shortName);
-                return;
-              } else if (key != null && context.mounted) {
-                await _processKeyFromQR(context, key, shortName);
-                return;
-              }
-            }
+          // Try to process seed phrase from QR
+          if (seed != null && context.mounted) {
+            await _processSeedFromQR(context, seed);
+            return;
           }
 
+          // Try to process private key from QR
+          if (key != null && context.mounted) {
+            await _processKeyFromQR(context, key);
+            return;
+          }
+
+          // Try to parse as plain BIP39 words
           final words =
               qrData.split(' ').where((word) => word.isNotEmpty).toList();
           final wordCount = words.length;
@@ -68,8 +98,13 @@ class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                     .toList();
 
             if (errorIndexes.isEmpty && context.mounted) {
-              Navigator.of(context).pushNamed('/net_setup',
-                  arguments: {'bip39': words, 'shortName': null});
+              final route = _chain!.slip44 == kBitcoinlip44
+                  ? '/bip_purpose_setup'
+                  : '/cipher_setup';
+              Navigator.of(context).pushNamed(
+                route,
+                arguments: {'bip39': words, 'chain': _chain},
+              );
               return;
             }
           }
@@ -85,8 +120,7 @@ class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
     );
   }
 
-  Future<void> _processSeedFromQR(
-      BuildContext context, String seed, String shortName) async {
+  Future<void> _processSeedFromQR(BuildContext context, String seed) async {
     final nonEmptyWords =
         seed.split(" ").where((word) => word.isNotEmpty).toList();
 
@@ -105,25 +139,28 @@ class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
     if (!context.mounted) return;
 
     if (errorIndexes.isEmpty) {
+      final route =
+          _chain!.slip44 == kBitcoinlip44 ? '/bip_purpose_setup' : '/cipher_setup';
       Navigator.of(context).pushNamed(
-        '/net_setup',
-        arguments: {'bip39': nonEmptyWords, 'shortName': shortName},
+        route,
+        arguments: {'bip39': nonEmptyWords, 'chain': _chain},
       );
     } else {
       Navigator.pop<void>(context);
     }
   }
 
-  Future<void> _processKeyFromQR(
-      BuildContext context, String key, String shortName) async {
+  Future<void> _processKeyFromQR(BuildContext context, String key) async {
     try {
       final KeyPairInfo keys = await keypairFromSk(sk: key);
 
       if (!context.mounted) return;
 
+      final route =
+          _chain!.slip44 == kBitcoinlip44 ? '/bip_purpose_setup' : '/cipher_setup';
       Navigator.of(context).pushNamed(
-        '/net_setup',
-        arguments: {'keys': keys, 'shortName': shortName},
+        route,
+        arguments: {'keys': keys, 'chain': _chain},
       );
     } catch (e) {
       debugPrint("Private key processing error: $e");
@@ -136,6 +173,12 @@ class RestoreWalletOptionsPage extends StatelessWidget with StatusBarMixin {
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
+    if (_chain == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

@@ -8,6 +8,7 @@ import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -20,6 +21,8 @@ class LedgerConnectPage extends StatefulWidget {
 
 class _LedgerConnectPageState extends State<LedgerConnectPage>
     with StatusBarMixin {
+  NetworkConfigInfo? _chain;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,24 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       appState.ledgerViewController.scan();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
   }
 
   @override
@@ -104,9 +125,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
 
     if (transport != null && mounted) {
       Navigator.of(context).pushNamed(
-        '/net_setup',
+        '/add_ledger_account',
         arguments: {
-          "ledger": device,
+          'chain': _chain,
+          'ledger': device,
         },
       );
     }

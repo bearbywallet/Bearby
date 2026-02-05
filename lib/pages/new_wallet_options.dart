@@ -6,16 +6,49 @@ import 'package:zilpay/components/view_item.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class AddWalletOptionsPage extends StatelessWidget with StatusBarMixin {
+class AddWalletOptionsPage extends StatefulWidget {
   const AddWalletOptionsPage({super.key});
+
+  @override
+  State<AddWalletOptionsPage> createState() => _AddWalletOptionsPageState();
+}
+
+class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
+    with StatusBarMixin {
+  NetworkConfigInfo? _chain;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/net_setup');
+      });
+    } else {
+      setState(() {
+        _chain = chain;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
+    if (_chain == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +86,10 @@ class AddWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed('/gen_options'),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/gen_options',
+                            arguments: {'chain': _chain},
+                          ),
                         ),
                         WalletListItem(
                           title: l10n.addWalletOptionsExistingWalletTitle,
@@ -67,7 +103,10 @@ class AddWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed('/restore_options'),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/restore_options',
+                            arguments: {'chain': _chain},
+                          ),
                         ),
                         WalletListItem(
                           title: l10n.addWalletOptionsPairWithLedgerTitle,
@@ -81,7 +120,10 @@ class AddWalletOptionsPage extends StatelessWidget with StatusBarMixin {
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed('/ledger_connect'),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/ledger_connect',
+                            arguments: {'chain': _chain},
+                          ),
                         ),
                         const SizedBox(height: 24),
                         Padding(
