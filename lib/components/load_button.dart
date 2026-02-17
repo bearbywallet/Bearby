@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -97,46 +99,66 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
             setState(() {});
           });
 
-        Widget successIcon = Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: theme.success,
-            borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+        Widget successIcon = ClipRRect(
+          borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: theme.success.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              width: _bounceAnimation.value,
+              height: _bounceAnimation.value,
+              child: _bounceAnimation.value > 20
+                  ? SvgPicture.asset(
+                      widget.successIcon!,
+                      width: widget.loaderSize,
+                      height: widget.loaderSize,
+                      colorFilter: ColorFilter.mode(
+                        widget.valueColor,
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  : null,
+            ),
           ),
-          width: _bounceAnimation.value,
-          height: _bounceAnimation.value,
-          child: _bounceAnimation.value > 20
-              ? SvgPicture.asset(
-                  widget.successIcon!,
-                  width: widget.loaderSize,
-                  height: widget.loaderSize,
-                  colorFilter: ColorFilter.mode(
-                    widget.valueColor,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : null,
         );
 
-        Widget errorIcon = Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: widget.errorColor,
-            borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+        Widget errorIcon = ClipRRect(
+          borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: widget.errorColor.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              width: _bounceAnimation.value,
+              height: _bounceAnimation.value,
+              child: _bounceAnimation.value > 20
+                  ? SvgPicture.asset(
+                      widget.failedSvgAsset!,
+                      width: widget.loaderSize,
+                      height: widget.loaderSize,
+                      colorFilter: ColorFilter.mode(
+                        widget.valueColor,
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  : null,
+            ),
           ),
-          width: _bounceAnimation.value,
-          height: _bounceAnimation.value,
-          child: _bounceAnimation.value > 20
-              ? SvgPicture.asset(
-                  widget.failedSvgAsset!,
-                  width: widget.loaderSize,
-                  height: widget.loaderSize,
-                  colorFilter: ColorFilter.mode(
-                    widget.valueColor,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : null,
         );
 
         Widget loader = SizedBox(
@@ -158,19 +180,47 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           },
         );
 
-        final button = ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(_squeezeAnimation.value, widget.height),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(widget.borderRadius),
+        final button = ClipRRect(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: (widget.color ?? theme.buttonBackground)
+                    .withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (widget.color ?? theme.buttonBackground)
+                        .withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(_squeezeAnimation.value, widget.height),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(widget.borderRadius),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: theme.buttonText,
+                  elevation: 0,
+                  padding: EdgeInsets.zero,
+                  shadowColor: Colors.transparent,
+                  splashFactory: NoSplash.splashFactory,
+                  overlayColor: Colors.transparent,
+                ),
+                onPressed: widget.onPressed,
+                child: buttonContent,
+              ),
             ),
-            backgroundColor: widget.color ?? theme.buttonBackground,
-            foregroundColor: theme.buttonText,
-            elevation: 0,
-            padding: EdgeInsets.zero,
           ),
-          onPressed: widget.onPressed,
-          child: buttonContent,
         );
 
         return SizedBox(

@@ -419,6 +419,13 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
           style: theme.titleSmall.copyWith(
             color: theme.buttonText,
             fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                color: theme.background.withValues(alpha: 0.5),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
         ),
       ),
