@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -423,18 +424,29 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Widget _buildWalletHeader(AppTheme theme, AppState appState) {
-    return SizedBox(
+    return Container(
       width: _avatarSize,
       height: _avatarSize,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.background,
-          borderRadius: BorderRadius.circular(_avatarSize / 2),
+      decoration: BoxDecoration(
+        color: theme.cardBackground.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(_avatarSize / 2),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+          width: 1,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(_avatarSize / 2),
-          child: Transform.scale(
-            scale: 1.0,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_avatarSize / 2),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Center(
             child: AsyncImage(
               url: viewChain(network: appState.chain!, theme: theme.value),
               width: 32,
@@ -507,11 +519,28 @@ class _WalletPageState extends State<WalletPage> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: theme.cardBackground,
+            color: theme.cardBackground.withValues(alpha: 0.25),
             borderRadius: BorderRadius.circular(_borderRadius),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.12),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: Column(
-            children: _buildPreferenceItems(appState),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_borderRadius - 1),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Column(
+                children: _buildPreferenceItems(appState),
+              ),
+            ),
           ),
         ),
       ],
@@ -540,7 +569,7 @@ class _WalletPageState extends State<WalletPage> {
       if (items.isNotEmpty) {
         widgets.add(Divider(
           height: 1,
-          color: theme.textSecondary.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.08),
         ));
       }
     }
@@ -550,7 +579,7 @@ class _WalletPageState extends State<WalletPage> {
       if (i < items.length - 1) {
         widgets.add(Divider(
           height: 1,
-          color: theme.textSecondary.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.08),
         ));
       }
     }
@@ -566,21 +595,35 @@ class _WalletPageState extends State<WalletPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            SvgPicture.asset(
-              item.iconPath,
-              width: _iconSize,
-              height: _iconSize,
-              colorFilter: ColorFilter.mode(
-                theme.textPrimary,
-                BlendMode.srcIn,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: SvgPicture.asset(
+                item.iconPath,
+                width: _iconSize * 0.7,
+                height: _iconSize * 0.7,
+                colorFilter: ColorFilter.mode(
+                  theme.textPrimary,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 item.title,
                 style: theme.bodyLarge.copyWith(
                   color: theme.textPrimary,
+                  shadows: [
+                    Shadow(
+                      color: theme.background.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -592,10 +635,25 @@ class _WalletPageState extends State<WalletPage> {
               )
             else if (item.title ==
                 AppLocalizations.of(context)!.walletPageManageConnections)
-              Text(
-                '${appState.connections.length}',
-                style: theme.bodyLarge.copyWith(
-                  color: theme.textSecondary,
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${appState.connections.length}',
+                  style: theme.bodyLarge.copyWith(
+                    color: theme.textSecondary,
+                    shadows: [
+                      Shadow(
+                        color: theme.background.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
                 ),
               ),
           ],
@@ -605,39 +663,41 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Widget _buildRemoveWalletButton(AppState appState) {
+    final theme = appState.currentTheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () async {
         showDeleteWalletModal(context: context, state: appState);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.1),
+          color: theme.danger.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(_borderRadius),
+          border: Border.all(
+            color: theme.danger.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                AppLocalizations.of(context)!.walletPageDeleteWallet,
-                style: TextStyle(
-                  fontFamily: AppTheme.fontFamily,
-                  color: Colors.red,
-                  fontSize: _fontSize,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
             SvgPicture.asset(
               'assets/icons/logout.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
               width: _iconSize,
               height: _iconSize,
+              colorFilter: ColorFilter.mode(
+                theme.danger,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              AppLocalizations.of(context)!.walletPageDeleteWallet,
+              style: theme.bodyLarge.copyWith(
+                color: theme.danger,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -666,6 +726,13 @@ class _WalletPageState extends State<WalletPage> {
             l10n.bipPurposeSetupPageTitle,
             style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
+              shadows: [
+                Shadow(
+                  color: theme.background.withValues(alpha: 0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
           ),
         ),

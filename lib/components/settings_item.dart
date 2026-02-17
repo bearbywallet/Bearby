@@ -73,14 +73,15 @@ class _SettingsItemState extends State<SettingsItem> {
         widget.onTap();
       },
       onTapCancel: () => setState(() => _isPressed = false),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         padding: EdgeInsets.symmetric(
           horizontal: sizes.padding,
           vertical: sizes.padding * 0.8,
         ),
         decoration: BoxDecoration(
           color: _isPressed
-              ? theme.background.withValues(alpha: 1.0)
+              ? Colors.white.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: borderRadius,
         ),
@@ -92,17 +93,31 @@ class _SettingsItemState extends State<SettingsItem> {
                 style: theme.subtitle2.copyWith(
                   color: theme.textPrimary,
                   fontSize: sizes.fontSize,
+                  shadows: [
+                    Shadow(
+                      color: theme.background.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
                 ),
               ),
             ),
-            SvgPicture.asset(
-              widget.trailingSvgPath,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(10),
               ),
-              width: sizes.iconSize,
-              height: sizes.iconSize,
+              child: SvgPicture.asset(
+                widget.trailingSvgPath,
+                colorFilter: ColorFilter.mode(
+                  theme.textSecondary,
+                  BlendMode.srcIn,
+                ),
+                width: sizes.iconSize * 0.7,
+                height: sizes.iconSize * 0.7,
+              ),
             ),
           ],
         ),

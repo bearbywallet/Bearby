@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -86,9 +87,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             _buildSettingsGroup(theme, [
                               if (appState.chain?.slip44 == kZilliqaSlip44 &&
                                   appState.wallet != null &&
-                                  !appState.wallet!.walletType.contains(WalletType
-                                      .ledger
-                                      .name)) 
+                                  !appState.wallet!.walletType
+                                      .contains(WalletType.ledger.name))
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
@@ -115,7 +115,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ),
                                       Switch(
                                         padding: EdgeInsets.all(0),
-                                        value: appState.account?.addrType == kScillaAddressType,
+                                        value: appState.account?.addrType ==
+                                            kScillaAddressType,
                                         onChanged: (bool value) async {
                                           BigInt walletIndex = BigInt.from(
                                               appState.selectedWallet);
@@ -261,27 +262,44 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildSettingsGroup(AppTheme theme, List<Widget> items) {
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardBackground,
+        color: theme.cardBackground.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Column(
-        children: List.generate(items.length, (index) {
-          final item = items[index];
-          final isLast = index == items.length - 1;
-          return Column(
-            children: [
-              item,
-              if (!isLast)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Divider(
-                    height: 1,
-                    color: theme.textSecondary.withValues(alpha: 0.1),
-                  ),
-                ),
-            ],
-          );
-        }),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Column(
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              final isLast = index == items.length - 1;
+              return Column(
+                children: [
+                  item,
+                  if (!isLast)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                ],
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

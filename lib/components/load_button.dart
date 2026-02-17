@@ -106,10 +106,10 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: theme.success.withValues(alpha: 0.4),
+                color: theme.success.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withValues(alpha: 0.25),
                   width: 1,
                 ),
               ),
@@ -137,10 +137,10 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: widget.errorColor.withValues(alpha: 0.4),
+                color: widget.errorColor.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withValues(alpha: 0.25),
                   width: 1,
                 ),
               ),
@@ -180,46 +180,35 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           },
         );
 
-        final button = ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              decoration: BoxDecoration(
+        final button = Container(
+          decoration: BoxDecoration(
+            color: widget.color ?? theme.buttonBackground,
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            boxShadow: [
+              BoxShadow(
                 color: (widget.color ?? theme.buttonBackground)
                     .withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(_squeezeAnimation.value, widget.height),
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (widget.color ?? theme.buttonBackground)
-                        .withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(_squeezeAnimation.value, widget.height),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                  ),
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: theme.buttonText,
-                  elevation: 0,
-                  padding: EdgeInsets.zero,
-                  shadowColor: Colors.transparent,
-                  splashFactory: NoSplash.splashFactory,
-                  overlayColor: Colors.transparent,
-                ),
-                onPressed: widget.onPressed,
-                child: buttonContent,
-              ),
+              backgroundColor: Colors.transparent,
+              foregroundColor: theme.buttonText,
+              elevation: 0,
+              padding: EdgeInsets.zero,
+              shadowColor: Colors.transparent,
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: Colors.transparent,
             ),
+            onPressed: widget.onPressed,
+            child: buttonContent,
           ),
         );
 

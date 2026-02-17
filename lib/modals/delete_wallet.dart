@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
@@ -106,110 +107,151 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       constraints:
           BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
       decoration: BoxDecoration(
-        color: theme.cardBackground,
+        color: theme.cardBackground.withValues(alpha: 0.85),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.viewInsetsOf(context).bottom),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.deleteWalletModalTitle,
-                        style: theme.titleSmall.copyWith(
-                          color: theme.danger,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.deleteWalletModalWarning,
-                        style: theme.bodyText2.copyWith(
-                          color: theme.warning,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.deleteWalletModalSecretPhraseWarning,
-                        style: theme.labelMedium.copyWith(
-                          color: theme.danger,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      if (appState.wallet?.walletType
-                              .contains(WalletType.ledger.name) ==
-                          false)
-                        SmartInput(
-                          key: _passwordInputKey,
-                          controller: _passwordController,
-                          hint: l10n.deleteWalletModalPasswordHint,
-                          height: _inputHeight,
-                          fontSize: 18,
-                          disabled: _isDisabled,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          obscureText: _obscurePassword,
-                          rightIconPath: _obscurePassword
-                              ? "assets/icons/close_eye.svg"
-                              : "assets/icons/open_eye.svg",
-                          onRightIconTap: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
-                          onChanged: (_) => _errorMessage.isNotEmpty
-                              ? setState(() => _errorMessage = '')
-                              : null,
-                        ),
-                      if (_errorMessage.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          _errorMessage,
-                          style: theme.labelMedium.copyWith(
-                            color: theme.danger,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: RoundedLoadingButton(
-                          color: theme.danger,
-                          valueColor: theme.buttonText,
-                          onPressed: () => _handleDeleteWallet(appState),
-                          controller: _btnController,
-                          child: Text(
-                            l10n.deleteWalletModalSubmit,
-                            style: theme.titleSmall.copyWith(
-                              color: theme.buttonText,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.viewInsetsOf(context).bottom),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.deleteWalletModalTitle,
+                            style: theme.titleSmall.copyWith(
+                              color: theme.danger,
+                              shadows: [
+                                Shadow(
+                                  color:
+                                      theme.background.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.deleteWalletModalWarning,
+                            style: theme.bodyText2.copyWith(
+                              color: theme.warning,
+                              shadows: [
+                                Shadow(
+                                  color:
+                                      theme.background.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.deleteWalletModalSecretPhraseWarning,
+                            style: theme.labelMedium.copyWith(
+                              color: theme.danger,
+                              shadows: [
+                                Shadow(
+                                  color:
+                                      theme.background.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          if (appState.wallet?.walletType
+                                  .contains(WalletType.ledger.name) ==
+                              false)
+                            SmartInput(
+                              key: _passwordInputKey,
+                              controller: _passwordController,
+                              hint: l10n.deleteWalletModalPasswordHint,
+                              height: _inputHeight,
+                              fontSize: 18,
+                              disabled: _isDisabled,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              obscureText: _obscurePassword,
+                              rightIconPath: _obscurePassword
+                                  ? "assets/icons/close_eye.svg"
+                                  : "assets/icons/open_eye.svg",
+                              onRightIconTap: () => setState(
+                                  () => _obscurePassword = !_obscurePassword),
+                              onChanged: (_) => _errorMessage.isNotEmpty
+                                  ? setState(() => _errorMessage = '')
+                                  : null,
+                            ),
+                          if (_errorMessage.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              _errorMessage,
+                              style: theme.labelMedium.copyWith(
+                                color: theme.danger,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            child: RoundedLoadingButton(
+                              color: theme.danger,
+                              valueColor: Colors.white,
+                              onPressed: () => _handleDeleteWallet(appState),
+                              controller: _btnController,
+                              child: Text(
+                                l10n.deleteWalletModalSubmit,
+                                style: theme.titleSmall.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
