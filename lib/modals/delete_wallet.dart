@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -217,15 +218,12 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                                   ? setState(() => _errorMessage = '')
                                   : null,
                             ),
-                          if (_errorMessage.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              _errorMessage,
-                              style: theme.labelMedium.copyWith(
-                                color: theme.danger,
-                              ),
+                          if (_errorMessage.isNotEmpty)
+                            GlassMessage(
+                              message: _errorMessage,
+                              type: GlassMessageType.error,
+                              margin: const EdgeInsets.only(top: 8),
                             ),
-                          ],
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,

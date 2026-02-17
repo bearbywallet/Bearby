@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 
+import '../components/glass_message.dart';
 import '../components/load_button.dart';
 import '../components/smart_input.dart';
 import '../components/wallet_option.dart';
@@ -327,37 +327,10 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Widget? _buildErrorMessage(AppState theme) {
     if (_errorMessage == null) return null;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: theme.currentTheme.danger.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.currentTheme.danger.withValues(alpha: 0.2),
-              width: 1,
-            ),
-          ),
-          child: Text(
-            _errorMessage!,
-            style: theme.currentTheme.bodyText2.copyWith(
-              color: theme.currentTheme.danger,
-              shadows: [
-                Shadow(
-                  color: theme.currentTheme.background.withValues(alpha: 0.8),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return GlassMessage(
+      message: _errorMessage!,
+      type: GlassMessageType.error,
+      onDismiss: () => setState(() => _errorMessage = null),
     );
   }
 
