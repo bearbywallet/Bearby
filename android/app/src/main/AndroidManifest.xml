@@ -22,7 +22,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        android:label="ZilPay"
+        android:label="Bearby"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">

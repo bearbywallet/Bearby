@@ -1,5 +1,5 @@
 {
-  "appTitle": "ZilPay Wallet",
+  "appTitle": "Bearby Wallet",
   "@appTitle": {
     "description": "The title of the application"
   },
@@ -55,7 +55,7 @@
   "@aboutPageTitle": {
     "description": "Title for the AboutPage"
   },
-  "aboutPageAppName": "ZilPay",
+  "aboutPageAppName": "Bearby",
   "@aboutPageAppName": {
     "description": "Application name displayed in logo section on AboutPage"
   },
@@ -119,7 +119,7 @@
   "@aboutPageLicenses": {
     "description": "Text for licenses link on AboutPage"
   },
-  "aboutPageLegalese": "© 2025 ZilPay. All rights reserved.",
+  "aboutPageLegalese": "© 2025 Bearby. All rights reserved.",
   "@aboutPageLegalese": {
     "description": "Legal text for license page from AboutPage"
   },
@@ -235,7 +235,7 @@
   "@securityPageIpfsGateway": {
     "description": "Label for IPFS gateway setting on SecurityPage"
   },
-  "securityPageIpfsDescription": "ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser's address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you're using them.",
+  "securityPageIpfsDescription": "Bearby uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser's address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you're using them.",
   "@securityPageIpfsDescription": {
     "description": "Description for IPFS gateway setting on SecurityPage"
   },
@@ -251,7 +251,7 @@
   "@securityPageNodeRanking": {
     "description": "Label for node ranking setting on SecurityPage"
   },
-  "securityPageNodeDescription": "Make requests to ZilPay server for fetch best node",
+  "securityPageNodeDescription": "Make requests to Bearby server for fetch best node",
   "@securityPageNodeDescription": {
     "description": "Description for node ranking setting on SecurityPage"
   },

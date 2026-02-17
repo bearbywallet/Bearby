@@ -71,9 +71,7 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              newValue
-                  ? 'Testnet options enabled'
-                  : 'Testnet options disabled',
+              newValue ? 'Testnet options enabled' : 'Testnet options disabled',
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -152,7 +150,7 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
             ),
             child: Center(
               child: SvgPicture.asset(
-                'assets/imgs/zilpay.svg',
+                'assets/imgs/logo.svg',
                 width: 80,
                 height: 80,
               ),
@@ -273,7 +271,7 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
       applicationName: _packageInfo.appName,
       applicationVersion: _packageInfo.version,
       applicationIcon: SvgPicture.asset(
-        'assets/imgs/zilpay.svg',
+        'assets/imgs/logo.svg',
         width: 48,
         height: 48,
       ),

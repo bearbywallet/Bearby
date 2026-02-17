@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         child: Transform.scale(
           scale: 1.4,
           child: SvgPicture.asset(
-            'assets/imgs/zilpay.svg',
+            'assets/imgs/logo.svg',
             fit: BoxFit.cover,
             width: screenSize.width,
             height: screenSize.height * 0.6,
