@@ -44,17 +44,28 @@ class WalletOption extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.cardBackground.withValues(alpha: 0.7),
+          color: theme.cardBackground.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? theme.primaryPurple : Colors.transparent,
-            width: 2,
+            color: isSelected
+                ? Colors.white.withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: 0.15),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? theme.primaryPurple.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.1),
+              blurRadius: isSelected ? 16 : 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(15),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Padding(
               padding: padding!,
               child: Row(
@@ -63,7 +74,7 @@ class WalletOption extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.primaryPurple.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AsyncImage(
@@ -91,6 +102,13 @@ class WalletOption extends StatelessWidget {
                           title,
                           style: theme.titleSmall.copyWith(
                             color: theme.textPrimary,
+                            shadows: [
+                              Shadow(
+                                color: theme.background.withValues(alpha: 0.5),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -98,6 +116,13 @@ class WalletOption extends StatelessWidget {
                           address,
                           style: theme.bodyText2.copyWith(
                             color: theme.textSecondary,
+                            shadows: [
+                              Shadow(
+                                color: theme.background.withValues(alpha: 0.5),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

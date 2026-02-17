@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -216,15 +217,20 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
   Widget _buildBackground(Size screenSize) {
     return Positioned(
-      child: SizedBox(
-        height: screenSize.height * 0.6,
-        child: Transform.scale(
-          scale: 1.4,
-          child: SvgPicture.asset(
-            'assets/imgs/logo.svg',
-            fit: BoxFit.cover,
-            width: screenSize.width,
-            height: screenSize.height * 0.6,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: SizedBox(
+          height: screenSize.height * 0.6,
+          child: Transform.scale(
+            scale: 1.4,
+            child: SvgPicture.asset(
+              'assets/imgs/logo.svg',
+              fit: BoxFit.cover,
+              width: screenSize.width,
+              height: screenSize.height * 0.6,
+            ),
           ),
         ),
       ),
@@ -321,22 +327,35 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Widget? _buildErrorMessage(AppState theme) {
     if (_errorMessage == null) return null;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: theme.currentTheme.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.currentTheme.danger.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        _errorMessage!,
-        style: theme.currentTheme.bodyText2.copyWith(
-          color: theme.currentTheme.danger,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: theme.currentTheme.danger.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.currentTheme.danger.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            _errorMessage!,
+            style: theme.currentTheme.bodyText2.copyWith(
+              color: theme.currentTheme.danger,
+              shadows: [
+                Shadow(
+                  color: theme.currentTheme.background.withValues(alpha: 0.8),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
