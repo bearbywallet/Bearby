@@ -39,9 +39,13 @@ class BiometricManager(private val context: Context) {
     fun biometricType(): String {
         val biometricManager = AndroidBiometricManager.from(context)
         val strongResult = biometricManager.canAuthenticate(AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG)
-        val combinedResult = biometricManager.canAuthenticate(
-            AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG or AndroidBiometricManager.Authenticators.DEVICE_CREDENTIAL
-        )
+        val combinedResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            biometricManager.canAuthenticate(
+                AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG or AndroidBiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
+        } else {
+            AndroidBiometricManager.BIOMETRIC_ERROR_UNSUPPORTED
+        }
 
         return when (strongResult) {
             AndroidBiometricManager.BIOMETRIC_SUCCESS -> {
@@ -253,11 +257,17 @@ class BiometricManager(private val context: Context) {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Device Authentication")
             .setSubtitle("Authenticate with your device PIN, pattern, or password")
-            .setAllowedAuthenticators(
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            promptInfo.setAllowedAuthenticators(
                 AndroidBiometricManager.Authenticators.DEVICE_CREDENTIAL or
                 AndroidBiometricManager.Authenticators.BIOMETRIC_STRONG
             )
-            .build()
+        } else {
+            promptInfo.setAllowedAuthenticators(
+                AndroidBiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
+        }
 
         val biometricPrompt = BiometricPrompt(
             activity,
@@ -281,7 +291,7 @@ class BiometricManager(private val context: Context) {
         )
 
         try {
-            biometricPrompt.authenticate(promptInfo)
+            biometricPrompt.authenticate(promptInfo.build())
         } catch (e: Exception) {
             Log.e(TAG, "authenticateWithDeviceCredential() - Failed", e)
             if (!isResumed) {
