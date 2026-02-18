@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
@@ -161,7 +162,8 @@ class _ConfirmTransactionContentState
     final wallet = appState.selectedWallet >= 0
         ? appState.wallets.elementAtOrNull(appState.selectedWallet)
         : null;
-    _isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
+    _isLedgerWallet =
+        wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();
@@ -384,29 +386,13 @@ class _ConfirmTransactionContentState
                       ),
                     ],
                     if (_error != null)
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.danger.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/warning.svg',
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                  theme.danger, BlendMode.srcIn),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                                child: Text(_error!,
-                                    style: theme.bodyText2
-                                        .copyWith(color: theme.danger))),
-                          ],
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: GlassMessage(
+                          message: _error!,
+                          type: GlassMessageType.error,
+                          onDismiss: () => setState(() => _error = null),
                         ),
                       ),
                     _buildTokenLogo(appState, primaryColor),

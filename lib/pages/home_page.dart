@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/net_btn.dart';
@@ -30,44 +31,9 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with TickerProviderStateMixin, StatusBarMixin {
+class _HomePageState extends State<HomePage> with StatusBarMixin {
   String? _errorMessage;
-  late AnimationController _animationController;
-  late Animation<double> _heightAnimation;
-  late Animation<double> _opacityAnimation;
   bool _isRefreshing = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-
-    _heightAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
 
   Future<void> _refreshData(AppState appState) async {
     if (_isRefreshing) return;
@@ -79,25 +45,15 @@ class _HomePageState extends State<HomePage>
 
       if (_errorMessage != null) {
         setState(() => _errorMessage = null);
-        _animationController.reverse();
       }
     } catch (e) {
       setState(() => _errorMessage = e.toString());
-      _animationController.forward();
     }
 
     await appState.syncRates();
     await appState.syncData();
 
     _isRefreshing = false;
-  }
-
-  void _dismissError() {
-    _animationController.reverse().then((_) {
-      setState(() {
-        _errorMessage = null;
-      });
-    });
   }
 
   @override
@@ -139,54 +95,12 @@ class _HomePageState extends State<HomePage>
         ),
       if (_errorMessage != null)
         SliverToBoxAdapter(
-          child: SizeTransition(
-            axisAlignment: -1,
-            sizeFactor: _heightAnimation,
-            child: FadeTransition(
-              opacity: _opacityAnimation,
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: theme.danger,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.homePageErrorTitle,
-                              style: theme.subtitle1.copyWith(
-                                color: theme.buttonText,
-                              )),
-                          const SizedBox(height: 4),
-                          Text(
-                            _errorMessage!,
-                            style: theme.bodyLarge.copyWith(
-                              color: theme.buttonText,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: SvgPicture.asset(
-                        'assets/icons/close.svg',
-                        width: iconSizeSmall,
-                        height: iconSizeSmall,
-                        colorFilter: ColorFilter.mode(
-                          theme.buttonText,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      onPressed: _dismissError,
-                    ),
-                  ],
-                ),
-              ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: GlassMessage(
+              message: _errorMessage!,
+              type: GlassMessageType.error,
+              onDismiss: () => setState(() => _errorMessage = null),
             ),
           ),
         ),

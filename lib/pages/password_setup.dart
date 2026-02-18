@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/bip_purpose_selector.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -48,7 +49,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   bool _zilLegacy = false;
   bool _bypassChecksumValidation = false;
 
-  String _errorMessage = '';
+  String? _errorMessage;
   bool _disabled = false;
   bool _walletNameInitialized = false;
   bool _updatedArgs = false;
@@ -184,7 +185,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
   void _createWallet() async {
     setState(() {
-      _errorMessage = '';
+      _errorMessage = null;
       _disabled = true;
     });
 
@@ -397,9 +398,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             focusedBorderColor: theme.primaryPurple,
                             disabled: _disabled,
                             onChanged: (value) {
-                              if (_errorMessage != '') {
+                              if (_errorMessage != null) {
                                 setState(() {
-                                  _errorMessage = '';
+                                  _errorMessage = null;
                                 });
                               }
                             },
@@ -420,9 +421,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                                 ? "assets/icons/close_eye.svg"
                                 : "assets/icons/open_eye.svg",
                             onChanged: (value) {
-                              if (_errorMessage != '') {
+                              if (_errorMessage != null) {
                                 setState(() {
-                                  _errorMessage = '';
+                                  _errorMessage = null;
                                 });
                               }
                             },
@@ -453,20 +454,19 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               });
                             },
                             onChanged: (value) {
-                              if (_errorMessage != '') {
+                              if (_errorMessage != null) {
                                 setState(() {
-                                  _errorMessage = '';
+                                  _errorMessage = null;
                                 });
                               }
                             },
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            _errorMessage,
-                            style: theme.bodyText2.copyWith(
-                              color: theme.danger,
+                          if (_errorMessage != null)
+                            GlassMessage(
+                              message: _errorMessage!,
+                              type: GlassMessageType.error,
                             ),
-                          ),
                           if (_chain?.slip44 == kZilliqaSlip44)
                             Padding(
                               padding:
@@ -526,8 +526,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               padding: const EdgeInsets.only(top: 16),
                               child: BipPurposeSelector(
                                 selectedIndex: _selectedPurposeIndex,
-                                onSelect: (index) =>
-                                    setState(() => _selectedPurposeIndex = index),
+                                onSelect: (index) => setState(
+                                    () => _selectedPurposeIndex = index),
                                 disabled: _disabled,
                               ),
                             ),
