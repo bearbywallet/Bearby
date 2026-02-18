@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -132,38 +133,43 @@ class _SwipeButtonState extends State<SwipeButton>
                 margin: const EdgeInsets.all(4),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Container(
-                    width: _isDragging
-                        ? _dragExtent + widget.height - 8
-                        : widget.height - 8,
-                    height: widget.height - 8,
-                    decoration: BoxDecoration(
-                      color:
-                          thumbColor.withValues(alpha: _isDragging ? 0.2 : 0.1),
-                      borderRadius:
-                          BorderRadius.circular((widget.height - 8) / 2),
-                    ),
-                    child: Row(
-                      children: [
-                        if (_isDragging) Expanded(child: Container()),
-                        Container(
-                          width: widget.height - 8,
-                          height: widget.height - 8,
-                          decoration: BoxDecoration(
-                            color: thumbColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: SvgPicture.asset(
-                            "assets/icons/right_circle_arrow.svg",
-                            width: widget.height * 0.4,
-                            height: widget.height * 0.4,
-                            colorFilter: ColorFilter.mode(
-                              theme.background,
-                              BlendMode.srcIn,
-                            ),
-                          ),
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular((widget.height - 8) / 2),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        width: _isDragging
+                            ? _dragExtent + widget.height - 8
+                            : widget.height - 8,
+                        height: widget.height - 8,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular((widget.height - 8) / 2),
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            if (_isDragging) Expanded(child: Container()),
+                            Container(
+                              width: widget.height - 8,
+                              height: widget.height - 8,
+                              decoration: BoxDecoration(
+                                color: thumbColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/right_circle_arrow.svg",
+                                width: widget.height * 0.4,
+                                height: widget.height * 0.4,
+                                colorFilter: ColorFilter.mode(
+                                  theme.background,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

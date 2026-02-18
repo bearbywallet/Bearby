@@ -91,13 +91,6 @@ class GlassMessage extends StatelessWidget {
                     message,
                     style: theme.bodyText2.copyWith(
                       color: _getTextColor(theme),
-                      shadows: [
-                        Shadow(
-                          color: theme.background.withValues(alpha: 0.8),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
                     ),
                   ),
                 ),
