@@ -178,8 +178,6 @@ class _SwitchChainNetworkContentState
               Center(
                 child: SwipeButton(
                   text: l10n.switchChainNetworkContentButton,
-                  backgroundColor: theme.primaryPurple,
-                  textColor: theme.buttonText,
                   disabled: _selectedNetwork == null,
                   onSwipeComplete: () async {
                     if (_selectedNetwork != null) {

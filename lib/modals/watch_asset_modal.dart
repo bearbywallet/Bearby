@@ -348,7 +348,8 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                   const SizedBox(width: 12),
                                   Text(
                                     _ftoken?.name ?? widget.tokenName,
-                                    style: theme.bodyLarge.copyWith(color: textColor),
+                                    style: theme.bodyLarge
+                                        .copyWith(color: textColor),
                                   ),
                                 ],
                               ),
@@ -357,11 +358,13 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 children: [
                                   Text(
                                     balance,
-                                    style: theme.bodyLarge.copyWith(color: textColor),
+                                    style: theme.bodyLarge
+                                        .copyWith(color: textColor),
                                   ),
                                   Text(
                                     convertedBalance,
-                                    style: theme.bodyText2.copyWith(color: secondaryColor),
+                                    style: theme.bodyText2
+                                        .copyWith(color: secondaryColor),
                                   ),
                                 ],
                               ),
@@ -387,7 +390,8 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 const SizedBox(width: 12),
                                 Text(
                                   widget.tokenName,
-                                  style: theme.bodyLarge.copyWith(color: textColor),
+                                  style: theme.bodyLarge
+                                      .copyWith(color: textColor),
                                 ),
                               ],
                             ),
@@ -396,11 +400,13 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                               children: [
                                 Text(
                                   balance,
-                                  style: theme.bodyLarge.copyWith(color: textColor),
+                                  style: theme.bodyLarge
+                                      .copyWith(color: textColor),
                                 ),
                                 Text(
                                   convertedBalance,
-                                  style: theme.bodyText2.copyWith(color: secondaryColor),
+                                  style: theme.bodyText2
+                                      .copyWith(color: secondaryColor),
                                 ),
                               ],
                             ),
@@ -418,8 +424,6 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                         ? l10n.watchAssetModalContentLoadingButton
                         : l10n.watchAssetModalContentAddButton,
                     disabled: _isLoadingBalance || _errorMessage != null,
-                    backgroundColor: primaryColor,
-                    textColor: textColor,
                     onSwipeComplete: () async {
                       if (_ftoken != null) {
                         widget.onConfirm(_ftoken!);

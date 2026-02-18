@@ -565,8 +565,6 @@ class _ConfirmTransactionContentState
                             setState(() => _loading = false);
                           }
                         },
-                        backgroundColor: theme.primaryPurple,
-                        textColor: theme.buttonText,
                       ),
                     ),
                     SizedBox(

@@ -86,7 +86,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     final wallet = appState.selectedWallet >= 0
         ? appState.wallets.elementAtOrNull(appState.selectedWallet)
         : null;
-    _isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
+    _isLedgerWallet =
+        wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();
@@ -535,8 +536,6 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                               appState.ledgerViewController
                                       .connectedTransport ==
                                   null),
-                      backgroundColor: primaryColor,
-                      textColor: theme.buttonText,
                       onSwipeComplete: () async => _handleSignMessage(appState),
                     ),
                   ),

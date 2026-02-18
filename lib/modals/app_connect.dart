@@ -165,8 +165,6 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
             child: SwipeButton(
               text: l10n.appConnectModalContent_swipeToConnect,
               disabled: !_selectedAccounts.values.any((selected) => selected),
-              backgroundColor: primaryColor,
-              textColor: theme.buttonText,
               onSwipeComplete: () async {
                 final selectedIndices = _selectedAccounts.entries
                     .where((entry) => entry.value)

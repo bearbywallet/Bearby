@@ -289,8 +289,6 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                 const SizedBox(height: 12),
                 SwipeButton(
                   text: l10n.addChainModalContentApprove,
-                  backgroundColor: theme.primaryPurple,
-                  textColor: theme.buttonText,
                   onSwipeComplete: () async {
                     final selected = widget.chain.rpc
                         .asMap()

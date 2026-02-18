@@ -509,12 +509,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   text: l10n.chainInfoModalContentSwipeToDelete,
                   onSwipeComplete: () => _deleteProvider(appState),
-                  backgroundColor:
-                      theme.danger.withValues(alpha: canRemove ? 0.2 : 0.05),
-                  textColor:
-                      theme.danger.withValues(alpha: canRemove ? 1.0 : 0.5),
-                  secondaryColor:
-                      theme.danger.withValues(alpha: canRemove ? 1.0 : 0.5),
                   disabled: !canRemove || _isDeleting,
                 ),
               ),
