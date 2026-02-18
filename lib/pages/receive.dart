@@ -226,8 +226,11 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                   width: double.infinity,
                                   padding: EdgeInsets.all(adaptivePadding),
                                   decoration: BoxDecoration(
-                                    color: theme.cardBackground,
                                     borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: theme.modalBorder,
+                                      width: 1,
+                                    ),
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -390,8 +393,9 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           onPressed: () async {
             await handleCopy(currentAddress);
           },
-          backgroundColor: theme.cardBackground,
+          backgroundColor: Colors.transparent,
           textColor: theme.primaryPurple,
+          defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
         TileButton(
           icon: SvgPicture.asset(
@@ -402,8 +406,9 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           ),
           disabled: false,
           onPressed: _handleAmountDialog,
-          backgroundColor: theme.cardBackground,
+          backgroundColor: Colors.transparent,
           textColor: theme.primaryPurple,
+          defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
         if (account != null && chain.slip44 == kZilliqaSlip44)
           TileButton(
@@ -424,8 +429,9 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                 });
               }
             },
-            backgroundColor: theme.cardBackground,
+            backgroundColor: Colors.transparent,
             textColor: theme.primaryPurple,
+            defaultBorderSide: BorderSide(color: theme.modalBorder),
           ),
         TileButton(
           icon: SvgPicture.asset(
@@ -438,8 +444,9 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           onPressed: () async {
             await handleShare(token, currentAddress, theme, chain);
           },
-          backgroundColor: theme.cardBackground,
+          backgroundColor: Colors.transparent,
           textColor: theme.primaryPurple,
+          defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
       ],
     );
@@ -455,7 +462,11 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         final theme = Provider.of<AppState>(context).currentTheme;
 
         return AlertDialog(
-          backgroundColor: theme.cardBackground,
+          backgroundColor: theme.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: theme.modalBorder),
+          ),
           title: Text(
             l10n.receivePageAmountDialogTitle,
             style: theme.titleMedium.copyWith(

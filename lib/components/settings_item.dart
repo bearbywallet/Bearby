@@ -81,7 +81,7 @@ class _SettingsItemState extends State<SettingsItem> {
         ),
         decoration: BoxDecoration(
           color: _isPressed
-              ? Colors.white.withValues(alpha: 0.08)
+              ? theme.primaryPurple.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: borderRadius,
         ),
@@ -93,20 +93,13 @@ class _SettingsItemState extends State<SettingsItem> {
                 style: theme.subtitle2.copyWith(
                   color: theme.textPrimary,
                   fontSize: sizes.fontSize,
-                  shadows: [
-                    Shadow(
-                      color: theme.background.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
                 ),
               ),
             ),
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
+                color: theme.modalBorder,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: SvgPicture.asset(

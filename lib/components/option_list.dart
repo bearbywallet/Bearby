@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -112,82 +111,57 @@ class _OptionItemWidgetState extends State<_OptionItemWidget> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Color.lerp(
-                        widget.theme.cardBackground.withValues(alpha: 0.25),
-                        widget.theme.primaryPurple,
-                        _isHovered && !widget.disabled ? 0.05 : 0,
-                      )?.withValues(
-                          alpha: _isHovered && !widget.disabled ? 0.3 : 0.25),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Color.lerp(
-                          Colors.white.withValues(alpha: 0.12),
+                          widget.theme.modalBorder,
                           widget.disabled
                               ? widget.theme.textSecondary
                               : widget.theme.primaryPurple,
-                          _isHovered && !widget.disabled
-                              ? value * 0.5 + 0.2
-                              : value * 0.5,
+                          value,
                         )!,
                         width: 1,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: widget.option.isSelected
-                              ? widget.theme.primaryPurple
-                                  .withValues(alpha: 0.15)
-                              : Colors.black.withValues(alpha: 0.08),
-                          blurRadius: widget.option.isSelected ? 16 : 10,
-                          offset: const Offset(0, 4),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: widget.option.child,
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: widget.option.isSelected
+                                  ? widget.disabled
+                                      ? widget.theme.textSecondary
+                                      : widget.theme.primaryPurple
+                                  : widget.theme.modalBorder,
+                              width: 2,
+                            ),
+                          ),
+                          child: Center(
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 200),
+                              scale: widget.option.isSelected ? 1.0 : 0.0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: widget.disabled
+                                      ? widget.theme.textSecondary
+                                      : widget.theme.primaryPurple,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(11),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: widget.option.child,
-                            ),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.06),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: widget.option.isSelected
-                                      ? widget.disabled
-                                          ? widget.theme.textSecondary
-                                          : widget.theme.primaryPurple
-                                      : Colors.white.withValues(alpha: 0.2),
-                                  width: 2,
-                                ),
-                              ),
-                              child: Center(
-                                child: AnimatedScale(
-                                  duration: const Duration(milliseconds: 200),
-                                  scale: widget.option.isSelected ? 1.0 : 0.0,
-                                  child: Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: widget.disabled
-                                          ? widget.theme.textSecondary
-                                          : widget.theme.primaryPurple,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 );

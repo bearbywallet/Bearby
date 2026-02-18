@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -139,7 +138,7 @@ class SmartInputState extends State<SmartInput>
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: SvgPicture.asset(
@@ -174,12 +173,12 @@ class SmartInputState extends State<SmartInput>
 
     Color getBorderColor() {
       if (widget.disabled) {
-        return widget.borderColor ?? Colors.white.withValues(alpha: 0.08);
+        return widget.borderColor ?? theme.modalBorder;
       }
       if (_isFocused) {
-        return defaultFocusedBorderColor.withValues(alpha: 0.6);
+        return defaultFocusedBorderColor;
       }
-      return widget.borderColor ?? Colors.white.withValues(alpha: 0.12);
+      return widget.borderColor ?? theme.modalBorder;
     }
 
     return AnimatedBuilder(
@@ -191,108 +190,72 @@ class SmartInputState extends State<SmartInput>
             height: widget.height,
             width: widget.width,
             decoration: BoxDecoration(
-              color: widget.disabled
-                  ? effectiveBackgroundColor.withValues(alpha: 0.15)
-                  : effectiveBackgroundColor.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: getBorderColor(),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: _isFocused
-                      ? defaultFocusedBorderColor.withValues(alpha: 0.15)
-                      : Colors.black.withValues(alpha: 0.08),
-                  blurRadius: _isFocused ? 16 : 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Row(
-                  children: [
-                    if (widget.leftIconPath != null)
-                      _buildIcon(
-                            iconPath: widget.leftIconPath,
-                            color: iconColor,
-                            onTap:
-                                widget.disabled ? null : widget.onLeftIconTap,
-                          ) ??
-                          const SizedBox(),
-                    Expanded(
-                      child: Padding(
-                        padding: widget.padding ??
-                            EdgeInsets.symmetric(
-                              horizontal: widget.leftIconPath == null &&
-                                      widget.rightIconPath == null
-                                  ? 16
-                                  : 8,
-                            ),
-                        child: TextFormField(
-                          controller: widget.controller,
-                          focusNode: _focusNode,
-                          obscureText: widget.obscureText,
-                          onChanged: widget.onChanged,
-                          enabled: !widget.disabled,
-                          onFieldSubmitted: (value) {
-                            if (!widget.disabled) {
-                              widget.onSubmitted?.call(value);
-                            }
-                          },
-                          style: theme.bodyText1.copyWith(
-                            color: widget.disabled
-                                ? effectiveTextColor.withValues(alpha: 0.5)
-                                : effectiveTextColor,
-                            fontSize: widget.fontSize,
-                            shadows: [
-                              Shadow(
-                                color: theme.background.withValues(alpha: 0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: widget.hint,
-                            hintStyle: theme.bodyText1.copyWith(
-                              color: widget.disabled
-                                  ? effectiveSecondaryColor.withValues(
-                                      alpha: 0.5)
-                                  : effectiveSecondaryColor,
-                              fontSize: widget.fontSize,
-                              shadows: [
-                                Shadow(
-                                  color:
-                                      theme.background.withValues(alpha: 0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                          ),
-                          autocorrect: false,
-                          enableSuggestions: false,
-                          autofillHints: null,
-                          keyboardType: widget.keyboardType,
+            child: Row(
+              children: [
+                if (widget.leftIconPath != null)
+                  _buildIcon(
+                        iconPath: widget.leftIconPath,
+                        color: iconColor,
+                        onTap: widget.disabled ? null : widget.onLeftIconTap,
+                      ) ??
+                      const SizedBox(),
+                Expanded(
+                  child: Padding(
+                    padding: widget.padding ??
+                        EdgeInsets.symmetric(
+                          horizontal: widget.leftIconPath == null &&
+                                  widget.rightIconPath == null
+                              ? 16
+                              : 8,
+                        ),
+                    child: TextFormField(
+                      controller: widget.controller,
+                      focusNode: _focusNode,
+                      obscureText: widget.obscureText,
+                      onChanged: widget.onChanged,
+                      enabled: !widget.disabled,
+                      onFieldSubmitted: (value) {
+                        if (!widget.disabled) {
+                          widget.onSubmitted?.call(value);
+                        }
+                      },
+                      style: theme.bodyText1.copyWith(
+                        color: widget.disabled
+                            ? effectiveTextColor.withValues(alpha: 0.5)
+                            : effectiveTextColor,
+                        fontSize: widget.fontSize,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: widget.hint,
+                        hintStyle: theme.bodyText1.copyWith(
+                          color: widget.disabled
+                              ? effectiveSecondaryColor.withValues(alpha: 0.5)
+                              : effectiveSecondaryColor,
+                          fontSize: widget.fontSize,
                         ),
                       ),
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      autofillHints: null,
+                      keyboardType: widget.keyboardType,
                     ),
-                    if (widget.rightIconPath != null)
-                      _buildIcon(
-                            iconPath: widget.rightIconPath,
-                            color: iconColor,
-                            onTap:
-                                widget.disabled ? null : widget.onRightIconTap,
-                          ) ??
-                          const SizedBox(),
-                  ],
+                  ),
                 ),
-              ),
+                if (widget.rightIconPath != null)
+                  _buildIcon(
+                        iconPath: widget.rightIconPath,
+                        color: iconColor,
+                        onTap: widget.disabled ? null : widget.onRightIconTap,
+                      ) ??
+                      const SizedBox(),
+              ],
             ),
           ),
         );
