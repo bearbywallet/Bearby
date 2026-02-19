@@ -578,7 +578,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Beaby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -715,7 +715,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Beaby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -740,7 +740,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Beaby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
