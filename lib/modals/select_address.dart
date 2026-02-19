@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -26,8 +27,7 @@ void showAddressSelectModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: _AddressSelectModalContent(onAddressSelected: onAddressSelected),
     ),
   );
@@ -89,85 +89,133 @@ class _AddressSelectModalContentState
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      constraints:
-          BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(2),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                theme.cardBackground.withValues(alpha: 0.85),
+                theme.cardBackground.withValues(alpha: 0.95),
+              ],
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border(
+              top: BorderSide(
+                color: theme.primaryPurple.withValues(alpha: 0.3),
+                width: 1.5,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                l10n.addressSelectModalContentTitle,
-                style: theme.titleMedium.copyWith(color: theme.textPrimary),
+            boxShadow: [
+              BoxShadow(
+                color: theme.primaryPurple.withValues(alpha: 0.15),
+                blurRadius: 30,
+                spreadRadius: 0,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SmartInput(
-                controller: _searchController,
-                hint: l10n.addressSelectModalContentSearchHint,
-                leftIconPath: 'assets/icons/qrcode.svg',
-                onChanged: (value) async {
-                  try {
-                    bool isAddress = await isValidAddress(addr: value);
-                    if (isAddress && mounted) {
-                      QRcodeScanResultInfo params =
-                          QRcodeScanResultInfo(recipient: value);
-                      widget.onAddressSelected(
-                        params,
-                        l10n.addressSelectModalContentUnknown,
-                      );
-                    } else {
-                      setState(() => _searchQuery = value.toLowerCase());
-                    }
-                  } catch (_) {
-                    //
-                  }
-                },
-                onLeftIconTap: () => showQRScannerModal(
-                    context: context, onScanned: _parseQrcodRes),
-                borderColor: theme.textPrimary,
-                focusedBorderColor: theme.primaryPurple,
-                height: 48,
-                fontSize: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-            ),
-            if (_isLoading)
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: CircularProgressIndicator(
-                  color: theme.primaryPurple,
-                ),
-              )
-            else
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildCategoryWidgets(),
+            ],
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildHandle(theme),
+                _buildTitle(l10n, theme),
+                _buildSearchBar(l10n, theme),
+                if (_isLoading)
+                  _buildLoadingIndicator(theme)
+                else
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildCategoryWidgets(),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHandle(AppTheme theme) {
+    return Container(
+      width: 48,
+      height: 5,
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: theme.textSecondary.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
+  }
+
+  Widget _buildTitle(AppLocalizations l10n, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Text(
+        l10n.addressSelectModalContentTitle,
+        style: theme.titleMedium.copyWith(
+          color: theme.textPrimary,
+          shadows: [
+            Shadow(
+              color: theme.primaryPurple.withValues(alpha: 0.3),
+              blurRadius: 8,
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(AppLocalizations l10n, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: SmartInput(
+        controller: _searchController,
+        hint: l10n.addressSelectModalContentSearchHint,
+        leftIconPath: 'assets/icons/qrcode.svg',
+        onChanged: (value) async {
+          try {
+            bool isAddress = await isValidAddress(addr: value);
+            if (isAddress && mounted) {
+              QRcodeScanResultInfo params =
+                  QRcodeScanResultInfo(recipient: value);
+              widget.onAddressSelected(
+                params,
+                l10n.addressSelectModalContentUnknown,
+              );
+            } else {
+              setState(() => _searchQuery = value.toLowerCase());
+            }
+          } catch (_) {}
+        },
+        onLeftIconTap: () =>
+            showQRScannerModal(context: context, onScanned: _parseQrcodRes),
+        borderColor: theme.textPrimary,
+        focusedBorderColor: theme.primaryPurple,
+        height: 48,
+        fontSize: 16,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator(AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: CircularProgressIndicator(
+        color: theme.primaryPurple,
       ),
     );
   }
@@ -176,7 +224,6 @@ class _AddressSelectModalContentState
     return _categories.map((category) {
       final filteredEntries = _getFilteredEntries(category.entries);
       if (filteredEntries.isEmpty) return const SizedBox.shrink();
-
       return _buildCategorySection(category.name, filteredEntries);
     }).toList();
   }
@@ -185,7 +232,6 @@ class _AddressSelectModalContentState
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
-
     final categoryInfo = _getCategoryInfo(categoryName, l10n);
 
     return Padding(
@@ -193,29 +239,7 @@ class _AddressSelectModalContentState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              if (categoryInfo.iconPath != null) ...[
-                SvgPicture.asset(
-                  categoryInfo.iconPath!,
-                  width: 16,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Text(
-                categoryInfo.displayName,
-                style: theme.bodyText2.copyWith(
-                  color: theme.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+          _buildCategoryHeader(categoryInfo, theme),
           const SizedBox(height: 8),
           ...List.generate(entries.length, (index) {
             final entry = entries[index];
@@ -223,12 +247,7 @@ class _AddressSelectModalContentState
               children: [
                 _buildAddressItem(appState, entry),
                 if (index < entries.length - 1)
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: theme.textSecondary.withValues(alpha: 0.1),
-                    endIndent: 16,
-                  ),
+                  _buildDivider(theme),
               ],
             );
           }),
@@ -237,10 +256,51 @@ class _AddressSelectModalContentState
     );
   }
 
+  Widget _buildCategoryHeader(
+      CategoryInfo categoryInfo, AppTheme theme) {
+    return Row(
+      children: [
+        if (categoryInfo.iconPath != null) ...[
+          SvgPicture.asset(
+            categoryInfo.iconPath!,
+            width: 16,
+            height: 16,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple.withValues(alpha: 0.7),
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+        Text(
+          categoryInfo.displayName,
+          style: theme.bodyText2.copyWith(
+            color: theme.textPrimary,
+            fontWeight: FontWeight.w600,
+            shadows: [
+              Shadow(
+                color: theme.primaryPurple.withValues(alpha: 0.2),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDivider(AppTheme theme) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: theme.primaryPurple.withValues(alpha: 0.15),
+      endIndent: 16,
+    );
+  }
+
   Widget _buildAddressItem(AppState appState, Entry entry) {
     final l10n = AppLocalizations.of(context)!;
     final theme = appState.currentTheme;
-
     final currentAccount = appState.wallet?.selectedAccount.toInt() ?? 0;
     final currentAccountData = currentAccount >= 0
         ? appState.wallet?.accounts.elementAtOrNull(currentAccount)
@@ -255,53 +315,19 @@ class _AddressSelectModalContentState
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: [
+              theme.primaryPurple.withValues(alpha: 0.03),
+              Colors.transparent,
+            ],
+          ),
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: Stack(
-                children: [
-                  ClipOval(
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: _getAvatarWidget(entry, theme),
-                    ),
-                  ),
-                  if (_shouldShowNetworkIcon(appState, entry))
-                    Positioned(
-                      right: -2,
-                      bottom: -2,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: theme.background,
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: theme.cardBackground, width: 1),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(2),
-                          child: Center(
-                            child: SvgPicture.asset(
-                              _getNetworkIconPath(entry),
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.textSecondary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+            _buildAvatarWithNetworkIcon(appState, entry, theme),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -329,12 +355,74 @@ class _AddressSelectModalContentState
                   const SizedBox(height: 4),
                   Text(
                     shortenAddress(entry.address),
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                    style: theme.bodyText2.copyWith(
+                      color: theme.textSecondary.withValues(alpha: 0.8),
+                    ),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarWithNetworkIcon(
+      AppState appState, Entry entry, AppTheme theme) {
+    return SizedBox(
+      width: 40,
+      height: 40,
+      child: Stack(
+        children: [
+          ClipOval(
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              child: _getAvatarWidget(entry, theme),
+            ),
+          ),
+          if (_shouldShowNetworkIcon(appState, entry))
+            _buildNetworkIconBadge(entry, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNetworkIconBadge(Entry entry, AppTheme theme) {
+    return Positioned(
+      right: -2,
+      bottom: -2,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          color: theme.cardBackground,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: theme.primaryPurple.withValues(alpha: 0.5),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: theme.primaryPurple.withValues(alpha: 0.3),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Center(
+            child: SvgPicture.asset(
+              _getNetworkIconPath(entry),
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                theme.primaryPurple.withValues(alpha: 0.8),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -389,8 +477,17 @@ class _AddressSelectModalContentState
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(4),
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.25),
+            color.withValues(alpha: 0.15),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
       ),
       child: Text(
         text,
