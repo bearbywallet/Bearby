@@ -1,18 +1,19 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/detail_group_card.dart';
 import 'package:zilpay/components/detail_item_group_card.dart';
-import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/modal_drag_handle.dart';
 import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/web3/eip_1193.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 void showChainInfoModal({
@@ -61,40 +62,25 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   void initState() {
     super.initState();
     _config = widget.networkConfig;
-    _checkRpcStatus();
   }
 
-  void _checkRpcStatus() async {}
-
   bool _canRemove(AppState appState) {
-    for (int i = 0; i < appState.wallets.length; i++) {
-      final wallet = appState.wallets[i];
-
-      if (wallet.defaultChainHash == _config.chainHash) {
-        return false;
-      }
-
-      for (int j = 0; j < wallet.accounts.length; j++) {
-        final account = wallet.accounts[j];
-
-        if (account.chainHash == _config.chainHash) {
-          return false;
-        }
+    for (final wallet in appState.wallets) {
+      if (wallet.defaultChainHash == _config.chainHash) return false;
+      for (final account in wallet.accounts) {
+        if (account.chainHash == _config.chainHash) return false;
       }
     }
     return true;
   }
 
-  void _removeRpc(String rpc) async {
-    if (_config.rpc.length > 5) {
-      setState(() {
-        _config.rpc.remove(rpc);
-      });
-      await createOrUpdateChain(providerConfig: _config);
-    }
+  Future<void> _removeRpc(String rpc) async {
+    if (_config.rpc.length <= 5) return;
+    setState(() => _config.rpc.remove(rpc));
+    await createOrUpdateChain(providerConfig: _config);
   }
 
-  void _selectRpc(int index) async {
+  Future<void> _selectRpc(int index) async {
     setState(() {
       final selectedRpc = _config.rpc.removeAt(index);
       _config.rpc.insert(0, selectedRpc);
@@ -111,7 +97,8 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     });
 
     final hash = _config.chainHash;
-    int index = appState.state.providers.indexWhere((p) => p.chainHash == hash);
+    final index =
+        appState.state.providers.indexWhere((p) => p.chainHash == hash);
 
     if (index == -1) {
       setState(() {
@@ -124,7 +111,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     try {
       await removeProvider(providerIndex: index);
       await appState.syncData();
-
       if (mounted) {
         if (widget.onRemoved != null) {
           widget.onRemoved!();
@@ -141,9 +127,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
       }
     } finally {
       if (mounted && _isDeleting) {
-        setState(() {
-          _isDeleting = false;
-        });
+        setState(() => _isDeleting = false);
       }
     }
   }
@@ -152,7 +136,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 12);
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -160,84 +143,122 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
+        color: theme.cardBackground.withValues(alpha: 0.85),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.12), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: Offset(0, -2),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildModalHeader(theme, adaptivePadding, _config.chain),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding,
-                  vertical: adaptivePadding / 2,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ModalDragHandle(theme: theme),
+              if (_config.chain.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    _config.chain,
+                    style: theme.titleMedium.copyWith(color: theme.textPrimary),
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    if (_config.ftokens.isNotEmpty)
-                      _buildTokenSection(appState, theme, l10n),
-                    const SizedBox(height: 12),
-                    _buildNetworkInfoSection(theme, l10n),
-                    const SizedBox(height: 12),
-                    _buildExplorersSection(theme, l10n),
-                    const SizedBox(height: 12),
-                    _buildRpcNodesSection(theme, l10n),
-                    const SizedBox(height: 12),
-                    _buildDeleteProviderSection(appState, l10n),
-                  ],
+              const SizedBox(height: 8),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    children: [
+                      if (_config.ftokens.isNotEmpty)
+                        _TokenSection(
+                            config: _config, theme: theme, l10n: l10n),
+                      if (_config.ftokens.isNotEmpty)
+                        const SizedBox(height: 12),
+                      _NetworkInfoSection(
+                          config: _config,
+                          theme: theme,
+                          l10n: l10n,
+                          onFallbackChanged: (value) async {
+                            setState(() {
+                              _config = NetworkConfigInfo(
+                                name: _config.name,
+                                logo: _config.logo,
+                                chain: _config.chain,
+                                shortName: _config.shortName,
+                                rpc: _config.rpc,
+                                features: _config.features,
+                                chainId: _config.chainId,
+                                chainIds: _config.chainIds,
+                                slip44: _config.slip44,
+                                diffBlockTime: _config.diffBlockTime,
+                                chainHash: _config.chainHash,
+                                ens: _config.ens,
+                                explorers: _config.explorers,
+                                fallbackEnabled: value,
+                                testnet: _config.testnet,
+                                ftokens: _config.ftokens,
+                              );
+                            });
+                            await createOrUpdateChain(providerConfig: _config);
+                          }),
+                      const SizedBox(height: 12),
+                      _ExplorersSection(
+                          config: _config, theme: theme, l10n: l10n),
+                      const SizedBox(height: 12),
+                      _RpcSection(
+                        config: _config,
+                        theme: theme,
+                        l10n: l10n,
+                        onSelect: _selectRpc,
+                        onRemove: _removeRpc,
+                      ),
+                      const SizedBox(height: 12),
+                      _DeleteSection(
+                        appState: appState,
+                        theme: theme,
+                        l10n: l10n,
+                        canRemove: _canRemove(appState),
+                        isDeleting: _isDeleting,
+                        errorText: _errorText,
+                        onDelete: () => _deleteProvider(appState),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+            ],
           ),
-          SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
-        ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildModalHeader(AppTheme theme, double padding, String title) {
-    return Column(
-      children: [
-        Container(
-          width: 32,
-          height: 4,
-          margin: EdgeInsets.symmetric(vertical: padding),
-          decoration: BoxDecoration(
-            color: theme.modalBorder,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        if (title.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Text(
-              title,
-              style: theme.titleMedium.copyWith(color: theme.textPrimary),
-            ),
-          ),
-        SizedBox(height: padding),
-      ],
-    );
-  }
+class _TokenSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
 
-  Widget _buildTokenSection(
-      AppState appState, AppTheme theme, AppLocalizations l10n) {
-    if (_config.ftokens.isEmpty) {
-      return const SizedBox.shrink();
-    }
+  const _TokenSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+  });
 
-    final token = _config.ftokens.first;
+  @override
+  Widget build(BuildContext context) {
+    final token = config.ftokens.first;
 
     return DetailGroupCard(
       title: l10n.chainInfoModalContentTokenTitle,
@@ -251,10 +272,9 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                 ClipOval(
                   child: AsyncImage(
                     url: processTokenLogo(
-                      token: token,
-                      shortName: widget.networkConfig.shortName,
-                      theme: theme.value,
-                    ),
+                        token: token,
+                        shortName: config.shortName,
+                        theme: theme.value),
                     width: 40,
                     height: 40,
                     fit: BoxFit.cover,
@@ -266,32 +286,25 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                           ColorFilter.mode(theme.warning, BlendMode.srcIn),
                     ),
                     loadingWidget: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.primaryPurple,
-                    ),
+                        strokeWidth: 2, color: theme.primaryPurple),
                   ),
                 ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(token.name,
+                        style:
+                            theme.labelLarge.copyWith(color: theme.textPrimary),
+                        overflow: TextOverflow.ellipsis),
+                    Text(token.symbol,
+                        style: theme.bodyText2
+                            .copyWith(color: theme.textSecondary)),
                     Text(
-                      token.name,
-                      style:
-                          theme.labelLarge.copyWith(color: theme.textPrimary),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      token.symbol,
-                      style:
-                          theme.bodyText2.copyWith(color: theme.textSecondary),
-                    ),
-                    Text(
-                      '${l10n.chainInfoModalContentDecimalsLabel} ${token.decimals}',
-                      style:
-                          theme.labelSmall.copyWith(color: theme.textSecondary),
-                    ),
+                        '${l10n.chainInfoModalContentDecimalsLabel} ${token.decimals}',
+                        style: theme.labelSmall
+                            .copyWith(color: theme.textSecondary)),
                   ],
                 ),
               ),
@@ -301,86 +314,98 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
       ],
     );
   }
+}
 
-  Widget _buildNetworkInfoSection(AppTheme theme, AppLocalizations l10n) {
-    final chainIds = _config.chainIds.map((id) => id.toString()).join(', ');
+class _NetworkInfoSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+  final void Function(bool value) onFallbackChanged;
 
+  const _NetworkInfoSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+    required this.onFallbackChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return DetailGroupCard(
       title: l10n.chainInfoModalContentNetworkInfoTitle,
       theme: theme,
       children: [
         DetailItem(
-          label: l10n.chainInfoModalContentChainLabel,
-          value: _config.chain,
-          theme: theme,
-        ),
+            label: l10n.chainInfoModalContentChainLabel,
+            value: config.chain,
+            theme: theme),
         DetailItem(
-          label: l10n.chainInfoModalContentShortNameLabel,
-          value: _config.shortName,
-          theme: theme,
-        ),
+            label: l10n.chainInfoModalContentShortNameLabel,
+            value: config.shortName,
+            theme: theme),
         DetailItem(
-          label: l10n.chainInfoModalContentChainIdLabel,
-          value: _config.chainId.toString(),
-          theme: theme,
-        ),
+            label: l10n.chainInfoModalContentChainIdLabel,
+            value: config.chainId.toString(),
+            theme: theme),
         DetailItem(
-          label: l10n.chainInfoModalContentSlip44Label,
-          value: _config.slip44.toString(),
-          theme: theme,
-        ),
+            label: l10n.chainInfoModalContentSlip44Label,
+            value: config.slip44.toString(),
+            theme: theme),
         DetailItem(
-          label: l10n.chainInfoModalContentChainIdsLabel,
-          value: chainIds,
-          theme: theme,
-        ),
-        if (_config.testnet != null)
+            label: l10n.chainInfoModalContentChainIdsLabel,
+            value: config.chainIds.map((id) => id.toString()).join(', '),
+            theme: theme),
+        if (config.testnet != null)
           DetailItem(
             label: l10n.chainInfoModalContentTestnetLabel,
-            value: _config.testnet!
+            value: config.testnet!
                 ? l10n.chainInfoModalContentYes
                 : l10n.chainInfoModalContentNo,
             theme: theme,
           ),
-        if (_config.diffBlockTime != BigInt.zero)
+        if (config.diffBlockTime != BigInt.zero)
           DetailItem(
-            label: l10n.chainInfoModalContentDiffBlockTimeLabel,
-            value: _config.diffBlockTime.toString(),
-            theme: theme,
-          ),
+              label: l10n.chainInfoModalContentDiffBlockTimeLabel,
+              value: config.diffBlockTime.toString(),
+              theme: theme),
         DetailItem(
           label: l10n.chainInfoModalContentFallbackEnabledLabel,
-          valueWidget: Switch(
-            value: _config.fallbackEnabled,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onChanged: (value) async {
-              setState(() {
-                _config = _config.copyWith(fallbackEnabled: value);
-              });
-              await createOrUpdateChain(providerConfig: _config);
-            },
-            activeThumbColor: theme.primaryPurple,
-          ),
           theme: theme,
+          valueWidget: Switch(
+            value: config.fallbackEnabled,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            activeThumbColor: theme.primaryPurple,
+            onChanged: onFallbackChanged,
+          ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildExplorersSection(AppTheme theme, AppLocalizations l10n) {
+class _ExplorersSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+
+  const _ExplorersSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return DetailGroupCard(
       title: l10n.chainInfoModalContentExplorersTitle,
       theme: theme,
-      children: _config.explorers.map((explorer) {
+      children: config.explorers.map((explorer) {
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6),
+          margin: const EdgeInsets.symmetric(vertical: 4),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            border: Border.all(
-              color: theme.textSecondary.withValues(alpha: 0.2),
-            ),
+            border: Border.all(color: theme.modalBorder.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(8),
-            color: Colors.transparent,
           ),
           child: Row(
             children: [
@@ -400,25 +425,19 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   loadingWidget: CircularProgressIndicator(
                       strokeWidth: 2, color: theme.primaryPurple),
                 ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      explorer.name,
-                      style: theme.labelSmall.copyWith(
-                        color: theme.textPrimary,
-                        fontWeight: FontWeight.normal,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      explorer.url,
-                      style:
-                          theme.overline.copyWith(color: theme.textSecondary),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(explorer.name,
+                        style:
+                            theme.labelSmall.copyWith(color: theme.textPrimary),
+                        overflow: TextOverflow.ellipsis),
+                    Text(explorer.url,
+                        style:
+                            theme.overline.copyWith(color: theme.textSecondary),
+                        overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -428,25 +447,42 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
       }).toList(),
     );
   }
+}
 
-  Widget _buildRpcNodesSection(AppTheme theme, AppLocalizations l10n) {
+class _RpcSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+  final Future<void> Function(int index) onSelect;
+  final Future<void> Function(String rpc) onRemove;
+
+  const _RpcSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+    required this.onSelect,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return DetailGroupCard(
       title: l10n.chainInfoModalContentRpcNodesTitle,
       theme: theme,
       children: [
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
-          itemCount: _config.rpc.length,
+          itemCount: config.rpc.length,
           itemBuilder: (context, index) {
-            final rpc = _config.rpc[index];
+            final rpc = config.rpc[index];
             final isSelected = index == 0;
-            final canDelete = _config.rpc.length > 5;
+            final canDelete = config.rpc.length > 5;
 
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => _selectRpc(index),
+              onTap: () => onSelect(index),
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 3),
                 padding: const EdgeInsets.all(10),
@@ -454,20 +490,19 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   border: Border.all(
                       color: isSelected
                           ? theme.primaryPurple
-                          : theme.textSecondary.withValues(alpha: 0.2)),
+                          : theme.modalBorder.withValues(alpha: 0.3)),
                   borderRadius: BorderRadius.circular(8),
                   color: isSelected
                       ? theme.primaryPurple.withValues(alpha: 0.1)
-                      : theme.background.withValues(alpha: 0.5),
+                      : Colors.transparent,
                 ),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         rpc,
-                        style: TextStyle(
+                        style: theme.bodyText2.copyWith(
                           color: theme.textPrimary,
-                          fontSize: 12,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -480,7 +515,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                         width: 20,
                         height: 20,
                         color: theme.danger,
-                        onTap: () => _removeRpc(rpc),
+                        onTap: () => onRemove(rpc),
                       ),
                   ],
                 ),
@@ -491,39 +526,50 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
       ],
     );
   }
+}
 
-  Widget _buildDeleteProviderSection(AppState appState, AppLocalizations l10n) {
-    final theme = appState.currentTheme;
-    final canRemove = _canRemove(appState);
+class _DeleteSection extends StatelessWidget {
+  final AppState appState;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+  final bool canRemove;
+  final bool isDeleting;
+  final String? errorText;
+  final Future<void> Function() onDelete;
 
+  const _DeleteSection({
+    required this.appState,
+    required this.theme,
+    required this.l10n,
+    required this.canRemove,
+    required this.isDeleting,
+    required this.errorText,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return DetailGroupCard(
       title: l10n.chainInfoModalContentDeleteProviderTitle,
       theme: theme,
       children: [
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Center(
-                child: SwipeButton(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  text: l10n.chainInfoModalContentSwipeToDelete,
-                  onSwipeComplete: () => _deleteProvider(appState),
-                  disabled: !canRemove || _isDeleting,
-                ),
-              ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Center(
+            child: SwipeButton(
+              width: MediaQuery.of(context).size.width * 0.8,
+              text: l10n.chainInfoModalContentSwipeToDelete,
+              onSwipeComplete: onDelete,
+              disabled: !canRemove || isDeleting,
             ),
-            if (_errorText != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  _errorText!,
-                  style: theme.labelSmall.copyWith(color: theme.danger),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-          ],
+          ),
         ),
+        if (errorText != null)
+          GlassMessage(
+            message: errorText!,
+            type: GlassMessageType.error,
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+          ),
       ],
     );
   }
