@@ -64,9 +64,12 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title: l10n.addWalletOptionsTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: l10n.addWalletOptionsTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: Padding(
@@ -130,7 +133,8 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
                           padding: const EdgeInsets.only(left: 16),
                           child: Text(
                             l10n.addWalletOptionsOtherOptions,
-                            style: theme.caption.copyWith(color: theme.textSecondary),
+                            style: theme.caption
+                                .copyWith(color: theme.textSecondary),
                           ),
                         ),
                         const SizedBox(height: 16),

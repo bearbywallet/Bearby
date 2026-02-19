@@ -64,9 +64,12 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title: l10n.genWalletOptionsTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: l10n.genWalletOptionsTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: Padding(
