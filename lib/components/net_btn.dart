@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -42,45 +43,52 @@ class NetworkDownButtonState extends State<NetworkDownButton>
 
     return buildPressable(
       onTap: widget.onPressed,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.cardBackground,
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: theme.textSecondary.withValues(alpha: 0.4)),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AsyncImage(
-              url: viewChain(network: widget.chain, theme: theme.value),
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-              loadingWidget: const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardBackground.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.textSecondary.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AsyncImage(
+                  url: viewChain(network: widget.chain, theme: theme.value),
+                  width: 22,
+                  height: 22,
+                  fit: BoxFit.contain,
+                  loadingWidget: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
-              ),
+                if (widget.chain.testnet == true) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    'testnet',
+                    style: theme.labelSmall.copyWith(color: theme.warning),
+                  ),
+                ],
+                const SizedBox(width: 6),
+                SvgPicture.asset(
+                  "assets/icons/tiny_down_arrow.svg",
+                  width: 10,
+                  height: 10,
+                  colorFilter: ColorFilter.mode(
+                    theme.textSecondary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ],
             ),
-            if (widget.chain.testnet == true) ...[
-              const SizedBox(width: 8),
-              Text(
-                'testnet',
-                style: TextStyle(color: theme.warning),
-              ),
-            ],
-            const SizedBox(width: 8),
-            SvgPicture.asset(
-              "assets/icons/tiny_down_arrow.svg",
-              width: 8,
-              height: 8,
-              colorFilter: ColorFilter.mode(
-                theme.textPrimary.withValues(alpha: 0.6),
-                BlendMode.srcIn,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
