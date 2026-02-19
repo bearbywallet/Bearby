@@ -1,5 +1,5 @@
 name: zilpay
-description: "ZilPay wallet IOS, Android, Mac, Linux, Windows"
+description: "Bearby wallet IOS, Android, Mac, Linux, Windows"
 version: 3.8.27+916
 
 environment:
@@ -32,6 +32,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
   integration_test:
     sdk: flutter
 
@@ -54,3 +55,9 @@ flutter:
           weight: 600                        
         - asset: assets/fonts/Ultralight.ttf
           weight: 300    
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/icon_foreground.png"
+  adaptive_icon_background: "#0D0D1A"
+  adaptive_icon_foreground: "assets/icon_foreground.png"
