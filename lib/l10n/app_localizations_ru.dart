@@ -9,7 +9,7 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get appTitle => 'ZilPay Кошелек';
+  String get appTitle => 'Bearby Кошелек';
 
   @override
   String get initialPagerestoreZilPay => 'Восстановить ZilPay 1.0!';
@@ -51,7 +51,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutPageTitle => 'О приложении';
 
   @override
-  String get aboutPageAppName => 'ZilPay';
+  String get aboutPageAppName => 'Bearby';
 
   @override
   String get aboutPageAppDescription => 'Ваш безопасный блокчейн-кошелек';
@@ -99,7 +99,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutPageLicenses => 'Лицензии';
 
   @override
-  String get aboutPageLegalese => '© 2025 ZilPay. Все права защищены.';
+  String get aboutPageLegalese => '© 2025 Bearby. Все права защищены.';
 
   @override
   String get languagePageTitle => 'Язык';
@@ -185,7 +185,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFS шлюз';
 
   @override
-  String get securityPageIpfsDescription => 'ZIlPay использует сторонние сервисы для отображения изображений ваших NFT, хранящихся в IPFS, информации, связанной с ENS(ZNS) адресами в адресной строке браузера, и получения иконок для различных токенов. Ваш IP-адрес может быть раскрыт этим сервисам при их использовании.';
+  String get securityPageIpfsDescription => 'Bearby использует сторонние сервисы для отображения изображений ваших NFT, хранящихся в IPFS, информации, связанной с ENS(ZNS) адресами в адресной строке браузера, и получения иконок для различных токенов. Ваш IP-адрес может быть раскрыт этим сервисам при их использовании.';
 
   @override
   String get securityPageTokensFetcherTitle => 'Получатель токенов';
@@ -197,31 +197,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityPageNodeRanking => 'Ранжирование узлов';
 
   @override
-  String get securityPageNodeDescription => 'Отправлять запросы на сервер ZilPay для получения лучшего узла';
-
-  @override
-  String get securityPageEncryptionLevel => 'Уровень шифрования';
-
-  @override
-  String get securityPageProtection => 'Защита';
-
-  @override
-  String get securityPageCpuLoad => 'Нагрузка ЦП';
-
-  @override
-  String get securityPageAes256 => 'AES256';
-
-  @override
-  String get securityPageKuznechikGost => 'КУЗНЕЧИК-ГОСТ';
-
-  @override
-  String get securityPageNtruPrime => 'NTRUPrime';
-
-  @override
-  String get securityPageCyber => 'Cyber';
-
-  @override
-  String get securityPageUnknown => 'Неизвестно';
+  String get securityPageNodeDescription => 'Отправлять запросы на сервер Bearby для получения лучшего узла';
 
   @override
   String get securityPageClearData => 'Очистить данные';

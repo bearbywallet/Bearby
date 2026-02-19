@@ -9,7 +9,7 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get appTitle => 'ZilPay 钱包';
+  String get appTitle => 'Bearby 钱包';
 
   @override
   String get initialPagerestoreZilPay => '恢复 ZilPay 1.0！';
@@ -51,7 +51,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutPageTitle => '关于';
 
   @override
-  String get aboutPageAppName => 'ZilPay';
+  String get aboutPageAppName => 'Bearby';
 
   @override
   String get aboutPageAppDescription => '您的安全区块链钱包';
@@ -99,7 +99,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutPageLicenses => '许可证';
 
   @override
-  String get aboutPageLegalese => '© 2025 ZilPay。保留所有权利。';
+  String get aboutPageLegalese => '© 2025 Bearby。保留所有权利。';
 
   @override
   String get languagePageTitle => '语言';
@@ -185,7 +185,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFS 网关';
 
   @override
-  String get securityPageIpfsDescription => 'ZIlPay 使用第三方服务来显示存储在 IPFS 上的 NFT 图像，显示与浏览器地址栏中输入的 ENS（ZNS）地址相关的信息，以及获取不同代币的图标。当您使用这些服务时，您的 IP 地址可能会暴露给这些服务。';
+  String get securityPageIpfsDescription => 'Bearby 使用第三方服务来显示存储在 IPFS 上的 NFT 图像，显示与浏览器地址栏中输入的 ENS（ZNS）地址相关的信息，以及获取不同代币的图标。当您使用这些服务时，您的 IP 地址可能会暴露给这些服务。';
 
   @override
   String get securityPageTokensFetcherTitle => '令牌获取器';
@@ -197,31 +197,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageNodeRanking => '节点排名';
 
   @override
-  String get securityPageNodeDescription => '向 ZilPay 服务器发出请求以获取最佳节点';
-
-  @override
-  String get securityPageEncryptionLevel => '加密级别';
-
-  @override
-  String get securityPageProtection => '保护';
-
-  @override
-  String get securityPageCpuLoad => 'CPU 负载';
-
-  @override
-  String get securityPageAes256 => 'AES256';
-
-  @override
-  String get securityPageKuznechikGost => 'KUZNECHIK-GOST';
-
-  @override
-  String get securityPageNtruPrime => 'NTRUPrime';
-
-  @override
-  String get securityPageCyber => 'Cyber';
-
-  @override
-  String get securityPageUnknown => '未知';
+  String get securityPageNodeDescription => '向 Bearby 服务器发出请求以获取最佳节点';
 
   @override
   String get securityPageClearData => '清除数据';

@@ -9,7 +9,7 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get appTitle => 'ZilPay 지갑';
+  String get appTitle => 'Bearby 지갑';
 
   @override
   String get initialPagerestoreZilPay => 'ZilPay 1.0 복원!';
@@ -51,7 +51,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutPageTitle => '정보';
 
   @override
-  String get aboutPageAppName => 'ZilPay';
+  String get aboutPageAppName => 'Bearby';
 
   @override
   String get aboutPageAppDescription => '안전한 블록체인 지갑';
@@ -99,7 +99,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutPageLicenses => '라이선스';
 
   @override
-  String get aboutPageLegalese => '© 2025 ZilPay. 모든 권리 보유.';
+  String get aboutPageLegalese => '© 2025 Bearby. 모든 권리 보유.';
 
   @override
   String get languagePageTitle => '언어';
@@ -185,7 +185,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFS 게이트웨이';
 
   @override
-  String get securityPageIpfsDescription => 'ZIlPay는 타사 서비스를 사용하여 IPFS에 저장된 NFT 이미지를 표시하고, 브라우저 주소 표시줄에 입력된 ENS(ZNS) 주소 관련 정보를 표시하며, 다양한 토큰 아이콘을 가져옵니다. 이를 사용할 때 IP 주소가 노출될 수 있습니다.';
+  String get securityPageIpfsDescription => 'Bearby는 타사 서비스를 사용하여 IPFS에 저장된 NFT 이미지를 표시하고, 브라우저 주소 표시줄에 입력된 ENS(ZNS) 주소 관련 정보를 표시하며, 다양한 토큰 아이콘을 가져옵니다. 이를 사용할 때 IP 주소가 노출될 수 있습니다.';
 
   @override
   String get securityPageTokensFetcherTitle => '토큰 가져오기';
@@ -197,31 +197,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityPageNodeRanking => '노드 랭킹';
 
   @override
-  String get securityPageNodeDescription => '최적 노드를 가져오기 위해 ZilPay 서버에 요청';
-
-  @override
-  String get securityPageEncryptionLevel => '암호화 수준';
-
-  @override
-  String get securityPageProtection => '보호';
-
-  @override
-  String get securityPageCpuLoad => 'CPU 부하';
-
-  @override
-  String get securityPageAes256 => 'AES256';
-
-  @override
-  String get securityPageKuznechikGost => 'KUZNECHIK-GOST';
-
-  @override
-  String get securityPageNtruPrime => 'NTRUPrime';
-
-  @override
-  String get securityPageCyber => 'Cyber';
-
-  @override
-  String get securityPageUnknown => '알 수 없음';
+  String get securityPageNodeDescription => '최적 노드를 가져오기 위해 Bearby 서버에 요청';
 
   @override
   String get securityPageClearData => '데이터 지우기';

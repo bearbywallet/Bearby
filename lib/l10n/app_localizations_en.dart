@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'ZilPay Wallet';
+  String get appTitle => 'Bearby Wallet';
 
   @override
   String get initialPagerestoreZilPay => 'Restore ZilPay 1.0!';
@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutPageTitle => 'About';
 
   @override
-  String get aboutPageAppName => 'ZilPay';
+  String get aboutPageAppName => 'Bearby';
 
   @override
   String get aboutPageAppDescription => 'Your Secure Blockchain Wallet';
@@ -99,7 +99,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutPageLicenses => 'Licenses';
 
   @override
-  String get aboutPageLegalese => '© 2025 ZilPay. All rights reserved.';
+  String get aboutPageLegalese => '© 2025 Bearby. All rights reserved.';
 
   @override
   String get languagePageTitle => 'Language';
@@ -185,7 +185,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFS gateway';
 
   @override
-  String get securityPageIpfsDescription => 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.';
+  String get securityPageIpfsDescription => 'Bearby uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.';
 
   @override
   String get securityPageTokensFetcherTitle => 'Tokens fetcher';
@@ -197,31 +197,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageNodeRanking => 'Node ranking';
 
   @override
-  String get securityPageNodeDescription => 'Make requests to ZilPay server for fetch best node';
-
-  @override
-  String get securityPageEncryptionLevel => 'Encryption Level';
-
-  @override
-  String get securityPageProtection => 'Protection';
-
-  @override
-  String get securityPageCpuLoad => 'CPU Load';
-
-  @override
-  String get securityPageAes256 => 'AES256';
-
-  @override
-  String get securityPageKuznechikGost => 'KUZNECHIK-GOST';
-
-  @override
-  String get securityPageNtruPrime => 'NTRUPrime';
-
-  @override
-  String get securityPageCyber => 'Cyber';
-
-  @override
-  String get securityPageUnknown => 'Unknown';
+  String get securityPageNodeDescription => 'Make requests to Bearby server for fetch best node';
 
   @override
   String get securityPageClearData => 'Clear Data';

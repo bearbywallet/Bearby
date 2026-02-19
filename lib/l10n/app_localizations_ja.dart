@@ -9,7 +9,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get appTitle => 'ZilPay ウォレット';
+  String get appTitle => 'Bearby ウォレット';
 
   @override
   String get initialPagerestoreZilPay => 'ZilPay 1.0を復元!';
@@ -51,7 +51,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutPageTitle => 'アプリについて';
 
   @override
-  String get aboutPageAppName => 'ZilPay';
+  String get aboutPageAppName => 'Bearby';
 
   @override
   String get aboutPageAppDescription => '安全なブロックチェーンウォレット';
@@ -99,7 +99,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutPageLicenses => 'ライセンス';
 
   @override
-  String get aboutPageLegalese => '© 2025 ZilPay. 全ての権利を保有。';
+  String get aboutPageLegalese => '© 2025 Bearby. 全ての権利を保有。';
 
   @override
   String get languagePageTitle => '言語';
@@ -185,7 +185,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFSゲートウェイ';
 
   @override
-  String get securityPageIpfsDescription => 'ZIlPayは、IPFS上のNFT画像の表示、ブラウザのアドレスバーに入力されたENS(ZNS)アドレスに関する情報の表示、およびトークンアイコンの取得にサードパーティサービスを使用します。これらのサービスを利用する際、IPアドレスが公開される可能性があります。';
+  String get securityPageIpfsDescription => 'Bearbyは、IPFS上のNFT画像の表示、ブラウザのアドレスバーに入力されたENS(ZNS)アドレスに関する情報の表示、およびトークンアイコンの取得にサードパーティサービスを使用します。これらのサービスを利用する際、IPアドレスが公開される可能性があります。';
 
   @override
   String get securityPageTokensFetcherTitle => 'トークンフェッチャー';
@@ -197,31 +197,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageNodeRanking => 'ノードランキング';
 
   @override
-  String get securityPageNodeDescription => '最適なノードを取得するためにZilPayサーバーにリクエストを送信';
-
-  @override
-  String get securityPageEncryptionLevel => '暗号化レベル';
-
-  @override
-  String get securityPageProtection => '保護';
-
-  @override
-  String get securityPageCpuLoad => 'CPU負荷';
-
-  @override
-  String get securityPageAes256 => 'AES256';
-
-  @override
-  String get securityPageKuznechikGost => 'KUZNECHIK-GOST';
-
-  @override
-  String get securityPageNtruPrime => 'NTRUPrime';
-
-  @override
-  String get securityPageCyber => 'サイバー';
-
-  @override
-  String get securityPageUnknown => '不明';
+  String get securityPageNodeDescription => '最適なノードを取得するためにBearbyサーバーにリクエストを送信';
 
   @override
   String get securityPageClearData => 'データを消去';

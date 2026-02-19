@@ -58,21 +58,25 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    appState.currentTheme.cardBackground.withValues(alpha: 0.85),
-                    appState.currentTheme.cardBackground.withValues(alpha: 0.95),
+                    appState.currentTheme.cardBackground
+                        .withValues(alpha: 0.85),
+                    appState.currentTheme.cardBackground
+                        .withValues(alpha: 0.95),
                   ],
                 ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(24)),
                 border: Border(
                   top: BorderSide(
-                    color: appState.currentTheme.primaryPurple.withValues(alpha: 0.3),
+                    color: appState.currentTheme.textSecondary
+                        .withValues(alpha: 0.2),
                     width: 1.5,
                   ),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: appState.currentTheme.primaryPurple.withValues(alpha: 0.15),
+                    color: appState.currentTheme.primaryPurple
+                        .withValues(alpha: 0.15),
                     blurRadius: 30,
                     spreadRadius: 0,
                   ),
@@ -154,12 +158,12 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             width: 40,
             height: 40,
             onTap: () {
-              if (appState.wallet!.walletType.contains(WalletType.ledger.name)) {
-                Navigator.pushNamed(context, "/add_ledger_account",
-                    arguments: {
-                      "createWallet": false,
-                      "chain": appState.chain,
-                    });
+              if (appState.wallet!.walletType
+                  .contains(WalletType.ledger.name)) {
+                Navigator.pushNamed(context, "/add_ledger_account", arguments: {
+                  "createWallet": false,
+                  "chain": appState.chain,
+                });
               } else {
                 Navigator.pushNamed(context, "/add_account");
               }

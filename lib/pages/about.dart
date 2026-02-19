@@ -23,7 +23,7 @@ class AboutPage extends StatefulWidget {
 
 class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   PackageInfo _packageInfo = PackageInfo(
-    appName: 'ZilPay',
+    appName: 'Bearby',
     packageName: '',
     version: '',
     buildNumber: '',

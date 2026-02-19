@@ -104,7 +104,7 @@ abstract class AppLocalizations {
   /// The title of the application
   ///
   /// In en, this message translates to:
-  /// **'ZilPay Wallet'**
+  /// **'Bearby Wallet'**
   String get appTitle;
 
   /// Button text to restore from ZilPay 1.0
@@ -188,7 +188,7 @@ abstract class AppLocalizations {
   /// Application name displayed in logo section on AboutPage
   ///
   /// In en, this message translates to:
-  /// **'ZilPay'**
+  /// **'Bearby'**
   String get aboutPageAppName;
 
   /// Description text below app name on AboutPage
@@ -284,7 +284,7 @@ abstract class AppLocalizations {
   /// Legal text for license page from AboutPage
   ///
   /// In en, this message translates to:
-  /// **'© 2025 ZilPay. All rights reserved.'**
+  /// **'© 2025 Bearby. All rights reserved.'**
   String get aboutPageLegalese;
 
   /// Title for the LanguagePage
@@ -452,7 +452,7 @@ abstract class AppLocalizations {
   /// Description for IPFS gateway setting on SecurityPage
   ///
   /// In en, this message translates to:
-  /// **'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.'**
+  /// **'Bearby uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.'**
   String get securityPageIpfsDescription;
 
   /// Label for tokens fetcher setting on SecurityPage
@@ -476,56 +476,8 @@ abstract class AppLocalizations {
   /// Description for node ranking setting on SecurityPage
   ///
   /// In en, this message translates to:
-  /// **'Make requests to ZilPay server for fetch best node'**
+  /// **'Make requests to Bearby server for fetch best node'**
   String get securityPageNodeDescription;
-
-  /// Section title for encryption level settings on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'Encryption Level'**
-  String get securityPageEncryptionLevel;
-
-  /// Label for protection progress bar in encryption card on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'Protection'**
-  String get securityPageProtection;
-
-  /// Label for CPU load progress bar in encryption card on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'CPU Load'**
-  String get securityPageCpuLoad;
-
-  /// Name of AES256 encryption algorithm on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'AES256'**
-  String get securityPageAes256;
-
-  /// Name of KUZNECHIK-GOST encryption algorithm on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'KUZNECHIK-GOST'**
-  String get securityPageKuznechikGost;
-
-  /// Name of NTRUPrime encryption algorithm on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'NTRUPrime'**
-  String get securityPageNtruPrime;
-
-  /// Name of Cyber encryption algorithm on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'Cyber'**
-  String get securityPageCyber;
-
-  /// Fallback name for unknown encryption algorithm on SecurityPage
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown'**
-  String get securityPageUnknown;
 
   /// Title for clear data section on SecurityPage
   ///
