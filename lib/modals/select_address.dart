@@ -27,7 +27,8 @@ void showAddressSelectModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: _AddressSelectModalContent(onAddressSelected: onAddressSelected),
     ),
   );
@@ -109,7 +110,7 @@ class _AddressSelectModalContentState
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border(
               top: BorderSide(
-                color: theme.primaryPurple.withValues(alpha: 0.3),
+                color: theme.textSecondary.withValues(alpha: 0.2),
                 width: 1.5,
               ),
             ),
@@ -246,8 +247,7 @@ class _AddressSelectModalContentState
             return Column(
               children: [
                 _buildAddressItem(appState, entry),
-                if (index < entries.length - 1)
-                  _buildDivider(theme),
+                if (index < entries.length - 1) _buildDivider(theme),
               ],
             );
           }),
@@ -256,8 +256,7 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildCategoryHeader(
-      CategoryInfo categoryInfo, AppTheme theme) {
+  Widget _buildCategoryHeader(CategoryInfo categoryInfo, AppTheme theme) {
     return Row(
       children: [
         if (categoryInfo.iconPath != null) ...[
