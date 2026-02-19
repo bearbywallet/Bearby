@@ -83,9 +83,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title: l10n.appearanceSettingsPageTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: l10n.appearanceSettingsPageTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: SingleChildScrollView(

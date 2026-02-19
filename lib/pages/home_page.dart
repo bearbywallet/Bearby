@@ -279,9 +279,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                           : 'assets/icons/lines.svg',
                       width: iconSizeManage,
                       height: iconSizeManage,
-                      blendMode: BlendMode.modulate,
                       padding: const EdgeInsets.all(0),
-                      color: theme.surface,
+                      color: theme.textSecondary,
                       onTap: () async {
                         await appState.updateIsTileView(!appState.isTileView);
                       },
@@ -291,9 +290,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     assetName: 'assets/icons/manage.svg',
                     width: iconSizeManage,
                     height: iconSizeManage,
-                    blendMode: BlendMode.modulate,
                     padding: const EdgeInsets.all(0),
-                    color: theme.surface,
+                    color: theme.textSecondary,
                     onTap: () {
                       Navigator.pushNamed(context, '/manage_tokens');
                     },
