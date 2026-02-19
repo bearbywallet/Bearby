@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -48,51 +49,81 @@ class _WalletListItemState extends State<WalletListItem>
       child: buildPressableWithOpacity(
         onTap: widget.onTap,
         disabled: widget.disabled,
-        child: Container(
-          decoration: BoxDecoration(
-            color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Opacity(opacity: opacity, child: _buildIcon()),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: theme.bodyText1.copyWith(
-                          color: theme.textPrimary.withValues(alpha: opacity),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.subtitle,
-                        style: theme.bodyText2.copyWith(
-                          color: theme.textSecondary.withValues(alpha: opacity),
-                        ),
-                      ),
-                    ],
-                  ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.cardBackground.withValues(alpha: 0.65),
+                    theme.cardBackground.withValues(alpha: 0.75),
+                  ],
                 ),
-                Opacity(
-                  opacity: opacity,
-                  child: SvgPicture.asset(
-                    'assets/icons/chevron_right.svg',
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      theme.textSecondary,
-                      BlendMode.srcIn,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: theme.primaryPurple.withValues(alpha: 0.15),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.primaryPurple.withValues(alpha: 0.05),
+                    blurRadius: 15,
+                    spreadRadius: 0,
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Opacity(opacity: opacity, child: _buildIcon()),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: theme.bodyText1.copyWith(
+                              color: theme.textPrimary.withValues(alpha: opacity),
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  color: theme.primaryPurple.withValues(alpha: 0.2),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.subtitle,
+                            style: theme.bodyText2.copyWith(
+                              color: theme.textSecondary.withValues(alpha: opacity * 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Opacity(
+                      opacity: opacity,
+                      child: SvgPicture.asset(
+                        'assets/icons/chevron_right.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          theme.primaryPurple.withValues(alpha: 0.6),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
