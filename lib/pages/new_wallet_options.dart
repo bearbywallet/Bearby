@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +8,6 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
 
 class AddWalletOptionsPage extends StatefulWidget {
   const AddWalletOptionsPage({super.key});
@@ -53,7 +51,6 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
     }
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -67,7 +64,10 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                _buildGlassAppBar(theme, l10n),
+                CustomAppBar(
+                  title: l10n.addWalletOptionsTitle,
+                  onBackPressed: () => Navigator.pop(context),
+                ),
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
@@ -126,7 +126,13 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
                           ),
                         ),
                         const SizedBox(height: 24),
-                        _buildSectionHeader(l10n, theme),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Text(
+                            l10n.addWalletOptionsOtherOptions,
+                            style: theme.caption.copyWith(color: theme.textSecondary),
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         WalletListItem(
                           disabled: true,
@@ -150,62 +156,6 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassAppBar(AppTheme theme, AppLocalizations l10n) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                theme.cardBackground.withValues(alpha: 0.75),
-                theme.cardBackground.withValues(alpha: 0.85),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.primaryPurple.withValues(alpha: 0.2),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: theme.primaryPurple.withValues(alpha: 0.1),
-                blurRadius: 20,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: CustomAppBar(
-            title: l10n.addWalletOptionsTitle,
-            onBackPressed: () => Navigator.pop(context),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(AppLocalizations l10n, AppTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: Text(
-        l10n.addWalletOptionsOtherOptions,
-        style: theme.caption.copyWith(
-          color: theme.textSecondary.withValues(alpha: 0.7),
-          shadows: [
-            Shadow(
-              color: theme.primaryPurple.withValues(alpha: 0.2),
-              blurRadius: 4,
-            ),
-          ],
         ),
       ),
     );
