@@ -46,7 +46,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
     super.dispose();
   }
 
-
   List<NetworkConfigInfo> get filteredNetworks {
     if (_searchQuery.isEmpty) {
       return networks;
@@ -66,8 +65,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
       final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final List<NetworkConfigInfo> mainnetChains =
-          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+      final String testnetJsonData =
+          await rootBundle.loadString('assets/chains/testnet-chains.json');
+      final (mainnetChains, _) = await getNetworks(
+          mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
 
       setState(() {
         networks = _appendUniqueNetworks(storedProviders, mainnetChains);

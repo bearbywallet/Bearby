@@ -13,6 +13,16 @@ pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };
 
+pub async fn get_networks(
+    mainnet_json: String,
+    testnet_json: String,
+) -> Result<(Vec<NetworkConfigInfo>, Vec<NetworkConfigInfo>), String> {
+    let providers_mainnet = get_chains_providers_from_json(mainnet_json)?;
+    let providers_testnet = get_chains_providers_from_json(testnet_json)?;
+
+    Ok((providers_mainnet, providers_testnet))
+}
+
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
     with_service(|core| {
         let providers = core.get_providers();

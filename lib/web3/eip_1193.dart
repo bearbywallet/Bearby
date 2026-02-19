@@ -1445,8 +1445,10 @@ class Web3EIP1193Handler {
       } else {
         final String mainnetJsonData =
             await rootBundle.loadString(kMainnetChainsPath);
-        final List<NetworkConfigInfo> mainnetChains =
-            await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+        final String testnetJsonData =
+            await rootBundle.loadString(kTestnetChainsPath);
+        final (mainnetChains, _) = await getNetworks(
+            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
 
         if (mainnetChains.any((c) => c.chainId == chainId)) {
           final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
@@ -1624,10 +1626,8 @@ class Web3EIP1193Handler {
             await rootBundle.loadString(kMainnetChainsPath);
         final String testnetJsonData =
             await rootBundle.loadString(kTestnetChainsPath);
-        final List<NetworkConfigInfo> mainnetChains =
-            await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
-        final List<NetworkConfigInfo> testnetChains =
-            await getChainsProvidersFromJson(jsonStr: testnetJsonData);
+        final (mainnetChains, testnetChains) = await getNetworks(
+            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&

@@ -94,10 +94,10 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
-      final List<NetworkConfigInfo> mainnetChains =
-          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
-      final List<NetworkConfigInfo> testnetChains =
-          await getChainsProvidersFromJson(jsonStr: testnetJsonData);
+      final (mainnetChains, testnetChains) = await getNetworks(
+        mainnetJson: mainnetJsonData,
+        testnetJson: testnetJsonData,
+      );
 
       setState(() {
         allNetworks.clear();

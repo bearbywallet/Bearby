@@ -8,6 +8,11 @@ import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<(List<NetworkConfigInfo>, List<NetworkConfigInfo>)> getNetworks(
+        {required String mainnetJson, required String testnetJson}) =>
+    RustLib.instance.api.crateApiProviderGetNetworks(
+        mainnetJson: mainnetJson, testnetJson: testnetJson);
+
 Future<List<NetworkConfigInfo>> getProviders() =>
     RustLib.instance.api.crateApiProviderGetProviders();
 
