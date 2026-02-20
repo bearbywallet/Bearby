@@ -5,6 +5,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
+import 'package:zilpay/components/glass_message.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -51,9 +52,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
         Navigator.of(context).pushReplacementNamed('/net_setup');
       });
     } else if (_chain == null) {
-      setState(() {
-        _chain = chain;
-      });
+      setState(() => _chain = chain);
     }
   }
 
@@ -62,14 +61,14 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
       final nonEmptyWords = _words.where((word) => word.isNotEmpty).toList();
       if (nonEmptyWords.isEmpty) return;
 
-      List<int> errorIndexes = (await checkNotExistsBip39Words(
+      final errorIndexes = (await checkNotExistsBip39Words(
         words: nonEmptyWords,
         lang: 'english',
       ))
           .map((e) => e.toInt())
           .toList();
 
-      final List<int> adjustedIndexes = [];
+      final adjustedIndexes = <int>[];
       var currentIndex = 0;
 
       for (int i = 0; i < _words.length; i++) {
@@ -93,17 +92,15 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
   }
 
   Future<void> _validateForm() async {
-    bool areAllWordsValid =
+    final areAllWordsValid =
         _words.every((word) => word.isNotEmpty) && _wordsErrorIndexes.isEmpty;
 
-    setState(() {
-      _allWordsEntered = areAllWordsValid;
-    });
+    setState(() => _allWordsEntered = areAllWordsValid);
 
     if (areAllWordsValid) {
       if (!_showChecksumWarning) {
-        String phrase = _words.join(' ');
-        bool checksumValid = await bip39ChecksumValid(words: phrase);
+        final phrase = _words.join(' ');
+        final checksumValid = await bip39ChecksumValid(words: phrase);
 
         if (mounted) {
           setState(() {
@@ -133,9 +130,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
     final currentIndex = index - 1;
 
     _words[currentIndex] = trimmedWord;
-    if (_wordsErrorIndexes.contains(currentIndex)) {
-      _wordsErrorIndexes.remove(currentIndex);
-    }
+    _wordsErrorIndexes.remove(currentIndex);
 
     if (_showChecksumWarning) {
       setState(() {
@@ -162,7 +157,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
 
     if (words.isEmpty) return;
 
-    int targetCount = _allowedCounts.firstWhere(
+    final targetCount = _allowedCounts.firstWhere(
       (count) => count >= (startIndex + words.length),
       orElse: () => _allowedCounts.last,
     );
@@ -197,71 +192,22 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
   }
 
   void _handleCountChanged(int newCount) {
-    if (mounted) {
-      setState(() {
-        _count = newCount;
-        final newWords = List<String>.filled(newCount, '');
-        for (var i = 0; i < math.min(_words.length, newCount); i++) {
-          newWords[i] = _words[i];
-        }
-        _words = newWords;
-        _wordsErrorIndexes = [];
-        _showChecksumWarning = false;
-        _bypassChecksumValidation = false;
-        _allWordsEntered = false;
-      });
+    if (!mounted) return;
 
-      _validateForm();
-    }
-  }
+    setState(() {
+      _count = newCount;
+      final newWords = List<String>.filled(newCount, '');
+      for (var i = 0; i < math.min(_words.length, newCount); i++) {
+        newWords[i] = _words[i];
+      }
+      _words = newWords;
+      _wordsErrorIndexes = [];
+      _showChecksumWarning = false;
+      _bypassChecksumValidation = false;
+      _allWordsEntered = false;
+    });
 
-  Widget _buildChecksumWarning() {
-    if (!_showChecksumWarning) return const SizedBox.shrink();
-
-    final theme = Provider.of<AppState>(context).currentTheme;
-
-    return Container(
-      padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: theme.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.danger),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.checksumValidationFailed,
-            style: theme.bodyText2.copyWith(
-              color: theme.danger,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            children: [
-              Checkbox(
-                value: _bypassChecksumValidation,
-                onChanged: (value) {
-                  setState(() {
-                    _bypassChecksumValidation = value ?? false;
-                  });
-                },
-                activeColor: theme.primaryPurple,
-              ),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.proceedDespiteInvalidChecksum,
-                  style: theme.bodyText2.copyWith(
-                    color: theme.textPrimary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+    _validateForm();
   }
 
   bool get _isButtonEnabled {
@@ -301,39 +247,65 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 16),
                         WordCountSelector(
                           wordCounts: _allowedCounts,
                           selectedCount: _count,
-                          onCountChanged: (count) => _handleCountChanged(count),
+                          onCountChanged: _handleCountChanged,
                         ),
                         const SizedBox(height: 16),
                         Expanded(
                           child: ListView.builder(
+                            padding: const EdgeInsets.all(12),
                             physics: const BouncingScrollPhysics(),
                             itemCount: _count,
                             itemBuilder: (context, index) {
                               return Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                    const EdgeInsets.symmetric(vertical: 6),
                                 child: MnemonicWordInput(
                                   key: ValueKey('word_$index'),
                                   index: index + 1,
                                   word: _words.elementAtOrNull(index) ?? '',
                                   isEditable: true,
                                   onChanged: _handleWordChange,
-                                  borderColor: theme.buttonText,
                                   hasError: _wordsErrorIndexes.contains(index),
-                                  errorBorderColor: theme.danger,
                                 ),
                               );
                             },
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildChecksumWarning(),
+                        if (_showChecksumWarning)
+                          GlassMessage(
+                            message: AppLocalizations.of(context)!
+                                .checksumValidationFailed,
+                            type: GlassMessageType.warning,
+                          ),
+                        if (_showChecksumWarning)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: _bypassChecksumValidation,
+                                  onChanged: (value) {
+                                    setState(() => _bypassChecksumValidation =
+                                        value ?? false);
+                                  },
+                                  activeColor: theme.primaryPurple,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(context)!
+                                        .proceedDespiteInvalidChecksum,
+                                    style: theme.bodyText2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: CustomButton(
@@ -351,8 +323,8 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                                 },
                               );
                             },
-                            borderRadius: 30.0,
-                            height: 56.0,
+                            borderRadius: 30,
+                            height: 56,
                             disabled: !_isButtonEnabled,
                           ),
                         ),

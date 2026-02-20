@@ -12,18 +12,20 @@ class CustomButton extends StatefulWidget {
   final double height;
   final EdgeInsetsGeometry padding;
   final bool disabled;
+  final bool glassEffect;
 
   const CustomButton({
     super.key,
     required this.text,
     this.onPressed,
-    this.borderRadius = 30.0,
+    this.borderRadius = 30,
     required this.textColor,
     required this.backgroundColor,
     this.width = double.infinity,
-    this.height = 56.0,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
+    this.height = 56,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16),
     this.disabled = false,
+    this.glassEffect = false,
   });
 
   @override
@@ -31,36 +33,44 @@ class CustomButton extends StatefulWidget {
 }
 
 class _CustomButtonState extends State<CustomButton> {
-  bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final theme = appState.currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return GestureDetector(
       onTap: widget.disabled ? null : widget.onPressed,
       onTapDown:
-          widget.disabled ? null : (_) => setState(() => _isHovered = true),
+          widget.disabled ? null : (_) => setState(() => _isPressed = true),
       onTapUp:
-          widget.disabled ? null : (_) => setState(() => _isHovered = false),
+          widget.disabled ? null : (_) => setState(() => _isPressed = false),
       onTapCancel:
-          widget.disabled ? null : () => setState(() => _isHovered = false),
+          widget.disabled ? null : () => setState(() => _isPressed = false),
       child: Focus(
         canRequestFocus: !widget.disabled,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 150),
           width: widget.width,
           height: widget.height,
           padding: widget.padding,
           decoration: BoxDecoration(
             color: widget.disabled
-                ? widget.backgroundColor.withValues(alpha: 0.5)
+                ? widget.backgroundColor.withValues(alpha: 0.4)
                 : widget.backgroundColor,
             borderRadius: BorderRadius.circular(widget.borderRadius),
+            boxShadow: _isPressed
+                ? null
+                : [
+                    BoxShadow(
+                      color: widget.backgroundColor.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
-          transform: _isHovered
-              ? Matrix4.diagonal3Values(0.9, 0.9, 1)
+          transform: _isPressed
+              ? Matrix4.diagonal3Values(0.98, 0.98, 1)
               : Matrix4.identity(),
           transformAlignment: Alignment.center,
           child: Center(
@@ -68,7 +78,7 @@ class _CustomButtonState extends State<CustomButton> {
               fit: BoxFit.scaleDown,
               child: Text(
                 widget.text,
-                style: theme.titleMedium.copyWith(
+                style: theme.labelLarge.copyWith(
                   color: widget.disabled
                       ? widget.textColor.withAlpha(128)
                       : widget.textColor,
