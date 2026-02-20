@@ -119,11 +119,13 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                 Expanded(
                   child: Center(
                     child: SvgPicture.asset(
-                      'assets/icons/little_dragons.svg',
+                      'assets/icons/bear.svg',
                       width: 400,
                       height: 400,
-                      colorFilter:
-                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                        theme.textPrimary,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
@@ -142,9 +144,7 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                               ? l10n.initialPagerestoreZilPay
                               : l10n.initialPagegetStarted,
                           onPressed: () => Navigator.of(context).pushNamed(
-                            _isRestoreAvailable
-                                ? '/rk_restore'
-                                : '/net_setup',
+                            _isRestoreAvailable ? '/rk_restore' : '/net_setup',
                             arguments: _isRestoreAvailable
                                 ? {
                                     'vaultJson': _vaultJson,
