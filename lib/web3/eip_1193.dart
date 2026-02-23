@@ -1180,15 +1180,8 @@ class Web3EIP1193Handler {
 
       try {
         typedDataeip712 = TypedDataEip712.fromJsonString(rawTypedData);
-        dev.log('EIP-712: Parsed typedData domain: ${typedDataeip712.domain}',
-            name: 'web3_handler');
-        dev.log(
-            'EIP-712: Parsed typedData primaryType: ${typedDataeip712.primaryType}',
-            name: 'web3_handler');
-        dev.log('EIP-712: Parsed typedData message: ${typedDataeip712.message}',
-            name: 'web3_handler');
       } catch (e) {
-        dev.log('EIP-712: Failed to parse typedData: $e', name: 'web3_handler');
+        debugPrint("parse eip712 $e");
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,

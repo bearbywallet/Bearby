@@ -16,7 +16,12 @@ String decodePersonalSignMessage(String dataToSign) {
   try {
     if (dataToSign.startsWith('0x')) {
       final bytes = hexToBytes(dataToSign.substring(2));
-      return String.fromCharCodes(bytes);
+      try {
+        return utf8.decode(bytes);
+      } catch (_) {
+        // Not valid UTF-8 — keep as original hex so Rust can hex-decode it
+        return dataToSign;
+      }
     }
     return dataToSign;
   } catch (e) {

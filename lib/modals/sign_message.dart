@@ -191,6 +191,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         await _signMessageNative(appState);
       }
     } catch (e) {
+      debugPrint('_handleSignMessage error: $e');
       appState.ledgerViewController.stopScan();
       appState.ledgerViewController.disconnect();
       appState.ledgerViewController.scan();

@@ -7,11 +7,6 @@ class EIP712Type {
   EIP712Type({required this.name, required this.type});
 
   factory EIP712Type.fromJson(Map<String, dynamic> json) {
-    print('EIP712Type.fromJson: json=$json');
-    print(
-        'EIP712Type.fromJson: name=${json['name']} (type: ${json['name'].runtimeType})');
-    print(
-        'EIP712Type.fromJson: type=${json['type']} (type: ${json['type'].runtimeType})');
     return EIP712Type(
       name: json['name'] as String,
       type: json['type'] as String,
@@ -40,15 +35,6 @@ class EIP712Domain {
   });
 
   factory EIP712Domain.fromJson(Map<String, dynamic> json) {
-    print('EIP712Domain.fromJson: json=$json');
-    print(
-        'EIP712Domain.fromJson: name=${json['name']} (type: ${json['name'].runtimeType})');
-    print(
-        'EIP712Domain.fromJson: version=${json['version']} (type: ${json['version'].runtimeType})');
-    print(
-        'EIP712Domain.fromJson: chainId=${json['chainId']} (type: ${json['chainId'].runtimeType})');
-    print(
-        'EIP712Domain.fromJson: verifyingContract=${json['verifyingContract']} (type: ${json['verifyingContract'].runtimeType})');
     return EIP712Domain(
       name: json['name'] as String,
       version: json['version'] as String?,
@@ -86,16 +72,6 @@ class TypedDataEip712 {
   });
 
   factory TypedDataEip712.fromJson(Map<String, dynamic> json) {
-    print('TypedDataEip712.fromJson: json=$json');
-    print(
-        'TypedDataEip712.fromJson: types=${json['types']} (type: ${json['types'].runtimeType})');
-    print(
-        'TypedDataEip712.fromJson: primaryType=${json['primaryType']} (type: ${json['primaryType'].runtimeType})');
-    print(
-        'TypedDataEip712.fromJson: domain=${json['domain']} (type: ${json['domain'].runtimeType})');
-    print(
-        'TypedDataEip712.fromJson: message=${json['message']} (type: ${json['message'].runtimeType})');
-
     final typesJson = json['types'] as Map<String, dynamic>;
     final types = typesJson.map((key, value) => MapEntry(
           key,
@@ -129,10 +105,7 @@ class TypedDataEip712 {
   }
 
   static TypedDataEip712 fromJsonString(String jsonStr) {
-    print('TypedDataEip712.fromJsonString: raw json string=$jsonStr');
     final decoded = jsonDecode(jsonStr);
-    print(
-        'TypedDataEip712.fromJsonString: decoded=$decoded (type: ${decoded.runtimeType})');
     return TypedDataEip712.fromJson(decoded as Map<String, dynamic>);
   }
 }
