@@ -371,13 +371,16 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                         theme,
                                         secondaryColor,
                                       ),
-                                      _buildTypedDataRow(
-                                        l10n.signMessageModalContentContract,
-                                        widget.typedData!.domain
-                                            .verifyingContract,
-                                        theme,
-                                        secondaryColor,
-                                      ),
+                                      if (widget.typedData!.domain
+                                              .verifyingContract !=
+                                          null)
+                                        _buildTypedDataRow(
+                                          l10n.signMessageModalContentContract,
+                                          widget.typedData!.domain
+                                              .verifyingContract!,
+                                          theme,
+                                          secondaryColor,
+                                        ),
                                     ],
                                   ),
                                 ),
