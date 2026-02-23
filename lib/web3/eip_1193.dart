@@ -297,6 +297,10 @@ class Web3EIP1193Handler {
           );
           break;
 
+        case Web3EIP1193Method.ethChainId:
+          await _handleEthChainId(message, appState);
+          break;
+
         case Web3EIP1193Method.ethGetBalance:
         case Web3EIP1193Method.ethGetTransactionByHash:
         case Web3EIP1193Method.ethGetTransactionReceipt:
@@ -306,7 +310,6 @@ class Web3EIP1193Handler {
         case Web3EIP1193Method.ethGetBlockByNumber:
         case Web3EIP1193Method.ethGetBlockByHash:
         case Web3EIP1193Method.netVersion:
-        case Web3EIP1193Method.ethChainId:
         case Web3EIP1193Method.ethGetCode:
         case Web3EIP1193Method.ethGetStorageAt:
         case Web3EIP1193Method.ethGasPrice:
@@ -494,6 +497,20 @@ class Web3EIP1193Handler {
       type: kBearbyResponseType,
       uuid: message.uuid,
       result: connectedAddr,
+    );
+  }
+
+  Future<void> _handleEthChainId(
+    ZilPayWeb3Message message,
+    AppState appState,
+  ) async {
+    final chain = appState.chain!;
+    final chainIdHex = '$kHexPrefix${chain.chainId.toRadixString(kHexRadix)}';
+
+    _sendResponse(
+      type: kBearbyResponseType,
+      uuid: message.uuid,
+      result: chainIdHex,
     );
   }
 
@@ -1126,6 +1143,8 @@ class Web3EIP1193Handler {
       final connection =
           Web3Utils.findConnected(_currentDomain, appState.connections);
       if (connection == null) {
+        dev.log('EIP-712: No connection found for domain',
+            name: 'web3_handler');
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,
@@ -1135,7 +1154,12 @@ class Web3EIP1193Handler {
       }
 
       final params = message.payload['params'] as List<dynamic>?;
+      dev.log('EIP-712: Params count: ${params?.length ?? 0}',
+          name: 'web3_handler');
+
       if (params == null || params.length < 2) {
+        dev.log('EIP-712: Invalid params - missing or insufficient length',
+            name: 'web3_handler');
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,
@@ -1147,11 +1171,24 @@ class Web3EIP1193Handler {
       final address = params[0] as String;
       final rawTypedData = params[1] as String;
 
+      dev.log('EIP-712: Address to sign: $address', name: 'web3_handler');
+      dev.log('EIP-712: Raw typedData length: ${rawTypedData.length}',
+          name: 'web3_handler');
+      dev.log('EIP-712: Raw typedData: $rawTypedData', name: 'web3_handler');
+
       TypedDataEip712 typedDataeip712;
 
       try {
         typedDataeip712 = TypedDataEip712.fromJsonString(rawTypedData);
+        dev.log('EIP-712: Parsed typedData domain: ${typedDataeip712.domain}',
+            name: 'web3_handler');
+        dev.log(
+            'EIP-712: Parsed typedData primaryType: ${typedDataeip712.primaryType}',
+            name: 'web3_handler');
+        dev.log('EIP-712: Parsed typedData message: ${typedDataeip712.message}',
+            name: 'web3_handler');
       } catch (e) {
+        dev.log('EIP-712: Failed to parse typedData: $e', name: 'web3_handler');
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,
