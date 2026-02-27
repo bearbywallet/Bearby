@@ -1,0 +1,4 @@
+- Prepare for F-Droid publishing
+- Add Linux desktop platform support
+- Fix personal_sign byte encoding for EVM accounts
+- Fix nullable verifyingContract in sign message modal

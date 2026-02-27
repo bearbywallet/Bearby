@@ -1,0 +1,39 @@
+Categories:
+  - Money
+License: GPL-3.0-only
+AuthorName: ZilPay
+AuthorWebSite: https://zilpay.io
+SourceCode: https://github.com/zilpay/zilpay-mobile
+IssueTracker: https://github.com/zilpay/zilpay-mobile/issues
+
+AutoName: Bearby
+
+RepoType: git
+Repo: https://github.com/zilpay/zilpay-mobile.git
+
+Builds:
+  - versionName: 3.8.27
+    versionCode: 916
+    commit: v3.8.27
+    subdir: .
+    sudo:
+      - apt-get update
+      - apt-get install -y build-essential pkg-config libssl-dev
+    output: build/app/outputs/flutter-apk/app-release.apk
+    srclibs:
+      - flutter@stable
+      - rustup@stable
+    prebuild:
+      - export PATH="$$flutter$$/bin:$$rustup$$/.cargo/bin:$PATH"
+      - rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+      - cargo install cargo-ndk
+      - flutter pub get
+      - cd rust && cargo fetch --locked
+    build:
+      - export PATH="$$flutter$$/bin:$$rustup$$/.cargo/bin:$PATH"
+      - flutter build apk --release
+
+AutoUpdateMode: None
+UpdateCheckMode: Tags
+CurrentVersion: 3.8.27
+CurrentVersionCode: 916

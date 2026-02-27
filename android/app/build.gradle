@@ -6,7 +6,9 @@ plugins {
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     namespace = "com.zilpaymobile"
@@ -53,23 +55,20 @@ android {
 
     signingConfigs {
         release {
-            if (project.hasProperty('ZILPAY_UPLOAD_STORE_FILE')) {
-                storeFile file(ZILPAY_UPLOAD_STORE_FILE)
-                storePassword ZILPAY_UPLOAD_STORE_PASSWORD
-                keyAlias ZILPAY_UPLOAD_KEY_ALIAS
-                keyPassword ZILPAY_UPLOAD_KEY_PASSWORD
-            } else {
-                println "Warning: Keystore properties not found, release build may fail."
+            if (keystoreProperties.containsKey('ZILPAY_UPLOAD_STORE_FILE')) {
+                storeFile file(keystoreProperties['ZILPAY_UPLOAD_STORE_FILE'])
+                storePassword keystoreProperties['ZILPAY_UPLOAD_STORE_PASSWORD']
+                keyAlias keystoreProperties['ZILPAY_UPLOAD_KEY_ALIAS']
+                keyPassword keystoreProperties['ZILPAY_UPLOAD_KEY_PASSWORD']
             }
         }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            // signingConfig = signingConfigs.debug
-            signingConfig signingConfigs.release
+            signingConfig keystoreProperties.containsKey('ZILPAY_UPLOAD_STORE_FILE')
+                ? signingConfigs.release
+                : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
