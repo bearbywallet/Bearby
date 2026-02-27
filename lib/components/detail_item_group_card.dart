@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:zilpay/components/copy_content.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/copy_content.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class DetailItem extends StatelessWidget {
   final String label;

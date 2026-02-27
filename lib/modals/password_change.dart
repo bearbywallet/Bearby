@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/button.dart';
 import '../../components/smart_input.dart';
 import '../../theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showChangePasswordModal({
   required BuildContext context,

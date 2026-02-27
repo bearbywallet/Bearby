@@ -1,4 +1,4 @@
-import 'package:zilpay/src/rust/models/settings.dart';
+import 'package:bearby/src/rust/models/settings.dart';
 
 class Argon2DefaultParams {
   static WalletArgonParamsInfo owaspDefault({String secret = ''}) {

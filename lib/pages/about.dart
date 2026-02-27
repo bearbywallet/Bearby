@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import '../state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 const String kTestnetEnabledKey = 'testnet_enabled';
 const int kTapsToEnableTestnet = 7;

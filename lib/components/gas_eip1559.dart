@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/gas_eip1559.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/src/rust/models/gas.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/gas_eip1559.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/gas.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 extension GasFeeOptionX on GasFeeOption {
   String title(BuildContext context) {

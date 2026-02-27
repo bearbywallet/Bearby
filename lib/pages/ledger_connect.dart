@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/ledger/ledger_connector.dart';
-import 'package:zilpay/ledger/ledger_view_controller.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/ledger/ledger_connector.dart';
+import 'package:bearby/ledger/ledger_view_controller.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LedgerConnectPage extends StatefulWidget {

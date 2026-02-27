@@ -1,16 +1,16 @@
-import 'package:zilpay/components/jazzicon.dart';
+import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/modals/select_token.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/modals/select_token.dart';
+import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class TokenAmountCard extends StatefulWidget {
   final String amount;

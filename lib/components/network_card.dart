@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:zilpay/components/network_tile.dart';
-import 'package:zilpay/mixins/pressable_animation.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
+import 'package:bearby/components/network_tile.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 
 class NetworkCard extends StatefulWidget {
   final NetworkConfigInfo configInfo;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/ledger_device_card.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/ledger_device_card.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/state/app_state.dart';
 import 'ledger_view_controller.dart';
 
 class LedgerConnector extends StatelessWidget {

@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/components/modal_drag_handle.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/load_button.dart';
+import 'package:bearby/components/modal_drag_handle.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showConfirmPasswordModal({
   required BuildContext context,

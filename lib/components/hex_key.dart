@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/state/app_state.dart';
 
 class HexKeyDisplay extends StatefulWidget {
   final String hexKey;

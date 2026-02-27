@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 enum GlassMessageType { error, warning, success, info }
 

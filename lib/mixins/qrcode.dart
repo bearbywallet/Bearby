@@ -1,4 +1,4 @@
-import 'package:zilpay/config/ftokens.dart';
+import 'package:bearby/config/ftokens.dart';
 
 String generateCryptoUrl({
   required String address,

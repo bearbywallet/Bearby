@@ -3,18 +3,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/ledger/ledger_connector.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/eip712.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/models/connection.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/swipe_button.dart';
+import 'package:bearby/ledger/ledger_connector.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/eip712.dart';
+import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/connection.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showSignMessageModal({
   required BuildContext context,

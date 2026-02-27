@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/state/app_state.dart';
 
 class BiometricSwitch extends StatelessWidget {
   final String biometricType;

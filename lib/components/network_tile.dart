@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class NetworkTile extends StatelessWidget {
   final String? iconUrl;

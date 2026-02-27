@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/main.dart' as app;
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/main.dart' as app;
+import 'package:bearby/components/button.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/state/app_state.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

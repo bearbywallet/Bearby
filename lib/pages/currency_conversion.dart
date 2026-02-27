@@ -2,16 +2,16 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/api/settings.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/modals/list_selector.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/settings.dart';
+import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/modals/list_selector.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class CurrencyConversionPage extends StatefulWidget {
   const CurrencyConversionPage({super.key});

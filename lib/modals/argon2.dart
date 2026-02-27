@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/option_list.dart';
-import 'package:zilpay/config/argon.dart';
-import 'package:zilpay/src/rust/models/settings.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/option_list.dart';
+import 'package:bearby/config/argon.dart';
+import 'package:bearby/src/rust/models/settings.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showArgonSettingsModal({
   required BuildContext context,

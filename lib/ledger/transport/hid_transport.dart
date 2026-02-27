@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:zilpay/ledger/models/device_model.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/ledger/transport/exceptions.dart';
-import 'package:zilpay/ledger/transport/transport.dart';
+import 'package:bearby/ledger/models/device_model.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/ledger/transport/exceptions.dart';
+import 'package:bearby/ledger/transport/transport.dart';
 
 class DescriptorEvent {
   final String type;

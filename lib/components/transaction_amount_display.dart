@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/state/app_state.dart';
 
 class TransactionAmountDisplay extends StatelessWidget {
   final BigInt amount;

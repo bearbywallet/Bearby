@@ -2,18 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/linear_refresh_indicator.dart';
-import 'package:zilpay/components/transaction_item.dart';
-import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/mixins/transaction_parsing.dart';
-import 'package:zilpay/modals/transaction_details_modal.dart';
-import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/models/transactions/history.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/linear_refresh_indicator.dart';
+import 'package:bearby/components/transaction_item.dart';
+import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/transaction_parsing.dart';
+import 'package:bearby/modals/transaction_details_modal.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/transactions/history.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 enum SortType { date, status }
 

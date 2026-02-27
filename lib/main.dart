@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:zilpay/services/preferences_service.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
-import 'package:zilpay/src/rust/models/background.dart';
+import 'package:bearby/services/preferences_service.dart';
+import 'package:bearby/src/rust/api/backend.dart';
+import 'package:bearby/src/rust/models/background.dart';
 
 import 'state/app_state.dart';
 
-import 'package:zilpay/src/rust/frb_generated.dart';
+import 'package:bearby/src/rust/frb_generated.dart';
 import 'app.dart';
 
 Future<String> getStoragePath() async {

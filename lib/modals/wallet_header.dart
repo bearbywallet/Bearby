@@ -2,15 +2,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/components/tile_button.dart';
-import 'package:zilpay/components/wallet_card.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/src/rust/models/wallet.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/tile_button.dart';
+import 'package:bearby/components/wallet_card.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/models/wallet.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 void showWalletModal({
   required BuildContext context,

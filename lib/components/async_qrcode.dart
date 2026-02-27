@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/src/rust/api/qrcode.dart';
-import 'package:zilpay/src/rust/models/qrcode.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/src/rust/api/qrcode.dart';
+import 'package:bearby/src/rust/models/qrcode.dart';
+import 'package:bearby/state/app_state.dart';
 
 enum EyeShape {
   square(0),

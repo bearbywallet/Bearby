@@ -4,18 +4,18 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/ledger/common.dart';
-import 'package:zilpay/ledger/ethereum/eth_ledger_app.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/ledger/transport/ble_transport.dart';
-import 'package:zilpay/ledger/transport/hid_transport.dart';
-import 'package:zilpay/ledger/transport/transport.dart';
-import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_app.dart';
-import 'package:zilpay/mixins/eip712.dart';
-import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/models/account.dart';
-import 'package:zilpay/src/rust/models/transactions/request.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/ledger/common.dart';
+import 'package:bearby/ledger/ethereum/eth_ledger_app.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/ledger/transport/ble_transport.dart';
+import 'package:bearby/ledger/transport/hid_transport.dart';
+import 'package:bearby/ledger/transport/transport.dart';
+import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
+import 'package:bearby/mixins/eip712.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/account.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
 
 enum LedgerStatus {
   initializing,

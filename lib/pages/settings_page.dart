@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/settings_item.dart';
-import 'package:zilpay/components/wallet_section.dart';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/social_media.dart';
-import 'package:zilpay/src/rust/api/token.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/settings_item.dart';
+import 'package:bearby/components/wallet_section.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/services/social_media.dart';
+import 'package:bearby/src/rust/api/token.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class SettingsPage extends StatefulWidget {

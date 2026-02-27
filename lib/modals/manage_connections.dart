@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showConnectedDappsModal({
   required BuildContext context,

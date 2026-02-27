@@ -1,16 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:zilpay/config/bip_purposes.dart';
-import 'package:zilpay/ledger/common.dart';
-import 'package:zilpay/ledger/ethereum/models.dart';
-import 'package:zilpay/ledger/ledger_operation.dart';
-import 'package:zilpay/ledger/transport/exceptions.dart';
-import 'package:zilpay/ledger/transport/transport.dart';
-import 'package:zilpay/src/rust/api/ledger.dart';
-import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/models/transactions/request.dart';
-import 'package:zilpay/utils/utils.dart';
+import 'package:bearby/config/bip_purposes.dart';
+import 'package:bearby/ledger/common.dart';
+import 'package:bearby/ledger/ethereum/models.dart';
+import 'package:bearby/ledger/ledger_operation.dart';
+import 'package:bearby/ledger/transport/exceptions.dart';
+import 'package:bearby/ledger/transport/transport.dart';
+import 'package:bearby/src/rust/api/ledger.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
+import 'package:bearby/utils/utils.dart';
 
 class EthAppConfiguration {
   final String version;

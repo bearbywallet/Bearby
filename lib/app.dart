@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'router.dart';
 import 'state/app_state.dart';
 

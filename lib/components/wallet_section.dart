@@ -1,9 +1,9 @@
-import 'package:zilpay/components/jazzicon.dart';
+import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class HoverableWalletSection extends StatefulWidget {
   final AppTheme theme;

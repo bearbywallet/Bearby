@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:zilpay/utils/utils.dart';
+import 'package:bearby/utils/utils.dart';
 
 class EthLedgerSignature {
   final int v;

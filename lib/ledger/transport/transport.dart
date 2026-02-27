@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:zilpay/ledger/models/device_model.dart';
-import 'package:zilpay/ledger/transport/exceptions.dart';
+import 'package:bearby/ledger/models/device_model.dart';
+import 'package:bearby/ledger/transport/exceptions.dart';
 
 enum TransportEvent { unresponsive, responsive }
 

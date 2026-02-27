@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/qrcode.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/mixins/qrcode.dart';
+import 'package:bearby/state/app_state.dart';
 
 class DeepLinkService {
   final AppLinks _appLinks = AppLinks();

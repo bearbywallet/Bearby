@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/jazzicon.dart';
-import 'package:zilpay/src/rust/models/account.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/src/rust/models/account.dart';
+import 'package:bearby/state/app_state.dart';
 
 class AvatarAddress extends StatelessWidget {
   final double avatarSize;

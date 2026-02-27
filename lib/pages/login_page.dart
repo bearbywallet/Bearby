@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:zilpay/src/rust/api/auth.dart';
-import 'package:zilpay/src/rust/models/wallet.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/auth.dart';
+import 'package:bearby/src/rust/models/wallet.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/status_bar.dart';
 
 import '../components/glass_message.dart';
 import '../components/load_button.dart';

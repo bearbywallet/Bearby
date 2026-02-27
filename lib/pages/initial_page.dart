@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/backend.dart';
+import 'package:bearby/state/app_state.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});

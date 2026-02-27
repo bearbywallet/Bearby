@@ -1,15 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/network_card.dart';
-import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/api/provider.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/network_card.dart';
+import 'package:bearby/components/swipe_button.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/src/rust/api/provider.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showSwitchChainNetworkModal({
   required BuildContext context,

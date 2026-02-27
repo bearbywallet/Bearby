@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:bearby/src/rust/models/connection.dart';
 
 class ZilPayWeb3Message {
   final String type;

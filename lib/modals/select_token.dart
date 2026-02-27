@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/token_select_item.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/token_select_item.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showTokenSelectModal({
   required BuildContext context,

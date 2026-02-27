@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/hex_key.dart';
-import 'package:zilpay/components/tile_button.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/modals/backup_confirmation_modal.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
-import 'package:zilpay/src/rust/models/keypair.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/hex_key.dart';
+import 'package:bearby/components/tile_button.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/modals/backup_confirmation_modal.dart';
+import 'package:bearby/src/rust/api/methods.dart';
+import 'package:bearby/src/rust/models/keypair.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
   const SecretKeyGeneratorPage({super.key});

@@ -1,4 +1,4 @@
-import 'package:zilpay/ledger/transport/exceptions.dart';
+import 'package:bearby/ledger/transport/exceptions.dart';
 
 // SW_OK                0x9000
 const int ok = 0x9000;

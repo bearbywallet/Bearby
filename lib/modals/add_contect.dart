@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/src/rust/api/book.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/src/rust/api/book.dart';
+import 'package:bearby/state/app_state.dart';
 import '../../components/button.dart';
 import '../../components/smart_input.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showAddContactModal({
   required BuildContext context,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class ModalDragHandle extends StatelessWidget {
   final AppTheme theme;

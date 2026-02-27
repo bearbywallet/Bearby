@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/addr.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/addr.dart';
+import 'package:bearby/state/app_state.dart';
 
 class TokenTransferInfo extends StatelessWidget {
   final String fromAddress;

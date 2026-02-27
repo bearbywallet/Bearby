@@ -4,16 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/linear_refresh_indicator.dart';
-import 'package:zilpay/components/stakeing_card.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/api/stake.dart';
-import 'package:zilpay/src/rust/models/stake.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/linear_refresh_indicator.dart';
+import 'package:bearby/components/stakeing_card.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/stake.dart';
+import 'package:bearby/src/rust/models/stake.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class ZilStakePage extends StatefulWidget {
   const ZilStakePage({super.key});

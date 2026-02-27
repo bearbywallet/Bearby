@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:bearby/src/rust/models/keypair.dart';
 
 const _hexChars = '0123456789abcdef';
 

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math' show pi, sin;
 
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/state/app_state.dart';
 
 class SmartInput extends StatefulWidget {
   final TextEditingController? controller;

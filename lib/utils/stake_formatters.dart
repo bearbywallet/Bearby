@@ -1,4 +1,4 @@
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class StakeFormatters {
   static String formatApr(double? apr) {

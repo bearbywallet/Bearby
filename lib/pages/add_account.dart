@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/components/counter.dart';
-import 'package:zilpay/components/smart_input.dart';
+import 'package:bearby/components/counter.dart';
+import 'package:bearby/components/smart_input.dart';
 import 'dart:async';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/src/rust/api/token.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/src/rust/api/token.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class AddAccount extends StatefulWidget {
   const AddAccount({super.key});

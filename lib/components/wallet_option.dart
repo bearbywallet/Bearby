@@ -1,11 +1,11 @@
 import 'dart:ui';
-import 'package:zilpay/components/jazzicon.dart';
+import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/state/app_state.dart';
 
 class WalletOption extends StatelessWidget {
   final String title;

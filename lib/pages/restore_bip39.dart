@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/mnemonic_word_input.dart';
-import 'package:zilpay/components/wor_count_selector.dart';
-import 'package:zilpay/components/glass_message.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/mnemonic_word_input.dart';
+import 'package:bearby/components/wor_count_selector.dart';
+import 'package:bearby/components/glass_message.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/methods.dart';
+import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class RestoreSecretPhrasePage extends StatefulWidget {
   const RestoreSecretPhrasePage({super.key});

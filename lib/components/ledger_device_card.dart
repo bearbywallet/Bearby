@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/state/app_state.dart';
 
 class LedgerCard extends StatefulWidget {
   final DiscoveredDevice device;

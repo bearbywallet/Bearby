@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/src/rust/models/transactions/history.dart';
-import 'package:zilpay/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/src/rust/models/transactions/history.dart';
+import 'package:bearby/src/rust/models/transactions/base_token.dart';
 
 class ParsedEvmReceipt {
   final String? transactionHash;

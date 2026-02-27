@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/address_avatar.dart';
-import 'package:zilpay/components/copy_content.dart';
-import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/pressable_animation.dart';
-import 'package:zilpay/modals/wallet_header.dart';
-import 'package:zilpay/src/rust/models/account.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/address_avatar.dart';
+import 'package:bearby/components/copy_content.dart';
+import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
+import 'package:bearby/modals/wallet_header.dart';
+import 'package:bearby/src/rust/models/account.dart';
+import 'package:bearby/state/app_state.dart';
 
 class WalletHeader extends StatefulWidget {
   final AccountInfo account;

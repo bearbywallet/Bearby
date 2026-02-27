@@ -1,5 +1,5 @@
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 
 String selectVariant(String? theme, List<String> options) {
   if (options.isEmpty) return '';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/mixins/pressable_animation.dart';
-import 'package:zilpay/src/rust/models/settings.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
+import 'package:bearby/src/rust/models/settings.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 extension BrowserSettingsInfoExtension on BrowserSettingsInfo {
   BrowserSettingsInfo copyWith({

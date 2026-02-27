@@ -1,13 +1,13 @@
-import 'package:zilpay/components/jazzicon.dart';
+import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/pressable_animation.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/state/app_state.dart';
 
 class TokenCard extends StatefulWidget {
   final FTokenInfo ftoken;

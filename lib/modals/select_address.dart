@@ -2,17 +2,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/jazzicon.dart';
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/modals/qr_scanner_modal.dart';
-import 'package:zilpay/src/rust/api/book.dart';
-import 'package:zilpay/src/rust/api/qrcode.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
-import 'package:zilpay/src/rust/models/qrcode.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/theme/app_theme.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/modals/qr_scanner_modal.dart';
+import 'package:bearby/src/rust/api/book.dart';
+import 'package:bearby/src/rust/api/qrcode.dart';
+import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/src/rust/models/qrcode.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 void showAddressSelectModal({
   required BuildContext context,

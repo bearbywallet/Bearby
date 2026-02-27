@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showBackupConfirmationModal({
   required BuildContext context,

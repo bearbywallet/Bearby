@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/address_avatar.dart';
-import 'package:zilpay/mixins/addr.dart';
-import 'package:zilpay/mixins/pressable_animation.dart';
-import 'package:zilpay/src/rust/models/account.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:bearby/components/address_avatar.dart';
+import 'package:bearby/mixins/addr.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
+import 'package:bearby/src/rust/models/account.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
 
 class WalletCard extends StatefulWidget {
   final AccountInfo account;

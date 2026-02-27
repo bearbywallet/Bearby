@@ -1,17 +1,17 @@
-import 'package:zilpay/components/jazzicon.dart';
+import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/addr.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/modals/add_contect.dart';
-import 'package:zilpay/src/rust/api/book.dart';
-import 'package:zilpay/src/rust/models/book.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/mixins/addr.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/modals/add_contect.dart';
+import 'package:bearby/src/rust/api/book.dart';
+import 'package:bearby/src/rust/models/book.dart';
+import 'package:bearby/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import '../components/switch_setting_item.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class AddressBookPage extends StatefulWidget {
   const AddressBookPage({super.key});

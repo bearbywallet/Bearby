@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/ledger/common.dart';
-import 'package:zilpay/ledger/ledger_operation.dart';
-import 'package:zilpay/ledger/transport/transport.dart';
-import 'package:zilpay/ledger/zilliqa/zilliqa_exception.dart';
-import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/models/transactions/request.dart';
-import 'package:zilpay/utils/utils.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/ledger/common.dart';
+import 'package:bearby/ledger/ledger_operation.dart';
+import 'package:bearby/ledger/transport/transport.dart';
+import 'package:bearby/ledger/zilliqa/zilliqa_exception.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
+import 'package:bearby/utils/utils.dart';
 
 class _ZilliqaIns {
   static const int getVersion = 0x01;

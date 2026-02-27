@@ -1,5 +1,5 @@
-import 'package:zilpay/config/web3_constants.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
 
 enum GasFeeOption { low, market, aggressive }
 

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zilpay/components/detail_group_card.dart';
-import 'package:zilpay/components/detail_item_group_card.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/mixins/transaction_parsing.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/src/rust/models/transactions/history.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/detail_group_card.dart';
+import 'package:bearby/components/detail_item_group_card.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/mixins/transaction_parsing.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/src/rust/models/transactions/history.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showTransactionDetailsModal({
   required BuildContext context,

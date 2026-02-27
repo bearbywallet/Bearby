@@ -1,7 +1,7 @@
 import 'package:flutter/rendering.dart';
-import 'package:zilpay/config/ftokens.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/config/ftokens.dart';
+import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/state/app_state.dart';
 
 BigInt toDecimalsWei(String amount, int decimals) {
   try {

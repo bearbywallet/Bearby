@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:zilpay/src/rust/api/token.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/src/rust/models/connection.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/web3/zilpay_legacy.dart';
+import 'package:bearby/src/rust/api/token.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/models/connection.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/web3/zilpay_legacy.dart';
 
 List<int> hexToBytes(String hex) => [
       for (int i = 0; i < hex.length; i += 2)

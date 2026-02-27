@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/option_list.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/src/rust/api/provider.dart';
-import 'package:zilpay/src/rust/models/provider.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/option_list.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/src/rust/api/provider.dart';
+import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class SetupNetworkSettingsPage extends StatefulWidget {
   const SetupNetworkSettingsPage({super.key});

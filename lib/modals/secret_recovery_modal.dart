@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/state/app_state.dart';
+import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/state/app_state.dart';
 import '../../components/button.dart';
 import '../../theme/app_theme.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 void showSecretRecoveryModal({
   required BuildContext context,

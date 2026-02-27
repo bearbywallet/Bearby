@@ -1,4 +1,4 @@
-import 'package:zilpay/ledger/models/device_model.dart';
+import 'package:bearby/ledger/models/device_model.dart';
 
 enum ConnectionType { ble, usb }
 

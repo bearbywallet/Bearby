@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/components/jazzicon.dart';
-import 'package:zilpay/mixins/status_bar.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/button.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/src/rust/api/backend.dart';
+import 'package:bearby/state/app_state.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/button.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 class Account {
   final String name;
