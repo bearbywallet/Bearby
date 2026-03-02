@@ -1,1 +1,38 @@
-{"images":[{"idiom":"universal","size":"1024x1024","platform":"ios","filename":"1024.png"},{"idiom":"universal","size":"1024x1024","platform":"ios","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"1024-dark.png"},{"idiom":"universal","size":"1024x1024","platform":"ios","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"1024-tinted.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"2x","filename":"40.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"40-dark.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"40-tinted.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"3x","filename":"60.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"60-dark.png"},{"idiom":"universal","size":"20x20","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"60-tinted.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"2x","filename":"58.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"58-dark.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"58-tinted.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"3x","filename":"87.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"87-dark.png"},{"idiom":"universal","size":"29x29","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"87-tinted.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"2x","filename":"76.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"76-dark.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"76-tinted.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"3x","filename":"114.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"114-dark.png"},{"idiom":"universal","size":"38x38","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"114-tinted.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"2x","filename":"80.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"80-dark.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"80-tinted.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"3x","filename":"120.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"120-dark.png"},{"idiom":"universal","size":"40x40","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"120-tinted.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"2x","filename":"120.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"120-dark.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"120-tinted.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"3x","filename":"180.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"180-dark.png"},{"idiom":"universal","size":"60x60","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"180-tinted.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"2x","filename":"128.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"128-dark.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"128-tinted.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"3x","filename":"192.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"192-dark.png"},{"idiom":"universal","size":"64x64","platform":"ios","scale":"3x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"192-tinted.png"},{"idiom":"universal","size":"68x68","platform":"ios","scale":"2x","filename":"136.png"},{"idiom":"universal","size":"68x68","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"136-dark.png"},{"idiom":"universal","size":"68x68","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"136-tinted.png"},{"idiom":"universal","size":"76x76","platform":"ios","scale":"2x","filename":"152.png"},{"idiom":"universal","size":"76x76","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"152-dark.png"},{"idiom":"universal","size":"76x76","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"152-tinted.png"},{"idiom":"universal","size":"83.5x83.5","platform":"ios","scale":"2x","filename":"167.png"},{"idiom":"universal","size":"83.5x83.5","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"dark"}],"filename":"167-dark.png"},{"idiom":"universal","size":"83.5x83.5","platform":"ios","scale":"2x","appearances":[{"appearance":"luminosity","value":"tinted"}],"filename":"167-tinted.png"}],"info":{"author":"xcode","version":1}}
+{
+  "images" : [
+    {
+      "filename" : "icon_light.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "icon_dark.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "tinted"
+        }
+      ],
+      "filename" : "icon_tinted.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

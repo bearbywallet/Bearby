@@ -492,7 +492,7 @@
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Bearby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -679,7 +679,7 @@
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Bearby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -707,7 +707,7 @@
 				DEVELOPMENT_TEAM = DNQ8PB6F6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ZilPay;
+				INFOPLIST_KEY_CFBundleDisplayName = Bearby;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (

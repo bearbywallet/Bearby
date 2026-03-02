@@ -202,7 +202,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
           final transaction = entry.value;
           final isLast = entry.key == sortedHistory.length - 1;
           return HistoryItem(
-            key: ValueKey(transaction.transactionHash),
+            key: ValueKey('${entry.key}_${transaction.transactionHash}'),
             transaction: transaction,
             showDivider: !isLast,
             onTap: () {
