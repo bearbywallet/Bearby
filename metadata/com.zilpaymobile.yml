@@ -1,30 +1,45 @@
 Categories:
   - Money
 License: GPL-3.0-only
-AuthorName: ZilPay
+AuthorName: Bearby
 AuthorWebSite: https://zilpay.io
 SourceCode: https://github.com/zilpay/zilpay-mobile
 IssueTracker: https://github.com/zilpay/zilpay-mobile/issues
 
 AutoName: Bearby
 
+Description: |
+  Bearby is a free and open-source multi-chain cryptocurrency wallet.
+  It supports Bitcoin, Ethereum, Binance Smart Chain, and other
+  EVM-compatible networks.
+
+  Features:
+  * Manage multiple accounts and wallets
+  * Send and receive tokens across supported chains
+  * Built-in dApp browser with Web3 injection
+  * QR code scanning for addresses
+  * Biometric authentication
+  * Hardware wallet support via USB and Bluetooth
+  * Full control of your private keys — non-custodial
+
 RepoType: git
 Repo: https://github.com/zilpay/zilpay-mobile.git
 
 Builds:
-  - versionName: 3.8.27
-    versionCode: 916
-    commit: v3.8.27
+  - versionName: 3.8.28
+    versionCode: 917
+    commit: 3.8.28
     subdir: .
     sudo:
       - apt-get update
-      - apt-get install -y build-essential pkg-config libssl-dev
+      - apt-get install -y build-essential pkg-config libssl-dev clang cmake ninja-build
     output: build/app/outputs/flutter-apk/app-release.apk
     srclibs:
       - flutter@stable
       - rustup@stable
     prebuild:
       - export PATH="$$flutter$$/bin:$$rustup$$/.cargo/bin:$PATH"
+      - rustup default stable
       - rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
       - cargo install cargo-ndk
       - flutter pub get
@@ -35,5 +50,5 @@ Builds:
 
 AutoUpdateMode: None
 UpdateCheckMode: Tags
-CurrentVersion: 3.8.27
-CurrentVersionCode: 916
+CurrentVersion: 3.8.28
+CurrentVersionCode: 917

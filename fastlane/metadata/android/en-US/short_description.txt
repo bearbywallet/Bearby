@@ -1,1 +1,1 @@
-ZilPay is a quantum-resistant, multi-currency decentralized wallet.
+Multi-chain crypto wallet for Bitcoin, Ethereum, and EVM networks
