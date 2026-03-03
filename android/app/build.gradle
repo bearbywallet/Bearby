@@ -4,12 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def keystorePropertiesFile = rootProject.file("key.properties")
-def keystoreProperties = new Properties()
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
 android {
     namespace = "com.zilpaymobile"
     ndkVersion = "29.0.13113456"
@@ -54,27 +48,28 @@ android {
         }
     }
 
-    signingConfigs {
-        release {
-            if (keystoreProperties.containsKey('ZILPAY_UPLOAD_STORE_FILE')) {
-                storeFile file(keystoreProperties['ZILPAY_UPLOAD_STORE_FILE'])
-                storePassword keystoreProperties['ZILPAY_UPLOAD_STORE_PASSWORD']
-                keyAlias keystoreProperties['ZILPAY_UPLOAD_KEY_ALIAS']
-                keyPassword keystoreProperties['ZILPAY_UPLOAD_KEY_PASSWORD']
-            }
-        }
-    }
-
     buildTypes {
         release {
-            signingConfig keystoreProperties.containsKey('ZILPAY_UPLOAD_STORE_FILE')
-                ? signingConfigs.release
-                : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    android.signingConfigs {
+        release {
+            storeFile file(keystoreProperties['ZILPAY_UPLOAD_STORE_FILE'])
+            storePassword keystoreProperties['ZILPAY_UPLOAD_STORE_PASSWORD']
+            keyAlias keystoreProperties['ZILPAY_UPLOAD_KEY_ALIAS']
+            keyPassword keystoreProperties['ZILPAY_UPLOAD_KEY_PASSWORD']
+        }
+    }
+    android.buildTypes.release.signingConfig = android.signingConfigs.release
 }
 
 flutter {
