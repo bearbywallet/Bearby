@@ -22,8 +22,17 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
-    
-    // Ensure Kotlin version consistency across all dependencies
+
+    buildscript {
+        configurations.all {
+            resolutionStrategy.eachDependency { details ->
+                if (details.requested.group == 'com.android.tools.build') {
+                    details.useVersion "8.9.1"
+                }
+            }
+        }
+    }
+
     configurations.all {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'org.jetbrains.kotlin') {
