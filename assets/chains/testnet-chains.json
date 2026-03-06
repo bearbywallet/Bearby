@@ -450,5 +450,38 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Tron Nile Testnet",
+    "chain": "TRX",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://nile.trongrid.io",
+      "https://api.nileex.io"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/tron/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
+        "name": "Tron",
+        "symbol": "TRX",
+        "decimals": 6
+      }
+    ],
+    "chainIds": [3448148188, 0],
+    "infoURL": "https://nileex.io",
+    "testnet": true,
+    "shortName": "tron",
+    "slip44": 195,
+    "explorers": [
+      {
+        "name": "Nile Tronscan",
+        "url": "https://nile.tronscan.org",
+        "icon": "https://tronscan.org/favicon.ico",
+        "standard": "none"
+      }
+    ]
   }
 ]

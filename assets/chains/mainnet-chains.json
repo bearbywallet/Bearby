@@ -101,6 +101,40 @@
     ]
   },
   {
+    "name": "Tron",
+    "chain": "TRX",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.trongrid.io",
+      "https://api.tronstack.io",
+      "https://tron-mainnet.token.im"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/tron/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
+        "name": "Tron",
+        "symbol": "TRX",
+        "decimals": 6
+      }
+    ],
+    "chainIds": [728126428, 0],
+    "infoURL": "https://tron.network",
+    "testnet": false,
+    "shortName": "tron",
+    "slip44": 195,
+    "explorers": [
+      {
+        "name": "Tronscan",
+        "url": "https://tronscan.org",
+        "icon": "https://tronscan.org/favicon.ico",
+        "standard": "none"
+      }
+    ]
+  },
+  {
     "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
