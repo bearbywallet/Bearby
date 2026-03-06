@@ -5808,11 +5808,13 @@ impl SseDecode for crate::models::transactions::request::TransactionRequestInfo 
                 deserializer,
             );
         let mut var_btc = <Option<String>>::sse_decode(deserializer);
+        let mut var_tron = <Option<String>>::sse_decode(deserializer);
         return crate::models::transactions::request::TransactionRequestInfo {
             metadata: var_metadata,
             scilla: var_scilla,
             evm: var_evm,
             btc: var_btc,
+            tron: var_tron,
         };
     }
 }
@@ -7138,6 +7140,7 @@ impl flutter_rust_bridge::IntoDart
             self.scilla.into_into_dart().into_dart(),
             self.evm.into_into_dart().into_dart(),
             self.btc.into_into_dart().into_dart(),
+            self.tron.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8289,6 +8292,7 @@ impl SseEncode for crate::models::transactions::request::TransactionRequestInfo 
             self.evm, serializer,
         );
         <Option<String>>::sse_encode(self.btc, serializer);
+        <Option<String>>::sse_encode(self.tron, serializer);
     }
 }
 

@@ -1,6 +1,7 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
 pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
+pub use zilpay::proto::tron_tx::TronTransactionRequest;
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
 pub use zilpay::proto::{
@@ -23,6 +24,7 @@ pub struct TransactionRequestInfo {
     pub scilla: Option<TransactionRequestScilla>,
     pub evm: Option<TransactionRequestEVM>,
     pub btc: Option<String>,
+    pub tron: Option<String>,
 }
 
 impl TryFrom<TransactionRequestInfo> for TransactionRequest {
@@ -42,6 +44,11 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
                 .map_err(|_| TransactionErrors::InvalidTxHash)?;
             let tx_req = TransactionRequest::Bitcoin((btc_tx, value.metadata.into()));
             Ok(tx_req)
+        } else if let Some(tron_json) = value.tron {
+            let tron_tx: TronTransactionRequest = serde_json::from_str(&tron_json)
+                .map_err(|_| TransactionErrors::InvalidTxHash)?;
+            let tx_req = TransactionRequest::Tron((tron_tx, value.metadata.into()));
+            Ok(tx_req)
         } else {
             Err(TransactionErrors::InvalidTxHash)
         }
@@ -54,6 +61,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
             TransactionRequest::Zilliqa((_, ref metadata)) => metadata.to_owned().into(),
             TransactionRequest::Ethereum((_, ref metadata)) => metadata.to_owned().into(),
             TransactionRequest::Bitcoin((_, ref metadata)) => metadata.to_owned().into(),
+            TransactionRequest::Tron((_, ref metadata)) => metadata.to_owned().into(),
         };
 
         match value {
@@ -62,12 +70,14 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 scilla: Some(tx.into()),
                 evm: None,
                 btc: None,
+                tron: None,
             },
             TransactionRequest::Ethereum((tx, _)) => Self {
                 metadata,
                 scilla: None,
                 evm: Some(tx.into()),
                 btc: None,
+                tron: None,
             },
             TransactionRequest::Bitcoin((tx, _)) => {
                 let bytes = bitcoin::consensus::encode::serialize(&tx);
@@ -77,6 +87,17 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                     scilla: None,
                     evm: None,
                     btc: Some(hex),
+                    tron: None,
+                }
+            }
+            TransactionRequest::Tron((tx, _)) => {
+                let json = serde_json::to_string(&tx).unwrap_or_default();
+                Self {
+                    metadata,
+                    scilla: None,
+                    evm: None,
+                    btc: None,
+                    tron: Some(json),
                 }
             }
         }

@@ -20,6 +20,10 @@ impl From<KeyPair> for KeyPairInfo {
                 sk: hex::encode(sk),
                 pk: hex::encode(pk),
             },
+            KeyPair::Secp256k1Tron((pk, sk)) => Self {
+                sk: hex::encode(sk),
+                pk: hex::encode(pk),
+            },
         }
     }
 }

@@ -4755,13 +4755,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return TransactionRequestInfo(
       metadata: dco_decode_transaction_metadata_info(arr[0]),
       scilla: dco_decode_opt_box_autoadd_transaction_request_scilla(arr[1]),
       evm: dco_decode_opt_box_autoadd_transaction_request_evm(arr[2]),
       btc: dco_decode_opt_String(arr[3]),
+      tron: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -6250,8 +6251,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_evm =
         sse_decode_opt_box_autoadd_transaction_request_evm(deserializer);
     var var_btc = sse_decode_opt_String(deserializer);
+    var var_tron = sse_decode_opt_String(deserializer);
     return TransactionRequestInfo(
-        metadata: var_metadata, scilla: var_scilla, evm: var_evm, btc: var_btc);
+        metadata: var_metadata,
+        scilla: var_scilla,
+        evm: var_evm,
+        btc: var_btc,
+        tron: var_tron);
   }
 
   @protected
@@ -7486,6 +7492,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         self.scilla, serializer);
     sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
     sse_encode_opt_String(self.btc, serializer);
+    sse_encode_opt_String(self.tron, serializer);
   }
 
   @protected

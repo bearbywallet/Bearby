@@ -16,17 +16,23 @@ class TransactionRequestInfo {
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
   final String? btc;
+  final String? tron;
 
   const TransactionRequestInfo({
     required this.metadata,
     this.scilla,
     this.evm,
     this.btc,
+    this.tron,
   });
 
   @override
   int get hashCode =>
-      metadata.hashCode ^ scilla.hashCode ^ evm.hashCode ^ btc.hashCode;
+      metadata.hashCode ^
+      scilla.hashCode ^
+      evm.hashCode ^
+      btc.hashCode ^
+      tron.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -36,5 +42,6 @@ class TransactionRequestInfo {
           metadata == other.metadata &&
           scilla == other.scilla &&
           evm == other.evm &&
-          btc == other.btc;
+          btc == other.btc &&
+          tron == other.tron;
 }

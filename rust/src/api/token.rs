@@ -342,6 +342,9 @@ async fn fetch_zilliqa_tokens(
         Address::Secp256k1Bitcoin(_) => {
             return Err("btc is not supporting".to_string());
         }
+        Address::Secp256k1Tron(_) => {
+            return Err("tron token auto-discovery is not supported".to_string());
+        }
         Address::Secp256k1Sha256(_) => {
             let response = client
                 .get(ZILLIQA_SCILLA_TOKENS_API)

@@ -217,7 +217,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         .get_provider(wallet_data.default_chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let bip49 = match selected_account.pub_key {
-        PubKey::Secp256k1Sha256(_) | PubKey::Secp256k1Keccak256(_) | PubKey::Ed25519Solana(_) => {
+        PubKey::Secp256k1Sha256(_) | PubKey::Secp256k1Keccak256(_) | PubKey::Ed25519Solana(_) | PubKey::Secp256k1Tron(_) => {
             DerivationPath::new(
                 default_chain.config.slip_44,
                 params.account_index,

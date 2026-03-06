@@ -108,7 +108,8 @@ pub async fn update_ledger_accounts(
         let bip49 = match selected_account.pub_key {
             PubKey::Secp256k1Sha256(_)
             | PubKey::Secp256k1Keccak256(_)
-            | PubKey::Ed25519Solana(_) => DerivationPath::new(
+            | PubKey::Ed25519Solana(_)
+            | PubKey::Secp256k1Tron(_) => DerivationPath::new(
                 provider.config.slip_44,
                 wallet_index,
                 DerivationPath::BIP44_PURPOSE,

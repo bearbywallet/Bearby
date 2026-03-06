@@ -135,6 +135,7 @@ pub async fn sign_send_transactions(
                 eth_tx.chain_id = Some(sender_account.chain_id);
             }
             TransactionRequest::Bitcoin(_) => {}
+            TransactionRequest::Tron(_) => {}
         }
 
         let signed_tx = wallet
@@ -190,7 +191,7 @@ pub async fn encode_tx_rlp(
             ))?;
         let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
         match tx {
-            TransactionRequest::Bitcoin(_) => Ok(EncodedRLPTx {
+            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => Ok(EncodedRLPTx {
                 bytes: tx
                     .to_rlp_encode(&account.pub_key)
                     .map_err(ServiceError::TransactionErrors)?,
@@ -526,6 +527,7 @@ pub async fn cacl_gas_fee(
                     gas.tx_estimate_gas = tx.gas.map(|gas| U256::from(gas)).unwrap_or(U256::ZERO);
                 }
                 TransactionRequest::Bitcoin(_) => {}
+                TransactionRequest::Tron(_) => {}
             }
         }
 
