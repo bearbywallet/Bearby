@@ -1,0 +1,4 @@
+- Build system improvements for F-Droid compatibility
+- Upgraded Gradle and Android Gradle Plugin
+- Upgraded Kotlin version
+- Added build diagnostics logging

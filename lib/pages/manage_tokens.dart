@@ -249,7 +249,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     final trimmed = query.trim();
-    if (trimmed.startsWith('0x') || trimmed.startsWith('zil1')) {
+    if (trimmed.startsWith('0x') || trimmed.startsWith('zil1') || trimmed.startsWith('T')) {
       _debounce = Timer(const Duration(milliseconds: 500), () {
         _fetchTokenByAddress(trimmed);
       });
@@ -369,7 +369,8 @@ class _ManageTokensPageState extends State<ManageTokensPage>
   List<FTokenInfo> _filterTokens(List<FTokenInfo> tokens) {
     if (_searchQuery.isEmpty ||
         _searchQuery.startsWith('0x') ||
-        _searchQuery.startsWith('zil1')) {
+        _searchQuery.startsWith('zil1') ||
+        _searchQuery.startsWith('T')) {
       return tokens;
     }
 
