@@ -75,6 +75,11 @@ String formExplorerUrl(ExplorerInfo explorer, String transactionHash) {
       ? explorer.url.substring(0, explorer.url.length - 1)
       : explorer.url;
 
+  if (explorer.standard == 1) {
+    // tron
+    return "$baseUrl/#/transaction/$transactionHash";
+  }
+
   return "$baseUrl/tx/$transactionHash";
 }
 

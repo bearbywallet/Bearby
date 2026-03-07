@@ -155,3 +155,20 @@ pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkCon
 
     Ok(chains)
 }
+
+#[cfg(test)]
+mod provider_tests {
+    use std::fs;
+    use std::path::Path;
+
+    use crate::api::provider::get_chains_providers_from_json;
+
+    #[test]
+    fn test_mainnet_chains_parse_count() {
+        let path = Path::new("../assets/chains/mainnet-chains.json");
+        let content = fs::read_to_string(path).unwrap();
+        let providers = get_chains_providers_from_json(content).unwrap();
+
+        assert_eq!(providers.len(), 12);
+    }
+}

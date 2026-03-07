@@ -135,7 +135,15 @@ pub async fn sign_send_transactions(
                 eth_tx.chain_id = Some(sender_account.chain_id);
             }
             TransactionRequest::Bitcoin(_) => {}
-            TransactionRequest::Tron(_) => {}
+            TransactionRequest::Tron((ref mut tron_tx, _)) => {
+                let provider = core
+                    .get_provider(sender_account.chain_hash)
+                    .map_err(ServiceError::BackgroundError)?;
+                provider
+                    .tron_fill_block_ref(tron_tx)
+                    .await
+                    .map_err(ServiceError::NetworkErrors)?;
+            }
         }
 
         let signed_tx = wallet

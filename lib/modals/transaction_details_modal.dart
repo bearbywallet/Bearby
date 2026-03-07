@@ -446,7 +446,8 @@ class TransactionDetailsModal extends StatelessWidget {
         const SizedBox(height: 12),
         if (btcReceipt?.inputs != null && btcReceipt!.inputs!.isNotEmpty) ...[
           DetailGroupCard(
-            title: 'Inputs (${btcReceipt.inputsCount ?? btcReceipt.inputs!.length})',
+            title:
+                'Inputs (${btcReceipt.inputsCount ?? btcReceipt.inputs!.length})',
             theme: theme,
             children: btcReceipt.inputs!.take(3).map((input) {
               return DetailItem(
@@ -461,12 +462,15 @@ class TransactionDetailsModal extends StatelessWidget {
         ],
         if (btcReceipt?.outputs != null && btcReceipt!.outputs!.isNotEmpty) ...[
           DetailGroupCard(
-            title: 'Outputs (${btcReceipt.outputsCount ?? btcReceipt.outputs!.length})',
+            title:
+                'Outputs (${btcReceipt.outputsCount ?? btcReceipt.outputs!.length})',
             theme: theme,
             children: btcReceipt.outputs!.take(3).map((output) {
               final token = appState.wallet?.tokens.first;
-              final decimals = transaction.tokenInfo?.decimals ?? token?.decimals ?? 8;
-              final symbol = transaction.tokenInfo?.symbol ?? token?.symbol ?? 'BTC';
+              final decimals =
+                  transaction.tokenInfo?.decimals ?? token?.decimals ?? 8;
+              final symbol =
+                  transaction.tokenInfo?.symbol ?? token?.symbol ?? 'BTC';
 
               final (formattedValue, _) = formatingAmount(
                 amount: output.value ?? BigInt.zero,
@@ -532,7 +536,8 @@ class TransactionDetailsModal extends StatelessWidget {
     );
   }
 
-  String _getLocalizedSignType(ParsedSignedMessage? signedMsg, AppLocalizations l10n) {
+  String _getLocalizedSignType(
+      ParsedSignedMessage? signedMsg, AppLocalizations l10n) {
     if (signedMsg == null) return l10n.signedMessageTypeUnknown;
     if (signedMsg.isPersonalSign) return l10n.signedMessageTypePersonalSign;
     if (signedMsg.isTypedData) return l10n.signedMessageTypeEip712;
@@ -541,9 +546,7 @@ class TransactionDetailsModal extends StatelessWidget {
 
   String _formatJsonValue(dynamic value) {
     if (value is Map) {
-      return value.entries
-          .map((e) => '${e.key}: ${e.value}')
-          .join(', ');
+      return value.entries.map((e) => '${e.key}: ${e.value}').join(', ');
     }
     if (value is List) {
       return value.map((e) => e.toString()).join(', ');
@@ -833,7 +836,8 @@ class _AmountSection extends StatelessWidget {
       final domainName = signedMsg.domainName ?? l10n.signedMessageTypeUnknown;
       final primaryType = signedMsg.primaryType ?? '';
       displayContent = domainName;
-      subtitle = primaryType.isNotEmpty ? primaryType : l10n.signedMessageTypeEip712;
+      subtitle =
+          primaryType.isNotEmpty ? primaryType : l10n.signedMessageTypeEip712;
       badgeText = l10n.signedMessageTypeEip712;
     } else {
       displayContent = signedMsg.decodedMessage;
@@ -856,7 +860,8 @@ class _AmountSection extends StatelessWidget {
                     Expanded(
                       child: Text(
                         transaction.title ?? l10n.signMessageModalContentTitle,
-                        style: theme.subtitle1.copyWith(color: theme.textPrimary),
+                        style:
+                            theme.subtitle1.copyWith(color: theme.textPrimary),
                       ),
                     ),
                     Container(

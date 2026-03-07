@@ -943,6 +943,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-stream"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b5a71a6f37880a80d1d7f19efd781e4b5de42c88f0722cc13bcb6cc2cfe8476"
+dependencies = [
+ "async-stream-impl",
+ "futures-core",
+ "pin-project-lite",
+]
+
+[[package]]
+name = "async-stream-impl"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7c24de15d275a1ecfd47a380fb4d5ec9bfe0933f309ed5e705b775596a3574d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1307,25 +1329,72 @@ dependencies = [
 
 [[package]]
 name = "axum"
-version = "0.8.8"
+version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b52af3cb4058c895d37317bb27508dccc8e5f2d39454016b297bf4a400597b8"
+checksum = "edca88bc138befd0323b20752846e6587272d3b03b0343c8ea28a6f819e6e71f"
 dependencies = [
- "axum-core",
+ "async-trait",
+ "axum-core 0.4.5",
  "bytes",
  "futures-util",
  "http 1.4.0",
  "http-body 1.0.1",
  "http-body-util",
  "itoa",
- "matchit",
+ "matchit 0.7.3",
+ "memchr",
+ "mime",
+ "percent-encoding",
+ "pin-project-lite",
+ "rustversion",
+ "serde",
+ "sync_wrapper",
+ "tower 0.5.3",
+ "tower-layer",
+ "tower-service",
+]
+
+[[package]]
+name = "axum"
+version = "0.8.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b52af3cb4058c895d37317bb27508dccc8e5f2d39454016b297bf4a400597b8"
+dependencies = [
+ "axum-core 0.5.6",
+ "bytes",
+ "futures-util",
+ "http 1.4.0",
+ "http-body 1.0.1",
+ "http-body-util",
+ "itoa",
+ "matchit 0.8.4",
  "memchr",
  "mime",
  "percent-encoding",
  "pin-project-lite",
  "serde_core",
  "sync_wrapper",
- "tower",
+ "tower 0.5.3",
+ "tower-layer",
+ "tower-service",
+]
+
+[[package]]
+name = "axum-core"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09f2bd6146b97ae3359fa0cc6d6b376d9539582c7b4220f041a33ec24c226199"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "futures-util",
+ "http 1.4.0",
+ "http-body 1.0.1",
+ "http-body-util",
+ "mime",
+ "pin-project-lite",
+ "rustversion",
+ "sync_wrapper",
  "tower-layer",
  "tower-service",
 ]
@@ -1351,7 +1420,7 @@ dependencies = [
 [[package]]
 name = "background"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "async-trait",
@@ -1756,7 +1825,7 @@ dependencies = [
 [[package]]
 name = "cache"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "errors",
  "image",
@@ -1810,7 +1879,7 @@ dependencies = [
 [[package]]
 name = "cipher"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "aes-gcm",
  "config",
@@ -1898,7 +1967,7 @@ checksum = "75984efb6ed102a0d42db99afb6c1948f0380d1d91808d5529916e6c08b49d8d"
 [[package]]
 name = "config"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "serde",
 ]
@@ -2064,7 +2133,7 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "bitcoin",
  "config",
@@ -2478,7 +2547,7 @@ dependencies = [
 [[package]]
 name = "errors"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "bincode",
  "ntrulp",
@@ -2859,8 +2928,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "tonic",
- "tower",
+ "tonic 0.13.1",
+ "tower 0.5.3",
  "tower-layer",
  "tower-util",
  "tracing",
@@ -3093,7 +3162,7 @@ dependencies = [
 [[package]]
 name = "history"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "errors",
@@ -3249,7 +3318,7 @@ dependencies = [
  "libc",
  "percent-encoding",
  "pin-project-lite",
- "socket2 0.6.2",
+ "socket2 0.6.3",
  "tokio",
  "tower-service",
  "tracing",
@@ -3514,7 +3583,7 @@ dependencies = [
 [[package]]
 name = "intl"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "bigdecimal",
@@ -3844,6 +3913,12 @@ dependencies = [
 
 [[package]]
 name = "matchit"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e7465ac9959cc2b1404e8e2367b43684a6d13790fe23056cc8c6c5a6b7bcb94"
+
+[[package]]
+name = "matchit"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
@@ -3963,7 +4038,7 @@ checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
 [[package]]
 name = "network"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "async-trait",
@@ -3983,6 +4058,7 @@ dependencies = [
  "storage",
  "token",
  "tokio",
+ "tonic 0.12.3",
 ]
 
 [[package]]
@@ -4772,7 +4848,7 @@ dependencies = [
 [[package]]
 name = "proto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "bech32",
@@ -4787,7 +4863,6 @@ dependencies = [
  "k256",
  "pqbip39",
  "prost 0.13.5",
- "prost-build",
  "prost-types 0.13.5",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -4796,6 +4871,8 @@ dependencies = [
  "serde_json",
  "sha2",
  "tokio",
+ "tonic 0.12.3",
+ "tonic-build",
  "zeroize",
 ]
 
@@ -4817,7 +4894,7 @@ dependencies = [
 [[package]]
 name = "qrcodes"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "errors",
@@ -4850,7 +4927,7 @@ dependencies = [
  "quinn-udp",
  "rustc-hash",
  "rustls",
- "socket2 0.6.2",
+ "socket2 0.6.3",
  "thiserror 2.0.18",
  "tokio",
  "tracing",
@@ -4887,7 +4964,7 @@ dependencies = [
  "cfg_aliases",
  "libc",
  "once_cell",
- "socket2 0.6.2",
+ "socket2 0.6.3",
  "tracing",
  "windows-sys 0.60.2",
 ]
@@ -5192,7 +5269,7 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tokio-util",
- "tower",
+ "tower 0.5.3",
  "tower-http",
  "tower-service",
  "url",
@@ -5292,7 +5369,7 @@ checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
 [[package]]
 name = "rpc"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "async-trait",
@@ -5478,6 +5555,15 @@ dependencies = [
  "rustls-pki-types",
  "schannel",
  "security-framework",
+]
+
+[[package]]
+name = "rustls-pemfile"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dce314e5fee3f39953d46bb63bb8a46d40c2f8fb7cc5a3b6cab2bde9721d6e50"
+dependencies = [
+ "rustls-pki-types",
 ]
 
 [[package]]
@@ -5813,7 +5899,7 @@ dependencies = [
 [[package]]
 name = "session"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "async-trait",
  "cipher 0.1.0",
@@ -5842,7 +5928,7 @@ dependencies = [
 [[package]]
 name = "settings"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -5985,12 +6071,12 @@ dependencies = [
 
 [[package]]
 name = "socket2"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86f4aa3ad99f2088c990dfa82d367e19cb29268ed67c574d10d0a4bfe71f07e0"
+checksum = "3a766e1110788c36f4fa1c2b71b387a7815aa65f88ce0229841826633d93723e"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -6018,7 +6104,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "config",
  "directories",
@@ -6287,7 +6373,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 [[package]]
 name = "token"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "bincode",
@@ -6308,7 +6394,7 @@ dependencies = [
  "libc",
  "mio",
  "pin-project-lite",
- "socket2 0.6.2",
+ "socket2 0.6.3",
  "tokio-macros",
  "windows-sys 0.61.2",
 ]
@@ -6390,12 +6476,44 @@ dependencies = [
 
 [[package]]
 name = "tonic"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "877c5b330756d856ffcc4553ab34a5684481ade925ecc54bcd1bf02b1d0d4d52"
+dependencies = [
+ "async-stream",
+ "async-trait",
+ "axum 0.7.9",
+ "base64 0.22.1",
+ "bytes",
+ "h2",
+ "http 1.4.0",
+ "http-body 1.0.1",
+ "http-body-util",
+ "hyper",
+ "hyper-timeout",
+ "hyper-util",
+ "percent-encoding",
+ "pin-project 1.1.11",
+ "prost 0.13.5",
+ "rustls-pemfile",
+ "socket2 0.5.10",
+ "tokio",
+ "tokio-rustls",
+ "tokio-stream",
+ "tower 0.4.13",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "tonic"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e581ba15a835f4d9ea06c55ab1bd4dce26fc53752c69a04aac00703bfb49ba9"
 dependencies = [
  "async-trait",
- "axum",
+ "axum 0.8.8",
  "base64 0.22.1",
  "bytes",
  "h2",
@@ -6413,7 +6531,41 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tokio-stream",
- "tower",
+ "tower 0.5.3",
+ "tower-layer",
+ "tower-service",
+ "tracing",
+]
+
+[[package]]
+name = "tonic-build"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9557ce109ea773b399c9b9e5dca39294110b74f1f342cb347a80d1fce8c26a11"
+dependencies = [
+ "prettyplease",
+ "proc-macro2",
+ "prost-build",
+ "prost-types 0.13.5",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "tower"
+version = "0.4.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8fa9be0de6cf49e536ce1851f987bd21a43b771b09473c3549a6c853db37c1c"
+dependencies = [
+ "futures-core",
+ "futures-util",
+ "indexmap 1.9.3",
+ "pin-project 1.1.11",
+ "pin-project-lite",
+ "rand 0.8.5",
+ "slab",
+ "tokio",
+ "tokio-util",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -6456,7 +6608,7 @@ dependencies = [
  "pin-project-lite",
  "tokio",
  "tokio-util",
- "tower",
+ "tower 0.5.3",
  "tower-layer",
  "tower-service",
 ]
@@ -6804,7 +6956,7 @@ dependencies = [
 [[package]]
 name = "wallet"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "alloy",
  "async-trait",
@@ -7575,7 +7727,7 @@ dependencies = [
 [[package]]
 name = "zilpay"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "background",
  "cache",
@@ -7599,7 +7751,7 @@ dependencies = [
 [[package]]
 name = "zilpay_core"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3b4fba3b145df887fda2a1aaccadd1d032a04c60"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#0978e61640adb5865740ed532a00bbee0ce74e55"
 dependencies = [
  "background",
  "cache",
