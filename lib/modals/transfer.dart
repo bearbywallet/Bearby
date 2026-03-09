@@ -121,6 +121,7 @@ class _ConfirmTransactionContentState
   bool get isEVM => widget.tx.evm != null;
   bool get isScilla => widget.tx.scilla != null;
   bool get isBTC => widget.tx.btc != null;
+  bool get isTron => widget.tx.tron != null;
 
   BigInt _getValueForOption(GasFeeOption option, RequiredTxParamsInfo params) {
     switch (option) {
@@ -140,7 +141,7 @@ class _ConfirmTransactionContentState
       return BigInt.zero;
     }
 
-    if (isBTC) {
+    if (isBTC || isTron) {
       return current;
     }
 
@@ -406,7 +407,7 @@ class _ConfirmTransactionContentState
                             timeDiffBlock:
                                 appState.chain?.diffBlockTime.toInt() ?? 10,
                             txParamsInfo: _txParamsInfo,
-                            isBitcoin: isBTC,
+                            isFeeFixed: isBTC || isTron,
                             disabled: _isDisabled,
                             onGasOptionChanged: (option, selectedValue) async {
                               setState(() => _userSelectedOption = option);

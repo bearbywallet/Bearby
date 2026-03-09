@@ -61,7 +61,7 @@ class GasDetails extends StatelessWidget {
   final FTokenInfo token;
   final AppTheme theme;
   final bool disabled;
-  final bool isBitcoin;
+  final bool isFeeFixed;
   final Color? textColor;
   final Color? secondaryColor;
 
@@ -72,7 +72,7 @@ class GasDetails extends StatelessWidget {
     required this.token,
     required this.theme,
     required this.disabled,
-    this.isBitcoin = false,
+    this.isFeeFixed = false,
     this.textColor,
     this.secondaryColor,
   });
@@ -116,7 +116,7 @@ class GasDetails extends StatelessWidget {
                 formatGasPriceDetail(
                   _getGasPriceForOption(),
                   token,
-                  isBitcoin: isBitcoin,
+                  isFeeFixed: isFeeFixed,
                 ),
                 effectiveTextColor,
                 effectiveSecondaryColor,
@@ -127,7 +127,7 @@ class GasDetails extends StatelessWidget {
                   formatGasPriceDetail(
                     txParamsInfo.feeHistory.baseFee,
                     token,
-                    isBitcoin: isBitcoin,
+                    isFeeFixed: isFeeFixed,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -138,7 +138,7 @@ class GasDetails extends StatelessWidget {
                   formatGasPriceDetail(
                     txParamsInfo.maxPriorityFee,
                     token,
-                    isBitcoin: isBitcoin,
+                    isFeeFixed: isFeeFixed,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -151,7 +151,7 @@ class GasDetails extends StatelessWidget {
                     txParamsInfo.feeHistory.baseFee +
                         txParamsInfo.maxPriorityFee,
                     token,
-                    isBitcoin: isBitcoin,
+                    isFeeFixed: isFeeFixed,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
@@ -198,7 +198,7 @@ class GasEIP1559 extends StatefulWidget {
   final Function(GasFeeOption option, BigInt selectedValue) onGasOptionChanged;
   final bool disabled;
   final int timeDiffBlock;
-  final bool isBitcoin;
+  final bool isFeeFixed;
   final Color? primaryColor;
   final Color? textColor;
   final Color? secondaryColor;
@@ -208,7 +208,7 @@ class GasEIP1559 extends StatefulWidget {
     required this.txParamsInfo,
     required this.onGasOptionChanged,
     required this.timeDiffBlock,
-    this.isBitcoin = false,
+    this.isFeeFixed = false,
     this.disabled = false,
     this.primaryColor,
     this.textColor,
@@ -298,7 +298,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       return BigInt.zero;
     }
 
-    if (widget.isBitcoin) {
+    if (widget.isFeeFixed) {
       return gasPriceForOption;
     }
 
@@ -434,7 +434,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           token: token,
                           theme: theme,
                           disabled: widget.disabled,
-                          isBitcoin: widget.isBitcoin,
+                          isFeeFixed: widget.isFeeFixed,
                           textColor: effectiveTextColor,
                           secondaryColor: effectiveSecondaryColor,
                         ),

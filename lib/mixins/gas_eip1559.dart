@@ -92,8 +92,12 @@ BigInt calculateTotalGasCost(
   }
 }
 
-String formatGasPriceDetail(BigInt price, FTokenInfo token, {bool isBitcoin = false}) {
-  if (isBitcoin) {
+String formatGasPriceDetail(BigInt price, FTokenInfo token,
+    {bool isFeeFixed = false}) {
+  if (isFeeFixed) {
+    if (token.symbol.toUpperCase().contains('TRX')) {
+      return '$price Sun';
+    }
     return '$price Sat';
   }
 
