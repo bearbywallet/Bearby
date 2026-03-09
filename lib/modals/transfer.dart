@@ -186,6 +186,9 @@ class _ConfirmTransactionContentState
   }
 
   bool get _isDisabled {
+    if (isTron) {
+      return _txParamsInfo.gasPrice == BigInt.zero || _loading;
+    }
     return (_txParamsInfo.gasPrice == BigInt.zero &&
             _txParamsInfo.maxPriorityFee == BigInt.zero &&
             _txParamsInfo.txEstimateGas == BigInt.zero) ||
@@ -200,10 +203,7 @@ class _ConfirmTransactionContentState
 
   void _initGasPolling() {
     _fetchGasFee(true);
-    final appState = context.read<AppState>();
-    final chainHash = appState.account?.chainHash ?? BigInt.zero;
-    int diffBlockTime =
-        appState.getChain(chainHash)?.diffBlockTime.toInt() ?? 20;
+    int diffBlockTime = 10;
 
     if (diffBlockTime < 2) {
       diffBlockTime = 2;
