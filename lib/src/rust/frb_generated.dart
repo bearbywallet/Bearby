@@ -4180,16 +4180,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return HistoricalTransactionInfo(
       status: dco_decode_transaction_status_info(arr[0]),
       metadata: dco_decode_transaction_metadata_info(arr[1]),
       evm: dco_decode_opt_String(arr[2]),
       scilla: dco_decode_opt_String(arr[3]),
       btc: dco_decode_opt_String(arr[4]),
-      signedMessage: dco_decode_opt_String(arr[5]),
-      timestamp: dco_decode_u_64(arr[6]),
+      tron: dco_decode_opt_String(arr[5]),
+      signedMessage: dco_decode_opt_String(arr[6]),
+      timestamp: dco_decode_u_64(arr[7]),
     );
   }
 
@@ -5460,6 +5461,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_evm = sse_decode_opt_String(deserializer);
     var var_scilla = sse_decode_opt_String(deserializer);
     var var_btc = sse_decode_opt_String(deserializer);
+    var var_tron = sse_decode_opt_String(deserializer);
     var var_signedMessage = sse_decode_opt_String(deserializer);
     var var_timestamp = sse_decode_u_64(deserializer);
     return HistoricalTransactionInfo(
@@ -5468,6 +5470,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         evm: var_evm,
         scilla: var_scilla,
         btc: var_btc,
+        tron: var_tron,
         signedMessage: var_signedMessage,
         timestamp: var_timestamp);
   }
@@ -6867,6 +6870,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.evm, serializer);
     sse_encode_opt_String(self.scilla, serializer);
     sse_encode_opt_String(self.btc, serializer);
+    sse_encode_opt_String(self.tron, serializer);
     sse_encode_opt_String(self.signedMessage, serializer);
     sse_encode_u_64(self.timestamp, serializer);
   }

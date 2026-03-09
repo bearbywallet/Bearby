@@ -27,6 +27,7 @@ pub struct HistoricalTransactionInfo {
     pub evm: Option<String>,
     pub scilla: Option<String>,
     pub btc: Option<String>,
+    pub tron: Option<String>,
     pub signed_message: Option<String>,
     pub timestamp: u64,
 }
@@ -50,6 +51,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 btc_utxo_amounts: value.metadata.btc_utxo_amounts,
             },
             btc: value.btc,
+            tron: value.tron,
             evm: value.evm,
             scilla: value.scilla,
             signed_message: value.signed_message,

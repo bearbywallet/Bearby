@@ -4937,6 +4937,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
         let mut var_evm = <Option<String>>::sse_decode(deserializer);
         let mut var_scilla = <Option<String>>::sse_decode(deserializer);
         let mut var_btc = <Option<String>>::sse_decode(deserializer);
+        let mut var_tron = <Option<String>>::sse_decode(deserializer);
         let mut var_signedMessage = <Option<String>>::sse_decode(deserializer);
         let mut var_timestamp = <u64>::sse_decode(deserializer);
         return crate::models::transactions::history::HistoricalTransactionInfo {
@@ -4945,6 +4946,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
             evm: var_evm,
             scilla: var_scilla,
             btc: var_btc,
+            tron: var_tron,
             signed_message: var_signedMessage,
             timestamp: var_timestamp,
         };
@@ -6839,6 +6841,7 @@ impl flutter_rust_bridge::IntoDart
             self.evm.into_into_dart().into_dart(),
             self.scilla.into_into_dart().into_dart(),
             self.btc.into_into_dart().into_dart(),
+            self.tron.into_into_dart().into_dart(),
             self.signed_message.into_into_dart().into_dart(),
             self.timestamp.into_into_dart().into_dart(),
         ]
@@ -7630,6 +7633,7 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         <Option<String>>::sse_encode(self.evm, serializer);
         <Option<String>>::sse_encode(self.scilla, serializer);
         <Option<String>>::sse_encode(self.btc, serializer);
+        <Option<String>>::sse_encode(self.tron, serializer);
         <Option<String>>::sse_encode(self.signed_message, serializer);
         <u64>::sse_encode(self.timestamp, serializer);
     }

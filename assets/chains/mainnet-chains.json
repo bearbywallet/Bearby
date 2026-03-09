@@ -107,6 +107,7 @@
     "rpc": [
       "https://api.trongrid.io/jsonrpc",
       "https://tron-rpc.publicnode.com/jsonrpc",
+      "https://tron-mainnet.gateway.tatum.io/jsonrpc",
       "grpc://grpc.trongrid.io:50051",
       "grpc://18.209.42.127:50051",
       "grpc://34.237.210.82:50051"
