@@ -108,14 +108,8 @@
       "https://api.trongrid.io/jsonrpc",
       "https://tron-rpc.publicnode.com/jsonrpc",
       "grpc://grpc.trongrid.io:50051",
-      "grpc://108.128.110.16:50051",
-      "grpc://13.228.119.63:50051",
-      "grpc://15.222.19.181:50051",
       "grpc://18.209.42.127:50051",
-      "grpc://3.79.71.167:50051",
-      "grpc://34.237.210.82:50051",
-      "grpc://35.180.81.133:50051",
-      "grpc://52.8.46.215:50051"
+      "grpc://34.237.210.82:50051"
     ],
     "features": [],
     "ftokens": [

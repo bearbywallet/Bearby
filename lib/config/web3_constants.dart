@@ -9,6 +9,7 @@ const String kChainChangedEvent = 'chainChanged';
 const int kBitcoinlip44 = 0;
 const int kZilliqaSlip44 = 313;
 const int kEthereumSlip44 = 60;
+const int kTronSlip44 = 195;
 final BigInt kZilliqaChainId = BigInt.one;
 
 // Address types
