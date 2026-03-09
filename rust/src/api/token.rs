@@ -13,7 +13,7 @@ pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    crypto::slip44::{BITCOIN, ETHEREUM, ZILLIQA},
+    crypto::slip44::{BITCOIN, ETHEREUM, TRON, ZILLIQA},
     settings::wallet_settings::TokenQuotesAPIOptions,
     token::ft::FToken,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
@@ -24,6 +24,7 @@ const UNISWAP_API_URL: &str =
 const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
 const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
 const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
+const TRONSCAN_TOKENS_API: &str = "https://apilist.tronscan.org/api/tokens/overview/web?start=0&limit=200&verifier=all&order=desc&filter=trc20";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
 #[derive(Debug, Deserialize)]
@@ -101,6 +102,22 @@ struct ZilstreamToken {
 #[derive(Debug, Deserialize)]
 struct ZilstreamResponse {
     data: Vec<ZilstreamToken>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TronScanToken {
+    #[serde(rename = "contractAddress")]
+    contract_address: String,
+    name: String,
+    abbr: String,
+    decimal: u8,
+    #[serde(rename = "imgUrl")]
+    img_url: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TronScanResponse {
+    tokens: Vec<TronScanToken>,
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -419,6 +436,49 @@ async fn fetch_zilliqa_tokens(
     }
 }
 
+async fn fetch_tron_tokens(
+    default_logo: Option<String>,
+    chain_hash: u64,
+    addr_type: u8,
+) -> Result<Vec<FTokenInfo>, String> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get(TRONSCAN_TOKENS_API)
+        .header("User-Agent", "ZilPay-Wallet/1.0")
+        .send()
+        .await
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("API error: {}", response.status()));
+    }
+
+    let api_response: TronScanResponse = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse TronScan response: {}", e))?;
+
+    let result = api_response
+        .tokens
+        .into_iter()
+        .map(|token| FTokenInfo {
+            name: token.name,
+            symbol: token.abbr,
+            decimals: token.decimal,
+            addr: token.contract_address,
+            addr_type,
+            logo: token.img_url.or_else(|| default_logo.clone()),
+            balances: HashMap::new(),
+            rate: 0.0,
+            default: false,
+            native: false,
+            chain_hash,
+        })
+        .collect();
+
+    Ok(result)
+}
+
 pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -456,6 +516,10 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
 
     if account.slip_44 == ZILLIQA {
         return fetch_zilliqa_tokens(&account.addr, default_logo, chain_hash).await;
+    }
+
+    if account.slip_44 == TRON {
+        return fetch_tron_tokens(default_logo, chain_hash, addr_type).await;
     }
 
     let request_body = serde_json::json!({
