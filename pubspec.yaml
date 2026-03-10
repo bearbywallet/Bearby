@@ -45,6 +45,7 @@ flutter:
     - assets/chains/
     - assets/zilpay_legacy_inject.js
     - assets/evm_inject.js
+    - assets/tron_inject.js
   fonts:
     - family: SFRounded
       fonts:

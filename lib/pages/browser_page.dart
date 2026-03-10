@@ -21,6 +21,7 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/web3/eip_1193.dart';
 import 'package:bearby/web3/message.dart';
+import 'package:bearby/web3/tron_web3.dart';
 import 'package:bearby/web3/zilpay_legacy.dart';
 
 class BrowserPage extends StatefulWidget {
@@ -37,6 +38,7 @@ class _BrowserPageState extends State<BrowserPage>
   InAppWebViewController? _webViewController;
   ZilPayLegacyHandler? _legacyHandler;
   Web3EIP1193Handler? _eip1193Handler;
+  TronWeb3Handler? _tronHandler;
   CookieManager? _cookieManager;
 
   bool _isWebViewVisible = false;
@@ -64,6 +66,8 @@ class _BrowserPageState extends State<BrowserPage>
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _legacyHandler?.dispose();
+    _eip1193Handler?.dispose();
+    _tronHandler?.dispose();
     _webViewController?.dispose();
     super.dispose();
   }
@@ -157,6 +161,11 @@ class _BrowserPageState extends State<BrowserPage>
       initialUrl: _currentUrl,
       appState: appState,
     );
+    _tronHandler = TronWeb3Handler(
+      webViewController: _webViewController!,
+      initialUrl: _currentUrl,
+      appState: appState,
+    );
 
     _webViewController?.addJavaScriptHandler(
       handlerName: 'ZilPayLegacy',
@@ -185,11 +194,26 @@ class _BrowserPageState extends State<BrowserPage>
         }
       },
     );
+
+    _webViewController?.addJavaScriptHandler(
+      handlerName: 'TIP6963TRON',
+      callback: (args) {
+        if (!mounted) return;
+        try {
+          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
+          final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
+          _tronHandler?.handleWeb3TronMessage(zilPayMessage, context);
+        } catch (e) {
+          debugPrint("Error handling TIP6963TRON message: $e");
+        }
+      },
+    );
   }
 
   Future<void> _initializeZilPayInjection(AppState appState) async {
     try {
-      if (appState.chain?.slip44 == kEthereumSlip44 || appState.chain?.slip44 == kZilliqaSlip44) {
+      if (appState.chain?.slip44 == kEthereumSlip44 ||
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await _webViewController?.injectJavascriptFileFromAsset(
             assetFilePath: 'assets/evm_inject.js');
       }
@@ -198,6 +222,10 @@ class _BrowserPageState extends State<BrowserPage>
             await rootBundle.loadString('assets/zilpay_legacy_inject.js');
         await _webViewController?.evaluateJavascript(source: scilla);
         await _legacyHandler?.sendData(appState);
+      }
+      if (appState.chain?.slip44 == kTronSlip44) {
+        await _webViewController?.injectJavascriptFileFromAsset(
+            assetFilePath: 'assets/tron_inject.js');
       }
     } catch (e) {
       debugPrint("Injection Error: $e");
@@ -345,6 +373,9 @@ class _BrowserPageState extends State<BrowserPage>
 
               _legacyHandler?.handleStartBlockWorker(appState);
             },
+            onConsoleMessage: (_, msg) {
+              print(msg);
+            },
             onProgressChanged: (controller, progress) async {
               if (progress > 20) {
                 await _initializeZilPayInjection(appState);
@@ -434,6 +465,11 @@ class _BrowserPageState extends State<BrowserPage>
               } catch (e) {
                 //
               }
+              try {
+                _tronHandler?.dispose();
+              } catch (e) {
+                //
+              }
             },
             color: theme.textPrimary,
             width: 24,
@@ -479,8 +515,7 @@ class _BrowserPageState extends State<BrowserPage>
       return Center(
         child: Text(
           l10n.browserPageNoConnectedApps,
-          style: theme.bodyLarge.copyWith(
-              color: theme.textSecondary),
+          style: theme.bodyLarge.copyWith(color: theme.textSecondary),
         ),
       );
     }
