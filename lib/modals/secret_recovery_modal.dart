@@ -158,8 +158,11 @@ class _SecretRecoveryModal extends StatelessWidget {
           child: CustomButton(
             text: buttonText,
             onPressed: onPressed,
-            backgroundColor: Colors.red.withValues(alpha: 0.1),
-            textColor: Colors.red,
+            backgroundColor: theme.danger.withValues(alpha: 0.15),
+            textColor: theme.danger,
+            borderColor: theme.danger.withValues(alpha: 0.4),
+            borderWidth: 1.5,
+            borderRadius: 16,
             height: 48,
           ),
         ),

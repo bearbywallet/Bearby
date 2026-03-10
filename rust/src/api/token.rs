@@ -268,6 +268,17 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 
             Ok(())
         }
+        TRON => {
+            if let Some(&idx) = ftokens_indices.first() {
+                ftokens[idx].rate = convert_rate;
+            }
+
+            wallet
+                .save_ftokens(&ftokens)
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+            Ok(())
+        }
         BITCOIN => {
             if let Some(&idx) = ftokens_indices.first() {
                 ftokens[idx].rate = convert_rate;

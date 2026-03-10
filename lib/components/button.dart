@@ -8,6 +8,8 @@ class CustomButton extends StatefulWidget {
   final double borderRadius;
   final Color textColor;
   final Color backgroundColor;
+  final Color? borderColor;
+  final double borderWidth;
   final double width;
   final double height;
   final EdgeInsetsGeometry padding;
@@ -21,6 +23,8 @@ class CustomButton extends StatefulWidget {
     this.borderRadius = 30,
     required this.textColor,
     required this.backgroundColor,
+    this.borderColor,
+    this.borderWidth = 0,
     this.width = double.infinity,
     this.height = 56,
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
@@ -59,7 +63,15 @@ class _CustomButtonState extends State<CustomButton> {
                 ? widget.backgroundColor.withValues(alpha: 0.4)
                 : widget.backgroundColor,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: _isPressed
+            border: widget.borderColor != null
+                ? Border.all(
+                    color: widget.disabled
+                        ? widget.borderColor!.withValues(alpha: 0.4)
+                        : widget.borderColor!,
+                    width: widget.borderWidth,
+                  )
+                : null,
+            boxShadow: _isPressed || widget.borderColor != null
                 ? null
                 : [
                     BoxShadow(
