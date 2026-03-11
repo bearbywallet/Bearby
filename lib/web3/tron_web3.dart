@@ -1,158 +1,14 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:bearby/config/eip1193.dart';
+import 'package:bearby/config/tip1193.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-import 'package:bearby/modals/app_connect.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
-import 'package:bearby/src/rust/models/connection.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
-
-class TronNodeConfig {
-  final String fullNode;
-  final String solidityNode;
-  final String eventServer;
-  final String chainId;
-  final String chain;
-
-  const TronNodeConfig({
-    required this.fullNode,
-    required this.solidityNode,
-    required this.eventServer,
-    required this.chainId,
-    required this.chain,
-  });
-
-  factory TronNodeConfig.fromChain(NetworkConfigInfo chain) {
-    final rpcUrls = chain.rpc.where((url) => url.isNotEmpty).toList();
-    final primaryNode = rpcUrls.isNotEmpty ? rpcUrls.first : '';
-    final chainName = chain.name.toLowerCase().replaceAll(' ', '-');
-
-    return TronNodeConfig(
-      fullNode: primaryNode,
-      solidityNode: primaryNode,
-      eventServer: primaryNode,
-      chainId: chain.chainId.toString(),
-      chain: chainName,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'fullNode': fullNode,
-        'solidityNode': solidityNode,
-        'eventServer': eventServer,
-        'chainId': chainId,
-        'chain': chain,
-      };
-}
-
-class TronInitProviderData {
-  final String address;
-  final TronNodeConfig node;
-  final String name;
-  final int type;
-  final bool isAuth;
-  final String chainId;
-  final List<TronPhishingItem>? phishingList;
-  final TronConnectNodeConfig? connectNode;
-
-  const TronInitProviderData({
-    required this.address,
-    required this.node,
-    required this.name,
-    required this.type,
-    required this.isAuth,
-    required this.chainId,
-    this.phishingList,
-    this.connectNode,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'address': address,
-        'node': node.toJson(),
-        'name': name,
-        'type': type,
-        'isAuth': isAuth,
-        'chainId': chainId,
-        if (phishingList != null)
-          'phishingList': phishingList!.map((p) => p.toJson()).toList(),
-        if (connectNode != null) 'connectNode': connectNode!.toJson(),
-      };
-}
-
-class TronPhishingItem {
-  final String url;
-  final bool? isVisit;
-
-  const TronPhishingItem({required this.url, this.isVisit});
-
-  Map<String, dynamic> toJson() => {
-        'url': url,
-        if (isVisit != null) 'isVisit': isVisit,
-      };
-}
-
-class TronConnectNodeConfig {
-  final String fullNode;
-  final String solidityNode;
-  final String eventServer;
-
-  const TronConnectNodeConfig({
-    required this.fullNode,
-    required this.solidityNode,
-    required this.eventServer,
-  });
-
-  factory TronConnectNodeConfig.fromChain(NetworkConfigInfo chain) {
-    final rpcUrls = chain.rpc.where((url) => url.isNotEmpty).toList();
-    final primaryNode = rpcUrls.isNotEmpty ? rpcUrls.first : '';
-
-    return TronConnectNodeConfig(
-      fullNode: primaryNode,
-      solidityNode: primaryNode,
-      eventServer: primaryNode,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'fullNode': fullNode,
-        'solidityNode': solidityNode,
-        'eventServer': eventServer,
-      };
-}
-
-enum TronWeb3Method {
-  getInitProviderData('getInitProviderData');
-
-  final String value;
-  const TronWeb3Method(this.value);
-
-  static TronWeb3Method fromValue(String value) {
-    return TronWeb3Method.values.firstWhere(
-      (m) => m.value == value,
-      orElse: () => TronWeb3Method.getInitProviderData,
-    );
-  }
-}
-
-enum TronWeb3ErrorCode {
-  userRejected(4001),
-  unauthorized(4100),
-  unsupportedMethod(4200),
-  disconnected(4900),
-  internalError(-32603),
-  invalidInput(-32000),
-  resourceUnavailable(-32002);
-
-  final int code;
-  const TronWeb3ErrorCode(this.code);
-}
 
 class TronWeb3Handler {
   final InAppWebViewController webViewController;
@@ -233,10 +89,10 @@ class TronWeb3Handler {
     final jsCode = '''
     (function() {
       const responseData = $jsonResponse;
-      if (window.__zilpay_response_handlers && window.__zilpay_response_handlers["$uuid"]) {
-        const handler = window.__zilpay_response_handlers["$uuid"];
+      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
+        const handler = window.__bearby_response_handlers["$uuid"];
         handler(responseData);
-        delete window.__zilpay_response_handlers["$uuid"];
+        delete window.__bearby_response_handlers["$uuid"];
       } else {
         window.dispatchEvent(new MessageEvent('message', { 
           data: responseData
@@ -277,11 +133,11 @@ class TronWeb3Handler {
 
     final jsCode = '''
     (function() {
-      if (typeof window.handleZilPayEvent === 'function') {
-        console.log('ZilPay TRON: Calling handleZilPayEvent with:', $jsonEventData);
-        window.handleZilPayEvent($jsonEventData);
+      if (typeof window.handleBearbyEvent === 'function') {
+        console.log('ZilPay TRON: Calling handleBearbyEvent with:', $jsonEventData);
+        window.handleBearbyEvent($jsonEventData);
       } else {
-        console.log('ZilPay TRON: window.handleZilPayEvent not found. Event "$eventName" not sent.');
+        console.log('Bearby TRON: window.handleBearbyEvent not found. Event "$eventName" not sent.');
       }
     })();
     ''';
@@ -297,30 +153,19 @@ class TronWeb3Handler {
     BuildContext context,
   ) async {
     final method = message.payload['method'] as String?;
-
-    if (method == null) {
-      final l10n = AppLocalizations.of(context);
-      return _returnError(
-        message.uuid,
-        TronWeb3ErrorCode.unsupportedMethod,
-        l10n?.web3ErrorNoMethod ?? '',
-      );
-    }
-
     final tronMethod = TronWeb3Method.fromValue(method);
 
     switch (tronMethod) {
       case TronWeb3Method.getInitProviderData:
         await _handleGetInitProviderData(message, context);
         break;
-      default:
+      case TronWeb3Method.unknown:
         final l10n = AppLocalizations.of(context);
-        _returnError(
+        return _returnError(
           message.uuid,
           TronWeb3ErrorCode.unsupportedMethod,
-          l10n?.web3ErrorUnsupportedMethod(method) ?? '',
+          l10n?.web3ErrorNoMethod ?? '',
         );
-        break;
     }
   }
 
@@ -350,6 +195,10 @@ class TronWeb3Handler {
       final account = appState.account;
       final chain = appState.chain;
 
+      if (!context.mounted) {
+        return;
+      }
+
       if (account == null || chain == null) {
         _removeActiveRequest(TronWeb3Method.getInitProviderData.value);
         return _returnError(
@@ -368,25 +217,28 @@ class TronWeb3Handler {
           connectedAddresses
               .any((addr) => addr.toLowerCase() == account.addr.toLowerCase());
 
-      final nodeConfig = TronNodeConfig.fromChain(chain);
-      final connectNodeConfig =
-          connection != null ? TronConnectNodeConfig.fromChain(chain) : null;
-
-      final responseData = TronInitProviderData(
-        address: account.addr,
-        node: nodeConfig,
-        name: account.name,
-        type: 0,
-        isAuth: isAuth,
-        chainId: chain.chainId.toString(),
-        phishingList: null,
-        connectNode: connectNodeConfig,
-      );
+      final isTestnet = chain.testnet ?? false;
+      final chainIdHex = '0x${chain.chainId.toRadixString(16)}';
+      final nodeUrl =
+          isTestnet ? 'https://api.nileex.io' : 'https://api.trongrid.io';
 
       _sendResponse(
         type: kBearbyResponseType,
         uuid: message.uuid,
-        result: responseData.toJson(),
+        result: {
+          'address': account.addr,
+          'node': {
+            'fullNode': nodeUrl,
+            'solidityNode': nodeUrl,
+            'eventServer': nodeUrl,
+            'chainId': chainIdHex,
+            'chain': chain.chain,
+          },
+          'name': account.name,
+          'type': 0,
+          'isAuth': isAuth,
+          'chainId': chainIdHex,
+        },
       );
     } catch (e) {
       debugPrint("Error in getInitProviderData: $e");
