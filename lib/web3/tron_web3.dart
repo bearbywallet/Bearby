@@ -139,7 +139,6 @@ class TronWeb3Handler {
     final jsCode = '''
     (function() {
       if (typeof window.handleBearbyEvent === 'function') {
-        console.log('ZilPay TRON: Calling handleBearbyEvent with:', $jsonEventData);
         window.handleBearbyEvent($jsonEventData);
       } else {
         console.log('Bearby TRON: window.handleBearbyEvent not found. Event "$eventName" not sent.');
@@ -276,17 +275,13 @@ class TronWeb3Handler {
             await appState.syncConnections();
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
-            _sendResponse(
-              type: kBearbyResponseType,
-              uuid: message.uuid,
-              result: {
-                'address': connectedAddr.first,
-                'name': appState.account?.name,
-                'type': 0,
-                'isAuth': true,
-                'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
-              },
-            );
+            _sendNotification(eventName: 'dataChanged', data: {
+              'address': connectedAddr.first,
+              'name': appState.account?.name,
+              'type': 0,
+              'isAuth': true,
+              'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
+            });
             _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
@@ -354,29 +349,14 @@ class TronWeb3Handler {
       final isAuth = connection != null &&
           connectedAddresses
               .any((addr) => addr.toLowerCase() == account.addr.toLowerCase());
-
-      if (!isAuth) {
-        throw "Wallet is locked";
-      }
-
-      final isTestnet = chain.testnet ?? false;
       final chainIdHex = '0x${chain.chainId.toRadixString(16)}';
-      final nodeUrl =
-          isTestnet ? 'https://api.nileex.io' : 'https://api.trongrid.io';
 
       _sendResponse(
         type: kBearbyResponseType,
         uuid: message.uuid,
         result: {
           'address': isAuth ? account.addr : null,
-          'node': {
-            'fullNode': nodeUrl,
-            'solidityNode': nodeUrl,
-            'eventServer': nodeUrl,
-            'chainId': chainIdHex,
-            'chain': chain.chain,
-          },
-          'name': account.name,
+          'name': isAuth ? account.name : null,
           'type': 0,
           'isAuth': isAuth,
           'chainId': chainIdHex,
