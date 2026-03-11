@@ -163,7 +163,8 @@ class TronWeb3Handler {
       case Web3EIP1193Method.getInitProviderData:
         await _handleGetInitProviderData(message, context);
         break;
-      case Web3EIP1193Method.ethRequestAccounts:
+      case Web3EIP1193Method.ethRequestAccounts ||
+            Web3EIP1193Method.tronRequestAccounts:
         final appState = Provider.of<AppState>(context, listen: false);
         await _handleEthRequestAccounts(message, context, appState);
         break;
@@ -208,6 +209,14 @@ class TronWeb3Handler {
               connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
+        _sendNotification(eventName: 'dataChanged', data: {
+          'address': addresses.first,
+          'name': appState.account?.name,
+          'type': 0,
+          'isAuth': true,
+          'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
+        });
+
         return _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
@@ -216,15 +225,6 @@ class TronWeb3Handler {
       }
 
       String? title = await webViewController.getTitle();
-
-      if (appState.account?.addrType == kScillaAddressType &&
-          appState.chain?.slip44 == kZilliqaSlip44) {
-        await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          accountIndex: appState.wallet!.selectedAccount,
-        );
-        await appState.syncData();
-      }
 
       if (!context.mounted) {
         _removeActiveRequest(method);

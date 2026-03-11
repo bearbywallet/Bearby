@@ -200,7 +200,7 @@ class _BrowserPageState extends State<BrowserPage>
       callback: (args) {
         if (!mounted) return;
         try {
-          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
+          final jsonData = jsonDecode(args.first) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
           _tronHandler?.handleWeb3TronMessage(zilPayMessage, context);
         } catch (e) {
