@@ -30,10 +30,21 @@ enum Web3EIP1193Method {
   walletRequestPermissions('wallet_requestPermissions'),
   walletScanQRCode('wallet_scanQRCode'),
   ethGetEncryptionPublicKey('eth_getEncryptionPublicKey'),
-  ethDecrypt('eth_decrypt');
+  ethDecrypt('eth_decrypt'),
+
+  // TRON
+  getInitProviderData('getInitProviderData'),
+  unknown('unknown');
 
   final String value;
   const Web3EIP1193Method(this.value);
+
+  static Web3EIP1193Method fromValue(String? value) {
+    return Web3EIP1193Method.values.firstWhere(
+      (m) => m.value == value,
+      orElse: () => Web3EIP1193Method.unknown,
+    );
+  }
 }
 
 enum Web3EIP1193ErrorCode {

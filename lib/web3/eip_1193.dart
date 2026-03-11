@@ -257,22 +257,9 @@ class Web3EIP1193Handler {
 
     try {
       final method = message.payload['method'] as String?;
+      final evmMethod = Web3EIP1193Method.fromValue(method);
 
-      if (method == null) {
-        final l10n = AppLocalizations.of(context);
-        return _returnError(
-          message.uuid,
-          Web3EIP1193ErrorCode.unsupportedMethod,
-          l10n?.web3ErrorNoMethod ?? '',
-        );
-      }
-
-      final zilPayMethod = Web3EIP1193Method.values.firstWhere(
-        (m) => m.value == method,
-        orElse: () => Web3EIP1193Method.ethRequestAccounts,
-      );
-
-      switch (zilPayMethod) {
+      switch (evmMethod) {
         case Web3EIP1193Method.ethRequestAccounts:
           await _handleEthRequestAccounts(message, context, appState);
           break;
@@ -293,7 +280,7 @@ class Web3EIP1193Handler {
             message: message,
             context: context,
             appState: appState,
-            isPersonalSign: zilPayMethod == Web3EIP1193Method.personalSign,
+            isPersonalSign: evmMethod == Web3EIP1193Method.personalSign,
           );
           break;
 
@@ -315,7 +302,7 @@ class Web3EIP1193Handler {
         case Web3EIP1193Method.ethGasPrice:
         case Web3EIP1193Method.ethGetTransactionCount:
           await _proxyRpcRequest(
-            method: zilPayMethod.value,
+            method: evmMethod.value,
             uuid: message.uuid,
             params: message.payload['params'],
             chainHash: chain?.chainHash ?? BigInt.zero,
@@ -350,7 +337,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.unsupportedMethod,
-            l10n?.web3ErrorUnsupportedMethod(zilPayMethod.value) ?? '',
+            l10n?.web3ErrorUnsupportedMethod(evmMethod.value) ?? '',
           );
           break;
       }
