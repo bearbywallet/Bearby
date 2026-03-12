@@ -542,7 +542,7 @@ class Web3EIP1193Handler {
         );
       }
     } catch (e) {
-      dev.log('RPC proxy error: $e', name: 'web3_handler');
+      debugPrint('RPC proxy error: $e');
       _returnError(
         uuid,
         Web3EIP1193ErrorCode.internalError,
