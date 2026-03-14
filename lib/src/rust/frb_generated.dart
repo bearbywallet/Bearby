@@ -4718,8 +4718,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return TransactionMetadataInfo(
       chainHash: dco_decode_u_64(arr[0]),
       hash: dco_decode_opt_String(arr[1]),
@@ -4729,6 +4729,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       signer: dco_decode_opt_String(arr[5]),
       tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[6]),
       btcUtxoAmounts: dco_decode_opt_list_prim_u_64_strict(arr[7]),
+      broadcast: dco_decode_bool(arr[8]),
     );
   }
 
@@ -6203,6 +6204,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_tokenInfo =
         sse_decode_opt_box_autoadd_base_token_info(deserializer);
     var var_btcUtxoAmounts = sse_decode_opt_list_prim_u_64_strict(deserializer);
+    var var_broadcast = sse_decode_bool(deserializer);
     return TransactionMetadataInfo(
         chainHash: var_chainHash,
         hash: var_hash,
@@ -6211,7 +6213,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         title: var_title,
         signer: var_signer,
         tokenInfo: var_tokenInfo,
-        btcUtxoAmounts: var_btcUtxoAmounts);
+        btcUtxoAmounts: var_btcUtxoAmounts,
+        broadcast: var_broadcast);
   }
 
   @protected
@@ -7469,6 +7472,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.signer, serializer);
     sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
     sse_encode_opt_list_prim_u_64_strict(self.btcUtxoAmounts, serializer);
+    sse_encode_bool(self.broadcast, serializer);
   }
 
   @protected

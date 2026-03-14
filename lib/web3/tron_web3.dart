@@ -299,6 +299,7 @@ class TronWeb3Handler {
         title: title ?? "",
         signer: null,
         tokenInfo: tokenInfo,
+        broadcast: false,
       );
       final transactionRequest = TransactionRequestInfo(
         metadata: metadata,
@@ -326,7 +327,7 @@ class TronWeb3Handler {
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
-            result: tx.metadata.hash,
+            result: tx.tron,
           );
           if (context.mounted) {
             Navigator.pop(context);

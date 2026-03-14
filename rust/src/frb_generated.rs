@@ -5750,6 +5750,7 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
                 deserializer,
             );
         let mut var_btcUtxoAmounts = <Option<Vec<u64>>>::sse_decode(deserializer);
+        let mut var_broadcast = <bool>::sse_decode(deserializer);
         return crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
             chain_hash: var_chainHash,
             hash: var_hash,
@@ -5759,6 +5760,7 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             signer: var_signer,
             token_info: var_tokenInfo,
             btc_utxo_amounts: var_btcUtxoAmounts,
+            broadcast: var_broadcast,
         };
     }
 }
@@ -7084,6 +7086,7 @@ impl flutter_rust_bridge::IntoDart
             self.signer.into_into_dart().into_dart(),
             self.token_info.into_into_dart().into_dart(),
             self.btc_utxo_amounts.into_into_dart().into_dart(),
+            self.broadcast.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8258,6 +8261,7 @@ impl SseEncode for crate::models::transactions::transaction_metadata::Transactio
             serializer,
         );
         <Option<Vec<u64>>>::sse_encode(self.btc_utxo_amounts, serializer);
+        <bool>::sse_encode(self.broadcast, serializer);
     }
 }
 

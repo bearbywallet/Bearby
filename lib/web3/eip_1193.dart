@@ -832,6 +832,7 @@ class Web3EIP1193Handler {
         title: title ?? "EVM Transaction",
         signer: null,
         tokenInfo: tokenInfo,
+        broadcast: true,
       );
 
       final transactionRequest = TransactionRequestInfo(

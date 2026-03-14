@@ -42,6 +42,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 info: value.metadata.info,
                 icon: value.metadata.icon,
                 title: value.metadata.title,
+                broadcast: value.metadata.broadcast,
                 signer: value.metadata.signer.map(|s| s.to_string()),
                 token_info: value.metadata.token_info.map(|(v, d, s)| BaseTokenInfo {
                     value: v.to_string(),

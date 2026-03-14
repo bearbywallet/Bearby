@@ -284,6 +284,7 @@ class ZilPayLegacyHandler {
         title: title,
         signer: null,
         tokenInfo: tokenInfo,
+        broadcast: true,
       );
 
       final transactionRequest = TransactionRequestInfo(

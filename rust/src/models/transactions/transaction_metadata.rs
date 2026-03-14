@@ -25,6 +25,7 @@ pub struct TransactionMetadataInfo {
     pub signer: Option<String>,
     pub token_info: Option<BaseTokenInfo>,
     pub btc_utxo_amounts: Option<Vec<u64>>,
+    pub broadcast: bool,
 }
 
 impl From<TransactionMetadata> for TransactionMetadataInfo {
@@ -37,6 +38,7 @@ impl From<TransactionMetadata> for TransactionMetadataInfo {
             title: value.title,
             signer: value.signer.map(|v| v.to_string()),
             btc_utxo_amounts: value.btc_utxo_amounts,
+            broadcast: value.broadcast,
             token_info: value.token_info.map(|t| BaseTokenInfo {
                 value: t.0.to_string(),
                 decimals: t.1,
@@ -54,6 +56,7 @@ impl From<TransactionMetadataInfo> for TransactionMetadata {
             info: value.info,
             icon: value.icon,
             title: value.title,
+            broadcast: value.broadcast,
             signer: value.signer.and_then(|v| PubKey::from_str(&v).ok()),
             token_info: value.token_info.map(|v| {
                 (

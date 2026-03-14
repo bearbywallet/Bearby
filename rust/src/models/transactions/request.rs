@@ -1,7 +1,7 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
 pub use zilpay::proto::tron_tx::TronTransaction;
-use zilpay::proto::tron_tx::{TronWebSignRequest, TronWebTransaction};
+use zilpay::proto::tron_tx::TronWebTransaction;
 pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};

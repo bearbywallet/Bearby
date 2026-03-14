@@ -20,6 +20,7 @@ use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
+use zilpay::history::transaction::HistoricalTransaction;
 use zilpay::network::btc::BtcOperations;
 use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
@@ -95,6 +96,9 @@ pub async fn sign_send_transactions(
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
     let password = password.map(|p| SecretString::new(p.into()));
+    let wallet = core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
 
     let signed_tx = {
         let seed_bytes = if let Some(mut pass) = password {
@@ -110,9 +114,6 @@ pub async fn sign_send_transactions(
         }
         .map_err(ServiceError::BackgroundError)?;
 
-        let wallet = core
-            .get_wallet_by_index(wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -150,17 +151,26 @@ pub async fn sign_send_transactions(
         Ok::<TransactionReceipt, ServiceError>(signed_tx)
     }
     .map_err(Into::<ServiceError>::into)?;
+    let is_broadcast = signed_tx.get_metadata().broadcast;
 
-    let tx = core
-        .broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
-        .await
-        .map_err(ServiceError::BackgroundError)?
-        .into_iter()
-        .next()
-        .map(|v| v.into())
-        .ok_or(ServiceError::TransactionErrors(
-            zilpay::errors::tx::TransactionErrors::InvalidTxHash,
-        ))?;
+    let tx = if is_broadcast {
+        core.broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+            .await
+            .map_err(ServiceError::BackgroundError)?
+            .into_iter()
+            .next()
+            .map(|v| v.into())
+            .ok_or(ServiceError::TransactionErrors(
+                zilpay::errors::tx::TransactionErrors::InvalidTransaction,
+            ))?
+    } else {
+        let history = HistoricalTransaction::from_transaction_receipt(signed_tx)
+            .map_err(ServiceError::TransactionErrors)?;
+        wallet
+            .add_history(&[history.clone()])
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        history.into()
+    };
 
     Ok(tx)
 }
