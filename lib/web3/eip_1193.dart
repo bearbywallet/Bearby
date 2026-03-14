@@ -107,7 +107,6 @@ class Web3EIP1193Handler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
-    webViewController.dispose();
   }
 
   void _handleAppStateChange() async {

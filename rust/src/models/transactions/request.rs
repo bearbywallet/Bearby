@@ -1,7 +1,8 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
+pub use zilpay::proto::tron_tx::TronTransaction;
+use zilpay::proto::tron_tx::TronWebTransaction;
 pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
-pub use zilpay::proto::tron_tx::TronTransactionRequest;
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
 pub use zilpay::proto::{
@@ -44,10 +45,16 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
                 .map_err(|_| TransactionErrors::InvalidTxHash)?;
             let tx_req = TransactionRequest::Bitcoin((btc_tx, value.metadata.into()));
             Ok(tx_req)
-        } else if let Some(tron_json) = value.tron {
-            let tron_tx: TronTransactionRequest = serde_json::from_str(&tron_json)
-                .map_err(|_| TransactionErrors::InvalidTxHash)?;
-            let tx_req = TransactionRequest::Tron((tron_tx, value.metadata.into()));
+        } else if let Some(tron_str) = value.tron {
+            let tx = if let Ok(tron_tx) = serde_json::from_str::<TronTransaction>(&tron_str) {
+                tron_tx
+            } else if let Ok(tron_web_tx) = serde_json::from_str::<TronWebTransaction>(&tron_str) {
+                TronTransaction::from_tron_web(&tron_web_tx)?
+            } else {
+                return Err(TransactionErrors::InvalidTransaction);
+            };
+
+            let tx_req = TransactionRequest::Tron((tx, value.metadata.into()));
             Ok(tx_req)
         } else {
             Err(TransactionErrors::InvalidTxHash)
@@ -91,7 +98,12 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 }
             }
             TransactionRequest::Tron((tx, _)) => {
-                let json = serde_json::to_string(&tx).unwrap_or_default();
+                let json = if let Ok(tron_web) = tx.to_tron_web() {
+                    serde_json::to_string(&tron_web).unwrap_or_default()
+                } else {
+                    serde_json::to_string(&tx).unwrap_or_default()
+                };
+
                 Self {
                     metadata,
                     scilla: None,

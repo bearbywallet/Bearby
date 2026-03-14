@@ -36,6 +36,7 @@ enum Web3EIP1193Method {
   getInitProviderData('getInitProviderData'),
   tronRequestAccounts('tron_requestAccounts'),
   tronSignMessageV2('tron_signMessageV2'),
+  tronSign('tron_sign'),
   unknown('unknown');
 
   final String value;

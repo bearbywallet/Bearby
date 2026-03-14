@@ -47,6 +47,7 @@ class _BrowserPageState extends State<BrowserPage>
   bool _isLoading = true;
   bool _canGoBack = false;
   bool _canGoForward = false;
+  int? _lastKnownSlip44;
 
   String get _baseUserAgent => Platform.isIOS
       ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
@@ -59,11 +60,26 @@ class _BrowserPageState extends State<BrowserPage>
     _cookieManager = CookieManager.instance();
     final appState = Provider.of<AppState>(context, listen: false);
     appState.syncConnections();
+    _lastKnownSlip44 = appState.chain?.slip44;
+    appState.addListener(_handleChainChange);
+  }
+
+  void _handleChainChange() {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final newSlip44 = appState.chain?.slip44;
+
+    if (newSlip44 != _lastKnownSlip44 && _webViewController != null) {
+      _lastKnownSlip44 = newSlip44;
+      _setupJavaScriptHandlers();
+      _initializeZilPayInjection(appState);
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    final appState = Provider.of<AppState>(context, listen: false);
+    appState.removeListener(_handleChainChange);
     _searchController.dispose();
     _legacyHandler?.dispose();
     _eip1193Handler?.dispose();
@@ -151,26 +167,42 @@ class _BrowserPageState extends State<BrowserPage>
   void _setupJavaScriptHandlers() {
     if (_webViewController == null) return;
     final appState = Provider.of<AppState>(context, listen: false);
+    final slip44 = appState.chain?.slip44;
 
-    _legacyHandler = ZilPayLegacyHandler(
-      webViewController: _webViewController!,
-      appState: appState,
-    );
-    _eip1193Handler = Web3EIP1193Handler(
-      webViewController: _webViewController!,
-      initialUrl: _currentUrl,
-      appState: appState,
-    );
-    _tronHandler = TronWeb3Handler(
-      webViewController: _webViewController!,
-      initialUrl: _currentUrl,
-      appState: appState,
-    );
+    _legacyHandler?.dispose();
+    _eip1193Handler?.dispose();
+    _tronHandler?.dispose();
+    _legacyHandler = null;
+    _eip1193Handler = null;
+    _tronHandler = null;
+
+    if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
+      _eip1193Handler = Web3EIP1193Handler(
+        webViewController: _webViewController!,
+        initialUrl: _currentUrl,
+        appState: appState,
+      );
+    }
+
+    if (slip44 == kZilliqaSlip44) {
+      _legacyHandler = ZilPayLegacyHandler(
+        webViewController: _webViewController!,
+        appState: appState,
+      );
+    }
+
+    if (slip44 == kTronSlip44) {
+      _tronHandler = TronWeb3Handler(
+        webViewController: _webViewController!,
+        initialUrl: _currentUrl,
+        appState: appState,
+      );
+    }
 
     _webViewController?.addJavaScriptHandler(
       handlerName: 'ZilPayLegacy',
       callback: (args) {
-        if (!mounted) return;
+        if (_legacyHandler == null || !mounted) return;
         try {
           final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
@@ -184,7 +216,7 @@ class _BrowserPageState extends State<BrowserPage>
     _webViewController?.addJavaScriptHandler(
       handlerName: 'EIP1193Channel',
       callback: (args) {
-        if (!mounted) return;
+        if (_eip1193Handler == null || !mounted) return;
         try {
           final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
@@ -198,7 +230,7 @@ class _BrowserPageState extends State<BrowserPage>
     _webViewController?.addJavaScriptHandler(
       handlerName: 'TIP6963TRON',
       callback: (args) {
-        if (!mounted) return;
+        if (_tronHandler == null || !mounted) return;
         try {
           final jsonData = jsonDecode(args.first) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
@@ -374,7 +406,7 @@ class _BrowserPageState extends State<BrowserPage>
               _legacyHandler?.handleStartBlockWorker(appState);
             },
             onConsoleMessage: (_, msg) {
-              print(msg);
+              // print(msg);
             },
             onProgressChanged: (controller, progress) async {
               if (progress > 20) {

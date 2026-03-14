@@ -3,16 +3,21 @@ import 'package:bearby/config/eip1193.dart';
 import 'package:bearby/config/tip1193.dart';
 import 'package:bearby/modals/app_connect.dart';
 import 'package:bearby/modals/sign_message.dart';
+import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/connections.dart';
 import 'package:bearby/src/rust/api/provider.dart';
+import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/connection.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
+import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
@@ -39,7 +44,6 @@ class TronWeb3Handler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
-    webViewController.dispose();
   }
 
   void _handleAppStateChange() async {
@@ -57,7 +61,7 @@ class TronWeb3Handler {
       _lastKnownAddress = newAccount.addr;
       final addresses = await _getWalletAddresses(appState);
       await _sendNotification(
-        eventName: 'accountsChanged',
+        eventName: kAccountsChangedEvent,
         data: addresses,
       );
     }
@@ -65,7 +69,7 @@ class TronWeb3Handler {
     if (newChain != null && newChain.chainId.toString() != _lastKnownChainId) {
       _lastKnownChainId = newChain.chainId.toString();
       await _sendNotification(
-        eventName: 'chainChanged',
+        eventName: kChainChangedEvent,
         data: {'chainId': newChain.chainId.toString()},
       );
     }
@@ -158,19 +162,23 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     BuildContext context,
   ) async {
+    print(message.toString());
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
 
     switch (tronMethod) {
+      case Web3EIP1193Method.tronSign:
+        await _handlhSendTransaction(message, context, appState);
+        break;
       case Web3EIP1193Method.ethChainId:
         await _handleChainId(message, appState);
         break;
       case Web3EIP1193Method.getInitProviderData:
         await _handleGetInitProviderData(message, context);
         break;
-      case Web3EIP1193Method.ethRequestAccounts ||
-            Web3EIP1193Method.tronRequestAccounts ||
-            Web3EIP1193Method.ethAccounts:
+      case Web3EIP1193Method.ethRequestAccounts:
+      case Web3EIP1193Method.tronRequestAccounts:
+      case Web3EIP1193Method.ethAccounts:
         final appState = Provider.of<AppState>(context, listen: false);
         await _handleEthRequestAccounts(message, context, appState);
         break;
@@ -213,6 +221,135 @@ class TronWeb3Handler {
           TronWeb3ErrorCode.unsupportedMethod,
           l10n?.web3ErrorNoMethod ?? '',
         );
+    }
+  }
+
+  Future<void> _handlhSendTransaction(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.resourceUnavailable,
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'] as Map<String, dynamic>?;
+
+      if (params == null || params.isEmpty) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.invalidInput,
+          'Invalid parameters for eth_sendTransaction',
+        );
+      }
+
+      final txParams =
+          params['transaction']['raw_data'] as Map<String, dynamic>;
+
+      final Map<String, dynamic> contract = txParams['contract'][0];
+      final Map<String, dynamic> value = contract['parameter']['value'];
+      final String to = value['to_address'];
+      final int? amount = value['amount'];
+      final BigInt valueAmount = BigInt.from(amount ?? 0);
+      final FTokenInfo? mbToken = appState.wallet?.tokens.first;
+      String? title = await webViewController.getTitle();
+
+      if (mbToken == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.internalError,
+          l10n?.web3ErrorNoNativeToken ?? '',
+        );
+      }
+
+      final tokenInfo = BaseTokenInfo(
+        value: valueAmount.toString(),
+        symbol: mbToken.symbol,
+        decimals: mbToken.decimals,
+      );
+      final metadata = TransactionMetadataInfo(
+        chainHash: appState.chain?.chainHash ?? BigInt.zero,
+        hash: null,
+        info: null,
+        icon: message.icon,
+        title: title ?? "EVM Transaction",
+        signer: null,
+        tokenInfo: tokenInfo,
+      );
+      final transactionRequest = TransactionRequestInfo(
+        metadata: metadata,
+        scilla: null,
+        evm: null,
+        tron: jsonEncode(txParams),
+      );
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: transactionRequest,
+        to: to,
+        colors: connection.colors,
+        token: mbToken,
+        amount: fromWei(
+          value: valueAmount.toString(),
+          decimals: mbToken.decimals,
+        ).toString(),
+        onConfirm: (tx) {
+          _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: tx.metadata.hash,
+          );
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+          _removeActiveRequest(method);
+        },
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.userRejected,
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      debugPrint('Error in $method: $e');
+      _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'Error processing $method: $e',
+      );
     }
   }
 

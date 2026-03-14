@@ -84,7 +84,6 @@ class ZilPayLegacyHandler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
-    webViewController.dispose();
     _blockStreamSubscription?.cancel();
     stopBlockWorker();
   }
@@ -205,7 +204,8 @@ class ZilPayLegacyHandler {
     try {
       final appState = Provider.of<AppState>(context, listen: false);
 
-      if (appState.account?.addrType == kEvmAddressType && appState.chain?.slip44 == kZilliqaSlip44) {
+      if (appState.account?.addrType == kEvmAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
