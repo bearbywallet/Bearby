@@ -1,7 +1,7 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
 pub use zilpay::proto::tron_tx::TronTransaction;
-use zilpay::proto::tron_tx::TronWebTransaction;
+use zilpay::proto::tron_tx::{TronWebSignRequest, TronWebTransaction};
 pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
@@ -46,18 +46,13 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let tx_req = TransactionRequest::Bitcoin((btc_tx, value.metadata.into()));
             Ok(tx_req)
         } else if let Some(tron_str) = value.tron {
-            let tx = if let Ok(tron_tx) = serde_json::from_str::<TronTransaction>(&tron_str) {
-                tron_tx
-            } else if let Ok(tron_web_tx) = serde_json::from_str::<TronWebTransaction>(&tron_str) {
-                TronTransaction::from_tron_web(&tron_web_tx)?
-            } else {
-                return Err(TransactionErrors::InvalidTransaction);
-            };
-
-            let tx_req = TransactionRequest::Tron((tx, value.metadata.into()));
+            let sign_req_tron = serde_json::from_str::<TronWebTransaction>(&tron_str)
+                .map_err(|e| TransactionErrors::ConvertTxError(e.to_string()))?;
+            let req_tron_tx = TronTransaction::from_tron_web(&sign_req_tron)?;
+            let tx_req = TransactionRequest::Tron((req_tron_tx, value.metadata.into()));
             Ok(tx_req)
         } else {
-            Err(TransactionErrors::InvalidTxHash)
+            Err(TransactionErrors::InvalidTransaction)
         }
     }
 }
@@ -98,11 +93,9 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 }
             }
             TransactionRequest::Tron((tx, _)) => {
-                let json = if let Ok(tron_web) = tx.to_tron_web() {
-                    serde_json::to_string(&tron_web).unwrap_or_default()
-                } else {
-                    serde_json::to_string(&tx).unwrap_or_default()
-                };
+                // TODO: must be fixed!
+                let tron_web = tx.to_tron_web().unwrap();
+                let json = serde_json::to_string(&tron_web).unwrap_or_default();
 
                 Self {
                     metadata,

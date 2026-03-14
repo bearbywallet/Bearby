@@ -134,16 +134,7 @@ pub async fn sign_send_transactions(
             TransactionRequest::Ethereum((eth_tx, _)) => {
                 eth_tx.chain_id = Some(sender_account.chain_id);
             }
-            TransactionRequest::Bitcoin(_) => {}
-            TransactionRequest::Tron((ref mut tron_tx, _)) => {
-                let provider = core
-                    .get_provider(sender_account.chain_hash)
-                    .map_err(ServiceError::BackgroundError)?;
-                provider
-                    .tron_fill_block_ref(tron_tx)
-                    .await
-                    .map_err(ServiceError::NetworkErrors)?;
-            }
+            _ => {}
         }
 
         let signed_tx = wallet
@@ -618,12 +609,30 @@ pub async fn update_tx_with_params(
     tx: TransactionRequestInfo,
     params: RequiredTxParamsInfo,
     balance: String,
+    chain_hash: u64,
 ) -> Result<TransactionRequestInfo, String> {
     let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
     let params: RequiredTxParams = params.into();
     let balance: U256 = balance.parse().unwrap_or_default();
 
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
+
+    match tx {
+        TransactionRequest::Tron((ref mut tron_tx, _)) => {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+            let core = Arc::clone(&service.core);
+
+            let provider = core
+                .get_provider(chain_hash)
+                .map_err(ServiceError::BackgroundError)?;
+            provider
+                .tron_fill_block_ref(tron_tx)
+                .await
+                .map_err(ServiceError::NetworkErrors)?;
+        }
+        _ => {}
+    }
 
     Ok(tx.into())
 }

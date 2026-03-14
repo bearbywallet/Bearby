@@ -211,8 +211,6 @@ class _ConfirmTransactionContentState
 
     _timerPooling = Timer.periodic(
         Duration(seconds: diffBlockTime), (_) => _fetchGasFee(false));
-
-    print(widget.tx.tron);
   }
 
   Future<void> _fetchGasFee(bool initial) async {
@@ -263,6 +261,7 @@ class _ConfirmTransactionContentState
         tx: _currentTx,
         params: params,
         balance: balance,
+        chainHash: widget.token.chainHash,
       );
 
       if (!mounted) return;

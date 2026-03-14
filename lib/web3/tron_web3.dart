@@ -162,12 +162,12 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     BuildContext context,
   ) async {
-    print(message.toString());
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
 
     switch (tronMethod) {
       case Web3EIP1193Method.tronSign:
+      case Web3EIP1193Method.ethSendTransaction:
         await _handlhSendTransaction(message, context, appState);
         break;
       case Web3EIP1193Method.ethChainId:
@@ -266,12 +266,12 @@ class TronWeb3Handler {
         );
       }
 
-      final txParams =
-          params['transaction']['raw_data'] as Map<String, dynamic>;
+      final Map<String, dynamic> transaction = params['transaction'];
+      final txParams = transaction['raw_data'] as Map<String, dynamic>;
 
       final Map<String, dynamic> contract = txParams['contract'][0];
       final Map<String, dynamic> value = contract['parameter']['value'];
-      final String to = value['to_address'];
+      final String to = value['to_address'] ?? "";
       final int? amount = value['amount'];
       final BigInt valueAmount = BigInt.from(amount ?? 0);
       final FTokenInfo? mbToken = appState.wallet?.tokens.first;
@@ -296,7 +296,7 @@ class TronWeb3Handler {
         hash: null,
         info: null,
         icon: message.icon,
-        title: title ?? "EVM Transaction",
+        title: title ?? "",
         signer: null,
         tokenInfo: tokenInfo,
       );
@@ -304,7 +304,7 @@ class TronWeb3Handler {
         metadata: metadata,
         scilla: null,
         evm: null,
-        tron: jsonEncode(txParams),
+        tron: jsonEncode(transaction),
       );
 
       if (!context.mounted) {
