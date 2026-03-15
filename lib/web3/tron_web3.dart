@@ -312,6 +312,7 @@ class TronWeb3Handler {
         _removeActiveRequest(method);
         return;
       }
+      print("payload: ${message.payload}");
 
       showConfirmTransactionModal(
         context: context,
@@ -324,6 +325,7 @@ class TronWeb3Handler {
           decimals: mbToken.decimals,
         ).toString(),
         onConfirm: (tx) {
+          print("tx: ${tx.tron}");
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,

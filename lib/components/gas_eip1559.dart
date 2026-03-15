@@ -56,7 +56,7 @@ extension GasFeeOptionX on GasFeeOption {
 }
 
 class GasDetails extends StatelessWidget {
-  final RequiredTxParamsInfo txParamsInfo;
+  final RequiredTxParamsInfo? txParamsInfo;
   final GasFeeOption selectedOption;
   final FTokenInfo token;
   final AppTheme theme;
@@ -78,13 +78,15 @@ class GasDetails extends StatelessWidget {
   });
 
   BigInt _getGasPriceForOption() {
+    final params = txParamsInfo;
+    if (params == null) return BigInt.zero;
     switch (selectedOption) {
       case GasFeeOption.low:
-        return BigInt.parse(txParamsInfo.slow);
+        return BigInt.parse(params.slow);
       case GasFeeOption.market:
-        return BigInt.parse(txParamsInfo.market);
+        return BigInt.parse(params.market);
       case GasFeeOption.aggressive:
-        return BigInt.parse(txParamsInfo.fast);
+        return BigInt.parse(params.fast);
     }
   }
 
@@ -92,6 +94,11 @@ class GasDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveTextColor = textColor ?? theme.textPrimary;
     final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
+    final params = txParamsInfo;
+
+    if (params == null) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       children: [
@@ -104,10 +111,10 @@ class GasDetails extends StatelessWidget {
           ),
           child: Column(
             children: [
-              if (txParamsInfo.txEstimateGas != BigInt.zero)
+              if (params.txEstimateGas != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsEstimatedGas,
-                  '${txParamsInfo.txEstimateGas}',
+                  '${params.txEstimateGas}',
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
@@ -121,35 +128,34 @@ class GasDetails extends StatelessWidget {
                 effectiveTextColor,
                 effectiveSecondaryColor,
               ),
-              if (txParamsInfo.feeHistory.baseFee != BigInt.zero)
+              if (params.feeHistory.baseFee != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsBaseFee,
                   formatGasPriceDetail(
-                    txParamsInfo.feeHistory.baseFee,
+                    params.feeHistory.baseFee,
                     token,
                     isFeeFixed: isFeeFixed,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
-              if (txParamsInfo.maxPriorityFee != BigInt.zero)
+              if (params.maxPriorityFee != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsPriorityFee,
                   formatGasPriceDetail(
-                    txParamsInfo.maxPriorityFee,
+                    params.maxPriorityFee,
                     token,
                     isFeeFixed: isFeeFixed,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
-              if (txParamsInfo.feeHistory.baseFee != BigInt.zero &&
-                  txParamsInfo.maxPriorityFee != BigInt.zero)
+              if (params.feeHistory.baseFee != BigInt.zero &&
+                  params.maxPriorityFee != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsMaxFee,
                   formatGasPriceDetail(
-                    txParamsInfo.feeHistory.baseFee +
-                        txParamsInfo.maxPriorityFee,
+                    params.feeHistory.baseFee + params.maxPriorityFee,
                     token,
                     isFeeFixed: isFeeFixed,
                   ),
@@ -194,7 +200,7 @@ class GasDetails extends StatelessWidget {
 }
 
 class GasEIP1559 extends StatefulWidget {
-  final RequiredTxParamsInfo txParamsInfo;
+  final RequiredTxParamsInfo? txParamsInfo;
   final Function(GasFeeOption option, BigInt selectedValue) onGasOptionChanged;
   final bool disabled;
   final int timeDiffBlock;
@@ -252,11 +258,14 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   void didUpdateWidget(GasEIP1559 oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.txParamsInfo != widget.txParamsInfo) {
-      final current = widget.txParamsInfo.current;
-      final slow = widget.txParamsInfo.slow;
-      final market = widget.txParamsInfo.market;
-      final fast = widget.txParamsInfo.fast;
+    final params = widget.txParamsInfo;
+    if (params == null) return;
+
+    if (oldWidget.txParamsInfo != params) {
+      final current = params.current;
+      final slow = params.slow;
+      final market = params.market;
+      final fast = params.fast;
 
       GasFeeOption? detectedOption;
       if (current == slow) {
@@ -281,13 +290,15 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   }
 
   BigInt _getValueForOption(GasFeeOption option) {
+    final params = widget.txParamsInfo;
+    if (params == null) return BigInt.zero;
     switch (option) {
       case GasFeeOption.low:
-        return BigInt.parse(widget.txParamsInfo.slow);
+        return BigInt.parse(params.slow);
       case GasFeeOption.market:
-        return BigInt.parse(widget.txParamsInfo.market);
+        return BigInt.parse(params.market);
       case GasFeeOption.aggressive:
-        return BigInt.parse(widget.txParamsInfo.fast);
+        return BigInt.parse(params.fast);
     }
   }
 
@@ -302,7 +313,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       return gasPriceForOption;
     }
 
-    final gasLimit = widget.txParamsInfo.txEstimateGas;
+    final gasLimit = widget.txParamsInfo?.txEstimateGas ?? BigInt.zero;
     if (gasLimit == BigInt.zero) {
       return BigInt.zero;
     }
@@ -348,15 +359,26 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         widget.secondaryColor ?? theme.textSecondary;
 
     final isSelected = _selectedOption == option;
+    final params = widget.txParamsInfo;
 
-    final totalGasFee = _calculateDisplayFee(option);
-    final (normalizedGasFee, convertedGasFee) = formatingAmount(
-      amount: totalGasFee,
-      symbol: token.symbol,
-      decimals: token.decimals,
-      rate: token.rate,
-      appState: appState,
-    );
+    String normalizedGasFee;
+    String convertedGasFee;
+
+    if (params == null) {
+      normalizedGasFee = '-';
+      convertedGasFee = '-';
+    } else {
+      final totalGasFee = _calculateDisplayFee(option);
+      final (normalized, converted) = formatingAmount(
+        amount: totalGasFee,
+        symbol: token.symbol,
+        decimals: token.decimals,
+        rate: token.rate,
+        appState: appState,
+      );
+      normalizedGasFee = normalized;
+      convertedGasFee = converted;
+    }
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(

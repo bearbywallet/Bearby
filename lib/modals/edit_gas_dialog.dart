@@ -13,11 +13,11 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
 class EditGasDialog extends StatefulWidget {
-  final RequiredTxParamsInfo txParamsInfo;
-  final BigInt initialGasPrice;
-  final BigInt initialMaxPriorityFee;
-  final BigInt initialGasLimit;
-  final BigInt initialNonce;
+  final RequiredTxParamsInfo? txParamsInfo;
+  final BigInt? initialGasPrice;
+  final BigInt? initialMaxPriorityFee;
+  final BigInt? initialGasLimit;
+  final BigInt? initialNonce;
   final String? data;
   final Function(
           BigInt gasPrice, BigInt maxPriorityFee, BigInt gasLimit, BigInt nonce)
@@ -52,23 +52,29 @@ class _EditGasDialogState extends State<EditGasDialog> {
   late TextEditingController _nonceController;
   late bool _isLegacy;
 
+  static const String _placeholder = '-';
+
   @override
   void initState() {
     super.initState();
-    _isLegacy = widget.txParamsInfo.feeHistory.baseFee == BigInt.zero;
+    _isLegacy =
+        (widget.txParamsInfo?.feeHistory.baseFee ?? BigInt.zero) == BigInt.zero;
 
     _gasPriceController = TextEditingController(
-      text: fromWei(value: widget.initialGasPrice.toString(), decimals: 9),
+      text: widget.initialGasPrice != null
+          ? fromWei(value: widget.initialGasPrice.toString(), decimals: 9)
+          : _placeholder,
     );
     _maxPriorityFeeController = TextEditingController(
-      text:
-          fromWei(value: widget.initialMaxPriorityFee.toString(), decimals: 9),
+      text: widget.initialMaxPriorityFee != null
+          ? fromWei(value: widget.initialMaxPriorityFee.toString(), decimals: 9)
+          : _placeholder,
     );
     _gasLimitController = TextEditingController(
-      text: widget.initialGasLimit.toString(),
+      text: widget.initialGasLimit?.toString() ?? _placeholder,
     );
     _nonceController = TextEditingController(
-      text: widget.initialNonce.toString(),
+      text: widget.initialNonce?.toString() ?? _placeholder,
     );
   }
 
@@ -94,9 +100,19 @@ class _EditGasDialogState extends State<EditGasDialog> {
 
   void _handleSave() {
     try {
-      final normalizedGasPrice = _normalizeDecimalInput(_gasPriceController.text);
-      final normalizedGasLimit = _normalizeDecimalInput(_gasLimitController.text);
-      final normalizedNonce = _normalizeDecimalInput(_nonceController.text);
+      final gasPriceText = _gasPriceController.text;
+      final gasLimitText = _gasLimitController.text;
+      final nonceText = _nonceController.text;
+
+      if (gasPriceText == _placeholder ||
+          gasLimitText == _placeholder ||
+          nonceText == _placeholder) {
+        throw ArgumentError('Please fill in all required fields');
+      }
+
+      final normalizedGasPrice = _normalizeDecimalInput(gasPriceText);
+      final normalizedGasLimit = _normalizeDecimalInput(gasLimitText);
+      final normalizedNonce = _normalizeDecimalInput(nonceText);
 
       final gasPriceWei =
           BigInt.parse(toWei(value: normalizedGasPrice, decimals: 9).$1);
@@ -105,9 +121,15 @@ class _EditGasDialogState extends State<EditGasDialog> {
 
       BigInt maxPriorityFeeWei;
       if (!_isLegacy) {
-        final normalizedMaxPriorityFee = _normalizeDecimalInput(_maxPriorityFeeController.text);
-        maxPriorityFeeWei = BigInt.parse(
-            toWei(value: normalizedMaxPriorityFee, decimals: 9).$1);
+        final maxPriorityFeeText = _maxPriorityFeeController.text;
+        if (maxPriorityFeeText == _placeholder) {
+          maxPriorityFeeWei = BigInt.zero;
+        } else {
+          final normalizedMaxPriorityFee =
+              _normalizeDecimalInput(maxPriorityFeeText);
+          maxPriorityFeeWei = BigInt.parse(
+              toWei(value: normalizedMaxPriorityFee, decimals: 9).$1);
+        }
       } else {
         maxPriorityFeeWei = BigInt.zero;
       }

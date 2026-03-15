@@ -625,8 +625,6 @@ pub async fn update_tx_with_params(
     let params: RequiredTxParams = params.into();
     let balance: U256 = balance.parse().unwrap_or_default();
 
-    update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
-
     match tx {
         TransactionRequest::Tron((ref mut tron_tx, _)) => {
             let guard = BACKGROUND_SERVICE.read().await;
@@ -643,6 +641,8 @@ pub async fn update_tx_with_params(
         }
         _ => {}
     }
+
+    update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
 
     Ok(tx.into())
 }

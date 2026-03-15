@@ -94,22 +94,7 @@ class _ConfirmTransactionContentState
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
 
-  RequiredTxParamsInfo _txParamsInfo = RequiredTxParamsInfo(
-    gasPrice: BigInt.zero,
-    maxPriorityFee: BigInt.zero,
-    feeHistory: GasFeeHistoryInfo(
-      maxFee: BigInt.zero,
-      priorityFee: BigInt.zero,
-      baseFee: BigInt.zero,
-    ),
-    txEstimateGas: BigInt.zero,
-    blobBaseFee: BigInt.zero,
-    nonce: BigInt.zero,
-    slow: '0',
-    market: '0',
-    fast: '0',
-    current: '0',
-  );
+  RequiredTxParamsInfo? _txParamsInfo;
   late TransactionRequestInfo _currentTx;
   GasFeeOption _userSelectedOption = GasFeeOption.market;
   bool _loading = false;
@@ -135,7 +120,10 @@ class _ConfirmTransactionContentState
   }
 
   BigInt _calculateCurrentFee() {
-    final current = BigInt.parse(_txParamsInfo.current);
+    final params = _txParamsInfo;
+    if (params == null) return BigInt.zero;
+
+    final current = BigInt.parse(params.current);
 
     if (current == BigInt.zero) {
       return BigInt.zero;
@@ -145,7 +133,7 @@ class _ConfirmTransactionContentState
       return current;
     }
 
-    final gasLimit = _txParamsInfo.txEstimateGas;
+    final gasLimit = params.txEstimateGas;
     if (gasLimit == BigInt.zero) {
       return BigInt.zero;
     }
@@ -186,12 +174,13 @@ class _ConfirmTransactionContentState
   }
 
   bool get _isDisabled {
-    if (isTron) {
-      return _txParamsInfo.gasPrice == BigInt.zero || _loading;
-    }
-    return (_txParamsInfo.gasPrice == BigInt.zero &&
-            _txParamsInfo.maxPriorityFee == BigInt.zero &&
-            _txParamsInfo.txEstimateGas == BigInt.zero) ||
+    final params = _txParamsInfo;
+    if (params == null) return true;
+    if (widget.tx.tron != null) return false;
+
+    return (params.gasPrice == BigInt.zero &&
+            params.maxPriorityFee == BigInt.zero &&
+            params.txEstimateGas == BigInt.zero) ||
         _loading;
   }
 
@@ -411,17 +400,20 @@ class _ConfirmTransactionContentState
                             isFeeFixed: isBTC || isTron,
                             disabled: _isDisabled,
                             onGasOptionChanged: (option, selectedValue) async {
+                              final currentParams = _txParamsInfo;
+                              if (currentParams == null) return;
+
                               setState(() => _userSelectedOption = option);
                               final updatedParams = RequiredTxParamsInfo(
-                                gasPrice: _txParamsInfo.gasPrice,
-                                maxPriorityFee: _txParamsInfo.maxPriorityFee,
-                                feeHistory: _txParamsInfo.feeHistory,
-                                txEstimateGas: _txParamsInfo.txEstimateGas,
-                                blobBaseFee: _txParamsInfo.blobBaseFee,
-                                nonce: _txParamsInfo.nonce,
-                                slow: _txParamsInfo.slow,
-                                market: _txParamsInfo.market,
-                                fast: _txParamsInfo.fast,
+                                gasPrice: currentParams.gasPrice,
+                                maxPriorityFee: currentParams.maxPriorityFee,
+                                feeHistory: currentParams.feeHistory,
+                                txEstimateGas: currentParams.txEstimateGas,
+                                blobBaseFee: currentParams.blobBaseFee,
+                                nonce: currentParams.nonce,
+                                slow: currentParams.slow,
+                                market: currentParams.market,
+                                fast: currentParams.fast,
                                 current: selectedValue.toString(),
                               );
                               await _updateTxParams(updatedParams);
@@ -436,20 +428,23 @@ class _ConfirmTransactionContentState
                               splashFactory: NoSplash.splashFactory,
                               highlightColor: Colors.transparent,
                               onTap: () {
+                                final currentParams = _txParamsInfo;
+                                if (currentParams == null) return;
+
                                 showDialog<void>(
                                   context: context,
                                   barrierDismissible: false,
                                   builder: (context) => EditGasDialog(
-                                    txParamsInfo: _txParamsInfo,
-                                    initialGasPrice: _txParamsInfo.gasPrice,
-                                    initialNonce: _txParamsInfo.nonce,
+                                    txParamsInfo: currentParams,
+                                    initialGasPrice: currentParams.gasPrice,
+                                    initialNonce: currentParams.nonce,
                                     initialMaxPriorityFee:
-                                        _txParamsInfo.maxPriorityFee,
+                                        currentParams.maxPriorityFee,
                                     data: widget.tx.evm?.data != null
                                         ? bytesToHex(widget.tx.evm!.data!)
                                         : null,
                                     initialGasLimit:
-                                        _txParamsInfo.txEstimateGas,
+                                        currentParams.txEstimateGas,
                                     onSave: (
                                       gasPrice,
                                       maxPriorityFee,
@@ -458,18 +453,21 @@ class _ConfirmTransactionContentState
                                     ) async {
                                       if (!mounted) return;
 
+                                      final params = _txParamsInfo;
+                                      if (params == null) return;
+
                                       final updatedParams =
                                           RequiredTxParamsInfo(
                                         gasPrice: gasPrice,
                                         maxPriorityFee: maxPriorityFee,
-                                        feeHistory: _txParamsInfo.feeHistory,
+                                        feeHistory: params.feeHistory,
                                         txEstimateGas: gasLimit,
-                                        blobBaseFee: _txParamsInfo.blobBaseFee,
+                                        blobBaseFee: params.blobBaseFee,
                                         nonce: nonce,
-                                        slow: _txParamsInfo.slow,
-                                        market: _txParamsInfo.market,
-                                        fast: _txParamsInfo.fast,
-                                        current: _txParamsInfo.current,
+                                        slow: params.slow,
+                                        market: params.market,
+                                        fast: params.fast,
+                                        current: params.current,
                                       );
 
                                       await _updateTxParams(updatedParams);

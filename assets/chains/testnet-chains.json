@@ -456,8 +456,7 @@
     "chain": "TRX",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
-      "https://nile.trongrid.io/jsonrpc",
-      "grpc://grpc.nile.trongrid.io:50051"
+      "https://nile.trongrid.io"
     ],
     "features": [],
     "ftokens": [
