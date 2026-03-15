@@ -24,7 +24,7 @@ const UNISWAP_API_URL: &str =
 const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
 const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
 const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
-const TRONSCAN_TOKENS_API: &str = "https://apilist.tronscan.org/api/tokens/overview/web?start=0&limit=200&verifier=all&order=desc&filter=trc20";
+const TRON_ACCOUNT_TOKENS_API: &str = "https://ts.endjgfsv.link/api/account/tokens";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
 #[derive(Debug, Deserialize)]
@@ -105,19 +105,23 @@ struct ZilstreamResponse {
 }
 
 #[derive(Debug, Deserialize)]
-struct TronScanToken {
-    #[serde(rename = "contractAddress")]
-    contract_address: String,
-    name: String,
-    abbr: String,
-    decimal: u8,
-    #[serde(rename = "imgUrl")]
-    img_url: Option<String>,
+struct TronAccountToken {
+    #[serde(rename = "tokenId")]
+    token_id: String,
+    balance: String,
+    #[serde(rename = "tokenName")]
+    token_name: String,
+    #[serde(rename = "tokenAbbr")]
+    token_abbr: String,
+    #[serde(rename = "tokenDecimal")]
+    token_decimal: u8,
+    #[serde(rename = "tokenLogo")]
+    token_logo: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
-struct TronScanResponse {
-    tokens: Vec<TronScanToken>,
+struct TronAccountResponse {
+    data: Vec<TronAccountToken>,
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -448,14 +452,24 @@ async fn fetch_zilliqa_tokens(
 }
 
 async fn fetch_tron_tokens(
+    addr: &str,
     default_logo: Option<String>,
     chain_hash: u64,
     addr_type: u8,
+    selected_account: usize,
 ) -> Result<Vec<FTokenInfo>, String> {
     let client = reqwest::Client::new();
+    let url = format!(
+        "{}?show=2&hidden=0&sortBy=2&sortType=1&limit=200&start=0&address={}",
+        TRON_ACCOUNT_TOKENS_API, addr
+    );
+
     let response = client
-        .get(TRONSCAN_TOKENS_API)
-        .header("User-Agent", "ZilPay-Wallet/1.0")
+        .get(&url)
+        .header("Accept", "application/json, text/plain, */*")
+        .header("Origin", "https://sun.io")
+        .header("Referer", "https://sun.io/")
+        .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36")
         .send()
         .await
         .map_err(|e| format!("HTTP request failed: {}", e))?;
@@ -464,26 +478,31 @@ async fn fetch_tron_tokens(
         return Err(format!("API error: {}", response.status()));
     }
 
-    let api_response: TronScanResponse = response
+    let api_response: TronAccountResponse = response
         .json()
         .await
-        .map_err(|e| format!("Failed to parse TronScan response: {}", e))?;
+        .map_err(|e| format!("Failed to parse TRON account tokens response: {}", e))?;
 
     let result = api_response
-        .tokens
+        .data
         .into_iter()
-        .map(|token| FTokenInfo {
-            name: token.name,
-            symbol: token.abbr,
-            decimals: token.decimal,
-            addr: token.contract_address,
-            addr_type,
-            logo: token.img_url.or_else(|| default_logo.clone()),
-            balances: HashMap::new(),
-            rate: 0.0,
-            default: false,
-            native: false,
-            chain_hash,
+        .map(|token| {
+            let mut balances = HashMap::new();
+            balances.insert(selected_account, token.balance);
+
+            FTokenInfo {
+                name: token.token_name,
+                symbol: token.token_abbr,
+                decimals: token.token_decimal,
+                addr: token.token_id,
+                addr_type,
+                logo: token.token_logo.or_else(|| default_logo.clone()),
+                balances,
+                rate: 0.0,
+                default: false,
+                native: false,
+                chain_hash,
+            }
         })
         .collect();
 
@@ -530,7 +549,8 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
     }
 
     if account.slip_44 == TRON {
-        return fetch_tron_tokens(default_logo, chain_hash, addr_type).await;
+        let tron_addr = account.addr.auto_format();
+        return fetch_tron_tokens(&tron_addr, default_logo, chain_hash, addr_type, data.selected_account).await;
     }
 
     let request_body = serde_json::json!({
