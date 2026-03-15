@@ -3,16 +3,19 @@ import 'package:bearby/config/eip1193.dart';
 import 'package:bearby/config/tip1193.dart';
 import 'package:bearby/modals/app_connect.dart';
 import 'package:bearby/modals/sign_message.dart';
+import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/connections.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
@@ -162,6 +165,7 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     BuildContext context,
   ) async {
+    print(message.toString());
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
 
@@ -174,6 +178,7 @@ class TronWeb3Handler {
         await _handleChainId(message, appState);
         break;
       case Web3EIP1193Method.getInitProviderData:
+      case Web3EIP1193Method.init:
         await _handleGetInitProviderData(message, context);
         break;
       case Web3EIP1193Method.ethRequestAccounts:
@@ -190,6 +195,9 @@ class TronWeb3Handler {
           context: context,
           appState: appState,
         );
+        break;
+      case Web3EIP1193Method.walletSwitchEthereumChain:
+        await _handleWalletSwitchChain(message, context, appState);
         break;
       case Web3EIP1193Method.ethGetBalance:
       case Web3EIP1193Method.ethGetTransactionByHash:
@@ -312,7 +320,6 @@ class TronWeb3Handler {
         _removeActiveRequest(method);
         return;
       }
-      print("payload: ${message.payload}");
 
       showConfirmTransactionModal(
         context: context,
@@ -625,6 +632,142 @@ class TronWeb3Handler {
         message.uuid,
         TronWeb3ErrorCode.internalError,
         'Error processing request: $e',
+      );
+    }
+  }
+
+  Future<void> _handleWalletSwitchChain(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.resourceUnavailable,
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null ||
+          params.isEmpty ||
+          params[0] is! Map<String, dynamic>) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.invalidInput,
+          'Invalid parameters for wallet_switchEthereumChain',
+        );
+      }
+
+      final chainParams = params[0] as Map<String, dynamic>;
+      if (!chainParams.containsKey(kParamChainId)) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.invalidInput,
+          l10n?.web3ErrorMissingChainId ?? '',
+        );
+      }
+
+      final chainId = BigInt.parse(
+        chainParams[kParamChainId].toString().replaceFirst(kHexPrefix, ''),
+        radix: kHexRadix,
+      );
+
+      NetworkConfigInfo? targetNetwork;
+      final List<NetworkConfigInfo> providers = appState.state.providers;
+
+      for (final provider in providers) {
+        if (provider.slip44 == kBitcoinlip44) {
+          continue;
+        }
+
+        if (provider.chainId == chainId) {
+          targetNetwork = provider;
+          break;
+        }
+      }
+
+      if (targetNetwork == null) {
+        final String mainnetJsonData =
+            await rootBundle.loadString(kMainnetChainsPath);
+        final String testnetJsonData =
+            await rootBundle.loadString(kTestnetChainsPath);
+        final (mainnetChains, testnetChains) = await getNetworks(
+            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+
+        for (final chain in mainnetChains) {
+          if (chain.chainId == chainId &&
+              !(chain.slip44 == kZilliqaSlip44 &&
+                  chain.chainId == kZilliqaChainId)) {
+            targetNetwork = chain;
+            break;
+          }
+        }
+
+        if (targetNetwork == null) {
+          for (final chain in testnetChains) {
+            if (chain.chainId == chainId &&
+                !(chain.slip44 == kZilliqaSlip44 &&
+                    chain.chainId == kZilliqaChainId)) {
+              targetNetwork = chain;
+              break;
+            }
+          }
+        }
+
+        if (targetNetwork != null) {
+          await addProvider(providerConfig: targetNetwork);
+          await appState.syncData();
+        } else {
+          _removeActiveRequest(method);
+          return _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.unauthorized,
+            l10n?.web3ErrorChainNotAdded ?? '',
+          );
+        }
+      }
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showSwitchChainNetworkModal(
+        context: context,
+        selectedChainId: chainId,
+        onNetworkSelected: () {
+          _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: null,
+          );
+          _removeActiveRequest(method);
+        },
+        onReject: () {
+          _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.userRejected,
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'Error processing wallet_switchEthereumChain: $e',
       );
     }
   }

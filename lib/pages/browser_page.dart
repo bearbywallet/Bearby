@@ -49,9 +49,9 @@ class _BrowserPageState extends State<BrowserPage>
   bool _canGoForward = false;
   int? _lastKnownSlip44;
 
-  String get _baseUserAgent => Platform.isIOS
-      ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
-      : 'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
+  // String get _baseUserAgent => Platform.isIOS
+  //     ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+  //     : 'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
 
   @override
   void initState() {
@@ -356,10 +356,10 @@ class _BrowserPageState extends State<BrowserPage>
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
               safeBrowsingEnabled: false,
-              userAgent: _baseUserAgent +
-                  (appState.state.browserSettings.doNotTrack
-                      ? ' DNT:1'
-                      : ' ZilPay/1.0'),
+              // userAgent: _baseUserAgent +
+              //     (appState.state.browserSettings.doNotTrack
+              //         ? ' DNT:1'
+              //         : ' ZilPay/1.0'),
               useHybridComposition: true,
               supportZoom: true,
               useOnLoadResource: true,
@@ -406,7 +406,7 @@ class _BrowserPageState extends State<BrowserPage>
               _legacyHandler?.handleStartBlockWorker(appState);
             },
             onConsoleMessage: (_, msg) {
-              // print(msg);
+              print(msg);
             },
             onProgressChanged: (controller, progress) async {
               if (progress > 20) {
