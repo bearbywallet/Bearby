@@ -517,19 +517,17 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         .core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
-
     let data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
     let account = data
         .get_selected_account()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
     let provider = service
         .core
         .get_provider(account.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
+
     if provider.config.testnet.unwrap_or(false) {
         return Ok(Vec::new());
     }
@@ -539,18 +537,25 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         .to_eth_checksummed()
         .unwrap_or_else(|_| account.addr.auto_format());
 
-    let chain_id = account.chain_id;
+    let chain_id = provider.config.chain_id();
     let chain_hash = account.chain_hash;
     let addr_type = account.addr.prefix_type();
     let default_logo = provider.config.ftokens.first().and_then(|t| t.logo.clone());
 
-    if account.slip_44 == ZILLIQA {
+    if data.slip44 == ZILLIQA {
         return fetch_zilliqa_tokens(&account.addr, default_logo, chain_hash).await;
     }
 
-    if account.slip_44 == TRON {
+    if data.slip44 == TRON {
         let tron_addr = account.addr.auto_format();
-        return fetch_tron_tokens(&tron_addr, default_logo, chain_hash, addr_type, data.selected_account).await;
+        return fetch_tron_tokens(
+            &tron_addr,
+            default_logo,
+            chain_hash,
+            addr_type,
+            data.selected_account,
+        )
+        .await;
     }
 
     let request_body = serde_json::json!({

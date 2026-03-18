@@ -7,7 +7,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{parse_address, with_service, with_wallet};
+use crate::utils::utils::{parse_address, with_service};
 use secrecy::zeroize::Zeroize;
 use secrecy::SecretString;
 use tokio::sync::mpsc;
@@ -53,18 +53,11 @@ pub async fn send_signed_transactions(
     let wallet_data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let sender_account =
-        wallet_data
-            .accounts
-            .get(account_index)
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
-            ))?;
-
+    let sender_account = wallet_data
+        .get_account(account_index)
+        .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
     let signed_tx = tx
-        .with_signature(sig, &sender_account.pub_key)
+        .with_signature(sig, sender_account.pub_key.as_ref())
         .map_err(ServiceError::TransactionErrors)?;
 
     let tx = core
@@ -117,23 +110,17 @@ pub async fn sign_send_transactions(
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let sender_account =
-            wallet_data
-                .accounts
-                .get(account_index)
-                .ok_or(ServiceError::AccountError(
-                    account_index,
-                    wallet_index,
-                    zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
-                ))?;
+        let chain = core
+            .get_provider(wallet_data.chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
         let mut tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
 
         match &mut tx {
             TransactionRequest::Zilliqa((zil_tx, _)) => {
-                zil_tx.chain_id = sender_account.chain_id as u16;
+                zil_tx.chain_id = chain.config.chain_ids[1] as u16;
             }
             TransactionRequest::Ethereum((eth_tx, _)) => {
-                eth_tx.chain_id = Some(sender_account.chain_id);
+                eth_tx.chain_id = Some(chain.config.chain_id());
             }
             _ => {}
         }
@@ -186,34 +173,36 @@ pub async fn encode_tx_rlp(
     tx: TransactionRequestInfo,
     slip44: u32,
 ) -> Result<EncodedRLPTx, String> {
-    with_wallet(wallet_index, |wallet| {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
         let walelt_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let chain = core.get_provider(walelt_data.chain_hash)?;
         let account = walelt_data
-            .accounts
-            .get(account_index)
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
-            ))?;
-        let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+            .get_account(account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+        let mut tx: TransactionRequest = tx.try_into()?;
+
         match tx {
-            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => Ok(EncodedRLPTx {
-                bytes: tx
-                    .to_rlp_encode(&account.pub_key)
-                    .map_err(ServiceError::TransactionErrors)?,
-                chunks_bytes: Vec::new(),
-            }),
-            TransactionRequest::Zilliqa(_) => Ok(EncodedRLPTx {
-                bytes: tx
-                    .to_rlp_encode(&account.pub_key)
-                    .map_err(ServiceError::TransactionErrors)?,
-                chunks_bytes: Vec::new(),
-            }),
+            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => {
+                Ok(EncodedRLPTx {
+                    bytes: tx
+                        .to_rlp_encode(account.pub_key.as_ref())
+                        .map_err(ServiceError::TransactionErrors)?,
+                    chunks_bytes: Vec::new(),
+                })
+            }
+            TransactionRequest::Zilliqa(_) => {
+                Ok(EncodedRLPTx {
+                    bytes: tx
+                        .to_rlp_encode(account.pub_key.as_ref())
+                        .map_err(ServiceError::TransactionErrors)?,
+                    chunks_bytes: Vec::new(),
+                })
+            }
             TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
-                tx_eth.chain_id = Some(account.chain_id);
+                tx_eth.chain_id = Some(chain.config.chain_id());
                 let derivation = DerivationPath::new(
                     slip44,
                     account.account_type.value(),
@@ -226,12 +215,10 @@ pub async fn encode_tx_rlp(
                 let transaction_type = tx_eth.preferred_type();
 
                 let rlp = tx
-                    .to_rlp_encode(&account.pub_key)
+                    .to_rlp_encode(account.pub_key.as_ref())
                     .map_err(ServiceError::TransactionErrors)?;
                 let chunks_bytes =
-                    safe_chunk_transaction(&rlp, &derivation_bytes, transaction_type)
-                        .map_err(|e| ServiceError::TransactionErrors(e))?;
-
+                    safe_chunk_transaction(&rlp, &derivation_bytes, transaction_type)?;
                 Ok(EncodedRLPTx {
                     chunks_bytes,
                     bytes: rlp,
@@ -426,14 +413,9 @@ pub async fn create_token_transfer(
     let data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-    let sender_account =
-        data.accounts
-            .get(params.account_index)
-            .ok_or(ServiceError::AccountError(
-                params.account_index,
-                params.wallet_index,
-                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(params.account_index),
-            ))?;
+    let sender_account = data
+        .get_account(params.account_index)
+        .map_err(|e| ServiceError::AccountError(params.account_index, params.wallet_index, e))?;
 
     if params.token.addr_type != sender_account.addr.prefix_type() {
         return Err(ServiceError::AccountError(
@@ -514,13 +496,8 @@ pub async fn cacl_gas_fee(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let sender_account = data
-            .accounts
-            .get(account_index)
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
-            ))?;
+            .get_account(account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
 
         let mut gas = chain
             .estimate_params_batch(&tx, &sender_account.addr, 4, None)
@@ -685,9 +662,9 @@ mod tests_ledger {
         );
 
         let rlp = native_tx
-            .to_rlp_encode(&zilpay::proto::pubkey::PubKey::Secp256k1Keccak256(
+            .to_rlp_encode(Some(&zilpay::proto::pubkey::PubKey::Secp256k1Keccak256(
                 [0u8; PUB_KEY_SIZE],
-            ))
+            )))
             .unwrap();
 
         assert_eq!("f9059181a784ce60755f83055c4e9445312ea0eff7e09c83cbe249fa1d7598c4c8cd4e865af3107a4000b905645c9c18e2000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000006b175474e89094c44da98b954eedeac495271d0f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005af3107a400000000000000000000000000000000000000000000000000006575041f270c7d5000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c7000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000018080",
@@ -730,9 +707,9 @@ mod tests_ledger {
         let derivation_bytes = components_to_derivation_path(&derivation_path);
 
         let rlp = native_tx
-            .to_rlp_encode(&zilpay::proto::pubkey::PubKey::Secp256k1Keccak256(
+            .to_rlp_encode(Some(&zilpay::proto::pubkey::PubKey::Secp256k1Keccak256(
                 [0u8; PUB_KEY_SIZE],
-            ))
+            )))
             .unwrap();
 
         assert_eq!(hex::encode(&rlp), "02f905920181a7808501a8e81b2083055c4e9445312ea0eff7e09c83cbe249fa1d7598c4c8cd4e865af3107a4000b905645c9c18e2000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000006b175474e89094c44da98b954eedeac495271d0f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005af3107a400000000000000000000000000000000000000000000000000006575041f270c7d5000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c7000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0");

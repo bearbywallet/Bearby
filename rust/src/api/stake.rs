@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    errors::wallet::WalletErrors,
     network::zil::{ZilliqaEVMStakeing, ZilliqaScillaStakeing},
     proto::{address::Address, U256},
     wallet::wallet_storage::StorageOperations,
@@ -32,9 +31,7 @@ pub async fn fetch_evm_stake(
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let account = data
-        .accounts
-        .get(account_index)
-        .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+        .get_account(account_index)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = core
         .get_provider(account.chain_hash)
@@ -62,9 +59,7 @@ pub async fn fetch_scilla_stake(
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let account = data
-        .accounts
-        .get(account_index)
-        .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+        .get_account(account_index)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = core
         .get_provider(account.chain_hash)
@@ -90,9 +85,7 @@ pub async fn build_claim_scilla_staking_rewards_tx(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -118,9 +111,7 @@ pub async fn build_tx_scilla_init_unstake(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -146,9 +137,7 @@ pub async fn build_tx_scilla_complete_withdrawal(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -175,9 +164,7 @@ pub async fn build_tx_scilla_withdraw_stake_avely(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -204,9 +191,7 @@ pub async fn build_tx_evm_stake_request(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -235,9 +220,7 @@ pub async fn build_tx_evm_unstake_request(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -269,9 +252,7 @@ pub async fn build_tx_claim_unstake_request(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)
@@ -298,9 +279,7 @@ pub async fn build_tx_claim_reward_request(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
             .get_provider(account.chain_hash)

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use zilpay::{
     background::bg_provider::ProvidersManagement,
     crypto::bip49::{split_path, DerivationPath},
+    proto::address::Address,
     wallet::wallet_storage::StorageOperations,
 };
 pub use zilpay::{
@@ -104,23 +105,27 @@ pub async fn update_ledger_accounts(
         let selected_account = wallet_data
             .get_selected_account()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let provider = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = match selected_account.pub_key {
-            PubKey::Secp256k1Sha256(_)
-            | PubKey::Secp256k1Keccak256(_)
-            | PubKey::Ed25519Solana(_)
-            | PubKey::Secp256k1Tron(_) => DerivationPath::new(
+        let provider = core.get_provider(wallet_data.chain_hash)?;
+
+        let bip49 = match selected_account.addr {
+            Address::Secp256k1Sha256(_)
+            | Address::Secp256k1Keccak256(_)
+            | Address::Secp256k1Tron(_) => DerivationPath::new(
                 provider.config.slip_44,
                 wallet_index,
                 DerivationPath::BIP44_PURPOSE,
                 None,
             ),
-            PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
-                provider.config.slip_44,
-                wallet_index,
-                DerivationPath::bip_from_address_type(btc_addr_type),
-                Some(net),
-            ),
+            Address::Secp256k1Bitcoin(_) => {
+                let net = selected_account.addr.get_bitcoin_network()?;
+                let btc_addr_type = selected_account.addr.get_bitcoin_address_type()?;
+                DerivationPath::new(
+                    provider.config.slip_44,
+                    wallet_index,
+                    DerivationPath::bip_from_address_type(btc_addr_type),
+                    Some(net),
+                )
+            }
         };
         let mut accounts = accounts
             .into_iter()

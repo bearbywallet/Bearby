@@ -3705,17 +3705,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo dco_decode_account_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return AccountInfo(
       addr: dco_decode_String(arr[0]),
       addrType: dco_decode_u_8(arr[1]),
       name: dco_decode_String(arr[2]),
-      pubKey: dco_decode_String(arr[3]),
-      chainHash: dco_decode_u_64(arr[4]),
-      chainId: dco_decode_u_64(arr[5]),
-      slip44: dco_decode_u_32(arr[6]),
-      index: dco_decode_usize(arr[7]),
+      chainHash: dco_decode_u_64(arr[3]),
+      index: dco_decode_usize(arr[4]),
     );
   }
 
@@ -4849,8 +4846,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WalletInfo dco_decode_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return WalletInfo(
       walletType: dco_decode_String(arr[0]),
       walletName: dco_decode_String(arr[1]),
@@ -4860,7 +4857,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       selectedAccount: dco_decode_usize(arr[5]),
       tokens: dco_decode_list_f_token_info(arr[6]),
       settings: dco_decode_wallet_settings_info(arr[7]),
-      defaultChainHash: dco_decode_u_64(arr[8]),
+      chainHash: dco_decode_u_64(arr[8]),
+      slip44: dco_decode_u_32(arr[9]),
     );
   }
 
@@ -4951,19 +4949,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_addr = sse_decode_String(deserializer);
     var var_addrType = sse_decode_u_8(deserializer);
     var var_name = sse_decode_String(deserializer);
-    var var_pubKey = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
-    var var_chainId = sse_decode_u_64(deserializer);
-    var var_slip44 = sse_decode_u_32(deserializer);
     var var_index = sse_decode_usize(deserializer);
     return AccountInfo(
         addr: var_addr,
         addrType: var_addrType,
         name: var_name,
-        pubKey: var_pubKey,
         chainHash: var_chainHash,
-        chainId: var_chainId,
-        slip44: var_slip44,
         index: var_index);
   }
 
@@ -6361,7 +6353,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_selectedAccount = sse_decode_usize(deserializer);
     var var_tokens = sse_decode_list_f_token_info(deserializer);
     var var_settings = sse_decode_wallet_settings_info(deserializer);
-    var var_defaultChainHash = sse_decode_u_64(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
     return WalletInfo(
         walletType: var_walletType,
         walletName: var_walletName,
@@ -6371,7 +6364,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         selectedAccount: var_selectedAccount,
         tokens: var_tokens,
         settings: var_settings,
-        defaultChainHash: var_defaultChainHash);
+        chainHash: var_chainHash,
+        slip44: var_slip44);
   }
 
   @protected
@@ -6476,10 +6470,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.addr, serializer);
     sse_encode_u_8(self.addrType, serializer);
     sse_encode_String(self.name, serializer);
-    sse_encode_String(self.pubKey, serializer);
     sse_encode_u_64(self.chainHash, serializer);
-    sse_encode_u_64(self.chainId, serializer);
-    sse_encode_u_32(self.slip44, serializer);
     sse_encode_usize(self.index, serializer);
   }
 
@@ -7583,7 +7574,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_usize(self.selectedAccount, serializer);
     sse_encode_list_f_token_info(self.tokens, serializer);
     sse_encode_wallet_settings_info(self.settings, serializer);
-    sse_encode_u_64(self.defaultChainHash, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_32(self.slip44, serializer);
   }
 
   @protected

@@ -13,9 +13,7 @@ pub use zilpay::settings::{
 };
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    config::key::PUB_KEY_SIZE,
     crypto::slip44::ZILLIQA,
-    proto::{address::Address, pubkey::PubKey},
     wallet::{wallet_storage::StorageOperations, wallet_types::WalletTypes},
 };
 
@@ -74,44 +72,36 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
             .get_selected_account()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let providers = core.get_providers();
+        let accounts = wallet_data
+            .get_accounts()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        let my_accounts: Vec<Entry> = if selected_account.slip_44 == ZILLIQA
+        let my_accounts: Vec<Entry> = if wallet_data.slip44 == ZILLIQA
             && !matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
         {
-            let capacity = wallet_data.accounts.len() * 2;
-            let mut accounts = Vec::with_capacity(capacity);
+            let capacity = accounts.len() * 2;
+            let accounts = Vec::with_capacity(capacity);
 
-            accounts.extend(wallet_data.accounts.iter().flat_map(|acc| {
-                let name = acc.name.clone();
-                let pub_key_bytes = acc
-                    .pub_key
-                    .as_bytes()
-                    .try_into()
-                    .unwrap_or([0u8; PUB_KEY_SIZE]);
-                vec![
-                    Entry {
-                        name: name.clone(),
-                        address: PubKey::Secp256k1Sha256(pub_key_bytes)
-                            .get_addr()
-                            .unwrap_or(Address::Secp256k1Sha256(Address::ZERO))
-                            .auto_format(),
-                        tag: Some("legacy".to_string()),
-                    },
-                    Entry {
-                        name: name,
-                        address: PubKey::Secp256k1Keccak256(pub_key_bytes)
-                            .get_addr()
-                            .unwrap_or(Address::Secp256k1Keccak256(Address::ZERO))
-                            .auto_format(),
-                        tag: Some("evm".to_string()),
-                    },
-                ]
-            }));
+            // TODO: fix this shit
+            // accounts.extend(accounts.iter().flat_map(|acc| {
+            //     let name = acc.name.clone();
+            //     vec![
+            //         Entry {
+            //             name: name.clone(),
+            //             address: acc.address,
+            //             tag: Some("legacy".to_string()),
+            //         },
+            //         Entry {
+            //             name: name,
+            //             address: acc.address,
+            //             tag: Some("evm".to_string()),
+            //         },
+            //     ]
+            // }));
 
             accounts
         } else {
-            wallet_data
-                .accounts
+            accounts
                 .iter()
                 .map(|acc| Entry {
                     name: acc.name.clone(),
@@ -151,15 +141,14 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
 
                 let chain_teg = providers
                     .iter()
-                    .find(|p| p.config.hash() == data.default_chain_hash)
+                    .find(|p| p.config.hash() == data.chain_hash)
                     .and_then(|p| Some(&p.config.name));
-                let entries: Vec<Entry> = data
-                    .accounts
+                let entries: Vec<Entry> = accounts
                     .into_iter()
                     .filter_map(|acc| {
                         if acc.addr.prefix_type() == selected_account.addr.prefix_type() {
                             Some(Entry {
-                                name: acc.name,
+                                name: acc.name.clone(),
                                 address: acc.addr.auto_format(),
                                 tag: chain_teg.cloned(),
                             })

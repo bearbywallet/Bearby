@@ -4,7 +4,7 @@ pub use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
     proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
-    wallet::{wallet_data::WalletData, Wallet, WalletAddrType},
+    wallet::{wallet_data::WalletDataV2, Wallet, WalletAddrType},
 };
 pub use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},

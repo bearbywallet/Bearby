@@ -57,7 +57,7 @@ impl From<TransactionMetadataInfo> for TransactionMetadata {
             icon: value.icon,
             title: value.title,
             broadcast: value.broadcast,
-            signer: value.signer.and_then(|v| PubKey::from_str(&v).ok()),
+            signer: value.signer.and_then(|v| Address::from_str(&v).ok()),
             token_info: value.token_info.map(|v| {
                 (
                     U256::from_str(&v.value).unwrap_or_default(),

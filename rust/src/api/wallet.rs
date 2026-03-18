@@ -212,25 +212,31 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     let selected_account = wallet_data
         .get_selected_account()
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-    let default_chain = service
+    let chain = service
         .core
-        .get_provider(wallet_data.default_chain_hash)
+        .get_provider(wallet_data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
-    let bip49 = match selected_account.pub_key {
-        PubKey::Secp256k1Sha256(_) | PubKey::Secp256k1Keccak256(_) | PubKey::Ed25519Solana(_) | PubKey::Secp256k1Tron(_) => {
+    let bip49 = match &selected_account.addr {
+        Address::Secp256k1Sha256(_)
+        | Address::Secp256k1Keccak256(_)
+        | Address::Secp256k1Tron(_) => DerivationPath::new(
+            chain.config.slip_44,
+            params.account_index,
+            DerivationPath::BIP44_PURPOSE,
+            None,
+        ),
+        Address::Secp256k1Bitcoin(_) => {
+            let net = selected_account.addr.get_bitcoin_network()
+                .map_err(|e| ServiceError::WalletError(params.wallet_index, WalletErrors::from(e)))?;
+            let btc_addr_type = selected_account.addr.get_bitcoin_address_type()
+                .map_err(|e| ServiceError::WalletError(params.wallet_index, WalletErrors::from(e)))?;
             DerivationPath::new(
-                default_chain.config.slip_44,
+                chain.config.slip_44,
                 params.account_index,
-                DerivationPath::BIP44_PURPOSE,
-                None,
+                DerivationPath::bip_from_address_type(btc_addr_type),
+                Some(net),
             )
         }
-        PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
-            default_chain.config.slip_44,
-            params.account_index,
-            DerivationPath::bip_from_address_type(btc_addr_type),
-            Some(net),
-        ),
     };
 
     wallet
@@ -239,22 +245,8 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
             &bip49,
             &params.passphrase,
             &seed,
-            &default_chain.config,
+            &chain.config,
         )
-        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
-    let mut wallet_data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
-    if let Some(added_account) = wallet_data.accounts.last_mut() {
-        added_account.slip_44 = selected_account.slip_44;
-        added_account.chain_hash = selected_account.chain_hash;
-        added_account.chain_id = selected_account.chain_id;
-    }
-
-    wallet
-        .save_wallet_data(wallet_data)
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
     Ok(())
@@ -279,9 +271,11 @@ pub async fn change_account_name(
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let slip44 = data.slip44;
         let acc = data
-            .accounts
-            .get_mut(account_index)
+            .slip44_accounts
+            .get_mut(&slip44)
+            .and_then(|accs| accs.get_mut(account_index))
             .ok_or(ServiceError::AccountError(
                 account_index,
                 wallet_index,
@@ -410,7 +404,7 @@ pub async fn bitcoin_change_address_type(
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = service
         .core
-        .get_provider(wallet_data.default_chain_hash)
+        .get_provider(wallet_data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let new_bip_purpose = DerivationPath::bip_from_address_type(address_type);
     let mnemonic = wallet
@@ -420,27 +414,32 @@ pub async fn bitcoin_change_address_type(
         .to_seed(passphrase.as_deref().unwrap_or(""))
         .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
 
-    for (index, account) in wallet_data.accounts.iter_mut().enumerate() {
-        let net = match account.pub_key {
-            PubKey::Secp256k1Bitcoin((_, net, _)) => Some(net),
-            _ => {
-                return Err(ServiceError::WalletError(
-                    wallet_index,
-                    WalletErrors::InvalidAccountType,
-                )
-                .into());
-            }
-        };
+    let slip44 = wallet_data.slip44;
+    let accounts = wallet_data
+        .slip44_accounts
+        .get_mut(&slip44)
+        .ok_or(ServiceError::WalletError(
+            wallet_index,
+            WalletErrors::InvalidSlip44Index(slip44),
+        ))?;
 
-        let new_path = DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, net);
+    for (index, account) in accounts.iter_mut().enumerate() {
+        let net = account.addr.get_bitcoin_network().map_err(|_| {
+            ServiceError::WalletError(wallet_index, WalletErrors::InvalidAccountType)
+        })?;
+
+        let new_path =
+            DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, Some(net));
 
         let keypair =
             zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
                 .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
 
-        account.pub_key = keypair
-            .get_pubkey()
-            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+        account.pub_key = Some(
+            keypair
+                .get_pubkey()
+                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?,
+        );
         account.addr = keypair
             .get_addr()
             .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
@@ -539,21 +538,16 @@ pub async fn zilliqa_get_bech32_base16_address(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                WalletErrors::NoAccounts,
-            ))?;
+            .get_account(account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
 
-        match account.pub_key {
-            PubKey::Secp256k1Sha256(_) => Ok((
+        match account.pub_key.as_ref() {
+            Some(PubKey::Secp256k1Sha256(_)) => Ok((
                 account.addr.get_zil_bech32().unwrap_or_default(),
                 account.addr.get_zil_check_sum_addr().unwrap_or_default(),
             )),
-            PubKey::Secp256k1Keccak256(pk) => {
-                let addr_result = PubKey::Secp256k1Sha256(pk)
+            Some(PubKey::Secp256k1Keccak256(pk)) => {
+                let addr_result = PubKey::Secp256k1Sha256(*pk)
                     .get_addr()
                     .map(|addr| {
                         (
@@ -577,15 +571,17 @@ pub async fn get_zil_eth_checksum_addresses(wallet_index: usize) -> Result<Vec<S
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let addresses = data
-            .accounts
-            .into_iter()
-            .filter_map(|a| match a.pub_key {
-                PubKey::Secp256k1Sha256(pk) => PubKey::Secp256k1Keccak256(pk)
+        let accounts = data
+            .get_accounts()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let addresses = accounts
+            .iter()
+            .filter_map(|a| match a.pub_key.as_ref() {
+                Some(PubKey::Secp256k1Sha256(pk)) => PubKey::Secp256k1Keccak256(*pk)
                     .get_addr()
                     .ok()
                     .and_then(|a| a.to_eth_checksummed().ok()),
-                PubKey::Secp256k1Keccak256(_) => a.addr.to_eth_checksummed().ok(),
+                Some(PubKey::Secp256k1Keccak256(_)) => a.addr.to_eth_checksummed().ok(),
                 _ => None,
             })
             .collect::<Vec<String>>();
@@ -601,12 +597,14 @@ pub async fn get_zil_bech32_addresses(wallet_index: usize) -> Result<Vec<String>
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let addresses = data
-            .accounts
-            .into_iter()
-            .filter_map(|a| match a.pub_key {
-                PubKey::Secp256k1Sha256(_) => a.addr.get_zil_bech32().ok(),
-                PubKey::Secp256k1Keccak256(pk) => PubKey::Secp256k1Sha256(pk)
+        let accounts = data
+            .get_accounts()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let addresses = accounts
+            .iter()
+            .filter_map(|a| match a.pub_key.as_ref() {
+                Some(PubKey::Secp256k1Sha256(_)) => a.addr.get_zil_bech32().ok(),
+                Some(PubKey::Secp256k1Keccak256(pk)) => PubKey::Secp256k1Sha256(*pk)
                     .get_addr()
                     .ok()
                     .and_then(|addr| addr.get_zil_bech32().ok()),
@@ -635,18 +633,15 @@ pub async fn zilliqa_get_n_format(
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let account = data
-            .accounts
-            .get(account_index)
-            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .get_account(account_index)
             .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
 
-        let address = match account.pub_key {
-            PubKey::Secp256k1Sha256(pk) => PubKey::Secp256k1Keccak256(pk)
+        let address = match account.pub_key.as_ref() {
+            Some(PubKey::Secp256k1Sha256(pk)) => PubKey::Secp256k1Keccak256(*pk)
                 .get_addr()
                 .ok()
                 .and_then(|a| a.to_eth_checksummed().ok()),
-            PubKey::Secp256k1Keccak256(_) => account
-                .pub_key
+            Some(PubKey::Secp256k1Keccak256(pk)) => PubKey::Secp256k1Keccak256(*pk)
                 .get_addr()
                 .ok()
                 .and_then(|a| a.get_zil_bech32().ok()),
@@ -667,7 +662,7 @@ pub async fn make_keystore_file(wallet_index: usize, password: String) -> Result
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        Ok(data.default_chain_hash)
+        Ok(data.chain_hash)
     })
     .await?;
     select_accounts_chain(wallet_index, chain_hash).await?;

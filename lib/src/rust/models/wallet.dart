@@ -18,7 +18,8 @@ class WalletInfo {
   final BigInt selectedAccount;
   final List<FTokenInfo> tokens;
   final WalletSettingsInfo settings;
-  final BigInt defaultChainHash;
+  final BigInt chainHash;
+  final int slip44;
 
   const WalletInfo({
     required this.walletType,
@@ -29,7 +30,8 @@ class WalletInfo {
     required this.selectedAccount,
     required this.tokens,
     required this.settings,
-    required this.defaultChainHash,
+    required this.chainHash,
+    required this.slip44,
   });
 
   @override
@@ -42,7 +44,8 @@ class WalletInfo {
       selectedAccount.hashCode ^
       tokens.hashCode ^
       settings.hashCode ^
-      defaultChainHash.hashCode;
+      chainHash.hashCode ^
+      slip44.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -57,5 +60,6 @@ class WalletInfo {
           selectedAccount == other.selectedAccount &&
           tokens == other.tokens &&
           settings == other.settings &&
-          defaultChainHash == other.defaultChainHash;
+          chainHash == other.chainHash &&
+          slip44 == other.slip44;
 }
