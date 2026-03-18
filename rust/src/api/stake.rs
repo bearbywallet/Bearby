@@ -34,7 +34,7 @@ pub async fn fetch_evm_stake(
         .get_account(account_index)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = core
-        .get_provider(account.chain_hash)
+        .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let stakes = provider
         .fetch_evm_stake(&account.addr)
@@ -62,7 +62,7 @@ pub async fn fetch_scilla_stake(
         .get_account(account_index)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = core
-        .get_provider(account.chain_hash)
+        .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let stakes = provider
         .fetch_scilla_stake(&account.addr)
@@ -74,7 +74,6 @@ pub async fn fetch_scilla_stake(
 
 pub async fn build_claim_scilla_staking_rewards_tx(
     wallet_index: usize,
-    account_index: usize,
     stake: FinalOutputInfo,
 ) -> Result<TransactionRequestInfo, String> {
     with_service(|core| {
@@ -84,11 +83,8 @@ pub async fn build_claim_scilla_staking_rewards_tx(
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_claim(&stake.into())?;
 
@@ -100,7 +96,6 @@ pub async fn build_claim_scilla_staking_rewards_tx(
 
 pub async fn build_tx_scilla_init_unstake(
     wallet_index: usize,
-    account_index: usize,
     stake: FinalOutputInfo,
 ) -> Result<TransactionRequestInfo, String> {
     with_service(|core| {
@@ -110,11 +105,8 @@ pub async fn build_tx_scilla_init_unstake(
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_init_unstake(&stake.into())?;
 
@@ -126,7 +118,6 @@ pub async fn build_tx_scilla_init_unstake(
 
 pub async fn build_tx_scilla_complete_withdrawal(
     wallet_index: usize,
-    account_index: usize,
     stake: FinalOutputInfo,
 ) -> Result<TransactionRequestInfo, String> {
     with_service(|core| {
@@ -136,11 +127,8 @@ pub async fn build_tx_scilla_complete_withdrawal(
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let contract = parse_address(stake.address)?;
         let tx = provider.build_tx_scilla_complete_withdrawal(contract)?;
@@ -153,7 +141,6 @@ pub async fn build_tx_scilla_complete_withdrawal(
 
 pub async fn build_tx_scilla_withdraw_stake_avely(
     wallet_index: usize,
-    account_index: usize,
     stake: FinalOutputInfo,
 ) -> Result<TransactionRequestInfo, String> {
     with_service(|core| {
@@ -163,11 +150,8 @@ pub async fn build_tx_scilla_withdraw_stake_avely(
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_withdraw_stake_avely(&stake.into())?;
 
@@ -194,7 +178,7 @@ pub async fn build_tx_evm_stake_request(
             .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let provider_address = Address::from_eth_address(&stake.address)?;
         let amount: U256 = amount.parse().unwrap_or_default();
@@ -223,7 +207,7 @@ pub async fn build_tx_evm_unstake_request(
             .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let provider_address = Address::from_eth_address(&stake.address)?;
         let amount_to_unstake: U256 = amount_to_unstake.parse().unwrap_or_default();
@@ -255,7 +239,7 @@ pub async fn build_tx_claim_unstake_request(
             .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let delegator_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_claim_unstake_request(&delegator_address, &account.addr)?;
@@ -282,7 +266,7 @@ pub async fn build_tx_claim_reward_request(
             .get_account(account_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core
-            .get_provider(account.chain_hash)
+            .get_provider(data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let provider_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_build_claim_reward_request(&provider_address, &account.addr)?;

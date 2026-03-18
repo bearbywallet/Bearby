@@ -6,7 +6,6 @@ pub struct AccountInfo {
     pub pub_key: Option<String>,
     pub addr_type: u8,
     pub name: String,
-    pub chain_hash: u64,
     pub index: usize,
 }
 
@@ -24,7 +23,6 @@ impl From<&AccountV2> for AccountInfo {
             addr: account.addr.auto_format(),
             addr_type: account.addr.prefix_type(),
             name: account.name.clone(),
-            chain_hash: account.chain_hash,
         }
     }
 }

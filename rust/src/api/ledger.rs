@@ -74,6 +74,7 @@ pub async fn add_ledger_wallet(
         ftokens,
         pub_keys,
         wallet_settings,
+        bip: params.bip_purpose,
         chain_hash: params.chain_hash,
         account_names: params.account_names,
         wallet_index: params.wallet_index,

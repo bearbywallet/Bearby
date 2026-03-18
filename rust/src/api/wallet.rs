@@ -97,6 +97,7 @@ pub async fn add_bip39_wallet(
         .add_bip39_wallet(BackgroundBip39Params {
             ftokens,
             wallet_settings,
+            bip: params.bip_purpose,
             mnemonic_check: params.mnemonic_check,
             chain_hash: params.chain_hash,
             password: &password,
@@ -155,8 +156,9 @@ pub async fn add_sk_wallet(
         .ok_or(ServiceError::CoreAccess)?
         .add_sk_wallet(BackgroundSKParams {
             ftokens,
-            chain_hash: params.chain_hash,
             secret_key,
+            chain_hash: params.chain_hash,
+            bip: params.bip_purpose,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
             password: &password,
@@ -226,10 +228,15 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
             None,
         ),
         Address::Secp256k1Bitcoin(_) => {
-            let net = selected_account.addr.get_bitcoin_network()
-                .map_err(|e| ServiceError::WalletError(params.wallet_index, WalletErrors::from(e)))?;
-            let btc_addr_type = selected_account.addr.get_bitcoin_address_type()
-                .map_err(|e| ServiceError::WalletError(params.wallet_index, WalletErrors::from(e)))?;
+            let net = selected_account.addr.get_bitcoin_network().map_err(|e| {
+                ServiceError::WalletError(params.wallet_index, WalletErrors::from(e))
+            })?;
+            let btc_addr_type = selected_account
+                .addr
+                .get_bitcoin_address_type()
+                .map_err(|e| {
+                    ServiceError::WalletError(params.wallet_index, WalletErrors::from(e))
+                })?;
             DerivationPath::new(
                 chain.config.slip_44,
                 params.account_index,
@@ -240,13 +247,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     };
 
     wallet
-        .add_next_bip39_account(
-            params.name,
-            &bip49,
-            &params.passphrase,
-            &seed,
-            &chain.config,
-        )
+        .add_next_bip39_account(params.name, &bip49, &params.passphrase, &seed)
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
     Ok(())
@@ -271,16 +272,9 @@ pub async fn change_account_name(
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let slip44 = data.slip44;
         let acc = data
-            .slip44_accounts
-            .get_mut(&slip44)
-            .and_then(|accs| accs.get_mut(account_index))
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                WalletErrors::InvalidAccountIndex(account_index),
-            ))?;
+            .get_mut_account(account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
 
         acc.name = new_name;
 
@@ -413,15 +407,9 @@ pub async fn bitcoin_change_address_type(
     let mnemonic_seed = mnemonic
         .to_seed(passphrase.as_deref().unwrap_or(""))
         .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
-
-    let slip44 = wallet_data.slip44;
     let accounts = wallet_data
-        .slip44_accounts
-        .get_mut(&slip44)
-        .ok_or(ServiceError::WalletError(
-            wallet_index,
-            WalletErrors::InvalidSlip44Index(slip44),
-        ))?;
+        .get_mut_accounts()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
     for (index, account) in accounts.iter_mut().enumerate() {
         let net = account.addr.get_bitcoin_network().map_err(|_| {

@@ -28,9 +28,8 @@ Future<BigInt> addProvider({required NetworkConfigInfo providerConfig}) =>
     RustLib.instance.api
         .crateApiProviderAddProvider(providerConfig: providerConfig);
 
-Future<void> removeProvider({required int providerIndex}) =>
-    RustLib.instance.api
-        .crateApiProviderRemoveProvider(providerIndex: providerIndex);
+Future<void> removeProvider({required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiProviderRemoveProvider(chainHash: chainHash);
 
 Future<void> addProvidersList(
         {required List<NetworkConfigInfo> providerConfig}) =>

@@ -61,11 +61,7 @@ pub async fn send_signed_transactions(
         .map_err(ServiceError::TransactionErrors)?;
 
     let tx = core
-        .broadcast_signed_transactions(
-            wallet_index as usize,
-            account_index as usize,
-            vec![signed_tx],
-        )
+        .broadcast_signed_transactions(wallet_index as usize, vec![signed_tx])
         .await
         .map_err(ServiceError::BackgroundError)?
         .into_iter()
@@ -141,7 +137,7 @@ pub async fn sign_send_transactions(
     let is_broadcast = signed_tx.get_metadata().broadcast;
 
     let tx = if is_broadcast {
-        core.broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+        core.broadcast_signed_transactions(wallet_index, vec![signed_tx])
             .await
             .map_err(ServiceError::BackgroundError)?
             .into_iter()
@@ -185,22 +181,18 @@ pub async fn encode_tx_rlp(
         let mut tx: TransactionRequest = tx.try_into()?;
 
         match tx {
-            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => {
-                Ok(EncodedRLPTx {
-                    bytes: tx
-                        .to_rlp_encode(account.pub_key.as_ref())
-                        .map_err(ServiceError::TransactionErrors)?,
-                    chunks_bytes: Vec::new(),
-                })
-            }
-            TransactionRequest::Zilliqa(_) => {
-                Ok(EncodedRLPTx {
-                    bytes: tx
-                        .to_rlp_encode(account.pub_key.as_ref())
-                        .map_err(ServiceError::TransactionErrors)?,
-                    chunks_bytes: Vec::new(),
-                })
-            }
+            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => Ok(EncodedRLPTx {
+                bytes: tx
+                    .to_rlp_encode(account.pub_key.as_ref())
+                    .map_err(ServiceError::TransactionErrors)?,
+                chunks_bytes: Vec::new(),
+            }),
+            TransactionRequest::Zilliqa(_) => Ok(EncodedRLPTx {
+                bytes: tx
+                    .to_rlp_encode(account.pub_key.as_ref())
+                    .map_err(ServiceError::TransactionErrors)?,
+                chunks_bytes: Vec::new(),
+            }),
             TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
                 tx_eth.chain_id = Some(chain.config.chain_id());
                 let derivation = DerivationPath::new(
@@ -441,7 +433,7 @@ pub async fn create_token_transfer(
 
             if amount >= token_balance && token_balance > U256::ZERO {
                 let provider = core
-                    .get_provider(sender_account.chain_hash)
+                    .get_provider(data.chain_hash)
                     .map_err(ServiceError::BackgroundError)?;
                 let unspents = provider
                     .btc_list_unspent(&sender_account.addr)

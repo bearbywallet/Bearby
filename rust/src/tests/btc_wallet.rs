@@ -134,8 +134,14 @@ mod btc_wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
+
         println!("BIP44 addresses:");
-        for (i, account) in wallet.accounts.iter().take(3).enumerate() {
+        for (i, account) in accounts.iter().take(3).enumerate() {
             println!("  Account {}: {}", i, account.addr);
             assert_eq!(
                 account.addr, expected_bip44[i],
@@ -152,8 +158,14 @@ mod btc_wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
+
         println!("BIP49 addresses:");
-        for (i, account) in wallet.accounts.iter().take(3).enumerate() {
+        for (i, account) in accounts.iter().take(3).enumerate() {
             println!("  Account {}: {}", i, account.addr);
             assert_eq!(
                 account.addr, expected_bip49[i],
@@ -170,8 +182,14 @@ mod btc_wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
+
         println!("BIP84 addresses:");
-        for (i, account) in wallet.accounts.iter().take(3).enumerate() {
+        for (i, account) in accounts.iter().take(3).enumerate() {
             println!("  Account {}: {}", i, account.addr);
             assert_eq!(
                 account.addr, expected_bip84[i],
@@ -188,8 +206,14 @@ mod btc_wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
+
         println!("BIP86 addresses:");
-        for (i, account) in wallet.accounts.iter().take(3).enumerate() {
+        for (i, account) in accounts.iter().take(3).enumerate() {
             println!("  Account {}: {}", i, account.addr);
             assert_eq!(
                 account.addr, expected_bip86[i],

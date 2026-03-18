@@ -11,7 +11,6 @@ class AccountInfo {
   final String? pubKey;
   final int addrType;
   final String name;
-  final BigInt chainHash;
   final BigInt index;
 
   const AccountInfo({
@@ -19,7 +18,6 @@ class AccountInfo {
     this.pubKey,
     required this.addrType,
     required this.name,
-    required this.chainHash,
     required this.index,
   });
 
@@ -29,7 +27,6 @@ class AccountInfo {
       pubKey.hashCode ^
       addrType.hashCode ^
       name.hashCode ^
-      chainHash.hashCode ^
       index.hashCode;
 
   @override
@@ -41,6 +38,5 @@ class AccountInfo {
           pubKey == other.pubKey &&
           addrType == other.addrType &&
           name == other.name &&
-          chainHash == other.chainHash &&
           index == other.index;
 }

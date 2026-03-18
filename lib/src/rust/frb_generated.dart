@@ -161,9 +161,7 @@ abstract class RustLibApi extends BaseApi {
       String? passphrase});
 
   Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake});
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
       {required BigInt walletIndex,
@@ -188,19 +186,13 @@ abstract class RustLibApi extends BaseApi {
       required String amountToUnstake});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake});
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake});
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake});
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
   Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee(
       {required BigInt walletIndex,
@@ -358,7 +350,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiBookRemoveFromAddressBook({required String addr});
 
-  Future<void> crateApiProviderRemoveProvider({required int providerIndex});
+  Future<void> crateApiProviderRemoveProvider({required BigInt chainHash});
 
   Future<String> crateApiWalletRestoreFromKeystore(
       {required List<int> keystoreBytes,
@@ -855,14 +847,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake}) {
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 13, port: port_);
@@ -872,7 +861,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta,
-      argValues: [walletIndex, accountIndex, stake],
+      argValues: [walletIndex, stake],
       apiImpl: this,
     ));
   }
@@ -880,7 +869,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta =>
       const TaskConstMeta(
         debugName: "build_claim_scilla_staking_rewards_tx",
-        argNames: ["walletIndex", "accountIndex", "stake"],
+        argNames: ["walletIndex", "stake"],
       );
 
   @override
@@ -1009,14 +998,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake}) {
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 18, port: port_);
@@ -1026,7 +1012,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta,
-      argValues: [walletIndex, accountIndex, stake],
+      argValues: [walletIndex, stake],
       apiImpl: this,
     ));
   }
@@ -1034,19 +1020,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta =>
       const TaskConstMeta(
         debugName: "build_tx_scilla_complete_withdrawal",
-        argNames: ["walletIndex", "accountIndex", "stake"],
+        argNames: ["walletIndex", "stake"],
       );
 
   @override
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake}) {
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 19, port: port_);
@@ -1056,7 +1039,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiStakeBuildTxScillaInitUnstakeConstMeta,
-      argValues: [walletIndex, accountIndex, stake],
+      argValues: [walletIndex, stake],
       apiImpl: this,
     ));
   }
@@ -1064,19 +1047,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeBuildTxScillaInitUnstakeConstMeta =>
       const TaskConstMeta(
         debugName: "build_tx_scilla_init_unstake",
-        argNames: ["walletIndex", "accountIndex", "stake"],
+        argNames: ["walletIndex", "stake"],
       );
 
   @override
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake}) {
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 20, port: port_);
@@ -1086,7 +1066,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta,
-      argValues: [walletIndex, accountIndex, stake],
+      argValues: [walletIndex, stake],
       apiImpl: this,
     ));
   }
@@ -1094,7 +1074,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta =>
       const TaskConstMeta(
         debugName: "build_tx_scilla_withdraw_stake_avely",
-        argNames: ["walletIndex", "accountIndex", "stake"],
+        argNames: ["walletIndex", "stake"],
       );
 
   @override
@@ -2478,11 +2458,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiProviderRemoveProvider({required int providerIndex}) {
+  Future<void> crateApiProviderRemoveProvider({required BigInt chainHash}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_16(providerIndex, serializer);
+        sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 73, port: port_);
       },
@@ -2491,7 +2471,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiProviderRemoveProviderConstMeta,
-      argValues: [providerIndex],
+      argValues: [chainHash],
       apiImpl: this,
     ));
   }
@@ -2499,7 +2479,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiProviderRemoveProviderConstMeta =>
       const TaskConstMeta(
         debugName: "remove_provider",
-        argNames: ["providerIndex"],
+        argNames: ["chainHash"],
       );
 
   @override
@@ -3649,6 +3629,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+        dco_decode_list_record_u_32_map_u_32_list_account_info_none(raw)
+            .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
   Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -3713,15 +3702,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo dco_decode_account_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return AccountInfo(
       addr: dco_decode_String(arr[0]),
       pubKey: dco_decode_opt_String(arr[1]),
       addrType: dco_decode_u_8(arr[2]),
       name: dco_decode_String(arr[3]),
-      chainHash: dco_decode_u_64(arr[4]),
-      index: dco_decode_usize(arr[5]),
+      index: dco_decode_usize(arr[4]),
     );
   }
 
@@ -4385,6 +4373,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_32_map_u_32_list_account_info_none)
+        .toList();
+  }
+
+  @protected
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList();
@@ -4654,6 +4651,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, Map<int, List<AccountInfo>>)
+      dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_32(arr[0]),
+      dco_decode_Map_u_32_list_account_info_None(arr[1]),
+    );
+  }
+
+  @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -4878,19 +4889,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WalletInfo dco_decode_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return WalletInfo(
       walletType: dco_decode_String(arr[0]),
       walletName: dco_decode_String(arr[1]),
       authType: dco_decode_String(arr[2]),
       walletAddress: dco_decode_String(arr[3]),
-      accounts: dco_decode_Map_u_32_list_account_info_None(arr[4]),
+      accounts:
+          dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(arr[4]),
       selectedAccount: dco_decode_usize(arr[5]),
       tokens: dco_decode_list_f_token_info(arr[6]),
       settings: dco_decode_wallet_settings_info(arr[7]),
       chainHash: dco_decode_u_64(arr[8]),
       slip44: dco_decode_u_32(arr[9]),
+      bip: dco_decode_u_32(arr[10]),
     );
   }
 
@@ -4919,6 +4932,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
+  }
+
+  @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_32_map_u_32_list_account_info_none(
+        deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
   }
 
   @protected
@@ -4990,14 +5013,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_pubKey = sse_decode_opt_String(deserializer);
     var var_addrType = sse_decode_u_8(deserializer);
     var var_name = sse_decode_String(deserializer);
-    var var_chainHash = sse_decode_u_64(deserializer);
     var var_index = sse_decode_usize(deserializer);
     return AccountInfo(
         addr: var_addr,
         pubKey: var_pubKey,
         addrType: var_addrType,
         name: var_name,
-        chainHash: var_chainHash,
         index: var_index);
   }
 
@@ -5798,6 +5819,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      sse_decode_list_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, Map<int, List<AccountInfo>>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_record_u_32_map_u_32_list_account_info_none(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<(int, String)> sse_decode_list_record_u_8_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6165,6 +6201,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, Map<int, List<AccountInfo>>)
+      sse_decode_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_32(deserializer);
+    var var_field1 = sse_decode_Map_u_32_list_account_info_None(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_u_8(deserializer);
@@ -6413,12 +6459,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_walletName = sse_decode_String(deserializer);
     var var_authType = sse_decode_String(deserializer);
     var var_walletAddress = sse_decode_String(deserializer);
-    var var_accounts = sse_decode_Map_u_32_list_account_info_None(deserializer);
+    var var_accounts =
+        sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(deserializer);
     var var_selectedAccount = sse_decode_usize(deserializer);
     var var_tokens = sse_decode_list_f_token_info(deserializer);
     var var_settings = sse_decode_wallet_settings_info(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_slip44 = sse_decode_u_32(deserializer);
+    var var_bip = sse_decode_u_32(deserializer);
     return WalletInfo(
         walletType: var_walletType,
         walletName: var_walletName,
@@ -6429,7 +6477,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         tokens: var_tokens,
         settings: var_settings,
         chainHash: var_chainHash,
-        slip44: var_slip44);
+        slip44: var_slip44,
+        bip: var_bip);
   }
 
   @protected
@@ -6464,6 +6513,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
+      Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_32_map_u_32_list_account_info_none(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
   }
 
   @protected
@@ -6543,7 +6600,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.pubKey, serializer);
     sse_encode_u_8(self.addrType, serializer);
     sse_encode_String(self.name, serializer);
-    sse_encode_u_64(self.chainHash, serializer);
     sse_encode_usize(self.index, serializer);
   }
 
@@ -7180,6 +7236,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_record_u_32_map_u_32_list_account_info_none(
+      List<(int, Map<int, List<AccountInfo>>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_32_map_u_32_list_account_info_none(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_record_u_8_string(
       List<(int, String)> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7482,6 +7548,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_record_u_32_map_u_32_list_account_info_none(
+      (int, Map<int, List<AccountInfo>>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.$1, serializer);
+    sse_encode_Map_u_32_list_account_info_None(self.$2, serializer);
+  }
+
+  @protected
   void sse_encode_record_u_8_string(
       (int, String) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7661,12 +7735,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.authType, serializer);
     sse_encode_String(self.walletAddress, serializer);
-    sse_encode_Map_u_32_list_account_info_None(self.accounts, serializer);
+    sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
+        self.accounts, serializer);
     sse_encode_usize(self.selectedAccount, serializer);
     sse_encode_list_f_token_info(self.tokens, serializer);
     sse_encode_wallet_settings_info(self.settings, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_u_32(self.slip44, serializer);
+    sse_encode_u_32(self.bip, serializer);
   }
 
   @protected

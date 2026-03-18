@@ -10,12 +10,13 @@ pub struct WalletInfo {
     pub wallet_name: String,
     pub auth_type: String,
     pub wallet_address: String,
-    pub accounts: HashMap<u32, Vec<AccountInfo>>,
+    pub accounts: HashMap<u32, HashMap<u32, Vec<AccountInfo>>>,
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
     pub settings: WalletSettingsInfo,
     pub chain_hash: u64,
     pub slip44: u32,
+    pub bip: u32,
 }
 
 impl TryFrom<&Wallet> for WalletInfo {
@@ -28,7 +29,7 @@ impl TryFrom<&Wallet> for WalletInfo {
             .get_ftokens()?
             .into_iter()
             .filter_map(|t| {
-                if t.chain_hash == account.chain_hash
+                if t.chain_hash == data.chain_hash
                     && t.addr.prefix_type() == account.addr.prefix_type()
                 {
                     Some(t.into())
@@ -37,14 +38,22 @@ impl TryFrom<&Wallet> for WalletInfo {
                 }
             })
             .collect();
-        let accounts: HashMap<u32, Vec<AccountInfo>> = data
+        let accounts: HashMap<u32, HashMap<u32, Vec<AccountInfo>>> = data
             .slip44_accounts
             .into_iter()
-            .map(|(k, v)| (k, v.iter().map(|a| a.into()).collect()))
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter()
+                        .map(|(kk, vv)| (kk, vv.iter().map(|a| a.into()).collect()))
+                        .collect(),
+                )
+            })
             .collect();
 
         Ok(Self {
             accounts,
+            bip: data.bip,
             chain_hash: data.chain_hash,
             slip44: data.slip44,
             auth_type: data.biometric_type.into(),

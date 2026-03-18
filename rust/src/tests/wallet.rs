@@ -309,15 +309,20 @@ mod wallet_tests {
         assert_eq!(wallet.accounts.len(), 1);
         assert_eq!(wallet.selected_account, 0);
         assert_eq!(wallet.tokens.len(), 1);
-        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
-        let selected_account = &wallet.accounts[wallet.selected_account];
+        assert_eq!(wallet.slip44, zil_chain_config.slip_44);
+        assert_eq!(wallet.bip, DerivationPath::BIP44_PURPOSE);
+
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
+        let selected_account = &accounts[wallet.selected_account];
 
         assert_eq!(selected_account.name, "Account 1");
         assert_eq!(selected_account.index, 0);
-        assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
-        assert_eq!(selected_account.chain_id, zil_chain_config.chain_id());
-        assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
         assert_eq!(selected_account.addr_type, 1); // Secp256k1Keccak256
 
         with_service(|core| {
@@ -326,7 +331,7 @@ mod wallet_tests {
             let selected_account = data.get_selected_account().unwrap();
 
             match selected_account.pub_key {
-                PubKey::Secp256k1Keccak256(_) => {
+                Some(PubKey::Secp256k1Keccak256(_)) => {
                     assert!(true);
                 }
                 _ => {
@@ -336,7 +341,7 @@ mod wallet_tests {
 
             assert_eq!(
                 "0103feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234",
-                selected_account.pub_key.to_string()
+                selected_account.pub_key.clone().unwrap().to_string()
             );
             Ok(())
         })
@@ -359,13 +364,11 @@ mod wallet_tests {
             let selected_account = data.get_selected_account().unwrap();
 
             assert_eq!(
-                selected_account.pub_key.to_string(),
+                selected_account.pub_key.clone().unwrap().to_string(),
                 "0003feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
             );
-            assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
-            assert_ne!(selected_account.chain_id, zil_chain_config.chain_id());
-            assert_eq!(selected_account.chain_id, zil_chain_config.chain_ids[1]);
-            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
+            assert_eq!(data.chain_hash, zil_chain_config.hash());
+            assert_eq!(data.slip44, zil_chain_config.slip_44);
             assert_eq!(
                 selected_account.addr.auto_format(),
                 "zil1vcck56z0s0njvkuzclh7gmewglkqwntazq7h2l"
@@ -410,19 +413,14 @@ mod wallet_tests {
             let selected_account = data.get_selected_account().unwrap();
 
             assert_eq!(data.selected_account, 1);
-            assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
+            assert_eq!(data.chain_hash, zil_chain_config.hash());
             assert_eq!(selected_account.name, "Second account");
             assert_eq!(selected_account.account_type.code(), 1);
             assert_eq!(
-                selected_account.pub_key.to_string(),
+                selected_account.pub_key.clone().unwrap().to_string(),
                 "010317743c1830dada97f96c51fa439b7a0673700ee38c71ccb117c9f0e974af522e"
             );
-            assert_eq!(
-                selected_account.chain_id,
-                *zil_chain_config.chain_ids.last().unwrap()
-            );
-            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
-            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
+            assert_eq!(data.slip44, zil_chain_config.slip_44);
 
             Ok(())
         })
@@ -450,7 +448,7 @@ mod wallet_tests {
         assert_eq!(wallet.wallet_address, wallet_address);
         assert_eq!(wallet.accounts.len(), 2);
         assert_eq!(wallet.selected_account, 1);
-        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
         {
             assert_eq!(wallet.tokens.len(), 1);
@@ -470,22 +468,24 @@ mod wallet_tests {
         }
 
         {
-            let account1 = &wallet.accounts[0];
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
+
+            let account1 = &accounts[0];
             assert_eq!(account1.addr, "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9");
             assert_eq!(account1.addr_type, 1);
             assert_eq!(account1.name, "Account 1");
-            assert_eq!(account1.chain_hash, bsc_chain_config.hash());
-            assert_eq!(account1.chain_id, bsc_chain_config.chain_id());
-            assert_eq!(account1.slip_44, bsc_chain_config.slip_44);
+            assert_eq!(wallet.chain_hash, bsc_chain_config.hash());
+            assert_eq!(wallet.slip44, bsc_chain_config.slip_44);
             assert_eq!(account1.index, 0);
 
-            let account2 = &wallet.accounts[1];
+            let account2 = &accounts[1];
             assert_eq!(account2.addr, "0xab92316Bd8f486C773C80EC88A00721A35f2D1de");
             assert_eq!(account2.addr_type, 1);
             assert_eq!(account2.name, "Second account");
-            assert_eq!(account2.chain_hash, bsc_chain_config.hash());
-            assert_eq!(account2.chain_id, bsc_chain_config.chain_id());
-            assert_eq!(account2.slip_44, bsc_chain_config.slip_44);
             assert_eq!(account2.index, 1);
         }
 
@@ -525,13 +525,13 @@ mod wallet_tests {
             let wallet = wallets.first().unwrap();
 
             {
-                let account3 = &wallet.accounts[2];
+                let accounts = wallet
+                    .accounts
+                    .get(&wallet.slip44)
+                    .and_then(|m| m.get(&wallet.bip))
+                    .unwrap();
 
-                for acc in &wallet.accounts {
-                    assert_eq!(account3.chain_hash, acc.chain_hash);
-                    assert_eq!(account3.chain_id, acc.chain_id);
-                    assert_eq!(account3.slip_44, acc.slip_44);
-                }
+                let account3 = &accounts[2];
 
                 assert_eq!(account3.addr, "0x1DA83F5b443cc87FBdC6ec06E40F4098C1592210");
                 assert_eq!(account3.addr_type, 1);
@@ -548,16 +548,17 @@ mod wallet_tests {
             let wallet = wallets.first().unwrap();
 
             {
-                let account3 = &wallet.accounts[2];
+                let accounts = wallet
+                    .accounts
+                    .get(&wallet.slip44)
+                    .and_then(|m| m.get(&wallet.bip))
+                    .unwrap();
+
+                let account3 = &accounts[2];
                 assert_eq!(account3.addr, "zil1xancfmqvv6nhwdf8uwy79xd7fr2t94ejqr3xs8");
                 assert_eq!(account3.addr_type, 0);
                 assert_eq!(account3.name, "account 3");
-                assert_eq!(account3.chain_hash, wallet.default_chain_hash);
-                assert_eq!(
-                    &account3.chain_id,
-                    zil_chain_config.chain_ids.last().unwrap()
-                );
-                assert_eq!(account3.slip_44, zil_chain_config.slip_44);
+                assert_eq!(wallet.slip44, zil_chain_config.slip_44);
                 assert_eq!(account3.index, 2);
             }
 
@@ -621,19 +622,22 @@ mod wallet_tests {
             assert_eq!(wallet.wallet_type, "SecretPhrase.false");
             assert_eq!(wallet.auth_type, "none");
             assert_eq!(wallet.selected_account, 0);
-            assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+            assert_eq!(wallet.chain_hash, zil_chain_config.hash());
             assert_eq!(wallet.accounts.len(), 1);
+
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
 
             {
                 assert_eq!(
-                    wallet.accounts[0].addr,
+                    accounts[0].addr,
                     "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9"
                 );
-                assert_eq!(wallet.accounts[0].addr_type, 1);
-                assert_eq!(wallet.accounts[0].chain_hash, zil_chain_config.hash());
-                assert_eq!(wallet.accounts[0].chain_id, zil_chain_config.chain_id());
-                assert_eq!(wallet.accounts[0].slip_44, zil_chain_config.slip_44);
-                assert_eq!(wallet.accounts[0].index, 0);
+                assert_eq!(accounts[0].addr_type, 1);
+                assert_eq!(accounts[0].index, 0);
             }
 
             let words = reveal_bip39_phrase(0, PASSWORD.to_string(), None)
@@ -715,12 +719,15 @@ mod wallet_tests {
         }
 
         {
-            let account = &wallet.accounts[0];
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
+
+            let account = &accounts[0];
             assert_eq!(account.name, "SK Wallet");
             assert_eq!(account.index, 0);
-            assert_eq!(account.chain_hash, zil_chain_config.hash());
-            assert_eq!(account.chain_id, zil_chain_config.chain_id());
-            assert_eq!(account.slip_44, zil_chain_config.slip_44);
         }
 
         {
@@ -777,7 +784,7 @@ mod wallet_tests {
             assert_eq!(wallet.settings.rates_api_options, 0);
         }
 
-        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
         assert_eq!(
             reveal_bip39_phrase(0, PASSWORD.to_string(), None,).await,
             Err("Wallet error at index: 0: Invalid account type".to_string())
@@ -810,15 +817,17 @@ mod wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
 
         {
-            let account = &wallet.accounts[0];
+            let account = &accounts[0];
             assert_eq!(account.name, "SK Wallet");
             assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
             assert_eq!(account.index, 0);
-            assert_eq!(account.chain_hash, bsc_chain_config.hash());
-            assert_eq!(account.chain_id, bsc_chain_config.chain_id());
-            assert_eq!(account.slip_44, bsc_chain_config.slip_44);
         }
 
         {
@@ -837,7 +846,7 @@ mod wallet_tests {
             assert_eq!(bnb_token.chain_hash, bsc_chain_config.hash());
         }
 
-        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
         let keystore_bytes = make_keystore_file(0, PASSWORD.to_string()).await.unwrap();
 
@@ -862,14 +871,16 @@ mod wallet_tests {
             assert_eq!(wallet.accounts.len(), 1);
             assert_eq!(wallet.selected_account, 0);
 
-            let account = &wallet.accounts[0];
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
+            let account = &accounts[0];
             assert_eq!(account.name, "SK Wallet");
             assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
             assert_eq!(account.addr_type, 1);
             assert_eq!(account.index, 0);
-            assert_eq!(account.chain_hash, zil_chain_config.hash());
-            assert_eq!(account.chain_id, zil_chain_config.chain_id());
-            assert_eq!(account.slip_44, zil_chain_config.slip_44);
 
             assert_eq!(wallet.tokens.len(), 1);
 
@@ -919,8 +930,7 @@ mod wallet_tests {
             assert_eq!(wallet.settings.max_connections, 0);
             assert_eq!(wallet.settings.request_timeout_secs, 0);
             assert_eq!(wallet.settings.rates_api_options, 0);
-
-            assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+            assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
             let restored_keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
                 .await
@@ -1012,9 +1022,14 @@ mod wallet_tests {
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
 
         assert_eq!(
-            wallet.accounts[0].addr,
+            accounts[0].addr,
             "zil1q2yyq6z2sz26p54700e5zpzu3gj070wxt8h75h"
         );
         let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();

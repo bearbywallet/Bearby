@@ -25,32 +25,24 @@ Future<List<FinalOutputInfo>> fetchScillaStake(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
 Future<TransactionRequestInfo> buildClaimScillaStakingRewardsTx(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required FinalOutputInfo stake}) =>
+        {required BigInt walletIndex, required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildClaimScillaStakingRewardsTx(
-        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+        walletIndex: walletIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxScillaInitUnstake(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required FinalOutputInfo stake}) =>
+        {required BigInt walletIndex, required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildTxScillaInitUnstake(
-        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+        walletIndex: walletIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawal(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required FinalOutputInfo stake}) =>
+        {required BigInt walletIndex, required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawal(
-        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+        walletIndex: walletIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxScillaWithdrawStakeAvely(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required FinalOutputInfo stake}) =>
+        {required BigInt walletIndex, required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildTxScillaWithdrawStakeAvely(
-        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+        walletIndex: walletIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxEvmStakeRequest(
         {required BigInt walletIndex,

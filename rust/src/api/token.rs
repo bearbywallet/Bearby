@@ -149,12 +149,9 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let currency: &str = data.settings.features.currency_convert.as_ref();
-    let selected_account = data
-        .get_selected_account()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let chain = service
         .core
-        .get_provider(selected_account.chain_hash)
+        .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let chain_hash = chain.config.hash();
     let mut ftokens = wallet
@@ -525,7 +522,7 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let provider = service
         .core
-        .get_provider(account.chain_hash)
+        .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
 
     if provider.config.testnet.unwrap_or(false) {
@@ -538,7 +535,7 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         .unwrap_or_else(|_| account.addr.auto_format());
 
     let chain_id = provider.config.chain_id();
-    let chain_hash = account.chain_hash;
+    let chain_hash = data.chain_hash;
     let addr_type = account.addr.prefix_type();
     let default_logo = provider.config.ftokens.first().and_then(|t| t.logo.clone());
 

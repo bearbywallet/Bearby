@@ -547,7 +547,6 @@ fn wire__crate__api__stake__build_claim_scilla_staking_rewards_tx_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -555,7 +554,6 @@ fn wire__crate__api__stake__build_claim_scilla_staking_rewards_tx_impl(
                     (move || async move {
                         let output_ok = crate::api::stake::build_claim_scilla_staking_rewards_tx(
                             api_wallet_index,
-                            api_account_index,
                             api_stake,
                         )
                         .await?;
@@ -766,7 +764,6 @@ fn wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -774,7 +771,6 @@ fn wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
                     (move || async move {
                         let output_ok = crate::api::stake::build_tx_scilla_complete_withdrawal(
                             api_wallet_index,
-                            api_account_index,
                             api_stake,
                         )
                         .await?;
@@ -809,7 +805,6 @@ fn wire__crate__api__stake__build_tx_scilla_init_unstake_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -817,7 +812,6 @@ fn wire__crate__api__stake__build_tx_scilla_init_unstake_impl(
                     (move || async move {
                         let output_ok = crate::api::stake::build_tx_scilla_init_unstake(
                             api_wallet_index,
-                            api_account_index,
                             api_stake,
                         )
                         .await?;
@@ -852,7 +846,6 @@ fn wire__crate__api__stake__build_tx_scilla_withdraw_stake_avely_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -860,7 +853,6 @@ fn wire__crate__api__stake__build_tx_scilla_withdraw_stake_avely_impl(
                     (move || async move {
                         let output_ok = crate::api::stake::build_tx_scilla_withdraw_stake_avely(
                             api_wallet_index,
-                            api_account_index,
                             api_stake,
                         )
                         .await?;
@@ -2827,13 +2819,13 @@ fn wire__crate__api__provider__remove_provider_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_provider_index = <u16>::sse_decode(&mut deserializer);
+            let api_chain_hash = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::provider::remove_provider(api_provider_index).await?;
+                            crate::api::provider::remove_provider(api_chain_hash).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -4443,6 +4435,22 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
+impl SseDecode
+    for std::collections::HashMap<
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <Vec<(
+            u32,
+            std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+        )>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode for std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4526,14 +4534,12 @@ impl SseDecode for crate::models::account::AccountInfo {
         let mut var_pubKey = <Option<String>>::sse_decode(deserializer);
         let mut var_addrType = <u8>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
-        let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_index = <usize>::sse_decode(deserializer);
         return crate::models::account::AccountInfo {
             addr: var_addr,
             pub_key: var_pubKey,
             addr_type: var_addrType,
             name: var_name,
-            chain_hash: var_chainHash,
             index: var_index,
         };
     }
@@ -5281,6 +5287,26 @@ impl SseDecode for Vec<(u32, Vec<crate::models::account::AccountInfo>)> {
     }
 }
 
+impl SseDecode
+    for Vec<(
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(
+                u32,
+                std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+            )>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<(u8, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5671,6 +5697,23 @@ impl SseDecode for (u32, Vec<crate::models::account::AccountInfo>) {
     }
 }
 
+impl SseDecode
+    for (
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <u32>::sse_decode(deserializer);
+        let mut var_field1 = <std::collections::HashMap<
+            u32,
+            Vec<crate::models::account::AccountInfo>,
+        >>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode for (u8, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5953,7 +5996,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
         let mut var_walletAddress = <String>::sse_decode(deserializer);
         let mut var_accounts = <std::collections::HashMap<
             u32,
-            Vec<crate::models::account::AccountInfo>,
+            std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
         >>::sse_decode(deserializer);
         let mut var_selectedAccount = <usize>::sse_decode(deserializer);
         let mut var_tokens = <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
@@ -5961,6 +6004,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
             <crate::models::settings::WalletSettingsInfo>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
+        let mut var_bip = <u32>::sse_decode(deserializer);
         return crate::models::wallet::WalletInfo {
             wallet_type: var_walletType,
             wallet_name: var_walletName,
@@ -5972,6 +6016,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
             settings: var_settings,
             chain_hash: var_chainHash,
             slip44: var_slip44,
+            bip: var_bip,
         };
     }
 }
@@ -6383,7 +6428,6 @@ impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
             self.pub_key.into_into_dart().into_dart(),
             self.addr_type.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
-            self.chain_hash.into_into_dart().into_dart(),
             self.index.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -7282,6 +7326,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
             self.settings.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.slip44.into_into_dart().into_dart(),
+            self.bip.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7331,6 +7376,21 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(format!("{:?}", self), serializer);
+    }
+}
+
+impl SseEncode
+    for std::collections::HashMap<
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(
+            u32,
+            std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+        )>>::sse_encode(self.into_iter().collect(), serializer);
     }
 }
 
@@ -7408,7 +7468,6 @@ impl SseEncode for crate::models::account::AccountInfo {
         <Option<String>>::sse_encode(self.pub_key, serializer);
         <u8>::sse_encode(self.addr_type, serializer);
         <String>::sse_encode(self.name, serializer);
-        <u64>::sse_encode(self.chain_hash, serializer);
         <usize>::sse_encode(self.index, serializer);
     }
 }
@@ -7926,6 +7985,24 @@ impl SseEncode for Vec<(u32, Vec<crate::models::account::AccountInfo>)> {
     }
 }
 
+impl SseEncode
+    for Vec<(
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(
+                u32,
+                std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+            )>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<(u8, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -8237,6 +8314,21 @@ impl SseEncode for (u32, Vec<crate::models::account::AccountInfo>) {
     }
 }
 
+impl SseEncode
+    for (
+        u32,
+        std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.0, serializer);
+        <std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>>::sse_encode(
+            self.1, serializer,
+        );
+    }
+}
+
 impl SseEncode for (u8, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -8453,15 +8545,16 @@ impl SseEncode for crate::models::wallet::WalletInfo {
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.auth_type, serializer);
         <String>::sse_encode(self.wallet_address, serializer);
-        <std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>>::sse_encode(
-            self.accounts,
-            serializer,
-        );
+        <std::collections::HashMap<
+            u32,
+            std::collections::HashMap<u32, Vec<crate::models::account::AccountInfo>>,
+        >>::sse_encode(self.accounts, serializer);
         <usize>::sse_encode(self.selected_account, serializer);
         <Vec<crate::models::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
         <crate::models::settings::WalletSettingsInfo>::sse_encode(self.settings, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <u32>::sse_encode(self.slip44, serializer);
+        <u32>::sse_encode(self.bip, serializer);
     }
 }
 

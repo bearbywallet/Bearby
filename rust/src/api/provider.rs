@@ -73,9 +73,9 @@ pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, Str
     .map_err(Into::into)
 }
 
-pub async fn remove_provider(provider_index: u16) -> Result<(), String> {
+pub async fn remove_provider(chain_hash: u64) -> Result<(), String> {
     with_service(|core| {
-        core.remvoe_provider(provider_index as usize)?;
+        core.remvoe_provider(chain_hash)?;
 
         Ok(())
     })
