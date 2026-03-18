@@ -165,7 +165,6 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     BuildContext context,
   ) async {
-    print(message.toString());
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
 
@@ -305,7 +304,7 @@ class TronWeb3Handler {
         info: null,
         icon: message.icon,
         title: title ?? "",
-        signer: null,
+        signer: appState.account?.addr,
         tokenInfo: tokenInfo,
         broadcast: false,
       );
@@ -332,7 +331,6 @@ class TronWeb3Handler {
           decimals: mbToken.decimals,
         ).toString(),
         onConfirm: (tx) {
-          print("tx: ${tx.tron}");
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,

@@ -406,7 +406,7 @@ class _BrowserPageState extends State<BrowserPage>
               _legacyHandler?.handleStartBlockWorker(appState);
             },
             onConsoleMessage: (_, msg) {
-              print(msg);
+              // print(msg);
             },
             onProgressChanged: (controller, progress) async {
               if (progress > 20) {

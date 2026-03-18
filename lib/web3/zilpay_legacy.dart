@@ -281,7 +281,7 @@ class ZilPayLegacyHandler {
         info: teg,
         icon: message.icon,
         title: title,
-        signer: null,
+        signer: appState.account?.addr,
         tokenInfo: tokenInfo,
         broadcast: true,
       );
