@@ -161,10 +161,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     try {
       if (_isLedgerWallet) {
         final wallet = appState.wallet!;
-        final accountIndex = wallet.selectedAccount.toInt();
-        final account = accountIndex >= 0
-            ? wallet.accounts.elementAtOrNull(accountIndex)
-            : null;
+        final account = appState.account;
         if (account == null) {
           throw Exception('Invalid account index');
         }
@@ -174,16 +171,17 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             message: widget.message!,
             account: account,
             walletIndex: BigInt.from(appState.selectedWallet),
+            slip44: wallet.slip44,
           );
-          widget.onMessageSigned(account.pubKey, sig);
+          widget.onMessageSigned(account.pubKey ?? account.addr, sig);
         } else if (widget.typedData != null) {
           final sig =
               await appState.ledgerViewController.signEIP712HashedMessage(
             account: account,
-            walletIndex: BigInt.from(appState.selectedWallet),
             typedData: widget.typedData!,
+            slip44: wallet.slip44,
           );
-          widget.onMessageSigned(account.pubKey, sig);
+          widget.onMessageSigned(account.pubKey ?? account.addr, sig);
         } else {
           throw "invalid message";
         }

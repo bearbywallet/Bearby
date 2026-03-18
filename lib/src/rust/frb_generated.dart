@@ -3649,6 +3649,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_u_32_list_account_info(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
   Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Map.fromEntries(dco_decode_list_record_usize_string(raw)
@@ -3705,14 +3713,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo dco_decode_account_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return AccountInfo(
       addr: dco_decode_String(arr[0]),
-      addrType: dco_decode_u_8(arr[1]),
-      name: dco_decode_String(arr[2]),
-      chainHash: dco_decode_u_64(arr[3]),
-      index: dco_decode_usize(arr[4]),
+      pubKey: dco_decode_opt_String(arr[1]),
+      addrType: dco_decode_u_8(arr[2]),
+      name: dco_decode_String(arr[3]),
+      chainHash: dco_decode_u_64(arr[4]),
+      index: dco_decode_usize(arr[5]),
     );
   }
 
@@ -4367,6 +4376,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_32_list_account_info)
+        .toList();
+  }
+
+  @protected
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList();
@@ -4622,6 +4640,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, List<AccountInfo>) dco_decode_record_u_32_list_account_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_32(arr[0]),
+      dco_decode_list_account_info(arr[1]),
+    );
+  }
+
+  @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -4853,7 +4885,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       walletName: dco_decode_String(arr[1]),
       authType: dco_decode_String(arr[2]),
       walletAddress: dco_decode_String(arr[3]),
-      accounts: dco_decode_list_account_info(arr[4]),
+      accounts: dco_decode_Map_u_32_list_account_info_None(arr[4]),
       selectedAccount: dco_decode_usize(arr[5]),
       tokens: dco_decode_list_f_token_info(arr[6]),
       settings: dco_decode_wallet_settings_info(arr[7]),
@@ -4887,6 +4919,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
+  }
+
+  @protected
+  Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_32_list_account_info(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
   }
 
   @protected
@@ -4947,12 +4987,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo sse_decode_account_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_addr = sse_decode_String(deserializer);
+    var var_pubKey = sse_decode_opt_String(deserializer);
     var var_addrType = sse_decode_u_8(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_index = sse_decode_usize(deserializer);
     return AccountInfo(
         addr: var_addr,
+        pubKey: var_pubKey,
         addrType: var_addrType,
         name: var_name,
         chainHash: var_chainHash,
@@ -5743,6 +5785,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, List<AccountInfo>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_32_list_account_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<(int, String)> sse_decode_list_record_u_8_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6101,6 +6156,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, List<AccountInfo>) sse_decode_record_u_32_list_account_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_32(deserializer);
+    var var_field1 = sse_decode_list_account_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_u_8(deserializer);
@@ -6349,7 +6413,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_walletName = sse_decode_String(deserializer);
     var var_authType = sse_decode_String(deserializer);
     var var_walletAddress = sse_decode_String(deserializer);
-    var var_accounts = sse_decode_list_account_info(deserializer);
+    var var_accounts = sse_decode_Map_u_32_list_account_info_None(deserializer);
     var var_selectedAccount = sse_decode_usize(deserializer);
     var var_tokens = sse_decode_list_f_token_info(deserializer);
     var var_settings = sse_decode_wallet_settings_info(deserializer);
@@ -6400,6 +6464,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_32_list_account_info_None(
+      Map<int, List<AccountInfo>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_32_list_account_info(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
   }
 
   @protected
@@ -6468,6 +6540,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_account_info(AccountInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.addr, serializer);
+    sse_encode_opt_String(self.pubKey, serializer);
     sse_encode_u_8(self.addrType, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_u_64(self.chainHash, serializer);
@@ -7097,6 +7170,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_record_u_32_list_account_info(
+      List<(int, List<AccountInfo>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_32_list_account_info(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_record_u_8_string(
       List<(int, String)> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7391,6 +7474,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_record_u_32_list_account_info(
+      (int, List<AccountInfo>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.$1, serializer);
+    sse_encode_list_account_info(self.$2, serializer);
+  }
+
+  @protected
   void sse_encode_record_u_8_string(
       (int, String) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7570,7 +7661,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.authType, serializer);
     sse_encode_String(self.walletAddress, serializer);
-    sse_encode_list_account_info(self.accounts, serializer);
+    sse_encode_Map_u_32_list_account_info_None(self.accounts, serializer);
     sse_encode_usize(self.selectedAccount, serializer);
     sse_encode_list_f_token_info(self.tokens, serializer);
     sse_encode_wallet_settings_info(self.settings, serializer);

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{account::AccountInfo, ftoken::FTokenInfo, settings::WalletSettingsInfo};
 pub use zilpay::wallet::Wallet;
 use zilpay::{errors::wallet::WalletErrors, wallet::wallet_storage::StorageOperations};
@@ -8,7 +10,7 @@ pub struct WalletInfo {
     pub wallet_name: String,
     pub auth_type: String,
     pub wallet_address: String,
-    pub accounts: Vec<AccountInfo>,
+    pub accounts: HashMap<u32, Vec<AccountInfo>>,
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
     pub settings: WalletSettingsInfo,
@@ -35,7 +37,11 @@ impl TryFrom<&Wallet> for WalletInfo {
                 }
             })
             .collect();
-        let accounts = data.get_accounts()?.iter().map(|v| v.into()).collect();
+        let accounts: HashMap<u32, Vec<AccountInfo>> = data
+            .slip44_accounts
+            .into_iter()
+            .map(|(k, v)| (k, v.iter().map(|a| a.into()).collect()))
+            .collect();
 
         Ok(Self {
             accounts,

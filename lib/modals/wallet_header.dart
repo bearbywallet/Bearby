@@ -113,7 +113,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             padding: EdgeInsets.symmetric(
                 horizontal: adaptivePadding, vertical: adaptivePadding),
             itemBuilder: (_, index) => WalletCard(
-              account: wallet.accounts[index],
+              account: appState.accounts.elementAt(index),
               onTap: () => _selectWallet(index),
               isSelected: wallet.selectedAccount == BigInt.from(index),
             ),

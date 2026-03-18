@@ -848,7 +848,7 @@ class TronWeb3Handler {
     List<String> addresses = [];
     final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
 
-    addresses = (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
+    addresses = (appState.accounts).map((a) => a.addr).toList();
 
     if (selectedAccountIndex != null &&
         selectedAccountIndex >= 0 &&

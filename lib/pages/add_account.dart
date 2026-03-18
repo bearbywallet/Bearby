@@ -82,10 +82,9 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   }
 
   bool _exists(AppState appState) {
-    return appState.wallet?.accounts.any(
-          (account) => account.index.toInt() == _bip39Index,
-        ) ??
-        false;
+    return appState.accounts.any(
+      (account) => account.index.toInt() == _bip39Index,
+    );
   }
 
   bool _isZIL(AppState appState) {
@@ -93,15 +92,13 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       return false;
     }
 
-    final defaultChain = appState.getChain(appState.wallet!.defaultChainHash);
-
-    if (defaultChain == null) {
+    if (appState.chain == null) {
       return false;
     }
 
     return appState.chain?.slip44 == kZilliqaSlip44 &&
         appState.wallet != null &&
-        defaultChain.slip44 == appState.chain?.slip44;
+        appState.chain?.slip44 == appState.wallet?.slip44;
   }
 
   Future<void> _createAccount(AppState appState) async {

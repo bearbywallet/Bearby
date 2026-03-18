@@ -71,7 +71,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
     super.initState();
     final appState = Provider.of<AppState>(context, listen: false);
     if (appState.wallet != null) {
-      _selectedAccounts = Map.fromEntries(appState.wallet!.accounts
+      _selectedAccounts = Map.fromEntries(appState.accounts
           .asMap()
           .entries
           .map((entry) => MapEntry(entry.key, true)));
@@ -204,7 +204,8 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
         shrinkWrap: true,
         itemCount: appState.wallet!.accounts.length,
         itemBuilder: (context, index) {
-          final account = appState.wallet!.accounts[index];
+          // TODO: possibe null, fix it!
+          final account = appState.account!;
           final isSelected = _selectedAccounts[index] ?? false;
 
           return EnableCard(

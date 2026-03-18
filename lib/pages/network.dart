@@ -190,8 +190,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
       if (aIsSelected && !bIsSelected) return -1;
       if (!aIsSelected && bIsSelected) return 1;
 
-      final aIsDefault = wallet?.defaultChainHash == a.configInfo.chainHash;
-      final bIsDefault = wallet?.defaultChainHash == b.configInfo.chainHash;
+      final aIsDefault = wallet?.chainHash == a.configInfo.chainHash;
+      final bIsDefault = wallet?.chainHash == b.configInfo.chainHash;
 
       if (aIsDefault && !bIsDefault) return -1;
       if (!aIsDefault && bIsDefault) return 1;
@@ -278,8 +278,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
           .map((network) => NetworkCard(
                 configInfo: network.configInfo,
                 isAdded: network.isAdded,
-                isDefault:
-                    wallet?.defaultChainHash == network.configInfo.chainHash,
+                isDefault: wallet?.chainHash == network.configInfo.chainHash,
                 isSelected: chain?.chainHash == network.configInfo.chainHash,
                 isTestnet: network.configInfo.testnet ?? false,
                 iconUrl:

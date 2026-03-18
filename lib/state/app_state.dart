@@ -104,11 +104,19 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return getChain(hash);
   }
 
+  List<AccountInfo> get accounts {
+    if (wallet == null) return [];
+    int index = wallet!.selectedAccount.toInt();
+    if (index < 0) return [];
+
+    return wallet!.accounts[wallet!.slip44] ?? [];
+  }
+
   AccountInfo? get account {
     if (wallet == null) return null;
     int index = wallet!.selectedAccount.toInt();
     if (index < 0) return null;
-    return wallet!.accounts.elementAtOrNull(index);
+    return accounts.elementAtOrNull(index);
   }
 
   int get selectedWallet => _selectedWallet;

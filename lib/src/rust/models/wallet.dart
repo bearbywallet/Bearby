@@ -14,7 +14,7 @@ class WalletInfo {
   final String walletName;
   final String authType;
   final String walletAddress;
-  final List<AccountInfo> accounts;
+  final Map<int, List<AccountInfo>> accounts;
   final BigInt selectedAccount;
   final List<FTokenInfo> tokens;
   final WalletSettingsInfo settings;

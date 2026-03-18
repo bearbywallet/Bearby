@@ -232,7 +232,7 @@ class Web3EIP1193Handler {
       addresses = await getZilEthChecksumAddresses(
           walletIndex: BigInt.from(appState.selectedWallet));
     } else {
-      addresses = (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
+      addresses = (appState.accounts).map((a) => a.addr).toList();
     }
 
     if (selectedAccountIndex != null &&
@@ -824,13 +824,14 @@ class Web3EIP1193Handler {
         decimals: mbToken.decimals,
       );
 
+      final signer = appState.account;
       final metadata = TransactionMetadataInfo(
         chainHash: appState.chain?.chainHash ?? BigInt.zero,
         hash: null,
         info: null,
         icon: message.icon,
         title: title ?? "EVM Transaction",
-        signer: null,
+        signer: signer?.addr,
         tokenInfo: tokenInfo,
         broadcast: true,
       );

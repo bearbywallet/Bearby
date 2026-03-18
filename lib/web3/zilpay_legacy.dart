@@ -228,9 +228,8 @@ class ZilPayLegacyHandler {
       final account = appState.account!;
 
       final chainHash = appState.chain?.chainHash ?? BigInt.zero;
-      final chainId = appState.account?.chainId ??
-          appState.chain?.chainIds.last ??
-          BigInt.zero;
+      // TODO: maybe never be null, but need to check the appState.chain?
+      final chainId = appState.chain!.chainIds.last;
       final nonce = BigInt.zero;
 
       final scillaRequest = TransactionRequestScilla(

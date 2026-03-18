@@ -93,13 +93,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       _createWallet = createWallet ?? true;
 
       final appState = context.read<AppState>();
-      final wallet = appState.selectedWallet >= 0
-          ? appState.wallets.elementAtOrNull(appState.selectedWallet)
-          : null;
-      final isLedgerWallet = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
+      final wallet = appState.wallets.elementAtOrNull(appState.selectedWallet);
+      final isLedgerWallet =
+          wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
       if (isLedgerWallet && !_createWallet) {
-        final existingAccounts = appState.wallet?.accounts ?? [];
+        final existingAccounts = appState.accounts;
         _accounts = existingAccounts
             .map((account) => LedgerAccount(
                   index: account.index.toInt(),
@@ -153,6 +152,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         chainHash = matches.first.chainHash;
       }
 
+      // TODO: params are harcoded, we need detect it from device!
       WalletSettingsInfo settings = WalletSettingsInfo(
         cipherOrders: Uint8List.fromList([]),
         argonParams: WalletArgonParamsInfo(
@@ -182,8 +182,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
+        // TODO: .publicKey maybe must be null, or not need to check!
         final pubKeys =
-            selectedAccounts.map((a) => (a.index, a.publicKey)).toList();
+            selectedAccounts.map((a) => (a.index, a.publicKey!)).toList();
         final accountNames = selectedAccounts
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
@@ -228,11 +229,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
+        // TODO: the publicKey possible be null, we need to check it!
         final accountsToUpdate = _selectedAccounts.entries
             .where((entry) => entry.value)
             .map((entry) => (
                   entry.key.index,
-                  entry.key.publicKey,
+                  entry.key.publicKey!,
                   "ledger ${entry.key.index + 1}"
                 ))
             .toList();

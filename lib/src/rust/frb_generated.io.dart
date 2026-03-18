@@ -56,6 +56,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
+  Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(
+      dynamic raw);
+
+  @protected
   Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw);
 
   @protected
@@ -300,6 +304,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
+  List<(int, List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(
+      dynamic raw);
+
+  @protected
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw);
 
   @protected
@@ -391,6 +399,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, int) dco_decode_record_string_u_8(dynamic raw);
 
   @protected
+  (int, List<AccountInfo>) dco_decode_record_u_32_list_account_info(
+      dynamic raw);
+
+  @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw);
 
   @protected
@@ -453,6 +465,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
+  Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(
+      SseDeserializer deserializer);
 
   @protected
   Map<BigInt, String> sse_decode_Map_usize_String_None(
@@ -727,6 +743,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<(int, List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<(int, String)> sse_decode_list_record_u_8_string(
       SseDeserializer deserializer);
 
@@ -831,6 +851,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, int) sse_decode_record_string_u_8(SseDeserializer deserializer);
 
   @protected
+  (int, List<AccountInfo>) sse_decode_record_u_32_list_account_info(
+      SseDeserializer deserializer);
+
+  @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer);
 
   @protected
@@ -905,6 +929,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_Map_u_32_list_account_info_None(
+      Map<int, List<AccountInfo>> self, SseSerializer serializer);
 
   @protected
   void sse_encode_Map_usize_String_None(
@@ -1190,6 +1218,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(String, String)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_u_32_list_account_info(
+      List<(int, List<AccountInfo>)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_record_u_8_string(
       List<(int, String)> self, SseSerializer serializer);
 
@@ -1294,6 +1326,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_string_u_8(
       (String, int) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_u_32_list_account_info(
+      (int, List<AccountInfo>) self, SseSerializer serializer);
 
   @protected
   void sse_encode_record_u_8_string(

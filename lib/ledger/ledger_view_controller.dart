@@ -155,9 +155,9 @@ class LedgerViewController extends ChangeNotifier {
   Future<String> signEIP712HashedMessage({
     required TypedDataEip712 typedData,
     required AccountInfo account,
-    required BigInt walletIndex,
+    required int slip44,
   }) async {
-    if (account.slip44 == kEthereumSlip44 || account.slip44 == kZilliqaSlip44) {
+    if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       final typedDataJson = jsonEncode(typedData.toJson());
       final eip712Hashes =
@@ -210,10 +210,11 @@ class LedgerViewController extends ChangeNotifier {
     required String message,
     required AccountInfo account,
     required BigInt walletIndex,
+    required int slip44,
   }) async {
     String? sig;
 
-    if (account.slip44 == kZilliqaSlip44 && account.addrType == 0) {
+    if (slip44 == kZilliqaSlip44 && account.addrType == 0) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       final hashBytes = await prepareMessage(
         walletIndex: walletIndex,
@@ -224,7 +225,7 @@ class LedgerViewController extends ChangeNotifier {
         account.index.toInt(),
         hashBytes,
       );
-    } else if (account.slip44 == kZilliqaSlip44 || account.slip44 == kEthereumSlip44) {
+    } else if (slip44 == kZilliqaSlip44 || slip44 == kEthereumSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       Uint8List bytes = utf8.encode(message);
       final personalSig = await evmApp.signPersonalMessage(
@@ -266,7 +267,8 @@ class LedgerViewController extends ChangeNotifier {
 
     _detectedAppType = LedgerAppType.unknown;
     notifyListeners();
-    throw LedgerAppDetectionError('Failed to detect Ledger app. Please open Zilliqa or Ethereum app on your Ledger device.');
+    throw LedgerAppDetectionError(
+        'Failed to detect Ledger app. Please open Zilliqa or Ethereum app on your Ledger device.');
   }
 
   Future<List<LedgerAccount>> getAccounts({

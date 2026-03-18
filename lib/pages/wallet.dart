@@ -667,7 +667,7 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   bool _isBitcoinWallet(AppState appState) {
-    return appState.account?.slip44 == kBitcoinlip44;
+    return appState.wallet?.slip44 == kBitcoinlip44;
   }
 
   Widget _buildBipPurposeSection(AppState appState) {

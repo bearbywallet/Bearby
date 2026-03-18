@@ -8,6 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class AccountInfo {
   final String addr;
+  final String? pubKey;
   final int addrType;
   final String name;
   final BigInt chainHash;
@@ -15,6 +16,7 @@ class AccountInfo {
 
   const AccountInfo({
     required this.addr,
+    this.pubKey,
     required this.addrType,
     required this.name,
     required this.chainHash,
@@ -24,6 +26,7 @@ class AccountInfo {
   @override
   int get hashCode =>
       addr.hashCode ^
+      pubKey.hashCode ^
       addrType.hashCode ^
       name.hashCode ^
       chainHash.hashCode ^
@@ -35,6 +38,7 @@ class AccountInfo {
       other is AccountInfo &&
           runtimeType == other.runtimeType &&
           addr == other.addr &&
+          pubKey == other.pubKey &&
           addrType == other.addrType &&
           name == other.name &&
           chainHash == other.chainHash &&

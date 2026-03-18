@@ -301,9 +301,8 @@ class _AddressSelectModalContentState
     final l10n = AppLocalizations.of(context)!;
     final theme = appState.currentTheme;
     final currentAccount = appState.wallet?.selectedAccount.toInt() ?? 0;
-    final currentAccountData = currentAccount >= 0
-        ? appState.wallet?.accounts.elementAtOrNull(currentAccount)
-        : null;
+    final currentAccountData =
+        appState.accounts.elementAtOrNull(currentAccount);
     final isCurrentAccount = currentAccountData?.addr == entry.address;
 
     return InkWell(
@@ -455,7 +454,7 @@ class _AddressSelectModalContentState
   }
 
   bool _isZilliqaNetwork(AppState appState) {
-    return appState.account?.slip44 == kZilliqaSlip44;
+    return appState.wallet?.slip44 == kZilliqaSlip44;
   }
 
   String _getNetworkIconPath(Entry entry) {

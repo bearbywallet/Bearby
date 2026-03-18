@@ -37,7 +37,7 @@ class WalletOption extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final chain = appState.getChain(wallet.defaultChainHash);
+    final chain = appState.getChain(wallet.chainHash);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
