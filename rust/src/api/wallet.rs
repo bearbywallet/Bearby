@@ -31,8 +31,6 @@ use crate::{
     utils::{errors::ServiceError, utils::with_service},
 };
 
-use super::provider::select_accounts_chain;
-
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     with_service(|core| {
         let wallets = core
@@ -67,22 +65,6 @@ pub async fn add_bip39_wallet(
 ) -> Result<String, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
-
-    let provider = service
-        .core
-        .get_provider(params.chain_hash)
-        .map_err(ServiceError::BackgroundError)?;
-    let net = provider.config.bitcoin_network();
-    let accounts_bip49 = params
-        .accounts
-        .into_iter()
-        .map(|(i, name)| {
-            (
-                DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, net),
-                name,
-            )
-        })
-        .collect::<Vec<(DerivationPath, String)>>();
     let ftokens = additional_ftokens
         .into_iter()
         .map(TryFrom::try_from)
@@ -102,7 +84,7 @@ pub async fn add_bip39_wallet(
             chain_hash: params.chain_hash,
             password: &password,
             mnemonic_str: &params.mnemonic_str,
-            accounts: &accounts_bip49,
+            accounts: &params.accounts,
             passphrase: &params.passphrase,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
@@ -645,16 +627,6 @@ pub async fn zilliqa_get_n_format(
 
 pub async fn make_keystore_file(wallet_index: usize, password: String) -> Result<Vec<u8>, String> {
     let mut password = SecretString::new(password.into());
-    let chain_hash = with_wallet(wallet_index, |wallet| {
-        let data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-        Ok(data.chain_hash)
-    })
-    .await?;
-    select_accounts_chain(wallet_index, chain_hash).await?;
-
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 

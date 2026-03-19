@@ -3,6 +3,7 @@ use crate::{
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::with_service},
 };
+use secrecy::SecretString;
 use serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
@@ -134,13 +135,21 @@ pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Resul
     .map_err(Into::into)
 }
 
-pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Result<(), String> {
-    with_service(|core| {
-        core.select_accounts_chain(wallet_index, chain_hash)
-            .map_err(ServiceError::BackgroundError)
-    })
-    .await
-    .map_err(Into::into)
+pub async fn select_accounts_chain(
+    wallet_index: usize,
+    chain_hash: u64,
+    password: Option<String>,
+) -> Result<(), String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let password = password.map(|p| SecretString::new(p.into()));
+
+    service
+        .core
+        .select_accounts_chain(wallet_index, chain_hash, password.as_ref())
+        .await
+        .map_err(ServiceError::BackgroundError)
+        .map_err(Into::into)
 }
 
 pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkConfigInfo>, String> {

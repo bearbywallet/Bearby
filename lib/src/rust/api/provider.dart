@@ -41,9 +41,11 @@ Future<void> createOrUpdateChain({required NetworkConfigInfo providerConfig}) =>
         .crateApiProviderCreateOrUpdateChain(providerConfig: providerConfig);
 
 Future<void> selectAccountsChain(
-        {required BigInt walletIndex, required BigInt chainHash}) =>
+        {required BigInt walletIndex,
+        required BigInt chainHash,
+        String? password}) =>
     RustLib.instance.api.crateApiProviderSelectAccountsChain(
-        walletIndex: walletIndex, chainHash: chainHash);
+        walletIndex: walletIndex, chainHash: chainHash, password: password);
 
 Future<List<NetworkConfigInfo>> getChainsProvidersFromJson(
         {required String jsonStr}) =>

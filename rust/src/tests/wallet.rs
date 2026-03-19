@@ -392,7 +392,7 @@ mod wallet_tests {
             providers[0].config.clone()
         };
 
-        select_accounts_chain(0, zil_chain_config.hash())
+        select_accounts_chain(0, zil_chain_config.hash(), None)
             .await
             .unwrap();
 
@@ -439,7 +439,7 @@ mod wallet_tests {
             providers[1].config.clone()
         };
 
-        select_accounts_chain(0, bsc_chain_config.hash())
+        select_accounts_chain(0, bsc_chain_config.hash(), None)
             .await
             .unwrap();
 
@@ -544,7 +544,7 @@ mod wallet_tests {
                 assert_eq!(account3.index, 2);
             }
 
-            select_accounts_chain(0, zil_chain_config.hash())
+            select_accounts_chain(0, zil_chain_config.hash(), None)
                 .await
                 .unwrap();
             zilliqa_swap_chain(0, 2).await.unwrap();
@@ -667,406 +667,406 @@ mod wallet_tests {
 
         delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
 
-        // GUARD.store(5, std::sync::atomic::Ordering::Relaxed);
+        GUARD.store(5, std::sync::atomic::Ordering::Relaxed);
     }
 
-    // #[tokio::test]
-    // async fn test_c_create_sk_wallet() {
-    //     wait_for(5).await;
-    //     let zil_chain_config = {
-    //         let guard = BACKGROUND_SERVICE.read().await;
-    //         let service = guard.as_ref().unwrap();
-    //         let providers = service.core.get_providers();
+    #[tokio::test]
+    async fn test_c_create_sk_wallet() {
+        wait_for(5).await;
+        let zil_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
 
-    //         providers[0].config.clone()
-    //     };
-    //     let params = AddSKWalletParams {
-    //         sk: SK.to_string(),
-    //         password: PASSWORD.to_string(),
-    //         wallet_name: "SK Wallet".to_string(),
-    //         biometric_type: "none".to_string(),
-    //         bip_purpose: DerivationPath::BIP44_PURPOSE,
-    //         chain_hash: zil_chain_config.hash(),
-    //     };
-    //     let wallet_settings = WalletSettingsInfo {
-    //         cipher_orders: vec![0, 1],
-    //         argon_params: WalletArgonParamsInfo {
-    //             memory: 10,
-    //             iterations: 1,
-    //             threads: 1,
-    //             secret: "secret".to_string(),
-    //         },
-    //         currency_convert: "BTC".to_string(),
-    //         ipfs_node: None,
-    //         ens_enabled: false,
-    //         tokens_list_fetcher: false,
-    //         node_ranking_enabled: false,
-    //         max_connections: 0,
-    //         request_timeout_secs: 0,
-    //         rates_api_options: 0,
-    //     };
-    //     let ftokens = vec![];
-    //     let wallet_address = add_sk_wallet(params, wallet_settings, ftokens)
-    //         .await
-    //         .unwrap();
-    //     assert!(!wallet_address.is_empty());
-    //     let wallets = get_wallets().await.unwrap();
-    //     let wallet = wallets.first().unwrap();
+            providers[0].config.clone()
+        };
+        let params = AddSKWalletParams {
+            sk: SK.to_string(),
+            password: PASSWORD.to_string(),
+            wallet_name: "SK Wallet".to_string(),
+            biometric_type: "none".to_string(),
+            bip_purpose: DerivationPath::BIP44_PURPOSE,
+            chain_hash: zil_chain_config.hash(),
+        };
+        let wallet_settings = WalletSettingsInfo {
+            cipher_orders: vec![0, 1],
+            argon_params: WalletArgonParamsInfo {
+                memory: 10,
+                iterations: 1,
+                threads: 1,
+                secret: "secret".to_string(),
+            },
+            currency_convert: "BTC".to_string(),
+            ipfs_node: None,
+            ens_enabled: false,
+            tokens_list_fetcher: false,
+            node_ranking_enabled: false,
+            max_connections: 0,
+            request_timeout_secs: 0,
+            rates_api_options: 0,
+        };
+        let ftokens = vec![];
+        let wallet_address = add_sk_wallet(params, wallet_settings, ftokens)
+            .await
+            .unwrap();
+        assert!(!wallet_address.is_empty());
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
 
-    //     {
-    //         assert_eq!(wallets.len(), 1);
-    //         assert_eq!(wallet.wallet_type, "SecretKey");
-    //         assert_eq!(wallet.wallet_name, "SK Wallet");
-    //         assert_eq!(wallet.auth_type, "none");
-    //         assert_eq!(wallet.wallet_address, wallet_address);
-    //         assert_eq!(wallet.accounts.len(), 1);
-    //         assert_eq!(wallet.selected_account, 0);
-    //     }
+        {
+            assert_eq!(wallets.len(), 1);
+            assert_eq!(wallet.wallet_type, "SecretKey");
+            assert_eq!(wallet.wallet_name, "SK Wallet");
+            assert_eq!(wallet.auth_type, "none");
+            assert_eq!(wallet.wallet_address, wallet_address);
+            assert_eq!(wallet.accounts.len(), 1);
+            assert_eq!(wallet.selected_account, 0);
+        }
 
-    //     {
-    //         let accounts = wallet
-    //             .accounts
-    //             .get(&wallet.slip44)
-    //             .and_then(|m| m.get(&wallet.bip))
-    //             .unwrap();
+        {
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
 
-    //         let account = &accounts[0];
-    //         assert_eq!(account.name, "SK Wallet");
-    //         assert_eq!(account.index, 0);
-    //     }
+            let account = &accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.index, 0);
+        }
 
-    //     {
-    //         assert_eq!(wallet.tokens.len(), 1);
-    //         let evm_token = &wallet.tokens[0];
-    //         assert_eq!(evm_token.name, "EVM");
-    //         assert_eq!(evm_token.symbol, "ZIL");
-    //         assert_eq!(evm_token.decimals, 18);
-    //         assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
-    //         assert_eq!(evm_token.addr_type, 1);
-    //         assert_eq!(evm_token.logo, Some(CDN.to_string()));
-    //         assert!(evm_token.balances.is_empty());
-    //         assert_eq!(evm_token.rate, 0.0);
-    //         assert!(!evm_token.default);
-    //         assert!(evm_token.native);
-    //         assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
+        {
+            assert_eq!(wallet.tokens.len(), 1);
+            let evm_token = &wallet.tokens[0];
+            assert_eq!(evm_token.name, "EVM");
+            assert_eq!(evm_token.symbol, "ZIL");
+            assert_eq!(evm_token.decimals, 18);
+            assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(evm_token.addr_type, 1);
+            assert_eq!(evm_token.logo, Some(CDN.to_string()));
+            assert!(evm_token.balances.is_empty());
+            assert_eq!(evm_token.rate, 0.0);
+            assert!(!evm_token.default);
+            assert!(evm_token.native);
+            assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
 
-    //         zilliqa_swap_chain(0, 0).await.unwrap();
-    //         let wallets = get_wallets().await.unwrap();
-    //         let wallet = wallets.first().unwrap();
+            zilliqa_swap_chain(0, 0).await.unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
 
-    //         let zil_token = &wallet.tokens[0];
-    //         assert_eq!(zil_token.name, "Scilla");
-    //         assert_eq!(zil_token.symbol, "ZIL");
-    //         assert_eq!(zil_token.decimals, 12);
-    //         assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
-    //         assert_eq!(zil_token.addr_type, 0);
-    //         assert_eq!(zil_token.logo, Some(CDN.to_string()));
-    //         assert!(zil_token.balances.is_empty());
-    //         assert_eq!(zil_token.rate, 0.0);
-    //         assert!(!zil_token.default);
-    //         assert!(zil_token.native);
-    //         assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
+            let zil_token = &wallet.tokens[0];
+            assert_eq!(zil_token.name, "Scilla");
+            assert_eq!(zil_token.symbol, "ZIL");
+            assert_eq!(zil_token.decimals, 12);
+            assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
+            assert_eq!(zil_token.addr_type, 0);
+            assert_eq!(zil_token.logo, Some(CDN.to_string()));
+            assert!(zil_token.balances.is_empty());
+            assert_eq!(zil_token.rate, 0.0);
+            assert!(!zil_token.default);
+            assert!(zil_token.native);
+            assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
 
-    //         zilliqa_swap_chain(0, 0).await.unwrap();
-    //     }
+            zilliqa_swap_chain(0, 0).await.unwrap();
+        }
 
-    //     {
-    //         assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
-    //         assert_eq!(wallet.settings.argon_params.memory, 10);
-    //         assert_eq!(wallet.settings.argon_params.iterations, 1);
-    //         assert_eq!(wallet.settings.argon_params.threads, 1);
-    //         assert_eq!(
-    //             wallet.settings.argon_params.secret,
-    //             "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
-    //         );
-    //         assert_eq!(wallet.settings.currency_convert, "BTC");
-    //         assert!(wallet.settings.ipfs_node.is_none());
-    //         assert!(!wallet.settings.ens_enabled);
-    //         assert!(!wallet.settings.tokens_list_fetcher);
-    //         assert!(!wallet.settings.node_ranking_enabled);
-    //         assert_eq!(wallet.settings.max_connections, 0);
-    //         assert_eq!(wallet.settings.request_timeout_secs, 0);
-    //         assert_eq!(wallet.settings.rates_api_options, 0);
-    //     }
+        {
+            assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
+            assert_eq!(wallet.settings.argon_params.memory, 10);
+            assert_eq!(wallet.settings.argon_params.iterations, 1);
+            assert_eq!(wallet.settings.argon_params.threads, 1);
+            assert_eq!(
+                wallet.settings.argon_params.secret,
+                "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
+            );
+            assert_eq!(wallet.settings.currency_convert, "BTC");
+            assert!(wallet.settings.ipfs_node.is_none());
+            assert!(!wallet.settings.ens_enabled);
+            assert!(!wallet.settings.tokens_list_fetcher);
+            assert!(!wallet.settings.node_ranking_enabled);
+            assert_eq!(wallet.settings.max_connections, 0);
+            assert_eq!(wallet.settings.request_timeout_secs, 0);
+            assert_eq!(wallet.settings.rates_api_options, 0);
+        }
 
-    //     assert_eq!(wallet.chain_hash, zil_chain_config.hash());
-    //     assert_eq!(
-    //         reveal_bip39_phrase(0, PASSWORD.to_string(), None,).await,
-    //         Err("Wallet error at index: 0: Invalid account type".to_string())
-    //     );
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
+        assert_eq!(
+            reveal_bip39_phrase(0, PASSWORD.to_string(), None,).await,
+            Err("Wallet error at index: 0: Invalid account type".to_string())
+        );
 
-    //     let keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
-    //         .await
-    //         .unwrap();
+        let keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+            .await
+            .unwrap();
 
-    //     assert_eq!(&keypair.sk, SK);
-    //     assert_eq!(
-    //         &keypair.pk,
-    //         "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
-    //     );
-    //     let bech32 = zilliqa_get_n_format(0, 0).await.unwrap();
+        assert_eq!(&keypair.sk, SK);
+        assert_eq!(
+            &keypair.pk,
+            "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
+        );
+        let bech32 = zilliqa_get_n_format(0, 0).await.unwrap();
 
-    //     assert_eq!("zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m", bech32);
+        assert_eq!("zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m", bech32);
 
-    //     let bsc_chain_config = {
-    //         let guard = BACKGROUND_SERVICE.read().await;
-    //         let service = guard.as_ref().unwrap();
-    //         let providers = service.core.get_providers();
+        let bsc_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
 
-    //         providers[1].config.clone()
-    //     };
+            providers[1].config.clone()
+        };
 
-    //     select_accounts_chain(0, bsc_chain_config.hash())
-    //         .await
-    //         .unwrap();
+        select_accounts_chain(0, bsc_chain_config.hash(), None)
+            .await
+            .unwrap();
 
-    //     let wallets = get_wallets().await.unwrap();
-    //     let wallet = wallets.first().unwrap();
-    //     let accounts = wallet
-    //         .accounts
-    //         .get(&wallet.slip44)
-    //         .and_then(|m| m.get(&wallet.bip))
-    //         .unwrap();
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
 
-    //     {
-    //         let account = &accounts[0];
-    //         assert_eq!(account.name, "SK Wallet");
-    //         assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
-    //         assert_eq!(account.index, 0);
-    //     }
+        {
+            let account = &accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
+            assert_eq!(account.index, 0);
+        }
 
-    //     {
-    //         assert_eq!(wallet.tokens.len(), 1);
-    //         let bnb_token = &wallet.tokens[0];
-    //         assert_eq!(bnb_token.name, "BinanceCoin");
-    //         assert_eq!(bnb_token.symbol, "BNB");
-    //         assert_eq!(bnb_token.decimals, 18);
-    //         assert_eq!(bnb_token.addr, "0x0000000000000000000000000000000000000000");
-    //         assert_eq!(bnb_token.addr_type, 1);
-    //         assert_eq!(bnb_token.logo, Some(BNB_CDN.to_string()));
-    //         assert!(bnb_token.balances.is_empty());
-    //         assert_eq!(bnb_token.rate, 0.0);
-    //         assert!(!bnb_token.default);
-    //         assert!(bnb_token.native);
-    //         assert_eq!(bnb_token.chain_hash, bsc_chain_config.hash());
-    //     }
+        {
+            assert_eq!(wallet.tokens.len(), 1);
+            let bnb_token = &wallet.tokens[0];
+            assert_eq!(bnb_token.name, "BinanceCoin");
+            assert_eq!(bnb_token.symbol, "BNB");
+            assert_eq!(bnb_token.decimals, 18);
+            assert_eq!(bnb_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(bnb_token.addr_type, 1);
+            assert_eq!(bnb_token.logo, Some(BNB_CDN.to_string()));
+            assert!(bnb_token.balances.is_empty());
+            assert_eq!(bnb_token.rate, 0.0);
+            assert!(!bnb_token.default);
+            assert!(bnb_token.native);
+            assert_eq!(bnb_token.chain_hash, bsc_chain_config.hash());
+        }
 
-    //     assert_eq!(wallet.chain_hash, zil_chain_config.hash());
+        assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
-    //     let keystore_bytes = make_keystore_file(0, PASSWORD.to_string()).await.unwrap();
+        let keystore_bytes = make_keystore_file(0, PASSWORD.to_string()).await.unwrap();
 
-    //     delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
+        delete_wallet(0, Some(PASSWORD.to_string())).await.unwrap();
 
-    //     let wallets = get_wallets().await.unwrap();
-    //     assert_eq!(wallets.len(), 0);
+        let wallets = get_wallets().await.unwrap();
+        assert_eq!(wallets.len(), 0);
 
-    //     let _new_address =
-    //         restore_from_keystore(keystore_bytes, PASSWORD.to_string(), "none".to_string())
-    //             .await
-    //             .unwrap();
-    //     let wallets = get_wallets().await.unwrap();
-    //     let wallet = wallets.first().unwrap();
+        let _new_address =
+            restore_from_keystore(keystore_bytes, PASSWORD.to_string(), "none".to_string())
+                .await
+                .unwrap();
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
 
-    //     {
-    //         assert_eq!(wallets.len(), 1);
-    //         assert_eq!(wallet.wallet_type, "SecretKey");
-    //         assert_eq!(wallet.wallet_name, "SK Wallet");
-    //         assert_eq!(wallet.auth_type, "none");
-    //         assert!(!wallet.wallet_address.is_empty());
-    //         assert_eq!(wallet.accounts.len(), 1);
-    //         assert_eq!(wallet.selected_account, 0);
+        {
+            assert_eq!(wallets.len(), 1);
+            assert_eq!(wallet.wallet_type, "SecretKey");
+            assert_eq!(wallet.wallet_name, "SK Wallet");
+            assert_eq!(wallet.auth_type, "none");
+            assert!(!wallet.wallet_address.is_empty());
+            assert_eq!(wallet.accounts.len(), 1);
+            assert_eq!(wallet.selected_account, 0);
 
-    //         let accounts = wallet
-    //             .accounts
-    //             .get(&wallet.slip44)
-    //             .and_then(|m| m.get(&wallet.bip))
-    //             .unwrap();
-    //         let account = &accounts[0];
-    //         assert_eq!(account.name, "SK Wallet");
-    //         assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
-    //         assert_eq!(account.addr_type, 1);
-    //         assert_eq!(account.index, 0);
+            let accounts = wallet
+                .accounts
+                .get(&wallet.slip44)
+                .and_then(|m| m.get(&wallet.bip))
+                .unwrap();
+            let account = &accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
+            assert_eq!(account.addr_type, 1);
+            assert_eq!(account.index, 0);
 
-    //         assert_eq!(wallet.tokens.len(), 1);
+            assert_eq!(wallet.tokens.len(), 1);
 
-    //         let evm_token = &wallet.tokens[0];
-    //         assert_eq!(evm_token.name, "EVM");
-    //         assert_eq!(evm_token.symbol, "ZIL");
-    //         assert_eq!(evm_token.decimals, 18);
-    //         assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
-    //         assert_eq!(evm_token.addr_type, 1);
-    //         assert_eq!(evm_token.logo, Some(CDN.to_string()));
-    //         assert!(evm_token.balances.is_empty());
-    //         assert_eq!(evm_token.rate, 0.0);
-    //         assert!(!evm_token.default);
-    //         assert!(evm_token.native);
-    //         assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
+            let evm_token = &wallet.tokens[0];
+            assert_eq!(evm_token.name, "EVM");
+            assert_eq!(evm_token.symbol, "ZIL");
+            assert_eq!(evm_token.decimals, 18);
+            assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(evm_token.addr_type, 1);
+            assert_eq!(evm_token.logo, Some(CDN.to_string()));
+            assert!(evm_token.balances.is_empty());
+            assert_eq!(evm_token.rate, 0.0);
+            assert!(!evm_token.default);
+            assert!(evm_token.native);
+            assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
 
-    //         zilliqa_swap_chain(0, 0).await.unwrap();
-    //         let wallets = get_wallets().await.unwrap();
-    //         let wallet = wallets.first().unwrap();
+            zilliqa_swap_chain(0, 0).await.unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
 
-    //         let zil_token = &wallet.tokens[0];
-    //         assert_eq!(zil_token.name, "Scilla");
-    //         assert_eq!(zil_token.symbol, "ZIL");
-    //         assert_eq!(zil_token.decimals, 12);
-    //         assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
-    //         assert_eq!(zil_token.addr_type, 0);
-    //         assert_eq!(zil_token.logo, Some(CDN.to_string()));
-    //         assert!(zil_token.balances.is_empty());
-    //         assert_eq!(zil_token.rate, 0.0);
-    //         assert!(!zil_token.default);
-    //         assert!(zil_token.native);
-    //         assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
+            let zil_token = &wallet.tokens[0];
+            assert_eq!(zil_token.name, "Scilla");
+            assert_eq!(zil_token.symbol, "ZIL");
+            assert_eq!(zil_token.decimals, 12);
+            assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
+            assert_eq!(zil_token.addr_type, 0);
+            assert_eq!(zil_token.logo, Some(CDN.to_string()));
+            assert!(zil_token.balances.is_empty());
+            assert_eq!(zil_token.rate, 0.0);
+            assert!(!zil_token.default);
+            assert!(zil_token.native);
+            assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
 
-    //         assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
-    //         assert_eq!(wallet.settings.argon_params.memory, 10);
-    //         assert_eq!(wallet.settings.argon_params.iterations, 1);
-    //         assert_eq!(wallet.settings.argon_params.threads, 1);
-    //         assert_eq!(
-    //             wallet.settings.argon_params.secret,
-    //             "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
-    //         );
-    //         assert_eq!(wallet.settings.currency_convert, "BTC");
-    //         assert!(wallet.settings.ipfs_node.is_none());
-    //         assert!(!wallet.settings.ens_enabled);
-    //         assert!(!wallet.settings.tokens_list_fetcher);
-    //         assert!(!wallet.settings.node_ranking_enabled);
-    //         assert_eq!(wallet.settings.max_connections, 0);
-    //         assert_eq!(wallet.settings.request_timeout_secs, 0);
-    //         assert_eq!(wallet.settings.rates_api_options, 0);
-    //         assert_eq!(wallet.chain_hash, zil_chain_config.hash());
+            assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
+            assert_eq!(wallet.settings.argon_params.memory, 10);
+            assert_eq!(wallet.settings.argon_params.iterations, 1);
+            assert_eq!(wallet.settings.argon_params.threads, 1);
+            assert_eq!(
+                wallet.settings.argon_params.secret,
+                "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
+            );
+            assert_eq!(wallet.settings.currency_convert, "BTC");
+            assert!(wallet.settings.ipfs_node.is_none());
+            assert!(!wallet.settings.ens_enabled);
+            assert!(!wallet.settings.tokens_list_fetcher);
+            assert!(!wallet.settings.node_ranking_enabled);
+            assert_eq!(wallet.settings.max_connections, 0);
+            assert_eq!(wallet.settings.request_timeout_secs, 0);
+            assert_eq!(wallet.settings.rates_api_options, 0);
+            assert_eq!(wallet.chain_hash, zil_chain_config.hash());
 
-    //         let restored_keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
-    //             .await
-    //             .unwrap();
+            let restored_keypair = reveal_keypair(0, 0, PASSWORD.to_string(), None)
+                .await
+                .unwrap();
 
-    //         assert_eq!(&restored_keypair.sk, SK);
-    //         assert_eq!(
-    //             &restored_keypair.pk,
-    //             "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
-    //         );
-    //         zilliqa_swap_chain(0, 0).await.unwrap();
-    //     }
+            assert_eq!(&restored_keypair.sk, SK);
+            assert_eq!(
+                &restored_keypair.pk,
+                "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
+            );
+            zilliqa_swap_chain(0, 0).await.unwrap();
+        }
 
-    //     select_accounts_chain(0, zil_chain_config.hash())
-    //         .await
-    //         .unwrap();
-    //     zilliqa_swap_chain(0, 0).await.unwrap();
+        select_accounts_chain(0, zil_chain_config.hash(), None)
+            .await
+            .unwrap();
+        zilliqa_swap_chain(0, 0).await.unwrap();
 
-    //     let token = fetch_token_meta(ZLP_ADDR.to_string(), 0).await.unwrap();
+        let token = fetch_token_meta(ZLP_ADDR.to_string(), 0).await.unwrap();
 
-    //     {
-    //         assert_eq!(token.name, "ZilPay wallet");
-    //         assert_eq!(token.symbol, "ZLP");
-    //         assert_eq!(token.decimals, 18);
-    //         assert_eq!(token.addr, ZLP_ADDR);
-    //         assert_eq!(token.addr_type, 0);
-    //         assert_eq!(token.logo, Some("https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp".to_string()));
-    //         assert!(token.balances.contains_key(&0));
-    //         assert_eq!(token.balances.get(&0).unwrap(), "0");
-    //         assert_eq!(token.rate, 0.0);
-    //         assert!(!token.default);
-    //         assert!(!token.native);
-    //         assert_eq!(token.chain_hash, zil_chain_config.hash());
-    //     }
+        {
+            assert_eq!(token.name, "ZilPay wallet");
+            assert_eq!(token.symbol, "ZLP");
+            assert_eq!(token.decimals, 18);
+            assert_eq!(token.addr, ZLP_ADDR);
+            assert_eq!(token.addr_type, 0);
+            assert_eq!(token.logo, Some("https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp".to_string()));
+            assert!(token.balances.contains_key(&0));
+            assert_eq!(token.balances.get(&0).unwrap(), "0");
+            assert_eq!(token.rate, 0.0);
+            assert!(!token.default);
+            assert!(!token.native);
+            assert_eq!(token.chain_hash, zil_chain_config.hash());
+        }
 
-    //     add_ftoken(token.clone(), 0).await.unwrap();
+        add_ftoken(token.clone(), 0).await.unwrap();
 
-    //     let wallets = get_wallets().await.unwrap();
-    //     let wallet = wallets.first().unwrap();
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
 
-    //     let bytes_sk: [u8; SECRET_KEY_SIZE] = hex::decode(SK).unwrap().try_into().unwrap();
-    //     let sk = SecretKey::Secp256k1Sha256Zilliqa(bytes_sk);
-    //     let keypair = KeyPair::from_secret_key(sk).unwrap();
+        let bytes_sk: [u8; SECRET_KEY_SIZE] = hex::decode(SK).unwrap().try_into().unwrap();
+        let sk = SecretKey::Secp256k1Sha256Zilliqa(bytes_sk);
+        let keypair = KeyPair::from_secret_key(sk).unwrap();
 
-    //     assert_eq!(wallet.tokens.len(), 2);
+        assert_eq!(wallet.tokens.len(), 2);
 
-    //     let tx = create_token_transfer(TokenTransferParamsInfo {
-    //         wallet_index: 0,
-    //         account_index: 0,
-    //         token: wallet.tokens.last().unwrap().clone(),
-    //         amount: "1000000000000000000".to_string(),
-    //         recipient: "zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace".to_string(),
-    //         icon: "".to_string(),
-    //     })
-    //     .await
-    //     .unwrap();
+        let tx = create_token_transfer(TokenTransferParamsInfo {
+            wallet_index: 0,
+            account_index: 0,
+            token: wallet.tokens.last().unwrap().clone(),
+            amount: "1000000000000000000".to_string(),
+            recipient: "zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace".to_string(),
+            icon: "".to_string(),
+        })
+        .await
+        .unwrap();
 
-    //     {
-    //         assert_eq!(tx.metadata.chain_hash, zil_chain_config.hash());
-    //         assert_eq!(tx.metadata.hash, None);
-    //         assert_eq!(tx.metadata.info, None);
-    //         assert_eq!(tx.metadata.icon, Some("".to_string()));
-    //         assert_eq!(tx.metadata.title, None);
-    //         assert_eq!(
-    //             tx.metadata.signer,
-    //             Some(keypair.get_pubkey().unwrap().to_string())
-    //         );
+        {
+            assert_eq!(tx.metadata.chain_hash, zil_chain_config.hash());
+            assert_eq!(tx.metadata.hash, None);
+            assert_eq!(tx.metadata.info, None);
+            assert_eq!(tx.metadata.icon, Some("".to_string()));
+            assert_eq!(tx.metadata.title, None);
+            assert_eq!(
+                tx.metadata.signer,
+                Some(keypair.get_pubkey().unwrap().to_string())
+            );
 
-    //         // Assert token info
-    //         let token_info = tx.metadata.token_info.as_ref().unwrap();
-    //         assert_eq!(token_info.value, "1000000000000000000");
-    //         assert_eq!(token_info.symbol, "ZLP");
-    //         assert_eq!(token_info.decimals, 18);
+            // Assert token info
+            let token_info = tx.metadata.token_info.as_ref().unwrap();
+            assert_eq!(token_info.value, "1000000000000000000");
+            assert_eq!(token_info.symbol, "ZLP");
+            assert_eq!(token_info.decimals, 18);
 
-    //         // Assert Scilla transaction details
-    //         let scilla = tx.scilla.as_ref().unwrap();
-    //         assert_eq!(scilla.chain_id, 1);
-    //         assert_eq!(scilla.nonce, 0);
-    //         assert_eq!(scilla.gas_price, 2000000000);
-    //         assert_eq!(scilla.gas_limit, 5000);
-    //         assert_eq!(scilla.to_addr, token.addr);
-    //         assert_eq!(scilla.amount, 0);
-    //         assert_eq!(scilla.code, "");
-    //         assert_eq!(scilla.data, "{\"_tag\":\"Transfer\",\"params\":[{\"type\":\"ByStr20\",\"value\":\"0x77e27c39ce572283b848e2cdf32cce761e34fa49\",\"vname\":\"to\"},{\"type\":\"Uint128\",\"value\":\"1000000000000000000\",\"vname\":\"amount\"}]}");
+            // Assert Scilla transaction details
+            let scilla = tx.scilla.as_ref().unwrap();
+            assert_eq!(scilla.chain_id, 1);
+            assert_eq!(scilla.nonce, 0);
+            assert_eq!(scilla.gas_price, 2000000000);
+            assert_eq!(scilla.gas_limit, 5000);
+            assert_eq!(scilla.to_addr, token.addr);
+            assert_eq!(scilla.amount, 0);
+            assert_eq!(scilla.code, "");
+            assert_eq!(scilla.data, "{\"_tag\":\"Transfer\",\"params\":[{\"type\":\"ByStr20\",\"value\":\"0x77e27c39ce572283b848e2cdf32cce761e34fa49\",\"vname\":\"to\"},{\"type\":\"Uint128\",\"value\":\"1000000000000000000\",\"vname\":\"amount\"}]}");
 
-    //         // Assert EVM is None
-    //         assert!(tx.evm.is_none());
-    //     }
+            // Assert EVM is None
+            assert!(tx.evm.is_none());
+        }
 
-    //     let wallets = get_wallets().await.unwrap();
-    //     let wallet = wallets.first().unwrap();
-    //     let accounts = wallet
-    //         .accounts
-    //         .get(&wallet.slip44)
-    //         .and_then(|m| m.get(&wallet.bip))
-    //         .unwrap();
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+        let accounts = wallet
+            .accounts
+            .get(&wallet.slip44)
+            .and_then(|m| m.get(&wallet.bip))
+            .unwrap();
 
-    //     assert_eq!(
-    //         accounts[0].addr,
-    //         "zil1q2yyq6z2sz26p54700e5zpzu3gj070wxt8h75h"
-    //     );
-    //     let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
+        assert_eq!(
+            accounts[0].addr,
+            "zil1q2yyq6z2sz26p54700e5zpzu3gj070wxt8h75h"
+        );
+        let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
 
-    //     assert_eq!(diff_addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
+        assert_eq!(diff_addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
 
-    //     zilliqa_swap_chain(0, 0).await.unwrap();
+        zilliqa_swap_chain(0, 0).await.unwrap();
 
-    //     let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
+        let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
 
-    //     assert_eq!(diff_addr, "zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m");
+        assert_eq!(diff_addr, "zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m");
 
-    //     let token = fetch_token_meta("0x2274005778063684fbB1BfA96a2b725dC37D75f9".to_string(), 0)
-    //         .await
-    //         .unwrap();
-    //     let mut tx = create_token_transfer(TokenTransferParamsInfo {
-    //         wallet_index: 0,
-    //         account_index: 0,
-    //         token,
-    //         amount: "1".to_string(),
-    //         recipient: "0xa1B2Ff03F501A4d8278CB75a9075F406A5B8C5Ff".to_string(),
-    //         icon: "".to_string(),
-    //     })
-    //     .await
-    //     .unwrap();
+        let token = fetch_token_meta("0x2274005778063684fbB1BfA96a2b725dC37D75f9".to_string(), 0)
+            .await
+            .unwrap();
+        let mut tx = create_token_transfer(TokenTransferParamsInfo {
+            wallet_index: 0,
+            account_index: 0,
+            token,
+            amount: "1".to_string(),
+            recipient: "0xa1B2Ff03F501A4d8278CB75a9075F406A5B8C5Ff".to_string(),
+            icon: "".to_string(),
+        })
+        .await
+        .unwrap();
 
-    //     if let Some(evm) = tx.evm.as_mut() {
-    //         evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
-    //     }
-    //     // let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
+        if let Some(evm) = tx.evm.as_mut() {
+            evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
+        }
+        // let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
 
-    //     // assert!(gas.gas_price > 0);
-    //     // assert!(gas.tx_estimate_gas > 0);
-    // }
+        // assert!(gas.gas_price > 0);
+        // assert!(gas.tx_estimate_gas > 0);
+    }
 }
