@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/bip_purpose_selector.dart';
+import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/web3_constants.dart';
@@ -129,17 +130,17 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
-  String _mapBipIndexToAddressType(int index) {
+  int _mapBipIndexToBipPurpose(int index) {
     switch (index) {
       case 0:
-        return "p2tr";
+        return kBip86Purpose;
       case 1:
-        return "p2wpkh";
+        return kBip84Purpose;
       case 2:
-        return "p2sh";
+        return kBip49Purpose;
       case 3:
       default:
-        return "p2pkh";
+        return kBip44Purpose;
     }
   }
 
@@ -241,13 +242,13 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> _executeBitcoinAddressChange({
     required AppState appState,
-    required String newAddressType,
+    required int newBip,
     required int newIndex,
     String? password,
   }) async {
     await bitcoinChangeAddressType(
       walletIndex: BigInt.from(appState.selectedWallet),
-      newAddressType: newAddressType,
+      newBip: newBip,
       password: password,
     );
 
@@ -263,7 +264,7 @@ class _WalletPageState extends State<WalletPage> {
   Future<void> _handleBipPurposeChange(int newIndex, AppState appState) async {
     if (newIndex == _selectedBipPurposeIndex) return;
 
-    final newAddressType = _mapBipIndexToAddressType(newIndex);
+    final newBip = _mapBipIndexToBipPurpose(newIndex);
     final wallet = appState.wallet;
     if (wallet == null) return;
 
@@ -272,7 +273,7 @@ class _WalletPageState extends State<WalletPage> {
     if (biometricEnabled && mounted) {
       await _executeBitcoinAddressChange(
         appState: appState,
-        newAddressType: newAddressType,
+        newBip: newBip,
         newIndex: newIndex,
       );
       return;
@@ -286,7 +287,7 @@ class _WalletPageState extends State<WalletPage> {
           try {
             await _executeBitcoinAddressChange(
               appState: appState,
-              newAddressType: newAddressType,
+              newBip: newBip,
               newIndex: newIndex,
               password: password,
             );
