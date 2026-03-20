@@ -128,9 +128,14 @@ mod btc_wallet_tests {
 
         // Test BIP44 (Legacy P2PKH)
         println!("\n=== Testing BIP44 (Legacy P2PKH) ===");
-        bitcoin_change_address_type(0, "p2pkh".to_string(), Some(PASSWORD.to_string()), None)
-            .await
-            .unwrap();
+        bitcoin_change_address_type(
+            0,
+            DerivationPath::BIP44_PURPOSE,
+            Some(PASSWORD.to_string()),
+            None,
+        )
+        .await
+        .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -152,9 +157,14 @@ mod btc_wallet_tests {
 
         // Test BIP49 (Nested SegWit P2SH-P2WPKH)
         println!("\n=== Testing BIP49 (Nested SegWit P2SH-P2WPKH) ===");
-        bitcoin_change_address_type(0, "p2sh".to_string(), Some(PASSWORD.to_string()), None)
-            .await
-            .unwrap();
+        bitcoin_change_address_type(
+            0,
+            DerivationPath::BIP49_PURPOSE,
+            Some(PASSWORD.to_string()),
+            None,
+        )
+        .await
+        .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -176,9 +186,14 @@ mod btc_wallet_tests {
 
         // Test BIP84 (Native SegWit Bech32 P2WPKH)
         println!("\n=== Testing BIP84 (Native SegWit Bech32 P2WPKH) ===");
-        bitcoin_change_address_type(0, "p2wpkh".to_string(), Some(PASSWORD.to_string()), None)
-            .await
-            .unwrap();
+        bitcoin_change_address_type(
+            0,
+            DerivationPath::BIP84_PURPOSE,
+            Some(PASSWORD.to_string()),
+            None,
+        )
+        .await
+        .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
@@ -200,9 +215,14 @@ mod btc_wallet_tests {
 
         // Test BIP86 (Taproot Bech32m P2TR)
         println!("\n=== Testing BIP86 (Taproot Bech32m P2TR) ===");
-        bitcoin_change_address_type(0, "p2tr".to_string(), Some(PASSWORD.to_string()), None)
-            .await
-            .unwrap();
+        bitcoin_change_address_type(
+            0,
+            DerivationPath::BIP86_PURPOSE,
+            Some(PASSWORD.to_string()),
+            None,
+        )
+        .await
+        .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();

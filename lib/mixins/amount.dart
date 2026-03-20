@@ -29,8 +29,7 @@ BigInt toDecimalsWei(String amount, int decimals) {
 
   if (appState.account != null &&
       appState.wallet?.settings.ratesApiOptions != 0) {
-    final account = appState.account;
-    final chain = appState.getChain(account!.chainHash);
+    final chain = appState.chain;
 
     converted = chain?.testnet == true ? 0 : rate;
   }

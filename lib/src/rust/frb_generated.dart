@@ -156,7 +156,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiWalletBitcoinChangeAddressType(
       {required BigInt walletIndex,
-      required String newAddressType,
+      required int newBip,
       String? password,
       String? passphrase});
 
@@ -818,14 +818,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiWalletBitcoinChangeAddressType(
       {required BigInt walletIndex,
-      required String newAddressType,
+      required int newBip,
       String? password,
       String? passphrase}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_String(newAddressType, serializer);
+        sse_encode_u_32(newBip, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -836,7 +836,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletBitcoinChangeAddressTypeConstMeta,
-      argValues: [walletIndex, newAddressType, password, passphrase],
+      argValues: [walletIndex, newBip, password, passphrase],
       apiImpl: this,
     ));
   }
@@ -844,7 +844,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletBitcoinChangeAddressTypeConstMeta =>
       const TaskConstMeta(
         debugName: "bitcoin_change_address_type",
-        argNames: ["walletIndex", "newAddressType", "password", "passphrase"],
+        argNames: ["walletIndex", "newBip", "password", "passphrase"],
       );
 
   @override

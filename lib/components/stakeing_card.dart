@@ -225,7 +225,6 @@ class _ErrorIcon extends StatelessWidget {
   }
 }
 
-
 class _PendingWithdrawalsSection extends StatelessWidget {
   final FinalOutputInfo stake;
   final AppTheme theme;
@@ -483,7 +482,6 @@ class _PendingWithdrawalItem extends StatelessWidget {
     if (isScilla) {
       return buildTxScillaCompleteWithdrawal(
         walletIndex: walletIndex,
-        accountIndex: accountIndex,
         stake: stake,
       );
     }
@@ -546,7 +544,8 @@ class _WithdrawalProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final blockTimeSeconds = avgBlockTimeMs.toInt() / 1000;
-    final totalSeconds = (blocksRemaining.toDouble() * blockTimeSeconds).round();
+    final totalSeconds =
+        (blocksRemaining.toDouble() * blockTimeSeconds).round();
     final duration = Duration(seconds: totalSeconds);
 
     return Column(
@@ -667,7 +666,8 @@ class _DelegatedAmountDisplay extends StatelessWidget {
                 'assets/icons/piggy.svg',
                 width: 14,
                 height: 14,
-                colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                colorFilter:
+                    ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
               ),
             ),
             const SizedBox(width: 6),
@@ -705,7 +705,8 @@ class _DelegatedAmountDisplay extends StatelessWidget {
       final lstDecimals = stake.token!.decimals;
       final lstAmountDouble = delegAmt.toDouble() / pow(10, lstDecimals);
       final zilBackedDouble = lstAmountDouble * lstPrice;
-      final zilBackedBigInt = BigInt.from(zilBackedDouble * pow(10, nativeDecimals));
+      final zilBackedBigInt =
+          BigInt.from(zilBackedDouble * pow(10, nativeDecimals));
 
       final (formatted, _) = formatingAmount(
         amount: zilBackedBigInt,
@@ -732,7 +733,6 @@ class _DelegatedAmountDisplay extends StatelessWidget {
     return formatted;
   }
 }
-
 
 class _ClaimableAmountCard extends StatelessWidget {
   final FinalOutputInfo stake;
@@ -896,9 +896,8 @@ class _LiquidStakingInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.read<AppState>();
     final hasGrowth = stake.lstPriceChangePercent != null;
-    final growthColor = (stake.lstPriceChangePercent ?? 0) >= 0
-        ? theme.success
-        : theme.danger;
+    final growthColor =
+        (stake.lstPriceChangePercent ?? 0) >= 0 ? theme.success : theme.danger;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1013,7 +1012,7 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasUnbonding = stake.unbondingPeriodSeconds != null &&
-                         stake.unbondingPeriodSeconds! > BigInt.zero;
+        stake.unbondingPeriodSeconds! > BigInt.zero;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1107,7 +1106,6 @@ class _CompactStatItem extends StatelessWidget {
     );
   }
 }
-
 
 class _ClaimRewardsButton extends StatelessWidget {
   final FinalOutputInfo stake;
@@ -1242,7 +1240,6 @@ class _ClaimRewardsButton extends StatelessWidget {
     if (isScilla) {
       return buildClaimScillaStakingRewardsTx(
         walletIndex: walletIndex,
-        accountIndex: accountIndex,
         stake: stake,
       );
     }
@@ -1387,7 +1384,6 @@ class _ActionButtons extends StatelessWidget {
 
       final tx = await buildTxScillaInitUnstake(
         walletIndex: walletIndex,
-        accountIndex: accountIndex,
         stake: stake,
       );
 

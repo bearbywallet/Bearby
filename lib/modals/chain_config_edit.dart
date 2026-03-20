@@ -67,9 +67,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   bool _canRemove(AppState appState) {
     for (final wallet in appState.wallets) {
       if (wallet.chainHash == _config.chainHash) return false;
-      for (final account in appState.accounts) {
-        if (account.chainHash == _config.chainHash) return false;
-      }
     }
     return true;
   }
@@ -109,7 +106,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     }
 
     try {
-      await removeProvider(providerIndex: index);
+      await removeProvider(chainHash: hash);
       await appState.syncData();
       if (mounted) {
         if (widget.onRemoved != null) {

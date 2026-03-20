@@ -99,7 +99,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   NetworkConfigInfo? get chain {
-    BigInt? hash = account?.chainHash;
+    BigInt? hash = wallet?.chainHash;
     if (hash == null) return null;
     return getChain(hash);
   }
@@ -109,7 +109,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     int index = wallet!.selectedAccount.toInt();
     if (index < 0) return [];
 
-    return wallet!.accounts[wallet!.slip44] ?? [];
+    return wallet!.accounts[wallet!.slip44]?[wallet?.bip] ?? [];
   }
 
   AccountInfo? get account {

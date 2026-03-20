@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
 use secrecy::zeroize::Zeroize;
@@ -349,86 +348,19 @@ pub async fn set_biometric(
 
 pub async fn bitcoin_change_address_type(
     wallet_index: usize,
-    new_address_type: String,
+    new_bip: u32,
     password: Option<String>,
-    passphrase: Option<String>,
+    _passphrase: Option<String>,
 ) -> Result<(), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let password = password.map(|p| SecretString::new(p.into()));
-    let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
-        ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
-    })?;
-    let seed = if let Some(mut pass) = password {
-        let key = service
-            .core
-            .unlock_wallet_with_password(&pass, None, wallet_index)
-            .await;
-        pass.zeroize();
-        key
-    } else {
-        service.core.unlock_wallet_with_session(wallet_index).await
-    }
-    .map_err(ServiceError::BackgroundError)?;
 
-    let wallet = service
+    service
         .core
-        .get_wallet_by_index(wallet_index)
+        .select_bitcoin_address_format(wallet_index, new_bip, password.as_ref())
+        .await
         .map_err(ServiceError::BackgroundError)?;
-    let mut wallet_data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let provider = service
-        .core
-        .get_provider(wallet_data.chain_hash)
-        .map_err(ServiceError::BackgroundError)?;
-    let new_bip_purpose = DerivationPath::bip_from_address_type(address_type);
-    let mnemonic = wallet
-        .reveal_mnemonic(&seed)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let mnemonic_seed = mnemonic
-        .to_seed(passphrase.as_deref().unwrap_or(""))
-        .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
-    let accounts = wallet_data
-        .get_mut_accounts()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-    for (index, account) in accounts.iter_mut().enumerate() {
-        let net = account.addr.get_bitcoin_network().map_err(|_| {
-            ServiceError::WalletError(wallet_index, WalletErrors::InvalidAccountType)
-        })?;
-
-        let new_path =
-            DerivationPath::new(provider.config.slip_44, index, new_bip_purpose, Some(net));
-
-        let keypair =
-            zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
-                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
-
-        account.pub_key = Some(
-            keypair
-                .get_pubkey()
-                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?,
-        );
-        account.addr = keypair
-            .get_addr()
-            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
-    }
-
-    let mut ftokens = wallet
-        .get_ftokens()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-    ftokens.iter_mut().for_each(|t| {
-        t.balances.clear();
-    });
-
-    wallet
-        .save_wallet_data(wallet_data)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    wallet
-        .save_ftokens(&ftokens)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
     Ok(())
 }

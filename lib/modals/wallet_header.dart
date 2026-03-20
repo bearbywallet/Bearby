@@ -109,7 +109,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           child: ListView.builder(
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
-            itemCount: wallet.accounts.length,
+            itemCount: appState.accounts.length,
             padding: EdgeInsets.symmetric(
                 horizontal: adaptivePadding, vertical: adaptivePadding),
             itemBuilder: (_, index) => WalletCard(
