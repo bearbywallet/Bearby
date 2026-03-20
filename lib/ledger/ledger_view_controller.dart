@@ -12,7 +12,6 @@ import 'package:bearby/ledger/transport/ble_transport.dart';
 import 'package:bearby/ledger/transport/hid_transport.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/tron/tron_ledger_app.dart';
-import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:bearby/mixins/eip712.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -220,10 +219,10 @@ class LedgerViewController extends ChangeNotifier {
       return sig.toBytes();
     } else if (transaction.tron != null) {
       final tronApp = TronLedgerApp(_connectedTransport!);
-      final hashBytes = hexToBytes(transaction.tron!);
-      final sig = await tronApp.signTransactionHash(
-        index: account.index.toInt(),
-        hash: hashBytes,
+      final sig = await tronApp.clearSignTransaction(
+        transaction: transaction,
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
       );
 
       return sig.toBytes();

@@ -273,6 +273,7 @@ class _ConfirmTransactionContentState
   ) async {
     final accountIndex = appState.wallet!.selectedAccount.toInt();
     final account = appState.account;
+
     final sig = await appState.ledgerViewController.signTransaction(
       transaction: tx,
       walletIndex: appState.selectedWallet,

@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bearby/config/bip_purposes.dart';
+import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ethereum/models.dart';
 import 'package:bearby/ledger/ledger_operation.dart';
 import 'package:bearby/ledger/tron/models.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/src/rust/api/ledger.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/utils/utils.dart';
 
 class _DecodeResult {
@@ -158,6 +161,26 @@ class TronLedgerApp {
     }
   }
 
+  Future<EthLedgerSignature> clearSignTransaction({
+    required TransactionRequestInfo transaction,
+    required int walletIndex,
+    required int accountIndex,
+  }) async {
+    final txRLP = await encodeTxRlp(
+      tx: transaction,
+      walletIndex: BigInt.from(walletIndex),
+      accountIndex: BigInt.from(accountIndex),
+      slip44: kTronSlip44,
+    );
+
+    final sig = await signTransaction(
+      index: accountIndex,
+      rawTx: Uint8List.fromList(txRLP.bytes),
+    );
+
+    return sig;
+  }
+
   Future<EthLedgerSignature> signTransaction({
     required int index,
     required Uint8List rawTx,
@@ -166,7 +189,6 @@ class TronLedgerApp {
     final paths = await _getPaths(index);
     final pathPayload = _buildPathPayload(paths);
 
-    // Build protobuf-aware chunks
     final List<Uint8List> chunks = [];
     List<int> currentBuffer = List<int>.from(pathPayload);
     int offset = 0;
@@ -181,7 +203,6 @@ class TronLedgerApp {
           chunks.add(Uint8List.fromList(currentBuffer));
           currentBuffer = [];
         }
-        // If a single field exceeds chunk size, split it
         if (fieldSize > _chunkSize) {
           int fieldOffset = 0;
           final fieldData = rawTx.sublist(offset, offset + fieldSize);
@@ -205,7 +226,6 @@ class TronLedgerApp {
       chunks.add(Uint8List.fromList(currentBuffer));
     }
 
-    // Compute P1 values
     final List<int> p1Values = [];
     if (chunks.length == 1) {
       p1Values.add(0x10);
@@ -221,7 +241,6 @@ class TronLedgerApp {
       }
     }
 
-    // Send transaction chunks
     late Uint8List response;
     for (int i = 0; i < chunks.length; i++) {
       response = await transport.send(
@@ -233,7 +252,6 @@ class TronLedgerApp {
       );
     }
 
-    // Send token signature chunks if present
     if (tokenSignatures != null && tokenSignatures.isNotEmpty) {
       for (int i = 0; i < tokenSignatures.length; i++) {
         final isLast = i == tokenSignatures.length - 1;
@@ -249,7 +267,14 @@ class TronLedgerApp {
       }
     }
 
-    return EthLedgerSignature.fromLedgerResponse(response);
+    if (response.length != 65) {
+      throw FormatException(
+          'Response must be exactly 65 bytes, got ${response.length}');
+    }
+    int v = response[64];
+    Uint8List r = Uint8List.fromList(response.sublist(0, 32));
+    Uint8List s = Uint8List.fromList(response.sublist(32, 64));
+    return EthLedgerSignature(v: v, r: r, s: s);
   }
 
   Future<EthLedgerSignature> signTransactionHash({
