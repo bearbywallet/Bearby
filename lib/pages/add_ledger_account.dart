@@ -9,7 +9,10 @@ import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/enable_card.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/config/argon.dart';
 import 'package:bearby/config/bip_purposes.dart';
+import 'package:bearby/config/cipher.dart';
+import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ledger_connector.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
@@ -93,7 +96,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       _createWallet = createWallet ?? true;
 
       final appState = context.read<AppState>();
-      final wallet = appState.wallets.elementAtOrNull(appState.selectedWallet);
+      final wallet = appState.selectedWallet >= 0
+          ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+          : null;
       final isLedgerWallet =
           wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
@@ -152,16 +157,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         chainHash = matches.first.chainHash;
       }
 
-      // TODO: params are harcoded, we need detect it from device!
       WalletSettingsInfo settings = WalletSettingsInfo(
-        cipherOrders: Uint8List.fromList([]),
-        argonParams: WalletArgonParamsInfo(
-          iterations: 0,
-          memory: 0,
-          threads: 0,
-          secret: '',
-        ),
-        currencyConvert: "BTC",
+        cipherOrders: CipherDefaults.getCipherOrders(CipherDefaults.defaultCipherIndex),
+        argonParams: Argon2DefaultParams.owaspDefault(),
+        currencyConvert: detectDeviceCurrency(),
         ipfsNode: "dweb.link",
         ensEnabled: true,
         tokensListFetcher: true,
