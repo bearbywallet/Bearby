@@ -147,7 +147,7 @@ class _WalletPageState extends State<WalletPage> {
   void _handleDappDisconnect(String url) async {
     AppState appState = Provider.of<AppState>(context, listen: false);
     await removeConnections(
-      walletIndex: BigInt.from(appState.selectedWallet),
+      walletIndex: appState.selectedWalletIndex,
       domain: url,
     );
     await appState.syncConnections();
@@ -188,7 +188,7 @@ class _WalletPageState extends State<WalletPage> {
   ) async {
     try {
       await setBiometric(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         newBiometricType: "none",
       );
       _resetBiometricLoading();
@@ -225,7 +225,7 @@ class _WalletPageState extends State<WalletPage> {
       onConfirm: (password) async {
         try {
           await setBiometric(
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
             password: password,
             newBiometricType: enable ? _authMethods.first : "none",
           );
@@ -247,7 +247,7 @@ class _WalletPageState extends State<WalletPage> {
     String? password,
   }) async {
     await bitcoinChangeAddressType(
-      walletIndex: BigInt.from(appState.selectedWallet),
+      walletIndex: appState.selectedWalletIndex,
       newBip: newBip,
       password: password,
     );

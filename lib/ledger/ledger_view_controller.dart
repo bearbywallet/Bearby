@@ -11,6 +11,8 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/ble_transport.dart';
 import 'package:bearby/ledger/transport/hid_transport.dart';
 import 'package:bearby/ledger/transport/transport.dart';
+import 'package:bearby/ledger/tron/tron_ledger_app.dart';
+import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:bearby/mixins/eip712.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -34,6 +36,7 @@ enum LedgerAppType {
   unknown,
   zilliqa,
   ethereum,
+  tron,
 }
 
 class LedgerAppDetectionError implements Exception {
@@ -67,6 +70,7 @@ class LedgerViewController extends ChangeNotifier {
   LedgerAppType get detectedAppType => _detectedAppType;
   bool get isZilliqaApp => _detectedAppType == LedgerAppType.zilliqa;
   bool get isEthApp => _detectedAppType == LedgerAppType.ethereum;
+  bool get isTronApp => _detectedAppType == LedgerAppType.tron;
 
   Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
@@ -157,7 +161,20 @@ class LedgerViewController extends ChangeNotifier {
     required AccountInfo account,
     required int slip44,
   }) async {
-    if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
+    if (slip44 == kTronSlip44) {
+      final tronApp = TronLedgerApp(_connectedTransport!);
+      final typedDataJson = jsonEncode(typedData.toJson());
+      final eip712Hashes =
+          await prepareEip712Message(typedDataJson: typedDataJson);
+
+      final sig = await tronApp.signTIP712HashedMessage(
+        index: account.index.toInt(),
+        domainSeparator: eip712Hashes.domainSeparator,
+        hashStructMessage: eip712Hashes.hashStructMessage,
+      );
+
+      return sig.toHexString();
+    } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       final typedDataJson = jsonEncode(typedData.toJson());
       final eip712Hashes =
@@ -201,6 +218,15 @@ class LedgerViewController extends ChangeNotifier {
       );
 
       return sig.toBytes();
+    } else if (transaction.tron != null) {
+      final tronApp = TronLedgerApp(_connectedTransport!);
+      final hashBytes = hexToBytes(transaction.tron!);
+      final sig = await tronApp.signTransactionHash(
+        index: account.index.toInt(),
+        hash: hashBytes,
+      );
+
+      return sig.toBytes();
     } else {
       throw "invalid tx";
     }
@@ -225,6 +251,14 @@ class LedgerViewController extends ChangeNotifier {
         account.index.toInt(),
         hashBytes,
       );
+    } else if (slip44 == kTronSlip44) {
+      final tronApp = TronLedgerApp(_connectedTransport!);
+      Uint8List bytes = utf8.encode(message);
+      final personalSig = await tronApp.signPersonalMessage(
+        index: account.index.toInt(),
+        message: bytes,
+      );
+      sig = personalSig.toHexString();
     } else if (slip44 == kZilliqaSlip44 || slip44 == kEthereumSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       Uint8List bytes = utf8.encode(message);
@@ -256,6 +290,17 @@ class LedgerViewController extends ChangeNotifier {
     } catch (_) {}
 
     try {
+      final tronApp = TronLedgerApp(_connectedTransport!);
+      await tronApp.getAppConfiguration();
+      final account = await tronApp.getAddress(index: 0);
+      if (account.address.startsWith('T')) {
+        _detectedAppType = LedgerAppType.tron;
+        notifyListeners();
+        return LedgerAppType.tron;
+      }
+    } catch (_) {}
+
+    try {
       final ethApp = EthLedgerApp(_connectedTransport!);
       final config = await ethApp.getAppConfiguration();
       if (config != null) {
@@ -268,7 +313,7 @@ class LedgerViewController extends ChangeNotifier {
     _detectedAppType = LedgerAppType.unknown;
     notifyListeners();
     throw LedgerAppDetectionError(
-        'Failed to detect Ledger app. Please open Zilliqa or Ethereum app on your Ledger device.');
+        'Failed to detect Ledger app. Please open Zilliqa, Ethereum, or Tron app on your Ledger device.');
   }
 
   Future<List<LedgerAccount>> getAccounts({
@@ -289,6 +334,11 @@ class LedgerViewController extends ChangeNotifier {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
+    } else if (_detectedAppType == LedgerAppType.tron && slip44 == kTronSlip44) {
+      final tronApp = TronLedgerApp(_connectedTransport!);
+      accounts = await tronApp.getAccounts(
+        indices: List<int>.generate(count, (i) => i),
+      );
     } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       accounts = await evmApp.getAccounts(

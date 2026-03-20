@@ -121,6 +121,14 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   int get selectedWallet => _selectedWallet;
 
+  /// Safe BigInt accessor — throws if no wallet is selected.
+  BigInt get selectedWalletIndex {
+    if (_selectedWallet < 0) {
+      throw StateError('No wallet selected');
+    }
+    return BigInt.from(_selectedWallet);
+  }
+
   void setHideBalance(bool value) async {
     _hideBalance = value;
     await _prefs.setHideBalance(value);

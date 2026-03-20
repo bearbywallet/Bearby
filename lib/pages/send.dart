@@ -261,7 +261,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       BigInt accountIndex = wallet.selectedAccount;
       FTokenInfo token = wallet.tokens[_tokenIndex];
       TokenTransferParamsInfo params = TokenTransferParamsInfo(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: accountIndex,
         token: token,
         amount: toDecimalsWei(_amount, token.decimals).toString(),

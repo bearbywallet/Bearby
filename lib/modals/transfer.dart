@@ -209,7 +209,7 @@ class _ConfirmTransactionContentState
       if (initial) _error = null;
       final gas = await caclGasFee(
         params: _currentTx,
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       );
 
@@ -293,7 +293,7 @@ class _ConfirmTransactionContentState
     TransactionRequestInfo tx,
   ) async {
     final wallet = appState.wallet!;
-    final walletIndex = BigInt.from(appState.selectedWallet);
+    final walletIndex = appState.selectedWalletIndex;
     final accountIndex = wallet.selectedAccount;
 
     if (wallet.authType != "none") {

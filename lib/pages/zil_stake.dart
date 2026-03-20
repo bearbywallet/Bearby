@@ -77,7 +77,7 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
 
   Future<List<FinalOutputInfo>> _fetchStakesForAccount(
       AppState appState) async {
-    final walletIndex = BigInt.from(appState.selectedWallet);
+    final walletIndex = appState.selectedWalletIndex;
     final accountIndex = appState.wallet!.selectedAccount;
 
     if (appState.account?.addrType == 0) {

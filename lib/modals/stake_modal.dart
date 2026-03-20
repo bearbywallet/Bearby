@@ -499,7 +499,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
     TransactionRequestInfo tx;
 
     try {
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = appState.wallet!.selectedAccount;
       final nativeToken = appState.wallet?.tokens.firstWhere((t) => t.native);
 
@@ -564,7 +564,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
               );
               await addFtoken(
                 meta: newToken,
-                walletIndex: BigInt.from(appState.selectedWallet),
+                walletIndex: appState.selectedWalletIndex,
               );
               await appState.syncData();
             } catch (err) {

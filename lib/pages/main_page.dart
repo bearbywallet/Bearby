@@ -50,7 +50,7 @@ class MainPageState extends State<MainPage> {
 
   Future<void> _loadInitialData() async {
     final appState = Provider.of<AppState>(context, listen: false);
-    final walletIndex = BigInt.from(appState.selectedWallet);
+    final walletIndex = appState.selectedWalletIndex;
 
     try {
       await syncBalances(walletIndex: walletIndex);

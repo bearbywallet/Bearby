@@ -103,7 +103,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
 
   Future<void> _createAccount(AppState appState) async {
     final l10n = AppLocalizations.of(context)!;
-    BigInt walletIndex = BigInt.from(appState.selectedWallet);
+    BigInt walletIndex = appState.selectedWalletIndex;
 
     if (_exists(appState)) {
       setState(() {
@@ -158,7 +158,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       }
 
       try {
-        await syncBalances(walletIndex: BigInt.from(appState.selectedWallet));
+        await syncBalances(walletIndex: appState.selectedWalletIndex);
       } catch (_) {}
 
       await appState.syncData();

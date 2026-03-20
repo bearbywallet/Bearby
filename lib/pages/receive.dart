@@ -57,7 +57,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
 
     if (chain.slip44 == kZilliqaSlip44) {
       zilliqaGetNFormat(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       ).then((addr) {
         setState(() {

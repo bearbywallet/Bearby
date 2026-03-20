@@ -234,7 +234,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     final appState = Provider.of<AppState>(context, listen: false);
     try {
       await appState.updateSelectedAccount(
-        BigInt.from(appState.selectedWallet),
+        appState.selectedWalletIndex,
         BigInt.from(index),
       );
       if (mounted) Navigator.pop(context);
@@ -247,7 +247,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     final appState = Provider.of<AppState>(context, listen: false);
     try {
       await deleteAccount(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       );
       await appState.syncData();

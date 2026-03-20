@@ -54,7 +54,8 @@ pub fn pubkey_from_provider(
             PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
         }
         (slip44::SOLANA, _) => PubKey::Ed25519Solana(pub_key_bytes),
-        _ => todo!(),
+        (slip44::TRON, _) => PubKey::Secp256k1Tron(pub_key_bytes),
+        _ => return Err(ServiceError::AccountTypeNotValid),
     };
 
     Ok(pub_key)
@@ -86,6 +87,11 @@ pub fn secretkey_from_provider(
                     return Err(ServiceError::DecodeSecretKey);
                 }
             }
+        }
+        slip44::TRON => {
+            let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
+            let secret_key_bytes = decode_secret_key(&sk)?;
+            SecretKey::Secp256k1Tron(secret_key_bytes)
         }
         _ => {
             return Err(ServiceError::AccountTypeNotValid);

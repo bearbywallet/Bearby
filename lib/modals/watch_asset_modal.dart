@@ -103,7 +103,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
     try {
       FTokenInfo meta = await fetchTokenMeta(
         addr: widget.tokenAddress,
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
 
       if (mounted) {

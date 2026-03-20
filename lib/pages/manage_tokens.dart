@@ -189,7 +189,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
       if (_canFetchApiTokens(appState)) {
         try {
           apiTokens = await autoHintTokens(
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
           );
         } catch (e) {
           debugPrint("Failed to fetch suggested tokens from API: \$e");
@@ -268,7 +268,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     try {
       final meta = await fetchTokenMeta(
         addr: address,
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
 
       if (mounted) {
@@ -314,7 +314,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
         if (token.native) return;
 
         await rmFtoken(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           tokenAddress: token.addr,
         );
 
@@ -329,7 +329,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
       } else if (!isAlreadyAdded && isEnabled) {
         await addFtoken(
           meta: token,
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
         );
 
         setState(() {

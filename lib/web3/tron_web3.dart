@@ -601,7 +601,7 @@ class TronWeb3Handler {
             );
 
             await createUpdateConnection(
-              walletIndex: BigInt.from(appState.selectedWallet),
+              walletIndex: appState.selectedWalletIndex,
               conn: connectionInfo,
             );
             await appState.syncConnections();

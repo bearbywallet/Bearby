@@ -22,16 +22,17 @@ class LedgerConnectPage extends StatefulWidget {
 class _LedgerConnectPageState extends State<LedgerConnectPage>
     with StatusBarMixin {
   NetworkConfigInfo? _chain;
+  late final AppState _appState;
 
   @override
   void initState() {
     super.initState();
 
-    final appState = context.read<AppState>();
-    appState.ledgerViewController.addListener(_handleControllerEvents);
+    _appState = context.read<AppState>();
+    _appState.ledgerViewController.addListener(_handleControllerEvents);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      appState.ledgerViewController.scan();
+      _appState.ledgerViewController.scan();
     });
   }
 
@@ -55,19 +56,16 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
 
   @override
   void dispose() {
-    final appState = context.read<AppState>();
-    appState.ledgerViewController.removeListener(_handleControllerEvents);
-    appState.ledgerViewController.dispose();
+    _appState.ledgerViewController.removeListener(_handleControllerEvents);
+    _appState.ledgerViewController.dispose();
     super.dispose();
   }
 
   void _handleControllerEvents() {
-    final appState = context.read<AppState>();
-
-    if (appState.ledgerViewController.status == LedgerStatus.connectionFailed) {
-      final device = appState.ledgerViewController.connectingDevice;
+    if (_appState.ledgerViewController.status == LedgerStatus.connectionFailed) {
+      final device = _appState.ledgerViewController.connectingDevice;
       final error =
-          appState.ledgerViewController.errorDetails ?? 'Unknown error';
+          _appState.ledgerViewController.errorDetails ?? 'Unknown error';
       final localizations = AppLocalizations.of(context)!;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {

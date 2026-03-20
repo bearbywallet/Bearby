@@ -31,10 +31,16 @@ class Devices {
         notifyUuid: CBUUID(string: "13d63400-2c97-6004-0001-4c6564676572"),
         writeUuid: CBUUID(string: "13d63400-2c97-6004-0002-4c6564676572")
     )
+    private static let FLEX = BleSpec(
+        serviceUuid: CBUUID(string: "13d63400-2c97-3004-0000-4c6564676572"),
+        notifyUuid: CBUUID(string: "13d63400-2c97-3004-0001-4c6564676572"),
+        writeUuid: CBUUID(string: "13d63400-2c97-3004-0002-4c6564676572")
+    )
 
     private static let serviceUuidToInfos: [CBUUID: BluetoothInfos] = [
         NANO_X.serviceUuid: BluetoothInfos(deviceModel: DeviceModel(id: "nanoX"), spec: NANO_X),
         STAX.serviceUuid: BluetoothInfos(deviceModel: DeviceModel(id: "stax"), spec: STAX),
+        FLEX.serviceUuid: BluetoothInfos(deviceModel: DeviceModel(id: "flex"), spec: FLEX),
     ]
 
     static func getBluetoothServiceUuids() -> [CBUUID] {

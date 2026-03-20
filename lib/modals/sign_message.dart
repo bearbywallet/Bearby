@@ -116,7 +116,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   Future<void> _signMessageNative(AppState appState) async {
     try {
       final wallet = appState.wallet!;
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = wallet.selectedAccount;
 
       if (widget.typedData != null) {
@@ -170,7 +170,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           final sig = await appState.ledgerViewController.signMesage(
             message: widget.message!,
             account: account,
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
             slip44: wallet.slip44,
           );
           widget.onMessageSigned(account.pubKey ?? account.addr, sig);

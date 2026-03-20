@@ -428,7 +428,7 @@ class _PendingWithdrawalItem extends StatelessWidget {
     PendingWithdrawalInfo item,
   ) async {
     try {
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = appState.wallet!.selectedAccount;
       final nativeToken = appState.wallet?.tokens.firstWhere(
         (t) => t.native,
@@ -817,7 +817,7 @@ class _ClaimableAmountCard extends StatelessWidget {
   Future<void> _claimClaimableAmount(
       BuildContext context, AppState appState) async {
     try {
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = appState.wallet!.selectedAccount;
       final nativeToken = appState.wallet?.tokens.firstWhere(
         (t) => t.native,
@@ -1186,7 +1186,7 @@ class _ClaimRewardsButton extends StatelessWidget {
 
   Future<void> _claimRewards(BuildContext context, AppState appState) async {
     try {
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = appState.wallet!.selectedAccount;
       final nativeToken = appState.wallet?.tokens.firstWhere(
         (t) => t.native,
@@ -1364,7 +1364,7 @@ class _ActionButtons extends StatelessWidget {
         (t) => t.native,
         orElse: () => throw Exception('Native token not found'),
       );
-      final walletIndex = BigInt.from(appState.selectedWallet);
+      final walletIndex = appState.selectedWalletIndex;
       final accountIndex = appState.wallet!.selectedAccount;
 
       await _ensureCorrectChain(appState, walletIndex, accountIndex);

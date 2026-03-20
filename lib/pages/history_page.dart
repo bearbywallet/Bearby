@@ -50,7 +50,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
     }
     try {
       final history = await getHistory(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
       if (mounted) {
         setState(() {
@@ -71,7 +71,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
   Future<void> _checkPendingTransactions(AppState appState) async {
     try {
       final history = await checkPendingTranasctions(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
       if (mounted) {
         setState(() {
@@ -86,7 +86,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
   Future<void> _clearAllTransactions(AppState appState) async {
     try {
       await clearHistory(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
       if (mounted) {
         setState(() {

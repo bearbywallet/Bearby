@@ -213,7 +213,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
     try {
       await selectAccountsChain(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         chainHash: config.chainHash,
       );
     } catch (_) {}

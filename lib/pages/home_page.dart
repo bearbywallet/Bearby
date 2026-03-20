@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     _isRefreshing = true;
 
     try {
-      await syncBalances(walletIndex: BigInt.from(appState.selectedWallet));
+      await syncBalances(walletIndex: appState.selectedWalletIndex);
 
       if (_errorMessage != null) {
         setState(() => _errorMessage = null);
@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       ? "Scilla"
                       : "EVM",
                   onPressed: () async {
-                    BigInt walletIndex = BigInt.from(appState.selectedWallet);
+                    BigInt walletIndex = appState.selectedWalletIndex;
                     await zilliqaSwapChain(
                       walletIndex: walletIndex,
                       accountIndex: appState.wallet!.selectedAccount,

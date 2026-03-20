@@ -100,7 +100,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     setState(() => _selectedCurrency = currency.code);
 
     await setRateFetcher(
-      walletIndex: BigInt.from(appState.selectedWallet),
+      walletIndex: appState.selectedWalletIndex,
       currency: currency.code,
     );
     await appState.syncRates(force: true);
@@ -112,7 +112,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     setState(() => _selectedEngine = index);
 
     await setRateEngine(
-      walletIndex: BigInt.from(appState.selectedWallet),
+      walletIndex: appState.selectedWalletIndex,
       engineCode: index,
     );
     await appState.syncData();

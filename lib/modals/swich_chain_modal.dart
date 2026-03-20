@@ -185,7 +185,7 @@ class _SwitchChainNetworkContentState
                           Provider.of<AppState>(context, listen: false);
                       try {
                         await selectAccountsChain(
-                          walletIndex: BigInt.from(appState.selectedWallet),
+                          walletIndex: appState.selectedWalletIndex,
                           chainHash: _selectedNetwork!.chainHash,
                         );
                         await appState.syncData();

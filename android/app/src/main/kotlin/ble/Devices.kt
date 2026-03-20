@@ -13,10 +13,16 @@ object Devices {
         UUID.fromString("13d63400-2c97-6004-0001-4c6564676572"),
         UUID.fromString("13d63400-2c97-6004-0002-4c6564676572"),
     )
+    private val FLEX = BleSpec(
+        UUID.fromString("13d63400-2c97-3004-0000-4c6564676572"),
+        UUID.fromString("13d63400-2c97-3004-0001-4c6564676572"),
+        UUID.fromString("13d63400-2c97-3004-0002-4c6564676572"),
+    )
 
     private val serviceUuidToInfos = mapOf(
         NANO_X.serviceUuid to BluetoothInfos(DeviceModel("nanoX"), NANO_X),
         STAX.serviceUuid to BluetoothInfos(DeviceModel("stax"), STAX),
+        FLEX.serviceUuid to BluetoothInfos(DeviceModel("flex"), FLEX),
     )
 
     fun getBluetoothServiceUuids(): List<UUID> = serviceUuidToInfos.keys.toList()

@@ -230,7 +230,7 @@ class Web3EIP1193Handler {
 
     if (appState.chain?.slip44 == kZilliqaSlip44) {
       addresses = await getZilEthChecksumAddresses(
-          walletIndex: BigInt.from(appState.selectedWallet));
+          walletIndex: appState.selectedWalletIndex);
     } else {
       addresses = (appState.accounts).map((a) => a.addr).toList();
     }
@@ -393,7 +393,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -442,7 +442,7 @@ class Web3EIP1193Handler {
             );
 
             await createUpdateConnection(
-              walletIndex: BigInt.from(appState.selectedWallet),
+              walletIndex: appState.selectedWalletIndex,
               conn: connectionInfo,
             );
             await appState.syncConnections();
@@ -621,7 +621,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -845,7 +845,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -1020,7 +1020,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -1070,7 +1070,7 @@ class Web3EIP1193Handler {
             );
 
             await createUpdateConnection(
-              walletIndex: BigInt.from(appState.selectedWallet),
+              walletIndex: appState.selectedWalletIndex,
               conn: connectionInfo,
             );
             await appState.syncConnections();
@@ -1198,7 +1198,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -1324,7 +1324,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -1346,7 +1346,7 @@ class Web3EIP1193Handler {
         onConfirm: (ftoken) async {
           await addFtoken(
             meta: ftoken,
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
           );
           _sendResponse(
             type: kBearbyResponseType,
@@ -1617,7 +1617,7 @@ class Web3EIP1193Handler {
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();

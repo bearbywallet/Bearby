@@ -126,7 +126,7 @@ class ZilPayLegacyHandler {
     }
 
     final (bech32, base16) = await zilliqaGetBech32Base16Address(
-      walletIndex: BigInt.from(appState.selectedWallet),
+      walletIndex: appState.selectedWalletIndex,
       accountIndex: appState.wallet!.selectedAccount,
     );
 
@@ -158,7 +158,7 @@ class ZilPayLegacyHandler {
     }
 
     final blockStream =
-        startBlockWorker(walletIndex: BigInt.from(appState.selectedWallet));
+        startBlockWorker(walletIndex: appState.selectedWalletIndex);
 
     _blockStreamSubscription = blockStream.listen((block) {
       if (block.blockNumber != null) {
@@ -207,7 +207,7 @@ class ZilPayLegacyHandler {
       if (appState.account?.addrType == kEvmAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -258,7 +258,7 @@ class ZilPayLegacyHandler {
           await Web3Utils.fetchTokenMetaLegacyZilliqa(
         data: data,
         contracAddr: toAddr,
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
       );
 
       if (ftMeta != null) {
@@ -294,7 +294,7 @@ class ZilPayLegacyHandler {
 
       if (account.addrType == kEvmAddressType) {
         await zilliqaSwapChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: appState.selectedWalletIndex,
           accountIndex: appState.wallet!.selectedAccount,
         );
         await appState.syncData();
@@ -363,7 +363,7 @@ class ZilPayLegacyHandler {
 
     if (account.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       );
       await appState.syncData();
@@ -420,7 +420,7 @@ class ZilPayLegacyHandler {
 
     if (isAlreadyConnected != null) {
       final (bech32, base16) = await zilliqaGetBech32Base16Address(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       );
 
@@ -436,7 +436,7 @@ class ZilPayLegacyHandler {
 
     if (appState.account?.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
-        walletIndex: BigInt.from(appState.selectedWallet),
+        walletIndex: appState.selectedWalletIndex,
         accountIndex: appState.wallet!.selectedAccount,
       );
       await appState.syncData();
@@ -479,14 +479,14 @@ class ZilPayLegacyHandler {
 
         if (selectedIndices.isNotEmpty) {
           await createUpdateConnection(
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
             conn: connectionInfo,
           );
 
           await appState.syncConnections();
 
           final (bech32, base16) = await zilliqaGetBech32Base16Address(
-            walletIndex: BigInt.from(appState.selectedWallet),
+            walletIndex: appState.selectedWalletIndex,
             accountIndex: appState.wallet!.selectedAccount,
           );
 
