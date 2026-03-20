@@ -15,8 +15,6 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-import 'package:bearby/config/web3_constants.dart';
-import 'package:bearby/mixins/wallet_type.dart';
 
 const String kTestnetEnabledKey = 'testnet_enabled';
 
@@ -157,30 +155,14 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     }
   }
 
-  List<NetworkItem> _getFilteredNetworks(
-      List<NetworkItem> networks, NetworkConfigInfo? currentChain, WalletInfo? wallet) {
-    var filtered = networks;
+  List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks) {
+    if (_searchQuery.isEmpty) return networks;
 
-    final isSecretPhrase = wallet != null &&
-        wallet.walletType.contains(WalletType.SecretPhrase.name);
-
-    if (currentChain != null && !isSecretPhrase) {
-      final isBitcoinChain = currentChain.slip44 == kBitcoinlip44;
-      filtered = filtered
-          .where((network) =>
-              (network.configInfo.slip44 == kBitcoinlip44) == isBitcoinChain)
-          .toList();
-    }
-
-    if (_searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where((network) => network.configInfo.name
-              .toLowerCase()
-              .contains(_searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    return filtered;
+    return networks
+        .where((network) => network.configInfo.name
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
+        .toList();
   }
 
   List<NetworkItem> _getSortedNetworks(List<NetworkItem> networks,
@@ -309,7 +291,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final filtered = _getFilteredNetworks(allNetworks, chain, wallet)
+    final filtered = _getFilteredNetworks(allNetworks)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
         .toList();
     final filteredNetworks = _getSortedNetworks(filtered, chain, wallet);
