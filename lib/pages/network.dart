@@ -16,6 +16,7 @@ import 'package:bearby/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/mixins/wallet_type.dart';
 
 const String kTestnetEnabledKey = 'testnet_enabled';
 
@@ -157,10 +158,13 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   }
 
   List<NetworkItem> _getFilteredNetworks(
-      List<NetworkItem> networks, NetworkConfigInfo? currentChain) {
+      List<NetworkItem> networks, NetworkConfigInfo? currentChain, WalletInfo? wallet) {
     var filtered = networks;
 
-    if (currentChain != null) {
+    final isSecretPhrase = wallet != null &&
+        wallet.walletType.contains(WalletType.SecretPhrase.name);
+
+    if (currentChain != null && !isSecretPhrase) {
       final isBitcoinChain = currentChain.slip44 == kBitcoinlip44;
       filtered = filtered
           .where((network) =>
@@ -305,7 +309,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final filtered = _getFilteredNetworks(allNetworks, chain)
+    final filtered = _getFilteredNetworks(allNetworks, chain, wallet)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
         .toList();
     final filteredNetworks = _getSortedNetworks(filtered, chain, wallet);
