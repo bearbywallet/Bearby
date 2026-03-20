@@ -39,7 +39,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   void initState() {
     super.initState();
     AppState appState = Provider.of<AppState>(context, listen: false);
-    _bip39Index = appState.wallet!.accounts.length;
+    _bip39Index = appState.accounts.length;
     _checkBiometricAvailability(appState);
 
     if (appState.account?.addrType == kScillaAddressType) {
@@ -153,7 +153,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       if (_zilliqaLegacy && _isZIL(appState) && appState.wallet != null) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
-          accountIndex: BigInt.from(appState.wallet!.accounts.length - 1),
+          accountIndex: BigInt.from(appState.accounts.length - 1),
         );
       }
 
