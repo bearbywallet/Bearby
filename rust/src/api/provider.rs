@@ -21,6 +21,24 @@ pub async fn get_networks(
     let providers_mainnet = get_chains_providers_from_json(mainnet_json)?;
     let providers_testnet = get_chains_providers_from_json(testnet_json)?;
 
+    with_service(|core| {
+        let mut configs: Vec<_> = providers_mainnet
+            .iter()
+            .map(|n| n.clone().try_into())
+            .collect::<Result<Vec<_>, _>>()?;
+        let testnet_configs: Vec<_> = providers_testnet
+            .iter()
+            .map(|n| n.clone().try_into())
+            .collect::<Result<Vec<_>, _>>()?;
+        configs.extend(testnet_configs);
+
+        core.add_batch_providers(configs)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(|e: ServiceError| e.to_string())?;
+
     Ok((providers_mainnet, providers_testnet))
 }
 

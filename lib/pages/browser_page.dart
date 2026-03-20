@@ -47,6 +47,7 @@ class _BrowserPageState extends State<BrowserPage>
   bool _canGoBack = false;
   bool _canGoForward = false;
   int? _lastKnownSlip44;
+  AppState? _appState;
 
   // String get _baseUserAgent => Platform.isIOS
   //     ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
@@ -58,27 +59,27 @@ class _BrowserPageState extends State<BrowserPage>
     WidgetsBinding.instance.addObserver(this);
     _cookieManager = CookieManager.instance();
     final appState = Provider.of<AppState>(context, listen: false);
+    _appState = appState;
     appState.syncConnections();
     _lastKnownSlip44 = appState.chain?.slip44;
     appState.addListener(_handleChainChange);
   }
 
   void _handleChainChange() {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final newSlip44 = appState.chain?.slip44;
+    if (!mounted || _appState == null) return;
+    final newSlip44 = _appState!.chain?.slip44;
 
     if (newSlip44 != _lastKnownSlip44 && _webViewController != null) {
       _lastKnownSlip44 = newSlip44;
       _setupJavaScriptHandlers();
-      _initializeZilPayInjection(appState);
+      _initializeZilPayInjection(_appState!);
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    final appState = Provider.of<AppState>(context, listen: false);
-    appState.removeListener(_handleChainChange);
+    _appState?.removeListener(_handleChainChange);
     _searchController.dispose();
     _legacyHandler?.dispose();
     _eip1193Handler?.dispose();

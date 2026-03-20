@@ -14,7 +14,7 @@ use crate::utils::errors::ServiceError;
 
 use super::ftoken::FTokenInfo;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExplorerInfo {
     pub name: String,
     pub url: String,
@@ -22,7 +22,7 @@ pub struct ExplorerInfo {
     pub standard: u16,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NetworkConfigInfo {
     pub name: String,
     pub logo: String,
