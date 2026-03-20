@@ -1431,6 +1431,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noStakingPoolsFound => 'Пулы для стейкинга не найдены';
 
   @override
+  String get stakingErrorTitle => 'Не удалось загрузить пулы стейкинга';
+
+  @override
+  String get stakingErrorRetry => 'Повторить';
+
+  @override
   String get claimButton => 'Забрать';
 
   @override

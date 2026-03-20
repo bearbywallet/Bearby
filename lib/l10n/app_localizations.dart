@@ -2897,6 +2897,18 @@ abstract class AppLocalizations {
   /// **'No Staking Pools Found'**
   String get noStakingPoolsFound;
 
+  /// Title displayed when staking pools fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Load Staking Pools'**
+  String get stakingErrorTitle;
+
+  /// Button text to retry loading staking pools
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get stakingErrorRetry;
+
   /// Text for the claim rewards button
   ///
   /// In en, this message translates to:

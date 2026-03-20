@@ -1431,6 +1431,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noStakingPoolsFound => '未找到质押池';
 
   @override
+  String get stakingErrorTitle => '加载质押池失败';
+
+  @override
+  String get stakingErrorRetry => '重试';
+
+  @override
   String get claimButton => '领取';
 
   @override

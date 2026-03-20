@@ -1431,6 +1431,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noStakingPoolsFound => 'ステーキングプールが見つかりません';
 
   @override
+  String get stakingErrorTitle => 'ステーキングプールの読み込みに失敗しました';
+
+  @override
+  String get stakingErrorRetry => '再試行';
+
+  @override
   String get claimButton => '請求';
 
   @override

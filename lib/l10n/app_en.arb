@@ -1891,6 +1891,14 @@
   "@noStakingPoolsFound": {
     "description": "Message displayed when no staking pools are available"
   },
+  "stakingErrorTitle": "Failed to Load Staking Pools",
+  "@stakingErrorTitle": {
+    "description": "Title displayed when staking pools fail to load"
+  },
+  "stakingErrorRetry": "Retry",
+  "@stakingErrorRetry": {
+    "description": "Button text to retry loading staking pools"
+  },
   "claimButton": "Claim",
   "@claimButton": {
     "description": "Text for the claim rewards button"

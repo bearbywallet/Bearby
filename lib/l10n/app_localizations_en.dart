@@ -1431,6 +1431,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noStakingPoolsFound => 'No Staking Pools Found';
 
   @override
+  String get stakingErrorTitle => 'Failed to Load Staking Pools';
+
+  @override
+  String get stakingErrorRetry => 'Retry';
+
+  @override
   String get claimButton => 'Claim';
 
   @override

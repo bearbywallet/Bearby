@@ -480,6 +480,8 @@
   "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。",
   "zilStakePageTitle": "Zilliqa ステーキング",
   "noStakingPoolsFound": "ステーキングプールが見つかりません",
+  "stakingErrorTitle": "ステーキングプールの読み込みに失敗しました",
+  "stakingErrorRetry": "再試行",
   "claimButton": "請求",
   "stakeButton": "ステーク",
   "unstakeButton": "アンステーク",

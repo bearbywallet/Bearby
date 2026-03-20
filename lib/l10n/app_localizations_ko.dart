@@ -1431,6 +1431,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noStakingPoolsFound => '스테이킹 풀 없음';
 
   @override
+  String get stakingErrorTitle => '스테이킹 풀 로드 실패';
+
+  @override
+  String get stakingErrorRetry => '재시도';
+
+  @override
   String get claimButton => '청구';
 
   @override

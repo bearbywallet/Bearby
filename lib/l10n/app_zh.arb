@@ -465,6 +465,8 @@
   "transactionHistoryDescription": "在地址簿中显示来自交易历史的地址。",
   "zilStakePageTitle": "Zilliqa 质押",
   "noStakingPoolsFound": "未找到质押池",
+  "stakingErrorTitle": "加载质押池失败",
+  "stakingErrorRetry": "重试",
   "claimButton": "领取",
   "stakeButton": "质押",
   "unstakeButton": "取消质押",

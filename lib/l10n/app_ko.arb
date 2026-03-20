@@ -465,6 +465,8 @@
   "transactionHistoryDescription": "주소록에 거래 내역 주소 표시.",
   "zilStakePageTitle": "Zilliqa 스테이킹",
   "noStakingPoolsFound": "스테이킹 풀 없음",
+  "stakingErrorTitle": "스테이킹 풀 로드 실패",
+  "stakingErrorRetry": "재시도",
   "claimButton": "청구",
   "stakeButton": "스테이크",
   "unstakeButton": "언스테이크",

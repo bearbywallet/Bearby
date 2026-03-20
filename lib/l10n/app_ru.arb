@@ -477,6 +477,8 @@
   "transactionHistoryDescription": "Показывать адреса из истории транзакций",
   "zilStakePageTitle": "Стейкинг Zilliqa",
   "noStakingPoolsFound": "Пулы для стейкинга не найдены",
+  "stakingErrorTitle": "Не удалось загрузить пулы стейкинга",
+  "stakingErrorRetry": "Повторить",
   "claimButton": "Забрать",
   "stakeButton": "Стейкать",
   "unstakeButton": "Отозвать",

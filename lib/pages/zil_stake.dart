@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/linear_refresh_indicator.dart';
 import 'package:bearby/components/stakeing_card.dart';
@@ -43,6 +44,17 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
 
     try {
       final appState = Provider.of<AppState>(context, listen: false);
+
+      if (appState.wallet == null) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _stakes = [];
+          });
+        }
+        return;
+      }
+
       final list = await _fetchStakesForAccount(appState);
 
       if (mounted) {
@@ -52,6 +64,7 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
         });
       }
     } catch (e) {
+      debugPrint("stake $e");
       if (mounted) {
         setState(() => _errorMessage = e.toString());
       }
@@ -187,6 +200,7 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
       return _ErrorSliver(
         errorMessage: _errorMessage!,
         adaptivePadding: adaptivePadding,
+        onRetry: () => _fetchStakes(),
       );
     }
 
@@ -403,24 +417,65 @@ class _StakingCardSkeleton extends StatelessWidget {
 class _ErrorSliver extends StatelessWidget {
   final String errorMessage;
   final double adaptivePadding;
+  final VoidCallback onRetry;
 
   const _ErrorSliver({
     required this.errorMessage,
     required this.adaptivePadding,
+    required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = context.read<AppState>().currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return SliverFillRemaining(
       child: Center(
         child: Padding(
           padding: EdgeInsets.all(adaptivePadding),
-          child: Text(
-            'Error: $errorMessage',
-            style: theme.bodyText2.copyWith(color: theme.danger),
-            textAlign: TextAlign.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/warning.svg',
+                width: 80,
+                height: 80,
+                colorFilter: ColorFilter.mode(
+                  theme.danger.withValues(alpha: 0.6),
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                l10n.stakingErrorTitle,
+                textAlign: TextAlign.center,
+                style: theme.titleLarge.copyWith(
+                  color: theme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                errorMessage,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: theme.bodyText2.copyWith(
+                  color: theme.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: 160,
+                child: CustomButton(
+                  text: l10n.stakingErrorRetry,
+                  textColor: theme.background,
+                  backgroundColor: theme.primaryPurple,
+                  onPressed: onRetry,
+                  height: 44,
+                ),
+              ),
+            ],
           ),
         ),
       ),
