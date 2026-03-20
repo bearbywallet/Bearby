@@ -96,7 +96,7 @@ struct ZilliqaScillaApiResponse {
 #[derive(Debug, Deserialize)]
 struct ZilstreamToken {
     symbol: String,
-    price_eth: String,
+    price_eth: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -232,6 +232,25 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 
     match chain.config.slip_44 {
         ZILLIQA => {
+            let non_native_indices: Vec<usize> = ftokens_indices
+                .iter()
+                .filter(|&&idx| !ftokens[idx].native)
+                .copied()
+                .collect();
+
+            for &idx in &ftokens_indices {
+                if ftokens[idx].native {
+                    ftokens[idx].rate = convert_rate;
+                }
+            }
+
+            if non_native_indices.is_empty() {
+                wallet
+                    .save_ftokens(&ftokens)
+                    .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+                return Ok(());
+            }
+
             let zilstream_url = "https://api-v2.zilstream.com/tokens?page=1&per_page=500";
             let client = reqwest::Client::new();
             let response = client
@@ -248,18 +267,16 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 .data
                 .into_iter()
                 .filter_map(|token| {
-                    let rate = token.price_eth.parse::<f64>().ok()?;
+                    let rate = token.price_eth?.parse::<f64>().ok()?;
                     Some((token.symbol.to_uppercase(), rate))
                 })
                 .collect();
 
-            for &idx in &ftokens_indices {
+            for &idx in &non_native_indices {
                 let token = &mut ftokens[idx];
                 let symbol_upper = token.symbol.to_uppercase();
                 if let Some(&rate_zil) = rate_map.get(&symbol_upper) {
                     token.rate = rate_zil * convert_rate;
-                } else if token.native {
-                    token.rate = convert_rate;
                 }
             }
 
