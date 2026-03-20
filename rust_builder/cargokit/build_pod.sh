@@ -11,6 +11,9 @@ NEW_PATH=`echo $PATH | tr ":" "\n" | grep -v "Contents/Developer/" | tr "\n" ":"
 
 export PATH=${NEW_PATH%?} # remove trailing :
 
+# Ensure protoc is available for proto compilation
+export PROTOC="${PROTOC:-/opt/homebrew/bin/protoc}"
+
 env
 
 # Platform name (macosx, iphoneos, iphonesimulator)
