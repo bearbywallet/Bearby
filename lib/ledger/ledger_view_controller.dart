@@ -10,6 +10,8 @@ import 'package:bearby/ledger/ethereum/eth_ledger_app.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/ble_transport.dart';
 import 'package:bearby/ledger/transport/hid_transport.dart';
+import 'package:bearby/ledger/transport/rust_ble_transport.dart';
+import 'package:bearby/ledger/transport/rust_hid_transport.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/tron/tron_ledger_app.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
@@ -59,6 +61,9 @@ class LedgerViewController extends ChangeNotifier {
   LedgerStatus _status = LedgerStatus.initializing;
   LedgerAppType _detectedAppType = LedgerAppType.unknown;
 
+  bool get _useRustTransport =>
+      Platform.isMacOS || Platform.isLinux || Platform.isWindows;
+
   Set<DiscoveredDevice> get discoveredDevices => _discoveredDevices;
   bool get isScanning => _isScanning;
   bool get isConnecting => _isConnecting;
@@ -92,14 +97,19 @@ class LedgerViewController extends ChangeNotifier {
       _startHidPolling();
     }
 
-    final bleSub = BleTransport.listen().listen(
-      (event) {
-        _discoveredDevices.add(DiscoveredDevice.fromBleDevice(event.rawDevice));
-        _updateStatus(LedgerStatus.foundDevices);
-      },
-      onError: (e) => _handleScanError(e, "BLE"),
-    );
-    _scanSubscriptions.add(bleSub);
+    if (_useRustTransport) {
+      _startRustBleScan();
+    } else {
+      final bleSub = BleTransport.listen().listen(
+        (event) {
+          _discoveredDevices
+              .add(DiscoveredDevice.fromBleDevice(event.rawDevice));
+          _updateStatus(LedgerStatus.foundDevices);
+        },
+        onError: (e) => _handleScanError(e, "BLE"),
+      );
+      _scanSubscriptions.add(bleSub);
+    }
   }
 
   void addDevice(DiscoveredDevice device) {
@@ -121,13 +131,33 @@ class LedgerViewController extends ChangeNotifier {
         return;
       }
       try {
-        final discoveredHid = await HidTransport.list();
+        final discoveredHid = _useRustTransport
+            ? await RustHidTransport.list()
+            : await HidTransport.list();
         _discoveredDevices.addAll(discoveredHid);
         _updateStatus(LedgerStatus.foundDevices);
       } on PlatformException catch (e) {
         _handleScanError(e, "USB Polling ${e.code}");
       } catch (e) {
         _handleScanError(e, "USB Polling");
+      }
+    });
+  }
+
+  void _startRustBleScan() {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (!_isScanning) {
+        timer.cancel();
+        return;
+      }
+      try {
+        final bleDevices = await RustBleTransport.scan();
+        _discoveredDevices.addAll(bleDevices);
+        if (bleDevices.isNotEmpty) {
+          _updateStatus(LedgerStatus.foundDevices);
+        }
+      } catch (e) {
+        _handleScanError(e, "BLE Rust");
       }
     });
   }
@@ -333,7 +363,8 @@ class LedgerViewController extends ChangeNotifier {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
-    } else if (_detectedAppType == LedgerAppType.tron && slip44 == kTronSlip44) {
+    } else if (_detectedAppType == LedgerAppType.tron &&
+        slip44 == kTronSlip44) {
       final tronApp = TronLedgerApp(_connectedTransport!);
       accounts = await tronApp.getAccounts(
         indices: List<int>.generate(count, (i) => i),
@@ -366,7 +397,13 @@ class LedgerViewController extends ChangeNotifier {
 
     try {
       Transport transport;
-      if (device.connectionType == ConnectionType.ble) {
+      if (_useRustTransport) {
+        if (device.connectionType == ConnectionType.ble) {
+          transport = await RustBleTransport.open(device);
+        } else {
+          transport = await RustHidTransport.open(device);
+        }
+      } else if (device.connectionType == ConnectionType.ble) {
         transport = await BleTransport.open(device);
       } else {
         transport = await HidTransport.open(device);

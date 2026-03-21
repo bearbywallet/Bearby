@@ -1,4 +1,5 @@
 import 'package:bearby/ledger/models/device_model.dart';
+import 'package:bearby/src/rust/api/ledger_transport.dart';
 
 enum ConnectionType { ble, usb }
 
@@ -61,6 +62,35 @@ class DiscoveredDevice {
       deviceModelProducName: rawData['deviceModel']['productName'],
       connectionType: ConnectionType.usb,
       rawDevice: rawData,
+    );
+  }
+
+  factory DiscoveredDevice.fromRustHidDevice(RustLedgerHidDevice device) {
+    final deviceModel = Devices.identifyUSBProductId(device.productId);
+    return DiscoveredDevice(
+      model: deviceModel,
+      vendorId: device.vendorId,
+      productId: device.productId,
+      name: device.productName,
+      devicePath: device.deviceId,
+      deviceModelId: device.modelId,
+      deviceModelProducName: device.productName,
+      connectionType: ConnectionType.usb,
+      rawDevice: const {},
+    );
+  }
+
+  factory DiscoveredDevice.fromRustBleDevice(RustLedgerBleDevice device) {
+    final deviceModel = Devices.identifyBluetoothServiceUuid(device.serviceUuid);
+    return DiscoveredDevice(
+      id: device.deviceId,
+      name: device.name,
+      serviceUUID: device.serviceUuid,
+      model: deviceModel,
+      deviceModelId: device.modelId,
+      deviceModelProducName: device.productName,
+      connectionType: ConnectionType.ble,
+      rawDevice: const {},
     );
   }
 

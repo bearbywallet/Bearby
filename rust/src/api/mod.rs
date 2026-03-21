@@ -4,6 +4,8 @@ pub mod book;
 pub mod cache;
 pub mod connections;
 pub mod ledger;
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub mod ledger_transport;
 pub mod methods;
 pub mod provider;
 pub mod qrcode;

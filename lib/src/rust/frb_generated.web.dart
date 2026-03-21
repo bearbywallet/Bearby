@@ -12,6 +12,7 @@ import 'api/book.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
+import 'api/ledger_transport.dart';
 import 'api/methods.dart';
 import 'api/provider.dart';
 import 'api/qrcode.dart';
@@ -332,6 +333,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw);
 
   @protected
+  List<RustLedgerBleDevice> dco_decode_list_rust_ledger_ble_device(dynamic raw);
+
+  @protected
+  List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
+
+  @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
   @protected
@@ -431,6 +438,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw);
+
+  @protected
+  RustLedgerBleDevice dco_decode_rust_ledger_ble_device(dynamic raw);
+
+  @protected
+  RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
@@ -788,6 +801,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<RustLedgerBleDevice> sse_decode_list_rust_ledger_ble_device(
+      SseDeserializer deserializer);
+
+  @protected
+  List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(
+      SseDeserializer deserializer);
+
+  @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
 
   @protected
@@ -900,6 +921,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RequiredTxParamsInfo sse_decode_required_tx_params_info(
+      SseDeserializer deserializer);
+
+  @protected
+  RustLedgerBleDevice sse_decode_rust_ledger_ble_device(
+      SseDeserializer deserializer);
+
+  @protected
+  RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
       SseDeserializer deserializer);
 
   @protected
@@ -1276,6 +1305,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(BigInt, String)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_rust_ledger_ble_device(
+      List<RustLedgerBleDevice> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_rust_ledger_hid_device(
+      List<RustLedgerHidDevice> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
 
@@ -1391,6 +1428,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rust_ledger_ble_device(
+      RustLedgerBleDevice self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_rust_ledger_hid_device(
+      RustLedgerHidDevice self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(

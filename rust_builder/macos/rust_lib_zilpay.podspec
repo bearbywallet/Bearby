@@ -32,7 +32,7 @@ This pod integrates the core Rust logic for the ZilPay wallet into the macOS app
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/librust_lib_zilpay.a',
+    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/librust_lib_zilpay.a -framework CoreBluetooth -framework IOKit',
   }
 end
 

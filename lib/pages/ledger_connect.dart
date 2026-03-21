@@ -62,11 +62,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
   }
 
   void _handleControllerEvents() {
-    if (_appState.ledgerViewController.status == LedgerStatus.connectionFailed) {
+    if (_appState.ledgerViewController.status ==
+        LedgerStatus.connectionFailed) {
       final device = _appState.ledgerViewController.connectingDevice;
       final error =
           _appState.ledgerViewController.errorDetails ?? 'Unknown error';
       final localizations = AppLocalizations.of(context)!;
+
+      debugPrint("[LEDGER CONNECT]: $error");
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -93,8 +96,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text(title, style: theme.titleMedium.copyWith(color: theme.textPrimary)),
-        content: Text(content, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
+        title: Text(title,
+            style: theme.titleMedium.copyWith(color: theme.textPrimary)),
+        content: Text(content,
+            style: theme.bodyText2.copyWith(color: theme.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -161,7 +166,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: CustomAppBar(
                         title: localizations.ledgerConnectPageTitle,
                         onBackPressed: () => Navigator.pop(context),
