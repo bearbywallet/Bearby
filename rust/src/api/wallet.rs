@@ -11,6 +11,7 @@ use zilpay::proto::address::Address;
 use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;
+use zilpay::wallet::wallet_types::WalletTypes;
 pub use zilpay::{
     background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
 };
@@ -290,21 +291,32 @@ pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result
 pub async fn delete_wallet(wallet_index: usize, password: Option<String>) -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
-    let password = password.map(|p| SecretString::new(p.into()));
 
-    if let Some(mut pass) = password {
-        let key = service
-            .core
-            .unlock_wallet_with_password(&pass, None, wallet_index)
-            .await;
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        pass.zeroize();
+    if !matches!(wallet_data.wallet_type, WalletTypes::Ledger(_)) {
+        let password = password.map(|p| SecretString::new(p.into()));
 
-        key
-    } else {
-        service.core.unlock_wallet_with_session(wallet_index).await
+        if let Some(mut pass) = password {
+            let key = service
+                .core
+                .unlock_wallet_with_password(&pass, None, wallet_index)
+                .await;
+
+            pass.zeroize();
+
+            key
+        } else {
+            service.core.unlock_wallet_with_session(wallet_index).await
+        }
+        .map_err(ServiceError::BackgroundError)?;
     }
-    .map_err(ServiceError::BackgroundError)?;
 
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?

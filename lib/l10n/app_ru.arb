@@ -271,7 +271,7 @@
   "argonSettingsModalContentSecretHint": "Введите секрет (опционально)",
   "argonSettingsModalContentConfirmButton": "Подтвердить",
   "confirmTransactionContentPasswordHint": "Пароль",
-  "confirmTransactionContentUnableToConfirm": "Невозможно подтвердить",
+  "confirmTransactionContentUnableToConfirm": "Подтвердить",
   "confirmTransactionContentConfirm": "Подтвердить",
   "confirmTransactionContentNoActiveAccount": "Нет активного аккаунта",
   "confirmTransactionContentFailedLoadTransfer": "Не удалось загрузить детали перевода",

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/counter.dart';
@@ -158,7 +157,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       }
 
       WalletSettingsInfo settings = WalletSettingsInfo(
-        cipherOrders: CipherDefaults.getCipherOrders(CipherDefaults.defaultCipherIndex),
+        cipherOrders:
+            CipherDefaults.getCipherOrders(CipherDefaults.defaultCipherIndex),
         argonParams: Argon2DefaultParams.owaspDefault(),
         currencyConvert: detectDeviceCurrency(),
         ipfsNode: "dweb.link",
@@ -181,7 +181,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
-        // TODO: .publicKey maybe must be null, or not need to check!
         final pubKeys =
             selectedAccounts.map((a) => (a.index, a.publicKey!)).toList();
         final accountNames = selectedAccounts
