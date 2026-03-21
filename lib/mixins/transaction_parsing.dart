@@ -158,7 +158,9 @@ class BtcInput {
       vout: json['vout'] as int?,
       scriptSig: json['scriptSig'] as Map<String, dynamic>?,
       sequence: json['sequence'] as int?,
-      txinwitness: (json['txinwitness'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
+      txinwitness: (json['txinwitness'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
     );
   }
 
@@ -335,9 +337,11 @@ class ParsedSignedMessage {
 
   String? get domainName => typedData?['domain']?['name'] as String?;
   int? get domainChainId => typedData?['domain']?['chainId'] as int?;
-  String? get domainContract => typedData?['domain']?['verifyingContract'] as String?;
+  String? get domainContract =>
+      typedData?['domain']?['verifyingContract'] as String?;
   String? get primaryType => typedData?['primaryType'] as String?;
-  Map<String, dynamic>? get typedMessage => typedData?['message'] as Map<String, dynamic>?;
+  Map<String, dynamic>? get typedMessage =>
+      typedData?['message'] as Map<String, dynamic>?;
 
   String get displayType {
     if (isPersonalSign) return 'Personal Sign';
@@ -400,7 +404,11 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   String get transactionHash {
-    return metadata.hash ?? evmReceipt?.transactionHash ?? scillaReceipt?.transactionHash ?? btcReceipt?.transactionHash ?? '';
+    return metadata.hash ??
+        evmReceipt?.transactionHash ??
+        scillaReceipt?.transactionHash ??
+        btcReceipt?.transactionHash ??
+        '';
   }
 
   String? get icon => metadata.icon;
@@ -436,26 +444,34 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   BigInt? get effectiveGasPrice => evmReceipt?.effectiveGasPrice;
   BigInt? get blobGasUsed => evmReceipt?.blobGasUsed;
   BigInt? get blobGasPrice => evmReceipt?.blobGasPrice;
-  BigInt? get blockNumber => evmReceipt?.blockNumber ?? scillaReceipt?.blockNumber;
+  BigInt? get blockNumber =>
+      evmReceipt?.blockNumber ?? scillaReceipt?.blockNumber;
   int? get statusCode => evmReceipt?.statusCode ?? scillaReceipt?.statusCode;
 
   String get amount {
     if (btc != null && metadata.tokenInfo?.value == null) {
       return btcReceipt?.totalOutputValue.toString() ?? '0';
     }
-    return metadata.tokenInfo?.value ?? evmReceipt?.amount ?? scillaReceipt?.amount ?? '0';
+    return metadata.tokenInfo?.value ??
+        evmReceipt?.amount ??
+        scillaReceipt?.amount ??
+        '0';
   }
 
   BigInt get fee {
-    if (btc != null && btcReceipt != null && metadata.btcUtxoAmounts != null) {
-      BigInt inputTotal = BigInt.zero;
-      for (int i = 0; i < metadata.btcUtxoAmounts!.length; i++) {
-        inputTotal += metadata.btcUtxoAmounts![i];
-      }
-
-      final outputTotal = btcReceipt!.totalOutputValue;
-
-      return inputTotal - outputTotal;
+    if (btc != null && btcReceipt != null && metadata.btcWitnessUtxos != null) {
+      try {
+        final utxos = jsonDecode(metadata.btcWitnessUtxos!) as List<dynamic>;
+        BigInt inputTotal = BigInt.zero;
+        for (final utxo in utxos) {
+          final value = utxo['value'];
+          if (value is int) {
+            inputTotal += BigInt.from(value);
+          }
+        }
+        final outputTotal = btcReceipt!.totalOutputValue;
+        return inputTotal - outputTotal;
+      } catch (_) {}
     }
 
     if (evm != null) {

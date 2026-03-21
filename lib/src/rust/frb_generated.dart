@@ -4780,12 +4780,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Uint64List? dco_decode_opt_list_prim_u_64_strict(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_list_prim_u_64_strict(raw);
-  }
-
-  @protected
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
@@ -5050,7 +5044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: dco_decode_opt_String(arr[4]),
       signer: dco_decode_opt_String(arr[5]),
       tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[6]),
-      btcUtxoAmounts: dco_decode_opt_list_prim_u_64_strict(arr[7]),
+      btcWitnessUtxos: dco_decode_opt_String(arr[7]),
       broadcast: dco_decode_bool(arr[8]),
     );
   }
@@ -6397,18 +6391,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Uint64List? sse_decode_opt_list_prim_u_64_strict(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_list_prim_u_64_strict(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
   Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -6647,7 +6629,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_signer = sse_decode_opt_String(deserializer);
     var var_tokenInfo =
         sse_decode_opt_box_autoadd_base_token_info(deserializer);
-    var var_btcUtxoAmounts = sse_decode_opt_list_prim_u_64_strict(deserializer);
+    var var_btcWitnessUtxos = sse_decode_opt_String(deserializer);
     var var_broadcast = sse_decode_bool(deserializer);
     return TransactionMetadataInfo(
         chainHash: var_chainHash,
@@ -6657,7 +6639,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         title: var_title,
         signer: var_signer,
         tokenInfo: var_tokenInfo,
-        btcUtxoAmounts: var_btcUtxoAmounts,
+        btcWitnessUtxos: var_btcWitnessUtxos,
         broadcast: var_broadcast);
   }
 
@@ -7818,17 +7800,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_list_prim_u_64_strict(
-      Uint64List? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_list_prim_u_64_strict(self, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_opt_list_prim_u_8_strict(
       Uint8List? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8011,7 +7982,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.title, serializer);
     sse_encode_opt_String(self.signer, serializer);
     sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
-    sse_encode_opt_list_prim_u_64_strict(self.btcUtxoAmounts, serializer);
+    sse_encode_opt_String(self.btcWitnessUtxos, serializer);
     sse_encode_bool(self.broadcast, serializer);
   }
 

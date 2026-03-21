@@ -24,20 +24,24 @@ pub struct TransactionMetadataInfo {
     pub title: Option<String>,
     pub signer: Option<String>,
     pub token_info: Option<BaseTokenInfo>,
-    pub btc_utxo_amounts: Option<Vec<u64>>,
+    pub btc_witness_utxos: Option<String>,
     pub broadcast: bool,
 }
 
 impl From<TransactionMetadata> for TransactionMetadataInfo {
     fn from(value: TransactionMetadata) -> Self {
+        let btc_witness_utxos = value
+            .btc_witness_utxos
+            .and_then(|witness_utxos| serde_json::to_string(&witness_utxos).ok());
+
         Self {
+            btc_witness_utxos,
             chain_hash: value.chain_hash,
             hash: value.hash,
             info: value.info,
             icon: value.icon,
             title: value.title,
             signer: value.signer.map(|v| v.to_string()),
-            btc_utxo_amounts: value.btc_utxo_amounts,
             broadcast: value.broadcast,
             token_info: value.token_info.map(|t| BaseTokenInfo {
                 value: t.0.to_string(),
@@ -50,7 +54,12 @@ impl From<TransactionMetadata> for TransactionMetadataInfo {
 
 impl From<TransactionMetadataInfo> for TransactionMetadata {
     fn from(value: TransactionMetadataInfo) -> Self {
+        let btc_witness_utxos = value
+            .btc_witness_utxos
+            .and_then(|witness_utxos| serde_json::from_str(&witness_utxos).ok());
+
         Self {
+            btc_witness_utxos,
             chain_hash: value.chain_hash,
             hash: value.hash,
             info: value.info,
@@ -65,7 +74,6 @@ impl From<TransactionMetadataInfo> for TransactionMetadata {
                     v.symbol,
                 )
             }),
-            btc_utxo_amounts: value.btc_utxo_amounts,
         }
     }
 }
