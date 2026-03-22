@@ -39,13 +39,13 @@ class BtcLedgerConstants {
   static String? descriptorTemplateForBip(int bip) {
     switch (bip) {
       case kBip44Purpose:
-        return 'pkh(@0/**)';
+        return 'pkh(@0)';
       case kBip49Purpose:
-        return 'sh(wpkh(@0/**))';
+        return 'sh(wpkh(@0))';
       case kBip84Purpose:
-        return 'wpkh(@0/**)';
+        return 'wpkh(@0)';
       case kBip86Purpose:
-        return 'tr(@0/**)';
+        return 'tr(@0)';
       default:
         return null;
     }

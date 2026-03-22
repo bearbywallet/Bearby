@@ -93,7 +93,7 @@ class BtcLedgerApp {
         await btc_ffi.btcLedgerComputeMerkleRoot(leafHashes: keyLeaves);
     allLeafHashes[_hexEncode(keysRoot)] = keyLeaves;
 
-    final response = await _sendApduWithClientLoop(
+    final result = await _sendApduWithClientLoop(
       ins: BtcLedgerConstants.insGetWalletAddress,
       data: Uint8List.fromList(dataBytes),
       preimageHashes: preimageHashes,
@@ -101,12 +101,12 @@ class BtcLedgerApp {
       allLeafHashes: allLeafHashes,
     );
 
-    if (response.isEmpty) {
+    if (result.finalResponse.isEmpty) {
       throw TransportException('Empty address response', 'EmptyAddress');
     }
 
-    // First yielded result is the address string
-    return String.fromCharCodes(response.first);
+    // Address comes in the final 0x9000 response, not via YIELD
+    return String.fromCharCodes(result.finalResponse);
   }
 
   /// Derive accounts for the given indices.
@@ -183,16 +183,13 @@ class BtcLedgerApp {
     );
 
     // Build the SIGN_PSBT payload:
-    // globalKeysValuesRoot(32) || varint(inputCount) || inputMapsRoot(32) ||
+    // globalCommitment || varint(inputCount) || inputMapsRoot(32) ||
     // varint(outputCount) || outputMapsRoot(32) || walletId(32) || walletHMAC(32)
-    final globalCommitmentHash =
-        await btc_ffi.btcLedgerSha256(data: merkelized.globalMapCommitment);
-
     final inputCountVarint = _encodeVarint(merkelized.inputCount);
     final outputCountVarint = _encodeVarint(merkelized.outputCount);
 
     final payload = <int>[
-      ...globalCommitmentHash,
+      ...merkelized.globalMapCommitment,
       ...inputCountVarint,
       ...merkelized.inputMapsRoot,
       ...outputCountVarint,
@@ -201,15 +198,22 @@ class BtcLedgerApp {
       ...walletPolicy.policyHmac,
     ];
 
-    // Build preimage store: merge merkelized preimages + wallet policy serialized
-    final preimageHashes = <Uint8List>[
-      ...merkelized.preimageHashes,
-      await btc_ffi.btcLedgerSha256(data: walletPolicy.serialized),
-    ];
-    final preimageData = <Uint8List>[
-      ...merkelized.preimageData,
-      walletPolicy.serialized,
-    ];
+    // Build preimage store: merge merkelized preimages + wallet policy
+    final preimageHashes = <Uint8List>[...merkelized.preimageHashes];
+    final preimageData = <Uint8List>[...merkelized.preimageData];
+
+    // Add wallet policy serialized as raw preimage
+    preimageHashes
+        .add(await btc_ffi.btcLedgerSha256(data: walletPolicy.serialized));
+    preimageData.add(walletPolicy.serialized);
+
+    // Add wallet policy keys as known-list preimages (0x00 || key)
+    for (final keyInfo in walletPolicy.keysInfo) {
+      final keyBytes = Uint8List.fromList(keyInfo.codeUnits);
+      final keyPreimage = Uint8List.fromList([0x00, ...keyBytes]);
+      preimageHashes.add(await btc_ffi.btcLedgerSha256(data: keyPreimage));
+      preimageData.add(keyPreimage);
+    }
 
     // Build leaf hash lookup for merkle proofs
     final allLeafHashes = <String, List<Uint8List>>{};
@@ -268,15 +272,16 @@ class BtcLedgerApp {
     allLeafHashes[_hexEncode(keysRoot)] = [keyLeaf];
 
     // Send SIGN_PSBT and run the client interaction loop
-    return _sendApduWithClientLoop(
+    final result = await _sendApduWithClientLoop(
       ins: BtcLedgerConstants.insSignPsbt,
-      p1: 0x00,
-      p2: 0x02, // PSBT v2
       data: Uint8List.fromList(payload),
       preimageHashes: preimageHashes,
       preimageData: preimageData,
       allLeafHashes: allLeafHashes,
     );
+
+    // Signatures come via YIELD
+    return result.yielded;
   }
 
   // --- Message Signing ---
@@ -321,19 +326,19 @@ class BtcLedgerApp {
       ...merkleRoot,
     ];
 
-    // Build preimage store for chunks
+    // Build preimage store for chunks (0x00 || chunk, matching addKnownList)
     final preimageHashes = <Uint8List>[];
     final preimageData = <Uint8List>[];
     for (final chunk in chunks) {
-      final hash = await btc_ffi.btcLedgerSha256(data: chunk);
-      preimageHashes.add(hash);
-      preimageData.add(chunk);
+      final chunkPreimage = Uint8List.fromList([0x00, ...chunk]);
+      preimageHashes.add(await btc_ffi.btcLedgerSha256(data: chunkPreimage));
+      preimageData.add(chunkPreimage);
     }
 
     final allLeafHashes = <String, List<Uint8List>>{};
     allLeafHashes[_hexEncode(merkleRoot)] = leafHashes;
 
-    final results = await _sendApduWithClientLoop(
+    final result = await _sendApduWithClientLoop(
       ins: BtcLedgerConstants.insSignMessage,
       data: Uint8List.fromList(payload),
       preimageHashes: preimageHashes,
@@ -341,11 +346,12 @@ class BtcLedgerApp {
       allLeafHashes: allLeafHashes,
     );
 
-    if (results.isEmpty) {
+    if (result.finalResponse.isEmpty) {
       throw TransportException('No signature received', 'NoSignature');
     }
 
-    return results.first;
+    // Signature comes in the final 0x9000 response
+    return result.finalResponse;
   }
 
   // --- Client Interaction Loop ---
@@ -355,7 +361,9 @@ class BtcLedgerApp {
   /// The device may respond with status 0xE000 multiple times, each time
   /// requesting data (preimages, merkle proofs, etc.) from the client.
   /// Signatures are collected via YIELD (0x10) commands.
-  Future<List<Uint8List>> _sendApduWithClientLoop({
+  /// Returns (finalResponse, yieldedResults) — the final 0x9000 response
+  /// body and any data yielded during the interaction loop.
+  Future<({Uint8List finalResponse, List<Uint8List> yielded})> _sendApduWithClientLoop({
     required int ins,
     int p1 = 0x00,
     int p2 = 0x00,
@@ -381,7 +389,9 @@ class BtcLedgerApp {
       final sw = _getStatusWord(response);
 
       if (sw == BtcLedgerConstants.swOk) {
-        break;
+        // Return both the final response body and any yielded results
+        final finalBody = response.sublist(0, response.length - 2);
+        return (finalResponse: finalBody, yielded: yieldedResults);
       }
 
       if (sw != BtcLedgerConstants.swInterrupt) {
@@ -449,8 +459,6 @@ class BtcLedgerApp {
         data: clientResponse,
       );
     }
-
-    return yieldedResults;
   }
 
   // --- Client Command Handlers ---

@@ -187,7 +187,7 @@ pub struct MerkleProof {
 
 /// Wallet policy for Ledger BTC app
 pub struct WalletPolicy {
-    /// Descriptor template string, e.g. "wpkh(@0/**)"
+    /// Descriptor template string, e.g. "wpkh(@0)"
     pub descriptor_template: String,
     /// Keys info strings, e.g. ["[fingerprint/84'/0'/0']xpub..."]
     pub keys_info: Vec<String>,
@@ -237,14 +237,18 @@ fn build_merkle_map(
     commitment.extend_from_slice(&keys_root);
     commitment.extend_from_slice(&values_root);
 
-    // Add all keys and values as preimages (keyed by their leaf hashes)
+    // Add all keys and values as known-list preimages (0x00 || element)
+    // This mirrors the reference addKnownList: preimage = 0x00 || element,
+    // hash = SHA256(0x00 || element) = leaf hash
     for (i, key) in keys.iter().enumerate() {
-        add_preimage(preimage_hashes, preimage_data, key.clone());
-        add_preimage(preimage_hashes, preimage_data, values[i].clone());
-    }
+        let mut key_preimage = vec![0x00];
+        key_preimage.extend_from_slice(key);
+        add_preimage(preimage_hashes, preimage_data, key_preimage);
 
-    // Also add the commitment itself as a preimage
-    add_preimage(preimage_hashes, preimage_data, commitment.clone());
+        let mut val_preimage = vec![0x00];
+        val_preimage.extend_from_slice(&values[i]);
+        add_preimage(preimage_hashes, preimage_data, val_preimage);
+    }
 
     (commitment, keys_leaves, values_leaves)
 }
@@ -457,12 +461,16 @@ pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, 
     let input_maps_root = build_merkle_tree(&input_commitment_leaves);
     let output_maps_root = build_merkle_tree(&output_commitment_leaves);
 
-    // Add input/output commitments as preimages too
+    // Add input/output commitments as known-list preimages (0x00 || commitment)
     for c in &input_map_commitments {
-        add_preimage(&mut preimage_hashes, &mut preimage_data, c.clone());
+        let mut preimage = vec![0x00];
+        preimage.extend_from_slice(c);
+        add_preimage(&mut preimage_hashes, &mut preimage_data, preimage);
     }
     for c in &output_map_commitments {
-        add_preimage(&mut preimage_hashes, &mut preimage_data, c.clone());
+        let mut preimage = vec![0x00];
+        preimage.extend_from_slice(c);
+        add_preimage(&mut preimage_hashes, &mut preimage_data, preimage);
     }
 
     Ok(MerkelizedPsbt {
@@ -490,10 +498,10 @@ pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, 
 /// Map BIP purpose to Ledger wallet descriptor template.
 fn descriptor_template_for_bip(bip: u32) -> Option<String> {
     match bip {
-        DerivationPath::BIP44_PURPOSE => Some("pkh(@0/**)".to_string()),
-        DerivationPath::BIP49_PURPOSE => Some("sh(wpkh(@0/**))".to_string()),
-        DerivationPath::BIP84_PURPOSE => Some("wpkh(@0/**)".to_string()),
-        DerivationPath::BIP86_PURPOSE => Some("tr(@0/**)".to_string()),
+        DerivationPath::BIP44_PURPOSE => Some("pkh(@0)".to_string()),
+        DerivationPath::BIP49_PURPOSE => Some("sh(wpkh(@0))".to_string()),
+        DerivationPath::BIP84_PURPOSE => Some("wpkh(@0)".to_string()),
+        DerivationPath::BIP86_PURPOSE => Some("tr(@0)".to_string()),
         _ => None,
     }
 }
@@ -520,7 +528,7 @@ pub fn btc_ledger_build_wallet_policy(
     // Bitcoin mainnet coin type = 0, testnet = 1
     let fp_hex = hex::encode(&master_fingerprint);
     let key_info = format!(
-        "[{}/{}h/0h/{}h]{}/**",
+        "[{}/{}'/0'/{}']{}/**",
         fp_hex, bip_purpose, account_index, xpub
     );
     let keys_info = vec![key_info.clone()];
@@ -1050,10 +1058,10 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
 
-        assert_eq!(policy.descriptor_template, "wpkh(@0/**)");
+        assert_eq!(policy.descriptor_template, "wpkh(@0)");
         assert_eq!(policy.policy_id.len(), 32);
         assert_eq!(policy.policy_hmac.len(), 32);
-        assert!(policy.keys_info[0].starts_with("[c55d6895/84h/0h/0h]"));
+        assert!(policy.keys_info[0].starts_with("[c55d6895/84'/0'/0']"));
         assert!(policy.keys_info[0].ends_with("/**"));
     }
 
@@ -1065,8 +1073,8 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP44_PURPOSE, 0).unwrap();
 
-        assert_eq!(policy.descriptor_template, "pkh(@0/**)");
-        assert!(policy.keys_info[0].starts_with("[abcdef12/44h/0h/0h]"));
+        assert_eq!(policy.descriptor_template, "pkh(@0)");
+        assert!(policy.keys_info[0].starts_with("[abcdef12/44'/0'/0']"));
     }
 
     #[test]
@@ -1077,8 +1085,8 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP49_PURPOSE, 0).unwrap();
 
-        assert_eq!(policy.descriptor_template, "sh(wpkh(@0/**))");
-        assert!(policy.keys_info[0].starts_with("[11223344/49h/0h/0h]"));
+        assert_eq!(policy.descriptor_template, "sh(wpkh(@0))");
+        assert!(policy.keys_info[0].starts_with("[11223344/49'/0'/0']"));
     }
 
     #[test]
@@ -1089,8 +1097,8 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP86_PURPOSE, 0).unwrap();
 
-        assert_eq!(policy.descriptor_template, "tr(@0/**)");
-        assert!(policy.keys_info[0].starts_with("[aabbccdd/86h/0h/0h]"));
+        assert_eq!(policy.descriptor_template, "tr(@0)");
+        assert!(policy.keys_info[0].starts_with("[aabbccdd/86'/0'/0']"));
     }
 
     #[test]
@@ -1104,7 +1112,7 @@ mod tests {
         assert_eq!(policy.serialized[0], 0x01, "version byte");
         assert_eq!(policy.serialized[1], 0x00, "empty wallet name");
 
-        let desc = "wpkh(@0/**)".as_bytes();
+        let desc = "wpkh(@0)".as_bytes();
         assert_eq!(
             policy.serialized[2],
             desc.len() as u8,
@@ -1149,8 +1157,8 @@ mod tests {
             policy0.policy_id, policy1.policy_id,
             "Different accounts should have different policy IDs"
         );
-        assert!(policy0.keys_info[0].contains("/0h]"));
-        assert!(policy1.keys_info[0].contains("/1h]"));
+        assert!(policy0.keys_info[0].contains("/0']"));
+        assert!(policy1.keys_info[0].contains("/1']"));
     }
 
     #[test]
@@ -1313,7 +1321,7 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
 
-        let desc = "wpkh(@0/**)".as_bytes();
+        let desc = "wpkh(@0)".as_bytes();
         assert_eq!(
             policy.serialized[2],
             desc.len() as u8,
@@ -1332,7 +1340,7 @@ mod tests {
         let policy =
             btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
 
-        let desc = "wpkh(@0/**)".as_bytes();
+        let desc = "wpkh(@0)".as_bytes();
         let key_count_offset = 3 + desc.len();
         assert_eq!(
             policy.serialized[key_count_offset], 0x01,
