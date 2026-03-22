@@ -1,0 +1,890 @@
+use bitcoin::consensus::encode as btc_encode;
+use bitcoin::psbt::Psbt;
+use bitcoin::Transaction as BitcoinTransaction;
+use bitcoin::Witness;
+use sha2::{Digest, Sha256};
+use zilpay::crypto::bip49::DerivationPath;
+
+// --- Merkle Tree ---
+
+/// Leaf hash: SHA256(0x00 || data)
+pub fn btc_ledger_hash_leaf(data: Vec<u8>) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update([0x00]);
+    hasher.update(&data);
+    hasher.finalize().to_vec()
+}
+
+/// Internal node hash: SHA256(0x01 || left || right)
+fn hash_node(left: &[u8], right: &[u8]) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update([0x01]);
+    hasher.update(left);
+    hasher.update(right);
+    hasher.finalize().to_vec()
+}
+
+/// SHA256 hash
+pub fn btc_ledger_sha256(data: Vec<u8>) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update(&data);
+    hasher.finalize().to_vec()
+}
+
+/// Largest power of 2 strictly less than n
+fn highest_power_of_2_less_than(n: usize) -> usize {
+    if n <= 1 {
+        return 0;
+    }
+    let mut p = 1;
+    while p * 2 < n {
+        p *= 2;
+    }
+    p
+}
+
+/// Build a merkle tree from leaf hashes and return (root, all_nodes_for_proofs).
+/// The tree is a balanced binary tree following the Ledger protocol spec.
+fn build_merkle_tree(leaf_hashes: &[Vec<u8>]) -> Vec<u8> {
+    if leaf_hashes.is_empty() {
+        return vec![0u8; 32];
+    }
+    if leaf_hashes.len() == 1 {
+        return leaf_hashes[0].clone();
+    }
+    let split = highest_power_of_2_less_than(leaf_hashes.len());
+    let left_root = build_merkle_tree(&leaf_hashes[..split]);
+    let right_root = build_merkle_tree(&leaf_hashes[split..]);
+    hash_node(&left_root, &right_root)
+}
+
+/// Compute merkle root from leaf hashes.
+pub fn btc_ledger_compute_merkle_root(leaf_hashes: Vec<Vec<u8>>) -> Vec<u8> {
+    build_merkle_tree(&leaf_hashes)
+}
+
+/// Compute merkle proof for a leaf at the given index.
+pub fn btc_ledger_get_merkle_proof(
+    leaf_hashes: Vec<Vec<u8>>,
+    leaf_index: u32,
+) -> Result<MerkleProof, String> {
+    let idx = leaf_index as usize;
+    if idx >= leaf_hashes.len() {
+        return Err("leaf_index out of bounds".into());
+    }
+    let proof = compute_proof(&leaf_hashes, idx);
+    Ok(MerkleProof {
+        leaf_hash: leaf_hashes[idx].clone(),
+        proof_hashes: proof,
+    })
+}
+
+fn compute_proof(leaf_hashes: &[Vec<u8>], index: usize) -> Vec<Vec<u8>> {
+    if leaf_hashes.len() <= 1 {
+        return vec![];
+    }
+    let split = highest_power_of_2_less_than(leaf_hashes.len());
+    if index < split {
+        let mut proof = compute_proof(&leaf_hashes[..split], index);
+        let right_root = build_merkle_tree(&leaf_hashes[split..]);
+        proof.push(right_root);
+        proof
+    } else {
+        let mut proof = compute_proof(&leaf_hashes[split..], index - split);
+        let left_root = build_merkle_tree(&leaf_hashes[..split]);
+        proof.push(left_root);
+        proof
+    }
+}
+
+/// Find the index of a leaf by its hash. Returns -1 if not found.
+pub fn btc_ledger_get_merkle_leaf_index(
+    leaf_hashes: Vec<Vec<u8>>,
+    target_hash: Vec<u8>,
+) -> i64 {
+    for (i, h) in leaf_hashes.iter().enumerate() {
+        if h == &target_hash {
+            return i as i64;
+        }
+    }
+    -1
+}
+
+// --- Varint Encoding ---
+
+/// Encode a value as a Bitcoin-style varint.
+fn encode_varint(value: u64) -> Vec<u8> {
+    if value < 0xFD {
+        vec![value as u8]
+    } else if value <= 0xFFFF {
+        let mut buf = vec![0xFDu8];
+        buf.extend_from_slice(&(value as u16).to_le_bytes());
+        buf
+    } else {
+        let mut buf = vec![0xFEu8];
+        buf.extend_from_slice(&(value as u32).to_le_bytes());
+        buf
+    }
+}
+
+// --- Preimage Store ---
+
+/// Look up preimage data by its SHA-256 hash.
+pub fn btc_ledger_get_preimage(
+    preimage_hashes: Vec<Vec<u8>>,
+    preimage_data: Vec<Vec<u8>>,
+    requested_hash: Vec<u8>,
+) -> Result<Vec<u8>, String> {
+    for (i, h) in preimage_hashes.iter().enumerate() {
+        if h == &requested_hash {
+            return Ok(preimage_data[i].clone());
+        }
+    }
+    Err(format!(
+        "Preimage not found for hash: {}",
+        hex::encode(&requested_hash)
+    ))
+}
+
+// --- PSBT Merkelization ---
+
+/// Represents a merkelized PSBT ready for Ledger signing.
+pub struct MerkelizedPsbt {
+    /// Global map commitment: varint(n) || keys_root || values_root
+    pub global_map_commitment: Vec<u8>,
+    /// Leaf hashes for global keys merkle tree
+    pub global_map_keys_leaves: Vec<Vec<u8>>,
+    /// Leaf hashes for global values merkle tree
+    pub global_map_values_leaves: Vec<Vec<u8>>,
+    /// Per-input map commitments
+    pub input_map_commitments: Vec<Vec<u8>>,
+    /// Per-input keys leaf hashes (flattened: input_index -> leaves)
+    pub input_map_keys_leaves: Vec<Vec<Vec<u8>>>,
+    /// Per-input values leaf hashes
+    pub input_map_values_leaves: Vec<Vec<Vec<u8>>>,
+    /// Per-output map commitments
+    pub output_map_commitments: Vec<Vec<u8>>,
+    /// Per-output keys leaf hashes
+    pub output_map_keys_leaves: Vec<Vec<Vec<u8>>>,
+    /// Per-output values leaf hashes
+    pub output_map_values_leaves: Vec<Vec<Vec<u8>>>,
+    /// Merkle root of input map commitment leaf hashes
+    pub input_maps_root: Vec<u8>,
+    /// Merkle root of output map commitment leaf hashes
+    pub output_maps_root: Vec<u8>,
+    /// All preimage data stored by SHA-256 hash
+    pub preimage_hashes: Vec<Vec<u8>>,
+    pub preimage_data: Vec<Vec<u8>>,
+    /// Counts
+    pub input_count: u32,
+    pub output_count: u32,
+    /// Original PSBT bytes
+    pub psbt_bytes: Vec<u8>,
+}
+
+/// Merkle proof result
+pub struct MerkleProof {
+    pub leaf_hash: Vec<u8>,
+    pub proof_hashes: Vec<Vec<u8>>,
+}
+
+/// Wallet policy for Ledger BTC app
+pub struct WalletPolicy {
+    /// Descriptor template string, e.g. "wpkh(@0/**)"
+    pub descriptor_template: String,
+    /// Keys info strings, e.g. ["[fingerprint/84'/0'/0']xpub..."]
+    pub keys_info: Vec<String>,
+    /// Wallet policy ID = SHA256(serialized policy)
+    pub policy_id: Vec<u8>,
+    /// HMAC for registered wallets (empty for default single-key wallets)
+    pub policy_hmac: Vec<u8>,
+    /// Serialized policy bytes (for preimage store)
+    pub serialized: Vec<u8>,
+}
+
+/// Input signature from Ledger
+pub struct LedgerInputSignature {
+    pub input_index: u32,
+    pub signature: Vec<u8>,
+    pub pubkey: Vec<u8>,
+}
+
+/// Finalized transaction result
+pub struct FinalizedBtcTx {
+    pub raw_tx_hex: String,
+    pub tx_hash: String,
+}
+
+/// Build a merkelized key-value map from sorted keys and values.
+/// Returns (commitment, keys_leaf_hashes, values_leaf_hashes) and adds preimages to the store.
+fn build_merkle_map(
+    keys: &[Vec<u8>],
+    values: &[Vec<u8>],
+    preimage_hashes: &mut Vec<Vec<u8>>,
+    preimage_data: &mut Vec<Vec<u8>>,
+) -> (Vec<u8>, Vec<Vec<u8>>, Vec<Vec<u8>>) {
+    let keys_leaves: Vec<Vec<u8>> = keys.iter().map(|k| btc_ledger_hash_leaf(k.clone())).collect();
+    let values_leaves: Vec<Vec<u8>> = values
+        .iter()
+        .map(|v| btc_ledger_hash_leaf(v.clone()))
+        .collect();
+
+    let keys_root = build_merkle_tree(&keys_leaves);
+    let values_root = build_merkle_tree(&values_leaves);
+
+    // Commitment: varint(count) || keys_root || values_root
+    let mut commitment = encode_varint(keys.len() as u64);
+    commitment.extend_from_slice(&keys_root);
+    commitment.extend_from_slice(&values_root);
+
+    // Add all keys and values as preimages (keyed by their leaf hashes)
+    for (i, key) in keys.iter().enumerate() {
+        add_preimage(preimage_hashes, preimage_data, key.clone());
+        add_preimage(preimage_hashes, preimage_data, values[i].clone());
+    }
+
+    // Also add the commitment itself as a preimage
+    add_preimage(preimage_hashes, preimage_data, commitment.clone());
+
+    (commitment, keys_leaves, values_leaves)
+}
+
+fn add_preimage(hashes: &mut Vec<Vec<u8>>, data: &mut Vec<Vec<u8>>, preimage: Vec<u8>) {
+    let hash = btc_ledger_sha256(preimage.clone());
+    // Avoid duplicates
+    if !hashes.contains(&hash) {
+        hashes.push(hash);
+        data.push(preimage);
+    }
+}
+
+/// Extract key-value pairs from a PSBT global map, sorted by key.
+fn extract_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
+    let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+
+    // Re-serialize the PSBT and extract raw key-value pairs from the global map.
+    // The bitcoin crate's Psbt type has typed fields, so we need to serialize
+    // back to raw format to extract the key-value pairs.
+    let raw_psbt = psbt.serialize();
+
+    // Skip magic bytes: "psbt" + 0xFF
+    if raw_psbt.len() < 5 || &raw_psbt[0..4] != b"psbt" || raw_psbt[4] != 0xFF {
+        return (vec![], vec![]);
+    }
+    let mut offset = 5;
+
+    // Parse global map key-value pairs until we hit 0x00 separator
+    while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
+        // Read key
+        let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
+        offset += key_varint_size;
+        let key = raw_psbt[offset..offset + key_len as usize].to_vec();
+        offset += key_len as usize;
+
+        // Read value
+        let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
+        offset += val_varint_size;
+        let value = raw_psbt[offset..offset + val_len as usize].to_vec();
+        offset += val_len as usize;
+
+        // For the merkle map, keys include their varint-prefixed length
+        let mut full_key = encode_varint(key.len() as u64);
+        full_key.extend_from_slice(&key);
+
+        pairs.push((full_key, value));
+    }
+
+    // Sort by key (lexicographic on bytes)
+    pairs.sort_by(|a, b| a.0.cmp(&b.0));
+
+    let keys = pairs.iter().map(|(k, _)| k.clone()).collect();
+    let values = pairs.iter().map(|(_, v)| v.clone()).collect();
+    (keys, values)
+}
+
+/// Parse PSBT input/output maps from raw PSBT bytes.
+/// Returns a list of (keys, values) for each input or output.
+fn extract_io_maps(raw_psbt: &[u8], start_offset: usize, count: usize) -> (Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)>, usize) {
+    let mut maps = Vec::new();
+    let mut offset = start_offset;
+
+    for _ in 0..count {
+        let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+
+        while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
+            // Read key
+            let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
+            offset += key_varint_size;
+            let key = raw_psbt[offset..offset + key_len as usize].to_vec();
+            offset += key_len as usize;
+
+            // Read value
+            let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
+            offset += val_varint_size;
+            let value = raw_psbt[offset..offset + val_len as usize].to_vec();
+            offset += val_len as usize;
+
+            let mut full_key = encode_varint(key.len() as u64);
+            full_key.extend_from_slice(&key);
+
+            pairs.push((full_key, value));
+        }
+
+        // Skip the 0x00 separator
+        if offset < raw_psbt.len() {
+            offset += 1;
+        }
+
+        pairs.sort_by(|a, b| a.0.cmp(&b.0));
+
+        let keys = pairs.iter().map(|(k, _)| k.clone()).collect();
+        let values = pairs.iter().map(|(_, v)| v.clone()).collect();
+        maps.push((keys, values));
+    }
+
+    (maps, offset)
+}
+
+fn decode_varint(data: &[u8]) -> (u64, usize) {
+    if data.is_empty() {
+        return (0, 0);
+    }
+    let first = data[0];
+    if first < 0xFD {
+        (first as u64, 1)
+    } else if first == 0xFD {
+        let val = u16::from_le_bytes([data[1], data[2]]) as u64;
+        (val, 3)
+    } else if first == 0xFE {
+        let val = u32::from_le_bytes([data[1], data[2], data[3], data[4]]) as u64;
+        (val, 5)
+    } else {
+        let val = u64::from_le_bytes([
+            data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8],
+        ]);
+        (val, 9)
+    }
+}
+
+/// Find the offset past the global map in raw PSBT bytes.
+fn find_global_map_end(raw_psbt: &[u8]) -> usize {
+    let mut offset = 5; // skip "psbt" + 0xFF
+
+    while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
+        // Skip key
+        let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
+        offset += key_varint_size + key_len as usize;
+
+        // Skip value
+        let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
+        offset += val_varint_size + val_len as usize;
+    }
+
+    // Skip the 0x00 separator
+    if offset < raw_psbt.len() {
+        offset += 1;
+    }
+
+    offset
+}
+
+/// Decompose a PSBT into merkle structures for Ledger signing.
+pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, String> {
+    let psbt: Psbt =
+        Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
+
+    let input_count = psbt.unsigned_tx.input.len();
+    let output_count = psbt.unsigned_tx.output.len();
+    let raw_psbt = psbt.serialize();
+
+    let mut preimage_hashes: Vec<Vec<u8>> = Vec::new();
+    let mut preimage_data: Vec<Vec<u8>> = Vec::new();
+
+    // Extract and merkelise global map
+    let (global_keys, global_values) = extract_global_map(&psbt);
+    let (global_commitment, global_keys_leaves, global_values_leaves) =
+        build_merkle_map(&global_keys, &global_values, &mut preimage_hashes, &mut preimage_data);
+
+    // Extract and merkelise input maps
+    let io_start = find_global_map_end(&raw_psbt);
+    let (input_maps_raw, output_start) = extract_io_maps(&raw_psbt, io_start, input_count);
+
+    let mut input_map_commitments = Vec::new();
+    let mut input_map_keys_leaves = Vec::new();
+    let mut input_map_values_leaves = Vec::new();
+
+    for (keys, values) in &input_maps_raw {
+        let (commitment, keys_leaves, values_leaves) =
+            build_merkle_map(keys, values, &mut preimage_hashes, &mut preimage_data);
+        input_map_commitments.push(commitment);
+        input_map_keys_leaves.push(keys_leaves);
+        input_map_values_leaves.push(values_leaves);
+    }
+
+    // Extract and merkelise output maps
+    let (output_maps_raw, _) = extract_io_maps(&raw_psbt, output_start, output_count);
+
+    let mut output_map_commitments = Vec::new();
+    let mut output_map_keys_leaves = Vec::new();
+    let mut output_map_values_leaves = Vec::new();
+
+    for (keys, values) in &output_maps_raw {
+        let (commitment, keys_leaves, values_leaves) =
+            build_merkle_map(keys, values, &mut preimage_hashes, &mut preimage_data);
+        output_map_commitments.push(commitment);
+        output_map_keys_leaves.push(keys_leaves);
+        output_map_values_leaves.push(values_leaves);
+    }
+
+    // Build top-level merkle trees for input and output commitments
+    let input_commitment_leaves: Vec<Vec<u8>> = input_map_commitments
+        .iter()
+        .map(|c| btc_ledger_hash_leaf(c.clone()))
+        .collect();
+    let output_commitment_leaves: Vec<Vec<u8>> = output_map_commitments
+        .iter()
+        .map(|c| btc_ledger_hash_leaf(c.clone()))
+        .collect();
+
+    let input_maps_root = build_merkle_tree(&input_commitment_leaves);
+    let output_maps_root = build_merkle_tree(&output_commitment_leaves);
+
+    // Add input/output commitments as preimages too
+    for c in &input_map_commitments {
+        add_preimage(&mut preimage_hashes, &mut preimage_data, c.clone());
+    }
+    for c in &output_map_commitments {
+        add_preimage(&mut preimage_hashes, &mut preimage_data, c.clone());
+    }
+
+    Ok(MerkelizedPsbt {
+        global_map_commitment: global_commitment,
+        global_map_keys_leaves: global_keys_leaves,
+        global_map_values_leaves: global_values_leaves,
+        input_map_commitments,
+        input_map_keys_leaves,
+        input_map_values_leaves,
+        output_map_commitments,
+        output_map_keys_leaves,
+        output_map_values_leaves,
+        input_maps_root,
+        output_maps_root,
+        preimage_hashes,
+        preimage_data,
+        input_count: input_count as u32,
+        output_count: output_count as u32,
+        psbt_bytes,
+    })
+}
+
+// --- Wallet Policy ---
+
+/// Map BIP purpose to Ledger wallet descriptor template.
+fn descriptor_template_for_bip(bip: u32) -> Option<String> {
+    match bip {
+        DerivationPath::BIP44_PURPOSE => Some("pkh(@0/**)".to_string()),
+        DerivationPath::BIP49_PURPOSE => Some("sh(wpkh(@0/**))".to_string()),
+        DerivationPath::BIP84_PURPOSE => Some("wpkh(@0/**)".to_string()),
+        DerivationPath::BIP86_PURPOSE => Some("tr(@0/**)".to_string()),
+        _ => None,
+    }
+}
+
+/// Build a wallet policy for the Ledger BTC app.
+/// `xpub`: the extended public key string
+/// `master_fingerprint`: 4-byte master key fingerprint
+/// `bip_purpose`: BIP purpose number (44, 49, 84, 86)
+/// `account_index`: the account index in the derivation path
+pub fn btc_ledger_build_wallet_policy(
+    xpub: String,
+    master_fingerprint: Vec<u8>,
+    bip_purpose: u32,
+    account_index: u32,
+) -> Result<WalletPolicy, String> {
+    if master_fingerprint.len() != 4 {
+        return Err("Master fingerprint must be 4 bytes".into());
+    }
+
+    let descriptor_template = descriptor_template_for_bip(bip_purpose)
+        .ok_or_else(|| format!("Unknown BIP purpose: {}", bip_purpose))?;
+
+    // Key info format: [fingerprint/purpose'/cointype'/account']xpub
+    // Bitcoin mainnet coin type = 0, testnet = 1
+    let fp_hex = hex::encode(&master_fingerprint);
+    let key_info = format!(
+        "[{}/{}h/0h/{}h]{}",
+        fp_hex, bip_purpose, account_index, xpub
+    );
+    let keys_info = vec![key_info.clone()];
+
+    // Serialize the policy for hashing
+    // Format: version(1) || name_len(1=0) || varint(desc_len) || descriptor || varint(key_count) || keys_merkle_root(32)
+    let desc_bytes = descriptor_template.as_bytes();
+    let key_info_bytes = key_info.as_bytes();
+
+    // Build keys merkle tree (single key = single leaf)
+    let key_leaf = btc_ledger_hash_leaf(key_info_bytes.to_vec());
+    let keys_root = build_merkle_tree(&[key_leaf]);
+
+    let mut serialized = Vec::new();
+    serialized.push(0x02); // policy map version 2
+    serialized.push(0x00); // empty name (default wallet)
+    serialized.extend_from_slice(&encode_varint(desc_bytes.len() as u64));
+    serialized.extend_from_slice(desc_bytes);
+    serialized.extend_from_slice(&encode_varint(1)); // 1 key
+    serialized.extend_from_slice(&keys_root);
+
+    let policy_id = btc_ledger_sha256(serialized.clone());
+
+    Ok(WalletPolicy {
+        descriptor_template,
+        keys_info,
+        policy_id,
+        policy_hmac: vec![0u8; 32], // empty for default wallets
+        serialized,
+    })
+}
+
+// --- PSBT Finalization with Ledger Signatures ---
+
+/// Finalize a PSBT with signatures collected from Ledger device.
+/// `psbt_bytes`: original PSBT bytes
+/// `sigs`: list of (input_index, signature_bytes, pubkey_bytes)
+/// `addr_type`: address type as BIP purpose (44=P2PKH, 49=P2SH-P2WPKH, 84=P2WPKH, 86=P2TR)
+pub fn btc_ledger_finalize_psbt_with_sigs(
+    psbt_bytes: Vec<u8>,
+    sigs: Vec<LedgerInputSignature>,
+    addr_type: u32,
+) -> Result<FinalizedBtcTx, String> {
+    let mut psbt: Psbt =
+        Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
+
+    let btc_addr_type = match addr_type {
+        DerivationPath::BIP44_PURPOSE => bitcoin::AddressType::P2pkh,
+        DerivationPath::BIP49_PURPOSE => bitcoin::AddressType::P2sh,
+        DerivationPath::BIP84_PURPOSE => bitcoin::AddressType::P2wpkh,
+        DerivationPath::BIP86_PURPOSE => bitcoin::AddressType::P2tr,
+        _ => return Err(format!("Unknown address type for BIP purpose: {}", addr_type)),
+    };
+
+    // Insert signatures into PSBT inputs
+    for sig_info in &sigs {
+        let idx = sig_info.input_index as usize;
+        if idx >= psbt.inputs.len() {
+            return Err(format!(
+                "Input index {} out of bounds ({})",
+                idx,
+                psbt.inputs.len()
+            ));
+        }
+
+        match btc_addr_type {
+            bitcoin::AddressType::P2tr => {
+                // Taproot: signature goes into tap_key_sig
+                let schnorr_sig = bitcoin::taproot::Signature::from_slice(&sig_info.signature)
+                    .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
+                psbt.inputs[idx].tap_key_sig = Some(schnorr_sig);
+            }
+            _ => {
+                // ECDSA: signature goes into partial_sigs
+                let ecdsa_sig =
+                    bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
+                        .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
+                let pubkey = bitcoin::PublicKey::from_slice(&sig_info.pubkey)
+                    .map_err(|e| format!("Invalid public key: {}", e))?;
+                psbt.inputs[idx].partial_sigs.insert(pubkey, ecdsa_sig);
+            }
+        }
+    }
+
+    // Finalize each input
+    for input in &mut psbt.inputs {
+        match btc_addr_type {
+            bitcoin::AddressType::P2tr => {
+                if let Some(sig) = input.tap_key_sig.take() {
+                    input.final_script_witness = Some(Witness::p2tr_key_spend(&sig));
+                }
+            }
+            bitcoin::AddressType::P2wpkh => {
+                if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
+                    let mut witness = Witness::new();
+                    witness.push(sig.serialize());
+                    witness.push(pubkey.to_bytes());
+                    input.final_script_witness = Some(witness);
+                }
+                input.partial_sigs.clear();
+            }
+            bitcoin::AddressType::P2sh => {
+                // P2SH-P2WPKH (wrapped segwit)
+                if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
+                    // Witness
+                    let mut witness = Witness::new();
+                    witness.push(sig.serialize());
+                    witness.push(pubkey.to_bytes());
+                    input.final_script_witness = Some(witness);
+
+                    // ScriptSig = push(redeemScript) where redeemScript = OP_0 <pubkey_hash>
+                    if let Some(redeem_script) = &input.redeem_script {
+                        // Build scriptSig manually: <len> <redeem_script>
+                        let rs_bytes = redeem_script.as_bytes();
+                        let mut script_bytes = Vec::new();
+                        script_bytes.push(rs_bytes.len() as u8);
+                        script_bytes.extend_from_slice(rs_bytes);
+                        input.final_script_sig =
+                            Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                    }
+                }
+                input.partial_sigs.clear();
+            }
+            bitcoin::AddressType::P2pkh => {
+                // Legacy P2PKH
+                if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
+                    // Build scriptSig: <sig_len> <sig> <pubkey_len> <pubkey>
+                    let sig_bytes = sig.serialize();
+                    let pk_bytes = pubkey.to_bytes();
+                    let mut script_bytes = Vec::new();
+                    script_bytes.push(sig_bytes.len() as u8);
+                    script_bytes.extend_from_slice(&sig_bytes);
+                    script_bytes.push(pk_bytes.len() as u8);
+                    script_bytes.extend_from_slice(&pk_bytes);
+                    input.final_script_sig =
+                        Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                }
+                input.partial_sigs.clear();
+            }
+            _ => {}
+        }
+
+        // Clean up PSBT fields after finalization
+        input.witness_utxo = None;
+        input.non_witness_utxo = None;
+        input.sighash_type = None;
+        input.bip32_derivation.clear();
+        input.tap_key_origins.clear();
+        input.tap_internal_key = None;
+        input.redeem_script = None;
+        input.witness_script = None;
+    }
+
+    // Extract the final signed transaction
+    let signed_tx = psbt.extract_tx_unchecked_fee_rate();
+    let tx_bytes = btc_encode::serialize(&signed_tx);
+    let tx_hash = signed_tx.compute_txid().to_string();
+
+    Ok(FinalizedBtcTx {
+        raw_tx_hex: hex::encode(&tx_bytes),
+        tx_hash,
+    })
+}
+
+// --- PSBT Building for Ledger ---
+
+/// Build PSBT bytes from a raw Bitcoin transaction hex and witness UTXOs JSON.
+/// This wraps the existing build_psbt from zilpay-core.
+pub fn btc_ledger_build_psbt_from_tx(
+    tx_hex: String,
+    witness_utxos_json: String,
+) -> Result<Vec<u8>, String> {
+    let tx_bytes = hex::decode(&tx_hex).map_err(|e| format!("Invalid tx hex: {}", e))?;
+    let tx: BitcoinTransaction = btc_encode::deserialize(&tx_bytes)
+        .map_err(|e| format!("Failed to deserialize transaction: {}", e))?;
+
+    let witness_utxos: Vec<bitcoin::TxOut> = serde_json::from_str(&witness_utxos_json)
+        .map_err(|e| format!("Failed to parse witness UTXOs: {}", e))?;
+
+    let psbt = zilpay::proto::btc_tx::build_psbt(tx, &witness_utxos)
+        .map_err(|e| format!("Failed to build PSBT: {:?}", e))?;
+
+    Ok(psbt.serialize())
+}
+
+/// Encode a BIP32 derivation path to bytes for APDU.
+/// Path format: number_of_elements(1) || element1(4) || element2(4) || ...
+/// Hardened elements have bit 31 set.
+pub fn btc_ledger_encode_path(path: String) -> Result<Vec<u8>, String> {
+    let parts: Vec<&str> = path.split('/').collect();
+    let mut elements: Vec<u32> = Vec::new();
+
+    for part in &parts {
+        let trimmed = part.trim();
+        if trimmed == "m" || trimmed.is_empty() {
+            continue;
+        }
+        let (hardened, num_str) = if trimmed.ends_with('\'') || trimmed.ends_with('h') {
+            (true, &trimmed[..trimmed.len() - 1])
+        } else {
+            (false, trimmed)
+        };
+        let num: u32 = num_str
+            .parse()
+            .map_err(|_| format!("Invalid path element: {}", trimmed))?;
+        let element = if hardened { num | 0x80000000 } else { num };
+        elements.push(element);
+    }
+
+    let mut buf = Vec::new();
+    buf.push(elements.len() as u8);
+    for elem in &elements {
+        buf.extend_from_slice(&elem.to_be_bytes());
+    }
+    Ok(buf)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hash_leaf() {
+        let data = vec![0x01, 0x02, 0x03];
+        let hash = btc_ledger_hash_leaf(data.clone());
+        assert_eq!(hash.len(), 32);
+
+        // Verify: SHA256(0x00 || data)
+        let mut hasher = Sha256::new();
+        hasher.update([0x00]);
+        hasher.update(&data);
+        let expected = hasher.finalize().to_vec();
+        assert_eq!(hash, expected);
+    }
+
+    #[test]
+    fn test_merkle_root_empty() {
+        let root = btc_ledger_compute_merkle_root(vec![]);
+        assert_eq!(root, vec![0u8; 32]);
+    }
+
+    #[test]
+    fn test_merkle_root_single() {
+        let leaf = btc_ledger_hash_leaf(vec![0x42]);
+        let root = btc_ledger_compute_merkle_root(vec![leaf.clone()]);
+        assert_eq!(root, leaf);
+    }
+
+    #[test]
+    fn test_merkle_root_two() {
+        let leaf0 = btc_ledger_hash_leaf(vec![0x01]);
+        let leaf1 = btc_ledger_hash_leaf(vec![0x02]);
+        let root = btc_ledger_compute_merkle_root(vec![leaf0.clone(), leaf1.clone()]);
+
+        let expected = hash_node(&leaf0, &leaf1);
+        assert_eq!(root, expected);
+    }
+
+    #[test]
+    fn test_merkle_proof() {
+        let leaves: Vec<Vec<u8>> = (0u8..4)
+            .map(|i| btc_ledger_hash_leaf(vec![i]))
+            .collect();
+
+        let root = btc_ledger_compute_merkle_root(leaves.clone());
+
+        // Verify proof for each leaf
+        for i in 0..4 {
+            let proof = btc_ledger_get_merkle_proof(leaves.clone(), i as u32).unwrap();
+            let verified_root = verify_proof(&proof.leaf_hash, &proof.proof_hashes, i, 4);
+            assert_eq!(verified_root, root, "Proof failed for leaf {}", i);
+        }
+    }
+
+    /// Verify a merkle proof by replaying the tree construction.
+    /// Proof elements are ordered bottom-up. We need to build a stack of
+    /// (split, size) decisions matching the recursive descent, then replay bottom-up.
+    fn verify_proof(leaf_hash: &[u8], proof: &[Vec<u8>], index: usize, size: usize) -> Vec<u8> {
+        // Collect the path decisions from top to bottom
+        let mut decisions: Vec<(bool, usize, usize)> = Vec::new(); // (is_left, split, new_size)
+        let mut idx = index;
+        let mut sz = size;
+        while sz > 1 {
+            let split = highest_power_of_2_less_than(sz);
+            if idx < split {
+                decisions.push((true, split, split)); // went left, new_size = split
+                sz = split;
+            } else {
+                decisions.push((false, split, sz - split)); // went right
+                idx -= split;
+                sz -= split;
+            }
+        }
+        // Now replay bottom-up: proof[0] corresponds to decisions[last], etc.
+        let mut current = leaf_hash.to_vec();
+        for (i, sibling) in proof.iter().enumerate() {
+            let dec_idx = decisions.len() - 1 - i;
+            let (is_left, _, _) = decisions[dec_idx];
+            if is_left {
+                // We were in the left subtree, sibling is right → hash(us, sibling)
+                // But wait - within the left subtree, the proof element is not from the right subtree at this level
+                // Actually, the proof collects the sibling at each recursion level in order from deepest to shallowest.
+                // At the deepest level, is_left tells us which side our leaf was on.
+                // If we went right at this level, sibling = left_root → hash(sibling, current)
+                // If we went left at this level, sibling = right_root → hash(current, sibling)
+                current = hash_node(&current, sibling);
+            } else {
+                current = hash_node(sibling, &current);
+            }
+        }
+        current
+    }
+
+    #[test]
+    fn test_merkle_leaf_index() {
+        let leaves: Vec<Vec<u8>> = (0u8..5)
+            .map(|i| btc_ledger_hash_leaf(vec![i]))
+            .collect();
+
+        assert_eq!(btc_ledger_get_merkle_leaf_index(leaves.clone(), leaves[3].clone()), 3);
+        assert_eq!(btc_ledger_get_merkle_leaf_index(leaves.clone(), vec![0u8; 32]), -1);
+    }
+
+    #[test]
+    fn test_varint_encoding() {
+        assert_eq!(encode_varint(0), vec![0x00]);
+        assert_eq!(encode_varint(252), vec![0xFC]);
+        assert_eq!(encode_varint(253), vec![0xFD, 0xFD, 0x00]);
+        assert_eq!(encode_varint(0xFFFF), vec![0xFD, 0xFF, 0xFF]);
+        assert_eq!(encode_varint(0x10000), vec![0xFE, 0x00, 0x00, 0x01, 0x00]);
+    }
+
+    #[test]
+    fn test_encode_path() {
+        let path = "m/84'/0'/0'/0/0".to_string();
+        let encoded = btc_ledger_encode_path(path).unwrap();
+        assert_eq!(encoded[0], 5); // 5 elements
+        assert_eq!(encoded.len(), 1 + 5 * 4); // 1 byte count + 5 * 4 bytes each
+
+        // 84' = 84 | 0x80000000
+        let elem0 = u32::from_be_bytes([encoded[1], encoded[2], encoded[3], encoded[4]]);
+        assert_eq!(elem0, 84 | 0x80000000);
+    }
+
+    #[test]
+    fn test_preimage_store() {
+        let data = vec![0x01, 0x02, 0x03];
+        let hash = btc_ledger_sha256(data.clone());
+
+        let hashes = vec![hash.clone()];
+        let datas = vec![data.clone()];
+
+        let result = btc_ledger_get_preimage(hashes, datas, hash).unwrap();
+        assert_eq!(result, data);
+    }
+
+    #[test]
+    fn test_wallet_policy() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy = btc_ledger_build_wallet_policy(
+            xpub,
+            fp,
+            DerivationPath::BIP84_PURPOSE,
+            0,
+        )
+        .unwrap();
+
+        assert_eq!(policy.descriptor_template, "wpkh(@0/**)");
+        assert_eq!(policy.policy_id.len(), 32);
+        assert_eq!(policy.policy_hmac.len(), 32);
+        assert!(policy.keys_info[0].starts_with("[c55d6895/84h/0h/0h]"));
+    }
+}

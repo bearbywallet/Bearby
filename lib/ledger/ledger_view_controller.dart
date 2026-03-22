@@ -4,7 +4,9 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/ledger/bitcoin/btc_ledger_app.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ethereum/eth_ledger_app.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
@@ -16,6 +18,7 @@ import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/tron/tron_ledger_app.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:bearby/mixins/eip712.dart';
+import 'package:bearby/src/rust/api/btc_ledger.dart' as btc_ffi;
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/account.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
@@ -38,6 +41,7 @@ enum LedgerAppType {
   zilliqa,
   ethereum,
   tron,
+  bitcoin,
 }
 
 class LedgerAppDetectionError implements Exception {
@@ -75,6 +79,7 @@ class LedgerViewController extends ChangeNotifier {
   bool get isZilliqaApp => _detectedAppType == LedgerAppType.zilliqa;
   bool get isEthApp => _detectedAppType == LedgerAppType.ethereum;
   bool get isTronApp => _detectedAppType == LedgerAppType.tron;
+  bool get isBtcApp => _detectedAppType == LedgerAppType.bitcoin;
 
   Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
@@ -226,6 +231,7 @@ class LedgerViewController extends ChangeNotifier {
     required int walletIndex,
     required int accountIndex,
     required AccountInfo account,
+    int bipPurpose = kBip86Purpose,
   }) async {
     if (transaction.scilla != null) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
@@ -256,6 +262,46 @@ class LedgerViewController extends ChangeNotifier {
       );
 
       return sig.toBytes();
+    } else if (transaction.btc != null) {
+      final btcApp = BtcLedgerApp(_connectedTransport!);
+
+      // Build PSBT from transaction data
+      final psbtBytes = await btc_ffi.btcLedgerBuildPsbtFromTx(
+        txHex: transaction.btc!,
+        witnessUtxosJson: transaction.metadata.btcWitnessUtxos ?? '[]',
+      );
+
+      // Sign PSBT via interactive Ledger protocol
+      final signatures = await btcApp.signPsbt(
+        psbtBytes: psbtBytes,
+        bipPurpose: bipPurpose,
+        accountIndex: accountIndex,
+      );
+
+      // Build LedgerInputSignature list for PSBT finalization
+      final ledgerSigs = <btc_ffi.LedgerInputSignature>[];
+      for (int i = 0; i < signatures.length; i++) {
+        ledgerSigs.add(btc_ffi.LedgerInputSignature(
+          inputIndex: i,
+          signature: signatures[i],
+          pubkey: Uint8List(0), // Pubkey extracted from PSBT by Rust
+        ));
+      }
+
+      // Finalize PSBT with signatures and extract raw transaction
+      final finalized = await btc_ffi.btcLedgerFinalizePsbtWithSigs(
+        psbtBytes: psbtBytes,
+        sigs: ledgerSigs,
+        addrType: bipPurpose,
+      );
+
+      // Return raw transaction bytes
+      final txBytes = <int>[];
+      for (int i = 0; i < finalized.rawTxHex.length; i += 2) {
+        txBytes.add(
+            int.parse(finalized.rawTxHex.substring(i, i + 2), radix: 16));
+      }
+      return Uint8List.fromList(txBytes);
     } else {
       throw "invalid tx";
     }
@@ -296,8 +342,18 @@ class LedgerViewController extends ChangeNotifier {
         message: bytes,
       );
       sig = personalSig.toHexString();
+    } else if (slip44 == kBitcoinlip44) {
+      final btcApp = BtcLedgerApp(_connectedTransport!);
+      final sigBytes = await btcApp.signMessage(
+        message: message,
+        bipPurpose: kBip86Purpose,
+        index: account.index.toInt(),
+      );
+      sig = sigBytes
+          .map((b) => b.toRadixString(16).padLeft(2, '0'))
+          .join();
     } else {
-      throw "Invlid slip44";
+      throw "Invalid slip44";
     }
 
     return sig;
@@ -330,6 +386,16 @@ class LedgerViewController extends ChangeNotifier {
     } catch (_) {}
 
     try {
+      final btcApp = BtcLedgerApp(_connectedTransport!);
+      final fingerprint = await btcApp.getMasterFingerprint();
+      if (fingerprint.length == 4) {
+        _detectedAppType = LedgerAppType.bitcoin;
+        notifyListeners();
+        return LedgerAppType.bitcoin;
+      }
+    } catch (_) {}
+
+    try {
       final ethApp = EthLedgerApp(_connectedTransport!);
       final config = await ethApp.getAppConfiguration();
       if (config != null) {
@@ -342,7 +408,7 @@ class LedgerViewController extends ChangeNotifier {
     _detectedAppType = LedgerAppType.unknown;
     notifyListeners();
     throw LedgerAppDetectionError(
-        'Failed to detect Ledger app. Please open Zilliqa, Ethereum, or Tron app on your Ledger device.');
+        'Failed to detect Ledger app. Please open Zilliqa, Ethereum, Tron, or Bitcoin app on your Ledger device.');
   }
 
   Future<List<LedgerAccount>> getAccounts({
@@ -350,6 +416,7 @@ class LedgerViewController extends ChangeNotifier {
     required int slip44,
     required int count,
     required int chainId,
+    int bipPurpose = kBip86Purpose,
   }) async {
     if (_connectedTransport == null) {
       await open(device);
@@ -368,6 +435,13 @@ class LedgerViewController extends ChangeNotifier {
       final tronApp = TronLedgerApp(_connectedTransport!);
       accounts = await tronApp.getAccounts(
         indices: List<int>.generate(count, (i) => i),
+      );
+    } else if (_detectedAppType == LedgerAppType.bitcoin &&
+        slip44 == kBitcoinlip44) {
+      final btcApp = BtcLedgerApp(_connectedTransport!);
+      accounts = await btcApp.getAccounts(
+        indices: List<int>.generate(count, (i) => i),
+        bipPurpose: bipPurpose,
       );
     } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);

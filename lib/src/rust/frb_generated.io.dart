@@ -6,6 +6,7 @@
 import 'api/auth.dart';
 import 'api/backend.dart';
 import 'api/book.dart';
+import 'api/btc_ledger.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
@@ -228,6 +229,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FinalOutputInfo dco_decode_final_output_info(dynamic raw);
 
   @protected
+  FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw);
+
+  @protected
   GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
 
   @protected
@@ -237,7 +241,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_i_32(dynamic raw);
 
   @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw);
+
+  @protected
   KeyPairInfo dco_decode_key_pair_info(dynamic raw);
+
+  @protected
+  LedgerInputSignature dco_decode_ledger_input_signature(dynamic raw);
 
   @protected
   LedgerParamsInput dco_decode_ledger_params_input(dynamic raw);
@@ -276,6 +286,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
       dynamic raw);
+
+  @protected
+  List<LedgerInputSignature> dco_decode_list_ledger_input_signature(
+      dynamic raw);
+
+  @protected
+  List<List<Uint8List>> dco_decode_list_list_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw);
@@ -338,6 +355,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+
+  @protected
+  MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
+
+  @protected
+  MerkleProof dco_decode_merkle_proof(dynamic raw);
 
   @protected
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw);
@@ -481,6 +504,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletInfo dco_decode_wallet_info(dynamic raw);
+
+  @protected
+  WalletPolicy dco_decode_wallet_policy(dynamic raw);
 
   @protected
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
@@ -679,6 +705,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer);
 
   @protected
+  FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer);
+
+  @protected
   GasFeeHistoryInfo sse_decode_gas_fee_history_info(
       SseDeserializer deserializer);
 
@@ -690,7 +719,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+
+  @protected
   KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
+
+  @protected
+  LedgerInputSignature sse_decode_ledger_input_signature(
+      SseDeserializer deserializer);
 
   @protected
   LedgerParamsInput sse_decode_ledger_params_input(
@@ -733,6 +769,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<LedgerInputSignature> sse_decode_list_ledger_input_signature(
+      SseDeserializer deserializer);
+
+  @protected
+  List<List<Uint8List>> sse_decode_list_list_list_prim_u_8_strict(
       SseDeserializer deserializer);
 
   @protected
@@ -805,6 +849,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
+
+  @protected
+  MerkleProof sse_decode_merkle_proof(SseDeserializer deserializer);
 
   @protected
   NetworkConfigInfo sse_decode_network_config_info(
@@ -970,6 +1020,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletInfo sse_decode_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  WalletPolicy sse_decode_wallet_policy(SseDeserializer deserializer);
 
   @protected
   WalletSettingsInfo sse_decode_wallet_settings_info(
@@ -1173,6 +1226,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FinalOutputInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_finalized_btc_tx(
+      FinalizedBtcTx self, SseSerializer serializer);
+
+  @protected
   void sse_encode_gas_fee_history_info(
       GasFeeHistoryInfo self, SseSerializer serializer);
 
@@ -1184,7 +1241,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+  @protected
   void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_ledger_input_signature(
+      LedgerInputSignature self, SseSerializer serializer);
 
   @protected
   void sse_encode_ledger_params_input(
@@ -1230,6 +1294,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_historical_transaction_info(
       List<HistoricalTransactionInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_ledger_input_signature(
+      List<LedgerInputSignature> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_list_list_prim_u_8_strict(
+      List<List<Uint8List>> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_list_prim_u_8_strict(
@@ -1306,6 +1378,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_merkelized_psbt(
+      MerkelizedPsbt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_merkle_proof(MerkleProof self, SseSerializer serializer);
 
   @protected
   void sse_encode_network_config_info(
@@ -1472,6 +1551,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_wallet_info(WalletInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wallet_policy(WalletPolicy self, SseSerializer serializer);
 
   @protected
   void sse_encode_wallet_settings_info(
