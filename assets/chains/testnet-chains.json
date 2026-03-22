@@ -14,7 +14,7 @@
       {
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "tb1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9s5v4h",
+        "addr": "tb1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5ssk79hv2",
         "name": "Bitcoin",
         "symbol": "BTC",
         "decimals": 8
@@ -46,7 +46,7 @@
       {
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "bcrt1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqdku202",
+        "addr": "bcrt1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5ssm803es",
         "name": "Bitcoin",
         "symbol": "tBTC",
         "decimals": 8
