@@ -173,10 +173,24 @@ class BtcLedgerApp {
       accountIndex: accountIndex,
     );
 
-    // Merkelise the PSBT
-    final merkelized = await btc_ffi.btcLedgerMerkelisePsbt(
+    // Populate BIP32 derivation info (tap_key_origins, tap_internal_key, etc.)
+    final preparedPsbt = await btc_ffi.btcLedgerPreparePsbt(
       psbtBytes: psbtBytes,
+      masterFingerprint: fingerprint,
+      bipPurpose: bipPurpose,
+      accountIndex: accountIndex,
+      xpub: xpub,
     );
+
+    // Merkelise the prepared PSBT (with derivation info)
+    final merkelized = await btc_ffi.btcLedgerMerkelisePsbt(
+      psbtBytes: preparedPsbt,
+    );
+
+    debugPrint('BTC PSBT merkelized: inputs=${merkelized.inputCount}, '
+        'outputs=${merkelized.outputCount}, '
+        'globalCommitLen=${merkelized.globalMapCommitment.length}, '
+        'globalKeysLeaves=${merkelized.globalMapKeysLeaves.length}');
 
     // Build the SIGN_PSBT payload:
     // globalCommitment || varint(inputCount) || inputMapsRoot(32) ||
@@ -471,11 +485,16 @@ class BtcLedgerApp {
     // Skip hash type byte (always 0x00 for SHA-256)
     final requestedHash = commandData.sublist(1, 33);
 
+    debugPrint('BTC GET_PREIMAGE: hash=${_hexEncode(requestedHash)}');
+
     final preimage = await btc_ffi.btcLedgerGetPreimage(
       preimageHashes: preimageHashes,
       preimageData: preimageData,
       requestedHash: requestedHash,
     );
+
+    debugPrint('BTC GET_PREIMAGE: found preimage len=${preimage.length}, '
+        'first bytes=${_hexEncode(preimage.sublist(0, preimage.length > 8 ? 8 : preimage.length))}');
 
     final totalLenVarint = _encodeVarint(preimage.length);
     // Max payload in single response: 255 - varint_len - 1 (for payload_size byte)
@@ -513,9 +532,13 @@ class BtcLedgerApp {
     final (leafIndex, _) = _decodeVarint(commandData, offset);
 
     // Find the leaf hashes for this root
+    debugPrint('BTC GET_MERKLE_LEAF_PROOF: root=${_hexEncode(rootHash)}, '
+        'treeSize=$treeSize, leafIndex=$leafIndex');
+
     final rootHex = _hexEncode(rootHash);
     final leafHashes = allLeafHashes[rootHex];
     if (leafHashes == null) {
+      debugPrint('BTC GET_MERKLE_LEAF_PROOF: UNKNOWN ROOT! Known roots: ${allLeafHashes.keys.toList()}');
       throw TransportException(
         'Unknown merkle root: $rootHex',
         'UnknownMerkleRoot',
@@ -562,9 +585,18 @@ class BtcLedgerApp {
     final targetLeafHash = commandData.sublist(32, 64);
 
     final rootHex = _hexEncode(rootHash);
+    final targetHex = _hexEncode(targetLeafHash);
+    debugPrint('BTC GET_MERKLE_LEAF_INDEX: root=$rootHex, target=$targetHex');
+
     final leafHashes = allLeafHashes[rootHex];
     if (leafHashes == null) {
+      debugPrint('BTC GET_MERKLE_LEAF_INDEX: ROOT NOT FOUND! Known roots: ${allLeafHashes.keys.toList()}');
       return Uint8List.fromList([0x00, 0x00]); // not found
+    }
+
+    debugPrint('BTC GET_MERKLE_LEAF_INDEX: tree has ${leafHashes.length} leaves');
+    for (int j = 0; j < leafHashes.length; j++) {
+      debugPrint('  leaf[$j]=${_hexEncode(leafHashes[j])}');
     }
 
     final index = await btc_ffi.btcLedgerGetMerkleLeafIndex(
@@ -573,9 +605,11 @@ class BtcLedgerApp {
     );
 
     if (index < 0) {
+      debugPrint('BTC GET_MERKLE_LEAF_INDEX: NOT FOUND');
       return Uint8List.fromList([0x00, 0x00]); // not found
     }
 
+    debugPrint('BTC GET_MERKLE_LEAF_INDEX: found at index=$index');
     final indexVarint = _encodeVarint(index);
     return Uint8List.fromList([0x01, ...indexVarint]);
   }

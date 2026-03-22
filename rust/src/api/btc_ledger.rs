@@ -1,8 +1,12 @@
+use bitcoin::bip32::{ChildNumber, Fingerprint, Xpub};
 use bitcoin::consensus::encode as btc_encode;
+use bitcoin::hashes::Hash;
 use bitcoin::psbt::Psbt;
+use bitcoin::secp256k1::Secp256k1;
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::Witness;
 use sha2::{Digest, Sha256};
+use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
 
 // --- Merkle Tree ---
@@ -262,43 +266,27 @@ fn add_preimage(hashes: &mut Vec<Vec<u8>>, data: &mut Vec<Vec<u8>>, preimage: Ve
     }
 }
 
-/// Extract key-value pairs from a PSBT global map, sorted by key.
-fn extract_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
-    let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+/// Build PSBTv2 global map key-value pairs from a PSBTv0 Psbt.
+/// The Ledger Bitcoin app v2 expects PSBTv2 format.
+fn build_v2_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
+    let tx = &psbt.unsigned_tx;
+    let input_count = tx.input.len();
+    let output_count = tx.output.len();
 
-    // Re-serialize the PSBT and extract raw key-value pairs from the global map.
-    // The bitcoin crate's Psbt type has typed fields, so we need to serialize
-    // back to raw format to extract the key-value pairs.
-    let raw_psbt = psbt.serialize();
+    // PSBTv2 global keys (already in sorted order: 0x02, 0x03, 0x04, 0x05, 0xFB)
+    let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = vec![
+        // PSBT_GLOBAL_TX_VERSION
+        (vec![0x02], tx.version.0.to_le_bytes().to_vec()),
+        // PSBT_GLOBAL_FALLBACK_LOCKTIME
+        (vec![0x03], tx.lock_time.to_consensus_u32().to_le_bytes().to_vec()),
+        // PSBT_GLOBAL_INPUT_COUNT
+        (vec![0x04], encode_varint(input_count as u64)),
+        // PSBT_GLOBAL_OUTPUT_COUNT
+        (vec![0x05], encode_varint(output_count as u64)),
+        // PSBT_GLOBAL_VERSION = 2
+        (vec![0xFB], 2u32.to_le_bytes().to_vec()),
+    ];
 
-    // Skip magic bytes: "psbt" + 0xFF
-    if raw_psbt.len() < 5 || &raw_psbt[0..4] != b"psbt" || raw_psbt[4] != 0xFF {
-        return (vec![], vec![]);
-    }
-    let mut offset = 5;
-
-    // Parse global map key-value pairs until we hit 0x00 separator
-    while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
-        // Read key
-        let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
-        offset += key_varint_size;
-        let key = raw_psbt[offset..offset + key_len as usize].to_vec();
-        offset += key_len as usize;
-
-        // Read value
-        let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
-        offset += val_varint_size;
-        let value = raw_psbt[offset..offset + val_len as usize].to_vec();
-        offset += val_len as usize;
-
-        // For the merkle map, keys include their varint-prefixed length
-        let mut full_key = encode_varint(key.len() as u64);
-        full_key.extend_from_slice(&key);
-
-        pairs.push((full_key, value));
-    }
-
-    // Sort by key (lexicographic on bytes)
     pairs.sort_by(|a, b| a.0.cmp(&b.0));
 
     let keys = pairs.iter().map(|(k, _)| k.clone()).collect();
@@ -306,41 +294,77 @@ fn extract_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
     (keys, values)
 }
 
-/// Parse PSBT input/output maps from raw PSBT bytes.
-/// Returns a list of (keys, values) for each input or output.
-fn extract_io_maps(
-    raw_psbt: &[u8],
-    start_offset: usize,
-    count: usize,
-) -> (Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)>, usize) {
+/// Build PSBTv2 input map key-value pairs from a PSBTv0 Psbt.
+fn build_v2_input_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
     let mut maps = Vec::new();
-    let mut offset = start_offset;
 
-    for _ in 0..count {
+    for (i, txin) in psbt.unsigned_tx.input.iter().enumerate() {
         let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+        let input = &psbt.inputs[i];
 
-        while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
-            // Read key
-            let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
-            offset += key_varint_size;
-            let key = raw_psbt[offset..offset + key_len as usize].to_vec();
-            offset += key_len as usize;
-
-            // Read value
-            let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
-            offset += val_varint_size;
-            let value = raw_psbt[offset..offset + val_len as usize].to_vec();
-            offset += val_len as usize;
-
-            let mut full_key = encode_varint(key.len() as u64);
-            full_key.extend_from_slice(&key);
-
-            pairs.push((full_key, value));
+        // Non-witness UTXO (key 0x00)
+        if let Some(ref tx) = input.non_witness_utxo {
+            pairs.push((vec![0x00], btc_encode::serialize(tx)));
         }
 
-        // Skip the 0x00 separator
-        if offset < raw_psbt.len() {
-            offset += 1;
+        // Witness UTXO (key 0x01)
+        if let Some(ref utxo) = input.witness_utxo {
+            pairs.push((vec![0x01], btc_encode::serialize(utxo)));
+        }
+
+        // Sighash type (key 0x03)
+        if let Some(sighash) = input.sighash_type {
+            pairs.push((vec![0x03], sighash.to_u32().to_le_bytes().to_vec()));
+        }
+
+        // Redeem script (key 0x04)
+        if let Some(ref script) = input.redeem_script {
+            pairs.push((vec![0x04], script.as_bytes().to_vec()));
+        }
+
+        // BIP32 derivation (key 0x06 || compressed_pubkey)
+        for (pubkey, (fingerprint, path)) in &input.bip32_derivation {
+            let mut key = vec![0x06];
+            key.extend_from_slice(&pubkey.serialize());
+
+            let mut value = Vec::new();
+            value.extend_from_slice(fingerprint.as_bytes());
+            for child in path {
+                value.extend_from_slice(&u32::from(*child).to_le_bytes());
+            }
+            pairs.push((key, value));
+        }
+
+        // PSBT_IN_PREVIOUS_TXID (key 0x0e) - from unsigned_tx
+        pairs.push((vec![0x0e], txin.previous_output.txid.as_byte_array().to_vec()));
+
+        // PSBT_IN_OUTPUT_INDEX (key 0x0f) - from unsigned_tx
+        pairs.push((vec![0x0f], txin.previous_output.vout.to_le_bytes().to_vec()));
+
+        // PSBT_IN_SEQUENCE (key 0x10) - from unsigned_tx
+        pairs.push((vec![0x10], txin.sequence.0.to_le_bytes().to_vec()));
+
+        // Taproot internal key (key 0x17)
+        if let Some(ref xonly) = input.tap_internal_key {
+            pairs.push((vec![0x17], xonly.serialize().to_vec()));
+        }
+
+        // Taproot BIP32 derivation (key 0x16 || x_only_pubkey)
+        for (xonly_pubkey, (leaf_hashes, (fingerprint, path))) in &input.tap_key_origins {
+            let mut key = vec![0x16];
+            key.extend_from_slice(&xonly_pubkey.serialize());
+
+            let mut value = Vec::new();
+            // varint(num_leaf_hashes) || leaf_hashes || fingerprint || path
+            value.extend_from_slice(&encode_varint(leaf_hashes.len() as u64));
+            for lh in leaf_hashes {
+                value.extend_from_slice(lh.to_byte_array().as_ref());
+            }
+            value.extend_from_slice(fingerprint.as_bytes());
+            for child in path {
+                value.extend_from_slice(&u32::from(*child).to_le_bytes());
+            }
+            pairs.push((key, value));
         }
 
         pairs.sort_by(|a, b| a.0.cmp(&b.0));
@@ -350,9 +374,70 @@ fn extract_io_maps(
         maps.push((keys, values));
     }
 
-    (maps, offset)
+    maps
 }
 
+/// Build PSBTv2 output map key-value pairs from a PSBTv0 Psbt.
+fn build_v2_output_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
+    let mut maps = Vec::new();
+
+    for (i, txout) in psbt.unsigned_tx.output.iter().enumerate() {
+        let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+        let output = &psbt.outputs[i];
+
+        // Redeem script (key 0x00)
+        if let Some(ref script) = output.redeem_script {
+            pairs.push((vec![0x00], script.as_bytes().to_vec()));
+        }
+
+        // BIP32 derivation (key 0x02 || compressed_pubkey)
+        for (pubkey, (fingerprint, path)) in &output.bip32_derivation {
+            let mut key = vec![0x02];
+            key.extend_from_slice(&pubkey.serialize());
+
+            let mut value = Vec::new();
+            value.extend_from_slice(fingerprint.as_bytes());
+            for child in path {
+                value.extend_from_slice(&u32::from(*child).to_le_bytes());
+            }
+            pairs.push((key, value));
+        }
+
+        // PSBT_OUT_AMOUNT (key 0x03) - from unsigned_tx
+        pairs.push((vec![0x03], txout.value.to_sat().to_le_bytes().to_vec()));
+
+        // PSBT_OUT_SCRIPT (key 0x04) - from unsigned_tx
+        pairs.push((vec![0x04], txout.script_pubkey.as_bytes().to_vec()));
+
+        // Taproot BIP32 derivation (key 0x07 || x_only_pubkey)
+        for (xonly_pubkey, (leaf_hashes, (fingerprint, path))) in &output.tap_key_origins {
+            let mut key = vec![0x07];
+            key.extend_from_slice(&xonly_pubkey.serialize());
+
+            let mut value = Vec::new();
+            value.extend_from_slice(&encode_varint(leaf_hashes.len() as u64));
+            for lh in leaf_hashes {
+                value.extend_from_slice(lh.to_byte_array().as_ref());
+            }
+            value.extend_from_slice(fingerprint.as_bytes());
+            for child in path {
+                value.extend_from_slice(&u32::from(*child).to_le_bytes());
+            }
+            pairs.push((key, value));
+        }
+
+        pairs.sort_by(|a, b| a.0.cmp(&b.0));
+
+        let keys = pairs.iter().map(|(k, _)| k.clone()).collect();
+        let values = pairs.iter().map(|(_, v)| v.clone()).collect();
+        maps.push((keys, values));
+    }
+
+    maps
+}
+
+/// Decode a Bitcoin-style varint. Returns (value, bytes_consumed).
+#[cfg(test)]
 fn decode_varint(data: &[u8]) -> (u64, usize) {
     if data.is_empty() {
         return (0, 0);
@@ -374,42 +459,20 @@ fn decode_varint(data: &[u8]) -> (u64, usize) {
     }
 }
 
-/// Find the offset past the global map in raw PSBT bytes.
-fn find_global_map_end(raw_psbt: &[u8]) -> usize {
-    let mut offset = 5; // skip "psbt" + 0xFF
-
-    while offset < raw_psbt.len() && raw_psbt[offset] != 0x00 {
-        // Skip key
-        let (key_len, key_varint_size) = decode_varint(&raw_psbt[offset..]);
-        offset += key_varint_size + key_len as usize;
-
-        // Skip value
-        let (val_len, val_varint_size) = decode_varint(&raw_psbt[offset..]);
-        offset += val_varint_size + val_len as usize;
-    }
-
-    // Skip the 0x00 separator
-    if offset < raw_psbt.len() {
-        offset += 1;
-    }
-
-    offset
-}
-
 /// Decompose a PSBT into merkle structures for Ledger signing.
+/// Converts PSBTv0 to PSBTv2 key-value maps as required by the Ledger Bitcoin app v2.
 pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, String> {
     let psbt: Psbt =
         Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
 
     let input_count = psbt.unsigned_tx.input.len();
     let output_count = psbt.unsigned_tx.output.len();
-    let raw_psbt = psbt.serialize();
 
     let mut preimage_hashes: Vec<Vec<u8>> = Vec::new();
     let mut preimage_data: Vec<Vec<u8>> = Vec::new();
 
-    // Extract and merkelise global map
-    let (global_keys, global_values) = extract_global_map(&psbt);
+    // Build PSBTv2 global map and merkelise
+    let (global_keys, global_values) = build_v2_global_map(&psbt);
     let (global_commitment, global_keys_leaves, global_values_leaves) = build_merkle_map(
         &global_keys,
         &global_values,
@@ -417,15 +480,14 @@ pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, 
         &mut preimage_data,
     );
 
-    // Extract and merkelise input maps
-    let io_start = find_global_map_end(&raw_psbt);
-    let (input_maps_raw, output_start) = extract_io_maps(&raw_psbt, io_start, input_count);
+    // Build PSBTv2 input maps and merkelise
+    let input_maps = build_v2_input_maps(&psbt);
 
     let mut input_map_commitments = Vec::new();
     let mut input_map_keys_leaves = Vec::new();
     let mut input_map_values_leaves = Vec::new();
 
-    for (keys, values) in &input_maps_raw {
+    for (keys, values) in &input_maps {
         let (commitment, keys_leaves, values_leaves) =
             build_merkle_map(keys, values, &mut preimage_hashes, &mut preimage_data);
         input_map_commitments.push(commitment);
@@ -433,14 +495,14 @@ pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, 
         input_map_values_leaves.push(values_leaves);
     }
 
-    // Extract and merkelise output maps
-    let (output_maps_raw, _) = extract_io_maps(&raw_psbt, output_start, output_count);
+    // Build PSBTv2 output maps and merkelise
+    let output_maps = build_v2_output_maps(&psbt);
 
     let mut output_map_commitments = Vec::new();
     let mut output_map_keys_leaves = Vec::new();
     let mut output_map_values_leaves = Vec::new();
 
-    for (keys, values) in &output_maps_raw {
+    for (keys, values) in &output_maps {
         let (commitment, keys_leaves, values_leaves) =
             build_merkle_map(keys, values, &mut preimage_hashes, &mut preimage_data);
         output_map_commitments.push(commitment);
@@ -712,6 +774,204 @@ pub fn btc_ledger_build_psbt_from_tx(
 
     let psbt = zilpay::proto::btc_tx::build_psbt(tx, &witness_utxos)
         .map_err(|e| format!("Failed to build PSBT: {:?}", e))?;
+
+    Ok(psbt.serialize())
+}
+
+/// Populate BIP32 derivation info into a PSBT for Ledger signing.
+/// Derives child keys from the account xpub and matches them against
+/// input/output script_pubkeys to set tap_key_origins / bip32_derivation.
+pub fn btc_ledger_prepare_psbt(
+    psbt_bytes: Vec<u8>,
+    master_fingerprint: Vec<u8>,
+    bip_purpose: u32,
+    account_index: u32,
+    xpub: String,
+) -> Result<Vec<u8>, String> {
+    if master_fingerprint.len() != 4 {
+        return Err("Master fingerprint must be 4 bytes".into());
+    }
+
+    let mut psbt: Psbt =
+        Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
+
+    let secp = Secp256k1::verification_only();
+    let account_xpub =
+        Xpub::from_str(&xpub).map_err(|e| format!("Failed to parse xpub: {}", e))?;
+
+    let fp = Fingerprint::from(
+        <[u8; 4]>::try_from(&master_fingerprint[..4])
+            .map_err(|_| "Invalid fingerprint".to_string())?,
+    );
+
+    // Build the hardened portion of the derivation path: purpose'/cointype'/account'
+    let account_path = vec![
+        ChildNumber::from_hardened_idx(bip_purpose).map_err(|e| e.to_string())?,
+        ChildNumber::from_hardened_idx(0).map_err(|e| e.to_string())?, // cointype 0 = mainnet
+        ChildNumber::from_hardened_idx(account_index).map_err(|e| e.to_string())?,
+    ];
+
+    // Pre-derive child keys for change=0,1 and index=0..GAP_LIMIT
+    const GAP_LIMIT: u32 = 30;
+    let mut derived_keys: Vec<(bitcoin::secp256k1::PublicKey, Vec<ChildNumber>)> = Vec::new();
+
+    for change in 0..=1u32 {
+        let change_child = ChildNumber::from_normal_idx(change).map_err(|e| e.to_string())?;
+        let change_xpub = account_xpub
+            .derive_pub(&secp, &[change_child])
+            .map_err(|e| format!("Failed to derive change key: {}", e))?;
+
+        for idx in 0..GAP_LIMIT {
+            let idx_child = ChildNumber::from_normal_idx(idx).map_err(|e| e.to_string())?;
+            let child_xpub = change_xpub
+                .derive_pub(&secp, &[idx_child])
+                .map_err(|e| format!("Failed to derive child key: {}", e))?;
+
+            let mut full_path = account_path.clone();
+            full_path.push(change_child);
+            full_path.push(idx_child);
+
+            derived_keys.push((child_xpub.public_key, full_path));
+        }
+    }
+
+    // Match inputs
+    for (i, input) in psbt.inputs.iter_mut().enumerate() {
+        let script_pubkey = if let Some(ref utxo) = input.witness_utxo {
+            utxo.script_pubkey.clone()
+        } else {
+            continue;
+        };
+
+        for (pubkey, full_path) in &derived_keys {
+            let matched = match bip_purpose {
+                DerivationPath::BIP86_PURPOSE => {
+                    // Taproot: compute p2tr script from x-only key
+                    let (xonly, _parity) = pubkey.x_only_public_key();
+                    let expected = bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None);
+                    expected == script_pubkey
+                }
+                DerivationPath::BIP84_PURPOSE => {
+                    // Native SegWit: p2wpkh
+                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
+                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
+                    if let Ok(cpk) = cpk {
+                        let expected = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                        expected == script_pubkey
+                    } else {
+                        false
+                    }
+                }
+                DerivationPath::BIP49_PURPOSE => {
+                    // Nested SegWit: p2sh-p2wpkh
+                    let btc_pk = bitcoin::PublicKey::new(*pubkey);
+                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pk);
+                    if let Ok(cpk) = cpk {
+                        let wpkh_script =
+                            bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                        let expected =
+                            bitcoin::ScriptBuf::new_p2sh(&wpkh_script.script_hash());
+                        expected == script_pubkey
+                    } else {
+                        false
+                    }
+                }
+                DerivationPath::BIP44_PURPOSE => {
+                    // Legacy: p2pkh
+                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
+                    let expected = bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash());
+                    expected == script_pubkey
+                }
+                _ => false,
+            };
+
+            if matched {
+                let deriv_path =
+                    bitcoin::bip32::DerivationPath::from(full_path.clone());
+
+                if bip_purpose == DerivationPath::BIP86_PURPOSE {
+                    let (xonly, _) = pubkey.x_only_public_key();
+                    input.tap_internal_key = Some(xonly);
+                    input
+                        .tap_key_origins
+                        .insert(xonly, (vec![], (fp, deriv_path)));
+                } else {
+                    input
+                        .bip32_derivation
+                        .insert(*pubkey, (fp, deriv_path));
+                }
+                break;
+            }
+        }
+
+        if bip_purpose == DerivationPath::BIP86_PURPOSE
+            && input.tap_key_origins.is_empty()
+        {
+            return Err(format!(
+                "Could not match input {} to any derived key (gap_limit={})",
+                i, GAP_LIMIT
+            ));
+        }
+    }
+
+    // Match outputs (for change output detection)
+    for (_i, txout) in psbt.unsigned_tx.output.iter().enumerate() {
+        let output = &mut psbt.outputs[_i];
+
+        for (pubkey, full_path) in &derived_keys {
+            let matched = match bip_purpose {
+                DerivationPath::BIP86_PURPOSE => {
+                    let (xonly, _) = pubkey.x_only_public_key();
+                    let expected = bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None);
+                    expected == txout.script_pubkey
+                }
+                DerivationPath::BIP84_PURPOSE => {
+                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
+                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
+                    if let Ok(cpk) = cpk {
+                        bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash())
+                            == txout.script_pubkey
+                    } else {
+                        false
+                    }
+                }
+                DerivationPath::BIP49_PURPOSE => {
+                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
+                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
+                    if let Ok(cpk) = cpk {
+                        let wpkh = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                        bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash())
+                            == txout.script_pubkey
+                    } else {
+                        false
+                    }
+                }
+                DerivationPath::BIP44_PURPOSE => {
+                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
+                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash())
+                        == txout.script_pubkey
+                }
+                _ => false,
+            };
+
+            if matched {
+                let deriv_path =
+                    bitcoin::bip32::DerivationPath::from(full_path.clone());
+
+                if bip_purpose == DerivationPath::BIP86_PURPOSE {
+                    let (xonly, _) = pubkey.x_only_public_key();
+                    output
+                        .tap_key_origins
+                        .insert(xonly, (vec![], (fp, deriv_path)));
+                } else {
+                    output
+                        .bip32_derivation
+                        .insert(*pubkey, (fp, deriv_path));
+                }
+                break;
+            }
+        }
+    }
 
     Ok(psbt.serialize())
 }

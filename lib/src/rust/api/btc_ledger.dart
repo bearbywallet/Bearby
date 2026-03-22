@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `add_preimage`, `build_merkle_map`, `build_merkle_tree`, `compute_proof`, `decode_varint`, `descriptor_template_for_bip`, `encode_varint`, `extract_global_map`, `extract_io_maps`, `find_global_map_end`, `hash_node`, `highest_power_of_2_less_than`
+// These functions are ignored because they are not marked as `pub`: `add_preimage`, `build_merkle_map`, `build_merkle_tree`, `build_v2_global_map`, `build_v2_input_maps`, `build_v2_output_maps`, `compute_proof`, `descriptor_template_for_bip`, `encode_varint`, `hash_node`, `highest_power_of_2_less_than`
 
 /// Leaf hash: SHA256(0x00 || data)
 Future<Uint8List> btcLedgerHashLeaf({required List<int> data}) =>
@@ -45,6 +45,7 @@ Future<Uint8List> btcLedgerGetPreimage(
         requestedHash: requestedHash);
 
 /// Decompose a PSBT into merkle structures for Ledger signing.
+/// Converts PSBTv0 to PSBTv2 key-value maps as required by the Ledger Bitcoin app v2.
 Future<MerkelizedPsbt> btcLedgerMerkelisePsbt({required List<int> psbtBytes}) =>
     RustLib.instance.api
         .crateApiBtcLedgerBtcLedgerMerkelisePsbt(psbtBytes: psbtBytes);
@@ -82,6 +83,22 @@ Future<Uint8List> btcLedgerBuildPsbtFromTx(
         {required String txHex, required String witnessUtxosJson}) =>
     RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromTx(
         txHex: txHex, witnessUtxosJson: witnessUtxosJson);
+
+/// Populate BIP32 derivation info into a PSBT for Ledger signing.
+/// Derives child keys from the account xpub and matches them against
+/// input/output script_pubkeys to set tap_key_origins / bip32_derivation.
+Future<Uint8List> btcLedgerPreparePsbt(
+        {required List<int> psbtBytes,
+        required List<int> masterFingerprint,
+        required int bipPurpose,
+        required int accountIndex,
+        required String xpub}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerPreparePsbt(
+        psbtBytes: psbtBytes,
+        masterFingerprint: masterFingerprint,
+        bipPurpose: bipPurpose,
+        accountIndex: accountIndex,
+        xpub: xpub);
 
 /// Encode a BIP32 derivation path to bytes for APDU.
 /// Path format: number_of_elements(1) || element1(4) || element2(4) || ...
