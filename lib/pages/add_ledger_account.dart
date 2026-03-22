@@ -184,8 +184,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
-        final pubKeys =
-            selectedAccounts.map((a) => (a.index, a.publicKey!)).toList();
+        final isBitcoin = _network?.slip44 == kBitcoinlip44;
+        final pubKeys = selectedAccounts
+            .map((a) => (a.index, isBitcoin ? a.address : a.publicKey!))
+            .toList();
         final accountNames = selectedAccounts
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
@@ -235,12 +237,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
-        // TODO: the publicKey possible be null, we need to check it!
+        final isBtcUpdate = appState.ledgerViewController.isBtcApp;
         final accountsToUpdate = _selectedAccounts.entries
             .where((entry) => entry.value)
             .map((entry) => (
                   entry.key.index,
-                  entry.key.publicKey!,
+                  isBtcUpdate ? entry.key.address : entry.key.publicKey!,
                   "ledger ${entry.key.index + 1}"
                 ))
             .toList();

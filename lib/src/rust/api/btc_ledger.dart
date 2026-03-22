@@ -268,7 +268,7 @@ class MerkleProof {
 
 /// Wallet policy for Ledger BTC app
 class WalletPolicy {
-  /// Descriptor template string, e.g. "wpkh(@0/**)"
+  /// Descriptor template string, e.g. "wpkh(@0)"
   final String descriptorTemplate;
 
   /// Keys info strings, e.g. ["[fingerprint/84'/0'/0']xpub..."]

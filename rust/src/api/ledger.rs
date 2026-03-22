@@ -14,6 +14,8 @@ pub use zilpay::{
 pub use zilpay::{errors::token::TokenError, token::ft::FToken};
 pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 
+use zilpay::crypto::slip44;
+
 use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
     service::service::BACKGROUND_SERVICE,
@@ -54,14 +56,21 @@ pub async fn add_ledger_wallet(
         params.bip_purpose,
         net,
     );
-    let pub_keys = params
+    let is_bitcoin = provider.config.slip_44 == slip44::BITCOIN;
+    let accounts = params
         .pub_keys
         .into_iter()
-        .map(|(ledger_index, pk)| {
-            pubkey_from_provider(&pk, bip49, params.zilliqa_legacy)
-                .map(|pub_key| (ledger_index, pub_key))
+        .map(|(ledger_index, key_or_addr)| {
+            if is_bitcoin {
+                let addr = Address::from_bitcoin_address(&key_or_addr)?;
+                Ok((ledger_index, None, addr))
+            } else {
+                let pub_key = pubkey_from_provider(&key_or_addr, bip49, params.zilliqa_legacy)?;
+                let addr = pub_key.get_addr()?;
+                Ok((ledger_index, Some(pub_key), addr))
+            }
         })
-        .collect::<Result<Vec<(u8, PubKey)>, ServiceError>>()?;
+        .collect::<Result<Vec<(u8, Option<PubKey>, Address)>, ServiceError>>()?;
     let ftokens = ftokens
         .into_iter()
         .map(TryFrom::try_from)
@@ -72,7 +81,7 @@ pub async fn add_ledger_wallet(
         .map_err(ServiceError::SettingsError)?;
     let params = BackgroundLedgerParams {
         ftokens,
-        pub_keys,
+        accounts,
         wallet_settings,
         bip: params.bip_purpose,
         chain_hash: params.chain_hash,
@@ -95,7 +104,7 @@ pub async fn add_ledger_wallet(
 
 pub async fn update_ledger_accounts(
     wallet_index: usize,
-    accounts: Vec<(u8, String, String)>, // index, pubkey, name
+    accounts: Vec<(u8, String, String)>, // index, pubkey_or_address, name
     zilliqa_legacy: bool,
 ) -> Result<(), String> {
     with_service(|core| {
@@ -107,6 +116,7 @@ pub async fn update_ledger_accounts(
             .get_selected_account()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core.get_provider(wallet_data.chain_hash)?;
+        let is_bitcoin = provider.config.slip_44 == slip44::BITCOIN;
 
         let bip49 = match selected_account.addr {
             Address::Secp256k1Sha256(_)
@@ -130,13 +140,19 @@ pub async fn update_ledger_accounts(
         };
         let mut accounts = accounts
             .into_iter()
-            .map(|(ledger_index, pk, name)| {
-                pubkey_from_provider(&pk, bip49, zilliqa_legacy)
-                    .map(|pub_key| (ledger_index, pub_key, name))
+            .map(|(ledger_index, key_or_addr, name)| {
+                if is_bitcoin {
+                    let addr = Address::from_bitcoin_address(&key_or_addr)?;
+                    Ok((ledger_index, None, addr, name))
+                } else {
+                    let pub_key = pubkey_from_provider(&key_or_addr, bip49, zilliqa_legacy)?;
+                    let addr = pub_key.get_addr()?;
+                    Ok((ledger_index, Some(pub_key), addr, name))
+                }
             })
-            .collect::<Result<Vec<(u8, PubKey, String)>, ServiceError>>()?;
+            .collect::<Result<Vec<(u8, Option<PubKey>, Address, String)>, ServiceError>>()?;
 
-        accounts.dedup_by(|a, b| a.0 == b.0 && a.1 == b.1);
+        accounts.dedup_by(|a, b| a.0 == b.0 && a.2 == b.2);
 
         wallet
             .update_ledger_accounts(accounts, &provider.config)

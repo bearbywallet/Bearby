@@ -139,12 +139,8 @@ class BtcLedgerApp {
         display: false,
       );
 
-      // Get the pubkey at the full path: m/purpose'/0'/account'/0/index
-      final fullPath = "m/$bipPurpose'/0'/$accountIndex'/0/$index";
-      final pubkeyXpub = await getExtendedPubkey(path: fullPath);
-
       accounts.add(LedgerAccount(
-        publicKey: pubkeyXpub,
+        publicKey: null,
         address: address,
         index: index,
       ));
