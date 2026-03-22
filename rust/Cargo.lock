@@ -6523,6 +6523,7 @@ name = "token"
 version = "0.1.0"
 dependencies = [
  "alloy",
+ "bitcoin",
  "config",
  "errors",
  "proto",

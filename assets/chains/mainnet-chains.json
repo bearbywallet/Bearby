@@ -23,7 +23,7 @@
       {
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "1111111111111111111114oLvT2",
+        "addr": "bc1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9s5v4h",
         "name": "Bitcoin",
         "symbol": "BTC",
         "decimals": 8
