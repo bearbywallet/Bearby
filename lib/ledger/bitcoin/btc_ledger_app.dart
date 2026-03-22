@@ -73,18 +73,21 @@ class BtcLedgerApp {
 
     _pendingElements.clear();
 
-    // Build preimage store with wallet policy serialized data
-    final preimageHashes = <Uint8List>[
-      await btc_ffi.btcLedgerSha256(data: walletPolicy.serialized),
-    ];
-    final preimageData = <Uint8List>[walletPolicy.serialized];
+    final preimageHashes = <Uint8List>[];
+    final preimageData = <Uint8List>[];
 
-    // Build leaf hash lookup for wallet policy keys
+    preimageHashes
+        .add(await btc_ffi.btcLedgerSha256(data: walletPolicy.serialized));
+    preimageData.add(walletPolicy.serialized);
+
     final allLeafHashes = <String, List<Uint8List>>{};
     final keyLeaves = <Uint8List>[];
     for (final keyInfo in walletPolicy.keysInfo) {
-      keyLeaves
-          .add(await btc_ffi.btcLedgerHashLeaf(data: Uint8List.fromList(keyInfo.codeUnits)));
+      final keyBytes = Uint8List.fromList(keyInfo.codeUnits);
+      keyLeaves.add(await btc_ffi.btcLedgerHashLeaf(data: keyBytes));
+      final keyPreimage = Uint8List.fromList([0x00, ...keyBytes]);
+      preimageHashes.add(await btc_ffi.btcLedgerSha256(data: keyPreimage));
+      preimageData.add(keyPreimage);
     }
     final keysRoot =
         await btc_ffi.btcLedgerComputeMerkleRoot(leafHashes: keyLeaves);
@@ -226,8 +229,7 @@ class BtcLedgerApp {
           leafHashes: merkelized.inputMapKeysLeaves[i]);
       final valuesRoot = await btc_ffi.btcLedgerComputeMerkleRoot(
           leafHashes: merkelized.inputMapValuesLeaves[i]);
-      allLeafHashes[_hexEncode(keysRoot)] =
-          merkelized.inputMapKeysLeaves[i];
+      allLeafHashes[_hexEncode(keysRoot)] = merkelized.inputMapKeysLeaves[i];
       allLeafHashes[_hexEncode(valuesRoot)] =
           merkelized.inputMapValuesLeaves[i];
     }
@@ -237,8 +239,7 @@ class BtcLedgerApp {
     for (final c in merkelized.inputMapCommitments) {
       inputCommitmentLeaves.add(await btc_ffi.btcLedgerHashLeaf(data: c));
     }
-    allLeafHashes[_hexEncode(merkelized.inputMapsRoot)] =
-        inputCommitmentLeaves;
+    allLeafHashes[_hexEncode(merkelized.inputMapsRoot)] = inputCommitmentLeaves;
 
     // Output maps leaves
     for (int i = 0; i < merkelized.outputCount; i++) {
@@ -246,8 +247,7 @@ class BtcLedgerApp {
           leafHashes: merkelized.outputMapKeysLeaves[i]);
       final valuesRoot = await btc_ffi.btcLedgerComputeMerkleRoot(
           leafHashes: merkelized.outputMapValuesLeaves[i]);
-      allLeafHashes[_hexEncode(keysRoot)] =
-          merkelized.outputMapKeysLeaves[i];
+      allLeafHashes[_hexEncode(keysRoot)] = merkelized.outputMapKeysLeaves[i];
       allLeafHashes[_hexEncode(valuesRoot)] =
           merkelized.outputMapValuesLeaves[i];
     }
@@ -294,7 +294,8 @@ class BtcLedgerApp {
     final chunks = <Uint8List>[];
     const chunkSize = 64;
     for (int i = 0; i < msgBytes.length; i += chunkSize) {
-      final end = (i + chunkSize > msgBytes.length) ? msgBytes.length : i + chunkSize;
+      final end =
+          (i + chunkSize > msgBytes.length) ? msgBytes.length : i + chunkSize;
       chunks.add(msgBytes.sublist(i, end));
     }
     if (chunks.isEmpty) {
@@ -525,8 +526,7 @@ class BtcLedgerApp {
     // Max proof elements per response: floor((255 - 32 - 1 - 1) / 32) = 6
     const maxProofElements = 6;
     final proofLen = proof.proofHashes.length;
-    final nResponse =
-        proofLen > maxProofElements ? maxProofElements : proofLen;
+    final nResponse = proofLen > maxProofElements ? maxProofElements : proofLen;
 
     // Queue remaining proof elements for GET_MORE_ELEMENTS
     if (proofLen > maxProofElements) {
@@ -619,8 +619,7 @@ class BtcLedgerApp {
 
     final sw = _getStatusWord(response);
     if (sw != BtcLedgerConstants.swOk) {
-      throw TransportStatusError(
-          sw, 'Status code: 0x${sw.toRadixString(16)}');
+      throw TransportStatusError(sw, 'Status code: 0x${sw.toRadixString(16)}');
     }
 
     return response.sublist(0, response.length - 2);
@@ -657,7 +656,8 @@ class BtcLedgerApp {
     }
 
     final sw = _getStatusWord(response);
-    debugPrint('BTC APDU ← SW=0x${sw.toRadixString(16)} len=${response.length}');
+    debugPrint(
+        'BTC APDU ← SW=0x${sw.toRadixString(16)} len=${response.length}');
 
     return response;
   }
@@ -665,8 +665,7 @@ class BtcLedgerApp {
   // --- Utility Methods ---
 
   int _getStatusWord(Uint8List response) {
-    return (response[response.length - 2] << 8) |
-        response[response.length - 1];
+    return (response[response.length - 2] << 8) | response[response.length - 1];
   }
 
   /// Queue raw data as single-byte elements for GET_MORE_ELEMENTS.

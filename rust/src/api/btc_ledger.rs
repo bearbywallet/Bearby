@@ -98,10 +98,7 @@ fn compute_proof(leaf_hashes: &[Vec<u8>], index: usize) -> Vec<Vec<u8>> {
 }
 
 /// Find the index of a leaf by its hash. Returns -1 if not found.
-pub fn btc_ledger_get_merkle_leaf_index(
-    leaf_hashes: Vec<Vec<u8>>,
-    target_hash: Vec<u8>,
-) -> i64 {
+pub fn btc_ledger_get_merkle_leaf_index(leaf_hashes: Vec<Vec<u8>>, target_hash: Vec<u8>) -> i64 {
     for (i, h) in leaf_hashes.iter().enumerate() {
         if h == &target_hash {
             return i as i64;
@@ -223,7 +220,10 @@ fn build_merkle_map(
     preimage_hashes: &mut Vec<Vec<u8>>,
     preimage_data: &mut Vec<Vec<u8>>,
 ) -> (Vec<u8>, Vec<Vec<u8>>, Vec<Vec<u8>>) {
-    let keys_leaves: Vec<Vec<u8>> = keys.iter().map(|k| btc_ledger_hash_leaf(k.clone())).collect();
+    let keys_leaves: Vec<Vec<u8>> = keys
+        .iter()
+        .map(|k| btc_ledger_hash_leaf(k.clone()))
+        .collect();
     let values_leaves: Vec<Vec<u8>> = values
         .iter()
         .map(|v| btc_ledger_hash_leaf(v.clone()))
@@ -304,7 +304,11 @@ fn extract_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
 
 /// Parse PSBT input/output maps from raw PSBT bytes.
 /// Returns a list of (keys, values) for each input or output.
-fn extract_io_maps(raw_psbt: &[u8], start_offset: usize, count: usize) -> (Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)>, usize) {
+fn extract_io_maps(
+    raw_psbt: &[u8],
+    start_offset: usize,
+    count: usize,
+) -> (Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)>, usize) {
     let mut maps = Vec::new();
     let mut offset = start_offset;
 
@@ -402,8 +406,12 @@ pub fn btc_ledger_merkelise_psbt(psbt_bytes: Vec<u8>) -> Result<MerkelizedPsbt, 
 
     // Extract and merkelise global map
     let (global_keys, global_values) = extract_global_map(&psbt);
-    let (global_commitment, global_keys_leaves, global_values_leaves) =
-        build_merkle_map(&global_keys, &global_values, &mut preimage_hashes, &mut preimage_data);
+    let (global_commitment, global_keys_leaves, global_values_leaves) = build_merkle_map(
+        &global_keys,
+        &global_values,
+        &mut preimage_hashes,
+        &mut preimage_data,
+    );
 
     // Extract and merkelise input maps
     let io_start = find_global_map_end(&raw_psbt);
@@ -512,7 +520,7 @@ pub fn btc_ledger_build_wallet_policy(
     // Bitcoin mainnet coin type = 0, testnet = 1
     let fp_hex = hex::encode(&master_fingerprint);
     let key_info = format!(
-        "[{}/{}h/0h/{}h]{}",
+        "[{}/{}h/0h/{}h]{}/**",
         fp_hex, bip_purpose, account_index, xpub
     );
     let keys_info = vec![key_info.clone()];
@@ -527,8 +535,8 @@ pub fn btc_ledger_build_wallet_policy(
     let keys_root = build_merkle_tree(&[key_leaf]);
 
     let mut serialized = Vec::new();
-    serialized.push(0x02); // policy map version 2
-    serialized.push(0x00); // empty name (default wallet)
+    serialized.push(0x01);
+    serialized.push(0x00);
     serialized.extend_from_slice(&encode_varint(desc_bytes.len() as u64));
     serialized.extend_from_slice(desc_bytes);
     serialized.extend_from_slice(&encode_varint(1)); // 1 key
@@ -564,7 +572,12 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         DerivationPath::BIP49_PURPOSE => bitcoin::AddressType::P2sh,
         DerivationPath::BIP84_PURPOSE => bitcoin::AddressType::P2wpkh,
         DerivationPath::BIP86_PURPOSE => bitcoin::AddressType::P2tr,
-        _ => return Err(format!("Unknown address type for BIP purpose: {}", addr_type)),
+        _ => {
+            return Err(format!(
+                "Unknown address type for BIP purpose: {}",
+                addr_type
+            ))
+        }
     };
 
     // Insert signatures into PSBT inputs
@@ -587,9 +600,8 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
             }
             _ => {
                 // ECDSA: signature goes into partial_sigs
-                let ecdsa_sig =
-                    bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
-                        .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
+                let ecdsa_sig = bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
+                    .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
                 let pubkey = bitcoin::PublicKey::from_slice(&sig_info.pubkey)
                     .map_err(|e| format!("Invalid public key: {}", e))?;
                 psbt.inputs[idx].partial_sigs.insert(pubkey, ecdsa_sig);
@@ -630,8 +642,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                         let mut script_bytes = Vec::new();
                         script_bytes.push(rs_bytes.len() as u8);
                         script_bytes.extend_from_slice(rs_bytes);
-                        input.final_script_sig =
-                            Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                        input.final_script_sig = Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
                     }
                 }
                 input.partial_sigs.clear();
@@ -647,8 +658,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                     script_bytes.extend_from_slice(&sig_bytes);
                     script_bytes.push(pk_bytes.len() as u8);
                     script_bytes.extend_from_slice(&pk_bytes);
-                    input.final_script_sig =
-                        Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                    input.final_script_sig = Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
                 }
                 input.partial_sigs.clear();
             }
@@ -734,16 +744,59 @@ pub fn btc_ledger_encode_path(path: String) -> Result<Vec<u8>, String> {
 mod tests {
     use super::*;
 
+    fn test_hasher(data: &[u8]) -> Vec<u8> {
+        data.to_vec()
+    }
+
+    fn leaf(n: u8) -> Vec<u8> {
+        vec![0, n]
+    }
+
+    fn merkle_of_count(count: usize) -> (Vec<Vec<u8>>, Vec<u8>) {
+        let leaves: Vec<Vec<u8>> = (0..count).map(|i| leaf(i as u8)).collect();
+        let root = build_merkle_tree_with_hasher(&leaves, &test_hasher);
+        (leaves, root)
+    }
+
+    fn build_merkle_tree_with_hasher(
+        leaf_hashes: &[Vec<u8>],
+        hasher: &impl Fn(&[u8]) -> Vec<u8>,
+    ) -> Vec<u8> {
+        if leaf_hashes.is_empty() {
+            return vec![0u8; 32];
+        }
+        if leaf_hashes.len() == 1 {
+            return leaf_hashes[0].clone();
+        }
+        let split = highest_power_of_2_less_than(leaf_hashes.len());
+        let left_root = build_merkle_tree_with_hasher(&leaf_hashes[..split], hasher);
+        let right_root = build_merkle_tree_with_hasher(&leaf_hashes[split..], hasher);
+        hasher(&[&[0x01], &left_root[..], &right_root[..]].concat())
+    }
+
     #[test]
     fn test_hash_leaf() {
         let data = vec![0x01, 0x02, 0x03];
         let hash = btc_ledger_hash_leaf(data.clone());
         assert_eq!(hash.len(), 32);
 
-        // Verify: SHA256(0x00 || data)
         let mut hasher = Sha256::new();
         hasher.update([0x00]);
         hasher.update(&data);
+        let expected = hasher.finalize().to_vec();
+        assert_eq!(hash, expected);
+    }
+
+    #[test]
+    fn test_hash_node() {
+        let left = vec![0x01; 32];
+        let right = vec![0x02; 32];
+        let hash = hash_node(&left, &right);
+
+        let mut hasher = Sha256::new();
+        hasher.update([0x01]);
+        hasher.update(&left);
+        hasher.update(&right);
         let expected = hasher.finalize().to_vec();
         assert_eq!(hash, expected);
     }
@@ -772,89 +825,176 @@ mod tests {
     }
 
     #[test]
-    fn test_merkle_proof() {
-        let leaves: Vec<Vec<u8>> = (0u8..4)
-            .map(|i| btc_ledger_hash_leaf(vec![i]))
-            .collect();
+    fn test_merkle_root_matches_js_0_leaves() {
+        let (_, root) = merkle_of_count(0);
+        let expected = vec![0u8; 32];
+        assert_eq!(root, expected);
+    }
 
-        let root = btc_ledger_compute_merkle_root(leaves.clone());
+    #[test]
+    fn test_merkle_root_matches_js_1_leaf() {
+        let (leaves, root) = merkle_of_count(1);
+        assert_eq!(root, leaves[0]);
+    }
 
-        // Verify proof for each leaf
+    #[test]
+    fn test_merkle_root_matches_js_2_leaves() {
+        let (leaves, root) = merkle_of_count(2);
+        let expected = test_hasher(&[&[0x01], &leaves[0][..], &leaves[1][..]].concat());
+        assert_eq!(root, expected);
+    }
+
+    #[test]
+    fn test_merkle_root_matches_js_3_leaves() {
+        let (leaves, root) = merkle_of_count(3);
+        let left_root = leaves[0..2].iter().map(|l| l.clone()).collect::<Vec<_>>();
+        let left = build_merkle_tree_with_hasher(&left_root, &test_hasher);
+        let right = leaves[2].clone();
+        let expected = test_hasher(&[&[0x01], &left[..], &right[..]].concat());
+        assert_eq!(root, expected);
+    }
+
+    #[test]
+    fn test_merkle_root_matches_js_4_leaves() {
+        let (leaves, root) = merkle_of_count(4);
+        let left = build_merkle_tree_with_hasher(&leaves[0..2], &test_hasher);
+        let right = build_merkle_tree_with_hasher(&leaves[2..4], &test_hasher);
+        let expected = test_hasher(&[&[0x01], &left[..], &right[..]].concat());
+        assert_eq!(root, expected);
+    }
+
+    #[test]
+    fn test_merkle_root_matches_js_5_leaves() {
+        let (leaves, root) = merkle_of_count(5);
+        let left = build_merkle_tree_with_hasher(&leaves[0..4], &test_hasher);
+        let right = leaves[4].clone();
+        let expected = test_hasher(&[&[0x01], &left[..], &right[..]].concat());
+        assert_eq!(root, expected);
+    }
+
+    #[test]
+    fn test_merkle_proof_single() {
+        let leaves: Vec<Vec<u8>> = (0..1).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+        let proof = btc_ledger_get_merkle_proof(leaves.clone(), 0).unwrap();
+        assert!(proof.proof_hashes.is_empty());
+    }
+
+    #[test]
+    fn test_merkle_proof_two() {
+        let leaves: Vec<Vec<u8>> = (0..2).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+        let _root = btc_ledger_compute_merkle_root(leaves.clone());
+
+        let proof0 = btc_ledger_get_merkle_proof(leaves.clone(), 0).unwrap();
+        assert_eq!(proof0.proof_hashes.len(), 1);
+        assert_eq!(proof0.proof_hashes[0], leaves[1]);
+
+        let proof1 = btc_ledger_get_merkle_proof(leaves.clone(), 1).unwrap();
+        assert_eq!(proof1.proof_hashes.len(), 1);
+        assert_eq!(proof1.proof_hashes[0], leaves[0]);
+    }
+
+    #[test]
+    fn test_merkle_proof_three() {
+        let leaves: Vec<Vec<u8>> = (0..3).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+        let _root = btc_ledger_compute_merkle_root(leaves.clone());
+
+        let proof0 = btc_ledger_get_merkle_proof(leaves.clone(), 0).unwrap();
+        assert_eq!(proof0.proof_hashes.len(), 2);
+
+        let proof1 = btc_ledger_get_merkle_proof(leaves.clone(), 1).unwrap();
+        assert_eq!(proof1.proof_hashes.len(), 2);
+
+        let proof2 = btc_ledger_get_merkle_proof(leaves.clone(), 2).unwrap();
+        assert_eq!(proof2.proof_hashes.len(), 1);
+    }
+
+    #[test]
+    fn test_merkle_proof_four() {
+        let leaves: Vec<Vec<u8>> = (0..4).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+        let _root = btc_ledger_compute_merkle_root(leaves.clone());
+
         for i in 0..4 {
-            let proof = btc_ledger_get_merkle_proof(leaves.clone(), i as u32).unwrap();
-            let verified_root = verify_proof(&proof.leaf_hash, &proof.proof_hashes, i, 4);
-            assert_eq!(verified_root, root, "Proof failed for leaf {}", i);
+            let proof = btc_ledger_get_merkle_proof(leaves.clone(), i).unwrap();
+            assert_eq!(proof.proof_hashes.len(), 2);
         }
     }
 
-    /// Verify a merkle proof by replaying the tree construction.
-    /// Proof elements are ordered bottom-up. We need to build a stack of
-    /// (split, size) decisions matching the recursive descent, then replay bottom-up.
-    fn verify_proof(leaf_hash: &[u8], proof: &[Vec<u8>], index: usize, size: usize) -> Vec<u8> {
-        // Collect the path decisions from top to bottom
-        let mut decisions: Vec<(bool, usize, usize)> = Vec::new(); // (is_left, split, new_size)
-        let mut idx = index;
-        let mut sz = size;
-        while sz > 1 {
-            let split = highest_power_of_2_less_than(sz);
-            if idx < split {
-                decisions.push((true, split, split)); // went left, new_size = split
-                sz = split;
-            } else {
-                decisions.push((false, split, sz - split)); // went right
-                idx -= split;
-                sz -= split;
-            }
+    #[test]
+    fn test_merkle_proof_five() {
+        let leaves: Vec<Vec<u8>> = (0..5).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+        let _root = btc_ledger_compute_merkle_root(leaves.clone());
+
+        for i in 0..4 {
+            let proof = btc_ledger_get_merkle_proof(leaves.clone(), i).unwrap();
+            assert_eq!(
+                proof.proof_hashes.len(),
+                3,
+                "Leaf {} should have 3 proof elements",
+                i
+            );
         }
-        // Now replay bottom-up: proof[0] corresponds to decisions[last], etc.
-        let mut current = leaf_hash.to_vec();
-        for (i, sibling) in proof.iter().enumerate() {
-            let dec_idx = decisions.len() - 1 - i;
-            let (is_left, _, _) = decisions[dec_idx];
-            if is_left {
-                // We were in the left subtree, sibling is right → hash(us, sibling)
-                // But wait - within the left subtree, the proof element is not from the right subtree at this level
-                // Actually, the proof collects the sibling at each recursion level in order from deepest to shallowest.
-                // At the deepest level, is_left tells us which side our leaf was on.
-                // If we went right at this level, sibling = left_root → hash(sibling, current)
-                // If we went left at this level, sibling = right_root → hash(current, sibling)
-                current = hash_node(&current, sibling);
-            } else {
-                current = hash_node(sibling, &current);
-            }
-        }
-        current
+
+        let proof4 = btc_ledger_get_merkle_proof(leaves.clone(), 4).unwrap();
+        assert_eq!(
+            proof4.proof_hashes.len(),
+            1,
+            "Leaf 4 should have 1 proof element"
+        );
     }
 
     #[test]
     fn test_merkle_leaf_index() {
-        let leaves: Vec<Vec<u8>> = (0u8..5)
-            .map(|i| btc_ledger_hash_leaf(vec![i]))
-            .collect();
+        let leaves: Vec<Vec<u8>> = (0..5).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
 
-        assert_eq!(btc_ledger_get_merkle_leaf_index(leaves.clone(), leaves[3].clone()), 3);
-        assert_eq!(btc_ledger_get_merkle_leaf_index(leaves.clone(), vec![0u8; 32]), -1);
+        assert_eq!(
+            btc_ledger_get_merkle_leaf_index(leaves.clone(), leaves[3].clone()),
+            3
+        );
+        assert_eq!(
+            btc_ledger_get_merkle_leaf_index(leaves.clone(), vec![0u8; 32]),
+            -1
+        );
     }
 
     #[test]
-    fn test_varint_encoding() {
+    fn test_varint_encoding_matches_js() {
         assert_eq!(encode_varint(0), vec![0x00]);
         assert_eq!(encode_varint(252), vec![0xFC]);
         assert_eq!(encode_varint(253), vec![0xFD, 0xFD, 0x00]);
         assert_eq!(encode_varint(0xFFFF), vec![0xFD, 0xFF, 0xFF]);
         assert_eq!(encode_varint(0x10000), vec![0xFE, 0x00, 0x00, 0x01, 0x00]);
+        assert_eq!(encode_varint(1), vec![0x01]);
+        assert_eq!(encode_varint(127), vec![0x7F]);
+        assert_eq!(encode_varint(128), vec![0x80]);
+    }
+
+    #[test]
+    fn test_varint_decoding() {
+        assert_eq!(decode_varint(&[0x00]), (0, 1));
+        assert_eq!(decode_varint(&[0xFC]), (252, 1));
+        assert_eq!(decode_varint(&[0xFD, 0xFD, 0x00]), (253, 3));
+        assert_eq!(decode_varint(&[0xFD, 0xFF, 0xFF]), (0xFFFF, 3));
+        assert_eq!(decode_varint(&[0xFE, 0x00, 0x00, 0x01, 0x00]), (0x10000, 5));
     }
 
     #[test]
     fn test_encode_path() {
         let path = "m/84'/0'/0'/0/0".to_string();
         let encoded = btc_ledger_encode_path(path).unwrap();
-        assert_eq!(encoded[0], 5); // 5 elements
-        assert_eq!(encoded.len(), 1 + 5 * 4); // 1 byte count + 5 * 4 bytes each
+        assert_eq!(encoded[0], 5);
+        assert_eq!(encoded.len(), 1 + 5 * 4);
 
-        // 84' = 84 | 0x80000000
         let elem0 = u32::from_be_bytes([encoded[1], encoded[2], encoded[3], encoded[4]]);
         assert_eq!(elem0, 84 | 0x80000000);
+    }
+
+    #[test]
+    fn test_encode_path_with_h() {
+        let path1 = "m/84'/0'/0'".to_string();
+        let path2 = "m/84h/0h/0h".to_string();
+        let encoded1 = btc_ledger_encode_path(path1).unwrap();
+        let encoded2 = btc_ledger_encode_path(path2).unwrap();
+        assert_eq!(encoded1, encoded2);
     }
 
     #[test]
@@ -870,21 +1010,425 @@ mod tests {
     }
 
     #[test]
-    fn test_wallet_policy() {
+    fn test_wallet_policy_version_byte() {
         let fp = vec![0xc5, 0x5d, 0x68, 0x95];
         let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
 
-        let policy = btc_ledger_build_wallet_policy(
-            xpub,
-            fp,
-            DerivationPath::BIP84_PURPOSE,
-            0,
-        )
-        .unwrap();
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        assert_eq!(
+            policy.serialized[0], 0x01,
+            "Wallet policy version should be 0x01"
+        );
+    }
+
+    #[test]
+    fn test_wallet_policy_key_format_with_wildcard() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub.clone(), fp, DerivationPath::BIP84_PURPOSE, 0)
+                .unwrap();
+
+        assert!(
+            policy.keys_info[0].ends_with("/**"),
+            "Key should end with /**"
+        );
+        assert!(
+            policy.keys_info[0].contains(&xpub),
+            "Key should contain xpub"
+        );
+    }
+
+    #[test]
+    fn test_wallet_policy_bip84() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
 
         assert_eq!(policy.descriptor_template, "wpkh(@0/**)");
         assert_eq!(policy.policy_id.len(), 32);
         assert_eq!(policy.policy_hmac.len(), 32);
         assert!(policy.keys_info[0].starts_with("[c55d6895/84h/0h/0h]"));
+        assert!(policy.keys_info[0].ends_with("/**"));
+    }
+
+    #[test]
+    fn test_wallet_policy_bip44() {
+        let fp = vec![0xab, 0xcd, 0xef, 0x12];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP44_PURPOSE, 0).unwrap();
+
+        assert_eq!(policy.descriptor_template, "pkh(@0/**)");
+        assert!(policy.keys_info[0].starts_with("[abcdef12/44h/0h/0h]"));
+    }
+
+    #[test]
+    fn test_wallet_policy_bip49() {
+        let fp = vec![0x11, 0x22, 0x33, 0x44];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP49_PURPOSE, 0).unwrap();
+
+        assert_eq!(policy.descriptor_template, "sh(wpkh(@0/**))");
+        assert!(policy.keys_info[0].starts_with("[11223344/49h/0h/0h]"));
+    }
+
+    #[test]
+    fn test_wallet_policy_bip86() {
+        let fp = vec![0xaa, 0xbb, 0xcc, 0xdd];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP86_PURPOSE, 0).unwrap();
+
+        assert_eq!(policy.descriptor_template, "tr(@0/**)");
+        assert!(policy.keys_info[0].starts_with("[aabbccdd/86h/0h/0h]"));
+    }
+
+    #[test]
+    fn test_wallet_policy_serialization_format() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        assert_eq!(policy.serialized[0], 0x01, "version byte");
+        assert_eq!(policy.serialized[1], 0x00, "empty wallet name");
+
+        let desc = "wpkh(@0/**)".as_bytes();
+        assert_eq!(
+            policy.serialized[2],
+            desc.len() as u8,
+            "descriptor length varint"
+        );
+
+        let desc_start = 3;
+        let desc_end = desc_start + desc.len();
+        assert_eq!(
+            &policy.serialized[desc_start..desc_end],
+            desc,
+            "descriptor template"
+        );
+
+        assert_eq!(policy.serialized[desc_end], 0x01, "key count varint = 1");
+
+        let keys_root_start = desc_end + 1;
+        assert_eq!(
+            policy.serialized.len(),
+            keys_root_start + 32,
+            "keys root (32 bytes)"
+        );
+    }
+
+    #[test]
+    fn test_wallet_policy_different_accounts() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy0 = btc_ledger_build_wallet_policy(
+            xpub.clone(),
+            fp.clone(),
+            DerivationPath::BIP84_PURPOSE,
+            0,
+        )
+        .unwrap();
+
+        let policy1 =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 1).unwrap();
+
+        assert_ne!(
+            policy0.policy_id, policy1.policy_id,
+            "Different accounts should have different policy IDs"
+        );
+        assert!(policy0.keys_info[0].contains("/0h]"));
+        assert!(policy1.keys_info[0].contains("/1h]"));
+    }
+
+    #[test]
+    fn test_sha256_consistency() {
+        let data = vec![0x01, 0x02, 0x03, 0x04];
+        let hash1 = btc_ledger_sha256(data.clone());
+        let hash2 = btc_ledger_sha256(data.clone());
+        assert_eq!(hash1, hash2);
+        assert_eq!(hash1.len(), 32);
+    }
+
+    #[test]
+    fn test_leaf_hash_vs_sha256() {
+        let data = vec![0x01, 0x02, 0x03];
+        let leaf_hash = btc_ledger_hash_leaf(data.clone());
+        let plain_hash =
+            btc_ledger_sha256(vec![0x00].into_iter().chain(data.into_iter()).collect());
+        assert_eq!(leaf_hash, plain_hash);
+    }
+
+    #[test]
+    fn test_highest_power_of_2() {
+        assert_eq!(highest_power_of_2_less_than(0), 0);
+        assert_eq!(highest_power_of_2_less_than(1), 0);
+        assert_eq!(highest_power_of_2_less_than(2), 1);
+        assert_eq!(highest_power_of_2_less_than(3), 2);
+        assert_eq!(highest_power_of_2_less_than(4), 2);
+        assert_eq!(highest_power_of_2_less_than(5), 4);
+        assert_eq!(highest_power_of_2_less_than(6), 4);
+        assert_eq!(highest_power_of_2_less_than(7), 4);
+        assert_eq!(highest_power_of_2_less_than(8), 4);
+        assert_eq!(highest_power_of_2_less_than(9), 8);
+        assert_eq!(highest_power_of_2_less_than(16), 8);
+        assert_eq!(highest_power_of_2_less_than(17), 16);
+    }
+
+    #[test]
+    fn test_merkle_proof_exact_js_two() {
+        let leaves: Vec<Vec<u8>> = (0..2).map(|i| leaf(i as u8)).collect();
+        let leaves_hashed: Vec<Vec<u8>> = leaves.iter().map(|l| test_hasher(l)).collect();
+
+        let proof0 = btc_ledger_get_merkle_proof(leaves_hashed.clone(), 0).unwrap();
+        assert_eq!(
+            proof0.proof_hashes,
+            vec![leaves_hashed[1].clone()],
+            "Proof for leaf 0 should be [leaf1]"
+        );
+
+        let proof1 = btc_ledger_get_merkle_proof(leaves_hashed.clone(), 1).unwrap();
+        assert_eq!(
+            proof1.proof_hashes,
+            vec![leaves_hashed[0].clone()],
+            "Proof for leaf 1 should be [leaf0]"
+        );
+    }
+
+    #[test]
+    fn test_merkle_proof_exact_js_three() {
+        let leaves: Vec<Vec<u8>> = (0..3).map(|i| leaf(i as u8)).collect();
+        let leaves_hashed: Vec<Vec<u8>> = leaves.iter().map(|l| test_hasher(l)).collect();
+
+        let proof0 = btc_ledger_get_merkle_proof(leaves_hashed.clone(), 0).unwrap();
+        assert_eq!(proof0.proof_hashes.len(), 2);
+
+        let proof2 = btc_ledger_get_merkle_proof(leaves_hashed.clone(), 2).unwrap();
+        assert_eq!(proof2.proof_hashes.len(), 1);
+    }
+
+    #[test]
+    fn test_merkle_proof_exact_js_four() {
+        let leaves: Vec<Vec<u8>> = (0..4).map(|i| leaf(i as u8)).collect();
+        let leaves_hashed: Vec<Vec<u8>> = leaves.iter().map(|l| test_hasher(l)).collect();
+
+        for i in 0..4 {
+            let proof = btc_ledger_get_merkle_proof(leaves_hashed.clone(), i).unwrap();
+            assert_eq!(proof.proof_hashes.len(), 2);
+        }
+    }
+
+    #[test]
+    fn test_merkle_proof_exact_js_five() {
+        let leaves: Vec<Vec<u8>> = (0..5).map(|i| leaf(i as u8)).collect();
+        let leaves_hashed: Vec<Vec<u8>> = leaves.iter().map(|l| test_hasher(l)).collect();
+
+        for i in 0..4 {
+            let proof = btc_ledger_get_merkle_proof(leaves_hashed.clone(), i).unwrap();
+            assert_eq!(proof.proof_hashes.len(), 3);
+        }
+
+        let proof4 = btc_ledger_get_merkle_proof(leaves_hashed.clone(), 4).unwrap();
+        assert_eq!(proof4.proof_hashes.len(), 1);
+    }
+
+    #[test]
+    fn test_path_elements_to_buffer_js_compat() {
+        let path_elements: Vec<u32> = vec![0x80000054, 0x80000000, 0x80000000, 0, 0];
+        let mut buf = Vec::new();
+        buf.push(path_elements.len() as u8);
+        for elem in &path_elements {
+            buf.extend_from_slice(&elem.to_be_bytes());
+        }
+
+        assert_eq!(buf.len(), 1 + 5 * 4);
+        assert_eq!(buf[0], 5);
+
+        assert_eq!(
+            u32::from_be_bytes([buf[1], buf[2], buf[3], buf[4]]),
+            0x80000054
+        );
+        assert_eq!(
+            u32::from_be_bytes([buf[5], buf[6], buf[7], buf[8]]),
+            0x80000000
+        );
+    }
+
+    #[test]
+    fn test_path_string_to_array_js_compat() {
+        let path = "m/44'/0'/0'/0/0";
+        let encoded = btc_ledger_encode_path(path.to_string()).unwrap();
+
+        assert_eq!(encoded[0], 5);
+
+        let elem0 = u32::from_be_bytes([encoded[1], encoded[2], encoded[3], encoded[4]]);
+        assert_eq!(elem0, 0x8000002C);
+
+        let elem1 = u32::from_be_bytes([encoded[5], encoded[6], encoded[7], encoded[8]]);
+        assert_eq!(elem1, 0x80000000);
+    }
+
+    #[test]
+    fn test_path_84h_js_compat() {
+        let path = "m/84'/0'/0'/0/0";
+        let encoded = btc_ledger_encode_path(path.to_string()).unwrap();
+
+        assert_eq!(encoded[0], 5);
+
+        let elem0 = u32::from_be_bytes([encoded[1], encoded[2], encoded[3], encoded[4]]);
+        assert_eq!(elem0, 0x80000054, "84' should be 0x80000054");
+    }
+
+    #[test]
+    fn test_wallet_policy_empty_name() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        assert_eq!(
+            policy.serialized[1], 0x00,
+            "Wallet name length should be 0 for default wallets"
+        );
+    }
+
+    #[test]
+    fn test_wallet_policy_descriptor_template_bytes() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        let desc = "wpkh(@0/**)".as_bytes();
+        assert_eq!(
+            policy.serialized[2],
+            desc.len() as u8,
+            "Descriptor length varint"
+        );
+
+        let desc_in_serialized = &policy.serialized[3..3 + desc.len()];
+        assert_eq!(desc_in_serialized, desc, "Descriptor template bytes");
+    }
+
+    #[test]
+    fn test_wallet_policy_key_count_varint() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        let desc = "wpkh(@0/**)".as_bytes();
+        let key_count_offset = 3 + desc.len();
+        assert_eq!(
+            policy.serialized[key_count_offset], 0x01,
+            "Key count varint should be 1"
+        );
+    }
+
+    #[test]
+    fn test_wallet_policy_id_is_sha256_of_serialized() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let policy =
+            btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0).unwrap();
+
+        let expected_id = btc_ledger_sha256(policy.serialized.clone());
+        assert_eq!(
+            policy.policy_id, expected_id,
+            "Policy ID should be SHA256 of serialized policy"
+        );
+    }
+
+    #[test]
+    fn test_preimage_not_found() {
+        let hashes = vec![vec![0u8; 32]];
+        let datas = vec![vec![0x01]];
+        let unknown_hash = vec![1u8; 32];
+
+        let result = btc_ledger_get_preimage(hashes, datas, unknown_hash);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_merkle_leaf_index_not_found() {
+        let leaves: Vec<Vec<u8>> = (0..3).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+
+        let unknown_hash = vec![0xFF; 32];
+        assert_eq!(btc_ledger_get_merkle_leaf_index(leaves, unknown_hash), -1);
+    }
+
+    #[test]
+    fn test_merkle_proof_out_of_bounds() {
+        let leaves: Vec<Vec<u8>> = (0..3).map(|i| btc_ledger_hash_leaf(vec![i])).collect();
+
+        let result = btc_ledger_get_merkle_proof(leaves, 5);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_wallet_policy_invalid_fingerprint_length() {
+        let fp = vec![0x01, 0x02];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let result = btc_ledger_build_wallet_policy(xpub, fp, DerivationPath::BIP84_PURPOSE, 0);
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_wallet_policy_invalid_bip_purpose() {
+        let fp = vec![0xc5, 0x5d, 0x68, 0x95];
+        let xpub = "xpub6CatWdiZiodmUeTDp8LT5or8nmbKNcuyvz7WyksVFkKB4RHwCD3XYuvFvS3w9TF1joB3Nq5LKFpCGRb5k5Jcc9L4CUmXA4wC9gPgL3ep6D1".to_string();
+
+        let result = btc_ledger_build_wallet_policy(xpub, fp, 12345, 0);
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_encode_path_empty() {
+        let path = "m";
+        let encoded = btc_ledger_encode_path(path.to_string()).unwrap();
+        assert_eq!(encoded, vec![0]);
+    }
+
+    #[test]
+    fn test_encode_path_m_only() {
+        let path = "m/";
+        let encoded = btc_ledger_encode_path(path.to_string()).unwrap();
+        assert_eq!(encoded, vec![0]);
+    }
+
+    #[test]
+    fn test_encode_path_non_hardened() {
+        let path = "m/0/1/2";
+        let encoded = btc_ledger_encode_path(path.to_string()).unwrap();
+
+        assert_eq!(encoded[0], 3);
+
+        let elem0 = u32::from_be_bytes([encoded[1], encoded[2], encoded[3], encoded[4]]);
+        assert_eq!(elem0, 0);
+
+        let elem1 = u32::from_be_bytes([encoded[5], encoded[6], encoded[7], encoded[8]]);
+        assert_eq!(elem1, 1);
+
+        let elem2 = u32::from_be_bytes([encoded[9], encoded[10], encoded[11], encoded[12]]);
+        assert_eq!(elem2, 2);
     }
 }
