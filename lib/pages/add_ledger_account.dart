@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/bip_purpose_selector.dart';
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/enable_card.dart';
@@ -11,6 +12,7 @@ import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/argon.dart';
 import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/config/cipher.dart';
+import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ledger_connector.dart';
@@ -47,6 +49,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   NetworkConfigInfo? _network;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
+  int _selectedPurposeIndex = 0;
 
   @override
   void initState() {
@@ -187,6 +190,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
+        final bipPurpose = _network?.slip44 == kBitcoinlip44
+            ? BipPurposeSelector.getBipPurposeOptions(
+                    l10n)[_selectedPurposeIndex]
+                .purpose
+            : kBip44Purpose;
 
         await addLedgerWallet(
           params: LedgerParamsInput(
@@ -198,7 +206,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             biometricType: "none",
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
-            bipPurpose: kBip44Purpose,
+            bipPurpose: bipPurpose,
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -321,6 +329,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 ),
               ),
               const SizedBox(height: 16),
+              if (_network?.slip44 == kBitcoinlip44)
+                BipPurposeSelector(
+                  selectedIndex: _selectedPurposeIndex,
+                  onSelect: (index) =>
+                      setState(() => _selectedPurposeIndex = index),
+                  disabled: _loading,
+                ),
+              if (_network?.slip44 == kBitcoinlip44) const SizedBox(height: 16),
               RoundedLoadingButton(
                 color: theme.primaryPurple,
                 valueColor: theme.buttonText,
@@ -333,6 +349,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   _btnController.start();
 
                   try {
+                    final l10n = AppLocalizations.of(context)!;
+                    final bipPurpose = _network?.slip44 == kBitcoinlip44
+                        ? BipPurposeSelector.getBipPurposeOptions(
+                                l10n)[_selectedPurposeIndex]
+                            .purpose
+                        : kBip44Purpose;
                     final accounts =
                         await appState.ledgerViewController.getAccounts(
                       device:
@@ -340,6 +362,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                       slip44: _network!.slip44,
                       count: _accountCount,
                       chainId: _network!.chainId.toInt(),
+                      bipPurpose: bipPurpose,
                     );
 
                     final newSelectedAccounts = {
