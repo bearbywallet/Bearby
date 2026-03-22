@@ -265,43 +265,33 @@ class LedgerViewController extends ChangeNotifier {
     } else if (transaction.btc != null) {
       final btcApp = BtcLedgerApp(_connectedTransport!);
 
-      // Build PSBT from transaction data
       final psbtBytes = await btc_ffi.btcLedgerBuildPsbtFromTx(
         txHex: transaction.btc!,
         witnessUtxosJson: transaction.metadata.btcWitnessUtxos ?? '[]',
       );
 
-      // Sign PSBT via interactive Ledger protocol
       final signatures = await btcApp.signPsbt(
         psbtBytes: psbtBytes,
         bipPurpose: bipPurpose,
         accountIndex: accountIndex,
       );
 
-      // Build LedgerInputSignature list for PSBT finalization
       final ledgerSigs = <btc_ffi.LedgerInputSignature>[];
       for (int i = 0; i < signatures.length; i++) {
         ledgerSigs.add(btc_ffi.LedgerInputSignature(
           inputIndex: i,
           signature: signatures[i],
-          pubkey: Uint8List(0), // Pubkey extracted from PSBT by Rust
+          pubkey: Uint8List(0),
         ));
       }
 
-      // Finalize PSBT with signatures and extract raw transaction
       final finalized = await btc_ffi.btcLedgerFinalizePsbtWithSigs(
         psbtBytes: psbtBytes,
         sigs: ledgerSigs,
         addrType: bipPurpose,
       );
 
-      // Return raw transaction bytes
-      final txBytes = <int>[];
-      for (int i = 0; i < finalized.rawTxHex.length; i += 2) {
-        txBytes.add(
-            int.parse(finalized.rawTxHex.substring(i, i + 2), radix: 16));
-      }
-      return Uint8List.fromList(txBytes);
+      return Uint8List.fromList(finalized.psbtBytes);
     } else {
       throw "invalid tx";
     }
@@ -349,9 +339,7 @@ class LedgerViewController extends ChangeNotifier {
         bipPurpose: kBip86Purpose,
         index: account.index.toInt(),
       );
-      sig = sigBytes
-          .map((b) => b.toRadixString(16).padLeft(2, '0'))
-          .join();
+      sig = sigBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     } else {
       throw "Invalid slip44";
     }

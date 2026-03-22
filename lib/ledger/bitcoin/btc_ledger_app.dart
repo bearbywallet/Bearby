@@ -290,8 +290,25 @@ class BtcLedgerApp {
       allLeafHashes: allLeafHashes,
     );
 
-    // Signatures come via YIELD
-    return result.yielded;
+    // YIELD format: [input_index, ...signature_bytes]
+    // Build map of input_index -> signature, then return sorted
+    final sigMap = <int, Uint8List>{};
+    for (final yielded in result.yielded) {
+      if (yielded.length < 2) continue;
+      final inputIndex = yielded[0];
+      final signature = yielded.sublist(1);
+      debugPrint(
+          'BTC YIELD: inputIndex=$inputIndex, sigLen=${signature.length}');
+      sigMap[inputIndex] = signature;
+    }
+
+    // Return signatures in input order
+    final sortedSigs = <Uint8List>[];
+    final keys = sigMap.keys.toList()..sort();
+    for (final key in keys) {
+      sortedSigs.add(sigMap[key]!);
+    }
+    return sortedSigs;
   }
 
   // --- Message Signing ---
@@ -373,7 +390,8 @@ class BtcLedgerApp {
   /// Signatures are collected via YIELD (0x10) commands.
   /// Returns (finalResponse, yieldedResults) — the final 0x9000 response
   /// body and any data yielded during the interaction loop.
-  Future<({Uint8List finalResponse, List<Uint8List> yielded})> _sendApduWithClientLoop({
+  Future<({Uint8List finalResponse, List<Uint8List> yielded})>
+      _sendApduWithClientLoop({
     required int ins,
     int p1 = 0x00,
     int p2 = 0x00,
@@ -538,7 +556,8 @@ class BtcLedgerApp {
     final rootHex = _hexEncode(rootHash);
     final leafHashes = allLeafHashes[rootHex];
     if (leafHashes == null) {
-      debugPrint('BTC GET_MERKLE_LEAF_PROOF: UNKNOWN ROOT! Known roots: ${allLeafHashes.keys.toList()}');
+      debugPrint(
+          'BTC GET_MERKLE_LEAF_PROOF: UNKNOWN ROOT! Known roots: ${allLeafHashes.keys.toList()}');
       throw TransportException(
         'Unknown merkle root: $rootHex',
         'UnknownMerkleRoot',
@@ -590,11 +609,13 @@ class BtcLedgerApp {
 
     final leafHashes = allLeafHashes[rootHex];
     if (leafHashes == null) {
-      debugPrint('BTC GET_MERKLE_LEAF_INDEX: ROOT NOT FOUND! Known roots: ${allLeafHashes.keys.toList()}');
+      debugPrint(
+          'BTC GET_MERKLE_LEAF_INDEX: ROOT NOT FOUND! Known roots: ${allLeafHashes.keys.toList()}');
       return Uint8List.fromList([0x00, 0x00]); // not found
     }
 
-    debugPrint('BTC GET_MERKLE_LEAF_INDEX: tree has ${leafHashes.length} leaves');
+    debugPrint(
+        'BTC GET_MERKLE_LEAF_INDEX: tree has ${leafHashes.length} leaves');
     for (int j = 0; j < leafHashes.length; j++) {
       debugPrint('  leaf[$j]=${_hexEncode(leafHashes[j])}');
     }

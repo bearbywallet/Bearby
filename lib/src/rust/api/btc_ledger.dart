@@ -110,14 +110,16 @@ Future<Uint8List> btcLedgerEncodePath({required String path}) =>
 class FinalizedBtcTx {
   final String rawTxHex;
   final String txHash;
+  final Uint8List psbtBytes;
 
   const FinalizedBtcTx({
     required this.rawTxHex,
     required this.txHash,
+    required this.psbtBytes,
   });
 
   @override
-  int get hashCode => rawTxHex.hashCode ^ txHash.hashCode;
+  int get hashCode => rawTxHex.hashCode ^ txHash.hashCode ^ psbtBytes.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -125,7 +127,8 @@ class FinalizedBtcTx {
       other is FinalizedBtcTx &&
           runtimeType == other.runtimeType &&
           rawTxHex == other.rawTxHex &&
-          txHash == other.txHash;
+          txHash == other.txHash &&
+          psbtBytes == other.psbtBytes;
 }
 
 /// Input signature from Ledger

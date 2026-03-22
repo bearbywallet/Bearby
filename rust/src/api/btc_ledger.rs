@@ -214,6 +214,7 @@ pub struct LedgerInputSignature {
 pub struct FinalizedBtcTx {
     pub raw_tx_hex: String,
     pub tx_hash: String,
+    pub psbt_bytes: Vec<u8>,
 }
 
 /// Build a merkelized key-value map from sorted keys and values.
@@ -278,7 +279,10 @@ fn build_v2_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
         // PSBT_GLOBAL_TX_VERSION
         (vec![0x02], tx.version.0.to_le_bytes().to_vec()),
         // PSBT_GLOBAL_FALLBACK_LOCKTIME
-        (vec![0x03], tx.lock_time.to_consensus_u32().to_le_bytes().to_vec()),
+        (
+            vec![0x03],
+            tx.lock_time.to_consensus_u32().to_le_bytes().to_vec(),
+        ),
         // PSBT_GLOBAL_INPUT_COUNT
         (vec![0x04], encode_varint(input_count as u64)),
         // PSBT_GLOBAL_OUTPUT_COUNT
@@ -336,7 +340,10 @@ fn build_v2_input_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
         }
 
         // PSBT_IN_PREVIOUS_TXID (key 0x0e) - from unsigned_tx
-        pairs.push((vec![0x0e], txin.previous_output.txid.as_byte_array().to_vec()));
+        pairs.push((
+            vec![0x0e],
+            txin.previous_output.txid.as_byte_array().to_vec(),
+        ));
 
         // PSBT_IN_OUTPUT_INDEX (key 0x0f) - from unsigned_tx
         pairs.push((vec![0x0f], txin.previous_output.vout.to_le_bytes().to_vec()));
@@ -664,6 +671,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         match btc_addr_type {
             bitcoin::AddressType::P2tr => {
                 // Taproot: signature goes into tap_key_sig
+                // Signature is 64 bytes (SIGHASH_DEFAULT) or 65 bytes (with sighash byte)
                 let schnorr_sig = bitcoin::taproot::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
                 psbt.inputs[idx].tap_key_sig = Some(schnorr_sig);
@@ -746,6 +754,9 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         input.witness_script = None;
     }
 
+    // Serialize PSBT before extraction (extract_tx consumes it)
+    let psbt_bytes = psbt.serialize();
+
     // Extract the final signed transaction
     let signed_tx = psbt.extract_tx_unchecked_fee_rate();
     let tx_bytes = btc_encode::serialize(&signed_tx);
@@ -754,6 +765,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
     Ok(FinalizedBtcTx {
         raw_tx_hex: hex::encode(&tx_bytes),
         tx_hash,
+        psbt_bytes,
     })
 }
 
@@ -796,8 +808,7 @@ pub fn btc_ledger_prepare_psbt(
         Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
 
     let secp = Secp256k1::verification_only();
-    let account_xpub =
-        Xpub::from_str(&xpub).map_err(|e| format!("Failed to parse xpub: {}", e))?;
+    let account_xpub = Xpub::from_str(&xpub).map_err(|e| format!("Failed to parse xpub: {}", e))?;
 
     let fp = Fingerprint::from(
         <[u8; 4]>::try_from(&master_fingerprint[..4])
@@ -867,10 +878,8 @@ pub fn btc_ledger_prepare_psbt(
                     let btc_pk = bitcoin::PublicKey::new(*pubkey);
                     let cpk = bitcoin::CompressedPublicKey::try_from(btc_pk);
                     if let Ok(cpk) = cpk {
-                        let wpkh_script =
-                            bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        let expected =
-                            bitcoin::ScriptBuf::new_p2sh(&wpkh_script.script_hash());
+                        let wpkh_script = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                        let expected = bitcoin::ScriptBuf::new_p2sh(&wpkh_script.script_hash());
                         expected == script_pubkey
                     } else {
                         false
@@ -886,8 +895,7 @@ pub fn btc_ledger_prepare_psbt(
             };
 
             if matched {
-                let deriv_path =
-                    bitcoin::bip32::DerivationPath::from(full_path.clone());
+                let deriv_path = bitcoin::bip32::DerivationPath::from(full_path.clone());
 
                 if bip_purpose == DerivationPath::BIP86_PURPOSE {
                     let (xonly, _) = pubkey.x_only_public_key();
@@ -896,17 +904,13 @@ pub fn btc_ledger_prepare_psbt(
                         .tap_key_origins
                         .insert(xonly, (vec![], (fp, deriv_path)));
                 } else {
-                    input
-                        .bip32_derivation
-                        .insert(*pubkey, (fp, deriv_path));
+                    input.bip32_derivation.insert(*pubkey, (fp, deriv_path));
                 }
                 break;
             }
         }
 
-        if bip_purpose == DerivationPath::BIP86_PURPOSE
-            && input.tap_key_origins.is_empty()
-        {
+        if bip_purpose == DerivationPath::BIP86_PURPOSE && input.tap_key_origins.is_empty() {
             return Err(format!(
                 "Could not match input {} to any derived key (gap_limit={})",
                 i, GAP_LIMIT
@@ -929,8 +933,7 @@ pub fn btc_ledger_prepare_psbt(
                     let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
                     let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
-                        bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash())
-                            == txout.script_pubkey
+                        bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == txout.script_pubkey
                     } else {
                         false
                     }
@@ -940,23 +943,20 @@ pub fn btc_ledger_prepare_psbt(
                     let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
                         let wpkh = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash())
-                            == txout.script_pubkey
+                        bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == txout.script_pubkey
                     } else {
                         false
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
                     let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash())
-                        == txout.script_pubkey
+                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == txout.script_pubkey
                 }
                 _ => false,
             };
 
             if matched {
-                let deriv_path =
-                    bitcoin::bip32::DerivationPath::from(full_path.clone());
+                let deriv_path = bitcoin::bip32::DerivationPath::from(full_path.clone());
 
                 if bip_purpose == DerivationPath::BIP86_PURPOSE {
                     let (xonly, _) = pubkey.x_only_public_key();
@@ -964,9 +964,7 @@ pub fn btc_ledger_prepare_psbt(
                         .tap_key_origins
                         .insert(xonly, (vec![], (fp, deriv_path)));
                 } else {
-                    output
-                        .bip32_derivation
-                        .insert(*pubkey, (fp, deriv_path));
+                    output.bip32_derivation.insert(*pubkey, (fp, deriv_path));
                 }
                 break;
             }

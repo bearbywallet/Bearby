@@ -4787,11 +4787,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return FinalizedBtcTx(
       rawTxHex: dco_decode_String(arr[0]),
       txHash: dco_decode_String(arr[1]),
+      psbtBytes: dco_decode_list_prim_u_8_strict(arr[2]),
     );
   }
 
@@ -6272,7 +6273,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_rawTxHex = sse_decode_String(deserializer);
     var var_txHash = sse_decode_String(deserializer);
-    return FinalizedBtcTx(rawTxHex: var_rawTxHex, txHash: var_txHash);
+    var var_psbtBytes = sse_decode_list_prim_u_8_strict(deserializer);
+    return FinalizedBtcTx(
+        rawTxHex: var_rawTxHex, txHash: var_txHash, psbtBytes: var_psbtBytes);
   }
 
   @protected
@@ -7922,6 +7925,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.rawTxHex, serializer);
     sse_encode_String(self.txHash, serializer);
+    sse_encode_list_prim_u_8_strict(self.psbtBytes, serializer);
   }
 
   @protected

@@ -5668,9 +5668,11 @@ impl SseDecode for crate::api::btc_ledger::FinalizedBtcTx {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_rawTxHex = <String>::sse_decode(deserializer);
         let mut var_txHash = <String>::sse_decode(deserializer);
+        let mut var_psbtBytes = <Vec<u8>>::sse_decode(deserializer);
         return crate::api::btc_ledger::FinalizedBtcTx {
             raw_tx_hex: var_rawTxHex,
             tx_hash: var_txHash,
+            psbt_bytes: var_psbtBytes,
         };
     }
 }
@@ -7928,6 +7930,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::btc_ledger::FinalizedBtcTx {
         [
             self.raw_tx_hex.into_into_dart().into_dart(),
             self.tx_hash.into_into_dart().into_dart(),
+            self.psbt_bytes.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8925,6 +8928,7 @@ impl SseEncode for crate::api::btc_ledger::FinalizedBtcTx {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.raw_tx_hex, serializer);
         <String>::sse_encode(self.tx_hash, serializer);
+        <Vec<u8>>::sse_encode(self.psbt_bytes, serializer);
     }
 }
 
