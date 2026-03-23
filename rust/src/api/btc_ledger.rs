@@ -919,6 +919,14 @@ pub fn btc_ledger_prepare_psbt(
                         .insert(xonly, (vec![], (fp, deriv_path)));
                 } else {
                     input.bip32_derivation.insert(*pubkey, (fp, deriv_path));
+                    // BIP49 (P2SH-P2WPKH): set redeemScript = OP_0 <hash160(pubkey)>
+                    if bip_purpose == DerivationPath::BIP49_PURPOSE {
+                        let btc_pk = bitcoin::PublicKey::new(*pubkey);
+                        if let Ok(cpk) = bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                            input.redeem_script =
+                                Some(bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
+                        }
+                    }
                 }
                 break;
             }
@@ -985,6 +993,14 @@ pub fn btc_ledger_prepare_psbt(
                         .insert(xonly, (vec![], (fp, deriv_path)));
                 } else {
                     output.bip32_derivation.insert(*pubkey, (fp, deriv_path));
+                    // BIP49 (P2SH-P2WPKH): set redeemScript on change output
+                    if bip_purpose == DerivationPath::BIP49_PURPOSE {
+                        let btc_pk = bitcoin::PublicKey::new(*pubkey);
+                        if let Ok(cpk) = bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                            output.redeem_script =
+                                Some(bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
+                        }
+                    }
                 }
                 break;
             }
