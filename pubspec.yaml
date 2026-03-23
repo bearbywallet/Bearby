@@ -1,7 +1,6 @@
 name: bearby
 description: "Bearby wallet IOS, Android, Mac, Linux, Windows"
-# Flutter version: 3.41.2
-version: 3.8.28+917
+version: 3.8.28+918
 
 environment:
   sdk: ^3.5.1
