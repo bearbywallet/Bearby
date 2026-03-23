@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/chain_config_edit.dart';
 import 'package:bearby/src/rust/api/provider.dart';
@@ -291,8 +292,12 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final isLedgerWallet =
+        wallet?.walletType.contains(WalletType.ledger.name) ?? false;
     final filtered = _getFilteredNetworks(allNetworks)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
+        .where((network) =>
+            !isLedgerWallet || network.configInfo.slip44 == wallet?.slip44)
         .toList();
     final filteredNetworks = _getSortedNetworks(filtered, chain, wallet);
     final l10n = AppLocalizations.of(context)!;
