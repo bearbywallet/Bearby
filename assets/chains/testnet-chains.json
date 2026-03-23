@@ -16,7 +16,7 @@
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
         "addr": "tb1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5ssk79hv2",
         "name": "Bitcoin",
-        "symbol": "BTC",
+        "symbol": "tBTC",
         "decimals": 8
       }
     ],
