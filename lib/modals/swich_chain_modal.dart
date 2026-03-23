@@ -186,7 +186,7 @@ class _SwitchChainNetworkContentState
                           Provider.of<AppState>(context, listen: false);
                       final wallet = appState.wallet;
 
-                      if (wallet?.accounts[wallet?.slip44] == null) {
+                      if (wallet?.accounts[_selectedNetwork?.slip44] == null) {
                         showConfirmPasswordModal(
                           context: context,
                           theme: appState.currentTheme,

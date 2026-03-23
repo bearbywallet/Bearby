@@ -24,7 +24,9 @@ class DeepLinkService {
         },
         onError: (err) {},
       );
-    } catch (e) {}
+    } catch (e) {
+      //
+    }
   }
 
   void _handleDeepLink(Uri uri, GlobalKey<NavigatorState> navigatorKey) {
@@ -84,7 +86,9 @@ class DeepLinkService {
       } else {
         Navigator.of(context).pushReplacementNamed('/login');
       }
-    } catch (e) {}
+    } catch (e) {
+      //
+    }
   }
 
   bool _chainMatches(String currentChain, String targetChain) {
