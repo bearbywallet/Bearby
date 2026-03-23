@@ -270,8 +270,22 @@ class LedgerViewController extends ChangeNotifier {
         witnessUtxosJson: transaction.metadata.btcWitnessUtxos ?? '[]',
       );
 
-      final signatures = await btcApp.signPsbt(
+      // Get fingerprint & xpub to prepare the PSBT with bip32_derivation
+      final fingerprint = await btcApp.getMasterFingerprint();
+      final accountPath = "m/$bipPurpose'/0'/$accountIndex'";
+      final xpub = await btcApp.getExtendedPubkey(path: accountPath);
+
+      // Prepare PSBT: populates bip32_derivation (pubkeys) for non-Taproot
+      final preparedPsbt = await btc_ffi.btcLedgerPreparePsbt(
         psbtBytes: psbtBytes,
+        masterFingerprint: fingerprint,
+        bipPurpose: bipPurpose,
+        accountIndex: accountIndex,
+        xpub: xpub,
+      );
+
+      final signatures = await btcApp.signPsbt(
+        psbtBytes: preparedPsbt,
         bipPurpose: bipPurpose,
         accountIndex: accountIndex,
       );
@@ -286,7 +300,7 @@ class LedgerViewController extends ChangeNotifier {
       }
 
       final finalized = await btc_ffi.btcLedgerFinalizePsbtWithSigs(
-        psbtBytes: psbtBytes,
+        psbtBytes: preparedPsbt,
         sigs: ledgerSigs,
         addrType: bipPurpose,
       );
@@ -302,6 +316,7 @@ class LedgerViewController extends ChangeNotifier {
     required AccountInfo account,
     required BigInt walletIndex,
     required int slip44,
+    int bipPurpose = kBip86Purpose,
   }) async {
     String? sig;
 
@@ -336,7 +351,7 @@ class LedgerViewController extends ChangeNotifier {
       final btcApp = BtcLedgerApp(_connectedTransport!);
       final sigBytes = await btcApp.signMessage(
         message: message,
-        bipPurpose: kBip86Purpose,
+        bipPurpose: bipPurpose,
         index: account.index.toInt(),
       );
       sig = sigBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();

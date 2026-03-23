@@ -680,8 +680,22 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                 // ECDSA: signature goes into partial_sigs
                 let ecdsa_sig = bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
-                let pubkey = bitcoin::PublicKey::from_slice(&sig_info.pubkey)
-                    .map_err(|e| format!("Invalid public key: {}", e))?;
+
+                let pubkey = if sig_info.pubkey.is_empty() {
+                    // Extract pubkey from PSBT's bip32_derivation (set by btc_ledger_prepare_psbt)
+                    let (pk, _) = psbt.inputs[idx]
+                        .bip32_derivation
+                        .iter()
+                        .next()
+                        .ok_or_else(|| {
+                            format!("No pubkey in bip32_derivation for input {}", idx)
+                        })?;
+                    bitcoin::PublicKey::new(*pk)
+                } else {
+                    bitcoin::PublicKey::from_slice(&sig_info.pubkey)
+                        .map_err(|e| format!("Invalid public key: {}", e))?
+                };
+
                 psbt.inputs[idx].partial_sigs.insert(pubkey, ecdsa_sig);
             }
         }
@@ -911,6 +925,12 @@ pub fn btc_ledger_prepare_psbt(
         }
 
         if bip_purpose == DerivationPath::BIP86_PURPOSE && input.tap_key_origins.is_empty() {
+            return Err(format!(
+                "Could not match input {} to any derived key (gap_limit={})",
+                i, GAP_LIMIT
+            ));
+        } else if bip_purpose != DerivationPath::BIP86_PURPOSE && input.bip32_derivation.is_empty()
+        {
             return Err(format!(
                 "Could not match input {} to any derived key (gap_limit={})",
                 i, GAP_LIMIT

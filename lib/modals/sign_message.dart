@@ -172,6 +172,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             account: account,
             walletIndex: appState.selectedWalletIndex,
             slip44: wallet.slip44,
+            bipPurpose: wallet.bip,
           );
           widget.onMessageSigned(account.pubKey ?? account.addr, sig);
         } else if (widget.typedData != null) {

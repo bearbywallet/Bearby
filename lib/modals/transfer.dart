@@ -277,6 +277,7 @@ class _ConfirmTransactionContentState
       walletIndex: appState.selectedWallet,
       accountIndex: accountIndex,
       account: appState.account!,
+      bipPurpose: appState.wallet!.bip,
     );
 
     return await sendSignedTransactions(
