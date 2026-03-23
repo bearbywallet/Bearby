@@ -115,6 +115,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .toList()
           ..sort((a, b) => a.index.compareTo(b.index));
         _selectedAccounts = {for (var account in _accounts) account: true};
+
+        if (wallet != null && network.slip44 == kBitcoinlip44) {
+          final l10n = AppLocalizations.of(context)!;
+          final options = BipPurposeSelector.getBipPurposeOptions(l10n);
+          final currentBip = wallet.bip;
+          final matchIndex = options.indexWhere((o) => o.purpose == currentBip);
+          if (matchIndex >= 0) {
+            _selectedPurposeIndex = matchIndex;
+          }
+        }
       }
     });
   }
@@ -248,11 +258,17 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .toList();
 
         final isZilliqaAppUpdate = appState.ledgerViewController.isZilliqaApp;
+        final updateBipPurpose = _network?.slip44 == kBitcoinlip44
+            ? BipPurposeSelector.getBipPurposeOptions(
+                    l10n)[_selectedPurposeIndex]
+                .purpose
+            : kBip44Purpose;
 
         await updateLedgerAccounts(
           walletIndex: BigInt.from(walletIndex),
           accounts: accountsToUpdate,
           zilliqaLegacy: isZilliqaAppUpdate,
+          bipPurpose: updateBipPurpose,
         );
 
         await appState.syncData();

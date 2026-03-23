@@ -106,6 +106,7 @@ pub async fn update_ledger_accounts(
     wallet_index: usize,
     accounts: Vec<(u8, String, String)>, // index, pubkey_or_address, name
     zilliqa_legacy: bool,
+    bip_purpose: u32,
 ) -> Result<(), String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
@@ -124,7 +125,7 @@ pub async fn update_ledger_accounts(
             | Address::Secp256k1Tron(_) => DerivationPath::new(
                 provider.config.slip_44,
                 wallet_index,
-                DerivationPath::BIP44_PURPOSE,
+                bip_purpose,
                 None,
             ),
             Address::Secp256k1Bitcoin(_) => {
@@ -155,7 +156,7 @@ pub async fn update_ledger_accounts(
         accounts.dedup_by(|a, b| a.0 == b.0 && a.2 == b.2);
 
         wallet
-            .update_ledger_accounts(accounts, &provider.config)
+            .update_ledger_accounts(accounts, &provider.config, bip_purpose)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())

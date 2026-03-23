@@ -4901,6 +4901,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_accounts = <Vec<(u8, String, String)>>::sse_decode(&mut deserializer);
             let api_zilliqa_legacy = <bool>::sse_decode(&mut deserializer);
+            let api_bip_purpose = <u32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -4909,6 +4910,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
                             api_wallet_index,
                             api_accounts,
                             api_zilliqa_legacy,
+                            api_bip_purpose,
                         )
                         .await?;
                         Ok(output_ok)

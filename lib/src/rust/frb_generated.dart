@@ -551,7 +551,8 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiLedgerUpdateLedgerAccounts(
       {required BigInt walletIndex,
       required List<(int, String, String)> accounts,
-      required bool zilliqaLegacy});
+      required bool zilliqaLegacy,
+      required int bipPurpose});
 
   Future<void> crateApiTokenUpdateRates({required BigInt walletIndex});
 
@@ -4057,13 +4058,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiLedgerUpdateLedgerAccounts(
       {required BigInt walletIndex,
       required List<(int, String, String)> accounts,
-      required bool zilliqaLegacy}) {
+      required bool zilliqaLegacy,
+      required int bipPurpose}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_list_record_u_8_string_string(accounts, serializer);
         sse_encode_bool(zilliqaLegacy, serializer);
+        sse_encode_u_32(bipPurpose, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 126, port: port_);
       },
@@ -4072,7 +4075,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiLedgerUpdateLedgerAccountsConstMeta,
-      argValues: [walletIndex, accounts, zilliqaLegacy],
+      argValues: [walletIndex, accounts, zilliqaLegacy, bipPurpose],
       apiImpl: this,
     ));
   }
@@ -4080,7 +4083,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiLedgerUpdateLedgerAccountsConstMeta =>
       const TaskConstMeta(
         debugName: "update_ledger_accounts",
-        argNames: ["walletIndex", "accounts", "zilliqaLegacy"],
+        argNames: ["walletIndex", "accounts", "zilliqaLegacy", "bipPurpose"],
       );
 
   @override

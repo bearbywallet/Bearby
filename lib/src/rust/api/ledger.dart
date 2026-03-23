@@ -18,11 +18,13 @@ Future<String> addLedgerWallet(
 Future<void> updateLedgerAccounts(
         {required BigInt walletIndex,
         required List<(int, String, String)> accounts,
-        required bool zilliqaLegacy}) =>
+        required bool zilliqaLegacy,
+        required int bipPurpose}) =>
     RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
         walletIndex: walletIndex,
         accounts: accounts,
-        zilliqaLegacy: zilliqaLegacy);
+        zilliqaLegacy: zilliqaLegacy,
+        bipPurpose: bipPurpose);
 
 Future<Uint32List> ledgerSplitPath({required String path}) =>
     RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
