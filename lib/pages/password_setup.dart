@@ -281,9 +281,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       await _appState.syncData();
 
       if (_zilLegacy && _chain?.slip44 == kZilliqaSlip44) {
-        BigInt walletIndex = BigInt.from(_appState.selectedWallet);
         await zilliqaSwapChain(
-          walletIndex: walletIndex,
+          walletIndex: _appState.selectedWalletIndex,
           accountIndex: _appState.wallet!.selectedAccount,
         );
         await _appState.syncData();

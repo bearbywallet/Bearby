@@ -72,7 +72,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       });
 
       await deleteWallet(
-        walletIndex: BigInt.from(widget.state.selectedWallet),
+        walletIndex: widget.state.selectedWalletIndex,
         password:
             _passwordController.text.isEmpty ? null : _passwordController.text,
       );

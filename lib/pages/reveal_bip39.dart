@@ -156,7 +156,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscurePassword,
                         onSubmitted: (_) => _onPasswordSubmit(
-                          BigInt.from(state.selectedWallet),
+                          state.selectedWalletIndex,
                         ),
                         rightIconPath: _obscurePassword
                             ? "assets/icons/close_eye.svg"
@@ -182,7 +182,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                           valueColor: theme.buttonText,
                           controller: _btnController,
                           onPressed: () => _onPasswordSubmit(
-                            BigInt.from(state.selectedWallet),
+                            state.selectedWalletIndex,
                           ),
                           child: Text(
                             AppLocalizations.of(context)!

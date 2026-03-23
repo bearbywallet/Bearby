@@ -129,6 +129,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return BigInt.from(_selectedWallet);
   }
 
+  BigInt? get selectedWalletIndexOrNull {
+    if (_selectedWallet < 0) return null;
+    return BigInt.from(_selectedWallet);
+  }
+
   void setHideBalance(bool value) async {
     _hideBalance = value;
     await _prefs.setHideBalance(value);
@@ -171,13 +176,16 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncConnections() async {
-    _connections =
-        await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
+    final index = selectedWalletIndexOrNull;
+    if (index == null) return;
+    _connections = await getConnectionsList(walletIndex: index);
     notifyListeners();
   }
 
   Future<void> syncRates({bool force = false}) async {
     if (chain?.testnet == true || wallet?.settings.ratesApiOptions == 0) return;
+    final walletIndex = selectedWalletIndexOrNull;
+    if (walletIndex == null) return;
     final now = DateTime.now();
     final tokens = wallet?.tokens;
 
@@ -190,7 +198,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     }
 
     try {
-      await updateRates(walletIndex: BigInt.from(_selectedWallet));
+      await updateRates(walletIndex: walletIndex);
       _lastRateUpdateTime = now;
     } catch (e) {
       debugPrint("error sync rates: $e");
@@ -256,9 +264,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> startTrackHistoryWorker() async {
+    final walletIndex = selectedWalletIndexOrNull;
+    if (walletIndex == null) return;
     try {
-      Stream<String> stream =
-          startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
+      Stream<String> stream = startHistoryWorker(walletIndex: walletIndex);
       stream.listen((event) async {
         notifyListeners();
       });

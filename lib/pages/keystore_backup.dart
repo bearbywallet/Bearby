@@ -271,7 +271,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
                           valueColor: theme.buttonText,
                           controller: _btnController,
                           onPressed: () => _onCreateBackup(
-                            BigInt.from(state.selectedWallet),
+                            state.selectedWalletIndex,
                             state.wallet?.walletName ?? "",
                           ),
                           child: Text(

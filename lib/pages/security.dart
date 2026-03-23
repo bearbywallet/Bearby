@@ -166,7 +166,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 state.wallet!.settings.tokensListFetcher,
                 (value) async {
                   await setTokensListFetcher(
-                    walletIndex: BigInt.from(state.selectedWallet),
+                    walletIndex: state.selectedWalletIndex,
                     enabled: value,
                   );
                   await state.syncData();
@@ -183,7 +183,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 state.wallet!.settings.ensEnabled,
                 (value) async {
                   await setWalletEns(
-                    walletIndex: BigInt.from(state.selectedWallet),
+                    walletIndex: state.selectedWalletIndex,
                     ensEnabled: value,
                   );
                   await state.syncData();
@@ -200,7 +200,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 state.wallet!.settings.ipfsNode != null,
                 (value) async {
                   await setWalletIpfsNode(
-                    walletIndex: BigInt.from(state.selectedWallet),
+                    walletIndex: state.selectedWalletIndex,
                     node: value ? _ipfsController.text : null,
                   );
                   await state.syncData();
@@ -219,7 +219,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 state.wallet!.settings.nodeRankingEnabled,
                 (value) async {
                   await setWalletNodeRanking(
-                    walletIndex: BigInt.from(state.selectedWallet),
+                    walletIndex: state.selectedWalletIndex,
                     enabled: value,
                   );
                   await state.syncData();

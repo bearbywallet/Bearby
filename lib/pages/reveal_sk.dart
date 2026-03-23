@@ -156,7 +156,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscurePassword,
                         onSubmitted: (_) => _onPasswordSubmit(
-                          BigInt.from(state.selectedWallet),
+                          state.selectedWalletIndex,
                           state.wallet!.selectedAccount,
                         ),
                         rightIconPath: _obscurePassword
@@ -183,7 +183,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                           valueColor: theme.buttonText,
                           controller: _btnController,
                           onPressed: () => _onPasswordSubmit(
-                            BigInt.from(state.selectedWallet),
+                            state.selectedWalletIndex,
                             state.wallet!.selectedAccount,
                           ),
                           child: Text(

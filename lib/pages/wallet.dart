@@ -495,7 +495,7 @@ class _WalletPageState extends State<WalletPage> {
       onSubmitted: (_) async {
         if (_walletNameController.text.isNotEmpty) {
           await changeWalletName(
-            walletIndex: BigInt.from(state.selectedWallet),
+            walletIndex: state.selectedWalletIndex,
             newName: _walletNameController.text,
           );
           await state.syncData();
@@ -691,5 +691,4 @@ class _WalletPageState extends State<WalletPage> {
   bool _isBitcoinWallet(AppState appState) {
     return appState.wallet?.slip44 == kBitcoinlip44;
   }
-
 }
