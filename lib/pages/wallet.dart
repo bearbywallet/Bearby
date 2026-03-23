@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/bip_purpose_selector.dart';
 import 'package:bearby/config/bip_purposes.dart';
+import 'package:bearby/modals/bip_purpose_modal.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/web3_constants.dart';
@@ -100,6 +100,11 @@ class _WalletPageState extends State<WalletPage> {
     if (!_isBitcoinWallet(appState) || appState.account?.addr == null) {
       return;
     }
+
+    final walletType = appState.wallet?.walletType ?? '';
+    final isSeedOrKey = walletType.contains(WalletType.SecretPhrase.name) ||
+        walletType.contains(WalletType.SecretKey.name);
+    if (!isSeedOrKey) return;
 
     try {
       final addressType = await bitcoinAddressTypeFromAddress(
@@ -319,13 +324,33 @@ class _WalletPageState extends State<WalletPage> {
       ),
     );
 
-    if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
+    final walletType = appState.wallet!.walletType;
+    final isSeedOrKey = walletType.contains(WalletType.SecretPhrase.name) ||
+        walletType.contains(WalletType.SecretKey.name);
+
+    if (_isBitcoinWallet(appState) && isSeedOrKey) {
+      items.add(
+        WalletPreferenceItem(
+          title: l10n.bipPurposeSetupPageTitle,
+          iconPath: 'assets/icons/currency.svg',
+          onTap: () {
+            showBipPurposeModal(
+              context: context,
+              selectedIndex: _selectedBipPurposeIndex,
+              onSelect: (index) => _handleBipPurposeChange(index, appState),
+            );
+          },
+        ),
+      );
+    }
+
+    if (!walletType.contains(WalletType.ledger.name)) {
       items.add(
         WalletPreferenceItem(
           title: l10n.walletPageBackup,
           iconPath: 'assets/icons/key.svg',
           onTap: () {
-            if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
+            if (!walletType.contains(WalletType.ledger.name)) {
               _handleBackup(appState.currentTheme);
             }
           },
@@ -390,10 +415,6 @@ class _WalletPageState extends State<WalletPage> {
                       _buildWalletNameInput(theme, appState),
                       const SizedBox(height: 32),
                       _buildPreferencesSection(appState),
-                      if (_isBitcoinWallet(appState)) ...[
-                        const SizedBox(height: 32),
-                        _buildBipPurposeSection(appState),
-                      ],
                     ]),
                   ),
                 ),
@@ -671,28 +692,4 @@ class _WalletPageState extends State<WalletPage> {
     return appState.wallet?.slip44 == kBitcoinlip44;
   }
 
-  Widget _buildBipPurposeSection(AppState appState) {
-    final theme = appState.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16),
-          child: Text(
-            l10n.bipPurposeSetupPageTitle,
-            style: theme.bodyLarge.copyWith(
-              color: theme.textSecondary,
-            ),
-          ),
-        ),
-        BipPurposeSelector(
-          selectedIndex: _selectedBipPurposeIndex,
-          onSelect: (index) => _handleBipPurposeChange(index, appState),
-          disabled: false,
-        ),
-      ],
-    );
-  }
 }
