@@ -106,65 +106,44 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
   OptionItem _buildNetworkItem(
       NetworkConfigInfo chain, AppTheme theme, int index) {
-    final l10n = AppLocalizations.of(context)!;
-    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 40);
-    final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
+    final spacing = AdaptiveSize.getAdaptiveSize(context, 10);
 
     return OptionItem(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: iconSize,
-                height: iconSize,
-                child: AsyncImage(
-                  url: viewChain(network: chain, theme: theme.value),
-                  fit: BoxFit.contain,
-                  errorWidget: const Icon(Icons.error),
+          SizedBox(
+            width: iconSize,
+            height: iconSize,
+            child: AsyncImage(
+              url: viewChain(network: chain, theme: theme.value),
+              fit: BoxFit.contain,
+              errorWidget: const Icon(Icons.error),
+            ),
+          ),
+          SizedBox(width: spacing),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  chain.name,
+                  style: theme.bodyText1.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SizedBox(width: spacing),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      chain.name,
-                      style: theme.labelLarge.copyWith(
-                        color: theme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${l10n.setupNetworkSettingsPageChainIdLabel} ${chain.chainIds.toList().first}',
-                      style: theme.bodyText2.copyWith(
-                        color: theme.primaryPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${l10n.setupNetworkSettingsPageTokenLabel} ${chain.chain}',
-                      style: theme.bodyText2.copyWith(
-                        color: theme.textSecondary,
-                      ),
-                    ),
-                    if (chain.explorers.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        '${l10n.setupNetworkSettingsPageExplorerLabel} ${chain.explorers.first.name}',
-                        style: theme.labelSmall.copyWith(
-                          color: theme.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  chain.chain,
+                  style: theme.bodySmall.copyWith(
+                    color: theme.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -79,7 +80,7 @@ class _OptionItemWidgetState extends State<_OptionItemWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 200),
         opacity: widget.disabled
@@ -106,62 +107,90 @@ class _OptionItemWidgetState extends State<_OptionItemWidget> {
                   scale: _isHovered && !widget.disabled ? 1.02 : 1.0,
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Color.lerp(
-                          widget.theme.modalBorder,
-                          widget.disabled
-                              ? widget.theme.textSecondary
-                              : widget.theme.primaryPurple,
-                          value,
-                        )!,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: widget.option.child,
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: widget.option.isSelected
-                                  ? widget.disabled
-                                      ? widget.theme.textSecondary
-                                      : widget.theme.primaryPurple
-                                  : widget.theme.modalBorder,
-                              width: 2,
-                            ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              widget.theme.cardBackground.withValues(
+                                  alpha: 0.65 + value * 0.15),
+                              widget.theme.cardBackground.withValues(
+                                  alpha: 0.75 + value * 0.10),
+                            ],
                           ),
-                          child: Center(
-                            child: AnimatedScale(
-                              duration: const Duration(milliseconds: 200),
-                              scale: widget.option.isSelected ? 1.0 : 0.0,
-                              child: Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: widget.disabled
-                                      ? widget.theme.textSecondary
-                                      : widget.theme.primaryPurple,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Color.lerp(
+                              widget.theme.primaryPurple
+                                  .withValues(alpha: 0.15),
+                              widget.disabled
+                                  ? widget.theme.textSecondary
+                                  : widget.theme.primaryPurple,
+                              value,
+                            )!,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: widget.theme.primaryPurple
+                                  .withValues(alpha: 0.05 + value * 0.05),
+                              blurRadius: 15,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: widget.option.child,
+                            ),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: widget.option.isSelected
+                                      ? widget.disabled
+                                          ? widget.theme.textSecondary
+                                          : widget.theme.primaryPurple
+                                      : widget.theme.primaryPurple
+                                          .withValues(alpha: 0.3),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Center(
+                                child: AnimatedScale(
+                                  duration:
+                                      const Duration(milliseconds: 200),
+                                  scale:
+                                      widget.option.isSelected ? 1.0 : 0.0,
+                                  child: Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: widget.disabled
+                                          ? widget.theme.textSecondary
+                                          : widget.theme.primaryPurple,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 );
