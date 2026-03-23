@@ -8,6 +8,7 @@ import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/chain_config_edit.dart';
+import 'package:bearby/modals/confirm_password.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
@@ -198,31 +199,43 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   void _handleNetworkSelect(NetworkItem networkItem) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final config = networkItem.configInfo;
+    final wallet = appState.wallet;
 
-    if (!networkItem.isAdded) {
-      try {
-        await addProvider(providerConfig: config);
-        await appState.syncData();
-      } catch (e) {
-        setState(() {
-          errorMessage =
-              '${AppLocalizations.of(context)!.networkPageAddError}$e';
-        });
-        return;
-      }
-    }
+    if (wallet?.accounts[wallet?.slip44] == null) {
+      showConfirmPasswordModal(
+        context: context,
+        theme: appState.currentTheme,
+        onConfirm: (password) async {
+          try {
+            await selectAccountsChain(
+              walletIndex: appState.selectedWalletIndex,
+              chainHash: config.chainHash,
+              password: password,
+            );
+          } catch (_) {}
 
-    try {
-      await selectAccountsChain(
-        walletIndex: appState.selectedWalletIndex,
-        chainHash: config.chainHash,
+          await appState.syncData();
+
+          if (_popOnSelect && mounted && Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+
+          return null;
+        },
       );
-    } catch (_) {}
+    } else {
+      try {
+        await selectAccountsChain(
+          walletIndex: appState.selectedWalletIndex,
+          chainHash: config.chainHash,
+        );
+      } catch (_) {}
 
-    await appState.syncData();
+      await appState.syncData();
 
-    if (_popOnSelect && mounted && Navigator.canPop(context)) {
-      Navigator.pop(context);
+      if (_popOnSelect && mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     }
   }
 
