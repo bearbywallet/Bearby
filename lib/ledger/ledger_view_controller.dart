@@ -519,6 +519,55 @@ class LedgerViewController extends ChangeNotifier {
     }
   }
 
+  Future<Transport?> scanAndAutoConnect({
+    Duration timeout = const Duration(seconds: 15),
+  }) async {
+    if (_isScanning || _isConnecting) return null;
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      final permissionsGranted = await _requestPermissions();
+      if (!permissionsGranted) {
+        _updateStatus(LedgerStatus.scanError, "Permissions not granted.");
+        return null;
+      }
+    }
+
+    _isScanning = true;
+    _updateStatus(LedgerStatus.scanning);
+
+    _startHidPolling();
+    if (_useRustTransport) {
+      _startRustBleScan();
+    }
+
+    final startTime = DateTime.now();
+    DiscoveredDevice? bleFallback;
+
+    while (_isScanning) {
+      final elapsed = DateTime.now().difference(startTime);
+      if (elapsed >= timeout) break;
+
+      for (final device in _discoveredDevices) {
+        if (device.isUsb) {
+          stopScan();
+          return await open(device);
+        }
+        bleFallback ??= device;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    if (bleFallback != null) {
+      stopScan();
+      return await open(bleFallback);
+    }
+
+    stopScan();
+    _updateStatus(LedgerStatus.scanFinishedNoDevices);
+    return null;
+  }
+
   Future<void> disconnect() async {
     if (_connectedTransport == null) return;
     try {

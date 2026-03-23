@@ -90,7 +90,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
-      appState.ledgerViewController.scan();
+      appState.ledgerViewController.scanAndAutoConnect().then((_) {
+        if (mounted) setState(() {});
+      });
     }
   }
 
