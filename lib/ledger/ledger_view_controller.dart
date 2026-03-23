@@ -107,8 +107,8 @@ class LedgerViewController extends ChangeNotifier {
     } else {
       final bleSub = BleTransport.listen().listen(
         (event) {
-          _discoveredDevices
-              .add(DiscoveredDevice.fromBleDevice(event.rawDevice));
+          _addDeviceWithPriority(
+              DiscoveredDevice.fromBleDevice(event.rawDevice));
           _updateStatus(LedgerStatus.foundDevices);
         },
         onError: (e) => _handleScanError(e, "BLE"),
@@ -139,7 +139,9 @@ class LedgerViewController extends ChangeNotifier {
         final discoveredHid = _useRustTransport
             ? await RustHidTransport.list()
             : await HidTransport.list();
-        _discoveredDevices.addAll(discoveredHid);
+        for (final device in discoveredHid) {
+          _addDeviceWithPriority(device);
+        }
         _updateStatus(LedgerStatus.foundDevices);
       } on PlatformException catch (e) {
         _handleScanError(e, "USB Polling ${e.code}");
@@ -157,7 +159,9 @@ class LedgerViewController extends ChangeNotifier {
       }
       try {
         final bleDevices = await RustBleTransport.scan();
-        _discoveredDevices.addAll(bleDevices);
+        for (final device in bleDevices) {
+          _addDeviceWithPriority(device);
+        }
         if (bleDevices.isNotEmpty) {
           _updateStatus(LedgerStatus.foundDevices);
         }
@@ -171,6 +175,16 @@ class LedgerViewController extends ChangeNotifier {
     debugPrint('[$type Scan] Scan Error: $error');
     _updateStatus(LedgerStatus.scanError, error.toString());
     stopScan();
+  }
+
+  void _addDeviceWithPriority(DiscoveredDevice device) {
+    final existing = _discoveredDevices.lookup(device);
+    if (existing == null) {
+      _discoveredDevices.add(device);
+    } else if (device.isUsb && !existing.isUsb) {
+      _discoveredDevices.remove(existing);
+      _discoveredDevices.add(device);
+    }
   }
 
   void stopScan() {

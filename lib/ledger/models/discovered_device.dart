@@ -81,7 +81,8 @@ class DiscoveredDevice {
   }
 
   factory DiscoveredDevice.fromRustBleDevice(RustLedgerBleDevice device) {
-    final deviceModel = Devices.identifyBluetoothServiceUuid(device.serviceUuid);
+    final deviceModel =
+        Devices.identifyBluetoothServiceUuid(device.serviceUuid);
     return DiscoveredDevice(
       id: device.deviceId,
       name: device.name,
@@ -94,13 +95,23 @@ class DiscoveredDevice {
     );
   }
 
+  String get _identityKey => '${name}_${model?.id}';
+
+  bool get isUsb => connectionType == ConnectionType.usb;
+
+  bool isSamePhysicalDevice(DiscoveredDevice other) {
+    if (name == null || other.name == null) return false;
+    if (model?.id == null || other.model?.id == null) return false;
+    return name == other.name && model?.id == other.model?.id;
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DiscoveredDevice &&
           runtimeType == other.runtimeType &&
-          productId == other.productId;
+          _identityKey == other._identityKey;
 
   @override
-  int get hashCode => productId.hashCode;
+  int get hashCode => _identityKey.hashCode;
 }
