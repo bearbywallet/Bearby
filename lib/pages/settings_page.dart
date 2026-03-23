@@ -215,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     .settingsPageTelegram,
                                 trailingSvgPath: 'assets/icons/telegram.svg',
                                 onTap: () => socialMediaService.openTelegram(
-                                    username: 'zilpaychat'),
+                                    chatUrl: 'https://t.me/+S7Dqp9ORznE1NDIy'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!

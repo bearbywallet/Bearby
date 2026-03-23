@@ -26,10 +26,13 @@ class SocialMediaService {
   static const String _githubIosStore =
       'https://apps.apple.com/app/github/id1477376905';
 
-  Future<void> openTelegram({String? username, String? message}) async {
+  Future<void> openTelegram(
+      {String? username, String? message, String? chatUrl}) async {
     String url = _telegramScheme;
 
-    if (username != null) {
+    if (chatUrl != null) {
+      url = chatUrl;
+    } else if (username != null) {
       url = 'tg://resolve?domain=$username';
     } else if (message != null) {
       url = 'tg://msg?text=${Uri.encodeComponent(message)}';
