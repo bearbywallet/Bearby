@@ -57,7 +57,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
   @override
   void dispose() {
     _appState.ledgerViewController.removeListener(_handleControllerEvents);
-    _appState.ledgerViewController.dispose();
     super.dispose();
   }
 
