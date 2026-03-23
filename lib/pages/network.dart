@@ -201,7 +201,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final config = networkItem.configInfo;
     final wallet = appState.wallet;
 
-    if (wallet?.accounts[wallet?.slip44] == null) {
+    if (wallet?.accounts[networkItem.configInfo.slip44] == null) {
       showConfirmPasswordModal(
         context: context,
         theme: appState.currentTheme,
