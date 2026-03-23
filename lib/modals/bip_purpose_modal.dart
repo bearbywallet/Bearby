@@ -123,8 +123,8 @@ class _BipPurposeModalContentState extends State<_BipPurposeModalContent> {
                   isSelected: _currentIndex == index,
                   onSelect: () {
                     setState(() => _currentIndex = index);
-                    Navigator.pop(context);
                     widget.onSelect(index);
+                    Navigator.pop(context);
                   },
                 ),
               ),

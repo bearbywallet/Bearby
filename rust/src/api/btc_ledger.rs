@@ -862,9 +862,25 @@ pub fn btc_ledger_prepare_psbt(
 
     // Match inputs
     for (i, input) in psbt.inputs.iter_mut().enumerate() {
+        // Debug: log input state
+        eprintln!(
+            "BTC PREPARE input {}: witness_utxo={}, non_witness_utxo={}, bip_purpose={}",
+            i,
+            input.witness_utxo.is_some(),
+            input.non_witness_utxo.is_some(),
+            bip_purpose
+        );
+        if let Some(ref utxo) = input.witness_utxo {
+            eprintln!(
+                "  script_pubkey: {}",
+                hex::encode(utxo.script_pubkey.as_bytes())
+            );
+        }
+
         let script_pubkey = if let Some(ref utxo) = input.witness_utxo {
             utxo.script_pubkey.clone()
         } else {
+            eprintln!("  WARNING: witness_utxo is None, skipping input {}", i);
             continue;
         };
 
@@ -903,6 +919,14 @@ pub fn btc_ledger_prepare_psbt(
                     // Legacy: p2pkh
                     let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
                     let expected = bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash());
+                    if full_path.last() == Some(&ChildNumber::from_normal_idx(0).unwrap()) {
+                        eprintln!(
+                            "  BIP44 try: expected={}, actual={}, match={}",
+                            hex::encode(expected.as_bytes()),
+                            hex::encode(script_pubkey.as_bytes()),
+                            expected == script_pubkey
+                        );
+                    }
                     expected == script_pubkey
                 }
                 _ => false,

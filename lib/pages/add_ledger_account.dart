@@ -50,21 +50,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
   int _selectedPurposeIndex = 0;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
-    final discoveredDevice =
-        appState.ledgerViewController.discoveredDevices.firstOrNull;
-    final productName = appState.ledgerViewController.connectedTransport
-            ?.deviceModel?.productName ??
-        discoveredDevice?.deviceModelProducName ??
-        discoveredDevice?.name ??
-        discoveredDevice?.deviceModelId ??
-        "Ledger";
-    _walletNameController.text =
-        _createWallet ? productName : appState.wallet?.walletName ?? "";
 
     if (appState.ledgerViewController.status == LedgerStatus.initializing) {
       appState.ledgerViewController.scan();
@@ -74,12 +65,25 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_initialized) return;
+
+    final appState = context.read<AppState>();
+    final discoveredDevice =
+        appState.ledgerViewController.discoveredDevices.firstOrNull;
+    final productName = appState.ledgerViewController.connectedTransport
+            ?.deviceModel?.productName ??
+        discoveredDevice?.deviceModelProducName ??
+        discoveredDevice?.name ??
+        discoveredDevice?.deviceModelId ??
+        "Ledger";
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop();
       });
+      _initialized = true;
       return;
     }
 
@@ -88,45 +92,46 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
     if (network == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop();
       });
+      _initialized = true;
       return;
     }
 
-    setState(() {
-      _network = network;
-      _createWallet = createWallet ?? true;
+    _network = network;
+    _createWallet = createWallet ?? true;
+    _walletNameController.text =
+        _createWallet ? productName : appState.wallet?.walletName ?? "";
 
-      final appState = context.read<AppState>();
-      final wallet = appState.selectedWallet >= 0
-          ? appState.wallets.elementAtOrNull(appState.selectedWallet)
-          : null;
-      final isLedgerWallet =
-          wallet?.walletType.contains(WalletType.ledger.name) ?? false;
+    final wallet = appState.selectedWallet >= 0
+        ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+        : null;
+    final isLedgerWallet =
+        wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
-      if (isLedgerWallet && !_createWallet) {
-        final existingAccounts = appState.accounts;
-        _accounts = existingAccounts
-            .map((account) => LedgerAccount(
-                  index: account.index.toInt(),
-                  address: account.addr,
-                  publicKey: account.pubKey,
-                ))
-            .toList()
-          ..sort((a, b) => a.index.compareTo(b.index));
-        _selectedAccounts = {for (var account in _accounts) account: true};
+    if (isLedgerWallet && !_createWallet) {
+      final existingAccounts = appState.accounts;
+      _accounts = existingAccounts
+          .map((account) => LedgerAccount(
+                index: account.index.toInt(),
+                address: account.addr,
+                publicKey: account.pubKey,
+              ))
+          .toList()
+        ..sort((a, b) => a.index.compareTo(b.index));
+      _selectedAccounts = {for (var account in _accounts) account: true};
 
-        if (wallet != null && network.slip44 == kBitcoinlip44) {
-          final l10n = AppLocalizations.of(context)!;
-          final options = BipPurposeSelector.getBipPurposeOptions(l10n);
-          final currentBip = wallet.bip;
-          final matchIndex = options.indexWhere((o) => o.purpose == currentBip);
-          if (matchIndex >= 0) {
-            _selectedPurposeIndex = matchIndex;
-          }
+      if (wallet != null && network.slip44 == kBitcoinlip44) {
+        final options = BipPurposeSelector.getBipPurposeOptions(
+            AppLocalizations.of(context)!);
+        final matchIndex = options.indexWhere((o) => o.purpose == wallet.bip);
+        if (matchIndex >= 0) {
+          _selectedPurposeIndex = matchIndex;
         }
       }
-    });
+    }
+
+    _initialized = true;
   }
 
   @override
