@@ -1514,11 +1514,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
-    return '$deviceName 연결 성공!';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => '연결 실패';
 
   @override

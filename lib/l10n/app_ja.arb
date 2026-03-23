@@ -504,7 +504,6 @@
   "ledgerConnectPageScanFinishedNoDevices": "スキャンが完了しました。デバイスは見つかりませんでした。",
   "ledgerConnectPageScanFinishedWithDevices": "スキャンが完了しました。{count}台のデバイスが見つかりました。接続するものを選択してください。",
   "ledgerConnectPageConnectingStatus": "{deviceName}（{connectionType}）に接続中...",
-  "ledgerConnectPageConnectionSuccessStatus": "{deviceName}への接続に成功しました！",
   "ledgerConnectPageConnectionFailedTitle": "接続に失敗しました",
   "ledgerConnectPageConnectionFailedErrorStatus": "接続に失敗しました: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "{deviceName}に接続できませんでした。\nエラー: {error}",

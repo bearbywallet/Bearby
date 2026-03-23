@@ -501,7 +501,6 @@
   "ledgerConnectPageScanFinishedNoDevices": "Сканирование завершено. Устройства не найдены.",
   "ledgerConnectPageScanFinishedWithDevices": "Сканирование завершено. Найдено устройств: {count}. Выберите одно для подключения.",
   "ledgerConnectPageConnectingStatus": "Подключение к {deviceName} ({connectionType})...",
-  "ledgerConnectPageConnectionSuccessStatus": "Успешное подключение к {deviceName}!",
   "ledgerConnectPageConnectionFailedTitle": "Сбой подключения",
   "ledgerConnectPageConnectionFailedErrorStatus": "Сбой подключения: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "Не удалось подключиться к {deviceName}.\nОшибка: {error}",

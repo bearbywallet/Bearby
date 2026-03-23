@@ -489,7 +489,6 @@
   "ledgerConnectPageScanFinishedNoDevices": "扫描完成。未找到任何设备。",
   "ledgerConnectPageScanFinishedWithDevices": "扫描完成。找到 {count} 个设备。请选择一个进行连接。",
   "ledgerConnectPageConnectingStatus": "正在连接到 {deviceName} ({connectionType})...",
-  "ledgerConnectPageConnectionSuccessStatus": "成功连接到 {deviceName}！",
   "ledgerConnectPageConnectionFailedTitle": "连接失败",
   "ledgerConnectPageConnectionFailedErrorStatus": "连接失败: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "无法连接到 {deviceName}。\n错误: {error}",

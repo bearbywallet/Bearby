@@ -46,9 +46,7 @@ class LedgerConnector extends StatelessWidget {
           device?.connectionType.name.toUpperCase() ?? '',
         );
       case LedgerStatus.connectionSuccess:
-        final device = controller.connectedTransport?.deviceModel;
-        return localizations.ledgerConnectPageConnectionSuccessStatus(
-            device?.productName ?? 'Ledger');
+        return '';
       case LedgerStatus.connectionFailed:
         return localizations.ledgerConnectPageConnectionFailedErrorStatus(
             controller.errorDetails ?? 'Unknown error');
@@ -66,36 +64,40 @@ class LedgerConnector extends StatelessWidget {
       builder: (context, child) {
         final isBusy = controller.isScanning || controller.isConnecting;
 
+        final statusText = _getStatusText(context, controller.status);
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              children: [
-                Text(
-                  _getStatusText(context, controller.status),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: theme.textSecondary, fontSize: 15, height: 1.4),
-                ),
-                const SizedBox(height: 12),
-                AnimatedOpacity(
-                  opacity: isBusy ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: SizedBox(
-                    height: 4,
-                    child: isBusy
-                        ? LinearProgressIndicator(
-                            backgroundColor: theme.primaryPurple.withAlpha(51),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.primaryPurple),
-                          )
-                        : Container(),
+            if (statusText.isNotEmpty) ...[
+              Column(
+                children: [
+                  Text(
+                    statusText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: theme.textSecondary, fontSize: 15, height: 1.4),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+                  const SizedBox(height: 12),
+                  AnimatedOpacity(
+                    opacity: isBusy ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: SizedBox(
+                      height: 4,
+                      child: isBusy
+                          ? LinearProgressIndicator(
+                              backgroundColor: theme.primaryPurple.withAlpha(51),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.primaryPurple),
+                            )
+                          : Container(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+            ],
             _buildDeviceList(context),
           ],
         );

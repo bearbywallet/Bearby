@@ -3047,12 +3047,6 @@ abstract class AppLocalizations {
   /// **'Connecting to {deviceName} ({connectionType})...'**
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType);
 
-  /// Status text shown upon a successful connection to a Ledger device.
-  ///
-  /// In en, this message translates to:
-  /// **'Successfully connected to {deviceName}!'**
-  String ledgerConnectPageConnectionSuccessStatus(String deviceName);
-
   /// Title for the dialog shown when a connection attempt fails.
   ///
   /// In en, this message translates to:

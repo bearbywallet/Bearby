@@ -490,7 +490,6 @@
   "ledgerConnectPageScanFinishedNoDevices": "스캔 완료. 기기 없음.",
   "ledgerConnectPageScanFinishedWithDevices": "스캔 완료. {count} 기기 발견. 연결할 하나 선택.",
   "ledgerConnectPageConnectingStatus": "{deviceName} ({connectionType}) 연결 중...",
-  "ledgerConnectPageConnectionSuccessStatus": "{deviceName} 연결 성공!",
   "ledgerConnectPageConnectionFailedTitle": "연결 실패",
   "ledgerConnectPageConnectionFailedErrorStatus": "연결 실패: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "{deviceName} 연결 불가.\n오류: {error}",

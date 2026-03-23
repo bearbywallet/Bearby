@@ -1514,11 +1514,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
-    return 'Successfully connected to $deviceName!';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => 'Connection Failed';
 
   @override

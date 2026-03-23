@@ -1514,11 +1514,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
-    return '成功连接到 $deviceName！';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => '连接失败';
 
   @override

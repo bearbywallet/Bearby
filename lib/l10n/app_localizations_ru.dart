@@ -845,7 +845,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmTransactionContentPasswordHint => 'Пароль';
 
   @override
-  String get confirmTransactionContentUnableToConfirm => 'Невозможно подтвердить';
+  String get confirmTransactionContentUnableToConfirm => 'Подтвердить';
 
   @override
   String get confirmTransactionContentConfirm => 'Подтвердить';
@@ -1511,11 +1511,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return 'Подключение к $deviceName ($connectionType)...';
-  }
-
-  @override
-  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
-    return 'Успешное подключение к $deviceName!';
   }
 
   @override

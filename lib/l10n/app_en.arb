@@ -2014,15 +2014,6 @@
       }
     }
   },
-  "ledgerConnectPageConnectionSuccessStatus": "Successfully connected to {deviceName}!",
-  "@ledgerConnectPageConnectionSuccessStatus": {
-    "description": "Status text shown upon a successful connection to a Ledger device.",
-    "placeholders": {
-      "deviceName": {
-        "type": "String"
-      }
-    }
-  },
   "ledgerConnectPageConnectionFailedTitle": "Connection Failed",
   "@ledgerConnectPageConnectionFailedTitle": {
     "description": "Title for the dialog shown when a connection attempt fails."
