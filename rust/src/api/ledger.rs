@@ -122,20 +122,17 @@ pub async fn update_ledger_accounts(
         let bip49 = match selected_account.addr {
             Address::Secp256k1Sha256(_)
             | Address::Secp256k1Keccak256(_)
-            | Address::Secp256k1Tron(_) => DerivationPath::new(
-                provider.config.slip_44,
-                wallet_index,
-                bip_purpose,
-                None,
-            ),
+            | Address::Secp256k1Tron(_) => {
+                DerivationPath::new(provider.config.slip_44, wallet_index, bip_purpose, None)
+            }
             Address::Secp256k1Bitcoin(_) => {
-                let net = selected_account.addr.get_bitcoin_network()?;
+                let net = provider.config.bitcoin_network();
                 let btc_addr_type = selected_account.addr.get_bitcoin_address_type()?;
                 DerivationPath::new(
                     provider.config.slip_44,
                     wallet_index,
                     DerivationPath::bip_from_address_type(btc_addr_type),
-                    Some(net),
+                    net,
                 )
             }
         };
