@@ -14,7 +14,7 @@ pub use zilpay::settings::{
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     crypto::slip44::ZILLIQA,
-    wallet::{wallet_storage::StorageOperations, wallet_types::WalletTypes},
+    wallet::{account::AccountV2, wallet_storage::StorageOperations, wallet_types::WalletTypes},
 };
 
 pub async fn add_new_book_address(
@@ -72,36 +72,38 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
             .get_selected_account()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let providers = core.get_providers();
-        let accounts = wallet_data
+        let wallet_accounts = wallet_data
             .get_accounts()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         let my_accounts: Vec<Entry> = if wallet_data.slip44 == ZILLIQA
             && !matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
         {
-            let capacity = accounts.len() * 2;
-            let accounts = Vec::with_capacity(capacity);
+            let capacity = wallet_accounts.len() * 2;
+            let mut accounts = Vec::with_capacity(capacity);
 
-            // TODO: fix this shit
-            // accounts.extend(accounts.iter().flat_map(|acc| {
-            //     let name = acc.name.clone();
-            //     vec![
-            //         Entry {
-            //             name: name.clone(),
-            //             address: acc.address,
-            //             tag: Some("legacy".to_string()),
-            //         },
-            //         Entry {
-            //             name: name,
-            //             address: acc.address,
-            //             tag: Some("evm".to_string()),
-            //         },
-            //     ]
-            // }));
+            accounts.extend(wallet_accounts.iter().flat_map(|acc: &AccountV2| {
+                if let Ok((legacy, eth)) = acc.get_zilliqa_addr_pair() {
+                    vec![
+                        Entry {
+                            name: acc.name.clone(),
+                            address: legacy.auto_format(),
+                            tag: Some("legacy".to_string()),
+                        },
+                        Entry {
+                            name: acc.name.clone(),
+                            address: eth.auto_format(),
+                            tag: Some("evm".to_string()),
+                        },
+                    ]
+                } else {
+                    vec![]
+                }
+            }));
 
             accounts
         } else {
-            accounts
+            wallet_accounts
                 .iter()
                 .map(|acc| Entry {
                     name: acc.name.clone(),
@@ -143,7 +145,7 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
                     .iter()
                     .find(|p| p.config.hash() == data.chain_hash)
                     .and_then(|p| Some(&p.config.name));
-                let entries: Vec<Entry> = accounts
+                let entries: Vec<Entry> = wallet_accounts
                     .into_iter()
                     .filter_map(|acc| {
                         if acc.addr.prefix_type() == selected_account.addr.prefix_type() {
