@@ -81,13 +81,12 @@ class TronWeb3Handler {
   Future<void> _sendResponse({
     required String type,
     required String uuid,
-    Map<String, dynamic>? payload,
     dynamic result,
     TronWeb3ErrorCode? errorCode,
     String? errorMessage,
   }) async {
+    print("sending result: $result, type: $type, uuid: $uuid");
     final responsePayload = <String, dynamic>{
-      if (payload != null) ...payload,
       if (result != null) 'result': result,
       if (errorCode != null && errorMessage != null)
         'error': {'code': errorCode.code, 'message': errorMessage},
@@ -167,6 +166,7 @@ class TronWeb3Handler {
   ) async {
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
+    print(message.toString());
 
     switch (tronMethod) {
       case Web3EIP1193Method.tronSign:
@@ -537,8 +537,7 @@ class TronWeb3Handler {
       final addresses = await _getWalletAddresses(appState);
 
       if (connection != null &&
-          appState.wallet?.accounts.length ==
-              connection.accountIndexes.length) {
+          appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
         _sendNotification(eventName: 'dataChanged', data: {
@@ -569,11 +568,12 @@ class TronWeb3Handler {
         uuid: message.uuid,
         iconUrl: message.icon ?? "",
         onReject: () {
-          _sendResponse(
-            type: kBearbyResponseType,
-            uuid: message.uuid,
-            result: <void>[],
+          _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.userRejected,
+            'Error Rejected',
           );
+
           _removeActiveRequest(method);
         },
         onConfirm: (selectedIndices) async {

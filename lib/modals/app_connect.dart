@@ -186,7 +186,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
     final l10n = AppLocalizations.of(context)!;
 
-    if (appState.wallet == null || appState.wallet!.accounts.isEmpty) {
+    if (appState.wallet == null || appState.accounts.isEmpty) {
       return Padding(
         padding: EdgeInsets.all(16),
         child: Text(
@@ -202,10 +202,9 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: appState.wallet!.accounts.length,
+        itemCount: appState.accounts.length,
         itemBuilder: (context, index) {
-          // TODO: possibe null, fix it!
-          final account = appState.account!;
+          final account = appState.accounts[index];
           final isSelected = _selectedAccounts[index] ?? false;
 
           return EnableCard(

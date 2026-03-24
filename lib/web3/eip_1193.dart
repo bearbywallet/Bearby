@@ -377,8 +377,7 @@ class Web3EIP1193Handler {
       final addresses = await _getWalletAddresses(appState);
 
       if (connection != null &&
-          appState.wallet?.accounts.length ==
-              connection.accountIndexes.length) {
+          appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
         return _sendResponse(
@@ -993,8 +992,7 @@ class Web3EIP1193Handler {
       final addresses = await _getWalletAddresses(appState);
 
       if (connection != null &&
-          appState.wallet?.accounts.length ==
-              connection.accountIndexes.length) {
+          appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
         return _sendResponse(
           type: kBearbyResponseType,
