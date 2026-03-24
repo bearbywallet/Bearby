@@ -202,27 +202,42 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final wallet = appState.wallet;
 
     if (wallet?.accounts[networkItem.configInfo.slip44] == null) {
-      showConfirmPasswordModal(
-        context: context,
-        theme: appState.currentTheme,
-        onConfirm: (password) async {
-          try {
-            await selectAccountsChain(
-              walletIndex: appState.selectedWalletIndex,
-              chainHash: config.chainHash,
-              password: password,
-            );
-          } catch (_) {}
+      if (wallet?.authType == "none") {
+        showConfirmPasswordModal(
+          context: context,
+          theme: appState.currentTheme,
+          onConfirm: (password) async {
+            try {
+              await selectAccountsChain(
+                walletIndex: appState.selectedWalletIndex,
+                chainHash: config.chainHash,
+                password: password,
+              );
+            } catch (_) {}
 
-          await appState.syncData();
+            await appState.syncData();
 
-          if (_popOnSelect && mounted && Navigator.canPop(context)) {
-            Navigator.pop(context);
-          }
+            if (_popOnSelect && mounted && Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
 
-          return null;
-        },
-      );
+            return null;
+          },
+        );
+      } else {
+        try {
+          await selectAccountsChain(
+            walletIndex: appState.selectedWalletIndex,
+            chainHash: config.chainHash,
+          );
+        } catch (_) {}
+
+        await appState.syncData();
+
+        if (_popOnSelect && mounted && Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      }
     } else {
       try {
         await selectAccountsChain(

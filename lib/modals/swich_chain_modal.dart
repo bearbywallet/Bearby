@@ -187,28 +187,42 @@ class _SwitchChainNetworkContentState
                       final wallet = appState.wallet;
 
                       if (wallet?.accounts[_selectedNetwork?.slip44] == null) {
-                        showConfirmPasswordModal(
-                          context: context,
-                          theme: appState.currentTheme,
-                          onConfirm: (password) async {
-                            try {
-                              await selectAccountsChain(
-                                walletIndex: appState.selectedWalletIndex,
-                                chainHash: _selectedNetwork!.chainHash,
-                                password: password,
-                              );
-                              await appState.syncData();
-                            } catch (_) {}
+                        if (wallet?.authType == "none") {
+                          showConfirmPasswordModal(
+                            context: context,
+                            theme: appState.currentTheme,
+                            onConfirm: (password) async {
+                              try {
+                                await selectAccountsChain(
+                                  walletIndex: appState.selectedWalletIndex,
+                                  chainHash: _selectedNetwork!.chainHash,
+                                  password: password,
+                                );
+                                await appState.syncData();
+                              } catch (_) {}
 
-                            widget.onNetworkSelected();
+                              widget.onNetworkSelected();
 
-                            if (mounted) {
-                              Navigator.pop(context);
-                            }
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
 
-                            return null;
-                          },
-                        );
+                              return null;
+                            },
+                          );
+                        } else {
+                          try {
+                            await selectAccountsChain(
+                              walletIndex: appState.selectedWalletIndex,
+                              chainHash: _selectedNetwork!.chainHash,
+                            );
+                            await appState.syncData();
+                          } catch (_) {}
+
+                          widget.onNetworkSelected();
+
+                          if (mounted) Navigator.pop(context);
+                        }
                       } else {
                         try {
                           await selectAccountsChain(
