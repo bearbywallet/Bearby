@@ -85,7 +85,6 @@ class TronWeb3Handler {
     TronWeb3ErrorCode? errorCode,
     String? errorMessage,
   }) async {
-    print("sending result: $result, type: $type, uuid: $uuid");
     final responsePayload = <String, dynamic>{
       if (result != null) 'result': result,
       if (errorCode != null && errorMessage != null)
@@ -166,7 +165,6 @@ class TronWeb3Handler {
   ) async {
     final method = message.payload['method'] as String?;
     final tronMethod = Web3EIP1193Method.fromValue(method);
-    print(message.toString());
 
     switch (tronMethod) {
       case Web3EIP1193Method.tronSign:

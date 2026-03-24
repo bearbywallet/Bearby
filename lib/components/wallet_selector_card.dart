@@ -90,8 +90,8 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                       widget.walletName ?? "",
                       style: theme.subtitle1.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 18, // subtitle1 is 20, adjusting
-                        fontWeight: FontWeight.w600, // subtitle1 is w500
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),

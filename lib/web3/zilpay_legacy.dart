@@ -227,8 +227,11 @@ class ZilPayLegacyHandler {
       final title = message.payload['title'] as String? ?? "";
       final account = appState.account!;
 
-      final chainHash = appState.chain?.chainHash ?? BigInt.zero;
-      // TODO: maybe never be null, but need to check the appState.chain?
+      if (appState.chain == null) {
+        throw "Fail load chain";
+      }
+
+      final chainHash = appState.chain!.chainHash;
       final chainId = appState.chain!.chainIds.last;
       final nonce = BigInt.zero;
 
