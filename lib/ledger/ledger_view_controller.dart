@@ -18,6 +18,7 @@ import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/tron/tron_ledger_app.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:bearby/mixins/eip712.dart';
+import 'package:bearby/utils/utils.dart';
 import 'package:bearby/src/rust/api/btc_ledger.dart' as btc_ffi;
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/account.dart';
@@ -130,45 +131,55 @@ class LedgerViewController extends ChangeNotifier {
 
   void _startHidPolling() {
     _hidPollingTimer?.cancel();
-    _hidPollingTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
-      if (!_isScanning) {
-        _hidPollingTimer?.cancel();
-        return;
-      }
-      try {
-        final discoveredHid = _useRustTransport
-            ? await RustHidTransport.list()
-            : await HidTransport.list();
-        for (final device in discoveredHid) {
-          _addDeviceWithPriority(device);
-        }
-        _updateStatus(LedgerStatus.foundDevices);
-      } on PlatformException catch (e) {
-        _handleScanError(e, "USB Polling ${e.code}");
-      } catch (e) {
-        _handleScanError(e, "USB Polling");
-      }
+    _pollHidDevices();
+    _hidPollingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      _pollHidDevices();
     });
   }
 
+  Future<void> _pollHidDevices() async {
+    if (!_isScanning) {
+      _hidPollingTimer?.cancel();
+      return;
+    }
+    try {
+      final discoveredHid = _useRustTransport
+          ? await RustHidTransport.list()
+          : await HidTransport.list();
+      for (final device in discoveredHid) {
+        _addDeviceWithPriority(device);
+      }
+      _updateStatus(LedgerStatus.foundDevices);
+    } on PlatformException catch (e) {
+      _handleScanError(e, "USB Polling ${e.code}");
+    } catch (e) {
+      _handleScanError(e, "USB Polling");
+    }
+  }
+
   void _startRustBleScan() {
+    _scanBleDevices();
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       if (!_isScanning) {
         timer.cancel();
         return;
       }
-      try {
-        final bleDevices = await RustBleTransport.scan();
-        for (final device in bleDevices) {
-          _addDeviceWithPriority(device);
-        }
-        if (bleDevices.isNotEmpty) {
-          _updateStatus(LedgerStatus.foundDevices);
-        }
-      } catch (e) {
-        _handleScanError(e, "BLE Rust");
-      }
+      await _scanBleDevices();
     });
+  }
+
+  Future<void> _scanBleDevices() async {
+    try {
+      final bleDevices = await RustBleTransport.scan();
+      for (final device in bleDevices) {
+        _addDeviceWithPriority(device);
+      }
+      if (bleDevices.isNotEmpty) {
+        _updateStatus(LedgerStatus.foundDevices);
+      }
+    } catch (e) {
+      _handleScanError(e, "BLE Rust");
+    }
   }
 
   void _handleScanError(dynamic error, String type) {
@@ -347,7 +358,8 @@ class LedgerViewController extends ChangeNotifier {
       );
     } else if (slip44 == kTronSlip44) {
       final tronApp = TronLedgerApp(_connectedTransport!);
-      Uint8List bytes = utf8.encode(message);
+      Uint8List bytes =
+          message.startsWith('0x') ? hexToBytes(message) : utf8.encode(message);
       final personalSig = await tronApp.signPersonalMessage(
         index: account.index.toInt(),
         message: bytes,
@@ -355,7 +367,8 @@ class LedgerViewController extends ChangeNotifier {
       sig = personalSig.toHexString();
     } else if (slip44 == kZilliqaSlip44 || slip44 == kEthereumSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
-      Uint8List bytes = utf8.encode(message);
+      Uint8List bytes =
+          message.startsWith('0x') ? hexToBytes(message) : utf8.encode(message);
       final personalSig = await evmApp.signPersonalMessage(
         index: account.index.toInt(),
         message: bytes,

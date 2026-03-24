@@ -87,7 +87,8 @@ class LedgerConnector extends StatelessWidget {
                       height: 4,
                       child: isBusy
                           ? LinearProgressIndicator(
-                              backgroundColor: theme.primaryPurple.withAlpha(51),
+                              backgroundColor:
+                                  theme.primaryPurple.withAlpha(51),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                   theme.primaryPurple),
                             )
@@ -126,15 +127,17 @@ class LedgerConnector extends StatelessWidget {
       itemCount: controller.discoveredDevices.length,
       itemBuilder: (context, index) {
         final device = controller.discoveredDevices.elementAt(index);
+        final connectingDevice = controller.connectingDevice;
         final isCurrentlyConnecting = controller.isConnecting &&
-            controller.connectingDevice?.productId == device.productId;
+            connectingDevice != null &&
+            connectingDevice.isSamePhysicalDevice(device);
         final isCurrentlyConnected = controller.connectedTransport != null &&
             controller.connectedTransport?.deviceModel?.id == device.model?.id;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: LedgerCard(
-            key: ValueKey(device.productId),
+            key: ValueKey(device.productId ?? device.id ?? index),
             device: device,
             disabled: disabled,
             isConnecting: isCurrentlyConnecting,

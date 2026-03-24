@@ -73,6 +73,7 @@ class _SignMessageModalContent extends StatefulWidget {
 class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
+  late final AppState _appState;
   late final bool _isLedgerWallet;
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -82,15 +83,15 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   @override
   void initState() {
     super.initState();
-    final appState = context.read<AppState>();
-    final wallet = appState.selectedWallet >= 0
-        ? appState.wallets.elementAtOrNull(appState.selectedWallet)
+    _appState = context.read<AppState>();
+    final wallet = _appState.selectedWallet >= 0
+        ? _appState.wallets.elementAtOrNull(_appState.selectedWallet)
         : null;
     _isLedgerWallet =
         wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
     if (_isLedgerWallet) {
-      appState.ledgerViewController.scanAndAutoConnect().then((_) {
+      _appState.ledgerViewController.scanAndAutoConnect().then((_) {
         if (mounted) setState(() {});
       });
     }
@@ -102,16 +103,14 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     _scanTimeout?.cancel();
 
     if (_isLedgerWallet) {
-      final appState = context.read<AppState>();
-      appState.ledgerViewController.stopScan();
+      _appState.ledgerViewController.stopScan();
     }
 
     super.dispose();
   }
 
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
-    final appState = context.read<AppState>();
-    await appState.ledgerViewController.open(device);
+    await _appState.ledgerViewController.open(device);
     setState(() {});
   }
 
