@@ -157,25 +157,26 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
 
     if (words.isEmpty) return;
 
+    final isCompletePhrase = _allowedCounts.contains(words.length);
+    final effectiveStartIndex = isCompletePhrase ? 0 : startIndex;
+
     final targetCount = _allowedCounts.firstWhere(
-      (count) => count >= (startIndex + words.length),
+      (count) => count >= words.length,
       orElse: () => _allowedCounts.last,
     );
 
     if (targetCount != _count) {
       setState(() {
         _count = targetCount;
-        final newWords = List<String>.filled(targetCount, '');
-        for (var i = 0; i < math.min(_words.length, targetCount); i++) {
-          newWords[i] = _words[i];
-        }
-        _words = newWords;
+        _words = List<String>.filled(targetCount, '');
         _wordsErrorIndexes = [];
       });
     }
 
-    for (var i = 0; i < words.length && (startIndex + i) < _words.length; i++) {
-      _words[startIndex + i] = words[i];
+    for (var i = 0;
+        i < words.length && (effectiveStartIndex + i) < _words.length;
+        i++) {
+      _words[effectiveStartIndex + i] = words[i];
     }
 
     setState(() {

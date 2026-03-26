@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -47,8 +46,12 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
 
   void _handleFocusChange() {
     if (widget.isEditable) {
-      setState(() {
-        _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
+          });
+        }
       });
     }
   }
@@ -107,53 +110,51 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
         widget.hasError || widget.validation != MnemonicValidation.none;
     final borderColor = hasValidation ? _getBorderColor(theme) : null;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            color: theme.cardBackground.withValues(alpha: 0.6 * widget.opacity),
-            borderRadius: BorderRadius.circular(12),
-            border: hasValidation
-                ? Border.all(
-                    color: borderColor!.withValues(alpha: 0.6), width: 1)
-                : null,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: theme.cardBackground.withValues(alpha: 0.8 * widget.opacity),
+        borderRadius: BorderRadius.circular(12),
+        border: hasValidation
+            ? Border.all(color: borderColor!.withValues(alpha: 0.6), width: 1)
+            : null,
+      ),
+      child: Row(
+        children: [
+          Text(
+            '${widget.index}',
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
           ),
-          child: Row(
-            children: [
-              Text(
-                '${widget.index}',
-                style: theme.bodyText2.copyWith(color: theme.textSecondary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              style: theme.bodyText1.copyWith(color: textColor),
+              enabled: widget.isEditable,
+              obscureText: _isObscured,
+              enableInteractiveSelection: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  style: theme.bodyText1.copyWith(color: textColor),
-                  enabled: widget.isEditable,
-                  obscureText: _isObscured,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onChanged: (value) {
-                    _shouldUpdateText = false;
-                    if (widget.isEditable) {
+              onChanged: (value) {
+                _shouldUpdateText = false;
+                if (widget.isEditable) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
                       setState(() {
                         _isObscured = !_focusNode.hasFocus && value.isNotEmpty;
                       });
                     }
-                    widget.onChanged?.call(widget.index, value);
-                  },
-                ),
-              ),
-            ],
+                  });
+                }
+                widget.onChanged?.call(widget.index, value);
+              },
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
