@@ -6,6 +6,40 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `next_connection_id`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `TRANSPORT_REGISTRY`, `TransportEntry`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `initialize`
+
+Future<List<RustLedgerHidDevice>> ledgerHidList() =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerHidList();
+
+Future<String> ledgerHidOpen({required String deviceId}) => RustLib.instance.api
+    .crateApiLedgerTransportLedgerHidOpen(deviceId: deviceId);
+
+Future<Uint8List> ledgerHidExchange(
+        {required String connectionId, required List<int> apdu}) =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerHidExchange(
+        connectionId: connectionId, apdu: apdu);
+
+Future<void> ledgerHidClose({required String connectionId}) =>
+    RustLib.instance.api
+        .crateApiLedgerTransportLedgerHidClose(connectionId: connectionId);
+
+Future<List<RustLedgerBleDevice>> ledgerBleScan() =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerBleScan();
+
+Future<String> ledgerBleOpen({required String deviceId}) => RustLib.instance.api
+    .crateApiLedgerTransportLedgerBleOpen(deviceId: deviceId);
+
+Future<Uint8List> ledgerBleExchange(
+        {required String connectionId, required List<int> apdu}) =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerBleExchange(
+        connectionId: connectionId, apdu: apdu);
+
+Future<void> ledgerBleClose({required String connectionId}) =>
+    RustLib.instance.api
+        .crateApiLedgerTransportLedgerBleClose(connectionId: connectionId);
+
 class RustLedgerBleDevice {
   final String deviceId;
   final String name;

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bearby/src/rust/api/ledger_transport/desktop_impl.dart';
+import 'package:bearby/src/rust/api/ledger_transport.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bearby/ledger/models/device_model.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';

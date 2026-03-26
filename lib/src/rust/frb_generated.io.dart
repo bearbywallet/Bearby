@@ -11,7 +11,6 @@ import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
-import 'api/ledger_transport/desktop_impl.dart';
 import 'api/local_storage.dart';
 import 'api/methods.dart';
 import 'api/provider.dart';
