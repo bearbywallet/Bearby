@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:bearby/services/preferences_service.dart';
 import 'package:bearby/src/rust/api/backend.dart';
+import 'package:bearby/src/rust/api/local_storage.dart';
 import 'package:bearby/src/rust/models/background.dart';
 
 import 'state/app_state.dart';
@@ -33,12 +33,14 @@ Future<void> main() async {
     }
 
     state = await loadService(path: "$appDocPath/storage");
-    final prefs = await PreferencesService.getInstance();
+    final storage = await LocalStorageImpl.newInstance(
+      pathDir: "$appDocPath/local_storage",
+    );
 
     final appState = AppState(
       state: state,
       cahceDir: tempDir.path,
-      prefs: prefs,
+      storage: storage,
     );
 
     runApp(ZilPayApp(appState: appState));

@@ -1264,12 +1264,13 @@ class Web3EIP1193Handler {
     AppState appState,
   ) async {
     final method = message.payload['method'] as String;
+    final l10n = AppLocalizations.of(context);
 
     if (_isRequestActive(method)) {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
+        l10n?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -1281,7 +1282,6 @@ class Web3EIP1193Handler {
           Web3Utils.findConnected(currentDomain, appState.connections);
       if (connection == null) {
         _removeActiveRequest(method);
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -1292,7 +1292,6 @@ class Web3EIP1193Handler {
       final params = message.payload['params'] as Map<String, dynamic>?;
       if (params == null || params[kTypeKey] != kErc20TokenType) {
         _removeActiveRequest(method);
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -1306,7 +1305,6 @@ class Web3EIP1193Handler {
           !options.containsKey(kParamSymbol) ||
           !options.containsKey(kParamDecimals)) {
         _removeActiveRequest(method);
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,

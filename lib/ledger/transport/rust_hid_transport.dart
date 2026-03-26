@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:bearby/src/rust/api/ledger_transport/desktop_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bearby/ledger/models/device_model.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
-import 'package:bearby/src/rust/api/ledger_transport.dart';
 
 class RustHidTransport extends Transport {
   final String _connectionId;
@@ -22,9 +22,7 @@ class RustHidTransport extends Transport {
 
   static Future<List<DiscoveredDevice>> list() async {
     final devices = await ledgerHidList();
-    return devices
-        .map((d) => DiscoveredDevice.fromRustHidDevice(d))
-        .toList();
+    return devices.map((d) => DiscoveredDevice.fromRustHidDevice(d)).toList();
   }
 
   static Future<RustHidTransport> open(DiscoveredDevice deviceInfo) async {

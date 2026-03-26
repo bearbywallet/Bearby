@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/config/storage_keys.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -17,8 +17,6 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-
-const String kTestnetEnabledKey = 'testnet_enabled';
 
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});
@@ -45,11 +43,12 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   }
 
   Future<void> _loadTestnetPreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final enabled = prefs.getBool(kTestnetEnabledKey) ?? false;
+    final appState = Provider.of<AppState>(context, listen: false);
+    final enabled =
+        await appState.storage.get_(key: StorageKeys.testnetEnabled);
     if (mounted) {
       setState(() {
-        isTestnet = enabled;
+        isTestnet = enabled == 'true';
       });
     }
   }

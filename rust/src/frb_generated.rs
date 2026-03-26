@@ -25,7 +25,8 @@
 
 // Section: imports
 
-use crate::api::local_storage::LocalStorage;
+use crate::api::local_storage::KeyValueStorage;
+use crate::api::local_storage::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -38,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -194089507;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 282331563;
 
 // Section: executor
 
@@ -46,6 +47,197 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__local_storage__LocalStorageImpl_get_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LocalStorageImpl_get",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>,
+            >>::sse_decode(&mut deserializer);
+            let api_key = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+                    let decode_indices_ =
+                        flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                            flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                &api_that, 0, false,
+                            ),
+                        ]);
+                    for i in decode_indices_ {
+                        match i {
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            _ => unreachable!(),
+                        }
+                    }
+                    let api_that_guard = api_that_guard.unwrap();
+                    let output_ok = Result::<_, ()>::Ok(
+                        crate::api::local_storage::LocalStorageImpl::get(&*api_that_guard, api_key),
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__local_storage__LocalStorageImpl_new_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LocalStorageImpl_new",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_path_dir = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::local_storage::LocalStorageImpl::new(api_path_dir)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__local_storage__LocalStorageImpl_rm_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LocalStorageImpl_rm",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>,
+            >>::sse_decode(&mut deserializer);
+            let api_key = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let mut api_that_guard = None;
+                    let decode_indices_ =
+                        flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                            flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                &api_that, 0, false,
+                            ),
+                        ]);
+                    for i in decode_indices_ {
+                        match i {
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            _ => unreachable!(),
+                        }
+                    }
+                    let api_that_guard = api_that_guard.unwrap();
+                    let output_ok =
+                        crate::api::local_storage::LocalStorageImpl::rm(&*api_that_guard, api_key)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__local_storage__LocalStorageImpl_set_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LocalStorageImpl_set",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>,
+            >>::sse_decode(&mut deserializer);
+            let api_key = <String>::sse_decode(&mut deserializer);
+            let api_value = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let mut api_that_guard = None;
+                    let decode_indices_ =
+                        flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                            flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                &api_that, 0, false,
+                            ),
+                        ]);
+                    for i in decode_indices_ {
+                        match i {
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            _ => unreachable!(),
+                        }
+                    }
+                    let api_that_guard = api_that_guard.unwrap();
+                    let output_ok = crate::api::local_storage::LocalStorageImpl::set(
+                        &*api_that_guard,
+                        api_key,
+                        api_value,
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__wallet__add_bip39_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3272,150 +3464,6 @@ fn wire__crate__api__backend__load_service_impl(
         },
     )
 }
-fn wire__crate__api__local_storage__local_storage_impl_get_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "local_storage_impl_get",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::local_storage::LocalStorageImpl>::sse_decode(&mut deserializer);
-            let api_key = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(
-                        crate::api::local_storage::LocalStorageImpl::get(&api_that, api_key),
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
-fn wire__crate__api__local_storage__local_storage_impl_new_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "local_storage_impl_new",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_path_dir = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::local_storage::LocalStorageImpl::new(api_path_dir)?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
-fn wire__crate__api__local_storage__local_storage_impl_rm_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "local_storage_impl_rm",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::local_storage::LocalStorageImpl>::sse_decode(&mut deserializer);
-            let api_key = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, String>((move || {
-                    let output_ok =
-                        crate::api::local_storage::LocalStorageImpl::rm(&api_that, api_key)?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
-fn wire__crate__api__local_storage__local_storage_impl_set_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "local_storage_impl_set",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::local_storage::LocalStorageImpl>::sse_decode(&mut deserializer);
-            let api_key = <String>::sse_decode(&mut deserializer);
-            let api_value = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::local_storage::LocalStorageImpl::set(
-                        &api_that, api_key, api_value,
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
 fn wire__crate__api__wallet__make_keystore_file_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -5352,6 +5400,12 @@ fn wire__crate__api__wallet__zilliqa_swap_chain_impl(
     )
 }
 
+// Section: related_funcs
+
+flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
+    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>
+);
+
 // Section: dart2rust
 
 impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
@@ -5359,6 +5413,16 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <String>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
+    }
+}
+
+impl SseDecode for LocalStorageImpl {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <RustOpaqueMoi<
+            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>,
+        >>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
 }
 
@@ -5405,6 +5469,16 @@ impl SseDecode
             crate::models::notification::BackgroundNotificationState,
         )>>::sse_decode(deserializer);
         return inner.into_iter().collect();
+    }
+}
+
+impl SseDecode
+    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <usize>::sse_decode(deserializer);
+        return decode_rust_opaque_moi(inner);
     }
 }
 
@@ -6393,16 +6467,6 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
     }
 }
 
-impl SseDecode for crate::api::local_storage::LocalStorageImpl {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_storage = <LocalStorage>::sse_decode(deserializer);
-        return crate::api::local_storage::LocalStorageImpl {
-            storage: var_storage,
-        };
-    }
-}
-
 impl SseDecode for crate::api::btc_ledger::MerkelizedPsbt {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7180,323 +7244,323 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        4 => wire__crate__api__wallet__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__token__add_ftoken_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__ledger__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__book__add_new_book_address_impl(port, ptr, rust_vec_len, data_len),
-        8 => {
+        1 => wire__crate__api__local_storage__LocalStorageImpl_get_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        2 => wire__crate__api__local_storage__LocalStorageImpl_new_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        3 => wire__crate__api__local_storage__LocalStorageImpl_rm_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        4 => wire__crate__api__local_storage__LocalStorageImpl_set_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        8 => wire__crate__api__wallet__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__token__add_ftoken_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__ledger__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__book__add_new_book_address_impl(port, ptr, rust_vec_len, data_len),
+        12 => {
             wire__crate__api__wallet__add_next_bip39_account_impl(port, ptr, rust_vec_len, data_len)
         }
-        9 => wire__crate__api__provider__add_provider_impl(port, ptr, rust_vec_len, data_len),
-        10 => {
+        13 => wire__crate__api__provider__add_provider_impl(port, ptr, rust_vec_len, data_len),
+        14 => {
             wire__crate__api__provider__add_providers_list_impl(port, ptr, rust_vec_len, data_len)
         }
-        11 => wire__crate__api__wallet__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__token__auto_hint_tokens_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__utils__bip39_checksum_valid_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__utils__bitcoin_address_type_from_address_impl(
+        15 => wire__crate__api__wallet__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__token__auto_hint_tokens_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__utils__bip39_checksum_valid_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__utils__bitcoin_address_type_from_address_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        15 => wire__crate__api__wallet__bitcoin_change_address_type_impl(
+        19 => wire__crate__api__wallet__bitcoin_change_address_type_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__btc_ledger__btc_ledger_build_psbt_from_tx_impl(
+        20 => wire__crate__api__btc_ledger__btc_ledger_build_psbt_from_tx_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        17 => wire__crate__api__btc_ledger__btc_ledger_build_wallet_policy_impl(
+        21 => wire__crate__api__btc_ledger__btc_ledger_build_wallet_policy_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        18 => wire__crate__api__btc_ledger__btc_ledger_compute_merkle_root_impl(
+        22 => wire__crate__api__btc_ledger__btc_ledger_compute_merkle_root_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => wire__crate__api__btc_ledger__btc_ledger_encode_path_impl(
+        23 => wire__crate__api__btc_ledger__btc_ledger_encode_path_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        20 => wire__crate__api__btc_ledger__btc_ledger_finalize_psbt_with_sigs_impl(
+        24 => wire__crate__api__btc_ledger__btc_ledger_finalize_psbt_with_sigs_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__btc_ledger__btc_ledger_get_merkle_leaf_index_impl(
+        25 => wire__crate__api__btc_ledger__btc_ledger_get_merkle_leaf_index_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__btc_ledger__btc_ledger_get_merkle_proof_impl(
+        26 => wire__crate__api__btc_ledger__btc_ledger_get_merkle_proof_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        23 => wire__crate__api__btc_ledger__btc_ledger_get_preimage_impl(
+        27 => wire__crate__api__btc_ledger__btc_ledger_get_preimage_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        24 => wire__crate__api__btc_ledger__btc_ledger_hash_leaf_impl(
+        28 => wire__crate__api__btc_ledger__btc_ledger_hash_leaf_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        25 => wire__crate__api__btc_ledger__btc_ledger_merkelise_psbt_impl(
+        29 => wire__crate__api__btc_ledger__btc_ledger_merkelise_psbt_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        26 => wire__crate__api__btc_ledger__btc_ledger_prepare_psbt_impl(
+        30 => wire__crate__api__btc_ledger__btc_ledger_prepare_psbt_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => {
+        31 => {
             wire__crate__api__btc_ledger__btc_ledger_sha256_impl(port, ptr, rust_vec_len, data_len)
         }
-        28 => wire__crate__api__stake__build_claim_scilla_staking_rewards_tx_impl(
+        32 => wire__crate__api__stake__build_claim_scilla_staking_rewards_tx_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__stake__build_tx_claim_reward_request_impl(
+        33 => wire__crate__api__stake__build_tx_claim_reward_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        30 => wire__crate__api__stake__build_tx_claim_unstake_request_impl(
+        34 => wire__crate__api__stake__build_tx_claim_unstake_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        31 => wire__crate__api__stake__build_tx_evm_stake_request_impl(
+        35 => wire__crate__api__stake__build_tx_evm_stake_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        32 => wire__crate__api__stake__build_tx_evm_unstake_request_impl(
+        36 => wire__crate__api__stake__build_tx_evm_unstake_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        33 => wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
+        37 => wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        34 => wire__crate__api__stake__build_tx_scilla_init_unstake_impl(
+        38 => wire__crate__api__stake__build_tx_scilla_init_unstake_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        35 => wire__crate__api__stake__build_tx_scilla_withdraw_stake_avely_impl(
+        39 => wire__crate__api__stake__build_tx_scilla_withdraw_stake_avely_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        36 => wire__crate__api__transaction__cacl_gas_fee_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__wallet__change_account_name_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__wallet__change_wallet_name_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
+        40 => wire__crate__api__transaction__cacl_gas_fee_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__wallet__change_account_name_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__wallet__change_wallet_name_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        40 => wire__crate__api__transaction__check_pending_tranasctions_impl(
+        44 => wire__crate__api__transaction__check_pending_tranasctions_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        41 => wire__crate__api__transaction__clear_history_impl(port, ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__provider__create_or_update_chain_impl(
+        45 => wire__crate__api__transaction__clear_history_impl(port, ptr, rust_vec_len, data_len),
+        46 => wire__crate__api__provider__create_or_update_chain_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        43 => wire__crate__api__transaction__create_token_transfer_impl(
+        47 => wire__crate__api__transaction__create_token_transfer_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        44 => wire__crate__api__connections__create_update_connection_impl(
+        48 => wire__crate__api__connections__create_update_connection_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        45 => wire__crate__api__wallet__delete_account_impl(port, ptr, rust_vec_len, data_len),
-        46 => wire__crate__api__wallet__delete_wallet_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__transaction__encode_tx_rlp_impl(port, ptr, rust_vec_len, data_len),
-        48 => wire__crate__api__stake__fetch_evm_stake_impl(port, ptr, rust_vec_len, data_len),
-        49 => wire__crate__api__stake__fetch_scilla_stake_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        52 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        53 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        54 => wire__crate__api__qrcode__gen_png_qrcode_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__api__qrcode__gen_svg_qrcode_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__api__auth__get_biometric_type_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__api__provider__get_chains_providers_from_json_impl(
+        49 => wire__crate__api__wallet__delete_account_impl(port, ptr, rust_vec_len, data_len),
+        50 => wire__crate__api__wallet__delete_wallet_impl(port, ptr, rust_vec_len, data_len),
+        51 => wire__crate__api__transaction__encode_tx_rlp_impl(port, ptr, rust_vec_len, data_len),
+        52 => wire__crate__api__stake__fetch_evm_stake_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__crate__api__stake__fetch_scilla_stake_impl(port, ptr, rust_vec_len, data_len),
+        54 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        56 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        57 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__api__qrcode__gen_png_qrcode_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__qrcode__gen_svg_qrcode_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
+        61 => wire__crate__api__auth__get_biometric_type_impl(port, ptr, rust_vec_len, data_len),
+        62 => wire__crate__api__provider__get_chains_providers_from_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => wire__crate__api__book__get_combine_sort_addresses_impl(
+        63 => wire__crate__api__book__get_combine_sort_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        60 => wire__crate__api__connections__get_connections_list_impl(
+        64 => wire__crate__api__connections__get_connections_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        61 => {
+        65 => {
             wire__crate__api__utils__get_currencies_tickets_impl(port, ptr, rust_vec_len, data_len)
         }
-        62 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        63 => wire__crate__api__transaction__get_history_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__api__cache__get_image_bytes_impl(port, ptr, rust_vec_len, data_len),
-        65 => wire__crate__api__cache__get_image_name_impl(port, ptr, rust_vec_len, data_len),
-        66 => wire__crate__api__provider__get_networks_impl(port, ptr, rust_vec_len, data_len),
-        67 => wire__crate__api__provider__get_provider_impl(port, ptr, rust_vec_len, data_len),
-        68 => wire__crate__api__provider__get_providers_impl(port, ptr, rust_vec_len, data_len),
-        69 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        70 => wire__crate__api__wallet__get_zil_bech32_addresses_impl(
+        66 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        67 => wire__crate__api__transaction__get_history_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__crate__api__cache__get_image_bytes_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__crate__api__cache__get_image_name_impl(port, ptr, rust_vec_len, data_len),
+        70 => wire__crate__api__provider__get_networks_impl(port, ptr, rust_vec_len, data_len),
+        71 => wire__crate__api__provider__get_provider_impl(port, ptr, rust_vec_len, data_len),
+        72 => wire__crate__api__provider__get_providers_impl(port, ptr, rust_vec_len, data_len),
+        73 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__api__wallet__get_zil_bech32_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        71 => wire__crate__api__wallet__get_zil_eth_checksum_addresses_impl(
+        75 => wire__crate__api__wallet__get_zil_eth_checksum_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        72 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        74 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        75 => wire__crate__api__utils__is_valid_address_impl(port, ptr, rust_vec_len, data_len),
-        76 => wire__crate__api__methods__keypair_from_sk_impl(port, ptr, rust_vec_len, data_len),
-        77 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_close_impl(
+        76 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        78 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__api__utils__is_valid_address_impl(port, ptr, rust_vec_len, data_len),
+        80 => wire__crate__api__methods__keypair_from_sk_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_close_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        78 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_exchange_impl(
+        82 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_exchange_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        79 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_open_impl(
+        83 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_open_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        80 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_scan_impl(
+        84 => wire__crate__api__ledger_transport__desktop_impl__ledger_ble_scan_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        81 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_close_impl(
+        85 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_close_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        82 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_exchange_impl(
+        86 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_exchange_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        83 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_list_impl(
+        87 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        84 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_open_impl(
+        88 => wire__crate__api__ledger_transport__desktop_impl__ledger_hid_open_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        85 => wire__crate__api__ledger__ledger_split_path_impl(port, ptr, rust_vec_len, data_len),
-        86 => wire__crate__api__backend__load_old_database_android_impl(
+        89 => wire__crate__api__ledger__ledger_split_path_impl(port, ptr, rust_vec_len, data_len),
+        90 => wire__crate__api__backend__load_old_database_android_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        87 => {
+        91 => {
             wire__crate__api__backend__load_old_database_ios_impl(port, ptr, rust_vec_len, data_len)
         }
-        88 => wire__crate__api__backend__load_service_impl(port, ptr, rust_vec_len, data_len),
-        89 => wire__crate__api__local_storage__local_storage_impl_get_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        90 => wire__crate__api__local_storage__local_storage_impl_new_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        91 => wire__crate__api__local_storage__local_storage_impl_rm_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        92 => wire__crate__api__local_storage__local_storage_impl_set_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
+        92 => wire__crate__api__backend__load_service_impl(port, ptr, rust_vec_len, data_len),
         93 => wire__crate__api__wallet__make_keystore_file_impl(port, ptr, rust_vec_len, data_len),
         94 => wire__crate__api__ledger_transport__desktop_impl__next_connection_id_impl(
             port,
@@ -7664,14 +7728,29 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        51 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
-        73 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
+        55 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
+        77 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
         130 => wire__crate__api__utils__to_wei_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
 
 // Section: rust2dart
+
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<LocalStorageImpl> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
+            .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<LocalStorageImpl> {}
+
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<LocalStorageImpl>> for LocalStorageImpl {
+    fn into_into_dart(self) -> FrbWrapper<LocalStorageImpl> {
+        self.into()
+    }
+}
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::transactions::access_list::AccessListItem {
@@ -8306,23 +8385,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger::LedgerParamsInput>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::local_storage::LocalStorageImpl {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.storage.into_into_dart().into_dart()].into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::local_storage::LocalStorageImpl
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::local_storage::LocalStorageImpl>
-    for crate::api::local_storage::LocalStorageImpl
-{
-    fn into_into_dart(self) -> crate::api::local_storage::LocalStorageImpl {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::btc_ledger::MerkelizedPsbt {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -8842,6 +8904,13 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
+impl SseEncode for LocalStorageImpl {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
+    }
+}
+
 impl SseEncode
     for std::collections::HashMap<
         u32,
@@ -8883,6 +8952,17 @@ impl SseEncode
             usize,
             crate::models::notification::BackgroundNotificationState,
         )>>::sse_encode(self.into_iter().collect(), serializer);
+    }
+}
+
+impl SseEncode
+    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        let (ptr, size) = self.sse_encode_raw();
+        <usize>::sse_encode(ptr, serializer);
+        <i32>::sse_encode(size, serializer);
     }
 }
 
@@ -9589,13 +9669,6 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
     }
 }
 
-impl SseEncode for crate::api::local_storage::LocalStorageImpl {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <LocalStorage>::sse_encode(self.storage, serializer);
-    }
-}
-
 impl SseEncode for crate::api::btc_ledger::MerkelizedPsbt {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10170,7 +10243,8 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::api::local_storage::LocalStorage;
+    use crate::api::local_storage::KeyValueStorage;
+    use crate::api::local_storage::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -10180,6 +10254,20 @@ mod io {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_io!();
+
+    #[unsafe(no_mangle)]
+    pub extern "C" fn frbgen_bearby_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+        ptr: *const std::ffi::c_void,
+    ) {
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>::increment_strong_count(ptr as _);
+    }
+
+    #[unsafe(no_mangle)]
+    pub extern "C" fn frbgen_bearby_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+        ptr: *const std::ffi::c_void,
+    ) {
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>::decrement_strong_count(ptr as _);
+    }
 }
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
@@ -10193,7 +10281,8 @@ mod web {
     // Section: imports
 
     use super::*;
-    use crate::api::local_storage::LocalStorage;
+    use crate::api::local_storage::KeyValueStorage;
+    use crate::api::local_storage::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -10205,6 +10294,20 @@ mod web {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_web!();
+
+    #[wasm_bindgen]
+    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+        ptr: *const std::ffi::c_void,
+    ) {
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>::increment_strong_count(ptr as _);
+    }
+
+    #[wasm_bindgen]
+    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+        ptr: *const std::ffi::c_void,
+    ) {
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>::decrement_strong_count(ptr as _);
+    }
 }
 #[cfg(target_family = "wasm")]
 pub use web::*;

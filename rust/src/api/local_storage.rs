@@ -1,4 +1,4 @@
-pub trait LocalStorage {
+pub trait KeyValueStorage {
     fn set(&self, key: String, value: String) -> Result<(), String>;
     fn get(&self, key: String) -> Option<String>;
     fn rm(&self, key: String) -> Result<(), String>;
@@ -15,7 +15,7 @@ impl LocalStorageImpl {
     }
 }
 
-impl LocalStorage for LocalStorageImpl {
+impl KeyValueStorage for LocalStorageImpl {
     fn set(&self, key: String, value: String) -> Result<(), String> {
         self.storage
             .set(key.as_bytes(), value.as_bytes())

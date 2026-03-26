@@ -15,7 +15,7 @@ pub struct RustLedgerBleDevice {
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-mod desktop_impl {
+pub mod desktop_impl {
     use std::collections::HashMap;
     use std::sync::{Arc, Mutex, RwLock};
 
@@ -170,7 +170,7 @@ mod desktop_impl {
 pub use desktop_impl::*;
 
 #[cfg(any(target_os = "android", target_os = "ios"))]
-mod mobile_impl {
+pub mod mobile_impl {
     const NOT_SUPPORTED: &str = "Ledger HID/BLE transport not supported on mobile";
 
     pub fn ledger_hid_list() -> Result<Vec<super::RustLedgerHidDevice>, String> {

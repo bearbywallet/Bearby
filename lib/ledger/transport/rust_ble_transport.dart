@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:bearby/src/rust/api/ledger_transport/desktop_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bearby/ledger/models/device_model.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
-import 'package:bearby/src/rust/api/ledger_transport.dart';
 
 class RustBleTransport extends Transport {
   final String _connectionId;
@@ -21,15 +21,12 @@ class RustBleTransport extends Transport {
 
   static Future<List<DiscoveredDevice>> scan() async {
     final devices = await ledgerBleScan();
-    return devices
-        .map((d) => DiscoveredDevice.fromRustBleDevice(d))
-        .toList();
+    return devices.map((d) => DiscoveredDevice.fromRustBleDevice(d)).toList();
   }
 
   static Future<RustBleTransport> open(DiscoveredDevice deviceInfo) async {
     try {
-      final connectionId =
-          await ledgerBleOpen(deviceId: deviceInfo.id!);
+      final connectionId = await ledgerBleOpen(deviceId: deviceInfo.id!);
       return RustBleTransport(connectionId, deviceInfo.model);
     } catch (e) {
       throw DisconnectedDeviceException(e.toString());

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
-import 'package:bearby/services/preferences_service.dart';
+import 'package:bearby/config/storage_keys.dart';
+import 'package:bearby/src/rust/api/local_storage.dart';
 import 'package:bearby/src/rust/api/backend.dart';
 import 'package:bearby/src/rust/api/book.dart';
 import 'package:bearby/src/rust/api/connections.dart';
@@ -33,7 +34,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   late BackgroundState _state;
   late String _cahceDir;
-  late PreferencesService _prefs;
+  late LocalStorageImpl _storage;
   int _selectedWallet = -1;
   bool _hideBalance = false;
   bool _isTileView = false;
@@ -45,13 +46,15 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   AppState({
     required BackgroundState state,
     required String cahceDir,
-    required PreferencesService prefs,
+    required LocalStorageImpl storage,
   }) {
     WidgetsBinding.instance.addObserver(this);
     _state = state;
     _cahceDir = cahceDir;
-    _prefs = prefs;
+    _storage = storage;
   }
+
+  LocalStorageImpl get storage => _storage;
 
   void setSelectedWallet(int index) {
     _selectedWallet = index;
@@ -134,9 +137,9 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return BigInt.from(_selectedWallet);
   }
 
-  void setHideBalance(bool value) async {
+  Future<void> setHideBalance(bool value) async {
     _hideBalance = value;
-    await _prefs.setHideBalance(value);
+    await _storage.set_(key: StorageKeys.hideBalance, value: value.toString());
     notifyListeners();
   }
 
@@ -144,21 +147,36 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
-    _loadPreferences();
+    await _loadPreferences();
     notifyListeners();
   }
 
-  void _loadPreferences() {
-    _hideBalance = _prefs.getHideBalance();
-    _isTileView = _prefs.getIsTileView(_selectedWallet);
-    _browserUrlBarTop = _prefs.getBrowserUrlBarTop();
-    _showAddressesThroughTransactionHistory =
-        _prefs.getShowAddressesHistory(_selectedWallet);
-    _loadGasOption();
+  Future<void> _loadPreferences() async {
+    final hideBalance = await _storage.get_(key: StorageKeys.hideBalance);
+    _hideBalance = hideBalance == 'true';
+
+    final isTileView = await _storage.get_(
+      key: StorageKeys.tokensCardStyleKey(_selectedWallet),
+    );
+    _isTileView = isTileView == 'true';
+
+    final browserUrlBarTop = await _storage.get_(
+      key: StorageKeys.browserUrlBarTop,
+    );
+    _browserUrlBarTop = browserUrlBarTop == 'true';
+
+    final showAddressesHistory = await _storage.get_(
+      key: StorageKeys.showAddressesHistoryKey(_selectedWallet),
+    );
+    _showAddressesThroughTransactionHistory = showAddressesHistory == 'true';
+
+    await _loadGasOption();
   }
 
-  void _loadGasOption() {
-    final optionName = _prefs.getGasOption(_selectedWallet);
+  Future<void> _loadGasOption() async {
+    final optionName = await _storage.get_(
+      key: StorageKeys.gasOptionKey(_selectedWallet),
+    );
     if (optionName != null) {
       try {
         _selectedGasOption = GasFeeOption.values.firstWhere(
@@ -232,7 +250,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> setSelectedGasOption(GasFeeOption option) async {
     _selectedGasOption = option;
-    await _prefs.setGasOption(_selectedWallet, option.name);
+    await _storage.set_(
+      key: StorageKeys.gasOptionKey(_selectedWallet),
+      value: option.name,
+    );
     notifyListeners();
   }
 
@@ -246,20 +267,29 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> updateIsTileView(bool value) async {
     if (_isTileView != value) {
       _isTileView = value;
-      await _prefs.setIsTileView(_selectedWallet, value);
+      await _storage.set_(
+        key: StorageKeys.tokensCardStyleKey(_selectedWallet),
+        value: value.toString(),
+      );
       notifyListeners();
     }
   }
 
   Future<void> setShowAddressesThroughTransactionHistory(bool value) async {
     _showAddressesThroughTransactionHistory = value;
-    await _prefs.setShowAddressesHistory(_selectedWallet, value);
+    await _storage.set_(
+      key: StorageKeys.showAddressesHistoryKey(_selectedWallet),
+      value: value.toString(),
+    );
     notifyListeners();
   }
 
   Future<void> setBrowserUrlBarTop(bool value) async {
     _browserUrlBarTop = value;
-    await _prefs.setBrowserUrlBarTop(value);
+    await _storage.set_(
+      key: StorageKeys.browserUrlBarTop,
+      value: value.toString(),
+    );
     notifyListeners();
   }
 

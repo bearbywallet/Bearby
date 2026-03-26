@@ -6,43 +6,28 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-abstract class LocalStorage {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>
+abstract class LocalStorageImpl
+    implements RustOpaqueInterface, KeyValueStorage {
+  @override
   Future<String?> get_({required String key});
-
-  Future<void> rm({required String key});
-
-  Future<void> set_({required String key, required String value});
-}
-
-class LocalStorageImpl {
-  final LocalStorage storage;
-
-  const LocalStorageImpl({
-    required this.storage,
-  });
-
-  Future<String?> get_({required String key}) => RustLib.instance.api
-      .crateApiLocalStorageLocalStorageImplGet(that: this, key: key);
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
   static Future<LocalStorageImpl> newInstance({required String pathDir}) =>
       RustLib.instance.api
           .crateApiLocalStorageLocalStorageImplNew(pathDir: pathDir);
 
-  Future<void> rm({required String key}) => RustLib.instance.api
-      .crateApiLocalStorageLocalStorageImplRm(that: this, key: key);
-
-  Future<void> set_({required String key, required String value}) =>
-      RustLib.instance.api.crateApiLocalStorageLocalStorageImplSet(
-          that: this, key: key, value: value);
+  @override
+  Future<void> rm({required String key});
 
   @override
-  int get hashCode => storage.hashCode;
+  Future<void> set_({required String key, required String value});
+}
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LocalStorageImpl &&
-          runtimeType == other.runtimeType &&
-          storage == other.storage;
+abstract class KeyValueStorage {
+  Future<String?> get_({required String key});
+
+  Future<void> rm({required String key});
+
+  Future<void> set_({required String key, required String value});
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/enable_card.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/config/storage_keys.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -14,8 +14,6 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'dart:convert';
 import 'dart:async';
-
-const String _deletedTokensKey = 'deleted_tokens_cache';
 
 enum TokenSearchError { fetchError, wrongChain }
 
@@ -122,16 +120,12 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     super.dispose();
   }
 
-  String _getDeletedTokensCacheKey(BigInt chainHash) {
-    return '${_deletedTokensKey}_$chainHash';
-  }
-
   Future<void> _loadDeletedTokens() async {
     if (_currentChainHash == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final cacheKey = _getDeletedTokensCacheKey(_currentChainHash!);
-    final cachedData = prefs.getString(cacheKey);
+    final appState = Provider.of<AppState>(context, listen: false);
+    final cacheKey = StorageKeys.deletedTokensCacheKey(_currentChainHash!);
+    final cachedData = await appState.storage.get_(key: cacheKey);
 
     if (cachedData != null && mounted) {
       final List<dynamic> decoded = jsonDecode(cachedData);
@@ -146,20 +140,20 @@ class _ManageTokensPageState extends State<ManageTokensPage>
   Future<void> _saveDeletedTokens() async {
     if (_currentChainHash == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final cacheKey = _getDeletedTokensCacheKey(_currentChainHash!);
-    await prefs.setString(
-      cacheKey,
-      jsonEncode(_deletedTokens.map((t) => t.toJson()).toList()),
+    final appState = Provider.of<AppState>(context, listen: false);
+    final cacheKey = StorageKeys.deletedTokensCacheKey(_currentChainHash!);
+    await appState.storage.set_(
+      key: cacheKey,
+      value: jsonEncode(_deletedTokens.map((t) => t.toJson()).toList()),
     );
   }
 
   Future<void> _clearDeletedTokens() async {
     if (_currentChainHash == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final cacheKey = _getDeletedTokensCacheKey(_currentChainHash!);
-    await prefs.remove(cacheKey);
+    final appState = Provider.of<AppState>(context, listen: false);
+    final cacheKey = StorageKeys.deletedTokensCacheKey(_currentChainHash!);
+    await appState.storage.rm(key: cacheKey);
 
     if (mounted) {
       setState(() {

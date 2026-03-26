@@ -56,8 +56,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_LocalStorageImplPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr;
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
+
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
 
   @protected
   Map<int, Map<int, List<AccountInfo>>>
@@ -75,6 +89,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dco_decode_Map_usize_background_notification_state_None(dynamic raw);
 
   @protected
+  LocalStorageImpl
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
+
+  @protected
   RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw);
 
   @protected
@@ -84,7 +103,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
-  LocalStorage dco_decode_TraitDef_LocalStorage(dynamic raw);
+  KeyValueStorage dco_decode_TraitDef_KeyValueStorage(dynamic raw);
 
   @protected
   BigInt dco_decode_U128(dynamic raw);
@@ -164,9 +183,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
-
-  @protected
-  LocalStorageImpl dco_decode_box_autoadd_local_storage_impl(dynamic raw);
 
   @protected
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
@@ -365,9 +381,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
   @protected
-  LocalStorageImpl dco_decode_local_storage_impl(dynamic raw);
-
-  @protected
   MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
 
   @protected
@@ -526,6 +539,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
+  LocalStorageImpl
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer);
+
+  @protected
+  LocalStorageImpl
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer);
+
+  @protected
   Map<int, Map<int, List<AccountInfo>>>
       sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(
           SseDeserializer deserializer);
@@ -541,6 +564,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Map<BigInt, BackgroundNotificationState>
       sse_decode_Map_usize_background_notification_state_None(
+          SseDeserializer deserializer);
+
+  @protected
+  LocalStorageImpl
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
           SseDeserializer deserializer);
 
   @protected
@@ -641,10 +669,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
-      SseDeserializer deserializer);
-
-  @protected
-  LocalStorageImpl sse_decode_box_autoadd_local_storage_impl(
       SseDeserializer deserializer);
 
   @protected
@@ -866,9 +890,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
 
   @protected
-  LocalStorageImpl sse_decode_local_storage_impl(SseDeserializer deserializer);
-
-  @protected
   MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
 
   @protected
@@ -1051,6 +1072,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       AnyhowException self, SseSerializer serializer);
 
   @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
+
+  @protected
   void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
       Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer);
 
@@ -1065,6 +1096,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_Map_usize_background_notification_state_None(
       Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
 
   @protected
   void sse_encode_StreamSink_String_Sse(
@@ -1168,10 +1204,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_local_storage_impl(
-      LocalStorageImpl self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_network_config_info(
@@ -1402,10 +1434,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<WalletInfo> self, SseSerializer serializer);
 
   @protected
-  void sse_encode_local_storage_impl(
-      LocalStorageImpl self, SseSerializer serializer);
-
-  @protected
   void sse_encode_merkelized_psbt(
       MerkelizedPsbt self, SseSerializer serializer);
 
@@ -1599,4 +1627,36 @@ class RustLibWire implements BaseWire {
   /// The symbols are looked up in [dynamicLibrary].
   RustLibWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_bearby_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_bearby_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 }
