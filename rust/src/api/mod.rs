@@ -6,6 +6,7 @@ pub mod cache;
 pub mod connections;
 pub mod ledger;
 pub mod ledger_transport;
+pub mod local_storage;
 pub mod methods;
 pub mod provider;
 pub mod qrcode;

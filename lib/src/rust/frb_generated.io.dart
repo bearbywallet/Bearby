@@ -11,6 +11,8 @@ import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
+import 'api/ledger_transport/desktop_impl.dart';
+import 'api/local_storage.dart';
 import 'api/methods.dart';
 import 'api/provider.dart';
 import 'api/qrcode.dart';
@@ -80,6 +82,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String dco_decode_String(dynamic raw);
+
+  @protected
+  LocalStorage dco_decode_TraitDef_LocalStorage(dynamic raw);
 
   @protected
   BigInt dco_decode_U128(dynamic raw);
@@ -159,6 +164,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
+
+  @protected
+  LocalStorageImpl dco_decode_box_autoadd_local_storage_impl(dynamic raw);
 
   @protected
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
@@ -355,6 +363,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+
+  @protected
+  LocalStorageImpl dco_decode_local_storage_impl(dynamic raw);
 
   @protected
   MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
@@ -633,6 +644,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  LocalStorageImpl sse_decode_box_autoadd_local_storage_impl(
+      SseDeserializer deserializer);
+
+  @protected
   NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
       SseDeserializer deserializer);
 
@@ -849,6 +864,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  LocalStorageImpl sse_decode_local_storage_impl(SseDeserializer deserializer);
 
   @protected
   MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
@@ -1152,6 +1170,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       LedgerParamsInput self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_local_storage_impl(
+      LocalStorageImpl self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer);
 
@@ -1378,6 +1400,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_local_storage_impl(
+      LocalStorageImpl self, SseSerializer serializer);
 
   @protected
   void sse_encode_merkelized_psbt(
