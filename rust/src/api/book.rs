@@ -12,8 +12,11 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 use zilpay::{
-    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    crypto::slip44::ZILLIQA,
+    background::bg_wallet::WalletManagement,
+    crypto::{
+        bip49::DerivationPath,
+        slip44::{BITCOIN, ZILLIQA},
+    },
     wallet::{account::AccountV2, wallet_storage::StorageOperations, wallet_types::WalletTypes},
 };
 
@@ -62,27 +65,15 @@ pub struct Entry {
     pub tag: Option<String>,
 }
 
-pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Category>, String> {
-    with_service(|core| {
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let wallet_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let selected_account = wallet_data
-            .get_selected_account()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let providers = core.get_providers();
-        let wallet_accounts = wallet_data
-            .get_accounts()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-        let my_accounts: Vec<Entry> = if wallet_data.slip44 == ZILLIQA
-            && !matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
-        {
-            let capacity = wallet_accounts.len() * 2;
-            let mut accounts = Vec::with_capacity(capacity);
-
-            accounts.extend(wallet_accounts.iter().flat_map(|acc: &AccountV2| {
+fn build_accounts_entries(
+    accounts: &[AccountV2],
+    wallet_type: &WalletTypes,
+    slip44: u32,
+) -> Vec<Entry> {
+    if slip44 == ZILLIQA && !matches!(wallet_type, WalletTypes::Ledger(_)) {
+        accounts
+            .iter()
+            .flat_map(|acc| {
                 if let Ok((legacy, eth)) = acc.get_zilliqa_addr_pair() {
                     vec![
                         Entry {
@@ -99,34 +90,49 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
                 } else {
                     vec![]
                 }
-            }));
+            })
+            .collect()
+    } else {
+        accounts
+            .iter()
+            .map(|acc| Entry {
+                name: acc.name.clone(),
+                address: acc.addr.auto_format(),
+                tag: None,
+            })
+            .collect()
+    }
+}
 
-            accounts
-        } else {
-            wallet_accounts
-                .iter()
-                .map(|acc| Entry {
-                    name: acc.name.clone(),
-                    address: acc.addr.auto_format(),
-                    tag: None,
-                })
-                .collect()
-        };
+pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Category>, String> {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let selected_slip44 = wallet_data.slip44;
+        let selected_bip = wallet_data.bip;
+
+        let my_accounts = wallet_data
+            .slip44_accounts
+            .get(&selected_slip44)
+            .and_then(|bip_map| bip_map.get(&selected_bip))
+            .map(|accounts| {
+                build_accounts_entries(accounts, &wallet_data.wallet_type, selected_slip44)
+            })
+            .unwrap_or_default();
+
         let book: Vec<Entry> = core
             .get_address_book()
             .into_iter()
-            .filter_map(|contact| {
-                if selected_account.addr.prefix_type() == contact.addr.prefix_type() {
-                    Some(Entry {
-                        name: contact.name,
-                        address: contact.addr.auto_format(),
-                        tag: Some("book".to_string()),
-                    })
-                } else {
-                    None
-                }
+            .filter(|contact| contact.slip44 == selected_slip44)
+            .map(|contact| Entry {
+                name: contact.name,
+                address: contact.addr.auto_format(),
+                tag: Some("book".to_string()),
             })
             .collect();
+
         let wallets_category: Vec<Category> = core
             .wallets
             .iter()
@@ -135,30 +141,29 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
                     return None;
                 }
 
-                let data = if let Some(data) = other_wallet.get_wallet_data().ok() {
-                    data
-                } else {
-                    return None;
+                let data = match other_wallet.get_wallet_data() {
+                    Ok(d) => d,
+                    Err(_) => return None,
                 };
 
-                let chain_teg = providers
-                    .iter()
-                    .find(|p| p.config.hash() == data.chain_hash)
-                    .and_then(|p| Some(&p.config.name));
-                let entries: Vec<Entry> = wallet_accounts
-                    .into_iter()
-                    .filter_map(|acc| {
-                        if acc.addr.prefix_type() == selected_account.addr.prefix_type() {
-                            Some(Entry {
-                                name: acc.name.clone(),
-                                address: acc.addr.auto_format(),
-                                tag: chain_teg.cloned(),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
+                let resolve_bip = if selected_slip44 == BITCOIN {
+                    data.bip_preferences
+                        .get(&selected_slip44)
+                        .copied()
+                        .unwrap_or_else(|| DerivationPath::default_bip(selected_slip44))
+                } else {
+                    DerivationPath::BIP44_PURPOSE
+                };
+
+                let accounts = data
+                    .slip44_accounts
+                    .get(&selected_slip44)
+                    .and_then(|bip_map| bip_map.get(&resolve_bip))?;
+
+                let entries = build_accounts_entries(accounts, &data.wallet_type, selected_slip44);
+                if entries.is_empty() {
+                    return None;
+                }
 
                 Some(Category {
                     entries,
@@ -166,7 +171,8 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
                 })
             })
             .collect();
-        let mut categories: Vec<Category> = vec![
+
+        let mut categories = vec![
             Category {
                 name: String::from("my_accounts"),
                 entries: my_accounts,
