@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -279,6 +280,8 @@ class _BrowserPageState extends State<BrowserPage>
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final urlBarTop = appState.browserUrlBarTop && _isWebViewVisible;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -290,48 +293,37 @@ class _BrowserPageState extends State<BrowserPage>
         toolbarHeight: 0,
         systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: urlBarTop
-                  ? Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          adaptivePadding, 0, adaptivePadding, 8),
-                      child: _buildBrowserControls(theme),
-                    )
-                  : const SizedBox.shrink(),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                _buildConnectedTab(
+                  appState.connections,
+                  theme,
+                  EdgeInsets.symmetric(horizontal: adaptivePadding),
+                ),
+                if (_isWebViewVisible) _buildWebView(),
+              ],
             ),
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  _buildConnectedTab(
-                    appState.connections,
-                    theme,
-                    EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  ),
-                  if (_isWebViewVisible) _buildWebView(),
-                ],
-              ),
+          ),
+          if (_isWebViewVisible)
+            Positioned(
+              top: urlBarTop ? topPadding + 8 : null,
+              bottom: !urlBarTop ? bottomPadding + 8 : null,
+              left: 8,
+              right: 8,
+              child: _buildBrowserControls(theme),
             ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: !urlBarTop
-                  ? Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          adaptivePadding, 8, adaptivePadding, 0),
-                      child: _isWebViewVisible
-                          ? _buildBrowserControls(theme)
-                          : _buildSearchBar(theme),
-                    )
-                  : const SizedBox.shrink(),
+          if (!_isWebViewVisible)
+            Positioned(
+              bottom: bottomPadding + 8,
+              left: 8,
+              right: 8,
+              child: _buildSearchBar(theme),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -430,82 +422,123 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   Widget _buildBrowserControls(AppTheme theme) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          HoverSvgIcon(
-            assetName: 'assets/icons/back.svg',
-            onTap: _canGoBack ? () => _webViewController?.goBack() : () {},
-            color: _canGoBack
-                ? theme.textPrimary
-                : theme.textSecondary.withValues(alpha: 0.5),
-            width: 24,
-            height: 24,
+    final isDark = theme.value == "Dark";
+    final glassColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.4);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.2)
+        : Colors.white.withValues(alpha: 0.3);
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.2);
+    final iconColor = isDark ? theme.textPrimary : Colors.white;
+    final iconDisabledColor = isDark
+        ? theme.textSecondary.withValues(alpha: 0.5)
+        : Colors.white.withValues(alpha: 0.5);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 450),
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: glassColor,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: borderColor,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          HoverSvgIcon(
-            assetName: 'assets/icons/forward.svg',
-            onTap:
-                _canGoForward ? () => _webViewController?.goForward() : () {},
-            color: _canGoForward
-                ? theme.textPrimary
-                : theme.textSecondary.withValues(alpha: 0.5),
-            width: 24,
-            height: 24,
-          ),
-          Expanded(
-            child: SmartInput(
-              controller: _searchController,
-              onSubmitted: _handleSearch,
-              borderColor: Colors.transparent,
-              focusedBorderColor: Colors.transparent,
-              backgroundColor: Colors.transparent,
-              height: 48,
-              fontSize: 14,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(23),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Row(
+                children: [
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/back.svg',
+                    onTap:
+                        _canGoBack ? () => _webViewController?.goBack() : () {},
+                    color: _canGoBack ? iconColor : iconDisabledColor,
+                    width: 24,
+                    height: 24,
+                  ),
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/forward.svg',
+                    onTap: _canGoForward
+                        ? () => _webViewController?.goForward()
+                        : () {},
+                    color: _canGoForward ? iconColor : iconDisabledColor,
+                    width: 24,
+                    height: 24,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onSubmitted: _handleSearch,
+                      style: theme.bodyText1.copyWith(
+                        color: isDark ? theme.textPrimary : Colors.white,
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      autocorrect: false,
+                      enableSuggestions: false,
+                    ),
+                  ),
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/dots.svg',
+                    onTap: _showBrowserMenu,
+                    color: iconColor,
+                    width: 24,
+                    height: 24,
+                  ),
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/close.svg',
+                    onTap: () async {
+                      setState(() {
+                        _isWebViewVisible = false;
+                        _searchController.text = "";
+                        _searchController.clear();
+                      });
+
+                      try {
+                        _legacyHandler?.dispose();
+                      } catch (e) {
+                        //
+                      }
+
+                      try {
+                        _eip1193Handler?.dispose();
+                      } catch (e) {
+                        //
+                      }
+                      try {
+                        _tronHandler?.dispose();
+                      } catch (e) {
+                        //
+                      }
+                    },
+                    color: iconColor,
+                    width: 24,
+                    height: 24,
+                  ),
+                ],
+              ),
             ),
           ),
-          HoverSvgIcon(
-            assetName: 'assets/icons/dots.svg',
-            onTap: _showBrowserMenu,
-            color: theme.textPrimary,
-            width: 24,
-            height: 24,
-          ),
-          HoverSvgIcon(
-            assetName: 'assets/icons/close.svg',
-            onTap: () async {
-              setState(() {
-                _isWebViewVisible = false;
-                _searchController.text = "";
-                _searchController.clear();
-              });
-
-              try {
-                _legacyHandler?.dispose();
-              } catch (e) {
-                //
-              }
-
-              try {
-                _eip1193Handler?.dispose();
-              } catch (e) {
-                //
-              }
-              try {
-                _tronHandler?.dispose();
-              } catch (e) {
-                //
-              }
-            },
-            color: theme.textPrimary,
-            width: 24,
-            height: 24,
-          ),
-        ],
+        ),
       ),
     );
   }
