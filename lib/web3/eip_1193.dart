@@ -76,7 +76,6 @@ extension NetworkConfigInfoExtension on NetworkConfigInfo {
 
 class Web3EIP1193Handler {
   final InAppWebViewController webViewController;
-  final String _currentDomain;
   final Set<String> _activeRequests = {};
   final AppState appState;
   String? _lastKnownAddress;
@@ -85,9 +84,8 @@ class Web3EIP1193Handler {
 
   Web3EIP1193Handler({
     required this.webViewController,
-    required String initialUrl,
     required this.appState,
-  }) : _currentDomain = Uri.parse(initialUrl).host {
+  }) {
     _lastKnownAddress = appState.account?.addr;
     _lastKnownChainId = appState.chain?.chainId;
     appState.addListener(_handleAppStateChange);
@@ -107,6 +105,14 @@ class Web3EIP1193Handler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
+  }
+
+  Future<String> _getCurrentDomain() async {
+    final url = await webViewController.getUrl();
+    if (url == null || url.host.isEmpty) {
+      throw Exception('Unable to determine current page domain');
+    }
+    return url.host;
   }
 
   void _handleAppStateChange() async {
@@ -369,8 +375,9 @@ class Web3EIP1193Handler {
 
     try {
       await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
-        _currentDomain,
+        currentDomain,
         appState.connections,
       );
 
@@ -428,7 +435,7 @@ class Web3EIP1193Handler {
 
             final accountIndexes = Uint64List.fromList(selectedIndices);
             final connectionInfo = ConnectionInfo(
-              domain: _currentDomain,
+              domain: currentDomain,
               accountIndexes: accountIndexes,
               favicon: message.icon,
               title: title ?? "",
@@ -472,8 +479,9 @@ class Web3EIP1193Handler {
     AppState appState,
   ) async {
     await appState.syncConnections();
+    final currentDomain = await _getCurrentDomain();
     final connection =
-        Web3Utils.findConnected(_currentDomain, appState.connections);
+        Web3Utils.findConnected(currentDomain, appState.connections);
     final addresses = await _getWalletAddresses(appState);
     final connectedAddr =
         filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
@@ -569,8 +577,9 @@ class Web3EIP1193Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
         _removeActiveRequest(method);
@@ -687,8 +696,9 @@ class Web3EIP1193Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
-        _currentDomain,
+        currentDomain,
         appState.connections,
       );
 
@@ -902,8 +912,9 @@ class Web3EIP1193Handler {
   ) async {
     try {
       await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
         return _sendResponse(
@@ -985,8 +996,9 @@ class Web3EIP1193Handler {
       }
 
       await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
-        _currentDomain,
+        currentDomain,
         appState.connections,
       );
       final addresses = await _getWalletAddresses(appState);
@@ -1055,7 +1067,7 @@ class Web3EIP1193Handler {
 
             final accountIndexes = Uint64List.fromList(selectedIndices);
             final connectionInfo = ConnectionInfo(
-              domain: _currentDomain,
+              domain: currentDomain,
               accountIndexes: accountIndexes,
               favicon: message.icon,
               title: title ?? "",
@@ -1126,8 +1138,9 @@ class Web3EIP1193Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
       if (connection == null) {
         dev.log('EIP-712: No connection found for domain',
             name: 'web3_handler');
@@ -1263,8 +1276,9 @@ class Web3EIP1193Handler {
     _addActiveRequest(method);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
       if (connection == null) {
         _removeActiveRequest(method);
         final l10n = AppLocalizations.of(context);

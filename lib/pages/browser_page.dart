@@ -179,7 +179,6 @@ class _BrowserPageState extends State<BrowserPage>
     if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       _eip1193Handler = Web3EIP1193Handler(
         webViewController: _webViewController!,
-        initialUrl: _currentUrl,
         appState: appState,
       );
     }
@@ -194,7 +193,6 @@ class _BrowserPageState extends State<BrowserPage>
     if (slip44 == kTronSlip44) {
       _tronHandler = TronWeb3Handler(
         webViewController: _webViewController!,
-        initialUrl: _currentUrl,
         appState: appState,
       );
     }

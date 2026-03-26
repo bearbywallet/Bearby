@@ -27,7 +27,6 @@ import 'package:bearby/web3/web3_utils.dart';
 
 class TronWeb3Handler {
   final InAppWebViewController webViewController;
-  final String _currentDomain;
   final AppState appState;
   bool isConnected = false;
 
@@ -37,9 +36,8 @@ class TronWeb3Handler {
 
   TronWeb3Handler({
     required this.webViewController,
-    required String initialUrl,
     required this.appState,
-  }) : _currentDomain = Uri.parse(initialUrl).host {
+  }) {
     _lastKnownAddress = appState.account?.addr;
     _lastKnownChainId = appState.chain?.chainId.toString();
     appState.addListener(_handleAppStateChange);
@@ -47,6 +45,14 @@ class TronWeb3Handler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
+  }
+
+  Future<String> _getCurrentDomain() async {
+    final url = await webViewController.getUrl();
+    if (url == null || url.host.isEmpty) {
+      throw Exception('Unable to determine current page domain');
+    }
+    return url.host;
   }
 
   void _handleAppStateChange() async {
@@ -248,8 +254,9 @@ class TronWeb3Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
         _removeActiveRequest(method);
@@ -378,8 +385,9 @@ class TronWeb3Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      final currentDomain = await _getCurrentDomain();
       final connection =
-          Web3Utils.findConnected(_currentDomain, appState.connections);
+          Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
         _removeActiveRequest(method);
@@ -527,8 +535,9 @@ class TronWeb3Handler {
 
     try {
       await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
-        _currentDomain,
+        currentDomain,
         appState.connections,
       );
 
@@ -586,7 +595,7 @@ class TronWeb3Handler {
 
             final accountIndexes = Uint64List.fromList(selectedIndices);
             final connectionInfo = ConnectionInfo(
-              domain: _currentDomain,
+              domain: currentDomain,
               accountIndexes: accountIndexes,
               favicon: message.icon,
               title: title ?? "",
@@ -786,8 +795,9 @@ class TronWeb3Handler {
       final appState = Provider.of<AppState>(context, listen: false);
       await appState.syncConnections();
 
+      final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
-        _currentDomain,
+        currentDomain,
         appState.connections,
       );
 
