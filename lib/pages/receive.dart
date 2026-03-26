@@ -326,22 +326,24 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               height: 32,
               decoration: const BoxDecoration(shape: BoxShape.circle),
               child: Center(
-                child: AsyncImage(
-                  key: _imageKey,
-                  url: processTokenLogo(
-                    token: token,
-                    shortName: appState.chain?.shortName ?? "",
-                    theme: theme.value,
-                  ),
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.contain,
-                  errorWidget: Jazzicon(
-                    seed: token.addr,
-                    diameter: 32,
-                  ),
-                  loadingWidget: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                child: ClipOval(
+                  child: AsyncImage(
+                    key: _imageKey,
+                    url: processTokenLogo(
+                      token: token,
+                      shortName: appState.chain?.shortName ?? "",
+                      theme: theme.value,
+                    ),
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                    errorWidget: Jazzicon(
+                      seed: token.addr,
+                      diameter: 32,
+                    ),
+                    loadingWidget: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   ),
                 ),
               ),
