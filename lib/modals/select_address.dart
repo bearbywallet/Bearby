@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/jazzicon.dart';
-import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/src/rust/api/book.dart';
 import 'package:bearby/src/rust/api/qrcode.dart';
@@ -230,8 +230,7 @@ class _AddressSelectModalContentState
   }
 
   Widget _buildCategorySection(String categoryName, List<Entry> entries) {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final theme = appState.currentTheme;
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final categoryInfo = _getCategoryInfo(categoryName, l10n);
 
@@ -246,7 +245,7 @@ class _AddressSelectModalContentState
             final entry = entries[index];
             return Column(
               children: [
-                _buildAddressItem(appState, entry),
+                _buildAddressItem(entry),
                 if (index < entries.length - 1) _buildDivider(theme),
               ],
             );
@@ -297,7 +296,8 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildAddressItem(AppState appState, Entry entry) {
+  Widget _buildAddressItem(Entry entry) {
+    final appState = Provider.of<AppState>(context, listen: false);
     final l10n = AppLocalizations.of(context)!;
     final theme = appState.currentTheme;
     final currentAccount = appState.wallet?.selectedAccount.toInt() ?? 0;
@@ -325,7 +325,11 @@ class _AddressSelectModalContentState
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildAvatarWithNetworkIcon(appState, entry, theme),
+            ClipOval(
+                child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: _getAvatarWidget(entry, theme))),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -366,66 +370,6 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildAvatarWithNetworkIcon(
-      AppState appState, Entry entry, AppTheme theme) {
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: Stack(
-        children: [
-          ClipOval(
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: _getAvatarWidget(entry, theme),
-            ),
-          ),
-          if (_shouldShowNetworkIcon(appState, entry))
-            _buildNetworkIconBadge(entry, theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNetworkIconBadge(Entry entry, AppTheme theme) {
-    return Positioned(
-      right: -2,
-      bottom: -2,
-      child: Container(
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          color: theme.cardBackground,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: theme.primaryPurple.withValues(alpha: 0.5),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: theme.primaryPurple.withValues(alpha: 0.3),
-              blurRadius: 4,
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(2),
-          child: Center(
-            child: SvgPicture.asset(
-              _getNetworkIconPath(entry),
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                theme.primaryPurple.withValues(alpha: 0.8),
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   List<Widget> _buildTags(Entry entry, bool isCurrentAccount, AppTheme theme,
       AppLocalizations l10n) {
     List<Widget> tags = [];
@@ -447,19 +391,6 @@ class _AddressSelectModalContentState
     }
 
     return tags;
-  }
-
-  bool _shouldShowNetworkIcon(AppState appState, Entry entry) {
-    return _isZilliqaNetwork(appState);
-  }
-
-  bool _isZilliqaNetwork(AppState appState) {
-    return appState.wallet?.slip44 == kZilliqaSlip44;
-  }
-
-  String _getNetworkIconPath(Entry entry) {
-    final isEvm = entry.tag == "evm" || _isEvmAddress(entry.address);
-    return isEvm ? 'assets/icons/solidity.svg' : 'assets/icons/scilla.svg';
   }
 
   Widget _getAvatarWidget(Entry entry, AppTheme theme) {
@@ -524,10 +455,6 @@ class _AddressSelectModalContentState
 
   String _getTagDisplayName(String tag, AppLocalizations l10n) {
     switch (tag) {
-      case "legacy":
-        return "Legacy";
-      case "evm":
-        return "EVM";
       case "book":
         return l10n.addressSelectModalContentAddressBook;
       default:
@@ -537,24 +464,11 @@ class _AddressSelectModalContentState
 
   Color _getTagColor(String tag, AppTheme theme) {
     switch (tag) {
-      case "legacy":
-        return theme.primaryPurple;
-      case "evm":
-        return theme.primaryPurple;
       case "book":
         return theme.secondaryPurple;
       default:
         return theme.textSecondary;
     }
-  }
-
-  bool _isEvmAddress(String address) {
-    return address.toLowerCase().startsWith('0x');
-  }
-
-  String shortenAddress(String address) {
-    if (address.length <= 12) return address;
-    return '${address.substring(0, 6)}...${address.substring(address.length - 6)}';
   }
 
   Future<void> _parseQrcodRes(String data) async {
