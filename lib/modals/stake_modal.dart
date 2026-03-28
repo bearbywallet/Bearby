@@ -286,9 +286,11 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
   Widget _buildStakeInfo(AppTheme theme, AppLocalizations l10n) {
     final aprValue = StakeFormatters.formatApr(widget.stake.apr);
-    final commissionValue = StakeFormatters.formatCommission(widget.stake.commission);
+    final commissionValue =
+        StakeFormatters.formatCommission(widget.stake.commission);
     final hasApr = widget.stake.apr != null && widget.stake.apr! > 0;
-    final hasCommission = widget.stake.commission != null && widget.stake.commission! > 0;
+    final hasCommission =
+        widget.stake.commission != null && widget.stake.commission! > 0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -610,5 +612,4 @@ class _StakeModalContentState extends State<StakeModalContent> {
       );
     }
   }
-
 }

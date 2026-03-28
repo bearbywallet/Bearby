@@ -550,5 +550,20 @@
   "bip49Name": "BIP49 (SegWit)",
   "bip49Description": "P2WPKH-nested-in-P2SH - 以3开头的地址",
   "bip44Name": "BIP44 (Legacy)",
-  "bip44Description": "P2PKH - 以1开头的地址"
+  "bip44Description": "P2PKH - 以1开头的地址",
+  "addNetworkPageTitle": "添加网络",
+  "addNetworkFieldName": "网络名称",
+  "addNetworkFieldShortName": "简称",
+  "addNetworkFieldChain": "链类型",
+  "addNetworkFieldRpc": "RPC URL",
+  "addNetworkFieldChainId": "链 ID",
+  "addNetworkFieldExplorerUrl": "区块浏览器 URL",
+  "addNetworkFieldTokenSymbol": "代币符号",
+  "addNetworkFieldTokenDecimals": "小数位",
+  "addNetworkFieldTestnet": "测试网",
+  "addNetworkPageButton": "添加网络",
+  "addNetworkPageErrorRequired": "请填写所有必填字段",
+  "addNetworkPageErrorInvalidRpc": "请输入有效的 RPC URL",
+  "addNetworkPageErrorInvalidChainId": "请输入有效的链 ID",
+  "addNetworkPageSuccess": "网络添加成功"
 }

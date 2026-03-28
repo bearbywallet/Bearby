@@ -246,8 +246,8 @@ class _EncryptionSettingsModalContentState
                         const SizedBox(height: 8),
                         Text(
                           l10n.argonSettingsModalContentSecretHint,
-                          style:
-                              theme.bodyText2.copyWith(color: theme.textPrimary),
+                          style: theme.bodyText2
+                              .copyWith(color: theme.textPrimary),
                         ),
                         const SizedBox(height: 8),
                         OptionsList(

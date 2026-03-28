@@ -107,9 +107,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
 
     final fontSize = _calculateAdaptiveFontSize(context, widget.amount);
-    final showConverted =
-        appState.wallet?.settings.currencyConvert != null &&
-            converted.isNotEmpty;
+    final showConverted = appState.wallet?.settings.currencyConvert != null &&
+        converted.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

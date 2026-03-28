@@ -23,7 +23,8 @@ class StakeFormatters {
     BigInt? unbondingPeriodSeconds,
     AppLocalizations l10n,
   ) {
-    if (unbondingPeriodSeconds == null || unbondingPeriodSeconds == BigInt.zero) {
+    if (unbondingPeriodSeconds == null ||
+        unbondingPeriodSeconds == BigInt.zero) {
       return l10n.durationNotAvailable;
     }
 
@@ -57,7 +58,8 @@ class StakeFormatters {
     BigInt? unbondingPeriodSeconds,
     AppLocalizations l10n,
   ) {
-    if (unbondingPeriodSeconds == null || unbondingPeriodSeconds == BigInt.zero) {
+    if (unbondingPeriodSeconds == null ||
+        unbondingPeriodSeconds == BigInt.zero) {
       return 'N/A';
     }
 

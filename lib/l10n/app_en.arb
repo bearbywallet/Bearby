@@ -2275,5 +2275,65 @@
   "bip44Description": "P2PKH - Addresses starting with 1",
   "@bip44Description": {
     "description": "Description for BIP44 address type"
+  },
+  "addNetworkPageTitle": "Add Network",
+  "@addNetworkPageTitle": {
+    "description": "Title for the AddNetworkPage"
+  },
+  "addNetworkFieldName": "Network Name",
+  "@addNetworkFieldName": {
+    "description": "Label for the network name input field on AddNetworkPage"
+  },
+  "addNetworkFieldShortName": "Short Name",
+  "@addNetworkFieldShortName": {
+    "description": "Label for the short name input field on AddNetworkPage"
+  },
+  "addNetworkFieldChain": "Chain Type",
+  "@addNetworkFieldChain": {
+    "description": "Label for the chain type input field on AddNetworkPage"
+  },
+  "addNetworkFieldRpc": "RPC URL",
+  "@addNetworkFieldRpc": {
+    "description": "Label for the RPC URL input field on AddNetworkPage"
+  },
+  "addNetworkFieldChainId": "Chain ID",
+  "@addNetworkFieldChainId": {
+    "description": "Label for the chain ID input field on AddNetworkPage"
+  },
+  "addNetworkFieldExplorerUrl": "Explorer URL",
+  "@addNetworkFieldExplorerUrl": {
+    "description": "Label for the explorer URL input field on AddNetworkPage"
+  },
+  "addNetworkFieldTokenSymbol": "Token Symbol",
+  "@addNetworkFieldTokenSymbol": {
+    "description": "Label for the token symbol input field on AddNetworkPage"
+  },
+  "addNetworkFieldTokenDecimals": "Decimals",
+  "@addNetworkFieldTokenDecimals": {
+    "description": "Label for the token decimals input field on AddNetworkPage"
+  },
+  "addNetworkFieldTestnet": "Testnet",
+  "@addNetworkFieldTestnet": {
+    "description": "Label for the testnet toggle on AddNetworkPage"
+  },
+  "addNetworkPageButton": "Add Network",
+  "@addNetworkPageButton": {
+    "description": "Button text to confirm adding a network on AddNetworkPage"
+  },
+  "addNetworkPageErrorRequired": "Please fill in all required fields",
+  "@addNetworkPageErrorRequired": {
+    "description": "Error when required fields are empty on AddNetworkPage"
+  },
+  "addNetworkPageErrorInvalidRpc": "Please enter a valid RPC URL",
+  "@addNetworkPageErrorInvalidRpc": {
+    "description": "Error when RPC URL is invalid on AddNetworkPage"
+  },
+  "addNetworkPageErrorInvalidChainId": "Please enter a valid Chain ID",
+  "@addNetworkPageErrorInvalidChainId": {
+    "description": "Error when Chain ID is invalid on AddNetworkPage"
+  },
+  "addNetworkPageSuccess": "Network added successfully",
+  "@addNetworkPageSuccess": {
+    "description": "Success message after adding a network on AddNetworkPage"
   }
 }

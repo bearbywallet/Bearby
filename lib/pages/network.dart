@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -352,6 +353,24 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   child: CustomAppBar(
                     title: l10n.networkPageTitle,
                     onBackPressed: () => Navigator.pop(context),
+                    actionIcon: SvgPicture.asset(
+                      'assets/icons/plus.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.textPrimary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onActionPressed: () async {
+                      final added = await Navigator.pushNamed(
+                        context,
+                        '/add_network',
+                      );
+                      if (added == true) {
+                        _loadNetworks();
+                      }
+                    },
                   ),
                 ),
                 Padding(

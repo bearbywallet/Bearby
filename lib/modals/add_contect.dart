@@ -145,12 +145,14 @@ class _AddAddressModalState extends State<AddAddressModal> {
                     children: [
                       Text(
                         l10n.addAddressModalTitle,
-                        style: theme.subtitle2.copyWith(color: theme.textPrimary),
+                        style:
+                            theme.subtitle2.copyWith(color: theme.textPrimary),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.addAddressModalDescription,
-                        style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                        style: theme.bodyText2
+                            .copyWith(color: theme.textSecondary),
                       ),
                       const SizedBox(height: 24),
                       SmartInput(
@@ -186,7 +188,8 @@ class _AddAddressModalState extends State<AddAddressModal> {
                         const SizedBox(height: 8),
                         Text(
                           _errorMessage,
-                          style: theme.labelMedium.copyWith(color: theme.danger),
+                          style:
+                              theme.labelMedium.copyWith(color: theme.danger),
                         ),
                       ],
                       const SizedBox(height: 16),

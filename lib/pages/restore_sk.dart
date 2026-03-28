@@ -87,7 +87,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
     }
 
     try {
-      final isValidHex = normalized.length == 64 && RegExp(r'^[a-f0-9]+$').hasMatch(normalized);
+      final isValidHex = normalized.length == 64 &&
+          RegExp(r'^[a-f0-9]+$').hasMatch(normalized);
       final isPossibleWif = normalized.length == 51 || normalized.length == 52;
 
       if (!isValidHex && !isPossibleWif) {
@@ -151,7 +152,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           child: Column(
                             children: [
                               Padding(
-                                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: adaptivePadding),
                                 child: SmartInput(
                                   controller: _privateKeyController,
                                   hint: l10n.secretKeyRestorePageHint,
@@ -168,8 +170,10 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                                   focusedBorderColor: theme.primaryPurple,
                                   height: 64,
                                   fontSize: 16,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  iconPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  iconPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
                                 ),
                               ),
                               if (_errorMessage != null)
@@ -195,7 +199,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                       ),
                       const SizedBox(height: 8),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
                         child: Theme(
                           data: Theme.of(context).copyWith(
                             splashFactory: NoSplash.splashFactory,

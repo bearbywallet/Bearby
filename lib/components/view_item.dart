@@ -30,7 +30,8 @@ class _WalletListItemState extends State<WalletListItem>
   @override
   void initState() {
     super.initState();
-    initPressAnimation(duration: const Duration(milliseconds: 100), opacityEnd: 0.7);
+    initPressAnimation(
+        duration: const Duration(milliseconds: 100), opacityEnd: 0.7);
   }
 
   @override
@@ -89,11 +90,13 @@ class _WalletListItemState extends State<WalletListItem>
                           Text(
                             widget.title,
                             style: theme.bodyText1.copyWith(
-                              color: theme.textPrimary.withValues(alpha: opacity),
+                              color:
+                                  theme.textPrimary.withValues(alpha: opacity),
                               fontWeight: FontWeight.bold,
                               shadows: [
                                 Shadow(
-                                  color: theme.primaryPurple.withValues(alpha: 0.2),
+                                  color: theme.primaryPurple
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 4,
                                 ),
                               ],
@@ -103,7 +106,8 @@ class _WalletListItemState extends State<WalletListItem>
                           Text(
                             widget.subtitle,
                             style: theme.bodyText2.copyWith(
-                              color: theme.textSecondary.withValues(alpha: opacity * 0.8),
+                              color: theme.textSecondary
+                                  .withValues(alpha: opacity * 0.8),
                             ),
                           ),
                         ],

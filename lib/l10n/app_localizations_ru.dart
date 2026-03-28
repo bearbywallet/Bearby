@@ -1707,4 +1707,49 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get bip44Description => 'P2PKH - Адреса начинаются с 1';
+
+  @override
+  String get addNetworkPageTitle => 'Добавить сеть';
+
+  @override
+  String get addNetworkFieldName => 'Имя сети';
+
+  @override
+  String get addNetworkFieldShortName => 'Короткое имя';
+
+  @override
+  String get addNetworkFieldChain => 'Тип цепочки';
+
+  @override
+  String get addNetworkFieldRpc => 'RPC URL';
+
+  @override
+  String get addNetworkFieldChainId => 'ID цепочки';
+
+  @override
+  String get addNetworkFieldExplorerUrl => 'URL обозревателя';
+
+  @override
+  String get addNetworkFieldTokenSymbol => 'Символ токена';
+
+  @override
+  String get addNetworkFieldTokenDecimals => 'Десятичные';
+
+  @override
+  String get addNetworkFieldTestnet => 'Тестовая сеть';
+
+  @override
+  String get addNetworkPageButton => 'Добавить сеть';
+
+  @override
+  String get addNetworkPageErrorRequired => 'Заполните все обязательные поля';
+
+  @override
+  String get addNetworkPageErrorInvalidRpc => 'Введите корректный RPC URL';
+
+  @override
+  String get addNetworkPageErrorInvalidChainId => 'Введите корректный ID цепочки';
+
+  @override
+  String get addNetworkPageSuccess => 'Сеть успешно добавлена';
 }

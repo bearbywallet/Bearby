@@ -1707,4 +1707,49 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get bip44Description => 'P2PKH - 1で始まるアドレス';
+
+  @override
+  String get addNetworkPageTitle => 'ネットワークを追加';
+
+  @override
+  String get addNetworkFieldName => 'ネットワーク名';
+
+  @override
+  String get addNetworkFieldShortName => 'ショートネーム';
+
+  @override
+  String get addNetworkFieldChain => 'チェーンタイプ';
+
+  @override
+  String get addNetworkFieldRpc => 'RPC URL';
+
+  @override
+  String get addNetworkFieldChainId => 'チェーンID';
+
+  @override
+  String get addNetworkFieldExplorerUrl => 'エクスプローラーURL';
+
+  @override
+  String get addNetworkFieldTokenSymbol => 'トークンシンボル';
+
+  @override
+  String get addNetworkFieldTokenDecimals => '小数点';
+
+  @override
+  String get addNetworkFieldTestnet => 'テストネット';
+
+  @override
+  String get addNetworkPageButton => 'ネットワークを追加';
+
+  @override
+  String get addNetworkPageErrorRequired => 'すべての必須項目を入力してください';
+
+  @override
+  String get addNetworkPageErrorInvalidRpc => '有効なRPC URLを入力してください';
+
+  @override
+  String get addNetworkPageErrorInvalidChainId => '有効なチェーンIDを入力してください';
+
+  @override
+  String get addNetworkPageSuccess => 'ネットワークが追加されました';
 }

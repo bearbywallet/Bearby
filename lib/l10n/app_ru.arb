@@ -562,5 +562,20 @@
   "bip49Name": "BIP49 (SegWit)",
   "bip49Description": "P2WPKH-nested-in-P2SH - Адреса начинаются с 3",
   "bip44Name": "BIP44 (Legacy)",
-  "bip44Description": "P2PKH - Адреса начинаются с 1"
+  "bip44Description": "P2PKH - Адреса начинаются с 1",
+  "addNetworkPageTitle": "Добавить сеть",
+  "addNetworkFieldName": "Имя сети",
+  "addNetworkFieldShortName": "Короткое имя",
+  "addNetworkFieldChain": "Тип цепочки",
+  "addNetworkFieldRpc": "RPC URL",
+  "addNetworkFieldChainId": "ID цепочки",
+  "addNetworkFieldExplorerUrl": "URL обозревателя",
+  "addNetworkFieldTokenSymbol": "Символ токена",
+  "addNetworkFieldTokenDecimals": "Десятичные",
+  "addNetworkFieldTestnet": "Тестовая сеть",
+  "addNetworkPageButton": "Добавить сеть",
+  "addNetworkPageErrorRequired": "Заполните все обязательные поля",
+  "addNetworkPageErrorInvalidRpc": "Введите корректный RPC URL",
+  "addNetworkPageErrorInvalidChainId": "Введите корректный ID цепочки",
+  "addNetworkPageSuccess": "Сеть успешно добавлена"
 }

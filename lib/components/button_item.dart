@@ -61,7 +61,8 @@ class _ButtonItemState extends State<ButtonItem>
   @override
   void initState() {
     super.initState();
-    initPressAnimation(duration: const Duration(milliseconds: 100), scaleEnd: 0.98);
+    initPressAnimation(
+        duration: const Duration(milliseconds: 100), scaleEnd: 0.98);
   }
 
   @override

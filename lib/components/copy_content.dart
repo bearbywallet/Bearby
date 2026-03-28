@@ -27,7 +27,8 @@ class _CopyContentState extends State<CopyContent>
   @override
   void initState() {
     super.initState();
-    initPressAnimation(duration: const Duration(milliseconds: 200), opacityEnd: 0.7);
+    initPressAnimation(
+        duration: const Duration(milliseconds: 200), opacityEnd: 0.7);
   }
 
   @override
@@ -84,9 +85,7 @@ class _CopyContentState extends State<CopyContent>
                 ),
               ),
               SvgPicture.asset(
-                _isCopied
-                    ? 'assets/icons/check.svg'
-                    : 'assets/icons/copy.svg',
+                _isCopied ? 'assets/icons/check.svg' : 'assets/icons/copy.svg',
                 width: 14,
                 height: 14,
                 colorFilter: ColorFilter.mode(

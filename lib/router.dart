@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:bearby/pages/about.dart';
 import 'package:bearby/pages/add_account.dart';
 import 'package:bearby/pages/add_ledger_account.dart';
+import 'package:bearby/pages/add_network.dart';
 import 'package:bearby/pages/address_book.dart';
 import 'package:bearby/pages/appearance.dart';
 import 'package:bearby/pages/browser_settings.dart';
@@ -86,6 +87,7 @@ class AppRouter {
       '/reveal_sk',
       '/reveal_bip39',
       '/add_account',
+      '/add_network',
       '/web_view',
       '/rk_restore',
       '/browser_settings',
@@ -118,6 +120,8 @@ class AppRouter {
             return wrapWithProviders(const PasswordSetupPage());
           case '/add_ledger_account':
             return wrapWithProviders(const AddLedgerAccountPage());
+          case '/add_network':
+            return wrapWithProviders(const AddNetworkPage());
           case '/about':
             return wrapWithProviders(const AboutPage());
           case '/restore_sk':
@@ -190,6 +194,8 @@ class AppRouter {
             return wrapWithProviders(const InitialPage());
           case '/add_ledger_account':
             return wrapWithProviders(const AddLedgerAccountPage());
+          case '/add_network':
+            return wrapWithProviders(const AddNetworkPage());
           default:
             return wrapWithProviders(const LoginPage());
         }
@@ -208,6 +214,8 @@ class AppRouter {
         return wrapWithProviders(const ReceivePage());
       case '/add_account':
         return wrapWithProviders(const AddAccount());
+      case '/add_network':
+        return wrapWithProviders(const AddNetworkPage());
       case '/manage_tokens':
         return wrapWithProviders(const ManageTokensPage());
       case '/send':

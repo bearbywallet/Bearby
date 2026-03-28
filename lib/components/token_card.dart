@@ -94,7 +94,8 @@ class _TokenCardState extends State<TokenCard>
     return "*******";
   }
 
-  Widget _buildTileLayout(AppState appState, String displayAmount, String displayConverted) {
+  Widget _buildTileLayout(
+      AppState appState, String displayAmount, String displayConverted) {
     final theme = appState.currentTheme;
     final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 28);
 
@@ -160,7 +161,8 @@ class _TokenCardState extends State<TokenCard>
     );
   }
 
-  Widget _buildListLayout(AppState appState, String displayAmount, String displayConverted, double adaptivePadding) {
+  Widget _buildListLayout(AppState appState, String displayAmount,
+      String displayConverted, double adaptivePadding) {
     final theme = appState.currentTheme;
     final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
 
@@ -238,7 +240,8 @@ class _TokenCardState extends State<TokenCard>
 
     Widget content = widget.isTileView
         ? _buildTileLayout(appState, displayAmount, displayConverted)
-        : _buildListLayout(appState, displayAmount, displayConverted, adaptivePadding);
+        : _buildListLayout(
+            appState, displayAmount, displayConverted, adaptivePadding);
 
     Widget gestureWidget = buildPressable(
       onTap: widget.onTap,
@@ -261,8 +264,7 @@ class _TokenCardState extends State<TokenCard>
       children: [
         gestureWidget,
         if (widget.showDivider)
-          Container(
-              height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
+          Container(height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
       ],
     );
   }

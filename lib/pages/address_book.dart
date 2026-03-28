@@ -20,8 +20,7 @@ class AddressBookPage extends StatefulWidget {
   State<AddressBookPage> createState() => _AddressBookPageState();
 }
 
-class _AddressBookPageState extends State<AddressBookPage>
-    with StatusBarMixin {
+class _AddressBookPageState extends State<AddressBookPage> with StatusBarMixin {
   Future<void> _showDeleteConfirmationDialog(BuildContext context,
       AppState state, AddressBookEntryInfo address) async {
     final l10n = AppLocalizations.of(context)!;

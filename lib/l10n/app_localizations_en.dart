@@ -1707,4 +1707,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bip44Description => 'P2PKH - Addresses starting with 1';
+
+  @override
+  String get addNetworkPageTitle => 'Add Network';
+
+  @override
+  String get addNetworkFieldName => 'Network Name';
+
+  @override
+  String get addNetworkFieldShortName => 'Short Name';
+
+  @override
+  String get addNetworkFieldChain => 'Chain Type';
+
+  @override
+  String get addNetworkFieldRpc => 'RPC URL';
+
+  @override
+  String get addNetworkFieldChainId => 'Chain ID';
+
+  @override
+  String get addNetworkFieldExplorerUrl => 'Explorer URL';
+
+  @override
+  String get addNetworkFieldTokenSymbol => 'Token Symbol';
+
+  @override
+  String get addNetworkFieldTokenDecimals => 'Decimals';
+
+  @override
+  String get addNetworkFieldTestnet => 'Testnet';
+
+  @override
+  String get addNetworkPageButton => 'Add Network';
+
+  @override
+  String get addNetworkPageErrorRequired => 'Please fill in all required fields';
+
+  @override
+  String get addNetworkPageErrorInvalidRpc => 'Please enter a valid RPC URL';
+
+  @override
+  String get addNetworkPageErrorInvalidChainId => 'Please enter a valid Chain ID';
+
+  @override
+  String get addNetworkPageSuccess => 'Network added successfully';
 }

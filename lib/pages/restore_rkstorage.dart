@@ -161,8 +161,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                       children: [
                         if (accounts.isNotEmpty) ...[
                           Text(l10n.restoreRKStorageAccountsPrompt,
-                              style: theme.bodyText2.copyWith(
-                                  color: theme.textSecondary)),
+                              style: theme.bodyText2
+                                  .copyWith(color: theme.textSecondary)),
                           const SizedBox(height: 16),
                           Container(
                             padding: const EdgeInsets.all(16.0),
@@ -201,8 +201,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(_errorMessage!,
-                                style: theme.bodyText2.copyWith(
-                                    color: theme.danger)),
+                                style: theme.bodyText2
+                                    .copyWith(color: theme.danger)),
                           ),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -225,8 +225,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                               onPressed: () => Navigator.of(context)
                                   .pushNamed('/new_wallet_options'),
                               child: Text(l10n.restoreRKStorageSkipButton,
-                                  style: theme.bodyText2.copyWith(
-                                      color: theme.textSecondary)),
+                                  style: theme.bodyText2
+                                      .copyWith(color: theme.textSecondary)),
                             ),
                           ),
                         ),
@@ -276,14 +276,14 @@ class AccountItem extends StatelessWidget {
               children: [
                 Text(account.name,
                     style: theme.bodyLarge.copyWith(
-                        color: theme.textPrimary,
-                        fontWeight: FontWeight.bold)),
+                        color: theme.textPrimary, fontWeight: FontWeight.bold)),
                 Text(account.address,
                     style: theme.bodyText2.copyWith(color: theme.textSecondary),
                     overflow: TextOverflow.ellipsis),
                 Text(
                     '${l10n.accountItemBalanceLabel} ${account.balance ?? '0'} ZIL',
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary)),
+                    style:
+                        theme.bodyText2.copyWith(color: theme.textSecondary)),
               ],
             ),
           ),

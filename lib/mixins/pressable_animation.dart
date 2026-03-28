@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-mixin PressableAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvider {
+mixin PressableAnimationMixin<T extends StatefulWidget>
+    on State<T>, TickerProvider {
   late AnimationController pressAnimationController;
   late Animation<double> scaleAnimation;
   late Animation<double> opacityAnimation;
@@ -127,7 +128,8 @@ mixin PressableAnimationMixin<T extends StatefulWidget> on State<T>, TickerProvi
       return MouseRegion(
         onEnter: disabled ? null : handleHoverEnter,
         onExit: disabled ? null : handleHoverExit,
-        cursor: disabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
+        cursor:
+            disabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click,
         child: gestureChild,
       );
     }

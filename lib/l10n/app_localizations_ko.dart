@@ -1707,4 +1707,49 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get bip44Description => 'P2PKH - 1로 시작하는 주소';
+
+  @override
+  String get addNetworkPageTitle => '네트워크 추가';
+
+  @override
+  String get addNetworkFieldName => '네트워크 이름';
+
+  @override
+  String get addNetworkFieldShortName => '짧은 이름';
+
+  @override
+  String get addNetworkFieldChain => '체인 유형';
+
+  @override
+  String get addNetworkFieldRpc => 'RPC URL';
+
+  @override
+  String get addNetworkFieldChainId => '체인 ID';
+
+  @override
+  String get addNetworkFieldExplorerUrl => '익스플로러 URL';
+
+  @override
+  String get addNetworkFieldTokenSymbol => '토큰 심볼';
+
+  @override
+  String get addNetworkFieldTokenDecimals => '소수점';
+
+  @override
+  String get addNetworkFieldTestnet => '테스트넷';
+
+  @override
+  String get addNetworkPageButton => '네트워크 추가';
+
+  @override
+  String get addNetworkPageErrorRequired => '모든 필수 항목을 입력하세요';
+
+  @override
+  String get addNetworkPageErrorInvalidRpc => '유효한 RPC URL을 입력하세요';
+
+  @override
+  String get addNetworkPageErrorInvalidChainId => '유효한 체인 ID를 입력하세요';
+
+  @override
+  String get addNetworkPageSuccess => '네트워크가 추가되었습니다';
 }

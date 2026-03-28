@@ -258,7 +258,8 @@ class _HistoryItemState extends State<HistoryItem>
       return const SizedBox.shrink();
     }
 
-    final decimals = widget.transaction.chainType == "EVM" ? 18 : baseToken.decimals;
+    final decimals =
+        widget.transaction.chainType == "EVM" ? 18 : baseToken.decimals;
 
     final (formattedValue, convertedValue) = formatingAmount(
       amount: widget.transaction.fee,
@@ -320,8 +321,7 @@ class _HistoryItemState extends State<HistoryItem>
                                 decoration: BoxDecoration(
                                     color: _getStatusColor(theme)
                                         .withValues(alpha: 0.1),
-                                    borderRadius:
-                                        BorderRadius.circular(12)),
+                                    borderRadius: BorderRadius.circular(12)),
                                 child: Text(
                                     widget.transaction.status.name
                                         .toUpperCase(),

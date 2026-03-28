@@ -57,38 +57,149 @@ class Jazzicon extends StatefulWidget {
 
 class _JazziconState extends State<Jazzicon> {
   static const List<Color> _colors = [
-    Color(0xFFFF007A), Color(0xFFFF1A8C), Color(0xFFFF339E), Color(0xFFFF4DB0), Color(0xFFFF66C2),
-    Color(0xFFAC59FF), Color(0xFFB66CFF), Color(0xFFC07FFF), Color(0xFFCA92FF), Color(0xFFD4A5FF),
-    Color(0xFF00D4FF), Color(0xFF1AD9FF), Color(0xFF33DEFF), Color(0xFF4DE3FF), Color(0xFF66E8FF),
-    Color(0xFFFF6B35), Color(0xFFFF7D4D), Color(0xFFFF8F66), Color(0xFFFFA17F), Color(0xFFFFB399),
-    Color(0xFF43CC71), Color(0xFF56D183), Color(0xFF69D695), Color(0xFF7CDBA7), Color(0xFF8FE0B9),
-    Color(0xFFFFD700), Color(0xFFFFDB1A), Color(0xFFFFDF33), Color(0xFFFFE34D), Color(0xFFFFE766),
-    Color(0xFF8B5CF6), Color(0xFF9B70F7), Color(0xFFAB84F8), Color(0xFFBB98F9), Color(0xFFCBACFA),
-    Color(0xFFEC4899), Color(0xFFEE5CA5), Color(0xFFF070B1), Color(0xFFF284BD), Color(0xFFF498C9),
-    Color(0xFF10B981), Color(0xFF24C290), Color(0xFF38CB9F), Color(0xFF4CD4AE), Color(0xFF60DDBD),
-    Color(0xFFF59E0B), Color(0xFFF6A922), Color(0xFFF7B439), Color(0xFFF8BF50), Color(0xFFF9CA67),
-    Color(0xFF6366F1), Color(0xFF7477F2), Color(0xFF8588F3), Color(0xFF9699F4), Color(0xFFA7AAF5),
-    Color(0xFFEF4444), Color(0xFFF05757), Color(0xFFF16A6A), Color(0xFFF27D7D), Color(0xFFF39090),
-    Color(0xFF14B8A6), Color(0xFF28C1B5), Color(0xFF3CCAC4), Color(0xFF50D3D3), Color(0xFF64DCE2),
-    Color(0xFFF97316), Color(0xFFFA832D), Color(0xFFFB9344), Color(0xFFFCA35B), Color(0xFFFDB372),
-    Color(0xFF8B5A3C), Color(0xFF996853), Color(0xFFA7766A), Color(0xFFB58481), Color(0xFFC39298),
-    Color(0xFF2DD4BF), Color(0xFF41D9C8), Color(0xFF55DED1), Color(0xFF69E3DA), Color(0xFF7DE8E3),
-    Color(0xFFFB923C), Color(0xFFFC9D53), Color(0xFFFDA86A), Color(0xFFFEB381), Color(0xFFFFBE98),
-    Color(0xFFC026D3), Color(0xFFC63AD9), Color(0xFFCC4EDF), Color(0xFFD262E5), Color(0xFFD876EB),
-    Color(0xFF38BDF8), Color(0xFF4CC4F9), Color(0xFF60CBFA), Color(0xFF74D2FB), Color(0xFF88D9FC),
-    Color(0xFFFBBF24), Color(0xFFFCC43B), Color(0xFFCDC952), Color(0xFFFECE69), Color(0xFFFFD380),
-    Color(0xFFA78BFA), Color(0xFFB39DFB), Color(0xFFBFAFFC), Color(0xFFCBC1FD), Color(0xFFD7D3FE),
-    Color(0xFFF472B6), Color(0xFFF686C2), Color(0xFFF89ACE), Color(0xFFFAADDA), Color(0xFFFCC1E6),
-    Color(0xFF34D399), Color(0xFF48D9A7), Color(0xFF5CDFB5), Color(0xFF70E5C3), Color(0xFF84EBD1),
-    Color(0xFFFBBF24), Color(0xFFCCC53B), Color(0xFFFDCB52), Color(0xFFFED169), Color(0xFFFFD780),
-    Color(0xFF818CF8), Color(0xFF9299F9), Color(0xFFA3A6FA), Color(0xFFB4B3FB), Color(0xFFC5C0FC),
+    Color(0xFFFF007A),
+    Color(0xFFFF1A8C),
+    Color(0xFFFF339E),
+    Color(0xFFFF4DB0),
+    Color(0xFFFF66C2),
+    Color(0xFFAC59FF),
+    Color(0xFFB66CFF),
+    Color(0xFFC07FFF),
+    Color(0xFFCA92FF),
+    Color(0xFFD4A5FF),
+    Color(0xFF00D4FF),
+    Color(0xFF1AD9FF),
+    Color(0xFF33DEFF),
+    Color(0xFF4DE3FF),
+    Color(0xFF66E8FF),
+    Color(0xFFFF6B35),
+    Color(0xFFFF7D4D),
+    Color(0xFFFF8F66),
+    Color(0xFFFFA17F),
+    Color(0xFFFFB399),
+    Color(0xFF43CC71),
+    Color(0xFF56D183),
+    Color(0xFF69D695),
+    Color(0xFF7CDBA7),
+    Color(0xFF8FE0B9),
+    Color(0xFFFFD700),
+    Color(0xFFFFDB1A),
+    Color(0xFFFFDF33),
+    Color(0xFFFFE34D),
+    Color(0xFFFFE766),
+    Color(0xFF8B5CF6),
+    Color(0xFF9B70F7),
+    Color(0xFFAB84F8),
+    Color(0xFFBB98F9),
+    Color(0xFFCBACFA),
+    Color(0xFFEC4899),
+    Color(0xFFEE5CA5),
+    Color(0xFFF070B1),
+    Color(0xFFF284BD),
+    Color(0xFFF498C9),
+    Color(0xFF10B981),
+    Color(0xFF24C290),
+    Color(0xFF38CB9F),
+    Color(0xFF4CD4AE),
+    Color(0xFF60DDBD),
+    Color(0xFFF59E0B),
+    Color(0xFFF6A922),
+    Color(0xFFF7B439),
+    Color(0xFFF8BF50),
+    Color(0xFFF9CA67),
+    Color(0xFF6366F1),
+    Color(0xFF7477F2),
+    Color(0xFF8588F3),
+    Color(0xFF9699F4),
+    Color(0xFFA7AAF5),
+    Color(0xFFEF4444),
+    Color(0xFFF05757),
+    Color(0xFFF16A6A),
+    Color(0xFFF27D7D),
+    Color(0xFFF39090),
+    Color(0xFF14B8A6),
+    Color(0xFF28C1B5),
+    Color(0xFF3CCAC4),
+    Color(0xFF50D3D3),
+    Color(0xFF64DCE2),
+    Color(0xFFF97316),
+    Color(0xFFFA832D),
+    Color(0xFFFB9344),
+    Color(0xFFFCA35B),
+    Color(0xFFFDB372),
+    Color(0xFF8B5A3C),
+    Color(0xFF996853),
+    Color(0xFFA7766A),
+    Color(0xFFB58481),
+    Color(0xFFC39298),
+    Color(0xFF2DD4BF),
+    Color(0xFF41D9C8),
+    Color(0xFF55DED1),
+    Color(0xFF69E3DA),
+    Color(0xFF7DE8E3),
+    Color(0xFFFB923C),
+    Color(0xFFFC9D53),
+    Color(0xFFFDA86A),
+    Color(0xFFFEB381),
+    Color(0xFFFFBE98),
+    Color(0xFFC026D3),
+    Color(0xFFC63AD9),
+    Color(0xFFCC4EDF),
+    Color(0xFFD262E5),
+    Color(0xFFD876EB),
+    Color(0xFF38BDF8),
+    Color(0xFF4CC4F9),
+    Color(0xFF60CBFA),
+    Color(0xFF74D2FB),
+    Color(0xFF88D9FC),
+    Color(0xFFFBBF24),
+    Color(0xFFFCC43B),
+    Color(0xFFCDC952),
+    Color(0xFFFECE69),
+    Color(0xFFFFD380),
+    Color(0xFFA78BFA),
+    Color(0xFFB39DFB),
+    Color(0xFFBFAFFC),
+    Color(0xFFCBC1FD),
+    Color(0xFFD7D3FE),
+    Color(0xFFF472B6),
+    Color(0xFFF686C2),
+    Color(0xFFF89ACE),
+    Color(0xFFFAADDA),
+    Color(0xFFFCC1E6),
+    Color(0xFF34D399),
+    Color(0xFF48D9A7),
+    Color(0xFF5CDFB5),
+    Color(0xFF70E5C3),
+    Color(0xFF84EBD1),
+    Color(0xFFFBBF24),
+    Color(0xFFCCC53B),
+    Color(0xFFFDCB52),
+    Color(0xFFFED169),
+    Color(0xFFFFD780),
+    Color(0xFF818CF8),
+    Color(0xFF9299F9),
+    Color(0xFFA3A6FA),
+    Color(0xFFB4B3FB),
+    Color(0xFFC5C0FC),
   ];
 
   static const List<ShapeType> _shapeTypes = [
-    ShapeType.circle, ShapeType.star, ShapeType.star6, ShapeType.star8,
-    ShapeType.triangle, ShapeType.triangleDown, ShapeType.square, ShapeType.diamond,
-    ShapeType.pentagon, ShapeType.hexagon, ShapeType.octagon, ShapeType.heart,
-    ShapeType.crescent, ShapeType.cross, ShapeType.plus
+    ShapeType.circle,
+    ShapeType.star,
+    ShapeType.star6,
+    ShapeType.star8,
+    ShapeType.triangle,
+    ShapeType.triangleDown,
+    ShapeType.square,
+    ShapeType.diamond,
+    ShapeType.pentagon,
+    ShapeType.hexagon,
+    ShapeType.octagon,
+    ShapeType.heart,
+    ShapeType.crescent,
+    ShapeType.cross,
+    ShapeType.plus
   ];
 
   static const int _colorDistanceThresholdSquared = 6400;
@@ -107,7 +218,9 @@ class _JazziconState extends State<Jazzicon> {
   @override
   void didUpdateWidget(Jazzicon oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.seed != oldWidget.seed || widget.diameter != oldWidget.diameter || widget.shapeCount != oldWidget.shapeCount) {
+    if (widget.seed != oldWidget.seed ||
+        widget.diameter != oldWidget.diameter ||
+        widget.shapeCount != oldWidget.shapeCount) {
       _generateShapes();
     }
   }
@@ -141,7 +254,9 @@ class _JazziconState extends State<Jazzicon> {
     for (int i = 0; i < colorsLen; i++) {
       if (usedColors[i]) continue;
       final color = _colors[i];
-      if (previousColor != null && _colorDistanceSquared(color, previousColor) < _colorDistanceThresholdSquared) {
+      if (previousColor != null &&
+          _colorDistanceSquared(color, previousColor) <
+              _colorDistanceThresholdSquared) {
         continue;
       }
       availableIndices.add(i);
@@ -194,19 +309,20 @@ class _JazziconState extends State<Jazzicon> {
 
       final double scaleRandom = _random.nextDouble();
       final double scaleBase = 0.25 + scaleRandom * 0.7;
-      final double centerBoost = distanceFromCenter < centerThreshold ? 1.2 : 1.0;
+      final double centerBoost =
+          distanceFromCenter < centerThreshold ? 1.2 : 1.0;
       final double scale = scaleBase * centerBoost;
 
-      final previousColor = shapeConfigs.isEmpty ? _backgroundColor : shapeConfigs.last.color;
+      final previousColor =
+          shapeConfigs.isEmpty ? _backgroundColor : shapeConfigs.last.color;
 
       shapeConfigs.add(ShapeConfig(
-        color: _genColor(usedColors, previousColor: previousColor),
-        tx: tx,
-        ty: ty,
-        rotation: rotation,
-        scale: scale,
-        type: _genShapeType()
-      ));
+          color: _genColor(usedColors, previousColor: previousColor),
+          tx: tx,
+          ty: ty,
+          rotation: rotation,
+          scale: scale,
+          type: _genShapeType()));
     }
 
     setState(() {

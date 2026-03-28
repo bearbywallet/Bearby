@@ -565,5 +565,20 @@
   "bip49Name": "BIP49 (SegWit)",
   "bip49Description": "P2WPKH-nested-in-P2SH - 3で始まるアドレス",
   "bip44Name": "BIP44 (Legacy)",
-  "bip44Description": "P2PKH - 1で始まるアドレス"
+  "bip44Description": "P2PKH - 1で始まるアドレス",
+  "addNetworkPageTitle": "ネットワークを追加",
+  "addNetworkFieldName": "ネットワーク名",
+  "addNetworkFieldShortName": "ショートネーム",
+  "addNetworkFieldChain": "チェーンタイプ",
+  "addNetworkFieldRpc": "RPC URL",
+  "addNetworkFieldChainId": "チェーンID",
+  "addNetworkFieldExplorerUrl": "エクスプローラーURL",
+  "addNetworkFieldTokenSymbol": "トークンシンボル",
+  "addNetworkFieldTokenDecimals": "小数点",
+  "addNetworkFieldTestnet": "テストネット",
+  "addNetworkPageButton": "ネットワークを追加",
+  "addNetworkPageErrorRequired": "すべての必須項目を入力してください",
+  "addNetworkPageErrorInvalidRpc": "有効なRPC URLを入力してください",
+  "addNetworkPageErrorInvalidChainId": "有効なチェーンIDを入力してください",
+  "addNetworkPageSuccess": "ネットワークが追加されました"
 }

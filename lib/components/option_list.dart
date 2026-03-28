@@ -120,10 +120,10 @@ class _OptionItemWidgetState extends State<_OptionItemWidget> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              widget.theme.cardBackground.withValues(
-                                  alpha: 0.65 + value * 0.15),
-                              widget.theme.cardBackground.withValues(
-                                  alpha: 0.75 + value * 0.10),
+                              widget.theme.cardBackground
+                                  .withValues(alpha: 0.65 + value * 0.15),
+                              widget.theme.cardBackground
+                                  .withValues(alpha: 0.75 + value * 0.10),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(12),
@@ -171,10 +171,8 @@ class _OptionItemWidgetState extends State<_OptionItemWidget> {
                               ),
                               child: Center(
                                 child: AnimatedScale(
-                                  duration:
-                                      const Duration(milliseconds: 200),
-                                  scale:
-                                      widget.option.isSelected ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 200),
+                                  scale: widget.option.isSelected ? 1.0 : 0.0,
                                   child: Container(
                                     width: 10,
                                     height: 10,

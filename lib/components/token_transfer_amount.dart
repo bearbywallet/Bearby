@@ -31,7 +31,8 @@ class TokenTransferInfo extends StatelessWidget {
   ) {
     final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
-    final displayName = name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown;
+    final displayName =
+        name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown;
 
     return Expanded(
       flex: 3,

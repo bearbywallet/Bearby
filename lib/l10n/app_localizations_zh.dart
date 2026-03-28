@@ -1707,4 +1707,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bip44Description => 'P2PKH - 以1开头的地址';
+
+  @override
+  String get addNetworkPageTitle => '添加网络';
+
+  @override
+  String get addNetworkFieldName => '网络名称';
+
+  @override
+  String get addNetworkFieldShortName => '简称';
+
+  @override
+  String get addNetworkFieldChain => '链类型';
+
+  @override
+  String get addNetworkFieldRpc => 'RPC URL';
+
+  @override
+  String get addNetworkFieldChainId => '链 ID';
+
+  @override
+  String get addNetworkFieldExplorerUrl => '区块浏览器 URL';
+
+  @override
+  String get addNetworkFieldTokenSymbol => '代币符号';
+
+  @override
+  String get addNetworkFieldTokenDecimals => '小数位';
+
+  @override
+  String get addNetworkFieldTestnet => '测试网';
+
+  @override
+  String get addNetworkPageButton => '添加网络';
+
+  @override
+  String get addNetworkPageErrorRequired => '请填写所有必填字段';
+
+  @override
+  String get addNetworkPageErrorInvalidRpc => '请输入有效的 RPC URL';
+
+  @override
+  String get addNetworkPageErrorInvalidChainId => '请输入有效的链 ID';
+
+  @override
+  String get addNetworkPageSuccess => '网络添加成功';
 }

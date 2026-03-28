@@ -3412,6 +3412,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'P2PKH - Addresses starting with 1'**
   String get bip44Description;
+
+  /// Title for the AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Add Network'**
+  String get addNetworkPageTitle;
+
+  /// Label for the network name input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Network Name'**
+  String get addNetworkFieldName;
+
+  /// Label for the short name input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Short Name'**
+  String get addNetworkFieldShortName;
+
+  /// Label for the chain type input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Chain Type'**
+  String get addNetworkFieldChain;
+
+  /// Label for the RPC URL input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'RPC URL'**
+  String get addNetworkFieldRpc;
+
+  /// Label for the chain ID input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID'**
+  String get addNetworkFieldChainId;
+
+  /// Label for the explorer URL input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer URL'**
+  String get addNetworkFieldExplorerUrl;
+
+  /// Label for the token symbol input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Token Symbol'**
+  String get addNetworkFieldTokenSymbol;
+
+  /// Label for the token decimals input field on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Decimals'**
+  String get addNetworkFieldTokenDecimals;
+
+  /// Label for the testnet toggle on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get addNetworkFieldTestnet;
+
+  /// Button text to confirm adding a network on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Add Network'**
+  String get addNetworkPageButton;
+
+  /// Error when required fields are empty on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in all required fields'**
+  String get addNetworkPageErrorRequired;
+
+  /// Error when RPC URL is invalid on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid RPC URL'**
+  String get addNetworkPageErrorInvalidRpc;
+
+  /// Error when Chain ID is invalid on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid Chain ID'**
+  String get addNetworkPageErrorInvalidChainId;
+
+  /// Success message after adding a network on AddNetworkPage
+  ///
+  /// In en, this message translates to:
+  /// **'Network added successfully'**
+  String get addNetworkPageSuccess;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
