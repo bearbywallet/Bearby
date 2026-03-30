@@ -1,6 +1,6 @@
-# ZilPay Mobile Wallet
+# Bearby Mobile Wallet
 
-ZilPay is a quantum-resistant, multi-currency decentralized wallet. Create and interact with decentralized applications across multiple blockchains with industry-leading security powered by advanced cryptographic primitives.
+Bearby is a quantum-resistant, multi-currency decentralized wallet. Create and interact with decentralized applications across multiple blockchains with industry-leading security powered by advanced cryptographic primitives.
 
 <p align="center">
   <a href="https://zilpay.io"><img src="https://github.com/zilpay/zilpay-mobile/blob/master/imgs/preview.png"></a>
@@ -17,7 +17,7 @@ ZilPay is a quantum-resistant, multi-currency decentralized wallet. Create and i
 
 ## Cryptographic Foundations
 
-ZilPay employs a comprehensive set of cryptographic primitives to ensure maximum security:
+Bearby employs a comprehensive set of cryptographic primitives to ensure maximum security:
 
 - **NTRU Prime**: Post-quantum cryptography for future-proof security
 - **Cyber**: Advanced cryptographic library for blockchain operations
@@ -30,12 +30,6 @@ ZilPay employs a comprehensive set of cryptographic primitives to ensure maximum
 - **Frontend**: Flutter/Dart
 - **Core Logic**: Rust
 - **Blockchain Integration**: Native rust implementations
-
-## For Developers
-
-- [ZilPay full documentation](https://zilpay.github.io/zilpay-docs/)
-- [Guide: Build your dApp with ZilPay](https://medium.com/coinmonks/test-and-develop-dapps-on-zilliqa-with-zilpay-52b165f118bf?source=friends_link&sk=2a60070ddac60677ec36b1234c60222a)
-- [Zilliqa dApps examples](https://github.com/lich666dead/zilliqa-dApps)
 
 ## Getting Started
 
