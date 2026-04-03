@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:bearby/components/hoverd_svg.dart';
 import 'package:bearby/components/image_cache.dart';
-import 'package:bearby/components/browser_search_bar.dart';
+import 'package:bearby/components/glass_search_bar.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/config/search_engines.dart';
 import 'package:bearby/config/web3_constants.dart';
@@ -34,8 +34,8 @@ class BrowserPage extends StatefulWidget {
 class _BrowserPageState extends State<BrowserPage>
     with WidgetsBindingObserver, StatusBarMixin {
   final TextEditingController _searchController = TextEditingController();
-  final GlobalKey<BrowserSearchBarState> _searchBarKey =
-      GlobalKey<BrowserSearchBarState>();
+  final GlobalKey<GlassSearchBarState> _searchBarKey =
+      GlobalKey<GlassSearchBarState>();
 
   InAppWebViewController? _webViewController;
   ZilPayLegacyHandler? _legacyHandler;
@@ -554,11 +554,19 @@ class _BrowserPageState extends State<BrowserPage>
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 450),
-        child: BrowserSearchBar(
-          key: _searchBarKey,
-          controller: _searchController,
-          hint: l10n.browserPageSearchHint(searchEngine.name),
-          onSubmitted: _handleSearch,
+        child: ListenableBuilder(
+          listenable: _searchController,
+          builder: (context, _) => GlassSearchBar(
+            key: _searchBarKey,
+            controller: _searchController,
+            hint: l10n.browserPageSearchHint(searchEngine.name),
+            onSubmitted: _handleSearch,
+            keyboardType: TextInputType.url,
+            rightIconPath: _searchController.text.isNotEmpty
+                ? 'assets/icons/close.svg'
+                : null,
+            onRightIconTap: () => _searchController.clear(),
+          ),
         ),
       ),
     );

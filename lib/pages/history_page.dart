@@ -280,7 +280,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
               children: [
                 Expanded(child: scrollView),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                   child: GlassSearchBar(
                     controller: _searchController,
                     hint: AppLocalizations.of(context)!.historyPageSearchHint,
