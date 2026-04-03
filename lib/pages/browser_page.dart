@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -54,9 +55,9 @@ class _BrowserPageState extends State<BrowserPage>
   AppState? _appState;
   String? _evmInjectScript;
 
-  // String get _baseUserAgent => Platform.isIOS
-  //     ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
-  //     : 'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
+  String get _baseUserAgent => Platform.isIOS
+      ? 'Bearby/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+      : 'Bearby/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
 
   @override
   void initState() {
@@ -366,10 +367,9 @@ class _BrowserPageState extends State<BrowserPage>
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
               safeBrowsingEnabled: false,
-              // userAgent: _baseUserAgent +
-              //     (appState.state.browserSettings.doNotTrack
-              //         ? ' DNT:1'
-              //         : ' ZilPay/1.0'),
+              userAgent: appState.state.browserSettings.doNotTrack
+                  ? ' DNT:1'
+                  : _baseUserAgent,
               useHybridComposition: true,
               supportZoom: true,
               useOnLoadResource: true,
