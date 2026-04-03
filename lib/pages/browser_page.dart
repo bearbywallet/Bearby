@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:bearby/components/hoverd_svg.dart';
 import 'package:bearby/components/image_cache.dart';
-import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/browser_search_bar.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/config/search_engines.dart';
 import 'package:bearby/config/web3_constants.dart';
@@ -34,6 +34,8 @@ class BrowserPage extends StatefulWidget {
 class _BrowserPageState extends State<BrowserPage>
     with WidgetsBindingObserver, StatusBarMixin {
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<BrowserSearchBarState> _searchBarKey =
+      GlobalKey<BrowserSearchBarState>();
 
   InAppWebViewController? _webViewController;
   ZilPayLegacyHandler? _legacyHandler;
@@ -552,17 +554,11 @@ class _BrowserPageState extends State<BrowserPage>
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 450),
-        child: SmartInput(
+        child: BrowserSearchBar(
+          key: _searchBarKey,
           controller: _searchController,
           hint: l10n.browserPageSearchHint(searchEngine.name),
-          leftIconPath: 'assets/icons/search.svg',
           onSubmitted: _handleSearch,
-          borderColor: theme.textPrimary,
-          focusedBorderColor: theme.primaryPurple,
-          height: 48,
-          fontSize: 16,
-          autofocus: false,
-          keyboardType: TextInputType.url,
         ),
       ),
     );
