@@ -354,6 +354,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
             hint: l10n.loginPagePasswordHint,
             fontSize: 18,
             height: 50,
+            backgroundColor: Colors.white.withValues(alpha: 0.12),
             disabled: _selectedWallet == -1 || isLedgerWallet || _loading,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             focusedBorderColor: theme.currentTheme.primaryPurple,

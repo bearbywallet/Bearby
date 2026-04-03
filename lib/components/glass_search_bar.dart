@@ -145,8 +145,8 @@ class GlassSearchBarState extends State<GlassSearchBar>
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          theme.cardBackground.withValues(alpha: 0.18),
-                          theme.cardBackground.withValues(alpha: 0.06),
+                          theme.cardBackground.withValues(alpha: 0.55),
+                          theme.cardBackground.withValues(alpha: 0.40),
                         ],
                       ),
                       border: Border.all(
@@ -157,33 +157,7 @@ class GlassSearchBarState extends State<GlassSearchBar>
                   ),
                 ),
 
-                // Layer 2 — Top highlight strip (glass light refraction)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                    child: Container(
-                      height: 6,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.22),
-                            Colors.white.withValues(alpha: 0.0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Layer 3 — Content row
+                // Layer 2 — Content row
                 Positioned.fill(
                   child: Row(
                     children: [
