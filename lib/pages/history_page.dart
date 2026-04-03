@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:bearby/components/linear_refresh_indicator.dart';
 import 'package:bearby/components/transaction_item.dart';
 import 'package:bearby/components/hoverd_svg.dart';
-import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/glass_search_bar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
@@ -280,26 +280,19 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
               children: [
                 Expanded(child: scrollView),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: SmartInput(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: GlassSearchBar(
                     controller: _searchController,
                     hint: AppLocalizations.of(context)!.historyPageSearchHint,
-                    leftIconPath: 'assets/icons/search.svg',
                     rightIconPath: "assets/icons/close.svg",
                     onChanged: (value) {
                       setState(() {});
                     },
                     onRightIconTap: () {
                       _searchController.text = "";
+                      setState(() {});
                     },
                     onSubmitted: (value) {},
-                    borderColor: appState.currentTheme.textPrimary,
-                    focusedBorderColor: appState.currentTheme.primaryPurple,
-                    height: 48,
-                    fontSize: 16,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    autofocus: false,
-                    keyboardType: TextInputType.text,
                   ),
                 ),
               ],
