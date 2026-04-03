@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:ui';
 
@@ -51,6 +52,7 @@ class _BrowserPageState extends State<BrowserPage>
   bool _canGoForward = false;
   int? _lastKnownSlip44;
   AppState? _appState;
+  String? _evmInjectScript;
 
   // String get _baseUserAgent => Platform.isIOS
   //     ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
@@ -66,6 +68,12 @@ class _BrowserPageState extends State<BrowserPage>
     appState.syncConnections();
     _lastKnownSlip44 = appState.chain?.slip44;
     appState.addListener(_handleChainChange);
+    _loadEvmScript();
+  }
+
+  Future<void> _loadEvmScript() async {
+    final src = await rootBundle.loadString('assets/evm_inject.js');
+    if (mounted) setState(() => _evmInjectScript = src);
   }
 
   void _handleChainChange() {
@@ -333,6 +341,7 @@ class _BrowserPageState extends State<BrowserPage>
   Widget _buildWebView() {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
+    final slip44 = appState.chain?.slip44;
     return Column(
       children: [
         if (_isLoading && _progress < 1.0)
@@ -345,6 +354,15 @@ class _BrowserPageState extends State<BrowserPage>
         Expanded(
           child: InAppWebView(
             initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
+            initialUserScripts: UnmodifiableListView([
+              if (_evmInjectScript != null &&
+                  (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44))
+                UserScript(
+                  source: _evmInjectScript!,
+                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+                  contentWorld: ContentWorld.PAGE,
+                ),
+            ]),
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
               safeBrowsingEnabled: false,
@@ -398,13 +416,9 @@ class _BrowserPageState extends State<BrowserPage>
               _legacyHandler?.handleStartBlockWorker(appState);
             },
             onConsoleMessage: (_, msg) {
-              // print(msg);
+              print(msg);
             },
-            onProgressChanged: (controller, progress) async {
-              if (progress > 20) {
-                await _initializeZilPayInjection(appState);
-              }
-
+            onProgressChanged: (controller, progress) {
               setState(() => _progress = progress / 100);
             },
             onUpdateVisitedHistory: (controller, url, androidIsReload) async {

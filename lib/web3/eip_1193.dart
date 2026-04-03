@@ -158,11 +158,10 @@ class Web3EIP1193Handler {
 
     final jsCode = '''
     (function() {
-      if (typeof window.handleZilPayEvent === 'function') {
-        console.log('ZilPay EIP-1193: Calling handleZilPayEvent with:', $jsonEventData);
-        window.handleZilPayEvent($jsonEventData);
+      if (typeof window.handleBearbyEvent === 'function') {
+        window.handleBearbyEvent($jsonEventData);
       } else {
-        console.log('ZilPay EIP-1193: window.handleZilPayEvent not found. Event "$eventName" not sent.');
+        console.log('Bearby EIP-1193: window.handleBearbyEvent not found. Event "$eventName" not sent.');
       }
     })();
     ''';
@@ -198,10 +197,10 @@ class Web3EIP1193Handler {
     final jsCode = '''
     (function() {
       const responseData = $jsResponse;
-      if (window.__zilpay_response_handlers && window.__zilpay_response_handlers["$uuid"]) {
-        const handler = window.__zilpay_response_handlers["$uuid"];
+      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
+        const handler = window.__bearby_response_handlers["$uuid"];
         handler(responseData);
-        delete window.__zilpay_response_handlers["$uuid"];
+        delete window.__bearby_response_handlers["$uuid"];
       } else {
         window.dispatchEvent(new MessageEvent('message', { 
           data: responseData
