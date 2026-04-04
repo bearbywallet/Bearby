@@ -17,7 +17,7 @@ pub use zilpay::{
 };
 pub use zilpay::{
     background::{BackgroundBip39Params, BackgroundSKParams},
-    crypto::bip49::DerivationPath,
+    crypto::bip49::{DerivationPath, DerivationType},
     proto::{pubkey::PubKey, secret_key::SecretKey},
 };
 
@@ -127,7 +127,7 @@ pub async fn add_sk_wallet(
         .get_provider(params.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let net = provider.config.bitcoin_network();
-    let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, net);
+    let bip49 = DerivationPath::new(provider.config.slip_44, DerivationType::AddressIndex(0, 0, 0), params.bip_purpose, net);
 
     let secret_key = secretkey_from_provider(&params.sk, bip49)?;
     let wallet_settings = wallet_settings
@@ -205,7 +205,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         | Address::Secp256k1Keccak256(_)
         | Address::Secp256k1Tron(_) => DerivationPath::new(
             chain.config.slip_44,
-            params.account_index,
+            DerivationType::AddressIndex(0, 0, params.account_index),
             DerivationPath::BIP44_PURPOSE,
             None,
         ),
@@ -221,7 +221,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
                 })?;
             DerivationPath::new(
                 chain.config.slip_44,
-                params.account_index,
+                DerivationType::AddressIndex(0, 0, params.account_index),
                 DerivationPath::bip_from_address_type(btc_addr_type),
                 Some(net),
             )

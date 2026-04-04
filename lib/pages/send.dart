@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -35,6 +38,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   String? _walletName;
 
   late final AppState _appState;
+  final FocusNode _focusNode = FocusNode();
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
 
@@ -82,6 +86,54 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     });
   }
 
+  bool get _isDesktop =>
+      Platform.isMacOS || Platform.isLinux || Platform.isWindows;
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (!_isDesktop) return;
+    if (event is! KeyDownEvent) return;
+
+    final key = event.logicalKey;
+
+    if (key == LogicalKeyboardKey.digit0 || key == LogicalKeyboardKey.numpad0) {
+      handleKeyPress("0");
+    } else if (key == LogicalKeyboardKey.digit1 ||
+        key == LogicalKeyboardKey.numpad1) {
+      handleKeyPress("1");
+    } else if (key == LogicalKeyboardKey.digit2 ||
+        key == LogicalKeyboardKey.numpad2) {
+      handleKeyPress("2");
+    } else if (key == LogicalKeyboardKey.digit3 ||
+        key == LogicalKeyboardKey.numpad3) {
+      handleKeyPress("3");
+    } else if (key == LogicalKeyboardKey.digit4 ||
+        key == LogicalKeyboardKey.numpad4) {
+      handleKeyPress("4");
+    } else if (key == LogicalKeyboardKey.digit5 ||
+        key == LogicalKeyboardKey.numpad5) {
+      handleKeyPress("5");
+    } else if (key == LogicalKeyboardKey.digit6 ||
+        key == LogicalKeyboardKey.numpad6) {
+      handleKeyPress("6");
+    } else if (key == LogicalKeyboardKey.digit7 ||
+        key == LogicalKeyboardKey.numpad7) {
+      handleKeyPress("7");
+    } else if (key == LogicalKeyboardKey.digit8 ||
+        key == LogicalKeyboardKey.numpad8) {
+      handleKeyPress("8");
+    } else if (key == LogicalKeyboardKey.digit9 ||
+        key == LogicalKeyboardKey.numpad9) {
+      handleKeyPress("9");
+    } else if (key == LogicalKeyboardKey.period ||
+        key == LogicalKeyboardKey.numpadDecimal ||
+        key == LogicalKeyboardKey.comma) {
+      handleKeyPress(".");
+    } else if (key == LogicalKeyboardKey.backspace ||
+        key == LogicalKeyboardKey.delete) {
+      handleBackspace();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
@@ -99,85 +151,95 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
         systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: CustomAppBar(
-                    title: l10n.sendTokenPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Expanded(
-                  child: ScrollConfiguration(
-                    behavior: const ScrollBehavior().copyWith(
-                      physics: const BouncingScrollPhysics(),
-                      overscroll: true,
+        child: KeyboardListener(
+          focusNode: _focusNode,
+          onKeyEvent: _handleKeyEvent,
+          child: GestureDetector(
+            onTap: () => _focusNode.requestFocus(),
+            behavior: HitTestBehavior.translucent,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: CustomAppBar(
+                        title: l10n.sendTokenPageTitle,
+                        onBackPressed: () => Navigator.pop(context),
+                      ),
                     ),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 16),
-                            TokenAmountCard(
-                              amount: _amount,
-                              tokenIndex: _tokenIndex,
-                              onMaxTap: _updateValue,
-                              onTokenSelected: (int value) {
-                                setState(() {
-                                  _tokenIndex = value;
-                                  _amount = '0';
-                                });
-                              },
-                            ),
-                            SvgPicture.asset(
-                              "assets/icons/down_arrow.svg",
-                              width: 20,
-                              height: 20,
-                              colorFilter: ColorFilter.mode(
-                                theme.textSecondary.withValues(alpha: 0.1),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            WalletSelectionCard(
-                              address: _address,
-                              walletName: _walletName,
-                              onChange: updateAddress,
-                            ),
-                            NumberKeyboard(
-                              onKeyPressed: (value) {
-                                handleKeyPress(value.toString());
-                              },
-                              onBackspace: handleBackspace,
-                              onDotPress: () => handleKeyPress("."),
-                            ),
-                            RoundedLoadingButton(
-                              controller: _btnController,
-                              onPressed: !_isFormValid
-                                  ? null
-                                  : () => handleSubmit(appState),
-                              color: theme.primaryPurple,
-                              valueColor: theme.buttonText,
-                              child: Text(
-                                l10n.sendTokenPageSubmitButton,
-                                style: theme.titleMedium.copyWith(
-                                  color: theme.buttonText,
+                    Expanded(
+                      child: ScrollConfiguration(
+                        behavior: const ScrollBehavior().copyWith(
+                          physics: const BouncingScrollPhysics(),
+                          overscroll: true,
+                        ),
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: adaptivePadding),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 16),
+                                TokenAmountCard(
+                                  amount: _amount,
+                                  tokenIndex: _tokenIndex,
+                                  onMaxTap: _updateValue,
+                                  onTokenSelected: (int value) {
+                                    setState(() {
+                                      _tokenIndex = value;
+                                      _amount = '0';
+                                    });
+                                    _focusNode.requestFocus();
+                                  },
                                 ),
-                              ),
+                                SvgPicture.asset(
+                                  "assets/icons/down_arrow.svg",
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: ColorFilter.mode(
+                                    theme.textSecondary.withValues(alpha: 0.1),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                WalletSelectionCard(
+                                  address: _address,
+                                  walletName: _walletName,
+                                  onChange: updateAddress,
+                                ),
+                                NumberKeyboard(
+                                  onKeyPressed: (value) {
+                                    handleKeyPress(value.toString());
+                                  },
+                                  onBackspace: handleBackspace,
+                                  onDotPress: () => handleKeyPress("."),
+                                ),
+                                RoundedLoadingButton(
+                                  controller: _btnController,
+                                  onPressed: !_isFormValid
+                                      ? null
+                                      : () => handleSubmit(appState),
+                                  color: theme.primaryPurple,
+                                  valueColor: theme.buttonText,
+                                  child: Text(
+                                    l10n.sendTokenPageSubmitButton,
+                                    style: theme.titleMedium.copyWith(
+                                      color: theme.buttonText,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -330,10 +392,14 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   void initState() {
     super.initState();
     _appState = Provider.of<AppState>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isDesktop) _focusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _btnController.dispose();
     super.dispose();
   }

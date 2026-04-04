@@ -17,7 +17,9 @@ use zilpay::background::bg_tx::update_tx_from_params;
 pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
-use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
+use zilpay::crypto::bip49::{
+    components_to_derivation_path, split_path, DerivationPath, DerivationType,
+};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
@@ -196,7 +198,7 @@ pub async fn encode_tx_rlp(
                 tx_eth.chain_id = Some(chain.config.chain_id());
                 let derivation = DerivationPath::new(
                     slip44,
-                    account.account_type.value(),
+                    DerivationType::AddressIndex(0, 0, account.account_type.value()),
                     DerivationPath::BIP44_PURPOSE,
                     None,
                 );

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use zilpay::{
     background::bg_provider::ProvidersManagement,
-    crypto::bip49::{split_path, DerivationPath},
+    crypto::bip49::{split_path, DerivationPath, DerivationType},
     proto::address::Address,
     wallet::wallet_storage::StorageOperations,
 };
@@ -52,7 +52,7 @@ pub async fn add_ledger_wallet(
     let net = provider.config.bitcoin_network();
     let bip49 = DerivationPath::new(
         provider.config.slip_44,
-        params.wallet_index,
+        DerivationType::AddressIndex(0, 0, params.wallet_index),
         params.bip_purpose,
         net,
     );
@@ -123,14 +123,14 @@ pub async fn update_ledger_accounts(
             Address::Secp256k1Sha256(_)
             | Address::Secp256k1Keccak256(_)
             | Address::Secp256k1Tron(_) => {
-                DerivationPath::new(provider.config.slip_44, wallet_index, bip_purpose, None)
+                DerivationPath::new(provider.config.slip_44, DerivationType::AddressIndex(0, 0, wallet_index), bip_purpose, None)
             }
             Address::Secp256k1Bitcoin(_) => {
                 let net = provider.config.bitcoin_network();
                 let btc_addr_type = selected_account.addr.get_bitcoin_address_type()?;
                 DerivationPath::new(
                     provider.config.slip_44,
-                    wallet_index,
+                    DerivationType::AddressIndex(0, 0, wallet_index),
                     DerivationPath::bip_from_address_type(btc_addr_type),
                     net,
                 )
