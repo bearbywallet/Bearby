@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +11,7 @@ import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
@@ -529,7 +532,7 @@ class KeystoreFile {
   }) : fileSize = file.lengthSync();
 }
 
-class KeystoreFileCard extends StatelessWidget {
+class KeystoreFileCard extends StatefulWidget {
   final KeystoreFile file;
   final bool isSelected;
   final String formattedDate;
@@ -547,177 +550,213 @@ class KeystoreFileCard extends StatelessWidget {
     this.disabled = false,
   });
 
+  @override
+  State<KeystoreFileCard> createState() => _KeystoreFileCardState();
+}
+
+class _KeystoreFileCardState extends State<KeystoreFileCard>
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   String get _fileSize {
-    final sizeInKB = (file.fileSize / 1024).toStringAsFixed(1);
+    final sizeInKB = (widget.file.fileSize / 1024).toStringAsFixed(1);
     return '$sizeInKB KB';
   }
 
   @override
+  void initState() {
+    super.initState();
+    initPressAnimation(
+      duration: const Duration(milliseconds: 100),
+      scaleEnd: 0.97,
+      opacityEnd: 0.7,
+    );
+  }
+
+  @override
+  void dispose() {
+    disposePressAnimation();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return PressableCard(
-      onPressed: disabled ? () {} : onPressed,
-      backgroundColor: isSelected
-          ? theme.primaryPurple.withValues(alpha: 0.1)
-          : theme.cardBackground,
-      borderColor: isSelected
-          ? theme.primaryPurple
-          : theme.secondaryPurple.withValues(alpha: 0.3),
-      disabled: disabled,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/document.svg',
-                  width: 32,
-                  height: 32,
-                  colorFilter: ColorFilter.mode(
-                    file.isValid
-                        ? (disabled ? theme.textSecondary : theme.primaryPurple)
-                        : theme.textSecondary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        file.fileName,
-                        style: theme.bodyLarge.copyWith(
-                          color: disabled
-                              ? theme.textSecondary
-                              : theme.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            formattedDate,
-                            style: theme.labelSmall.copyWith(
-                              color: theme.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _fileSize,
-                            style: theme.labelSmall.copyWith(
-                              color: theme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
+    final theme = widget.theme;
+    final opacity = widget.disabled ? 0.5 : 1.0;
+
+    return buildPressableWithOpacity(
+      onTap: widget.onPressed,
+      disabled: widget.disabled,
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 300),
+        tween: Tween(begin: 0.0, end: widget.isSelected ? 1.0 : 0.0),
+        curve: Curves.easeOutCubic,
+        builder: (context, value, _) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.cardBackground
+                          .withValues(alpha: 0.65 + value * 0.15),
+                      theme.cardBackground
+                          .withValues(alpha: 0.75 + value * 0.10),
                     ],
                   ),
-                ),
-                if (file.isValid)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.primaryPurple
-                          .withValues(alpha: disabled ? 0.1 : 0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'v${file.version ?? "?"}',
-                      style: theme.labelSmall.copyWith(
-                        color: disabled
-                            ? theme.textSecondary
-                            : theme.primaryPurple,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Color.lerp(
+                      theme.primaryPurple.withValues(alpha: 0.15),
+                      widget.disabled
+                          ? theme.textSecondary
+                          : theme.primaryPurple,
+                      value,
+                    )!,
+                    width: 1,
                   ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              file.filePath,
-              style: theme.labelSmall.copyWith(
-                color: theme.textSecondary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryPurple
+                          .withValues(alpha: 0.05 + value * 0.05),
+                      blurRadius: 15,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _buildIcon(theme, value),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildFileInfo(theme, opacity)),
+                        if (widget.file.isValid)
+                          _buildVersionBadge(theme, value),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.file.filePath,
+                      style: theme.labelSmall.copyWith(
+                        color: theme.textSecondary
+                            .withValues(alpha: opacity * 0.8),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
-          ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildIcon(AppTheme theme, double selectionValue) {
+    final accentColor = Color.lerp(
+      theme.textSecondary,
+      theme.primaryPurple,
+      widget.disabled ? 0.0 : selectionValue,
+    )!;
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: theme.cardBackground.withValues(alpha: 0.5),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
+      ),
+      child: Center(
+        child: SvgPicture.asset(
+          'assets/icons/document.svg',
+          width: 20,
+          height: 20,
+          colorFilter: ColorFilter.mode(
+            widget.file.isValid ? accentColor : theme.textSecondary,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );
   }
-}
 
-class PressableCard extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-  final Color backgroundColor;
-  final Color borderColor;
-  final bool disabled;
-
-  const PressableCard({
-    super.key,
-    required this.child,
-    required this.onPressed,
-    required this.backgroundColor,
-    required this.borderColor,
-    this.disabled = false,
-  });
-
-  @override
-  State<PressableCard> createState() => _PressableCardState();
-}
-
-class _PressableCardState extends State<PressableCard> {
-  bool _isPressed = false;
-
-  void _handleTapDown(TapDownDetails details) {
-    if (!widget.disabled) {
-      setState(() => _isPressed = true);
-    }
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    if (!widget.disabled) {
-      setState(() => _isPressed = false);
-      widget.onPressed();
-    }
-  }
-
-  void _handleTapCancel() {
-    if (!widget.disabled) {
-      setState(() => _isPressed = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: widget.disabled ? null : _handleTapDown,
-      onTapUp: widget.disabled ? null : _handleTapUp,
-      onTapCancel: widget.disabled ? null : _handleTapCancel,
-      child: AnimatedScale(
-        scale: (_isPressed && !widget.disabled) ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        child: Card(
-          margin: EdgeInsets.zero,
-          color: widget.backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: widget.disabled
-                  ? widget.borderColor.withValues(alpha: 0.5)
-                  : widget.borderColor,
-              width: 1,
-            ),
+  Widget _buildFileInfo(AppTheme theme, double opacity) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.file.fileName,
+          style: theme.bodyLarge.copyWith(
+            color: theme.textPrimary.withValues(alpha: opacity),
+            shadows: [
+              Shadow(
+                color: theme.primaryPurple.withValues(alpha: 0.2),
+                blurRadius: 4,
+              ),
+            ],
           ),
-          child: widget.child,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(
+              widget.formattedDate,
+              style: theme.labelSmall.copyWith(
+                color: theme.textSecondary.withValues(alpha: opacity * 0.8),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _fileSize,
+              style: theme.labelSmall.copyWith(
+                color: theme.textSecondary.withValues(alpha: opacity * 0.8),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVersionBadge(AppTheme theme, double selectionValue) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.primaryPurple.withValues(
+          alpha: widget.disabled ? 0.1 : 0.1 + selectionValue * 0.15,
+        ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: theme.primaryPurple.withValues(
+            alpha: 0.15 + selectionValue * 0.3,
+          ),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        'v${widget.file.version ?? "?"}',
+        style: theme.labelSmall.copyWith(
+          color: widget.disabled
+              ? theme.textSecondary
+              : Color.lerp(
+                  theme.textSecondary,
+                  theme.primaryPurple,
+                  selectionValue,
+                )!,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
