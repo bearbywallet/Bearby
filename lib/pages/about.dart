@@ -244,14 +244,14 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
             l10n.aboutPagePrivacyPolicy,
             'assets/icons/shield.svg',
             false,
-            () => _launchUrl('https://zilpay.io/policy'),
+            () => _launchUrl('https://bearby.io/policy'),
           ),
           _buildActionRow(
             theme,
             l10n.aboutPageTermsOfService,
             'assets/icons/document.svg',
             false,
-            () => _launchUrl('https://zilpay.io/terms'),
+            () => _launchUrl('https://bearby.io/terms'),
           ),
           _buildActionRow(
             theme,

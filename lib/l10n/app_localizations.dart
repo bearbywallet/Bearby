@@ -254,7 +254,7 @@ abstract class AppLocalizations {
   /// Value for website info on AboutPage
   ///
   /// In en, this message translates to:
-  /// **'https://zilpay.io'**
+  /// **'https://bearby.io'**
   String get aboutPageWebsiteValue;
 
   /// Title for legal section on AboutPage

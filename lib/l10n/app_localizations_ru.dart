@@ -84,7 +84,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aboutPageWebsiteLabel => 'Веб-сайт';
 
   @override
-  String get aboutPageWebsiteValue => 'https://zilpay.io';
+  String get aboutPageWebsiteValue => 'https://bearby.io';
 
   @override
   String get aboutPageLegalTitle => 'Юридическая информация';

@@ -99,7 +99,7 @@
   "@aboutPageWebsiteLabel": {
     "description": "Label for website info on AboutPage"
   },
-  "aboutPageWebsiteValue": "https://zilpay.io",
+  "aboutPageWebsiteValue": "https://bearby.io",
   "@aboutPageWebsiteValue": {
     "description": "Value for website info on AboutPage"
   },

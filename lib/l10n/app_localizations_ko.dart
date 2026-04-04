@@ -84,7 +84,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutPageWebsiteLabel => '웹사이트';
 
   @override
-  String get aboutPageWebsiteValue => 'https://zilpay.io';
+  String get aboutPageWebsiteValue => 'https://bearby.io';
 
   @override
   String get aboutPageLegalTitle => '법적 사항';

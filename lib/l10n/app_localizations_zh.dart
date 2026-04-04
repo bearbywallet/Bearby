@@ -84,7 +84,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutPageWebsiteLabel => '网站';
 
   @override
-  String get aboutPageWebsiteValue => 'https://zilpay.io';
+  String get aboutPageWebsiteValue => 'https://bearby.io';
 
   @override
   String get aboutPageLegalTitle => '法律信息';

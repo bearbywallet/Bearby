@@ -84,7 +84,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutPageWebsiteLabel => 'ウェブサイト';
 
   @override
-  String get aboutPageWebsiteValue => 'https://zilpay.io';
+  String get aboutPageWebsiteValue => 'https://bearby.io';
 
   @override
   String get aboutPageLegalTitle => '法的情報';

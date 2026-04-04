@@ -222,15 +222,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                     .settingsPageTwitter,
                                 trailingSvgPath: 'assets/icons/x.svg',
                                 onTap: () => socialMediaService.openX(
-                                    username: 'pay_zil'),
+                                    username: 'BearbyPro'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageGitHub,
                                 trailingSvgPath: 'assets/icons/github.svg',
                                 onTap: () => socialMediaService.openGitHub(
-                                  username: 'zilpay',
-                                  repository: 'zilpay-mobile',
+                                  username: 'bearbywallet',
                                 ),
                               ),
                               SettingsItem(
