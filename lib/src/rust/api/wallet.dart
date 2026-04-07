@@ -222,7 +222,7 @@ class Bip39AddWalletParams {
   final String walletName;
   final String biometricType;
   final BigInt chainHash;
-  final int bipPurpose;
+  final String derivePath;
 
   const Bip39AddWalletParams({
     required this.password,
@@ -233,7 +233,7 @@ class Bip39AddWalletParams {
     required this.walletName,
     required this.biometricType,
     required this.chainHash,
-    required this.bipPurpose,
+    required this.derivePath,
   });
 
   @override
@@ -246,7 +246,7 @@ class Bip39AddWalletParams {
       walletName.hashCode ^
       biometricType.hashCode ^
       chainHash.hashCode ^
-      bipPurpose.hashCode;
+      derivePath.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -261,5 +261,5 @@ class Bip39AddWalletParams {
           walletName == other.walletName &&
           biometricType == other.biometricType &&
           chainHash == other.chainHash &&
-          bipPurpose == other.bipPurpose;
+          derivePath == other.derivePath;
 }

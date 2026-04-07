@@ -441,6 +441,38 @@
     ]
   },
   {
+    "name": "Solana Devnet",
+    "chain": "SOL",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.devnet.solana.com"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/solana/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "11111111111111111111111111111111",
+        "name": "Solana",
+        "symbol": "tSOL",
+        "decimals": 9
+      }
+    ],
+    "chainIds": [0, 0],
+    "infoURL": "https://solana.com",
+    "testnet": true,
+    "shortName": "solana",
+    "slip44": 501,
+    "explorers": [
+      {
+        "name": "Solana Explorer",
+        "url": "https://explorer.solana.com/?cluster=devnet",
+        "icon": "https://explorer.solana.com/favicon.ico",
+        "standard": "none"
+      }
+    ]
+  },
+  {
     "name": "Sonic Testnet",
     "chain": "S",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",

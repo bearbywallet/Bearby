@@ -42,20 +42,32 @@ pub fn pubkey_from_provider(
     bip49: DerivationPath,
     zilliqa_legacy: bool,
 ) -> Result<PubKey, ServiceError> {
-    let pub_key_bytes = PubKey::from_uncompressed_hex(pub_key)?;
-
-    let pub_key = match (bip49.slip44, zilliqa_legacy) {
-        (slip44::ZILLIQA, true) => PubKey::Secp256k1Sha256(pub_key_bytes),
-        (slip44::ZILLIQA, false) => PubKey::Secp256k1Keccak256(pub_key_bytes),
-        (slip44::ETHEREUM, _) => PubKey::Secp256k1Keccak256(pub_key_bytes),
-        (slip44::BITCOIN, _) => {
-            let network = bip49.network.unwrap_or(bitcoin::Network::Bitcoin);
-            let addr_type = bip49.get_address_type();
-            PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
+    let pub_key = match bip49.slip44 {
+        slip44::SOLANA => {
+            let bytes = hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
+            let mut prefixed = vec![3u8];
+            prefixed.extend_from_slice(&bytes);
+            PubKey::try_from(prefixed.as_slice())?
         }
-        (slip44::SOLANA, _) => PubKey::Ed25519Solana(pub_key_bytes),
-        (slip44::TRON, _) => PubKey::Secp256k1Tron(pub_key_bytes),
-        _ => return Err(ServiceError::AccountTypeNotValid),
+        _ => {
+            let pub_key_vec = PubKey::from_uncompressed_hex(pub_key)?;
+            let pub_key_bytes: [u8; PUB_KEY_SIZE] = pub_key_vec
+                .try_into()
+                .map_err(|_| ServiceError::InvalidPublicKeyLength)?;
+
+            match (bip49.slip44, zilliqa_legacy) {
+                (slip44::ZILLIQA, true) => PubKey::Secp256k1Sha256(pub_key_bytes),
+                (slip44::ZILLIQA, false) => PubKey::Secp256k1Keccak256(pub_key_bytes),
+                (slip44::ETHEREUM, _) => PubKey::Secp256k1Keccak256(pub_key_bytes),
+                (slip44::BITCOIN, _) => {
+                    let network = bip49.network.unwrap_or(bitcoin::Network::Bitcoin);
+                    let addr_type = bip49.get_address_type();
+                    PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
+                }
+                (slip44::TRON, _) => PubKey::Secp256k1Tron(pub_key_bytes),
+                _ => return Err(ServiceError::AccountTypeNotValid),
+            }
+        }
     };
 
     Ok(pub_key)

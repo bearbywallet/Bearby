@@ -5095,7 +5095,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_accounts = <Vec<(u8, String, String)>>::sse_decode(&mut deserializer);
             let api_zilliqa_legacy = <bool>::sse_decode(&mut deserializer);
-            let api_bip_purpose = <u32>::sse_decode(&mut deserializer);
+            let api_derive_path = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -5104,7 +5104,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
                             api_wallet_index,
                             api_accounts,
                             api_zilliqa_legacy,
-                            api_bip_purpose,
+                            api_derive_path,
                         )
                         .await?;
                         Ok(output_ok)
@@ -5627,7 +5627,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
-        let mut var_bipPurpose = <u32>::sse_decode(deserializer);
+        let mut var_derivePath = <String>::sse_decode(deserializer);
         return crate::api::wallet::Bip39AddWalletParams {
             password: var_password,
             mnemonic_str: var_mnemonicStr,
@@ -5637,7 +5637,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
             wallet_name: var_walletName,
             biometric_type: var_biometricType,
             chain_hash: var_chainHash,
-            bip_purpose: var_bipPurpose,
+            derive_path: var_derivePath,
         };
     }
 }
@@ -5989,7 +5989,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_zilliqaLegacy = <bool>::sse_decode(deserializer);
-        let mut var_bipPurpose = <u32>::sse_decode(deserializer);
+        let mut var_derivePath = <String>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
             pub_keys: var_pubKeys,
             wallet_index: var_walletIndex,
@@ -5999,7 +5999,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
             biometric_type: var_biometricType,
             chain_hash: var_chainHash,
             zilliqa_legacy: var_zilliqaLegacy,
-            bip_purpose: var_bipPurpose,
+            derive_path: var_derivePath,
         };
     }
 }
@@ -7008,12 +7008,14 @@ impl SseDecode for crate::models::transactions::request::TransactionRequestInfo 
             );
         let mut var_btc = <Option<String>>::sse_decode(deserializer);
         let mut var_tron = <Option<String>>::sse_decode(deserializer);
+        let mut var_solana = <Option<Vec<u8>>>::sse_decode(deserializer);
         return crate::models::transactions::request::TransactionRequestInfo {
             metadata: var_metadata,
             scilla: var_scilla,
             evm: var_evm,
             btc: var_btc,
             tron: var_tron,
+            solana: var_solana,
         };
     }
 }
@@ -7908,7 +7910,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::Bip39AddWalletParams 
             self.wallet_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
-            self.bip_purpose.into_into_dart().into_dart(),
+            self.derive_path.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8319,7 +8321,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
             self.biometric_type.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.zilliqa_legacy.into_into_dart().into_dart(),
-            self.bip_purpose.into_into_dart().into_dart(),
+            self.derive_path.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8674,6 +8676,7 @@ impl flutter_rust_bridge::IntoDart
             self.evm.into_into_dart().into_dart(),
             self.btc.into_into_dart().into_dart(),
             self.tron.into_into_dart().into_dart(),
+            self.solana.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -9046,7 +9049,7 @@ impl SseEncode for crate::api::wallet::Bip39AddWalletParams {
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
-        <u32>::sse_encode(self.bip_purpose, serializer);
+        <String>::sse_encode(self.derive_path, serializer);
     }
 }
 
@@ -9286,7 +9289,7 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.biometric_type, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <bool>::sse_encode(self.zilliqa_legacy, serializer);
-        <u32>::sse_encode(self.bip_purpose, serializer);
+        <String>::sse_encode(self.derive_path, serializer);
     }
 }
 
@@ -10052,6 +10055,7 @@ impl SseEncode for crate::models::transactions::request::TransactionRequestInfo 
         );
         <Option<String>>::sse_encode(self.btc, serializer);
         <Option<String>>::sse_encode(self.tron, serializer);
+        <Option<Vec<u8>>>::sse_encode(self.solana, serializer);
     }
 }
 

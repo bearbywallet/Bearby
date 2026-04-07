@@ -70,7 +70,7 @@ mod btc_wallet_tests {
             wallet_name: "Bitcoin Wallet".to_string(),
             biometric_type: "none".to_string(),
             chain_hash: btc_mainnet_provider.hash(),
-            bip_purpose: DerivationPath::BIP84_PURPOSE,
+            derive_path: "m/84'/0'/0'/0/0".to_string(),
         };
 
         let wallet_address = add_bip39_wallet(params, wallet_settings, vec![])

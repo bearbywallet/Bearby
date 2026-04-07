@@ -182,7 +182,9 @@ pub async fn encode_tx_rlp(
         let mut tx: TransactionRequest = tx.try_into()?;
 
         match tx {
-            TransactionRequest::Bitcoin(_) | TransactionRequest::Tron(_) => Ok(EncodedRLPTx {
+            TransactionRequest::Bitcoin(_)
+            | TransactionRequest::Tron(_)
+            | TransactionRequest::Solana(_) => Ok(EncodedRLPTx {
                 bytes: tx
                     .to_rlp_encode(account.pub_key.as_ref())
                     .map_err(ServiceError::TransactionErrors)?,
@@ -476,6 +478,7 @@ pub async fn cacl_gas_fee(
                 }
                 TransactionRequest::Bitcoin(_) => {}
                 TransactionRequest::Tron(_) => {}
+                TransactionRequest::Solana(_) => {}
             }
         }
 

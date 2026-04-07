@@ -24,6 +24,10 @@ impl From<KeyPair> for KeyPairInfo {
                 sk: hex::encode(sk),
                 pk: hex::encode(pk),
             },
+            KeyPair::Ed25519Solana((pk, sk)) => Self {
+                sk: hex::encode(sk),
+                pk: hex::encode(pk),
+            },
         }
     }
 }

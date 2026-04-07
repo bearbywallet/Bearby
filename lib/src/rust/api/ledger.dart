@@ -19,12 +19,12 @@ Future<void> updateLedgerAccounts(
         {required BigInt walletIndex,
         required List<(int, String, String)> accounts,
         required bool zilliqaLegacy,
-        required int bipPurpose}) =>
+        required String derivePath}) =>
     RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
         walletIndex: walletIndex,
         accounts: accounts,
         zilliqaLegacy: zilliqaLegacy,
-        bipPurpose: bipPurpose);
+        derivePath: derivePath);
 
 Future<Uint32List> ledgerSplitPath({required String path}) =>
     RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
@@ -38,7 +38,7 @@ class LedgerParamsInput {
   final String biometricType;
   final BigInt chainHash;
   final bool zilliqaLegacy;
-  final int bipPurpose;
+  final String derivePath;
 
   const LedgerParamsInput({
     required this.pubKeys,
@@ -49,7 +49,7 @@ class LedgerParamsInput {
     required this.biometricType,
     required this.chainHash,
     required this.zilliqaLegacy,
-    required this.bipPurpose,
+    required this.derivePath,
   });
 
   @override
@@ -62,7 +62,7 @@ class LedgerParamsInput {
       biometricType.hashCode ^
       chainHash.hashCode ^
       zilliqaLegacy.hashCode ^
-      bipPurpose.hashCode;
+      derivePath.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -77,5 +77,5 @@ class LedgerParamsInput {
           biometricType == other.biometricType &&
           chainHash == other.chainHash &&
           zilliqaLegacy == other.zilliqaLegacy &&
-          bipPurpose == other.bipPurpose;
+          derivePath == other.derivePath;
 }

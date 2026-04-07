@@ -13,6 +13,8 @@ pub use zilpay::{
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
 };
 
+use zilpay::proto::solana_tx::SolanaTransaction;
+
 use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
 use super::transaction_metadata::TransactionMetadataInfo;
@@ -26,6 +28,7 @@ pub struct TransactionRequestInfo {
     pub evm: Option<TransactionRequestEVM>,
     pub btc: Option<String>,
     pub tron: Option<String>,
+    pub solana: Option<Vec<u8>>,
 }
 
 impl TryFrom<TransactionRequestInfo> for TransactionRequest {
@@ -51,6 +54,12 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let req_tron_tx = TronTransaction::from_tron_web(&sign_req_tron)?;
             let tx_req = TransactionRequest::Tron((req_tron_tx, value.metadata.into()));
             Ok(tx_req)
+        } else if let Some(solana_msg) = value.solana {
+            let tx_req = TransactionRequest::Solana((
+                SolanaTransaction { message: solana_msg },
+                value.metadata.into(),
+            ));
+            Ok(tx_req)
         } else {
             Err(TransactionErrors::InvalidTransaction)
         }
@@ -64,6 +73,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
             TransactionRequest::Ethereum((_, ref metadata)) => metadata.to_owned().into(),
             TransactionRequest::Bitcoin((_, ref metadata)) => metadata.to_owned().into(),
             TransactionRequest::Tron((_, ref metadata)) => metadata.to_owned().into(),
+            TransactionRequest::Solana((_, ref metadata)) => metadata.to_owned().into(),
         };
 
         match value {
@@ -73,6 +83,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 evm: None,
                 btc: None,
                 tron: None,
+                solana: None,
             },
             TransactionRequest::Ethereum((tx, _)) => Self {
                 metadata,
@@ -80,6 +91,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 evm: Some(tx.into()),
                 btc: None,
                 tron: None,
+                solana: None,
             },
             TransactionRequest::Bitcoin((tx, _)) => {
                 let bytes = bitcoin::consensus::encode::serialize(&tx);
@@ -90,6 +102,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                     evm: None,
                     btc: Some(hex),
                     tron: None,
+                    solana: None,
                 }
             }
             TransactionRequest::Tron((tx, _)) => {
@@ -103,8 +116,17 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                     evm: None,
                     btc: None,
                     tron: Some(json),
+                    solana: None,
                 }
             }
+            TransactionRequest::Solana((tx, _)) => Self {
+                metadata,
+                scilla: None,
+                evm: None,
+                btc: None,
+                tron: None,
+                solana: Some(tx.message),
+            },
         }
     }
 }
