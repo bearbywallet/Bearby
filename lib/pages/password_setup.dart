@@ -11,6 +11,7 @@ import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/argon.dart';
 import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/config/cipher.dart';
+import 'package:bearby/config/derive_path.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -38,9 +39,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
-  int _selectedPurposeIndex = 0; // Default to BIP86 (Taproot)
+  int _selectedPurposeIndex = 0;
   int _selectedCipherIndex = CipherDefaults.defaultCipherIndex;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
+  DerivePathType _derivePathType = DerivePathType.addressIndex;
 
   late AppState _appState;
 
@@ -91,6 +93,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
         if (_chain?.slip44 == kZilliqaSlip44) {
           _zilLegacy = true;
+        }
+
+        if (_chain != null) {
+          _derivePathType = defaultDerivePathType(_chain!.slip44);
         }
 
         _updatedArgs = true;
@@ -239,6 +245,12 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         bipPurpose = kBip44Purpose;
       }
 
+      final derivePath = buildDerivePath(
+        type: _derivePathType,
+        bipPurpose: bipPurpose,
+        slip44: _chain!.slip44,
+      );
+
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
@@ -249,7 +261,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           biometricType: biometricType,
           chainHash: chainHash,
           mnemonicCheck: !_bypassChecksumValidation,
-          bipPurpose: bipPurpose,
+          derivePath: derivePath,
         );
 
         await addBip39Wallet(
@@ -314,14 +326,31 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   }
 
   void _showEncryptionModal() {
+    final l10n = AppLocalizations.of(context)!;
+    final int bipPurpose;
+    if (_chain?.slip44 == kBitcoinlip44) {
+      final options = BipPurposeSelector.getBipPurposeOptions(l10n);
+      bipPurpose = options[_selectedPurposeIndex].purpose;
+    } else {
+      bipPurpose = kBip44Purpose;
+    }
+
     showEncryptionSettingsModal(
       context: context,
       selectedCipherIndex: _selectedCipherIndex,
       argonParams: _argonParams,
-      onSettingsChanged: (cipherIndex, argonParams) {
+      slip44: _chain?.slip44 ?? 0,
+      bipPurpose: bipPurpose,
+      derivePathType: _derivePathType,
+      onSettingsChanged: (
+        cipherIndex,
+        argonParams,
+        derivePathType,
+      ) {
         setState(() {
           _selectedCipherIndex = cipherIndex;
           _argonParams = argonParams;
+          _derivePathType = derivePathType;
         });
       },
     );
