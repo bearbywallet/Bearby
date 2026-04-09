@@ -135,6 +135,47 @@
     ]
   },
   {
+    "name": "Solana",
+    "chain": "SOL",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.mainnet-beta.solana.com",
+      "https://solana-rpc.publicnode.com",
+      "https://solana.drpc.org",
+      "https://1rpc.io/sol"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/solana/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "11111111111111111111111111111111",
+        "name": "Solana",
+        "symbol": "SOL",
+        "decimals": 9
+      }
+    ],
+    "chainIds": [0, 0],
+    "infoURL": "https://solana.com",
+    "testnet": false,
+    "shortName": "solana",
+    "slip44": 501,
+    "explorers": [
+      {
+        "name": "Solana Explorer",
+        "url": "https://explorer.solana.com",
+        "icon": "https://explorer.solana.com/favicon.ico",
+        "standard": "none"
+      },
+      {
+        "name": "Solscan",
+        "url": "https://solscan.io",
+        "icon": "https://solscan.io/favicon.ico",
+        "standard": "none"
+      }
+    ]
+  },
+  {
     "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
@@ -513,47 +554,6 @@
         "url": "https://optimistic.etherscan.io",
         "icon": "https://optimistic.etherscan.io/images/svg/logo.svg",
         "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Solana",
-    "chain": "SOL",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
-    "rpc": [
-      "https://api.mainnet-beta.solana.com",
-      "https://solana-rpc.publicnode.com",
-      "https://solana.drpc.org",
-      "https://1rpc.io/sol"
-    ],
-    "features": [],
-    "ftokens": [
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/solana/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "11111111111111111111111111111111",
-        "name": "Solana",
-        "symbol": "SOL",
-        "decimals": 9
-      }
-    ],
-    "chainIds": [0, 0],
-    "infoURL": "https://solana.com",
-    "testnet": false,
-    "shortName": "solana",
-    "slip44": 501,
-    "explorers": [
-      {
-        "name": "Solana Explorer",
-        "url": "https://explorer.solana.com",
-        "icon": "https://explorer.solana.com/favicon.ico",
-        "standard": "none"
-      },
-      {
-        "name": "Solscan",
-        "url": "https://solscan.io",
-        "icon": "https://solscan.io/favicon.ico",
-        "standard": "none"
       }
     ]
   },

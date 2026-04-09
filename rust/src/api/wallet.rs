@@ -201,49 +201,14 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     let wallet_data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-    let selected_account = wallet_data
-        .get_selected_account()
-        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
     let chain = service
         .core
         .get_provider(wallet_data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
-    let bip49 = match &selected_account.addr {
-        Address::Secp256k1Sha256(_)
-        | Address::Secp256k1Keccak256(_)
-        | Address::Secp256k1Tron(_) => DerivationPath::new(
-            chain.config.slip_44,
-            DerivationType::AddressIndex(0, 0, params.account_index),
-            DerivationPath::BIP44_PURPOSE,
-            None,
-        ),
-        Address::Ed25519Solana(_) => DerivationPath::new(
-            chain.config.slip_44,
-            DerivationType::Account(params.account_index),
-            DerivationPath::BIP44_PURPOSE,
-            None,
-        ),
-        Address::Secp256k1Bitcoin(_) => {
-            let net = selected_account.addr.get_bitcoin_network().map_err(|e| {
-                ServiceError::WalletError(params.wallet_index, WalletErrors::from(e))
-            })?;
-            let btc_addr_type = selected_account
-                .addr
-                .get_bitcoin_address_type()
-                .map_err(|e| {
-                    ServiceError::WalletError(params.wallet_index, WalletErrors::from(e))
-                })?;
-            DerivationPath::new(
-                chain.config.slip_44,
-                DerivationType::AddressIndex(0, 0, params.account_index),
-                DerivationPath::bip_from_address_type(btc_addr_type),
-                Some(net),
-            )
-        }
-    };
+    let network = chain.config.bitcoin_network();
 
     wallet
-        .add_next_bip39_account(params.name, &bip49, &params.passphrase, &seed)
+        .add_next_bip39_account(params.name, params.account_index, network, &params.passphrase, &seed)
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
     Ok(())
