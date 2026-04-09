@@ -60,6 +60,9 @@ class ManageTokensPage extends StatefulWidget {
 
 class _ManageTokensPageState extends State<ManageTokensPage>
     with StatusBarMixin {
+  static const int _solanaSlip44 = 501;
+  static final _base58Regex = RegExp(
+      r'^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$');
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -231,6 +234,12 @@ class _ManageTokensPageState extends State<ManageTokensPage>
         .any((t) => t.addr.toLowerCase() == token.addr.toLowerCase());
   }
 
+  bool _looksLikeSolanaAddress(String input) {
+    return input.length >= 32 &&
+        input.length <= 44 &&
+        _base58Regex.hasMatch(input);
+  }
+
   void _onSearchChanged(String query) {
     if (!mounted) return;
 
@@ -243,9 +252,13 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     final trimmed = query.trim();
+    final appState = Provider.of<AppState>(context, listen: false);
+    final isSolana = appState.chain?.slip44 == _solanaSlip44;
+
     if (trimmed.startsWith('0x') ||
         trimmed.startsWith('zil1') ||
-        trimmed.startsWith('T')) {
+        trimmed.startsWith('T') ||
+        (isSolana && _looksLikeSolanaAddress(trimmed))) {
       _debounce = Timer(const Duration(milliseconds: 500), () {
         _fetchTokenByAddress(trimmed);
       });
@@ -367,6 +380,13 @@ class _ManageTokensPageState extends State<ManageTokensPage>
         _searchQuery.startsWith('0x') ||
         _searchQuery.startsWith('zil1') ||
         _searchQuery.startsWith('T')) {
+      return tokens;
+    }
+
+    final trimmed = _searchQuery.trim();
+    final appState = Provider.of<AppState>(context, listen: false);
+    if (appState.chain?.slip44 == _solanaSlip44 &&
+        _looksLikeSolanaAddress(trimmed)) {
       return tokens;
     }
 
