@@ -12,6 +12,13 @@ DerivePathType defaultDerivePathType(int slip44) {
   return DerivePathType.addressIndex;
 }
 
+List<DerivePathType> supportedDerivePathTypes(int slip44) {
+  if (slip44 == kSolanaSlip44) {
+    return [DerivePathType.root, DerivePathType.account, DerivePathType.accountChange];
+  }
+  return DerivePathType.values;
+}
+
 String buildDerivePath({
   required DerivePathType type,
   required int bipPurpose,

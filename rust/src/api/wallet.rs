@@ -74,8 +74,7 @@ pub async fn add_bip39_wallet(
         .try_into()
         .map_err(ServiceError::SettingsError)?;
     let password = SecretString::new(params.password.into());
-    let dp = DerivationPath::try_from(params.derive_path.as_str())
-        .map_err(|e| e.to_string())?;
+    let dp = DerivationPath::try_from(params.derive_path.as_str()).map_err(|e| e.to_string())?;
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
         .add_bip39_wallet(BackgroundBip39Params {
@@ -208,7 +207,13 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     let network = chain.config.bitcoin_network();
 
     wallet
-        .add_next_bip39_account(params.name, params.account_index, network, &params.passphrase, &seed)
+        .add_next_bip39_account(
+            params.name,
+            params.account_index,
+            network,
+            &params.passphrase,
+            &seed,
+        )
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
     Ok(())

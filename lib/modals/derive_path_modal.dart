@@ -69,7 +69,7 @@ class _DerivePathModalContentState extends State<_DerivePathModalContent> {
         slip44: widget.slip44,
       );
 
-  static const _options = [
+  static const _allOptions = [
     (
       DerivePathType.root,
       'Root',
@@ -96,10 +96,14 @@ class _DerivePathModalContentState extends State<_DerivePathModalContent> {
     ),
   ];
 
+  List<(DerivePathType, String, String, String)> get _options {
+    final supported = supportedDerivePathTypes(widget.slip44);
+    return _allOptions.where((e) => supported.contains(e.$1)).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context, listen: false).currentTheme;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
       constraints: BoxConstraints(
@@ -189,23 +193,6 @@ class _DerivePathModalContentState extends State<_DerivePathModalContent> {
                   ),
                   const SizedBox(height: 16),
                 ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16, 0, 16, 8 + bottomPadding),
-            child: SizedBox(
-              width: double.infinity,
-              child: CustomButton(
-                textColor: theme.buttonText,
-                backgroundColor: theme.primaryPurple,
-                text: 'Confirm',
-                onPressed: () {
-                  widget.onChanged(_type);
-                  Navigator.pop(context);
-                },
-                borderRadius: 30.0,
-                height: 50.0,
               ),
             ),
           ),

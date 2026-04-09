@@ -312,6 +312,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       }
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
+      debugPrint(e.toString());
       setState(() {
         _disabled = false;
         _errorMessage = e.toString();
