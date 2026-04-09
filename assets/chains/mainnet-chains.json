@@ -54,11 +54,13 @@
     "chain": "ETH",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
+      "https://rpc.mevblocker.io",
       "https://eth.merkle.io",
       "https://singapore.rpc.blxrbdn.com",
       "https://1rpc.io/eth",
       "https://rpc.payload.de",
       "https://eth.drpc.org",
+      "https://api.noderpc.xyz/rpc-mainnet/public",
       "https://eth.llamarpc.com"
     ],
     "features": [
@@ -340,6 +342,7 @@
       "https://mainnet.base.org",
       "https://base.publicnode.com",
       "https://1rpc.io/base",
+      "https://api.noderpc.xyz/rpc-base-mainnet/public",
       "https://base.drpc.org",
       "https://base.meowrpc.com"
     ],
@@ -520,6 +523,7 @@
       "https://optimism.publicnode.com",
       "https://optimism.drpc.org",
       "https://1rpc.io/op",
+      "https://api.noderpc.xyz/rpc-optimism-mainnet/public",
       "https://optimism.gateway.tenderly.co"
     ],
     "features": [

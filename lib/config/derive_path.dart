@@ -14,7 +14,11 @@ DerivePathType defaultDerivePathType(int slip44) {
 
 List<DerivePathType> supportedDerivePathTypes(int slip44) {
   if (slip44 == kSolanaSlip44) {
-    return [DerivePathType.root, DerivePathType.account, DerivePathType.accountChange];
+    return [
+      DerivePathType.root,
+      DerivePathType.account,
+      DerivePathType.accountChange
+    ];
   }
   return DerivePathType.values;
 }

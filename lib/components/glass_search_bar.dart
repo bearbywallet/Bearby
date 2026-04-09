@@ -203,8 +203,7 @@ class GlassSearchBarState extends State<GlassSearchBar>
                           behavior: HitTestBehavior.opaque,
                           onTap: widget.onRightIconTap,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: SvgPicture.asset(
                               widget.rightIconPath!,
                               width: 18,

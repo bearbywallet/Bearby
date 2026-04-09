@@ -555,7 +555,8 @@ class TronWeb3Handler {
           'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
         });
 
-        final isTronMethod = method == Web3EIP1193Method.tronRequestAccounts.value;
+        final isTronMethod =
+            method == Web3EIP1193Method.tronRequestAccounts.value;
         return _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
@@ -622,11 +623,13 @@ class TronWeb3Handler {
               'isAuth': true,
               'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
             });
-            final isTronMethod = method == Web3EIP1193Method.tronRequestAccounts.value;
+            final isTronMethod =
+                method == Web3EIP1193Method.tronRequestAccounts.value;
             _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
-              result: isTronMethod ? {'code': 200, 'message': 'OK'} : connectedAddr,
+              result:
+                  isTronMethod ? {'code': 200, 'message': 'OK'} : connectedAddr,
             );
           } finally {
             _removeActiveRequest(method);

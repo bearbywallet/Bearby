@@ -185,13 +185,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageIpfsGateway => 'IPFS 网关';
 
   @override
-  String get securityPageIpfsDescription => 'Bearby 使用第三方服务来显示存储在 IPFS 上的 NFT 图像，显示与浏览器地址栏中输入的 ENS（ZNS）地址相关的信息，以及获取不同代币的图标。当您使用这些服务时，您的 IP 地址可能会暴露给这些服务。';
+  String get securityPageIpfsDescription =>
+      'Bearby 使用第三方服务来显示存储在 IPFS 上的 NFT 图像，显示与浏览器地址栏中输入的 ENS（ZNS）地址相关的信息，以及获取不同代币的图标。当您使用这些服务时，您的 IP 地址可能会暴露给这些服务。';
 
   @override
   String get securityPageTokensFetcherTitle => '令牌获取器';
 
   @override
-  String get securityPageTokensFetcherDescription => '安全页面上的令牌获取器设置。如果启用，将自动从服务器获取令牌并可添加。';
+  String get securityPageTokensFetcherDescription =>
+      '安全页面上的令牌获取器设置。如果启用，将自动从服务器获取令牌并可添加。';
 
   @override
   String get securityPageNodeRanking => '节点排名';
@@ -283,7 +285,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceSettingsPageCompactNumbersTitle => '简洁数字';
 
   @override
-  String get appearanceSettingsPageCompactNumbersDescription => '启用后显示简短数字（例如，20K 而不是 20,000）。';
+  String get appearanceSettingsPageCompactNumbersDescription =>
+      '启用后显示简短数字（例如，20K 而不是 20,000）。';
 
   @override
   String get appearanceSettingsPageDeviceSettingsTitle => '设备设置';
@@ -292,7 +295,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceSettingsPageDeviceSettingsSubtitle => '系统默认';
 
   @override
-  String get appearanceSettingsPageDeviceSettingsDescription => '默认使用您设备的外观。您的钱包主题将根据系统设置自动调整。';
+  String get appearanceSettingsPageDeviceSettingsDescription =>
+      '默认使用您设备的外观。您的钱包主题将根据系统设置自动调整。';
 
   @override
   String get appearanceSettingsPageDarkModeTitle => '深色模式';
@@ -443,7 +447,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationsSettingsPagePushTitle => '推送通知';
 
   @override
-  String get notificationsSettingsPagePushDescription => '在交易发送和确认时获取通知，以及来自已连接应用的通知。';
+  String get notificationsSettingsPagePushDescription =>
+      '在交易发送和确认时获取通知，以及来自已连接应用的通知。';
 
   @override
   String get notificationsSettingsPageWalletsTitle => '钱包';
@@ -476,7 +481,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretPhraseScamAlertTitle => '诈骗警告';
 
   @override
-  String get revealSecretPhraseScamAlertDescription => '绝不与任何人分享您的助记词。绝不在任何网站上输入。';
+  String get revealSecretPhraseScamAlertDescription =>
+      '绝不与任何人分享您的助记词。绝不在任何网站上输入。';
 
   @override
   String get cipherSettingsPageTitle => '加密设置';
@@ -491,7 +497,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cipherSettingsPageStandardSubtitle => 'AES-256 + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageStandardDescription => '使用 AES-256 和 GOST 标准 KUZNECHIK 的基本加密。';
+  String get cipherSettingsPageStandardDescription =>
+      '使用 AES-256 和 GOST 标准 KUZNECHIK 的基本加密。';
 
   @override
   String get cipherSettingsPageHybridTitle => '混合加密';
@@ -500,13 +507,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cipherSettingsPageHybridSubtitle => 'CYBER + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageHybridDescription => '结合 CYBER 和 KUZNECHIK-GOST 算法的混合加密。';
+  String get cipherSettingsPageHybridDescription =>
+      '结合 CYBER 和 KUZNECHIK-GOST 算法的混合加密。';
 
   @override
   String get cipherSettingsPageQuantumTitle => '抗量子';
 
   @override
-  String get cipherSettingsPageQuantumSubtitle => 'CYBER + KUZNECHIK + NTRUP1277';
+  String get cipherSettingsPageQuantumSubtitle =>
+      'CYBER + KUZNECHIK + NTRUP1277';
 
   @override
   String get cipherSettingsPageQuantumDescription => '使用 NTRUP1277 的高级抗量子加密。';
@@ -779,7 +788,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => '从 CryptoCompare 获取汇率';
+  String get currencyConversionEngineCryptoCompareSubtitle =>
+      '从 CryptoCompare 获取汇率';
 
   @override
   String get restoreWalletOptionsTitle => '恢复钱包';
@@ -949,7 +959,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteWalletModalTitle => '删除钱包';
 
   @override
-  String get deleteWalletModalWarning => '警告：此操作无法撤销。您的钱包只能使用助记词恢复。如果您无法访问助记词，您将永久失去与此账户关联的所有资金。';
+  String get deleteWalletModalWarning =>
+      '警告：此操作无法撤销。您的钱包只能使用助记词恢复。如果您无法访问助记词，您将永久失去与此账户关联的所有资金。';
 
   @override
   String get deleteWalletModalSecretPhraseWarning => '请确保您能够访问您的助记词，然后再继续。';
@@ -1131,7 +1142,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretRecoveryModalRevealPhraseTitle => '显示助记词';
 
   @override
-  String get secretRecoveryModalRevealPhraseDescription => '如果您更换浏览器或更换电脑，您将需要这个助记词来访问您的账户。将它们保存在安全且隐秘的地方。';
+  String get secretRecoveryModalRevealPhraseDescription =>
+      '如果您更换浏览器或更换电脑，您将需要这个助记词来访问您的账户。将它们保存在安全且隐秘的地方。';
 
   @override
   String get secretRecoveryModalRevealPhraseButton => '显示';
@@ -1140,7 +1152,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretRecoveryModalShowKeysTitle => '显示私钥';
 
   @override
-  String get secretRecoveryModalShowKeysDescription => '警告：绝不要泄露此密钥。任何拥有您私钥的人都可以窃取您账户中的任何资产。';
+  String get secretRecoveryModalShowKeysDescription =>
+      '警告：绝不要泄露此密钥。任何拥有您私钥的人都可以窃取您账户中的任何资产。';
 
   @override
   String get secretRecoveryModalShowKeysButton => '导出';
@@ -1149,7 +1162,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretRecoveryModalKeystoreBackupTitle => '密钥库备份';
 
   @override
-  String get secretRecoveryModalKeystoreBackupDescription => '将您的私钥保存在密码保护的加密密钥库文件中。这为您的钱包提供了额外的安全层。';
+  String get secretRecoveryModalKeystoreBackupDescription =>
+      '将您的私钥保存在密码保护的加密密钥库文件中。这为您的钱包提供了额外的安全层。';
 
   @override
   String get secretRecoveryModalKeystoreBackupButton => '创建密钥库备份';
@@ -1158,7 +1172,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backupConfirmationContentTitle => '备份确认';
 
   @override
-  String get backupConfirmationWarning => '警告：如果您丢失或忘记助记词的确切顺序，您将永久失去您的资金。绝不与任何人分享您的助记词，否则他们可能会窃取您的资金。BIP39恢复是严格的 - 恢复过程中任何单词错误都将导致资金损失。';
+  String get backupConfirmationWarning =>
+      '警告：如果您丢失或忘记助记词的确切顺序，您将永久失去您的资金。绝不与任何人分享您的助记词，否则他们可能会窃取您的资金。BIP39恢复是严格的 - 恢复过程中任何单词错误都将导致资金损失。';
 
   @override
   String get backupConfirmationContentWrittenDown => '我已经写下了全部内容';
@@ -1329,7 +1344,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get keystoreBackupWarningTitle => '保护您的密钥库文件';
 
   @override
-  String get keystoreBackupWarningMessage => '密钥库文件包含您的加密私钥。将此文件保存在安全位置，绝不与任何人分享。您需要创建的密码来解密此文件。';
+  String get keystoreBackupWarningMessage =>
+      '密钥库文件包含您的加密私钥。将此文件保存在安全位置，绝不与任何人分享。您需要创建的密码来解密此文件。';
 
   @override
   String get keystoreBackupConfirmPasswordHint => '确认密码';
@@ -1509,7 +1525,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
+  String ledgerConnectPageConnectingStatus(
+      String deviceName, String connectionType) {
     return '正在连接到 $deviceName ($connectionType)...';
   }
 
@@ -1522,7 +1539,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
+  String ledgerConnectPageConnectionFailedGenericContent(
+      String deviceName, String error) {
     return '无法连接到 $deviceName。\n错误: $error';
   }
 
@@ -1535,7 +1553,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ledgerConnectPageGoToSettings => '前往设置';
 
   @override
-  String get ledgerConnectPageNoDevicesFound => '未找到设备。请确保 Ledger 已开机、解锁，并启用了蓝牙/USB。\n下拉或使用刷新图标再次扫描。';
+  String get ledgerConnectPageNoDevicesFound =>
+      '未找到设备。请确保 Ledger 已开机、解锁，并启用了蓝牙/USB。\n下拉或使用刷新图标再次扫描。';
 
   @override
   String get durationDay => '天';
@@ -1664,7 +1683,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get web3ErrorNotAuthorizedSuggestTokens => '此域名未授权建议代币。';
 
   @override
-  String get web3ErrorInvalidTokenType => 'wallet_watchAsset 的参数无效。需要 ERC20 代币类型。';
+  String get web3ErrorInvalidTokenType =>
+      'wallet_watchAsset 的参数无效。需要 ERC20 代币类型。';
 
   @override
   String get web3ErrorMissingTokenFields => '缺少必需字段：address、symbol 或 decimals。';
