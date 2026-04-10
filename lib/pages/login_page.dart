@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
   void _navigateToHome() {
     _appState.setSelectedWallet(_selectedWallet);
-    Navigator.of(context).pushNamed('/');
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
   void _navigateToNewWallet() {
