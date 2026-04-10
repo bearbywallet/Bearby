@@ -56,7 +56,9 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             Ok(tx_req)
         } else if let Some(solana_msg) = value.solana {
             let tx_req = TransactionRequest::Solana((
-                SolanaTransaction { message: solana_msg },
+                SolanaTransaction {
+                    message: solana_msg,
+                },
                 value.metadata.into(),
             ));
             Ok(tx_req)
