@@ -1697,6 +1697,7 @@ class Web3EIP1193Handler {
       showSwitchChainNetworkModal(
         context: context,
         selectedChainId: chainId,
+        filtersBySlip44: [60, 313],
         onNetworkSelected: () {
           _sendResponse(
             type: kBearbyResponseType,

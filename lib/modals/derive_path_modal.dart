@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/button.dart';
 import 'package:bearby/components/option_list.dart';
 import 'package:bearby/config/derive_path.dart';
 import 'package:bearby/state/app_state.dart';

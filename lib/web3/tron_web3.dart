@@ -755,6 +755,7 @@ class TronWeb3Handler {
       showSwitchChainNetworkModal(
         context: context,
         selectedChainId: chainId,
+        filtersBySlip44: [60, 195],
         onNetworkSelected: () {
           _sendResponse(
             type: kBearbyResponseType,

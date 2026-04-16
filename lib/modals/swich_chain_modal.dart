@@ -17,6 +17,7 @@ void showSwitchChainNetworkModal({
   required BigInt selectedChainId,
   required Function() onNetworkSelected,
   required Function() onReject,
+  List<int>? filtersBySlip44,
 }) {
   bool isCallbackCalled = false;
 
@@ -35,6 +36,7 @@ void showSwitchChainNetworkModal({
         ),
         child: _SwitchChainNetworkContent(
           selectedChainId: selectedChainId,
+          filtersBySlip44: filtersBySlip44,
           onNetworkSelected: () {
             isCallbackCalled = true;
             onNetworkSelected();
@@ -52,10 +54,12 @@ void showSwitchChainNetworkModal({
 class _SwitchChainNetworkContent extends StatefulWidget {
   final BigInt selectedChainId;
   final Function() onNetworkSelected;
+  final List<int>? filtersBySlip44;
 
   const _SwitchChainNetworkContent({
     required this.selectedChainId,
     required this.onNetworkSelected,
+    this.filtersBySlip44,
   });
 
   @override
@@ -248,10 +252,16 @@ class _SwitchChainNetworkContentState
   }
 
   List<NetworkConfigInfo> _getSortedNetworks(AppState appState) {
-    final networks = List<NetworkConfigInfo>.from(appState.state.providers);
+    var networks = List<NetworkConfigInfo>.from(appState.state.providers);
+
+    final slip44Filter = widget.filtersBySlip44;
+    if (slip44Filter != null && slip44Filter.isNotEmpty) {
+      networks =
+          networks.where((n) => slip44Filter.contains(n.slip44)).toList();
+    }
 
     NetworkConfigInfo? selectedNetwork;
-    final filteredNetworks = <NetworkConfigInfo>[];
+    final otherNetworks = <NetworkConfigInfo>[];
 
     for (final network in networks) {
       if (network.chainIds.first == widget.selectedChainId) {
@@ -260,12 +270,12 @@ class _SwitchChainNetworkContentState
           _selectedNetwork = network;
         });
       } else {
-        filteredNetworks.add(network);
+        otherNetworks.add(network);
       }
     }
 
     if (selectedNetwork != null) {
-      return [selectedNetwork, ...filteredNetworks];
+      return [selectedNetwork, ...otherNetworks];
     }
 
     return networks;
