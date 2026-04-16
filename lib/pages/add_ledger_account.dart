@@ -595,30 +595,30 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                     ),
                   ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(adaptivePadding),
-                    child: RoundedLoadingButton(
-                      controller: _createBtnController,
-                      color: theme.primaryPurple,
-                      valueColor: theme.buttonText,
-                      onPressed:
-                          _accounts.isNotEmpty ? _saveSelectedAccounts : null,
-                      successIcon: "assets/icons/ok.svg",
-                      child: Text(
-                        _createWallet
-                            ? l10n.addLedgerAccountPageCreateButton
-                            : l10n.addLedgerAccountPageAddButton,
-                        style: theme.titleSmall.copyWith(
-                          color: theme.buttonText,
+                if (_accounts.isNotEmpty)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: EdgeInsets.all(adaptivePadding),
+                      child: RoundedLoadingButton(
+                        controller: _createBtnController,
+                        color: theme.primaryPurple,
+                        valueColor: theme.buttonText,
+                        onPressed: _saveSelectedAccounts,
+                        successIcon: "assets/icons/ok.svg",
+                        child: Text(
+                          _createWallet
+                              ? l10n.addLedgerAccountPageCreateButton
+                              : l10n.addLedgerAccountPageAddButton,
+                          style: theme.titleSmall.copyWith(
+                            color: theme.buttonText,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
