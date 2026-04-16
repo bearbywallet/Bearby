@@ -13,7 +13,7 @@ pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    crypto::slip44::{BITCOIN, ETHEREUM, TRON, ZILLIQA},
+    crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA},
     settings::wallet_settings::TokenQuotesAPIOptions,
     token::ft::FToken,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
@@ -25,6 +25,8 @@ const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
 const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
 const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
 const TRON_ACCOUNT_TOKENS_API: &str = "https://ts.endjgfsv.link/api/account/tokens";
+const SOLANA_TOKEN_LIST_API: &str =
+    "https://token-list-api.solana.cloud/v1/search?chainId=101&query=%20&start=0&limit=100";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
 #[derive(Debug, Deserialize)]
@@ -122,6 +124,21 @@ struct TronAccountToken {
 #[derive(Debug, Deserialize)]
 struct TronAccountResponse {
     data: Vec<TronAccountToken>,
+}
+
+#[derive(Debug, Deserialize)]
+struct SolanaTokenEntry {
+    address: String,
+    name: String,
+    symbol: String,
+    decimals: u8,
+    #[serde(rename = "logoURI")]
+    logo_uri: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct SolanaTokenListResponse {
+    content: Vec<SolanaTokenEntry>,
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -526,6 +543,47 @@ async fn fetch_tron_tokens(
     Ok(result)
 }
 
+async fn fetch_solana_tokens(
+    default_logo: Option<String>,
+    chain_hash: u64,
+) -> Result<Vec<FTokenInfo>, String> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get(SOLANA_TOKEN_LIST_API)
+        .send()
+        .await
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("API error: {}", response.status()));
+    }
+
+    let api_response: SolanaTokenListResponse = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse Solana token list response: {}", e))?;
+
+    let result = api_response
+        .content
+        .into_iter()
+        .map(|token| FTokenInfo {
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            addr: token.address,
+            addr_type: 0,
+            logo: token.logo_uri.or_else(|| default_logo.clone()),
+            balances: HashMap::new(),
+            rate: 0.0,
+            default: false,
+            native: false,
+            chain_hash,
+        })
+        .collect();
+
+    Ok(result)
+}
+
 pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -573,6 +631,10 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
             data.selected_account,
         )
         .await;
+    }
+
+    if data.slip44 == SOLANA {
+        return fetch_solana_tokens(default_logo, chain_hash).await;
     }
 
     let request_body = serde_json::json!({

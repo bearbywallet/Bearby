@@ -157,7 +157,7 @@
         "decimals": 9
       }
     ],
-    "chainIds": [0, 0],
+    "chainIds": [101, 101],
     "infoURL": "https://solana.com",
     "testnet": false,
     "shortName": "solana",
