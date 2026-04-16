@@ -205,7 +205,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             let client = reqwest::Client::new();
             let response = client
                 .get(&coingecko_url)
-                .header("User-Agent", "ZilPay-Wallet/1.0")
+                .header("User-Agent", "Bearby/1.0")
                 .send()
                 .await
                 .map_err(|e| format!("HTTP request failed: {}", e))?;
@@ -365,6 +365,68 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                             ftokens[idx].rate = rate;
                         }
                     }
+                }
+            }
+
+            wallet
+                .save_ftokens(&ftokens)
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+            Ok(())
+        }
+        SOLANA => {
+            for &idx in &ftokens_indices {
+                if ftokens[idx].native {
+                    ftokens[idx].rate = convert_rate;
+                }
+            }
+
+            let non_native_indices: Vec<usize> = ftokens_indices
+                .iter()
+                .filter(|&&idx| !ftokens[idx].native)
+                .copied()
+                .collect();
+
+            if non_native_indices.is_empty() {
+                wallet
+                    .save_ftokens(&ftokens)
+                    .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+                return Ok(());
+            }
+
+            let symbols: Vec<String> = non_native_indices
+                .iter()
+                .map(|&idx| ftokens[idx].symbol.to_lowercase())
+                .collect();
+
+            let symbols_param = symbols.join(",");
+            let currency_lower = currency.to_lowercase();
+            let coingecko_url = format!(
+                "{}?symbols={}&vs_currencies={}",
+                COINGECKO_API_URL, symbols_param, currency_lower
+            );
+
+            let client = reqwest::Client::new();
+            let response = client
+                .get(&coingecko_url)
+                .header("User-Agent", "Bearby/1.0")
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {e}"))?;
+
+            let rate_data: Value = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse coingecko response: {e}"))?;
+
+            for &idx in &non_native_indices {
+                let symbol_lower = ftokens[idx].symbol.to_lowercase();
+                if let Some(rate) = rate_data
+                    .get(&symbol_lower)
+                    .and_then(|v| v.get(&currency_lower))
+                    .and_then(|v| v.as_f64())
+                {
+                    ftokens[idx].rate = rate;
                 }
             }
 
