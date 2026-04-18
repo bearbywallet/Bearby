@@ -35,8 +35,8 @@ Bearby employs a comprehensive set of cryptographic primitives to ensure maximum
 
 Clone the repository:
 ```bash
-$ git clone https://github.com/zilpay/zilpay-mobile.git
-$ cd zilpay-mobile
+$ git clone https://github.com/bearbywallet/Bearby.git
+$ cd Bearby
 ```
 
 ### Prerequisites

@@ -141,6 +141,7 @@
     "chain": "SOL",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
+      "https://solana-mainnet.phantom.app/YBPpkkN4g91xDiAnTE9r0RcMkjg0sKUIWvAfoFVJ?advancedTxSubmission=true",
       "https://api.mainnet-beta.solana.com",
       "https://solana-rpc.publicnode.com",
       "https://solana.drpc.org",

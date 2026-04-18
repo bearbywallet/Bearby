@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         setState(() => _errorMessage = null);
       }
     } catch (e) {
+      debugPrint("refresh: $e");
       setState(() => _errorMessage = e.toString());
     }
 
