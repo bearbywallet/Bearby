@@ -1,4 +1,3 @@
-import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
@@ -79,9 +78,18 @@ class _TokenCardState extends State<TokenCard>
           width: iconSize,
           height: iconSize,
           fit: BoxFit.contain,
-          errorWidget: Jazzicon(
-            seed: widget.ftoken.addr,
-            diameter: iconSize,
+          errorWidget: Container(
+            width: iconSize,
+            height: iconSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.textPrimary.withValues(alpha: 0.08),
+            ),
+            child: Icon(
+              Icons.image_not_supported_outlined,
+              size: iconSize * 0.55,
+              color: theme.textSecondary,
+            ),
           ),
           loadingWidget:
               const Center(child: CircularProgressIndicator(strokeWidth: 2)),
