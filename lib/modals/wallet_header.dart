@@ -48,42 +48,41 @@ class _WalletModalContentState extends State<_WalletModalContent> {
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity! > 0) Navigator.pop(context);
         },
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    appState.currentTheme.cardBackground
-                        .withValues(alpha: 0.85),
-                    appState.currentTheme.cardBackground
-                        .withValues(alpha: 0.95),
+        child: RepaintBoundary(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      appState.currentTheme.cardBackground
+                          .withValues(alpha: 0.85),
+                      appState.currentTheme.cardBackground
+                          .withValues(alpha: 0.95),
+                    ],
+                  ),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border(
+                    top: BorderSide(
+                      color: appState.currentTheme.textSecondary
+                          .withValues(alpha: 0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: appState.currentTheme.primaryPurple
+                          .withValues(alpha: 0.15),
+                      blurRadius: 30,
+                      spreadRadius: 0,
+                    ),
                   ],
                 ),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(24)),
-                border: Border(
-                  top: BorderSide(
-                    color: appState.currentTheme.textSecondary
-                        .withValues(alpha: 0.2),
-                    width: 1.5,
-                  ),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: appState.currentTheme.primaryPurple
-                        .withValues(alpha: 0.15),
-                    blurRadius: 30,
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
                 child: _buildMainContent(appState),
               ),
             ),
@@ -103,21 +102,27 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       children: [
         _buildHandle(theme),
         _buildHeader(appState, theme, wallet),
-        ConstrainedBox(
-          constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(context).height * 0.5),
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            itemCount: appState.accounts.length,
-            padding: EdgeInsets.symmetric(
-                horizontal: adaptivePadding, vertical: adaptivePadding),
-            itemBuilder: (_, index) => WalletCard(
-              account: appState.accounts.elementAt(index),
-              onTap: () => _selectWallet(index),
-              isSelected: wallet.selectedAccount == BigInt.from(index),
-            ),
-          ),
+        Consumer<AppState>(
+          builder: (_, state, __) {
+            final accounts = state.accounts;
+            final selected = state.wallet?.selectedAccount ?? BigInt.zero;
+            return ConstrainedBox(
+              constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.5),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                itemCount: accounts.length,
+                padding: EdgeInsets.symmetric(
+                    horizontal: adaptivePadding, vertical: adaptivePadding),
+                itemBuilder: (_, index) => WalletCard(
+                  account: accounts.elementAt(index),
+                  onTap: () => _selectWallet(index),
+                  isSelected: selected == BigInt.from(index),
+                ),
+              ),
+            );
+          },
         ),
         if (!wallet.walletType.contains(WalletType.SecretKey.name))
           _buildBottomActions(theme, appState),
