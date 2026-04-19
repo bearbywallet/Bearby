@@ -8,6 +8,8 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import '../../components/smart_input.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 void showDeleteWalletModal({
   required BuildContext context,
@@ -81,7 +83,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
 
       if (!mounted) return;
       _btnController.success();
-      await Navigator.of(context).pushNamed('/login');
+      context.go(AppRoutes.login);
     } catch (e) {
       debugPrint("error: $e");
       if (mounted) {

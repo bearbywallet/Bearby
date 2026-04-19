@@ -17,6 +17,8 @@ import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -301,7 +303,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       _btnController.success();
 
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/');
+        context.go(AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {

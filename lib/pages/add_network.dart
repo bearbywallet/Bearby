@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
@@ -132,7 +133,7 @@ class _AddNetworkPageState extends State<AddNetworkPage> with StatusBarMixin {
       await appState.syncData();
 
       if (mounted) {
-        Navigator.of(context).pop(true);
+        context.pop(true);
       }
     } catch (e) {
       if (mounted) {

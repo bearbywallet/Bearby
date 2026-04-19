@@ -8,6 +8,8 @@ import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 const _maxNumbers = 4;
 
@@ -51,14 +53,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (bip39 == null || bip39.isEmpty || chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_bip39List == null) {
       setState(() {
@@ -120,7 +121,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                   child: CustomAppBar(
                     title: AppLocalizations.of(context)!
                         .secretPhraseVerifyPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Expanded(
@@ -175,13 +176,10 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                                   text: AppLocalizations.of(context)!
                                       .secretPhraseVerifyPageNextButton,
                                   onPressed: () {
-                                    Navigator.of(context).pushReplacementNamed(
-                                      '/pass_setup',
-                                      arguments: {
-                                        'bip39': _bip39List,
-                                        'chain': _chain,
-                                      },
-                                    );
+                                    context.pushReplacement(AppRoutes.passSetup, extra: {
+                                      'bip39': _bip39List,
+                                      'chain': _chain,
+                                    });
                                   },
                                   borderRadius: 30,
                                   height: 56,

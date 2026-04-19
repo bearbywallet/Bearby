@@ -18,6 +18,8 @@ import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/utils/stake_formatters.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class StakingPoolCard extends StatelessWidget {
   final FinalOutputInfo stake;
@@ -493,9 +495,7 @@ class _PendingWithdrawalItem extends StatelessWidget {
   }
 
   void _navigateToHistory(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed('/', arguments: {
-      'selectedIndex': 1,
-    });
+    context.go(AppRoutes.history);
   }
 
   void _showErrorDialog(BuildContext context, AppState appState, Object e) {
@@ -846,9 +846,7 @@ class _ClaimableAmountCard extends StatelessWidget {
         token: stake.token ?? nativeToken!,
         amount: "0",
         onConfirm: (_) {
-          Navigator.of(context).pushReplacementNamed('/', arguments: {
-            'selectedIndex': 1,
-          });
+          context.go(AppRoutes.history);
         },
       );
     } catch (e) {
@@ -1251,9 +1249,7 @@ class _ClaimRewardsButton extends StatelessWidget {
   }
 
   void _navigateToHistory(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed('/', arguments: {
-      'selectedIndex': 1,
-    });
+    context.go(AppRoutes.history);
   }
 
   void _showErrorDialog(BuildContext context, AppState appState, Object e) {
@@ -1420,9 +1416,7 @@ class _ActionButtons extends StatelessWidget {
   }
 
   void _navigateToHistory(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed('/', arguments: {
-      'selectedIndex': 1,
-    });
+    context.go(AppRoutes.history);
   }
 
   void _showErrorDialog(BuildContext context, AppState appState, Object e) {

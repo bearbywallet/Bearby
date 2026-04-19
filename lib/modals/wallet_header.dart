@@ -11,10 +11,11 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 void showWalletModal({
   required BuildContext context,
-  VoidCallback? onManageWallet,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -24,14 +25,12 @@ void showWalletModal({
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (_) => _WalletModalContent(onManageWallet: onManageWallet),
+    builder: (_) => const _WalletModalContent(),
   );
 }
 
 class _WalletModalContent extends StatefulWidget {
-  final VoidCallback? onManageWallet;
-
-  const _WalletModalContent({this.onManageWallet});
+  const _WalletModalContent();
 
   @override
   State<_WalletModalContent> createState() => _WalletModalContentState();
@@ -165,12 +164,12 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             onTap: () {
               if (appState.wallet!.walletType
                   .contains(WalletType.ledger.name)) {
-                Navigator.pushNamed(context, "/add_ledger_account", arguments: {
+                context.push(AppRoutes.addLedgerAccount, extra: {
                   "createWallet": false,
                   "chain": appState.chain,
                 });
               } else {
-                Navigator.pushNamed(context, "/add_account");
+                context.push(AppRoutes.addAccount);
               }
             },
           ),
@@ -231,8 +230,8 @@ class _WalletModalContentState extends State<_WalletModalContent> {
   }
 
   void _lockWallet() {
-    Navigator.pop(context);
-    widget.onManageWallet?.call();
+    final appState = Provider.of<AppState>(context, listen: false);
+    appState.clearAuthentication();
   }
 
   Future<void> _selectWallet(int index) async {

@@ -14,6 +14,8 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -64,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
                     title: AppLocalizations.of(context)!.settingsPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Expanded(
@@ -144,22 +146,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                 title: AppLocalizations.of(context)!
                                     .settingsPageCurrency,
                                 trailingSvgPath: 'assets/icons/currency.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/currency'),
+                                onTap: () => context.push(AppRoutes.currency),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAppearance,
                                 trailingSvgPath: 'assets/icons/appearance.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/appearance'),
+                                onTap: () => context.push(AppRoutes.appearance),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageNotifications,
                                 trailingSvgPath: 'assets/icons/bell.svg',
-                                onTap: () => Navigator.pushNamed(
-                                    context, '/notifications'),
+                                onTap: () => context.push(AppRoutes.notifications),
                               ),
                               SettingsItem(
                                 isFirst: false,
@@ -167,8 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAddressBook,
                                 trailingSvgPath: 'assets/icons/book.svg',
-                                onTap: () => Navigator.pushNamed(
-                                    context, '/address-book'),
+                                onTap: () => context.push(AppRoutes.addressBook),
                               ),
                             ]),
                             const SizedBox(height: 24),
@@ -179,15 +177,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 title: AppLocalizations.of(context)!
                                     .settingsPageSecurityPrivacy,
                                 trailingSvgPath: 'assets/icons/shield.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/security'),
+                                onTap: () => context.push(AppRoutes.security),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageNetworks,
                                 trailingSvgPath: 'assets/icons/globe.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/networks'),
+                                onTap: () => context.push(AppRoutes.networks),
                               ),
                               SettingsItem(
                                 isFirst: false,
@@ -195,15 +191,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 title: AppLocalizations.of(context)!
                                     .settingsPageLanguage,
                                 trailingSvgPath: 'assets/icons/language.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/language'),
+                                onTap: () => context.push(AppRoutes.language),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageBrowser,
                                 trailingSvgPath: 'assets/icons/browser.svg',
-                                onTap: () => Navigator.pushNamed(
-                                    context, '/browser_settings'),
+                                onTap: () => context.push(AppRoutes.browserSettings),
                               ),
                             ]),
                             const SizedBox(height: 24),
@@ -238,8 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAbout,
                                 trailingSvgPath: 'assets/icons/info.svg',
-                                onTap: () =>
-                                    Navigator.pushNamed(context, '/about'),
+                                onTap: () => context.push(AppRoutes.about),
                               ),
                             ]),
                             SizedBox(height: adaptivePadding),

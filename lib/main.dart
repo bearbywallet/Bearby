@@ -43,7 +43,7 @@ Future<void> main() async {
       storage: storage,
     );
 
-    runApp(ZilPayApp(appState: appState));
+    runApp(BearbyApp(appState: appState));
   } catch (e) {
     debugPrint("try start, Error: $e");
   }

@@ -11,6 +11,8 @@ import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class LedgerConnectPage extends StatefulWidget {
   const LedgerConnectPage({super.key});
@@ -39,13 +41,12 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_chain == null) {
       setState(() {
@@ -126,13 +127,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
     final transport = await appState.ledgerViewController.open(device);
 
     if (transport != null && mounted) {
-      Navigator.of(context).pushNamed(
-        '/add_ledger_account',
-        arguments: {
-          'chain': _chain,
-          'ledger': device,
-        },
-      );
+      context.push(AppRoutes.addLedgerAccount, extra: {
+        'chain': _chain,
+        'ledger': device,
+      });
     }
   }
 

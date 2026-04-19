@@ -1,285 +1,234 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:bearby/pages/about.dart';
-import 'package:bearby/pages/add_account.dart';
-import 'package:bearby/pages/add_ledger_account.dart';
-import 'package:bearby/pages/add_network.dart';
-import 'package:bearby/pages/address_book.dart';
-import 'package:bearby/pages/appearance.dart';
-import 'package:bearby/pages/browser_settings.dart';
-import 'package:bearby/pages/currency_conversion.dart';
-import 'package:bearby/pages/keystore_backup.dart';
-import 'package:bearby/pages/keystore_file_restore.dart';
-import 'package:bearby/pages/ledger_connect.dart';
-import 'package:bearby/pages/locale.dart';
-import 'package:bearby/pages/manage_tokens.dart';
-import 'package:bearby/pages/network.dart';
-import 'package:bearby/pages/notification.dart';
-import 'package:bearby/pages/password_setup.dart';
-import 'package:bearby/pages/receive.dart';
-import 'package:bearby/pages/restore_bip39.dart';
-import 'package:bearby/pages/restore_rkstorage.dart';
-import 'package:bearby/pages/restore_sk.dart';
-import 'package:bearby/pages/reveal_bip39.dart';
-import 'package:bearby/pages/reveal_sk.dart';
-import 'package:bearby/pages/security.dart';
-import 'package:bearby/pages/send.dart';
-import 'package:bearby/pages/setup_net.dart';
-import 'package:bearby/pages/sk_gen.dart';
-import 'package:bearby/pages/verify_bip39.dart';
-import 'package:bearby/pages/wallet.dart';
-import 'package:bearby/pages/zil_stake.dart';
+import 'package:go_router/go_router.dart';
 
 import 'state/app_state.dart';
-
 import 'pages/main_page.dart';
 import 'pages/login_page.dart';
 import 'pages/initial_page.dart';
+import 'pages/home_page.dart';
+import 'pages/history_page.dart';
 import 'pages/browser_page.dart';
-import 'pages/settings_page.dart';
-import 'pages/new_wallet_options.dart';
+import 'pages/about.dart';
+import 'pages/add_account.dart';
+import 'pages/add_ledger_account.dart';
+import 'pages/add_network.dart';
+import 'pages/address_book.dart';
+import 'pages/appearance.dart';
+import 'pages/browser_settings.dart';
+import 'pages/currency_conversion.dart';
+import 'pages/gen_bip39.dart';
 import 'pages/gen_wallet_options.dart';
+import 'pages/keystore_backup.dart';
+import 'pages/keystore_file_restore.dart';
+import 'pages/ledger_connect.dart';
+import 'pages/locale.dart';
+import 'pages/manage_tokens.dart';
+import 'pages/network.dart';
+import 'pages/new_wallet_options.dart';
+import 'pages/notification.dart';
+import 'pages/password_setup.dart';
+import 'pages/receive.dart';
+import 'pages/restore_bip39.dart';
+import 'pages/restore_rkstorage.dart';
+import 'pages/restore_sk.dart';
+import 'pages/reveal_bip39.dart';
+import 'pages/reveal_sk.dart';
+import 'pages/security.dart';
+import 'pages/send.dart';
+import 'pages/settings_page.dart';
+import 'pages/setup_net.dart';
+import 'pages/sk_gen.dart';
+import 'pages/verify_bip39.dart';
+import 'pages/wallet.dart';
 import 'pages/wallet_restore_options.dart';
-import './pages/gen_bip39.dart';
+import 'pages/zil_stake.dart';
 
-class AppRouter {
-  final AppState appState;
+abstract class AppRoutes {
+  static const home               = '/';
+  static const history            = '/history';
+  static const browser            = '/browser';
+  static const login              = '/login';
+  static const initial            = '/initial';
+  static const settings           = '/settings';
+  static const about              = '/about';
+  static const receive            = '/receive';
+  static const addAccount         = '/add_account';
+  static const addNetwork         = '/add_network';
+  static const manageTokens       = '/manage_tokens';
+  static const send               = '/send';
+  static const revealSk           = '/reveal_sk';
+  static const revealBip39        = '/reveal_bip39';
+  static const wallet             = '/wallet';
+  static const appearance         = '/appearance';
+  static const notifications      = '/notifications';
+  static const addressBook        = '/address-book';
+  static const language           = '/language';
+  static const networks           = '/networks';
+  static const security           = '/security';
+  static const currency           = '/currency';
+  static const passSetup          = '/pass_setup';
+  static const rkRestore          = '/rk_restore';
+  static const netSetup           = '/net_setup';
+  static const genSk              = '/gen_sk';
+  static const genBip39           = '/gen_bip39';
+  static const verifyBip39        = '/verify_bip39';
+  static const browserSettings    = '/browser_settings';
+  static const keystoreBackup     = '/keystore_backup';
+  static const restoreOptions     = '/restore_options';
+  static const genOptions         = '/gen_options';
+  static const newWalletOptions   = '/new_wallet_options';
+  static const restoreBip39       = '/restore_bip39';
+  static const restoreSk          = '/restore_sk';
+  static const keystoreFileRestore = '/keystore_file_restore';
+  static const addLedgerAccount   = '/add_ledger_account';
+  static const zilStake           = '/zil_stake';
+  static const ledgerConnect      = '/ledger_connect';
+}
 
-  AppRouter({required this.appState});
+const _setupRoutes = <String>{
+  AppRoutes.passSetup,
+  AppRoutes.netSetup,
+  AppRoutes.genBip39,
+  AppRoutes.genSk,
+  AppRoutes.verifyBip39,
+  AppRoutes.restoreOptions,
+  AppRoutes.genOptions,
+  AppRoutes.newWalletOptions,
+  AppRoutes.initial,
+  AppRoutes.ledgerConnect,
+  AppRoutes.wallet,
+  AppRoutes.appearance,
+  AppRoutes.restoreBip39,
+  AppRoutes.currency,
+  AppRoutes.notifications,
+  AppRoutes.language,
+  AppRoutes.addressBook,
+  AppRoutes.security,
+  AppRoutes.networks,
+  AppRoutes.send,
+  AppRoutes.receive,
+  AppRoutes.revealSk,
+  AppRoutes.revealBip39,
+  AppRoutes.addAccount,
+  AppRoutes.addNetwork,
+  AppRoutes.rkRestore,
+  AppRoutes.browserSettings,
+  AppRoutes.restoreSk,
+  AppRoutes.about,
+  AppRoutes.keystoreBackup,
+  AppRoutes.keystoreFileRestore,
+  AppRoutes.addLedgerAccount,
+  AppRoutes.zilStake,
+  AppRoutes.settings,
+  AppRoutes.manageTokens,
+};
 
-  Route<void> onGenerateRoute(RouteSettings settings) {
-    return MaterialPageRoute(
-      settings: settings,
-      builder: (context) => _buildRoute(context, settings),
-    );
+String? _globalRedirect(
+  BuildContext context,
+  GoRouterState state,
+  AppState appState,
+) {
+  final loc = state.matchedLocation;
+
+  if (appState.wallets.isEmpty) {
+    if (loc == AppRoutes.initial || _setupRoutes.contains(loc)) return null;
+    return AppRoutes.initial;
   }
 
-  Widget _buildRoute(BuildContext context, RouteSettings settings) {
-    Widget wrapWithProviders(Widget child) {
-      return ChangeNotifierProvider.value(
-        value: appState,
-        child: child,
-      );
-    }
-
-    final List<String> setupRoutes = [
-      '/pass_setup',
-      '/net_setup',
-      '/gen_bip39',
-      '/gen_sk',
-      '/verify_bip39',
-      '/restore_options',
-      '/gen_options',
-      '/new_wallet_options',
-      '/initial',
-      '/ledger_connect',
-      '/wallet',
-      '/appearance',
-      '/restore_bip39',
-      '/currency',
-      '/notifications',
-      '/language',
-      '/address-book',
-      '/security',
-      '/networks',
-      '/send',
-      '/receive',
-      '/reveal_sk',
-      '/reveal_bip39',
-      '/add_account',
-      '/add_network',
-      '/web_view',
-      '/rk_restore',
-      '/browser_settings',
-      '/restore_sk',
-      '/about',
-      '/keystore_backup',
-      '/keystore_file_restore',
-      '/add_ledger_account',
-      '/zil_stake',
-    ];
-
-    if (settings.name == '/ledger_connect') {
-      return wrapWithProviders(const LedgerConnectPage());
-    }
-
-    if (settings.name == '/' || settings.name == null) {
-      if (appState.wallets.isEmpty) {
-        return wrapWithProviders(const InitialPage());
-      } else if (appState.wallet == null) {
-        return wrapWithProviders(const LoginPage());
-      } else {
-        return wrapWithProviders(const MainPage());
-      }
-    }
-
-    if (appState.wallets.isEmpty) {
-      if (setupRoutes.contains(settings.name)) {
-        switch (settings.name) {
-          case '/pass_setup':
-            return wrapWithProviders(const PasswordSetupPage());
-          case '/add_ledger_account':
-            return wrapWithProviders(const AddLedgerAccountPage());
-          case '/add_network':
-            return wrapWithProviders(const AddNetworkPage());
-          case '/about':
-            return wrapWithProviders(const AboutPage());
-          case '/restore_sk':
-            return wrapWithProviders(const SecretKeyRestorePage());
-          case '/rk_restore':
-            return wrapWithProviders(const RestoreRKStorage());
-          case '/restore_bip39':
-            return wrapWithProviders(const RestoreSecretPhrasePage());
-          case '/net_setup':
-            return wrapWithProviders(const SetupNetworkSettingsPage());
-          case '/gen_bip39':
-            return wrapWithProviders(const SecretPhraseGeneratorPage());
-          case '/gen_sk':
-            return wrapWithProviders(const SecretKeyGeneratorPage());
-          case '/verify_bip39':
-            return wrapWithProviders(const SecretPhraseVerifyPage());
-          case '/restore_options':
-            return wrapWithProviders(const RestoreWalletOptionsPage());
-          case '/gen_options':
-            return wrapWithProviders(const GenWalletOptionsPage());
-          case '/new_wallet_options':
-            return wrapWithProviders(const AddWalletOptionsPage());
-          case '/keystore_file_restore':
-            return wrapWithProviders(const RestoreKeystoreFilePage());
-          case '/initial':
-            return wrapWithProviders(const InitialPage());
-          case '/language':
-            return wrapWithProviders(const LanguagePage());
-          default:
-            return wrapWithProviders(const InitialPage());
-        }
-      }
-      return wrapWithProviders(const InitialPage());
-    }
-
-    if (appState.wallet == null) {
-      if (settings.name == '/login') {
-        return wrapWithProviders(const LoginPage());
-      }
-
-      if (setupRoutes.contains(settings.name)) {
-        switch (settings.name) {
-          case '/about':
-            return wrapWithProviders(const AboutPage());
-          case '/restore_sk':
-            return wrapWithProviders(const SecretKeyRestorePage());
-          case '/pass_setup':
-            return wrapWithProviders(const PasswordSetupPage());
-          case '/rk_restore':
-            return wrapWithProviders(const RestoreRKStorage());
-          case '/net_setup':
-            return wrapWithProviders(const SetupNetworkSettingsPage());
-          case '/gen_sk':
-            return wrapWithProviders(const SecretKeyGeneratorPage());
-          case '/keystore_file_restore':
-            return wrapWithProviders(const RestoreKeystoreFilePage());
-          case '/gen_bip39':
-            return wrapWithProviders(const SecretPhraseGeneratorPage());
-          case '/verify_bip39':
-            return wrapWithProviders(const SecretPhraseVerifyPage());
-          case '/restore_bip39':
-            return wrapWithProviders(const RestoreSecretPhrasePage());
-          case '/restore_options':
-            return wrapWithProviders(const RestoreWalletOptionsPage());
-          case '/gen_options':
-            return wrapWithProviders(const GenWalletOptionsPage());
-          case '/new_wallet_options':
-            return wrapWithProviders(const AddWalletOptionsPage());
-          case '/initial':
-            return wrapWithProviders(const InitialPage());
-          case '/add_ledger_account':
-            return wrapWithProviders(const AddLedgerAccountPage());
-          case '/add_network':
-            return wrapWithProviders(const AddNetworkPage());
-          default:
-            return wrapWithProviders(const LoginPage());
-        }
-      }
-      return wrapWithProviders(const LoginPage());
-    }
-
-    switch (settings.name) {
-      case '/about':
-        return wrapWithProviders(const AboutPage());
-      case '/login':
-        return wrapWithProviders(const LoginPage());
-      case '/':
-        return wrapWithProviders(const MainPage());
-      case '/receive':
-        return wrapWithProviders(const ReceivePage());
-      case '/add_account':
-        return wrapWithProviders(const AddAccount());
-      case '/add_network':
-        return wrapWithProviders(const AddNetworkPage());
-      case '/manage_tokens':
-        return wrapWithProviders(const ManageTokensPage());
-      case '/send':
-        return wrapWithProviders(const SendTokenPage());
-      case '/reveal_sk':
-        return wrapWithProviders(const RevealSecretKey());
-      case '/reveal_bip39':
-        return wrapWithProviders(const RevealSecretPhrase());
-      case '/browser':
-        return wrapWithProviders(const BrowserPage());
-      case '/wallet':
-        return wrapWithProviders(const WalletPage());
-      case '/appearance':
-        return wrapWithProviders(const AppearanceSettingsPage());
-      case '/notifications':
-        return wrapWithProviders(const NotificationsSettingsPage());
-      case '/address-book':
-        return wrapWithProviders(const AddressBookPage());
-      case '/language':
-        return wrapWithProviders(const LanguagePage());
-      case '/networks':
-        return wrapWithProviders(const NetworkPage());
-      case '/security':
-        return wrapWithProviders(const SecurityPage());
-      case '/settings':
-        return wrapWithProviders(const SettingsPage());
-      case '/currency':
-        return wrapWithProviders(const CurrencyConversionPage());
-      case '/pass_setup':
-        return wrapWithProviders(const PasswordSetupPage());
-      case '/rk_restore':
-        return wrapWithProviders(const RestoreRKStorage());
-      case '/net_setup':
-        return wrapWithProviders(const SetupNetworkSettingsPage());
-      case '/gen_sk':
-        return wrapWithProviders(const SecretKeyGeneratorPage());
-      case '/gen_bip39':
-        return wrapWithProviders(const SecretPhraseGeneratorPage());
-      case '/verify_bip39':
-        return wrapWithProviders(const SecretPhraseVerifyPage());
-      case '/browser_settings':
-        return wrapWithProviders(const BrowserSettingsPage());
-      case '/keystore_backup':
-        return wrapWithProviders(const KeystoreBackup());
-      case '/restore_options':
-        return wrapWithProviders(const RestoreWalletOptionsPage());
-      case '/gen_options':
-        return wrapWithProviders(const GenWalletOptionsPage());
-      case '/new_wallet_options':
-        return wrapWithProviders(const AddWalletOptionsPage());
-      case '/restore_bip39':
-        return wrapWithProviders(const RestoreSecretPhrasePage());
-      case '/restore_sk':
-        return wrapWithProviders(const SecretKeyRestorePage());
-      case '/keystore_file_restore':
-        return wrapWithProviders(const RestoreKeystoreFilePage());
-      case '/initial':
-        return wrapWithProviders(const InitialPage());
-      case '/add_ledger_account':
-        return wrapWithProviders(const AddLedgerAccountPage());
-      case '/zil_stake':
-        return wrapWithProviders(const ZilStakePage());
-      default:
-        return wrapWithProviders(const MainPage());
-    }
+  if (appState.wallet == null) {
+    if (loc == AppRoutes.login || _setupRoutes.contains(loc)) return null;
+    return AppRoutes.login;
   }
+
+  if (loc == AppRoutes.login || loc == AppRoutes.initial) {
+    return AppRoutes.home;
+  }
+
+  return null;
+}
+
+GoRouter createRouter(AppState appState) {
+  return GoRouter(
+    initialLocation: AppRoutes.home,
+    refreshListenable: appState,
+    redirect: (context, state) => _globalRedirect(context, state, appState),
+    routes: [
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) => MainPage(shell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (_, __) => const HomePage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.history,
+                builder: (_, __) => const HistoryPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.browser,
+                builder: (_, __) => const BrowserPage(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      GoRoute(path: AppRoutes.login,   builder: (_, __) => const LoginPage()),
+      GoRoute(path: AppRoutes.initial, builder: (_, __) => const InitialPage()),
+
+      GoRoute(path: AppRoutes.settings,       builder: (_, __) => const SettingsPage()),
+      GoRoute(path: AppRoutes.about,          builder: (_, __) => const AboutPage()),
+      GoRoute(path: AppRoutes.appearance,     builder: (_, __) => const AppearanceSettingsPage()),
+      GoRoute(path: AppRoutes.notifications,  builder: (_, __) => const NotificationsSettingsPage()),
+      GoRoute(path: AppRoutes.language,       builder: (_, __) => const LanguagePage()),
+      GoRoute(path: AppRoutes.security,       builder: (_, __) => const SecurityPage()),
+      GoRoute(path: AppRoutes.currency,       builder: (_, __) => const CurrencyConversionPage()),
+      GoRoute(path: AppRoutes.browserSettings, builder: (_, __) => const BrowserSettingsPage()),
+      GoRoute(path: AppRoutes.addressBook,    builder: (_, __) => const AddressBookPage()),
+      GoRoute(
+        path: AppRoutes.networks,
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>?;
+          return NetworkPage(popOnSelect: args?['popOnSelect'] as bool? ?? false);
+        },
+      ),
+
+      GoRoute(path: AppRoutes.wallet,        builder: (_, __) => const WalletPage()),
+      GoRoute(path: AppRoutes.addAccount,    builder: (_, __) => const AddAccount()),
+      GoRoute(path: AppRoutes.receive,       builder: (_, __) => const ReceivePage()),
+      GoRoute(path: AppRoutes.manageTokens,  builder: (_, __) => const ManageTokensPage()),
+      GoRoute(path: AppRoutes.keystoreBackup, builder: (_, __) => const KeystoreBackup()),
+      GoRoute(path: AppRoutes.revealSk,      builder: (_, __) => const RevealSecretKey()),
+      GoRoute(path: AppRoutes.revealBip39,   builder: (_, __) => const RevealSecretPhrase()),
+      GoRoute(path: AppRoutes.send,          builder: (_, __) => const SendTokenPage()),
+      GoRoute(path: AppRoutes.zilStake,      builder: (_, __) => const ZilStakePage()),
+      GoRoute(path: AppRoutes.addNetwork,    builder: (_, __) => const AddNetworkPage()),
+
+      GoRoute(path: AppRoutes.netSetup,          builder: (_, __) => const SetupNetworkSettingsPage()),
+      GoRoute(path: AppRoutes.passSetup,         builder: (_, __) => const PasswordSetupPage()),
+      GoRoute(path: AppRoutes.newWalletOptions,  builder: (_, __) => const AddWalletOptionsPage()),
+      GoRoute(path: AppRoutes.genOptions,        builder: (_, __) => const GenWalletOptionsPage()),
+      GoRoute(path: AppRoutes.restoreOptions,    builder: (_, __) => const RestoreWalletOptionsPage()),
+      GoRoute(path: AppRoutes.genSk,             builder: (_, __) => const SecretKeyGeneratorPage()),
+      GoRoute(path: AppRoutes.genBip39,          builder: (_, __) => const SecretPhraseGeneratorPage()),
+      GoRoute(path: AppRoutes.verifyBip39,       builder: (_, __) => const SecretPhraseVerifyPage()),
+      GoRoute(path: AppRoutes.restoreSk,         builder: (_, __) => const SecretKeyRestorePage()),
+      GoRoute(path: AppRoutes.restoreBip39,      builder: (_, __) => const RestoreSecretPhrasePage()),
+      GoRoute(path: AppRoutes.keystoreFileRestore, builder: (_, __) => const RestoreKeystoreFilePage()),
+      GoRoute(path: AppRoutes.rkRestore,         builder: (_, __) => const RestoreRKStorage()),
+
+      GoRoute(path: AppRoutes.ledgerConnect,    builder: (_, __) => const LedgerConnectPage()),
+      GoRoute(path: AppRoutes.addLedgerAccount, builder: (_, __) => const AddLedgerAccountPage()),
+    ],
+  );
 }

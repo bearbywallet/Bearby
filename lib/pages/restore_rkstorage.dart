@@ -10,6 +10,8 @@ import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class Account {
   final String name;
@@ -48,10 +50,11 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
     super.didChangeDependencies();
     final appState = Provider.of<AppState>(context, listen: false);
 
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     if (args == null || args['vaultJson'] == null) {
-      Navigator.pop(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.pop();
+      });
       return;
     }
     _vaultJson = args['vaultJson'];
@@ -111,7 +114,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
         password: _passwordController.text,
       );
       if (mounted) {
-        Navigator.of(context).pushNamed('/net_setup', arguments: {
+        context.push(AppRoutes.netSetup, extra: {
           'bip39': words.split(" "),
           'zilLegacy': true,
           'ignore_checksum': true,
@@ -149,7 +152,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: CustomAppBar(
                       title: l10n.restoreRKStorageTitle,
-                      onBackPressed: () => Navigator.pop(context),
+                      onBackPressed: () => context.pop(),
                     ),
                   ),
                 ),
@@ -222,8 +225,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                           child: SizedBox(
                             width: 100,
                             child: TextButton(
-                              onPressed: () => Navigator.of(context)
-                                  .pushNamed('/new_wallet_options'),
+                              onPressed: () => context.push(AppRoutes.newWalletOptions),
                               child: Text(l10n.restoreRKStorageSkipButton,
                                   style: theme.bodyText2
                                       .copyWith(color: theme.textSecondary)),

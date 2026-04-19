@@ -8,6 +8,8 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class GenWalletOptionsPage extends StatefulWidget {
   const GenWalletOptionsPage({super.key});
@@ -23,13 +25,12 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else {
       setState(() {
@@ -68,7 +69,7 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
                     title: l10n.genWalletOptionsTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Expanded(
@@ -89,10 +90,7 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed(
-                            '/gen_bip39',
-                            arguments: {'chain': _chain},
-                          ),
+                          onTap: () => context.push(AppRoutes.genBip39, extra: {'chain': _chain}),
                         ),
                         WalletListItem(
                           title: l10n.genWalletOptionsPrivateKeyTitle,
@@ -106,10 +104,7 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                               BlendMode.srcIn,
                             ),
                           ),
-                          onTap: () => Navigator.of(context).pushNamed(
-                            '/gen_sk',
-                            arguments: {'chain': _chain},
-                          ),
+                          onTap: () => context.push(AppRoutes.genSk, extra: {'chain': _chain}),
                         ),
                       ],
                     ),

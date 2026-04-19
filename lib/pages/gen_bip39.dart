@@ -14,6 +14,8 @@ import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
   const SecretPhraseGeneratorPage({
@@ -41,13 +43,12 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_chain == null) {
       setState(() {
@@ -83,7 +84,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
               children: [
                 CustomAppBar(
                   title: l10n.secretPhraseGeneratorPageTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                  onBackPressed: () => context.pop(),
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',
                     width: 30,
@@ -193,13 +194,10 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                             backgroundColor: theme.primaryPurple,
                             text: l10n.secretPhraseGeneratorPageNextButton,
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed(
-                                '/verify_bip39',
-                                arguments: {
-                                  'bip39': _mnemonicWords,
-                                  'chain': _chain,
-                                },
-                              );
+                              context.pushReplacement(AppRoutes.verifyBip39, extra: {
+                                'bip39': _mnemonicWords,
+                                'chain': _chain,
+                              });
                             },
                             borderRadius: 30.0,
                             height: 56.0,

@@ -26,6 +26,8 @@ import 'package:bearby/src/rust/models/settings.dart';
 import 'package:bearby/state/app_state.dart' show AppState;
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/utils/utils.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class PasswordSetupPage extends StatefulWidget {
   const PasswordSetupPage({super.key});
@@ -73,8 +75,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
     if (_updatedArgs) return;
 
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
     final keys = args?['keys'] as KeyPairInfo?;
@@ -82,7 +83,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
     if (bip39 == null && chain == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/initial');
+        if (mounted) context.go(AppRoutes.initial);
       });
     } else {
       setState(() {
@@ -310,7 +311,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       if (_keys != null) {
         _keys = _keys!.zeroize();
       }
-      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      context.go(AppRoutes.home);
     } catch (e) {
       debugPrint(e.toString());
       setState(() {
@@ -382,7 +383,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                 children: [
                   CustomAppBar(
                     title: AppLocalizations.of(context)!.passwordSetupPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                   Expanded(
                     child: SingleChildScrollView(

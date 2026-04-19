@@ -14,6 +14,8 @@ import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class SetupNetworkSettingsPage extends StatefulWidget {
   const SetupNetworkSettingsPage({super.key});
@@ -176,7 +178,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
                     title: l10n.networkPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Padding(
@@ -253,10 +255,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                         ? () {}
                         : () {
                             final chain = networks[selectedNetworkIndex];
-                            Navigator.of(context).pushNamed(
-                              '/new_wallet_options',
-                              arguments: {'chain': chain},
-                            );
+                            context.push(AppRoutes.newWalletOptions, extra: {'chain': chain});
                           },
                     borderRadius: 30.0,
                     height: 56.0,

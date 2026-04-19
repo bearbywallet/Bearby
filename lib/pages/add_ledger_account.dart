@@ -30,6 +30,8 @@ import 'package:bearby/src/rust/models/settings.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class AddLedgerAccountPage extends StatefulWidget {
   const AddLedgerAccountPage({super.key});
@@ -80,11 +82,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         discoveredDevice?.deviceModelId ??
         "Ledger";
 
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     if (args == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.of(context).pop();
+        if (mounted) context.pop();
       });
       _initialized = true;
       return;
@@ -95,7 +96,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
     if (network == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.of(context).pop();
+        if (mounted) context.pop();
       });
       _initialized = true;
       return;
@@ -251,7 +252,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
-            Navigator.of(context).pushNamed("/");
+            context.go(AppRoutes.home);
           }
         });
       } else {
@@ -301,7 +302,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
-            Navigator.of(context).pushNamed("/");
+            context.go(AppRoutes.home);
           }
         });
       }
@@ -557,7 +558,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                           EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: CustomAppBar(
                         title: l10n.addLedgerAccountPageAppBarTitle,
-                        onBackPressed: () => Navigator.pop(context),
+                        onBackPressed: () => context.pop(),
                       ),
                     ),
                     Expanded(

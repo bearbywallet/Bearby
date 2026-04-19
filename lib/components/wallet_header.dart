@@ -40,13 +40,7 @@ class _WalletHeaderState extends State<WalletHeader>
   }
 
   void _showWalletModal() {
-    showWalletModal(
-      context: context,
-      onManageWallet: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, '/login');
-      },
-    );
+    showWalletModal(context: context);
   }
 
   @override

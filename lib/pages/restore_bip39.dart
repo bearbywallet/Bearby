@@ -13,6 +13,8 @@ import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class RestoreSecretPhrasePage extends StatefulWidget {
   const RestoreSecretPhrasePage({super.key});
@@ -43,13 +45,12 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_chain == null) {
       setState(() => _chain = chain);
@@ -241,7 +242,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                   child: CustomAppBar(
                     title: AppLocalizations.of(context)!
                         .restoreSecretPhrasePageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Expanded(
@@ -315,14 +316,11 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                             text: AppLocalizations.of(context)!
                                 .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
-                              Navigator.of(context).pushNamed(
-                                '/pass_setup',
-                                arguments: {
-                                  'bip39': _words,
-                                  'chain': _chain,
-                                  'ignore_checksum': _bypassChecksumValidation,
-                                },
-                              );
+                              context.push(AppRoutes.passSetup, extra: {
+                                'bip39': _words,
+                                'chain': _chain,
+                                'ignore_checksum': _bypassChecksumValidation,
+                              });
                             },
                             borderRadius: 30,
                             height: 56,

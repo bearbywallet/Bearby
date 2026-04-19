@@ -5,6 +5,8 @@ import 'package:bearby/state/app_state.dart';
 import '../../components/button.dart';
 import '../../theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 void showSecretRecoveryModal({
   required BuildContext context,
@@ -171,14 +173,14 @@ class _SecretRecoveryModal extends StatelessWidget {
   }
 
   void _onRevealPhrase(BuildContext context) {
-    Navigator.of(context).pushNamed('/reveal_bip39');
+    context.push(AppRoutes.revealBip39);
   }
 
   void _onShowPrivateKeys(BuildContext context) {
-    Navigator.of(context).pushNamed('/reveal_sk');
+    context.push(AppRoutes.revealSk);
   }
 
   void _onCreateKeystoreBackup(BuildContext context) {
-    Navigator.of(context).pushNamed('/keystore_backup');
+    context.push(AppRoutes.keystoreBackup);
   }
 }

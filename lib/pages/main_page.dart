@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../components/bottom_nav_bar.dart';
 import '../src/rust/api/token.dart';
 import '../state/app_state.dart';
-import './home_page.dart';
-import './history_page.dart';
-import './browser_page.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final StatefulNavigationShell shell;
+
+  const MainPage({super.key, required this.shell});
 
   @override
   State<MainPage> createState() => MainPageState();
@@ -17,30 +17,10 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   static bool _hasInitialDataLoaded = false;
-  int _selectedIndex = 0;
-  bool _isInitialRoute = true;
-
-  final List<Widget> _pages = const <Widget>[
-    HomePage(),
-    HistoryPage(),
-    BrowserPage(),
-  ];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    if (_isInitialRoute) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      final selectedIndex = args?['selectedIndex'] as int?;
-
-      if (selectedIndex != null) {
-        _selectedIndex = selectedIndex;
-      }
-
-      _isInitialRoute = false;
-    }
 
     if (!_hasInitialDataLoaded) {
       _hasInitialDataLoaded = true;
@@ -61,9 +41,10 @@ class MainPageState extends State<MainPage> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    widget.shell.goBranch(
+      index,
+      initialLocation: index == widget.shell.currentIndex,
+    );
   }
 
   @override
@@ -88,10 +69,7 @@ class MainPageState extends State<MainPage> {
       body: SafeArea(
         top: true,
         bottom: false,
-        child: IndexedStack(
-          index: _selectedIndex,
-          children: _pages,
-        ),
+        child: widget.shell,
       ),
       appBar: AppBar(
         elevation: 0,
@@ -107,7 +85,7 @@ class MainPageState extends State<MainPage> {
             CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
             CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
           ],
-          currentIndex: _selectedIndex,
+          currentIndex: widget.shell.currentIndex,
           onTap: _onItemTapped,
         ),
       ),

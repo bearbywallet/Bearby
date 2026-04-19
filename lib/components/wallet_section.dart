@@ -4,6 +4,8 @@ import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class HoverableWalletSection extends StatefulWidget {
   final AppTheme theme;
@@ -29,7 +31,7 @@ class _HoverableWalletSectionState extends State<HoverableWalletSection> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => Navigator.pushNamed(context, '/wallet'),
+        onTap: () => context.push(AppRoutes.wallet),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(16),

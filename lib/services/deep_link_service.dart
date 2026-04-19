@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:bearby/mixins/qrcode.dart';
+import 'package:bearby/router.dart';
 import 'package:bearby/state/app_state.dart';
 
 class DeepLinkService {
@@ -10,17 +10,17 @@ class DeepLinkService {
   StreamSubscription<Uri>? _linkSubscription;
   String? _lastProcessedUri;
 
-  Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
+  Future<void> initialize(GoRouter router, AppState appState) async {
     try {
       final initialUri = await _appLinks.getInitialLink();
 
       if (initialUri != null) {
-        _handleDeepLink(initialUri, navigatorKey);
+        _handleDeepLink(initialUri, router, appState);
       }
 
       _linkSubscription = _appLinks.uriLinkStream.listen(
         (uri) {
-          _handleDeepLink(uri, navigatorKey);
+          _handleDeepLink(uri, router, appState);
         },
         onError: (err) {},
       );
@@ -29,7 +29,7 @@ class DeepLinkService {
     }
   }
 
-  void _handleDeepLink(Uri uri, GlobalKey<NavigatorState> navigatorKey) {
+  void _handleDeepLink(Uri uri, GoRouter router, AppState appState) {
     final uriString = uri.toString();
 
     if (_lastProcessedUri == uriString) {
@@ -41,12 +41,6 @@ class DeepLinkService {
     try {
       final parsed = parseCryptoUrl(uri.toString());
 
-      final context = navigatorKey.currentContext;
-
-      if (context == null) {
-        return;
-      }
-
       if (parsed.isEmpty || parsed['address'] == null) {
         return;
       }
@@ -56,23 +50,16 @@ class DeepLinkService {
         return;
       }
 
-      final appState = Provider.of<AppState>(context, listen: false);
-
       final walletIndex = _findWalletByChainName(appState, chainName);
 
       if (walletIndex != -1) {
         appState.setSelectedWallet(walletIndex);
       }
 
-      final deepLinkData = {
-        'route': '/send',
-        'wallet_index':
-            walletIndex != -1 ? walletIndex : appState.selectedWallet,
-        'arguments': {
-          'recipient': parsed['address'],
-          'amount': parsed['amount'],
-          'token_address': parsed['token'],
-        },
+      final sendArgs = {
+        'recipient': parsed['address'],
+        'amount': parsed['amount'],
+        'token_address': parsed['token'],
       };
 
       final currentChain = appState.chain;
@@ -81,10 +68,9 @@ class DeepLinkService {
           _chainMatches(currentChain.shortName, chainName);
 
       if (canNavigate) {
-        Navigator.of(context)
-            .pushNamed('/send', arguments: deepLinkData['arguments']);
+        router.push(AppRoutes.send, extra: sendArgs);
       } else {
-        Navigator.of(context).pushReplacementNamed('/login');
+        router.go(AppRoutes.login);
       }
     } catch (e) {
       //
@@ -111,10 +97,6 @@ class DeepLinkService {
 
   int _findWalletByChainName(AppState appState, String chainName) {
     for (int i = 0; i < appState.wallets.length; i++) {
-      final wallet = appState.wallets[i];
-      final firstAccount =
-          wallet.accounts[wallet.slip44]?[wallet.bip]?.elementAtOrNull(0);
-      if (firstAccount == null) continue;
       final chain = appState.chain;
 
       if (chain != null && _chainMatches(chain.shortName, chainName)) {

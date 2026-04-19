@@ -9,6 +9,8 @@ import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/api/backend.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});
@@ -110,8 +112,7 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                           colorFilter: ColorFilter.mode(
                               theme.textPrimary, BlendMode.srcIn),
                         ),
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/language'),
+                        onPressed: () => context.push(AppRoutes.language),
                       ),
                     ],
                   ),
@@ -143,15 +144,12 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                           text: _isRestoreAvailable
                               ? l10n.initialPagerestoreZilPay
                               : l10n.initialPagegetStarted,
-                          onPressed: () => Navigator.of(context).pushNamed(
-                            _isRestoreAvailable ? '/rk_restore' : '/net_setup',
-                            arguments: _isRestoreAvailable
-                                ? {
-                                    'vaultJson': _vaultJson,
-                                    'accountsJson': _accountsJson
-                                  }
-                                : null,
-                          ),
+                          onPressed: () => _isRestoreAvailable
+                              ? context.push(AppRoutes.rkRestore, extra: {
+                                  'vaultJson': _vaultJson,
+                                  'accountsJson': _accountsJson,
+                                })
+                              : context.push(AppRoutes.netSetup),
                           borderRadius: 30.0,
                           height: 56.0,
                         ),

@@ -1,29 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'router.dart';
+import 'services/deep_link_service.dart';
 import 'state/app_state.dart';
 
-class ZilPayApp extends StatelessWidget {
+class BearbyApp extends StatefulWidget {
   final AppState appState;
 
-  const ZilPayApp({super.key, required this.appState});
+  const BearbyApp({super.key, required this.appState});
+
+  @override
+  State<BearbyApp> createState() => _BearbyAppState();
+}
+
+class _BearbyAppState extends State<BearbyApp> {
+  late final GoRouter _router;
+  final _deepLinkService = DeepLinkService();
+
+  @override
+  void initState() {
+    super.initState();
+    _router = createRouter(widget.appState);
+    _deepLinkService.initialize(_router, widget.appState);
+  }
+
+  @override
+  void dispose() {
+    _deepLinkService.dispose();
+    _router.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: appState,
+      value: widget.appState,
       child: Builder(
         builder: (context) {
           return Consumer<AppState>(
             builder: (context, appState, _) {
               final currentTheme = appState.currentTheme;
 
-              return MaterialApp(
+              return MaterialApp.router(
+                routerConfig: _router,
                 // debugShowCheckedModeBanner: false,
                 title:
-                    AppLocalizations.of(context)?.appTitle ?? 'ZilPay Wallet',
+                    AppLocalizations.of(context)?.appTitle ?? 'Bearby Wallet',
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
@@ -150,10 +175,6 @@ class ZilPayApp extends StatelessWidget {
                     }),
                   ),
                 ),
-                initialRoute: '/',
-                onGenerateRoute: AppRouter(
-                  appState: Provider.of<AppState>(context, listen: false),
-                ).onGenerateRoute,
               );
             },
           );

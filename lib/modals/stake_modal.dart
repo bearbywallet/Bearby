@@ -13,6 +13,8 @@ import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/stake.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -576,9 +578,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
           if (!mounted) return;
 
           Navigator.of(context).pop();
-          Navigator.of(context).pushReplacementNamed('/', arguments: {
-            'selectedIndex': 1,
-          });
+          context.go(AppRoutes.history);
         },
       );
     } catch (err) {

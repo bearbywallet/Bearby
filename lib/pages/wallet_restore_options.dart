@@ -12,6 +12,8 @@ import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class RestoreWalletOptionsPage extends StatefulWidget {
   const RestoreWalletOptionsPage({super.key});
@@ -28,13 +30,12 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_chain == null) {
       setState(() {
@@ -44,24 +45,15 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
   }
 
   void _handleBip39Restore(BuildContext context) {
-    Navigator.of(context).pushNamed(
-      '/restore_bip39',
-      arguments: {'chain': _chain},
-    );
+    context.push(AppRoutes.restoreBip39, extra: {'chain': _chain});
   }
 
   void _handlePrivateKeyRestore(BuildContext context) {
-    Navigator.of(context).pushNamed(
-      '/restore_sk',
-      arguments: {'chain': _chain},
-    );
+    context.push(AppRoutes.restoreSk, extra: {'chain': _chain});
   }
 
   void _handleKeystoreResotre(BuildContext context) {
-    Navigator.of(context).pushNamed(
-      '/keystore_file_restore',
-      arguments: {'chain': _chain},
-    );
+    context.push(AppRoutes.keystoreFileRestore, extra: {'chain': _chain});
   }
 
   void _handleQRCodeScanning(BuildContext context) {
@@ -97,10 +89,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                     .toList();
 
             if (errorIndexes.isEmpty && context.mounted) {
-              Navigator.of(context).pushNamed(
-                '/pass_setup',
-                arguments: {'bip39': words, 'chain': _chain},
-              );
+              context.push(AppRoutes.passSetup, extra: {'bip39': words, 'chain': _chain});
               return;
             }
           }
@@ -110,7 +99,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
           }
         } catch (e) {
           debugPrint("QR scanning error: $e");
-          if (context.mounted) Navigator.pop(context);
+          if (context.mounted) context.pop();
         }
       },
     );
@@ -135,12 +124,9 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
     if (!context.mounted) return;
 
     if (errorIndexes.isEmpty) {
-      Navigator.of(context).pushNamed(
-        '/pass_setup',
-        arguments: {'bip39': nonEmptyWords, 'chain': _chain},
-      );
+      context.push(AppRoutes.passSetup, extra: {'bip39': nonEmptyWords, 'chain': _chain});
     } else {
-      Navigator.pop<void>(context);
+      context.pop();
     }
   }
 
@@ -150,10 +136,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
 
       if (!context.mounted) return;
 
-      Navigator.of(context).pushNamed(
-        '/pass_setup',
-        arguments: {'keys': keys, 'chain': _chain},
-      );
+      context.push(AppRoutes.passSetup, extra: {'keys': keys, 'chain': _chain});
     } catch (e) {
       debugPrint("Private key processing error: $e");
       if (context.mounted) Navigator.pop(context);
@@ -190,7 +173,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
                     title: l10n.restoreWalletOptionsTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                   ),
                 ),
                 Expanded(

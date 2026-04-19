@@ -13,6 +13,8 @@ import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
   const SecretKeyGeneratorPage({super.key});
@@ -68,7 +70,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
               children: [
                 CustomAppBar(
                   title: l10n.secretKeyGeneratorPageTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                  onBackPressed: () => context.pop(),
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',
                     width: 30,
@@ -171,10 +173,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
                           backgroundColor: theme.primaryPurple,
                           text: l10n.secretKeyGeneratorPageNextButton,
                           onPressed: () {
-                            Navigator.of(context).pushReplacementNamed(
-                              '/net_setup',
-                              arguments: {'keys': _keyPair},
-                            );
+                            context.pushReplacement(AppRoutes.netSetup, extra: {'keys': _keyPair});
                           },
                           borderRadius: 30.0,
                           height: 56.0,

@@ -18,9 +18,13 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class NetworkPage extends StatefulWidget {
-  const NetworkPage({super.key});
+  final bool popOnSelect;
+
+  const NetworkPage({super.key, this.popOnSelect = false});
 
   @override
   State<NetworkPage> createState() => _NetworkPageState();
@@ -64,10 +68,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
       });
     }
 
-    final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is Map<String, dynamic>) {
-      _popOnSelect = args['popOnSelect'] ?? false;
-    }
+    _popOnSelect = widget.popOnSelect;
   }
 
   @override
@@ -217,8 +218,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
             await appState.syncData();
 
-            if (_popOnSelect && mounted && Navigator.canPop(context)) {
-              Navigator.pop(context);
+            if (_popOnSelect && mounted && context.canPop()) {
+              context.pop();
             }
 
             return null;
@@ -234,8 +235,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
         await appState.syncData();
 
-        if (_popOnSelect && mounted && Navigator.canPop(context)) {
-          Navigator.pop(context);
+        if (_popOnSelect && mounted && context.canPop()) {
+          context.pop();
         }
       }
     } else {
@@ -278,7 +279,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
       context: context,
       networkConfig: config,
       onRemoved: () async {
-        Navigator.of(context).pop();
+        context.pop();
         await _loadNetworks();
       },
     );
@@ -352,7 +353,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   ),
                   child: CustomAppBar(
                     title: l10n.networkPageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                    onBackPressed: () => context.pop(),
                     actionIcon: SvgPicture.asset(
                       'assets/icons/plus.svg',
                       width: 24,
@@ -363,10 +364,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                       ),
                     ),
                     onActionPressed: () async {
-                      final added = await Navigator.pushNamed(
-                        context,
-                        '/add_network',
-                      );
+                      final added = await context.push<bool>(AppRoutes.addNetwork);
                       if (added == true) {
                         _loadNetworks();
                       }

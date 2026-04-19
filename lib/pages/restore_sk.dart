@@ -13,6 +13,8 @@ import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class SecretKeyRestorePage extends StatefulWidget {
   const SecretKeyRestorePage({super.key});
@@ -33,13 +35,12 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
     if (chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/net_setup');
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
     } else if (_chain == null) {
       setState(() {
@@ -131,7 +132,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
               children: [
                 CustomAppBar(
                   title: l10n.secretKeyRestorePageTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                  onBackPressed: () => context.pop(),
                   onActionPressed: _handlePaste,
                   actionIcon: SvgPicture.asset(
                     'assets/icons/copy.svg',
@@ -244,13 +245,10 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           text: l10n.secretKeyRestorePageNextButton,
                           onPressed: _keyPair.sk.isNotEmpty && _hasBackup
                               ? () {
-                                  Navigator.of(context).pushNamed(
-                                    '/pass_setup',
-                                    arguments: {
-                                      'keys': _keyPair,
-                                      'chain': _chain,
-                                    },
-                                  );
+                                  context.push(AppRoutes.passSetup, extra: {
+                                    'keys': _keyPair,
+                                    'chain': _chain,
+                                  });
                                 }
                               : null,
                           borderRadius: 30.0,

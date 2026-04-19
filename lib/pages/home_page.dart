@@ -20,6 +20,8 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 const double _ICON_SIZE_SMALL_BASE = 24.0;
 const double _ICON_SIZE_TILE_BUTTON_BASE = 25.0;
@@ -72,6 +74,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final l10n = AppLocalizations.of(context)!;
 
+    if (appState.wallet == null) return const SizedBox.shrink();
+
     final filteredTokens = appState.wallet!.tokens
         .where((t) => t.addrType == appState.account?.addrType)
         .toList();
@@ -120,7 +124,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   child: WalletHeader(
                     account: appState.account!,
                     onSettings: () {
-                      Navigator.pushNamed(context, '/settings');
+                      context.push(AppRoutes.settings);
                     },
                   ),
                 ),
@@ -149,10 +153,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   if (filteredTokens.isNotEmpty) {
                     final originalIndex =
                         appState.wallet!.tokens.indexOf(filteredTokens[0]);
-                    Navigator.of(context).pushNamed(
-                      '/send',
-                      arguments: {'token_index': originalIndex},
-                    );
+                    context.push(AppRoutes.send, extra: {'token_index': originalIndex});
                   }
                 },
                 backgroundColor: theme.cardBackground,
@@ -171,7 +172,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 ),
                 title: l10n.homePageReceiveButton,
                 onPressed: () {
-                  Navigator.pushNamed(context, '/receive');
+                  context.push(AppRoutes.receive);
                 },
                 backgroundColor: theme.cardBackground,
                 textColor: theme.primaryPurple,
@@ -189,7 +190,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   ),
                   title: "Stake",
                   onPressed: () async {
-                    Navigator.pushNamed(context, '/zil_stake');
+                    context.push(AppRoutes.zilStake);
                   },
                   backgroundColor: theme.cardBackground,
                   textColor: theme.primaryPurple,
@@ -247,11 +248,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 children: [
                   NetworkDownButton(
                     onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/networks',
-                        arguments: {'popOnSelect': true},
-                      );
+                      context.push(AppRoutes.networks, extra: {'popOnSelect': true});
                     },
                     chain: appState.chain!,
                   ),
@@ -294,7 +291,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary,
                     onTap: () {
-                      Navigator.pushNamed(context, '/manage_tokens');
+                      context.push(AppRoutes.manageTokens);
                     },
                   ),
                 ],
@@ -332,10 +329,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   onTap: () {
                     final originalIndex =
                         appState.wallet!.tokens.indexOf(token);
-                    Navigator.of(context).pushNamed(
-                      '/send',
-                      arguments: {'token_index': originalIndex},
-                    );
+                    context.push(AppRoutes.send, extra: {'token_index': originalIndex});
                   },
                 );
               },
@@ -361,10 +355,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 showDivider: !isLast,
                 onTap: () {
                   final originalIndex = appState.wallet!.tokens.indexOf(token);
-                  Navigator.of(context).pushNamed(
-                    '/send',
-                    arguments: {'token_index': originalIndex},
-                  );
+                  context.push(AppRoutes.send, extra: {'token_index': originalIndex});
                 },
               );
             },

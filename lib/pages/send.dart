@@ -18,6 +18,8 @@ import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/qrcode.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -253,8 +255,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     super.didChangeDependencies();
 
     if (!_initialized) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
       final int? argTokenIndex = args?['token_index'];
       final wallet = _appState.wallet;
 
@@ -349,9 +350,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
         token: token,
         amount: _amount,
         onConfirm: (_) {
-          Navigator.of(context).pushReplacementNamed('/', arguments: {
-            'selectedIndex': 1,
-          });
+          context.go(AppRoutes.history);
         },
       );
     } catch (e) {
@@ -418,7 +417,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       _walletName = name;
     });
 
-    Navigator.pop(context);
+    context.pop();
   }
 
   void updateAmount(String value) {

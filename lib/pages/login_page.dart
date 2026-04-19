@@ -16,6 +16,8 @@ import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
 import '../services/device.dart';
 import '../state/app_state.dart';
+import 'package:go_router/go_router.dart';
+import 'package:bearby/router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -53,7 +55,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
     if (_appState.wallets.isEmpty) {
       setState(() => _selectedWallet = -1);
-      Navigator.of(context).pushNamed('/initial');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.go(AppRoutes.initial);
+      });
     }
   }
 
@@ -66,11 +70,11 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
   void _navigateToHome() {
     _appState.setSelectedWallet(_selectedWallet);
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    context.go(AppRoutes.home);
   }
 
   void _navigateToNewWallet() {
-    Navigator.pushNamed(context, '/net_setup');
+    context.push(AppRoutes.netSetup);
   }
 
   Future<void> _completeAuthentication(int walletIndex) async {
@@ -414,7 +418,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
 
     if (appState.wallets.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/initial');
+        context.go(AppRoutes.initial);
       });
       return const Scaffold(
         body: Center(
