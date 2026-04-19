@@ -216,11 +216,11 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
               );
             } catch (_) {}
 
-            await appState.syncData();
-
-            if (_popOnSelect && mounted && context.canPop()) {
-              context.pop();
+            if (_popOnSelect && mounted) {
+              context.go(AppRoutes.home);
             }
+
+            await appState.syncData();
 
             return null;
           },
@@ -233,11 +233,11 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
           );
         } catch (_) {}
 
-        await appState.syncData();
-
-        if (_popOnSelect && mounted && context.canPop()) {
-          context.pop();
+        if (_popOnSelect && mounted) {
+          context.go(AppRoutes.home);
         }
+
+        await appState.syncData();
       }
     } else {
       try {
@@ -247,11 +247,11 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         );
       } catch (_) {}
 
-      await appState.syncData();
-
-      if (_popOnSelect && mounted && Navigator.canPop(context)) {
-        Navigator.pop(context);
+      if (_popOnSelect && mounted) {
+        context.go(AppRoutes.home);
       }
+
+      await appState.syncData();
     }
   }
 
