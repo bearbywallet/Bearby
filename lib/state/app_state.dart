@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bearby/src/rust/api/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
@@ -121,6 +122,9 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     if (index < 0) return null;
     return accounts.elementAtOrNull(index);
   }
+
+  BigInt get accountBalanceKey =>
+      addressToHash(addr: account?.addr ?? '');
 
   int get selectedWallet => _selectedWallet;
 

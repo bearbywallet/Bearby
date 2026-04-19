@@ -95,9 +95,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
       _balanceDecimals = token.decimals;
 
       if (_isStaking) {
-        final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
         _availableBalance =
-            BigInt.tryParse(token.balances[selectedAccount] ?? "0") ??
+            BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '-') ??
                 BigInt.zero;
       } else {
         _availableBalance =

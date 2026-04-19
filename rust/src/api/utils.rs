@@ -3,12 +3,20 @@ use std::str::FromStr;
 use flutter_rust_bridge::frb;
 use sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
+use zilpay::proto::address::Address;
 use zilpay::{background::Mnemonic, config::bip39::EN_WORDS, proto::U256};
 
 use crate::utils::utils::parse_address;
 
 pub fn is_valid_address(addr: String) -> bool {
     parse_address(addr).is_ok()
+}
+
+#[frb(sync)]
+pub fn address_to_hash(addr: String) -> usize {
+    Address::from_str_hex(&addr)
+        .map(|v| v.to_hash())
+        .unwrap_or_default()
 }
 
 pub fn bitcoin_address_type_from_address(addr: String) -> Result<String, String> {

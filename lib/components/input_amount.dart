@@ -51,7 +51,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final token = wallet.tokens[widget.tokenIndex];
     final bigAmount = toDecimalsWei(widget.amount.toString(), token.decimals);
     final bigBalance =
-        BigInt.parse(token.balances[wallet.selectedAccount] ?? '0');
+        BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '-') ??
+            BigInt.zero;
 
     return Container(
       padding: const EdgeInsets.all(16),

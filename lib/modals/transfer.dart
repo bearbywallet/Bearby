@@ -246,7 +246,7 @@ class _ConfirmTransactionContentState
     try {
       final appState = context.read<AppState>();
       final balance =
-          widget.token.balances[appState.wallet!.selectedAccount] ?? '0';
+          widget.token.balances[appState.accountBalanceKey] ?? '-';
 
       final updatedTx = await updateTxWithParams(
         tx: _currentTx,
@@ -649,8 +649,9 @@ class _ConfirmTransactionContentState
               .confirmTransactionContentNoActiveAccount));
 
       final amount = toDecimalsWei(widget.amount.toString(), token.decimals);
-      final balance = BigInt.parse(
-          widget.token.balances[appState.wallet!.selectedAccount] ?? '0');
+      final balance = BigInt.tryParse(
+              widget.token.balances[appState.accountBalanceKey] ?? '-') ??
+          BigInt.zero;
 
       return Padding(
         padding: const EdgeInsets.all(16),

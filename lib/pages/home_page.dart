@@ -318,14 +318,10 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final token = filteredTokens[index];
-                final tokenAmountValue = token.balances.isNotEmpty &&
-                        token.balances.keys
-                            .contains(appState.wallet!.selectedAccount)
-                    ? BigInt.tryParse(token
-                            .balances[appState.wallet!.selectedAccount]
-                            .toString()) ??
-                        BigInt.zero
-                    : BigInt.zero;
+                final tokenAmountValue =
+                    BigInt.tryParse(token.balances[appState.accountBalanceKey] ??
+                            '-') ??
+                        BigInt.zero;
 
                 return TokenCard(
                   ftoken: token,
@@ -353,14 +349,10 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
             (context, index) {
               final token = filteredTokens[index];
               final isLast = index == filteredTokens.length - 1;
-              final tokenAmountValue = token.balances.isNotEmpty &&
-                      token.balances.keys
-                          .contains(appState.wallet!.selectedAccount)
-                  ? BigInt.tryParse(token
-                          .balances[appState.wallet!.selectedAccount]
-                          .toString()) ??
-                      BigInt.zero
-                  : BigInt.zero;
+              final tokenAmountValue =
+                  BigInt.tryParse(token.balances[appState.accountBalanceKey] ??
+                          '-') ??
+                      BigInt.zero;
 
               return TokenCard(
                 ftoken: token,

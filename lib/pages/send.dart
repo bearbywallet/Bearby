@@ -69,7 +69,8 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       final numAmount = double.parse(_amount);
       final token = wallet.tokens[_tokenIndex];
       final bigBalance =
-          BigInt.parse(token.balances[wallet.selectedAccount] ?? '0');
+          BigInt.tryParse(token.balances[_appState.accountBalanceKey] ?? '-') ??
+              BigInt.zero;
       final balance =
           fromWei(value: bigBalance.toString(), decimals: token.decimals);
 

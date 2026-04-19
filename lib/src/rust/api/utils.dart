@@ -9,6 +9,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<bool> isValidAddress({required String addr}) =>
     RustLib.instance.api.crateApiUtilsIsValidAddress(addr: addr);
 
+BigInt addressToHash({required String addr}) =>
+    RustLib.instance.api.crateApiUtilsAddressToHash(addr: addr);
+
 Future<String> bitcoinAddressTypeFromAddress({required String addr}) =>
     RustLib.instance.api.crateApiUtilsBitcoinAddressTypeFromAddress(addr: addr);
 

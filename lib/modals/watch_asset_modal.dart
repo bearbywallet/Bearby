@@ -146,9 +146,9 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
     final primaryColor = theme.primaryPurple;
     final secondaryColor = theme.textSecondary;
     final textColor = theme.textPrimary;
-    final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
     final (balance, convertedBalance) = formatingAmount(
-      amount: BigInt.tryParse(_ftoken?.balances[selectedAccount] ?? '0') ??
+      amount: BigInt.tryParse(
+              _ftoken?.balances[appState.accountBalanceKey] ?? '-') ??
           BigInt.zero,
       symbol: _ftoken?.symbol ?? '',
       decimals: _ftoken?.decimals ?? 18,
