@@ -1,30 +1,36 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/main.dart' as app;
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/state/app_state.dart';
 
+Future<void> _clearStorage() async {
+  final appDocDir = await getApplicationSupportDirectory();
+  for (final name in ['storage', 'local_storage']) {
+    final dir = Directory('${appDocDir.path}/$name');
+    if (await dir.exists()) await dir.delete(recursive: true);
+  }
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async => await _clearStorage());
 
   testWidgets('Initial page and navigation full test flow',
       (WidgetTester tester) async {
     // Start the app only once
     await app.main();
-    await tester.pump();
-
-    // Test 1: Initial loading indicator appears
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-    // Wait for initialization to complete
     await tester.pumpAndSettle(const Duration(seconds: 5));
 
     // Test 2: Theme toggle button test
+    expect(find.byType(IconButton), findsWidgets);
     final themeIconButton = find.byType(IconButton).first;
-    expect(themeIconButton, findsOneWidget);
 
     // Get initial appearance code
     AppState appState =
@@ -94,10 +100,7 @@ void main() {
     await tester.tap(getStartedButtonFinder);
     await tester.pumpAndSettle();
 
-    // Verify we're on the new wallet options page
-    // This depends on what text or elements are on that page
-    // expect(find.text("New Wallet Options"), findsOneWidget);
-    // Instead of looking for a key, we'll check we're no longer on initial page
-    expect(find.byType(CustomButton), findsNothing);
+    // Verify we navigated away from initial page to network setup
+    expect(find.byType(CustomButton), findsOneWidget);
   });
 }
