@@ -65,8 +65,7 @@ import 'app_localizations_zh.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -74,8 +73,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -87,8 +85,7 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -3048,8 +3045,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Connecting to {deviceName} ({connectionType})...'**
-  String ledgerConnectPageConnectingStatus(
-      String deviceName, String connectionType);
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType);
 
   /// Title for the dialog shown when a connection attempt fails.
   ///
@@ -3067,8 +3063,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Could not connect to {deviceName}.\nError: {error}'**
-  String ledgerConnectPageConnectionFailedGenericContent(
-      String deviceName, String error);
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error);
 
   /// Status text shown after a successful disconnection.
   ///
@@ -3507,10 +3502,39 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Network added successfully'**
   String get addNetworkPageSuccess;
+
+  /// Error when QR code format is not recognized during wallet restore
+  ///
+  /// In en, this message translates to:
+  /// **'QR code not recognized. Please use a supported format.'**
+  String get qrCodeUnrecognizedError;
+
+  /// Error when QR code scanning or parsing throws an exception
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read QR code. Please try again.'**
+  String get qrCodeScanError;
+
+  /// Error when QR code produces an empty seed phrase
+  ///
+  /// In en, this message translates to:
+  /// **'QR code contains no seed words.'**
+  String get qrCodeEmptySeedError;
+
+  /// Error when QR code seed phrase has words not in the BIP39 wordlist
+  ///
+  /// In en, this message translates to:
+  /// **'QR code contains invalid BIP39 words.'**
+  String get qrCodeInvalidWordsError;
+
+  /// Error when QR code private key cannot be parsed
+  ///
+  /// In en, this message translates to:
+  /// **'QR code contains an invalid private key.'**
+  String get qrCodeInvalidKeyError;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -3519,31 +3543,28 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'ja', 'ko', 'ru', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'ja', 'ko', 'ru', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'ja':
-      return AppLocalizationsJa();
-    case 'ko':
-      return AppLocalizationsKo();
-    case 'ru':
-      return AppLocalizationsRu();
-    case 'zh':
-      return AppLocalizationsZh();
+    case 'en': return AppLocalizationsEn();
+    case 'ja': return AppLocalizationsJa();
+    case 'ko': return AppLocalizationsKo();
+    case 'ru': return AppLocalizationsRu();
+    case 'zh': return AppLocalizationsZh();
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

@@ -565,5 +565,10 @@
   "addNetworkPageErrorRequired": "모든 필수 항목을 입력하세요",
   "addNetworkPageErrorInvalidRpc": "유효한 RPC URL을 입력하세요",
   "addNetworkPageErrorInvalidChainId": "유효한 체인 ID를 입력하세요",
-  "addNetworkPageSuccess": "네트워크가 추가되었습니다"
+  "addNetworkPageSuccess": "네트워크가 추가되었습니다",
+  "qrCodeUnrecognizedError": "QR 코드를 인식할 수 없습니다. 지원되는 형식을 사용하세요.",
+  "qrCodeScanError": "QR 코드를 읽지 못했습니다. 다시 시도하세요.",
+  "qrCodeEmptySeedError": "QR 코드에 시드 단어가 없습니다.",
+  "qrCodeInvalidWordsError": "QR 코드에 유효하지 않은 BIP39 단어가 있습니다.",
+  "qrCodeInvalidKeyError": "QR 코드에 유효하지 않은 개인 키가 있습니다."
 }

@@ -577,5 +577,10 @@
   "addNetworkPageErrorRequired": "Заполните все обязательные поля",
   "addNetworkPageErrorInvalidRpc": "Введите корректный RPC URL",
   "addNetworkPageErrorInvalidChainId": "Введите корректный ID цепочки",
-  "addNetworkPageSuccess": "Сеть успешно добавлена"
+  "addNetworkPageSuccess": "Сеть успешно добавлена",
+  "qrCodeUnrecognizedError": "QR-код не распознан. Используйте поддерживаемый формат.",
+  "qrCodeScanError": "Не удалось прочитать QR-код. Попробуйте ещё раз.",
+  "qrCodeEmptySeedError": "QR-код не содержит слов сид-фразы.",
+  "qrCodeInvalidWordsError": "QR-код содержит недопустимые слова BIP39.",
+  "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ."
 }

@@ -2335,5 +2335,25 @@
   "addNetworkPageSuccess": "Network added successfully",
   "@addNetworkPageSuccess": {
     "description": "Success message after adding a network on AddNetworkPage"
+  },
+  "qrCodeUnrecognizedError": "QR code not recognized. Please use a supported format.",
+  "@qrCodeUnrecognizedError": {
+    "description": "Error when QR code format is not recognized during wallet restore"
+  },
+  "qrCodeScanError": "Failed to read QR code. Please try again.",
+  "@qrCodeScanError": {
+    "description": "Error when QR code scanning or parsing throws an exception"
+  },
+  "qrCodeEmptySeedError": "QR code contains no seed words.",
+  "@qrCodeEmptySeedError": {
+    "description": "Error when QR code produces an empty seed phrase"
+  },
+  "qrCodeInvalidWordsError": "QR code contains invalid BIP39 words.",
+  "@qrCodeInvalidWordsError": {
+    "description": "Error when QR code seed phrase has words not in the BIP39 wordlist"
+  },
+  "qrCodeInvalidKeyError": "QR code contains an invalid private key.",
+  "@qrCodeInvalidKeyError": {
+    "description": "Error when QR code private key cannot be parsed"
   }
 }

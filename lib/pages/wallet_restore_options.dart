@@ -56,6 +56,14 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
     context.push(AppRoutes.keystoreFileRestore, extra: {'chain': _chain});
   }
 
+  void _showQrError(BuildContext ctx, String message) {
+    if (!ctx.mounted) return;
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+    );
+    ctx.pop();
+  }
+
   void _handleQRCodeScanning(BuildContext context) {
     showQRScannerModal(
       context: context,
@@ -75,18 +83,18 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                 await _processKeyFromQR(context, key);
                 return;
               }
-              if (context.mounted) Navigator.pop(context);
+              if (context.mounted) _showQrError(context, AppLocalizations.of(context)!.qrCodeUnrecognizedError);
             case QrSecretKind.bip39Mnemonic:
               if (context.mounted) await _processSeedFromQR(context, result.payload!);
             case QrSecretKind.wifPrivateKey:
             case QrSecretKind.hexPrivateKey:
               if (context.mounted) await _processKeyFromQR(context, result.payload!);
             case QrSecretKind.unknown:
-              if (context.mounted) Navigator.pop(context);
+              if (context.mounted) _showQrError(context, AppLocalizations.of(context)!.qrCodeUnrecognizedError);
           }
         } catch (e) {
           debugPrint("QR scanning error: $e");
-          if (context.mounted) context.pop();
+          if (context.mounted) _showQrError(context, AppLocalizations.of(context)!.qrCodeScanError);
         }
       },
     );
@@ -97,7 +105,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
         seed.split(" ").where((word) => word.isNotEmpty).toList();
 
     if (nonEmptyWords.isEmpty) {
-      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) _showQrError(context, AppLocalizations.of(context)!.qrCodeEmptySeedError);
       return;
     }
 
@@ -113,7 +121,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
     if (errorIndexes.isEmpty) {
       context.push(AppRoutes.passSetup, extra: {'bip39': nonEmptyWords, 'chain': _chain});
     } else {
-      context.pop();
+      _showQrError(context, AppLocalizations.of(context)!.qrCodeInvalidWordsError);
     }
   }
 
@@ -126,7 +134,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
       context.push(AppRoutes.passSetup, extra: {'keys': keys, 'chain': _chain});
     } catch (e) {
       debugPrint("Private key processing error: $e");
-      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) _showQrError(context, AppLocalizations.of(context)!.qrCodeInvalidKeyError);
     }
   }
 

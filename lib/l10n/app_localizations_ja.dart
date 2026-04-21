@@ -21,8 +21,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreRKStorageTitle => 'ZilPay 1.0から2.0への移行';
 
   @override
-  String get restoreRKStorageAccountsPrompt =>
-      'ZilPay 2.0に移行するアカウント。パスワードを入力してください。';
+  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0に移行するアカウント。パスワードを入力してください。';
 
   @override
   String get restoreRKStoragePasswordHint => 'パスワード';
@@ -180,22 +179,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageEnsDomains => 'アドレスバーにENSドメインを表示';
 
   @override
-  String get securityPageEnsDescription =>
-      'この機能を使用すると、IPアドレスがIPFSサードパーティサービスに公開されることに注意してください。';
+  String get securityPageEnsDescription => 'この機能を使用すると、IPアドレスがIPFSサードパーティサービスに公開されることに注意してください。';
 
   @override
   String get securityPageIpfsGateway => 'IPFSゲートウェイ';
 
   @override
-  String get securityPageIpfsDescription =>
-      'Bearbyは、IPFS上のNFT画像の表示、ブラウザのアドレスバーに入力されたENS(ZNS)アドレスに関する情報の表示、およびトークンアイコンの取得にサードパーティサービスを使用します。これらのサービスを利用する際、IPアドレスが公開される可能性があります。';
+  String get securityPageIpfsDescription => 'Bearbyは、IPFS上のNFT画像の表示、ブラウザのアドレスバーに入力されたENS(ZNS)アドレスに関する情報の表示、およびトークンアイコンの取得にサードパーティサービスを使用します。これらのサービスを利用する際、IPアドレスが公開される可能性があります。';
 
   @override
   String get securityPageTokensFetcherTitle => 'トークンフェッチャー';
 
   @override
-  String get securityPageTokensFetcherDescription =>
-      'セキュリティページのトークンフェッチャー設定。有効にすると、トークンがサーバーから自動的に取得され、追加できます。';
+  String get securityPageTokensFetcherDescription => 'セキュリティページのトークンフェッチャー設定。有効にすると、トークンがサーバーから自動的に取得され、追加できます。';
 
   @override
   String get securityPageNodeRanking => 'ノードランキング';
@@ -210,8 +206,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageClearImageCache => '画像キャッシュをクリア';
 
   @override
-  String get securityPageClearImageCacheDescription =>
-      '一時ストレージからキャッシュされた画像をすべて削除';
+  String get securityPageClearImageCacheDescription => '一時ストレージからキャッシュされた画像をすべて削除';
 
   @override
   String get secretPhraseGeneratorPageTitle => '新しいウォレット';
@@ -250,8 +245,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretKeyScamAlertTitle => '詐欺警告';
 
   @override
-  String get revealSecretKeyScamAlertMessage =>
-      '秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
+  String get revealSecretKeyScamAlertMessage => '秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
 
   @override
   String get revealSecretKeySecurityTimer => 'セキュリティタイマー';
@@ -289,8 +283,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appearanceSettingsPageCompactNumbersTitle => 'コンパクト数字';
 
   @override
-  String get appearanceSettingsPageCompactNumbersDescription =>
-      '省略形の数字を表示します（例：20,000の代わりに20K）。';
+  String get appearanceSettingsPageCompactNumbersDescription => '省略形の数字を表示します（例：20,000の代わりに20K）。';
 
   @override
   String get appearanceSettingsPageDeviceSettingsTitle => 'デバイス設定';
@@ -299,8 +292,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appearanceSettingsPageDeviceSettingsSubtitle => 'システムデフォルト';
 
   @override
-  String get appearanceSettingsPageDeviceSettingsDescription =>
-      'デバイスの外観に合わせます。ウォレットのテーマはシステム設定に基づいて自動的に調整されます。';
+  String get appearanceSettingsPageDeviceSettingsDescription => 'デバイスの外観に合わせます。ウォレットのテーマはシステム設定に基づいて自動的に調整されます。';
 
   @override
   String get appearanceSettingsPageDarkModeTitle => 'ダークモード';
@@ -309,8 +301,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appearanceSettingsPageDarkModeSubtitle => '常にダーク';
 
   @override
-  String get appearanceSettingsPageDarkModeDescription =>
-      'デバイス設定に関係なく、常にダークテーマを有効にします。';
+  String get appearanceSettingsPageDarkModeDescription => 'デバイス設定に関係なく、常にダークテーマを有効にします。';
 
   @override
   String get appearanceSettingsPageLightModeTitle => 'ライトモード';
@@ -319,8 +310,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appearanceSettingsPageLightModeSubtitle => '常にライト';
 
   @override
-  String get appearanceSettingsPageLightModeDescription =>
-      'デバイス設定に関係なく、常にライトテーマを有効にします。';
+  String get appearanceSettingsPageLightModeDescription => 'デバイス設定に関係なく、常にライトテーマを有効にします。';
 
   @override
   String get loginPageBiometricReason => '認証してください';
@@ -453,8 +443,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationsSettingsPagePushTitle => 'プッシュ通知';
 
   @override
-  String get notificationsSettingsPagePushDescription =>
-      'トランザクションの送信と確認、接続されたアプリからの通知を受け取ります。';
+  String get notificationsSettingsPagePushDescription => 'トランザクションの送信と確認、接続されたアプリからの通知を受け取ります。';
 
   @override
   String get notificationsSettingsPageWalletsTitle => 'ウォレット';
@@ -487,8 +476,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretPhraseScamAlertTitle => '詐欺警告';
 
   @override
-  String get revealSecretPhraseScamAlertDescription =>
-      '秘密フレーズを他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
+  String get revealSecretPhraseScamAlertDescription => '秘密フレーズを他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
 
   @override
   String get cipherSettingsPageTitle => '暗号化設定';
@@ -503,8 +491,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cipherSettingsPageStandardSubtitle => 'AES-256 + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageStandardDescription =>
-      'AES-256とGOST標準KUZNECHIKによる基本的な暗号化。';
+  String get cipherSettingsPageStandardDescription => 'AES-256とGOST標準KUZNECHIKによる基本的な暗号化。';
 
   @override
   String get cipherSettingsPageHybridTitle => 'ハイブリッド暗号化';
@@ -513,22 +500,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cipherSettingsPageHybridSubtitle => 'CYBER + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageHybridDescription =>
-      'CYBERとKUZNECHIK-GOSTアルゴリズムを組み合わせたハイブリッド暗号化。';
+  String get cipherSettingsPageHybridDescription => 'CYBERとKUZNECHIK-GOSTアルゴリズムを組み合わせたハイブリッド暗号化。';
 
   @override
   String get cipherSettingsPageQuantumTitle => '量子耐性';
 
   @override
-  String get cipherSettingsPageQuantumSubtitle =>
-      'CYBER + KUZNECHIK + NTRUP1277';
+  String get cipherSettingsPageQuantumSubtitle => 'CYBER + KUZNECHIK + NTRUP1277';
 
   @override
   String get cipherSettingsPageQuantumDescription => 'NTRUP1277による高度な量子耐性暗号化。';
 
   @override
-  String get cipherSettingsPageQuantumWarning =>
-      '量子耐性暗号化はパフォーマンスに影響を与える可能性があります';
+  String get cipherSettingsPageQuantumWarning => '量子耐性暗号化はパフォーマンスに影響を与える可能性があります';
 
   @override
   String get cipherSettingsPageConfirmButton => '確認';
@@ -702,22 +686,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get browserSettingsClearCookies => 'Cookieを消去';
 
   @override
-  String get browserSettingsClearCookiesDescription =>
-      'ウェブサイトによって保存されたすべてのCookieを削除';
+  String get browserSettingsClearCookiesDescription => 'ウェブサイトによって保存されたすべてのCookieを削除';
 
   @override
   String get browserSettingsClearCache => 'キャッシュを消去';
 
   @override
-  String get browserSettingsClearCacheDescription =>
-      'ブラウジング中に保存された一時ファイルや画像を削除';
+  String get browserSettingsClearCacheDescription => 'ブラウジング中に保存された一時ファイルや画像を削除';
 
   @override
   String get browserSettingsClearLocalStorage => 'ローカルストレージを消去';
 
   @override
-  String get browserSettingsClearLocalStorageDescription =>
-      'デバイスに保存されているウェブサイトのデータを削除';
+  String get browserSettingsClearLocalStorageDescription => 'デバイスに保存されているウェブサイトのデータを削除';
 
   @override
   String get browserSettingsCacheDescription => 'より速い読み込みのためにウェブサイトのデータを保存';
@@ -798,8 +779,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle =>
-      'CryptoCompareからレートを取得';
+  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompareからレートを取得';
 
   @override
   String get restoreWalletOptionsTitle => 'ウォレットを復元';
@@ -820,8 +800,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreWalletOptionsKeyStoreTitle => 'キーストアファイル';
 
   @override
-  String get restoreWalletOptionsKeyStoreSubtitle =>
-      'パスワードで暗号化されたバックアップファイルを使用してウォレットを復元';
+  String get restoreWalletOptionsKeyStoreSubtitle => 'パスワードで暗号化されたバックアップファイルを使用してウォレットを復元';
 
   @override
   String get restoreWalletOptionsQRCodeTitle => 'QRコード';
@@ -836,8 +815,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get argonSettingsModalContentLowMemorySubtitle => '64KB RAM、3反復';
 
   @override
-  String get argonSettingsModalContentLowMemoryDescription =>
-      '最小メモリ使用量、低スペックデバイスに適しています。';
+  String get argonSettingsModalContentLowMemoryDescription => '最小メモリ使用量、低スペックデバイスに適しています。';
 
   @override
   String get argonSettingsModalContentOwaspTitle => 'OWASPデフォルト';
@@ -855,8 +833,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get argonSettingsModalContentSecureSubtitle => '256MB RAM、4反復';
 
   @override
-  String get argonSettingsModalContentSecureDescription =>
-      'メモリと反復回数を増やした高セキュリティ。';
+  String get argonSettingsModalContentSecureDescription => 'メモリと反復回数を増やした高セキュリティ。';
 
   @override
   String get argonSettingsModalContentSecretHint => '秘密を入力（任意）';
@@ -942,8 +919,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signMessageModalContentTitle => 'メッセージに署名';
 
   @override
-  String get signMessageModalContentDescription =>
-      'ウォレットを使用して以下のメッセージを確認し、署名してください。';
+  String get signMessageModalContentDescription => 'ウォレットを使用して以下のメッセージを確認し、署名してください。';
 
   @override
   String get signMessageModalContentDomain => 'ドメイン：';
@@ -973,12 +949,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteWalletModalTitle => 'ウォレットを削除';
 
   @override
-  String get deleteWalletModalWarning =>
-      '警告：この操作は元に戻せません。ウォレットは秘密フレーズを使用してのみ復元できます。アクセスできない場合、このアカウントに関連するすべての資金が永久に失われます。';
+  String get deleteWalletModalWarning => '警告：この操作は元に戻せません。ウォレットは秘密フレーズを使用してのみ復元できます。アクセスできない場合、このアカウントに関連するすべての資金が永久に失われます。';
 
   @override
-  String get deleteWalletModalSecretPhraseWarning =>
-      '続行する前に、秘密フレーズにアクセスできることを確認してください。';
+  String get deleteWalletModalSecretPhraseWarning => '続行する前に、秘密フレーズにアクセスできることを確認してください。';
 
   @override
   String get deleteWalletModalPasswordHint => 'パスワードを入力';
@@ -1011,8 +985,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get changePasswordModalTitle => 'パスワード変更';
 
   @override
-  String get changePasswordModalDescription =>
-      '現在のパスワードを入力し、ウォレットのセキュリティを更新するための新しいパスワードを選択してください。';
+  String get changePasswordModalDescription => '現在のパスワードを入力し、ウォレットのセキュリティを更新するための新しいパスワードを選択してください。';
 
   @override
   String get changePasswordModalCurrentPasswordHint => '現在のパスワード';
@@ -1126,8 +1099,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get watchAssetModalContentTitle => '提案されたトークンを追加';
 
   @override
-  String get watchAssetModalContentDescription =>
-      'アプリによって提案された以下のトークンを確認して追加します。';
+  String get watchAssetModalContentDescription => 'アプリによって提案された以下のトークンを確認して追加します。';
 
   @override
   String get watchAssetModalContentTokenLabel => 'トークン';
@@ -1159,8 +1131,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretRecoveryModalRevealPhraseTitle => '秘密回復フレーズを表示';
 
   @override
-  String get secretRecoveryModalRevealPhraseDescription =>
-      'ブラウザを変更したりコンピュータを移動する場合、アカウントにアクセスするにはこの秘密回復フレーズが必要です。安全で秘密の場所に保存してください。';
+  String get secretRecoveryModalRevealPhraseDescription => 'ブラウザを変更したりコンピュータを移動する場合、アカウントにアクセスするにはこの秘密回復フレーズが必要です。安全で秘密の場所に保存してください。';
 
   @override
   String get secretRecoveryModalRevealPhraseButton => '表示';
@@ -1169,8 +1140,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretRecoveryModalShowKeysTitle => 'プライベートキーを表示';
 
   @override
-  String get secretRecoveryModalShowKeysDescription =>
-      '警告：このキーを誰にも公開しないでください。プライベートキーを持つ人は、あなたのアカウントにある資産を盗むことができます。';
+  String get secretRecoveryModalShowKeysDescription => '警告：このキーを誰にも公開しないでください。プライベートキーを持つ人は、あなたのアカウントにある資産を盗むことができます。';
 
   @override
   String get secretRecoveryModalShowKeysButton => 'エクスポート';
@@ -1179,8 +1149,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretRecoveryModalKeystoreBackupTitle => 'キーストアバックアップ';
 
   @override
-  String get secretRecoveryModalKeystoreBackupDescription =>
-      'パスワードで保護された暗号化されたキーストアファイルに秘密鍵を保存します。これにより、ウォレットにさらなるセキュリティ層が提供されます。';
+  String get secretRecoveryModalKeystoreBackupDescription => 'パスワードで保護された暗号化されたキーストアファイルに秘密鍵を保存します。これにより、ウォレットにさらなるセキュリティ層が提供されます。';
 
   @override
   String get secretRecoveryModalKeystoreBackupButton => 'キーストアバックアップを作成';
@@ -1189,8 +1158,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get backupConfirmationContentTitle => 'バックアップ確認';
 
   @override
-  String get backupConfirmationWarning =>
-      '警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。';
+  String get backupConfirmationWarning => '警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。';
 
   @override
   String get backupConfirmationContentWrittenDown => 'すべてを書き留めました';
@@ -1361,8 +1329,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get keystoreBackupWarningTitle => 'キーストアファイルを安全に保管';
 
   @override
-  String get keystoreBackupWarningMessage =>
-      'キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。';
+  String get keystoreBackupWarningMessage => 'キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。';
 
   @override
   String get keystoreBackupConfirmPasswordHint => 'パスワードを確認';
@@ -1383,8 +1350,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get keystoreBackupSuccessTitle => 'バックアップの作成に成功';
 
   @override
-  String get keystoreBackupSuccessMessage =>
-      'キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。';
+  String get keystoreBackupSuccessMessage => 'キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。';
 
   @override
   String get keystoreBackupSaveAsButton => 'ファイルとして保存';
@@ -1535,8 +1501,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanFinishedNoDevices =>
-      'スキャンが完了しました。デバイスは見つかりませんでした。';
+  String get ledgerConnectPageScanFinishedNoDevices => 'スキャンが完了しました。デバイスは見つかりませんでした。';
 
   @override
   String ledgerConnectPageScanFinishedWithDevices(int count) {
@@ -1544,8 +1509,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectingStatus(
-      String deviceName, String connectionType) {
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return '$deviceName（$connectionType）に接続中...';
   }
 
@@ -1558,8 +1522,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedGenericContent(
-      String deviceName, String error) {
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
     return '$deviceNameに接続できませんでした。\nエラー: $error';
   }
 
@@ -1572,8 +1535,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ledgerConnectPageGoToSettings => '設定に移動';
 
   @override
-  String get ledgerConnectPageNoDevicesFound =>
-      'デバイスが見つかりません。Ledgerの電源がオンで、ロックが解除されており、Bluetooth/USBが有効になっていることを確認してください。\n下にスワイプするか、更新アイコンを使用して再度スキャンしてください。';
+  String get ledgerConnectPageNoDevicesFound => 'デバイスが見つかりません。Ledgerの電源がオンで、ロックが解除されており、Bluetooth/USBが有効になっていることを確認してください。\n下にスワイプするか、更新アイコンを使用して再度スキャンしてください。';
 
   @override
   String get durationDay => '日';
@@ -1696,23 +1658,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get web3ErrorNoNativeToken => 'ネイティブトークンが見つかりません';
 
   @override
-  String get web3ErrorPermissionNotSupported =>
-      'eth_accounts パーミッションのみサポートされています';
+  String get web3ErrorPermissionNotSupported => 'eth_accounts パーミッションのみサポートされています';
 
   @override
   String get web3ErrorNotAuthorizedSuggestTokens => 'このドメインはトークンの提案を許可されていません。';
 
   @override
-  String get web3ErrorInvalidTokenType =>
-      'wallet_watchAsset のパラメータが無効です。ERC20トークンタイプが必要です。';
+  String get web3ErrorInvalidTokenType => 'wallet_watchAsset のパラメータが無効です。ERC20トークンタイプが必要です。';
 
   @override
-  String get web3ErrorMissingTokenFields =>
-      '必須フィールドがありません: address、symbol、または decimals。';
+  String get web3ErrorMissingTokenFields => '必須フィールドがありません: address、symbol、または decimals。';
 
   @override
-  String get web3ErrorMissingChainFields =>
-      'wallet_addEthereumChain の必須フィールドがありません';
+  String get web3ErrorMissingChainFields => 'wallet_addEthereumChain の必須フィールドがありません';
 
   @override
   String get web3ErrorNoValidRpcUrls => '有効なHTTP RPC URLが提供されていません';
@@ -1721,8 +1679,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get web3ErrorMissingChainId => '必須フィールドがありません: chainId';
 
   @override
-  String get web3ErrorChainNotAdded =>
-      'リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。';
+  String get web3ErrorChainNotAdded => 'リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。';
 
   @override
   String get bipPurposeSetupPageTitle => 'ビットコインアドレス';
@@ -1795,4 +1752,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get addNetworkPageSuccess => 'ネットワークが追加されました';
+
+  @override
+  String get qrCodeUnrecognizedError => 'QRコードを認識できません。サポートされているフォーマットを使用してください。';
+
+  @override
+  String get qrCodeScanError => 'QRコードの読み取りに失敗しました。再試行してください。';
+
+  @override
+  String get qrCodeEmptySeedError => 'QRコードにシードワードが含まれていません。';
+
+  @override
+  String get qrCodeInvalidWordsError => 'QRコードに無効なBIP39ワードが含まれています。';
+
+  @override
+  String get qrCodeInvalidKeyError => 'QRコードに無効な秘密鍵が含まれています。';
 }

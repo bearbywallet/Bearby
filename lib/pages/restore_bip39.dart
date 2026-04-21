@@ -39,7 +39,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
   @override
   void initState() {
     super.initState();
-    _words = List.filled(_count, '');
+    _words = List.filled(_count, '', growable: true);
   }
 
   @override
@@ -169,7 +169,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
     if (targetCount != _count) {
       setState(() {
         _count = targetCount;
-        _words = List<String>.filled(targetCount, '');
+        _words = List<String>.filled(targetCount, '', growable: true);
         _wordsErrorIndexes = [];
       });
     }
@@ -198,7 +198,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
 
     setState(() {
       _count = newCount;
-      final newWords = List<String>.filled(newCount, '');
+      final newWords = List<String>.filled(newCount, '', growable: true);
       for (var i = 0; i < math.min(_words.length, newCount); i++) {
         newWords[i] = _words[i];
       }

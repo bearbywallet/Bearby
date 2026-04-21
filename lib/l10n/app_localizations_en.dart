@@ -21,8 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreRKStorageTitle => 'Migrate ZilPay 1.0 to 2.0';
 
   @override
-  String get restoreRKStorageAccountsPrompt =>
-      'Accounts to migrate to ZilPay 2.0. Enter password.';
+  String get restoreRKStorageAccountsPrompt => 'Accounts to migrate to ZilPay 2.0. Enter password.';
 
   @override
   String get restoreRKStoragePasswordHint => 'Password';
@@ -180,29 +179,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageEnsDomains => 'Show ENS domains in address bar';
 
   @override
-  String get securityPageEnsDescription =>
-      'Keep in mind that using this feature exposes your IP address to IPFS third-party services.';
+  String get securityPageEnsDescription => 'Keep in mind that using this feature exposes your IP address to IPFS third-party services.';
 
   @override
   String get securityPageIpfsGateway => 'IPFS gateway';
 
   @override
-  String get securityPageIpfsDescription =>
-      'Bearby uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.';
+  String get securityPageIpfsDescription => 'Bearby uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.';
 
   @override
   String get securityPageTokensFetcherTitle => 'Tokens fetcher';
 
   @override
-  String get securityPageTokensFetcherDescription =>
-      'tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.';
+  String get securityPageTokensFetcherDescription => 'tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.';
 
   @override
   String get securityPageNodeRanking => 'Node ranking';
 
   @override
-  String get securityPageNodeDescription =>
-      'Make requests to Bearby server for fetch best node';
+  String get securityPageNodeDescription => 'Make requests to Bearby server for fetch best node';
 
   @override
   String get securityPageClearData => 'Clear Data';
@@ -211,8 +206,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageClearImageCache => 'Clear Image Cache';
 
   @override
-  String get securityPageClearImageCacheDescription =>
-      'Delete all cached images from temporary storage';
+  String get securityPageClearImageCacheDescription => 'Delete all cached images from temporary storage';
 
   @override
   String get secretPhraseGeneratorPageTitle => 'New Wallet';
@@ -251,15 +245,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretKeyScamAlertTitle => 'SCAM ALERT';
 
   @override
-  String get revealSecretKeyScamAlertMessage =>
-      'Never share your secret key with anyone. Never input it on any website.';
+  String get revealSecretKeyScamAlertMessage => 'Never share your secret key with anyone. Never input it on any website.';
 
   @override
   String get revealSecretKeySecurityTimer => 'Security Timer';
 
   @override
-  String get revealSecretKeyRevealAfter =>
-      'Your secret key will be revealed after:';
+  String get revealSecretKeyRevealAfter => 'Your secret key will be revealed after:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => 'Search';
@@ -291,8 +283,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettingsPageCompactNumbersTitle => 'Compact Numbers';
 
   @override
-  String get appearanceSettingsPageCompactNumbersDescription =>
-      'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).';
+  String get appearanceSettingsPageCompactNumbersDescription => 'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).';
 
   @override
   String get appearanceSettingsPageDeviceSettingsTitle => 'Device settings';
@@ -301,8 +292,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettingsPageDeviceSettingsSubtitle => 'System default';
 
   @override
-  String get appearanceSettingsPageDeviceSettingsDescription =>
-      'Default to your device\'s appearance. Your wallet theme will automatically adjust based on your system settings.';
+  String get appearanceSettingsPageDeviceSettingsDescription => 'Default to your device\'s appearance. Your wallet theme will automatically adjust based on your system settings.';
 
   @override
   String get appearanceSettingsPageDarkModeTitle => 'Dark Mode';
@@ -311,8 +301,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettingsPageDarkModeSubtitle => 'Always dark';
 
   @override
-  String get appearanceSettingsPageDarkModeDescription =>
-      'Keep the dark theme enabled at all times, regardless of your device settings.';
+  String get appearanceSettingsPageDarkModeDescription => 'Keep the dark theme enabled at all times, regardless of your device settings.';
 
   @override
   String get appearanceSettingsPageLightModeTitle => 'Light mode';
@@ -321,8 +310,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettingsPageLightModeSubtitle => 'Always light';
 
   @override
-  String get appearanceSettingsPageLightModeDescription =>
-      'Keep the light theme enabled at all times, regardless of your device settings.';
+  String get appearanceSettingsPageLightModeDescription => 'Keep the light theme enabled at all times, regardless of your device settings.';
 
   @override
   String get loginPageBiometricReason => 'Please authenticate';
@@ -354,8 +342,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => 'Private Key';
 
   @override
-  String get secretKeyRestorePageBackupLabel =>
-      'I have backed up my secret key';
+  String get secretKeyRestorePageBackupLabel => 'I have backed up my secret key';
 
   @override
   String get secretKeyRestorePageNextButton => 'Next';
@@ -387,8 +374,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqa Legacy';
 
   @override
-  String get addAccountPageBiometricReason =>
-      'Authenticate to create a new account';
+  String get addAccountPageBiometricReason => 'Authenticate to create a new account';
 
   @override
   String addAccountPageBiometricError(Object error) {
@@ -412,8 +398,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressBookPageTitle => 'Address Book';
 
   @override
-  String get addressBookPageEmptyMessage =>
-      'Your contacts and their wallet address will\nappear here.';
+  String get addressBookPageEmptyMessage => 'Your contacts and their wallet address will\nappear here.';
 
   @override
   String get addressBookPageDeleteConfirmationTitle => 'Delete Contact';
@@ -458,15 +443,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsSettingsPagePushTitle => 'Push notifications';
 
   @override
-  String get notificationsSettingsPagePushDescription =>
-      'Get notifications when tx sent and confirm, Notifications from connected apps.';
+  String get notificationsSettingsPagePushDescription => 'Get notifications when tx sent and confirm, Notifications from connected apps.';
 
   @override
   String get notificationsSettingsPageWalletsTitle => 'Wallets';
 
   @override
-  String get notificationsSettingsPageWalletsDescription =>
-      'Notifications from wallets';
+  String get notificationsSettingsPageWalletsDescription => 'Notifications from wallets';
 
   @override
   String get notificationsSettingsPageWalletPrefix => 'Wallet';
@@ -481,8 +464,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => 'invalid password, error:';
 
   @override
-  String get revealSecretPhraseRevealAfter =>
-      'Your seed phrase will be revealed after:';
+  String get revealSecretPhraseRevealAfter => 'Your seed phrase will be revealed after:';
 
   @override
   String get revealSecretPhraseSubmitButton => 'Submit';
@@ -494,8 +476,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretPhraseScamAlertTitle => 'SCAM ALERT';
 
   @override
-  String get revealSecretPhraseScamAlertDescription =>
-      'Never share your secret phrase with anyone. Never input it on any website.';
+  String get revealSecretPhraseScamAlertDescription => 'Never share your secret phrase with anyone. Never input it on any website.';
 
   @override
   String get cipherSettingsPageTitle => 'Encryption Setup';
@@ -510,8 +491,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cipherSettingsPageStandardSubtitle => 'AES-256 + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageStandardDescription =>
-      'Basic encryption with AES-256 and GOST standard KUZNECHIK.';
+  String get cipherSettingsPageStandardDescription => 'Basic encryption with AES-256 and GOST standard KUZNECHIK.';
 
   @override
   String get cipherSettingsPageHybridTitle => 'Hybrid Encryption';
@@ -520,23 +500,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cipherSettingsPageHybridSubtitle => 'CYBER + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageHybridDescription =>
-      'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.';
+  String get cipherSettingsPageHybridDescription => 'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.';
 
   @override
   String get cipherSettingsPageQuantumTitle => 'Quantum-Resistant';
 
   @override
-  String get cipherSettingsPageQuantumSubtitle =>
-      'CYBER + KUZNECHIK + NTRUP1277';
+  String get cipherSettingsPageQuantumSubtitle => 'CYBER + KUZNECHIK + NTRUP1277';
 
   @override
-  String get cipherSettingsPageQuantumDescription =>
-      'Advanced quantum-resistant encryption with NTRUP1277.';
+  String get cipherSettingsPageQuantumDescription => 'Advanced quantum-resistant encryption with NTRUP1277.';
 
   @override
-  String get cipherSettingsPageQuantumWarning =>
-      'Quantum-resistant encryption may impact performance';
+  String get cipherSettingsPageQuantumWarning => 'Quantum-resistant encryption may impact performance';
 
   @override
   String get cipherSettingsPageConfirmButton => 'Confirm';
@@ -560,8 +536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checksumValidationFailed => 'Checksum validation failed';
 
   @override
-  String get proceedDespiteInvalidChecksum =>
-      'Continue despite checksum error?';
+  String get proceedDespiteInvalidChecksum => 'Continue despite checksum error?';
 
   @override
   String get settingsPageTitle => 'Settings';
@@ -621,15 +596,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordSetupPageConfirmPasswordHint => 'Confirm Password';
 
   @override
-  String get passwordSetupPageEmptyWalletNameError =>
-      'Wallet name cannot be empty';
+  String get passwordSetupPageEmptyWalletNameError => 'Wallet name cannot be empty';
 
   @override
   String get passwordSetupPageLongWalletNameError => 'Wallet name is too long';
 
   @override
-  String get passwordSetupPageShortPasswordError =>
-      'Password must be at least 8 characters';
+  String get passwordSetupPageShortPasswordError => 'Password must be at least 8 characters';
 
   @override
   String get passwordSetupPageMismatchPasswordError => 'Passwords do not match';
@@ -641,8 +614,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordSetupPageCreateButton => 'Create Password';
 
   @override
-  String get passwordSetupPageAuthReason =>
-      'Please authenticate to enable quick access';
+  String get passwordSetupPageAuthReason => 'Please authenticate to enable quick access';
 
   @override
   String get passwordSetupPageSeedType => 'Seed';
@@ -663,8 +635,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserSettingsSearchEngine => 'Search Engine';
 
   @override
-  String get browserSettingsSearchEngineDescription =>
-      'Configure your default search engine';
+  String get browserSettingsSearchEngineDescription => 'Configure your default search engine';
 
   @override
   String get browserSettingsSearchEngineTitle => 'Search Engine';
@@ -673,8 +644,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserSettingsContentBlocking => 'Content Blocking';
 
   @override
-  String get browserSettingsContentBlockingDescription =>
-      'Configure content blocking settings';
+  String get browserSettingsContentBlockingDescription => 'Configure content blocking settings';
 
   @override
   String get browserSettingsContentBlockingTitle => 'Content Blocking';
@@ -686,22 +656,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserSettingsCookies => 'Cookies';
 
   @override
-  String get browserSettingsCookiesDescription =>
-      'Allow websites to save and read cookies';
+  String get browserSettingsCookiesDescription => 'Allow websites to save and read cookies';
 
   @override
   String get browserSettingsDoNotTrack => 'Do Not Track';
 
   @override
-  String get browserSettingsDoNotTrackDescription =>
-      'Request websites not to track your browsing';
+  String get browserSettingsDoNotTrackDescription => 'Request websites not to track your browsing';
 
   @override
   String get browserSettingsIncognitoMode => 'Incognito Mode';
 
   @override
-  String get browserSettingsIncognitoModeDescription =>
-      'Browse without saving history or cookies';
+  String get browserSettingsIncognitoModeDescription => 'Browse without saving history or cookies';
 
   @override
   String get browserSettingsPerformance => 'Performance';
@@ -719,26 +686,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserSettingsClearCookies => 'Clear Cookies';
 
   @override
-  String get browserSettingsClearCookiesDescription =>
-      'Delete all cookies stored by websites';
+  String get browserSettingsClearCookiesDescription => 'Delete all cookies stored by websites';
 
   @override
   String get browserSettingsClearCache => 'Clear Cache';
 
   @override
-  String get browserSettingsClearCacheDescription =>
-      'Delete temporary files and images stored during browsing';
+  String get browserSettingsClearCacheDescription => 'Delete temporary files and images stored during browsing';
 
   @override
   String get browserSettingsClearLocalStorage => 'Clear Local Storage';
 
   @override
-  String get browserSettingsClearLocalStorageDescription =>
-      'Delete website data stored locally on your device';
+  String get browserSettingsClearLocalStorageDescription => 'Delete website data stored locally on your device';
 
   @override
-  String get browserSettingsCacheDescription =>
-      'Store website data for faster loading';
+  String get browserSettingsCacheDescription => 'Store website data for faster loading';
 
   @override
   String get genWalletOptionsTitle => 'Generate Wallet';
@@ -753,8 +716,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genWalletOptionsPrivateKeyTitle => 'Private Key';
 
   @override
-  String get genWalletOptionsPrivateKeySubtitle =>
-      'Generate just one private key';
+  String get genWalletOptionsPrivateKeySubtitle => 'Generate just one private key';
 
   @override
   String get addWalletOptionsTitle => 'Add Wallet';
@@ -769,15 +731,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => 'Existing Wallet';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle =>
-      'Import wallet with a 24 secret recovery words';
+  String get addWalletOptionsExistingWalletSubtitle => 'Import wallet with a 24 secret recovery words';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => 'Pair with Ledger';
 
   @override
-  String get addWalletOptionsPairWithLedgerSubtitle =>
-      'Hardware module, Bluetooth';
+  String get addWalletOptionsPairWithLedgerSubtitle => 'Hardware module, Bluetooth';
 
   @override
   String get addWalletOptionsOtherOptions => 'Other options';
@@ -786,8 +746,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWalletOptionsWatchAccountTitle => 'Watch Account';
 
   @override
-  String get addWalletOptionsWatchAccountSubtitle =>
-      'For monitor wallet activity without recovery phrase';
+  String get addWalletOptionsWatchAccountSubtitle => 'For monitor wallet activity without recovery phrase';
 
   @override
   String get currencyConversionTitle => 'Primary Currency';
@@ -799,8 +758,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConversionEngineTitle => 'Currency Engine';
 
   @override
-  String get currencyConversionEngineDescription =>
-      'Engine for fetching currency rates';
+  String get currencyConversionEngineDescription => 'Engine for fetching currency rates';
 
   @override
   String get currencyConversionEngineSelectorTitle => 'Select Currency Engine';
@@ -815,15 +773,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConversionEngineCoingecko => 'Coingecko';
 
   @override
-  String get currencyConversionEngineCoingeckoSubtitle =>
-      'Fetch rates from Coingecko';
+  String get currencyConversionEngineCoingeckoSubtitle => 'Fetch rates from Coingecko';
 
   @override
   String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle =>
-      'Fetch rates from CryptoCompare';
+  String get currencyConversionEngineCryptoCompareSubtitle => 'Fetch rates from CryptoCompare';
 
   @override
   String get restoreWalletOptionsTitle => 'Restore Wallet';
@@ -832,62 +788,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreWalletOptionsBIP39Title => 'BIP39';
 
   @override
-  String get restoreWalletOptionsBIP39Subtitle =>
-      'Restore with Mnemonic phrase';
+  String get restoreWalletOptionsBIP39Subtitle => 'Restore with Mnemonic phrase';
 
   @override
   String get restoreWalletOptionsPrivateKeyTitle => 'Private Key';
 
   @override
-  String get restoreWalletOptionsPrivateKeySubtitle =>
-      'Restore with private key';
+  String get restoreWalletOptionsPrivateKeySubtitle => 'Restore with private key';
 
   @override
   String get restoreWalletOptionsKeyStoreTitle => 'Keystore File';
 
   @override
-  String get restoreWalletOptionsKeyStoreSubtitle =>
-      'Restore wallet using password-encrypted backup file';
+  String get restoreWalletOptionsKeyStoreSubtitle => 'Restore wallet using password-encrypted backup file';
 
   @override
   String get restoreWalletOptionsQRCodeTitle => 'QRcode';
 
   @override
-  String get restoreWalletOptionsQRCodeSubtitle =>
-      'Restore wallet by QRcode scanning';
+  String get restoreWalletOptionsQRCodeSubtitle => 'Restore wallet by QRcode scanning';
 
   @override
   String get argonSettingsModalContentLowMemoryTitle => 'Low Memory';
 
   @override
-  String get argonSettingsModalContentLowMemorySubtitle =>
-      '64KB RAM, 3 iterations';
+  String get argonSettingsModalContentLowMemorySubtitle => '64KB RAM, 3 iterations';
 
   @override
-  String get argonSettingsModalContentLowMemoryDescription =>
-      'Minimal memory usage, suitable for low-end devices.';
+  String get argonSettingsModalContentLowMemoryDescription => 'Minimal memory usage, suitable for low-end devices.';
 
   @override
   String get argonSettingsModalContentOwaspTitle => 'OWASP Default';
 
   @override
-  String get argonSettingsModalContentOwaspSubtitle =>
-      '6.5MB RAM, 2 iterations';
+  String get argonSettingsModalContentOwaspSubtitle => '6.5MB RAM, 2 iterations';
 
   @override
-  String get argonSettingsModalContentOwaspDescription =>
-      'Recommended by OWASP for general use.';
+  String get argonSettingsModalContentOwaspDescription => 'Recommended by OWASP for general use.';
 
   @override
   String get argonSettingsModalContentSecureTitle => 'Secure';
 
   @override
-  String get argonSettingsModalContentSecureSubtitle =>
-      '256MB RAM, 4 iterations';
+  String get argonSettingsModalContentSecureSubtitle => '256MB RAM, 4 iterations';
 
   @override
-  String get argonSettingsModalContentSecureDescription =>
-      'High security with increased memory and iterations.';
+  String get argonSettingsModalContentSecureDescription => 'High security with increased memory and iterations.';
 
   @override
   String get argonSettingsModalContentSecretHint => 'Enter secret (optional)';
@@ -908,8 +854,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => 'No active account';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer =>
-      'Failed to load transfer details';
+  String get confirmTransactionContentFailedLoadTransfer => 'Failed to load transfer details';
 
   @override
   String get confirmTransactionEditGasButtonText => 'Edit gas';
@@ -918,8 +863,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authReason => 'Please authenticate';
 
   @override
-  String get addChainModalContentWarning =>
-      'Beware of network scams and security risks.';
+  String get addChainModalContentWarning => 'Beware of network scams and security risks.';
 
   @override
   String get addChainModalContentApprove => 'Approve';
@@ -943,8 +887,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAddressModalTitle => 'Add Contact';
 
   @override
-  String get addAddressModalDescription =>
-      'Enter the contact name and wallet address to add to your address book.';
+  String get addAddressModalDescription => 'Enter the contact name and wallet address to add to your address book.';
 
   @override
   String get addAddressModalNameHint => 'Name';
@@ -965,8 +908,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => 'Search';
 
   @override
-  String get signMessageModalContentAuthReason =>
-      'Please authenticate to sign the message';
+  String get signMessageModalContentAuthReason => 'Please authenticate to sign the message';
 
   @override
   String signMessageModalContentFailedToSign(Object error) {
@@ -977,8 +919,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signMessageModalContentTitle => 'Sign Message';
 
   @override
-  String get signMessageModalContentDescription =>
-      'Review and sign the following message with your wallet.';
+  String get signMessageModalContentDescription => 'Review and sign the following message with your wallet.';
 
   @override
   String get signMessageModalContentDomain => 'Domain:';
@@ -1008,12 +949,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteWalletModalTitle => 'Delete Wallet';
 
   @override
-  String get deleteWalletModalWarning =>
-      'Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don\'t have access to it, you will permanently lose all funds associated with this account.';
+  String get deleteWalletModalWarning => 'Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don\'t have access to it, you will permanently lose all funds associated with this account.';
 
   @override
-  String get deleteWalletModalSecretPhraseWarning =>
-      'Please make sure you have access to your secret phrase before proceeding.';
+  String get deleteWalletModalSecretPhraseWarning => 'Please make sure you have access to your secret phrase before proceeding.';
 
   @override
   String get deleteWalletModalPasswordHint => 'Enter Password';
@@ -1046,8 +985,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePasswordModalTitle => 'Change Password';
 
   @override
-  String get changePasswordModalDescription =>
-      'Enter your current password and choose a new password to update your wallet security.';
+  String get changePasswordModalDescription => 'Enter your current password and choose a new password to update your wallet security.';
 
   @override
   String get changePasswordModalCurrentPasswordHint => 'Current Password';
@@ -1059,16 +997,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePasswordModalConfirmPasswordHint => 'Confirm New Password';
 
   @override
-  String get changePasswordModalCurrentPasswordEmptyError =>
-      'Current password cannot be empty';
+  String get changePasswordModalCurrentPasswordEmptyError => 'Current password cannot be empty';
 
   @override
-  String get changePasswordModalPasswordLengthError =>
-      'Password must be at least 6 characters';
+  String get changePasswordModalPasswordLengthError => 'Password must be at least 6 characters';
 
   @override
-  String get changePasswordModalPasswordsMismatchError =>
-      'Passwords do not match';
+  String get changePasswordModalPasswordsMismatchError => 'Passwords do not match';
 
   @override
   String get changePasswordModalButton => 'Change Password';
@@ -1077,8 +1012,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPasswordModalTitle => 'Confirm Password';
 
   @override
-  String get confirmPasswordModalDescription =>
-      'Enter your password to continue.';
+  String get confirmPasswordModalDescription => 'Enter your password to continue.';
 
   @override
   String get confirmPasswordModalHint => 'Password';
@@ -1096,8 +1030,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrScannerModalContentTitle => 'Scan';
 
   @override
-  String get qrScannerModalContentCameraInitError =>
-      'Camera initialization error:';
+  String get qrScannerModalContentCameraInitError => 'Camera initialization error:';
 
   @override
   String get chainInfoModalContentTokenTitle => 'Network Token';
@@ -1166,8 +1099,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get watchAssetModalContentTitle => 'Add suggested token';
 
   @override
-  String get watchAssetModalContentDescription =>
-      'Review and add the following token suggested by the app.';
+  String get watchAssetModalContentDescription => 'Review and add the following token suggested by the app.';
 
   @override
   String get watchAssetModalContentTokenLabel => 'Token';
@@ -1196,12 +1128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dappListItemJustNow => 'just now';
 
   @override
-  String get secretRecoveryModalRevealPhraseTitle =>
-      'Reveal Secret Recovery Phrase';
+  String get secretRecoveryModalRevealPhraseTitle => 'Reveal Secret Recovery Phrase';
 
   @override
-  String get secretRecoveryModalRevealPhraseDescription =>
-      'If you ever change browsers or move computers, you will need this Secret Recovery Phrase to access your accounts. Save them somewhere safe and secret.';
+  String get secretRecoveryModalRevealPhraseDescription => 'If you ever change browsers or move computers, you will need this Secret Recovery Phrase to access your accounts. Save them somewhere safe and secret.';
 
   @override
   String get secretRecoveryModalRevealPhraseButton => 'Reveal';
@@ -1210,8 +1140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretRecoveryModalShowKeysTitle => 'Show Private Keys';
 
   @override
-  String get secretRecoveryModalShowKeysDescription =>
-      'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.';
+  String get secretRecoveryModalShowKeysDescription => 'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.';
 
   @override
   String get secretRecoveryModalShowKeysButton => 'Export';
@@ -1220,34 +1149,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretRecoveryModalKeystoreBackupTitle => 'Keystore Backup';
 
   @override
-  String get secretRecoveryModalKeystoreBackupDescription =>
-      'Save your private keys in a password-protected encrypted keystore file. This provides an additional layer of security for your wallet.';
+  String get secretRecoveryModalKeystoreBackupDescription => 'Save your private keys in a password-protected encrypted keystore file. This provides an additional layer of security for your wallet.';
 
   @override
-  String get secretRecoveryModalKeystoreBackupButton =>
-      'Create Keystore Backup';
+  String get secretRecoveryModalKeystoreBackupButton => 'Create Keystore Backup';
 
   @override
   String get backupConfirmationContentTitle => 'Backup Confirmation';
 
   @override
-  String get backupConfirmationWarning =>
-      'WARNING: If you lose or forget your seed phrase in the exact order, you will lose your funds permanently. Never share your seed phrase with anyone or they may steal your funds. BIP39 recovery is strict - any mistake in the words during recovery will result in loss of funds.';
+  String get backupConfirmationWarning => 'WARNING: If you lose or forget your seed phrase in the exact order, you will lose your funds permanently. Never share your seed phrase with anyone or they may steal your funds. BIP39 recovery is strict - any mistake in the words during recovery will result in loss of funds.';
 
   @override
   String get backupConfirmationContentWrittenDown => 'I have written down all';
 
   @override
-  String get backupConfirmationContentSafelyStored =>
-      'I have safely stored the backup';
+  String get backupConfirmationContentSafelyStored => 'I have safely stored the backup';
 
   @override
-  String get backupConfirmationContentWontLose =>
-      'I am sure I won\'t lose the backup';
+  String get backupConfirmationContentWontLose => 'I am sure I won\'t lose the backup';
 
   @override
-  String get backupConfirmationContentNotShare =>
-      'I understand not to share these words with anyone';
+  String get backupConfirmationContentNotShare => 'I understand not to share these words with anyone';
 
   @override
   String get counterMaxValueError => 'Maximum value reached';
@@ -1406,8 +1329,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupWarningTitle => 'Secure Your Keystore File';
 
   @override
-  String get keystoreBackupWarningMessage =>
-      'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.';
+  String get keystoreBackupWarningMessage => 'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.';
 
   @override
   String get keystoreBackupConfirmPasswordHint => 'Confirm Password';
@@ -1428,8 +1350,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupSuccessTitle => 'Backup Created Successfully';
 
   @override
-  String get keystoreBackupSuccessMessage =>
-      'Your keystore file has been created. Remember to keep both the file and your password safe.';
+  String get keystoreBackupSuccessMessage => 'Your keystore file has been created. Remember to keep both the file and your password safe.';
 
   @override
   String get keystoreBackupSaveAsButton => 'Save to File';
@@ -1444,8 +1365,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupSaveFailed => 'Failed to save keystore file';
 
   @override
-  String get keystoreBackupPasswordTooShort =>
-      'Password must be at least 8 characters';
+  String get keystoreBackupPasswordTooShort => 'Password must be at least 8 characters';
 
   @override
   String get keystoreBackupTempLocation => 'Temporary file location';
@@ -1478,8 +1398,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editGasDialogGasLimit => 'Gas Limit';
 
   @override
-  String get editGasDialogInvalidGasValues =>
-      'Invalid gas values. Please check your inputs.';
+  String get editGasDialogInvalidGasValues => 'Invalid gas values. Please check your inputs.';
 
   @override
   String get addLedgerAccountPageAppBarTitle => 'Add Ledger Account';
@@ -1494,8 +1413,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addLedgerAccountPageAddButton => 'Update';
 
   @override
-  String get addLedgerAccountPageNoAccountsSelectedError =>
-      'No accounts selected';
+  String get addLedgerAccountPageNoAccountsSelectedError => 'No accounts selected';
 
   @override
   String get addLedgerAccountPageNoWalletSelectedError => 'No wallet selected';
@@ -1504,8 +1422,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionHistoryTitle => 'Transaction History';
 
   @override
-  String get transactionHistoryDescription =>
-      'Show addresses from transaction history in the address book.';
+  String get transactionHistoryDescription => 'Show addresses from transaction history in the address book.';
 
   @override
   String get zilStakePageTitle => 'Zilliqa Staking';
@@ -1571,8 +1488,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ledgerConnectPageInitializing => 'Initializing...';
 
   @override
-  String get ledgerConnectPageScanningStatus =>
-      'Scanning for Ledger devices...';
+  String get ledgerConnectPageScanningStatus => 'Scanning for Ledger devices...';
 
   @override
   String ledgerConnectPageFoundDevicesStatus(int count) {
@@ -1585,8 +1501,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanFinishedNoDevices =>
-      'Scan finished. No devices found.';
+  String get ledgerConnectPageScanFinishedNoDevices => 'Scan finished. No devices found.';
 
   @override
   String ledgerConnectPageScanFinishedWithDevices(int count) {
@@ -1594,8 +1509,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectingStatus(
-      String deviceName, String connectionType) {
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return 'Connecting to $deviceName ($connectionType)...';
   }
 
@@ -1608,8 +1522,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedGenericContent(
-      String deviceName, String error) {
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
     return 'Could not connect to $deviceName.\nError: $error';
   }
 
@@ -1622,8 +1535,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ledgerConnectPageGoToSettings => 'Go to Settings';
 
   @override
-  String get ledgerConnectPageNoDevicesFound =>
-      'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.';
+  String get ledgerConnectPageNoDevicesFound => 'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.';
 
   @override
   String get durationDay => 'd';
@@ -1718,12 +1630,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get web3ErrorRequestInProgress =>
-      'A similar request is already being processed';
+  String get web3ErrorRequestInProgress => 'A similar request is already being processed';
 
   @override
-  String get web3ErrorNotConnected =>
-      'This domain is not connected. Please connect first.';
+  String get web3ErrorNotConnected => 'This domain is not connected. Please connect first.';
 
   @override
   String web3ErrorInvalidParams(String method, String params) {
@@ -1731,8 +1641,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get web3ErrorAddressNotAuthorized =>
-      'The requested address is not authorized';
+  String get web3ErrorAddressNotAuthorized => 'The requested address is not authorized';
 
   @override
   String get web3ErrorUserRejected => 'User rejected';
@@ -1749,24 +1658,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get web3ErrorNoNativeToken => 'No native token found';
 
   @override
-  String get web3ErrorPermissionNotSupported =>
-      'Only eth_accounts permission is supported';
+  String get web3ErrorPermissionNotSupported => 'Only eth_accounts permission is supported';
 
   @override
-  String get web3ErrorNotAuthorizedSuggestTokens =>
-      'This domain is not authorized to suggest tokens.';
+  String get web3ErrorNotAuthorizedSuggestTokens => 'This domain is not authorized to suggest tokens.';
 
   @override
-  String get web3ErrorInvalidTokenType =>
-      'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.';
+  String get web3ErrorInvalidTokenType => 'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.';
 
   @override
-  String get web3ErrorMissingTokenFields =>
-      'Missing required fields: address, symbol, or decimals.';
+  String get web3ErrorMissingTokenFields => 'Missing required fields: address, symbol, or decimals.';
 
   @override
-  String get web3ErrorMissingChainFields =>
-      'Missing required fields for wallet_addEthereumChain';
+  String get web3ErrorMissingChainFields => 'Missing required fields for wallet_addEthereumChain';
 
   @override
   String get web3ErrorNoValidRpcUrls => 'No valid HTTP RPC URLs provided';
@@ -1775,8 +1679,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get web3ErrorMissingChainId => 'Missing required field: chainId';
 
   @override
-  String get web3ErrorChainNotAdded =>
-      'The requested chain has not been added. Use wallet_addEthereumChain first.';
+  String get web3ErrorChainNotAdded => 'The requested chain has not been added. Use wallet_addEthereumChain first.';
 
   @override
   String get bipPurposeSetupPageTitle => 'Bitcoin Address';
@@ -1797,8 +1700,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bip49Name => 'BIP49 (SegWit)';
 
   @override
-  String get bip49Description =>
-      'P2WPKH-nested-in-P2SH - Addresses starting with 3';
+  String get bip49Description => 'P2WPKH-nested-in-P2SH - Addresses starting with 3';
 
   @override
   String get bip44Name => 'BIP44 (Legacy)';
@@ -1840,16 +1742,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNetworkPageButton => 'Add Network';
 
   @override
-  String get addNetworkPageErrorRequired =>
-      'Please fill in all required fields';
+  String get addNetworkPageErrorRequired => 'Please fill in all required fields';
 
   @override
   String get addNetworkPageErrorInvalidRpc => 'Please enter a valid RPC URL';
 
   @override
-  String get addNetworkPageErrorInvalidChainId =>
-      'Please enter a valid Chain ID';
+  String get addNetworkPageErrorInvalidChainId => 'Please enter a valid Chain ID';
 
   @override
   String get addNetworkPageSuccess => 'Network added successfully';
+
+  @override
+  String get qrCodeUnrecognizedError => 'QR code not recognized. Please use a supported format.';
+
+  @override
+  String get qrCodeScanError => 'Failed to read QR code. Please try again.';
+
+  @override
+  String get qrCodeEmptySeedError => 'QR code contains no seed words.';
+
+  @override
+  String get qrCodeInvalidWordsError => 'QR code contains invalid BIP39 words.';
+
+  @override
+  String get qrCodeInvalidKeyError => 'QR code contains an invalid private key.';
 }

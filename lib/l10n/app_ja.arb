@@ -580,5 +580,10 @@
   "addNetworkPageErrorRequired": "すべての必須項目を入力してください",
   "addNetworkPageErrorInvalidRpc": "有効なRPC URLを入力してください",
   "addNetworkPageErrorInvalidChainId": "有効なチェーンIDを入力してください",
-  "addNetworkPageSuccess": "ネットワークが追加されました"
+  "addNetworkPageSuccess": "ネットワークが追加されました",
+  "qrCodeUnrecognizedError": "QRコードを認識できません。サポートされているフォーマットを使用してください。",
+  "qrCodeScanError": "QRコードの読み取りに失敗しました。再試行してください。",
+  "qrCodeEmptySeedError": "QRコードにシードワードが含まれていません。",
+  "qrCodeInvalidWordsError": "QRコードに無効なBIP39ワードが含まれています。",
+  "qrCodeInvalidKeyError": "QRコードに無効な秘密鍵が含まれています。"
 }

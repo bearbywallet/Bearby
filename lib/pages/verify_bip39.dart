@@ -36,8 +36,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   List<int> _indexes = [];
-  final List<String> _verifyWords =
-      List.filled(_maxNumbers, '', growable: false);
+  final List<String> _verifyWords = List.filled(_maxNumbers, '');
 
   void _generateIndexes({bool useSetState = true}) {
     if (_bip39List == null || _bip39List!.isEmpty) return;

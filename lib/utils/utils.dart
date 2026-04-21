@@ -59,7 +59,11 @@ extension SecureListExtension on List<String> {
     for (var i = 0; i < length; i++) {
       this[i] = '';
     }
-    clear();
+    // Wrap clear() — fixed-length lists (List.filled growable:false) throw on clear().
+    // Zeroing values above is the security operation; clear() is best-effort.
+    try {
+      clear();
+    } catch (_) {}
   }
 }
 

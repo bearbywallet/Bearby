@@ -21,8 +21,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restoreRKStorageTitle => 'ZilPay 1.0에서 2.0으로 마이그레이션';
 
   @override
-  String get restoreRKStorageAccountsPrompt =>
-      'ZilPay 2.0으로 마이그레이션할 계정. 비밀번호 입력.';
+  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0으로 마이그레이션할 계정. 비밀번호 입력.';
 
   @override
   String get restoreRKStoragePasswordHint => '비밀번호';
@@ -180,22 +179,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityPageEnsDomains => '주소 표시줄에 ENS 도메인 표시';
 
   @override
-  String get securityPageEnsDescription =>
-      '이 기능을 사용하면 IP 주소가 IPFS 타사 서비스에 노출될 수 있습니다.';
+  String get securityPageEnsDescription => '이 기능을 사용하면 IP 주소가 IPFS 타사 서비스에 노출될 수 있습니다.';
 
   @override
   String get securityPageIpfsGateway => 'IPFS 게이트웨이';
 
   @override
-  String get securityPageIpfsDescription =>
-      'Bearby는 타사 서비스를 사용하여 IPFS에 저장된 NFT 이미지를 표시하고, 브라우저 주소 표시줄에 입력된 ENS(ZNS) 주소 관련 정보를 표시하며, 다양한 토큰 아이콘을 가져옵니다. 이를 사용할 때 IP 주소가 노출될 수 있습니다.';
+  String get securityPageIpfsDescription => 'Bearby는 타사 서비스를 사용하여 IPFS에 저장된 NFT 이미지를 표시하고, 브라우저 주소 표시줄에 입력된 ENS(ZNS) 주소 관련 정보를 표시하며, 다양한 토큰 아이콘을 가져옵니다. 이를 사용할 때 IP 주소가 노출될 수 있습니다.';
 
   @override
   String get securityPageTokensFetcherTitle => '토큰 가져오기';
 
   @override
-  String get securityPageTokensFetcherDescription =>
-      '활성화되면 토큰이 서버에서 자동으로 가져와 추가될 수 있습니다.';
+  String get securityPageTokensFetcherDescription => '활성화되면 토큰이 서버에서 자동으로 가져와 추가될 수 있습니다.';
 
   @override
   String get securityPageNodeRanking => '노드 랭킹';
@@ -249,8 +245,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretKeyScamAlertTitle => '사기 경고';
 
   @override
-  String get revealSecretKeyScamAlertMessage =>
-      '비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
+  String get revealSecretKeyScamAlertMessage => '비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
 
   @override
   String get revealSecretKeySecurityTimer => '보안 타이머';
@@ -288,8 +283,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appearanceSettingsPageCompactNumbersTitle => '압축 숫자';
 
   @override
-  String get appearanceSettingsPageCompactNumbersDescription =>
-      '압축 숫자 표시 활성화 (예: 20K 대신 20,000).';
+  String get appearanceSettingsPageCompactNumbersDescription => '압축 숫자 표시 활성화 (예: 20K 대신 20,000).';
 
   @override
   String get appearanceSettingsPageDeviceSettingsTitle => '기기 설정';
@@ -298,8 +292,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appearanceSettingsPageDeviceSettingsSubtitle => '시스템 기본값';
 
   @override
-  String get appearanceSettingsPageDeviceSettingsDescription =>
-      '기기 모양에 기본 설정. 시스템 설정에 따라 지갑 테마가 자동 조정됩니다.';
+  String get appearanceSettingsPageDeviceSettingsDescription => '기기 모양에 기본 설정. 시스템 설정에 따라 지갑 테마가 자동 조정됩니다.';
 
   @override
   String get appearanceSettingsPageDarkModeTitle => '다크 모드';
@@ -308,8 +301,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appearanceSettingsPageDarkModeSubtitle => '항상 다크';
 
   @override
-  String get appearanceSettingsPageDarkModeDescription =>
-      '기기 설정과 상관없이 다크 테마 항상 활성화.';
+  String get appearanceSettingsPageDarkModeDescription => '기기 설정과 상관없이 다크 테마 항상 활성화.';
 
   @override
   String get appearanceSettingsPageLightModeTitle => '라이트 모드';
@@ -318,8 +310,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appearanceSettingsPageLightModeSubtitle => '항상 라이트';
 
   @override
-  String get appearanceSettingsPageLightModeDescription =>
-      '기기 설정과 상관없이 라이트 테마 항상 활성화.';
+  String get appearanceSettingsPageLightModeDescription => '기기 설정과 상관없이 라이트 테마 항상 활성화.';
 
   @override
   String get loginPageBiometricReason => '인증하세요';
@@ -452,8 +443,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notificationsSettingsPagePushTitle => '푸시 알림';
 
   @override
-  String get notificationsSettingsPagePushDescription =>
-      '거래 전송 및 확인 시 알림, 연결된 앱 알림.';
+  String get notificationsSettingsPagePushDescription => '거래 전송 및 확인 시 알림, 연결된 앱 알림.';
 
   @override
   String get notificationsSettingsPageWalletsTitle => '지갑';
@@ -486,8 +476,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretPhraseScamAlertTitle => '사기 경고';
 
   @override
-  String get revealSecretPhraseScamAlertDescription =>
-      '비밀 구문을 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
+  String get revealSecretPhraseScamAlertDescription => '비밀 구문을 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
 
   @override
   String get cipherSettingsPageTitle => '암호화 설정';
@@ -502,8 +491,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cipherSettingsPageStandardSubtitle => 'AES-256 + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageStandardDescription =>
-      'AES-256과 GOST 표준 KUZNECHIK 기본 암호화.';
+  String get cipherSettingsPageStandardDescription => 'AES-256과 GOST 표준 KUZNECHIK 기본 암호화.';
 
   @override
   String get cipherSettingsPageHybridTitle => '하이브리드 암호화';
@@ -512,15 +500,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cipherSettingsPageHybridSubtitle => 'CYBER + KUZNECHIK-GOST';
 
   @override
-  String get cipherSettingsPageHybridDescription =>
-      'CYBER와 KUZNECHIK-GOST 알고리즘 결합 하이브리드 암호화.';
+  String get cipherSettingsPageHybridDescription => 'CYBER와 KUZNECHIK-GOST 알고리즘 결합 하이브리드 암호화.';
 
   @override
   String get cipherSettingsPageQuantumTitle => '양자 내성';
 
   @override
-  String get cipherSettingsPageQuantumSubtitle =>
-      'CYBER + KUZNECHIK + NTRUP1277';
+  String get cipherSettingsPageQuantumSubtitle => 'CYBER + KUZNECHIK + NTRUP1277';
 
   @override
   String get cipherSettingsPageQuantumDescription => 'NTRUP1277 고급 양자 내성 암호화.';
@@ -706,15 +692,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get browserSettingsClearCache => '캐시 지우기';
 
   @override
-  String get browserSettingsClearCacheDescription =>
-      '브라우징 중 저장된 임시 파일 및 이미지 삭제';
+  String get browserSettingsClearCacheDescription => '브라우징 중 저장된 임시 파일 및 이미지 삭제';
 
   @override
   String get browserSettingsClearLocalStorage => '로컬 스토리지 지우기';
 
   @override
-  String get browserSettingsClearLocalStorageDescription =>
-      '기기에 저장된 웹사이트 데이터 삭제';
+  String get browserSettingsClearLocalStorageDescription => '기기에 저장된 웹사이트 데이터 삭제';
 
   @override
   String get browserSettingsCacheDescription => '더 빠른 로드를 위해 웹사이트 데이터 저장';
@@ -795,8 +779,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle =>
-      'CryptoCompare에서 환율 가져오기';
+  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompare에서 환율 가져오기';
 
   @override
   String get restoreWalletOptionsTitle => '지갑 복원';
@@ -832,8 +815,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get argonSettingsModalContentLowMemorySubtitle => '64KB RAM, 3 반복';
 
   @override
-  String get argonSettingsModalContentLowMemoryDescription =>
-      '저사양 기기에 적합한 최소 메모리 사용.';
+  String get argonSettingsModalContentLowMemoryDescription => '저사양 기기에 적합한 최소 메모리 사용.';
 
   @override
   String get argonSettingsModalContentOwaspTitle => 'OWASP 기본';
@@ -967,8 +949,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteWalletModalTitle => '지갑 삭제';
 
   @override
-  String get deleteWalletModalWarning =>
-      '경고: 이 작업 취소 불가. 비밀 구문으로만 지갑 복구 가능. 액세스 없으면 계정 관련 모든 자금 영구 손실.';
+  String get deleteWalletModalWarning => '경고: 이 작업 취소 불가. 비밀 구문으로만 지갑 복구 가능. 액세스 없으면 계정 관련 모든 자금 영구 손실.';
 
   @override
   String get deleteWalletModalSecretPhraseWarning => '진행 전에 비밀 구문 액세스 확인하세요.';
@@ -1004,8 +985,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changePasswordModalTitle => '비밀번호 변경';
 
   @override
-  String get changePasswordModalDescription =>
-      '현재 비밀번호 입력 후 새 비밀번호 선택하여 지갑 보안 업데이트.';
+  String get changePasswordModalDescription => '현재 비밀번호 입력 후 새 비밀번호 선택하여 지갑 보안 업데이트.';
 
   @override
   String get changePasswordModalCurrentPasswordHint => '현재 비밀번호';
@@ -1151,8 +1131,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretRecoveryModalRevealPhraseTitle => '비밀 복구 구문 공개';
 
   @override
-  String get secretRecoveryModalRevealPhraseDescription =>
-      '브라우저 변경 또는 컴퓨터 이동 시 계정 액세스에 이 비밀 복구 구문 필요. 안전한 곳에 비밀스럽게 저장하세요.';
+  String get secretRecoveryModalRevealPhraseDescription => '브라우저 변경 또는 컴퓨터 이동 시 계정 액세스에 이 비밀 복구 구문 필요. 안전한 곳에 비밀스럽게 저장하세요.';
 
   @override
   String get secretRecoveryModalRevealPhraseButton => '공개';
@@ -1161,8 +1140,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretRecoveryModalShowKeysTitle => '개인 키 표시';
 
   @override
-  String get secretRecoveryModalShowKeysDescription =>
-      '경고: 이 키 공개 금지. 개인 키 소유자는 계정 자산 도난 가능.';
+  String get secretRecoveryModalShowKeysDescription => '경고: 이 키 공개 금지. 개인 키 소유자는 계정 자산 도난 가능.';
 
   @override
   String get secretRecoveryModalShowKeysButton => '내보내기';
@@ -1171,8 +1149,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretRecoveryModalKeystoreBackupTitle => '키스토어 백업';
 
   @override
-  String get secretRecoveryModalKeystoreBackupDescription =>
-      '비밀번호 보호 암호화 키스토어 파일에 개인 키 저장. 지갑 보안 추가 계층 제공.';
+  String get secretRecoveryModalKeystoreBackupDescription => '비밀번호 보호 암호화 키스토어 파일에 개인 키 저장. 지갑 보안 추가 계층 제공.';
 
   @override
   String get secretRecoveryModalKeystoreBackupButton => '키스토어 백업 생성';
@@ -1181,8 +1158,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get backupConfirmationContentTitle => '백업 확인';
 
   @override
-  String get backupConfirmationWarning =>
-      '경고: 정확한 순서의 시드 구문 분실 또는 잊음 시 자금 영구 손실. 시드 구문 공유 금지. 복구 시 단어 오류 시 자금 손실.';
+  String get backupConfirmationWarning => '경고: 정확한 순서의 시드 구문 분실 또는 잊음 시 자금 영구 손실. 시드 구문 공유 금지. 복구 시 단어 오류 시 자금 손실.';
 
   @override
   String get backupConfirmationContentWrittenDown => '모두 적음';
@@ -1353,8 +1329,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get keystoreBackupWarningTitle => '키스토어 파일 보호';
 
   @override
-  String get keystoreBackupWarningMessage =>
-      '키스토어 파일에 암호화된 개인 키 포함. 안전한 위치에 보관하고 공유 금지. 파일 복호화에 생성 비밀번호 필요.';
+  String get keystoreBackupWarningMessage => '키스토어 파일에 암호화된 개인 키 포함. 안전한 위치에 보관하고 공유 금지. 파일 복호화에 생성 비밀번호 필요.';
 
   @override
   String get keystoreBackupConfirmPasswordHint => '비밀번호 확인';
@@ -1534,8 +1509,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectingStatus(
-      String deviceName, String connectionType) {
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return '$deviceName ($connectionType) 연결 중...';
   }
 
@@ -1548,8 +1522,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedGenericContent(
-      String deviceName, String error) {
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
     return '$deviceName 연결 불가.\n오류: $error';
   }
 
@@ -1562,8 +1535,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ledgerConnectPageGoToSettings => '설정으로 이동';
 
   @override
-  String get ledgerConnectPageNoDevicesFound =>
-      '기기 없음. Ledger 전원 켜기, 잠금 해제, Bluetooth/USB 활성화 확인.\n아래로 끌기 또는 새로고침 아이콘으로 다시 스캔.';
+  String get ledgerConnectPageNoDevicesFound => '기기 없음. Ledger 전원 켜기, 잠금 해제, Bluetooth/USB 활성화 확인.\n아래로 끌기 또는 새로고침 아이콘으로 다시 스캔.';
 
   @override
   String get durationDay => '일';
@@ -1692,16 +1664,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get web3ErrorNotAuthorizedSuggestTokens => '이 도메인은 토큰 제안 권한이 없습니다.';
 
   @override
-  String get web3ErrorInvalidTokenType =>
-      'wallet_watchAsset에 대한 매개변수가 유효하지 않습니다. ERC20 토큰 유형이 필요합니다.';
+  String get web3ErrorInvalidTokenType => 'wallet_watchAsset에 대한 매개변수가 유효하지 않습니다. ERC20 토큰 유형이 필요합니다.';
 
   @override
-  String get web3ErrorMissingTokenFields =>
-      '필수 필드가 없습니다: address, symbol 또는 decimals.';
+  String get web3ErrorMissingTokenFields => '필수 필드가 없습니다: address, symbol 또는 decimals.';
 
   @override
-  String get web3ErrorMissingChainFields =>
-      'wallet_addEthereumChain에 대한 필수 필드가 없습니다';
+  String get web3ErrorMissingChainFields => 'wallet_addEthereumChain에 대한 필수 필드가 없습니다';
 
   @override
   String get web3ErrorNoValidRpcUrls => '유효한 HTTP RPC URL이 제공되지 않았습니다';
@@ -1710,8 +1679,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get web3ErrorMissingChainId => '필수 필드가 없습니다: chainId';
 
   @override
-  String get web3ErrorChainNotAdded =>
-      '요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.';
+  String get web3ErrorChainNotAdded => '요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.';
 
   @override
   String get bipPurposeSetupPageTitle => '비트코인 주소';
@@ -1784,4 +1752,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get addNetworkPageSuccess => '네트워크가 추가되었습니다';
+
+  @override
+  String get qrCodeUnrecognizedError => 'QR 코드를 인식할 수 없습니다. 지원되는 형식을 사용하세요.';
+
+  @override
+  String get qrCodeScanError => 'QR 코드를 읽지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String get qrCodeEmptySeedError => 'QR 코드에 시드 단어가 없습니다.';
+
+  @override
+  String get qrCodeInvalidWordsError => 'QR 코드에 유효하지 않은 BIP39 단어가 있습니다.';
+
+  @override
+  String get qrCodeInvalidKeyError => 'QR 코드에 유효하지 않은 개인 키가 있습니다.';
 }
