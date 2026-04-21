@@ -221,7 +221,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
 
     try {
       final l10n = AppLocalizations.of(context)!;
-      final result = await FilePicker.platform.pickFiles(type: FileType.any);
+      final result = await FilePicker.pickFiles(type: FileType.any);
 
       if (result == null ||
           result.files.isEmpty ||

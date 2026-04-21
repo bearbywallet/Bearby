@@ -147,7 +147,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
           ),
         );
       } else {
-        String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+        String? outputDirectory = await FilePicker.getDirectoryPath(
           dialogTitle: l10n.keystoreBackupSaveDialogTitle,
         );
 
