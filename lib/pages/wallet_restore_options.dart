@@ -61,41 +61,28 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
       context: context,
       onScanned: (String qrData) async {
         try {
-          final values = parseQRSecretData(qrData);
-          final String? seed = values['seed'];
-          final String? key = values['key'];
-
-          // Try to process seed phrase from QR
-          if (seed != null && context.mounted) {
-            await _processSeedFromQR(context, seed);
-            return;
-          }
-
-          // Try to process private key from QR
-          if (key != null && context.mounted) {
-            await _processKeyFromQR(context, key);
-            return;
-          }
-
-          // Try to parse as plain BIP39 words
-          final words =
-              qrData.split(' ').where((word) => word.isNotEmpty).toList();
-          final wordCount = words.length;
-
-          if ([12, 15, 18, 21, 24].contains(wordCount) && context.mounted) {
-            final errorIndexes =
-                (await checkNotExistsBip39Words(words: words, lang: 'english'))
-                    .map((e) => e.toInt())
-                    .toList();
-
-            if (errorIndexes.isEmpty && context.mounted) {
-              context.push(AppRoutes.passSetup, extra: {'bip39': words, 'chain': _chain});
-              return;
-            }
-          }
-
-          if (context.mounted) {
-            Navigator.pop(context);
+          final result = parseAnyQrSecret(qrData);
+          switch (result.kind) {
+            case QrSecretKind.bearby:
+              final values = parseQRSecretData(qrData);
+              final seed = values['seed'];
+              final key = values['key'];
+              if (seed != null && context.mounted) {
+                await _processSeedFromQR(context, seed);
+                return;
+              }
+              if (key != null && context.mounted) {
+                await _processKeyFromQR(context, key);
+                return;
+              }
+              if (context.mounted) Navigator.pop(context);
+            case QrSecretKind.bip39Mnemonic:
+              if (context.mounted) await _processSeedFromQR(context, result.payload!);
+            case QrSecretKind.wifPrivateKey:
+            case QrSecretKind.hexPrivateKey:
+              if (context.mounted) await _processKeyFromQR(context, result.payload!);
+            case QrSecretKind.unknown:
+              if (context.mounted) Navigator.pop(context);
           }
         } catch (e) {
           debugPrint("QR scanning error: $e");

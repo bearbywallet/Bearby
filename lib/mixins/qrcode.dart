@@ -1,5 +1,79 @@
 import 'package:bearby/config/ftokens.dart';
 
+enum QrSecretKind { bearby, bip39Mnemonic, wifPrivateKey, hexPrivateKey, unknown }
+
+class QrSecretResult {
+  final QrSecretKind kind;
+
+  /// Normalized payload:
+  /// - bearby        → null; caller uses parseQRSecretData on the original string
+  /// - bip39Mnemonic → single-space joined, trimmed mnemonic string
+  /// - wifPrivateKey → raw WIF string (trimmed)
+  /// - hexPrivateKey → lowercase 64-char hex WITHOUT 0x prefix
+  /// - unknown       → null
+  final String? payload;
+
+  /// Only set for [QrSecretKind.bearby]: the chain prefix (e.g. "ETH", "ZIL").
+  final String? chain;
+
+  const QrSecretResult({required this.kind, this.payload, this.chain});
+}
+
+final _wifCompressedRegex = RegExp(r'^[KL][1-9A-HJ-NP-Za-km-z]{51}$');
+final _wifUncompressedRegex = RegExp(r'^5[1-9A-HJ-NP-Za-km-z]{50}$');
+final _hexKeyRegex = RegExp(r'^(?:0[xX])?([0-9a-fA-F]{64})$');
+final _bip39WordRegex = RegExp(r'^[a-z]+$');
+
+/// Detects and parses any supported QR secret format:
+/// - Bearby format (`chain:?seed=...` / `chain:?key=...`)
+/// - Plain BIP39 mnemonic (12/15/18/21/24 lowercase words)
+/// - Bitcoin WIF private key (K.../L... 52 chars or 5... 51 chars)
+/// - Plain hex private key (64 hex chars, optional 0x prefix)
+QrSecretResult parseAnyQrSecret(String qrData) {
+  final trimmed = qrData.trim();
+  if (trimmed.isEmpty) return const QrSecretResult(kind: QrSecretKind.unknown);
+
+  // 1. Bearby format: chain:?seed=... or chain:?key=...
+  if (trimmed.contains(':?')) {
+    final parsed = parseQRSecretData(trimmed);
+    if (parsed.containsKey('chain')) {
+      return QrSecretResult(
+        kind: QrSecretKind.bearby,
+        chain: parsed['chain'],
+      );
+    }
+  }
+
+  // 2. Plain BIP39 mnemonic: space-separated lowercase alpha words, valid count
+  final words =
+      trimmed.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+  const validWordCounts = {12, 15, 18, 21, 24};
+  if (validWordCounts.contains(words.length) &&
+      words.every((w) => _bip39WordRegex.hasMatch(w))) {
+    return QrSecretResult(
+      kind: QrSecretKind.bip39Mnemonic,
+      payload: words.join(' '),
+    );
+  }
+
+  // 3. Bitcoin WIF key
+  if (_wifCompressedRegex.hasMatch(trimmed) ||
+      _wifUncompressedRegex.hasMatch(trimmed)) {
+    return QrSecretResult(kind: QrSecretKind.wifPrivateKey, payload: trimmed);
+  }
+
+  // 4. Plain hex private key (64 hex chars, optional 0x prefix)
+  final hexMatch = _hexKeyRegex.firstMatch(trimmed);
+  if (hexMatch != null) {
+    return QrSecretResult(
+      kind: QrSecretKind.hexPrivateKey,
+      payload: hexMatch.group(1)!.toLowerCase(),
+    );
+  }
+
+  return const QrSecretResult(kind: QrSecretKind.unknown);
+}
+
 String generateCryptoUrl({
   required String address,
   required String chain,
