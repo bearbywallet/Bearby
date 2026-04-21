@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:bearby/components/bip_purpose_selector.dart';
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
-import 'package:bearby/components/derive_path_selector.dart';
 import 'package:bearby/components/enable_card.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -54,7 +53,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
   int _selectedPurposeIndex = 0;
-  DerivePathType _derivePathType = DerivePathType.addressIndex;
   bool _initialized = false;
 
   @override
@@ -104,7 +102,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
     _network = network;
     _createWallet = createWallet ?? true;
-    _derivePathType = defaultDerivePathType(network.slip44);
     _walletNameController.text =
         _createWallet ? productName : appState.wallet?.walletName ?? "";
 
@@ -218,8 +215,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 .purpose
             : kBip44Purpose;
 
-        final derivePath = buildDerivePath(
-          type: _derivePathType,
+        final derivePath = defaultDerivePath(
           bipPurpose: bipPurpose,
           slip44: _network!.slip44,
         );
@@ -280,8 +276,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 .purpose
             : kBip44Purpose;
 
-        final updateDerivePath = buildDerivePath(
-          type: _derivePathType,
+        final updateDerivePath = defaultDerivePath(
           bipPurpose: updateBipPurpose,
           slip44: _network!.slip44,
         );
@@ -377,22 +372,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   disabled: _loading,
                 ),
               if (_network?.slip44 == kBitcoinlip44) const SizedBox(height: 16),
-              DerivePathSelector(
-                type: _derivePathType,
-                bipPurpose: _network?.slip44 == kBitcoinlip44
-                    ? BipPurposeSelector.getBipPurposeOptions(
-                                AppLocalizations.of(context)!)[
-                            _selectedPurposeIndex]
-                        .purpose
-                    : kBip44Purpose,
-                slip44: _network?.slip44 ?? 0,
-                onChanged: (type) {
-                  setState(() {
-                    _derivePathType = type;
-                  });
-                },
-                disabled: _loading,
-              ),
               const SizedBox(height: 16),
               RoundedLoadingButton(
                 color: theme.primaryPurple,

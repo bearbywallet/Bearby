@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
-import 'package:bearby/components/derive_path_selector.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/option_list.dart';
 import 'package:bearby/config/argon.dart';
-import 'package:bearby/config/derive_path.dart';
 import 'package:bearby/src/rust/models/settings.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -14,13 +12,9 @@ void showEncryptionSettingsModal({
   required BuildContext context,
   required int selectedCipherIndex,
   required WalletArgonParamsInfo argonParams,
-  required int slip44,
-  required int bipPurpose,
-  required DerivePathType derivePathType,
   required Function(
     int cipherIndex,
     WalletArgonParamsInfo argonParams,
-    DerivePathType derivePathType,
   ) onSettingsChanged,
 }) {
   showModalBottomSheet<void>(
@@ -39,9 +33,6 @@ void showEncryptionSettingsModal({
         child: _EncryptionSettingsModalContent(
           selectedCipherIndex: selectedCipherIndex,
           argonParams: argonParams,
-          slip44: slip44,
-          bipPurpose: bipPurpose,
-          derivePathType: derivePathType,
           onSettingsChanged: onSettingsChanged,
         ),
       );
@@ -52,21 +43,14 @@ void showEncryptionSettingsModal({
 class _EncryptionSettingsModalContent extends StatefulWidget {
   final int selectedCipherIndex;
   final WalletArgonParamsInfo argonParams;
-  final int slip44;
-  final int bipPurpose;
-  final DerivePathType derivePathType;
   final Function(
     int cipherIndex,
     WalletArgonParamsInfo argonParams,
-    DerivePathType derivePathType,
   ) onSettingsChanged;
 
   const _EncryptionSettingsModalContent({
     required this.selectedCipherIndex,
     required this.argonParams,
-    required this.slip44,
-    required this.bipPurpose,
-    required this.derivePathType,
     required this.onSettingsChanged,
   });
 
@@ -83,7 +67,6 @@ class _EncryptionSettingsModalContentState
 
   late int _selectedCipherIndex;
   late int _selectedArgonIndex;
-  late DerivePathType _derivePathType;
 
   @override
   void initState() {
@@ -91,7 +74,6 @@ class _EncryptionSettingsModalContentState
     _selectedCipherIndex = widget.selectedCipherIndex;
     _selectedArgonIndex = _getInitialArgonIndex();
     _secretController.text = widget.argonParams.secret;
-    _derivePathType = widget.derivePathType;
   }
 
   int _getInitialArgonIndex() {
@@ -203,16 +185,6 @@ class _EncryptionSettingsModalContentState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DerivePathSelector(
-                    type: _derivePathType,
-                    bipPurpose: widget.bipPurpose,
-                    slip44: widget.slip44,
-                    onChanged: (type) {
-                      setState(() {
-                        _derivePathType = type;
-                      });
-                    },
-                  ),
                   const SizedBox(height: 16),
                   OptionsList(
                     options: List.generate(
@@ -359,7 +331,6 @@ class _EncryptionSettingsModalContentState
                   widget.onSettingsChanged(
                     _selectedCipherIndex,
                     _getSelectedArgonParams(),
-                    _derivePathType,
                   );
                   Navigator.pop(context);
                 },

@@ -44,8 +44,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   int _selectedPurposeIndex = 0;
   int _selectedCipherIndex = CipherDefaults.defaultCipherIndex;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
-  DerivePathType _derivePathType = DerivePathType.addressIndex;
-
   late AppState _appState;
 
   List<String> _authMethods = [];
@@ -94,10 +92,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
         if (_chain?.slip44 == kZilliqaSlip44) {
           _zilLegacy = true;
-        }
-
-        if (_chain != null) {
-          _derivePathType = defaultDerivePathType(_chain!.slip44);
         }
 
         _updatedArgs = true;
@@ -246,8 +240,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         bipPurpose = kBip44Purpose;
       }
 
-      final derivePath = buildDerivePath(
-        type: _derivePathType,
+      final derivePath = defaultDerivePath(
         bipPurpose: bipPurpose,
         slip44: _chain!.slip44,
       );
@@ -328,31 +321,17 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   }
 
   void _showEncryptionModal() {
-    final l10n = AppLocalizations.of(context)!;
-    final int bipPurpose;
-    if (_chain?.slip44 == kBitcoinlip44) {
-      final options = BipPurposeSelector.getBipPurposeOptions(l10n);
-      bipPurpose = options[_selectedPurposeIndex].purpose;
-    } else {
-      bipPurpose = kBip44Purpose;
-    }
-
     showEncryptionSettingsModal(
       context: context,
       selectedCipherIndex: _selectedCipherIndex,
       argonParams: _argonParams,
-      slip44: _chain?.slip44 ?? 0,
-      bipPurpose: bipPurpose,
-      derivePathType: _derivePathType,
       onSettingsChanged: (
         cipherIndex,
         argonParams,
-        derivePathType,
       ) {
         setState(() {
           _selectedCipherIndex = cipherIndex;
           _argonParams = argonParams;
-          _derivePathType = derivePathType;
         });
       },
     );
