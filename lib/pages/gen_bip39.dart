@@ -29,7 +29,7 @@ class SecretPhraseGeneratorPage extends StatefulWidget {
 class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
     with StatusBarMixin {
   List<String> _mnemonicWords = [];
-  var _count = 12;
+  var _count = 24;
   bool _hasBackupWords = false;
   bool _isCopied = false;
   NetworkConfigInfo? _chain;
