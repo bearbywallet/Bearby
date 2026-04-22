@@ -122,6 +122,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
                                 child: MnemonicWordInput(
+                                  key: ValueKey('gen_word_$index'),
                                   index: index + 1,
                                   word: _mnemonicWords[index],
                                   isEditable: false,
