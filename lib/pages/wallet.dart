@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/bip_purposes.dart';
-import 'package:bearby/modals/bip_purpose_modal.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/web3_constants.dart';

@@ -39,7 +39,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
-  int _selectedPurposeIndex = 0;
   int _selectedCipherIndex = CipherDefaults.defaultCipherIndex;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
   late AppState _appState;
@@ -229,14 +228,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
       List<FTokenInfo> ftokens = [];
 
-      // Compute bipPurpose from selector for Bitcoin, default for others
-      final int bipPurpose;
-      if (_chain?.slip44 == kBitcoinlip44) {
-        final options = BipPurposeSelector.getBipPurposeOptions(l10n);
-        bipPurpose = options[_selectedPurposeIndex].purpose;
-      } else {
-        bipPurpose = kBip44Purpose;
-      }
+      final int bipPurpose =
+          _chain?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
 
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(
@@ -521,16 +514,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               onChanged: (value) async {
                                 setState(() => _useDeviceAuth = value);
                               },
-                            ),
-                          if (_chain?.slip44 == kBitcoinlip44)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: BipPurposeSelector(
-                                selectedIndex: _selectedPurposeIndex,
-                                onSelect: (index) => setState(
-                                    () => _selectedPurposeIndex = index),
-                                disabled: _disabled,
-                              ),
                             ),
                           SizedBox(height: 80),
                         ],
