@@ -107,59 +107,11 @@ abstract class AppLocalizations {
   /// **'Bearby Wallet'**
   String get appTitle;
 
-  /// Button text to restore from ZilPay 1.0
-  ///
-  /// In en, this message translates to:
-  /// **'Restore ZilPay 1.0!'**
-  String get initialPagerestoreZilPay;
-
   /// Button text to begin using the app
   ///
   /// In en, this message translates to:
   /// **'Get Started'**
   String get initialPagegetStarted;
-
-  /// Title for the RestoreRKStorage page showing wallet migration
-  ///
-  /// In en, this message translates to:
-  /// **'Migrate ZilPay 1.0 to 2.0'**
-  String get restoreRKStorageTitle;
-
-  /// Prompt text instructing user to enter password for account migration on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Accounts to migrate to ZilPay 2.0. Enter password.'**
-  String get restoreRKStorageAccountsPrompt;
-
-  /// Hint text for password input field on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get restoreRKStoragePasswordHint;
-
-  /// Error message when password field is empty on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Enter password'**
-  String get restoreRKStorageEnterPassword;
-
-  /// Prefix for error messages on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Error:'**
-  String get restoreRKStorageErrorPrefix;
-
-  /// Text for restore button on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Restore'**
-  String get restoreRKStorageRestoreButton;
-
-  /// Text for skip button on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get restoreRKStorageSkipButton;
 
   /// Label for balance display in AccountItem widget
   ///

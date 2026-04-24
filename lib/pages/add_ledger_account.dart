@@ -12,7 +12,6 @@ import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/argon.dart';
 import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/config/cipher.dart';
-import 'package:bearby/config/derive_path.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/common.dart';
@@ -214,11 +213,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                     l10n)[_selectedPurposeIndex]
                 .purpose
             : kBip44Purpose;
-
-        final derivePath = defaultDerivePath(
-          bipPurpose: bipPurpose,
-          slip44: _network!.slip44,
-        );
 
         await addLedgerWallet(
           params: LedgerParamsInput(

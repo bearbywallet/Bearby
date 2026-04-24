@@ -12,31 +12,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appTitle => 'Bearby ウォレット';
 
   @override
-  String get initialPagerestoreZilPay => 'ZilPay 1.0を復元!';
-
-  @override
   String get initialPagegetStarted => '始める';
-
-  @override
-  String get restoreRKStorageTitle => 'ZilPay 1.0から2.0への移行';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0に移行するアカウント。パスワードを入力してください。';
-
-  @override
-  String get restoreRKStoragePasswordHint => 'パスワード';
-
-  @override
-  String get restoreRKStorageEnterPassword => 'パスワードを入力';
-
-  @override
-  String get restoreRKStorageErrorPrefix => 'エラー:';
-
-  @override
-  String get restoreRKStorageRestoreButton => '復元';
-
-  @override
-  String get restoreRKStorageSkipButton => 'スキップ';
 
   @override
   String get accountItemBalanceLabel => '残高:';

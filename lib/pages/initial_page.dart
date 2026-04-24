@@ -1,13 +1,10 @@
-import 'dart:io' show Platform;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/src/rust/api/backend.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
@@ -20,38 +17,9 @@ class InitialPage extends StatefulWidget {
 }
 
 class _InitialPageState extends State<InitialPage> with StatusBarMixin {
-  bool _isLoading = true;
-  bool _isRestoreAvailable = false;
-  String? _vaultJson;
-  String? _accountsJson;
-
   @override
   void initState() {
     super.initState();
-    _loadingOldStorage();
-  }
-
-  Future<void> _loadingOldStorage() async {
-    try {
-      final (vaultJson, accountsJson) = Platform.isAndroid
-          ? await loadOldDatabaseAndroid()
-          : Platform.isIOS
-              ? await loadOldDatabaseIos(
-                  baseDir: (await getApplicationSupportDirectory()).path)
-              : (null, null);
-
-      if (mounted) {
-        setState(() {
-          _vaultJson = vaultJson;
-          _accountsJson = accountsJson;
-          _isRestoreAvailable = vaultJson != null && accountsJson != null;
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _isRestoreAvailable = false);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
   }
 
   Future<void> _toggleTheme() async {
@@ -133,23 +101,11 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                 Padding(
                   padding:
                       const EdgeInsets.only(left: 16, right: 16, bottom: 32),
-                  child: _isLoading
-                      ? CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              theme.primaryPurple),
-                        )
-                      : CustomButton(
+                  child: CustomButton(
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
-                          text: _isRestoreAvailable
-                              ? l10n.initialPagerestoreZilPay
-                              : l10n.initialPagegetStarted,
-                          onPressed: () => _isRestoreAvailable
-                              ? context.push(AppRoutes.rkRestore, extra: {
-                                  'vaultJson': _vaultJson,
-                                  'accountsJson': _accountsJson,
-                                })
-                              : context.push(AppRoutes.netSetup),
+                          text: l10n.initialPagegetStarted,
+                          onPressed: () => context.push(AppRoutes.netSetup),
                           borderRadius: 30.0,
                           height: 56.0,
                         ),

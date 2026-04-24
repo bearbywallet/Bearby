@@ -11,7 +11,6 @@ import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/argon.dart';
 import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/config/cipher.dart';
-import 'package:bearby/config/derive_path.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -240,11 +239,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         bipPurpose = kBip44Purpose;
       }
 
-      final derivePath = defaultDerivePath(
-        bipPurpose: bipPurpose,
-        slip44: _chain!.slip44,
-      );
-
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
@@ -255,7 +249,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           biometricType: biometricType,
           chainHash: chainHash,
           mnemonicCheck: !_bypassChecksumValidation,
-          derivePath: derivePath,
         );
 
         await addBip39Wallet(

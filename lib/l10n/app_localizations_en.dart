@@ -12,31 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Bearby Wallet';
 
   @override
-  String get initialPagerestoreZilPay => 'Restore ZilPay 1.0!';
-
-  @override
   String get initialPagegetStarted => 'Get Started';
-
-  @override
-  String get restoreRKStorageTitle => 'Migrate ZilPay 1.0 to 2.0';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'Accounts to migrate to ZilPay 2.0. Enter password.';
-
-  @override
-  String get restoreRKStoragePasswordHint => 'Password';
-
-  @override
-  String get restoreRKStorageEnterPassword => 'Enter password';
-
-  @override
-  String get restoreRKStorageErrorPrefix => 'Error:';
-
-  @override
-  String get restoreRKStorageRestoreButton => 'Restore';
-
-  @override
-  String get restoreRKStorageSkipButton => 'Skip';
 
   @override
   String get accountItemBalanceLabel => 'Balance:';

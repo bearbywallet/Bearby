@@ -12,31 +12,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appTitle => 'Bearby 지갑';
 
   @override
-  String get initialPagerestoreZilPay => 'ZilPay 1.0 복원!';
-
-  @override
   String get initialPagegetStarted => '시작하기';
-
-  @override
-  String get restoreRKStorageTitle => 'ZilPay 1.0에서 2.0으로 마이그레이션';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0으로 마이그레이션할 계정. 비밀번호 입력.';
-
-  @override
-  String get restoreRKStoragePasswordHint => '비밀번호';
-
-  @override
-  String get restoreRKStorageEnterPassword => '비밀번호 입력';
-
-  @override
-  String get restoreRKStorageErrorPrefix => '오류:';
-
-  @override
-  String get restoreRKStorageRestoreButton => '복원';
-
-  @override
-  String get restoreRKStorageSkipButton => '건너뛰기';
 
   @override
   String get accountItemBalanceLabel => '잔액:';

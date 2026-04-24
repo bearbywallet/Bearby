@@ -29,7 +29,6 @@ import 'pages/notification.dart';
 import 'pages/password_setup.dart';
 import 'pages/receive.dart';
 import 'pages/restore_bip39.dart';
-import 'pages/restore_rkstorage.dart';
 import 'pages/restore_sk.dart';
 import 'pages/reveal_bip39.dart';
 import 'pages/reveal_sk.dart';
@@ -67,7 +66,6 @@ abstract class AppRoutes {
   static const security           = '/security';
   static const currency           = '/currency';
   static const passSetup          = '/pass_setup';
-  static const rkRestore          = '/rk_restore';
   static const netSetup           = '/net_setup';
   static const genSk              = '/gen_sk';
   static const genBip39           = '/gen_bip39';
@@ -111,7 +109,6 @@ const _setupRoutes = <String>{
   AppRoutes.revealBip39,
   AppRoutes.addAccount,
   AppRoutes.addNetwork,
-  AppRoutes.rkRestore,
   AppRoutes.browserSettings,
   AppRoutes.restoreSk,
   AppRoutes.about,
@@ -225,8 +222,6 @@ GoRouter createRouter(AppState appState) {
       GoRoute(path: AppRoutes.restoreSk,         builder: (_, __) => const SecretKeyRestorePage()),
       GoRoute(path: AppRoutes.restoreBip39,      builder: (_, __) => const RestoreSecretPhrasePage()),
       GoRoute(path: AppRoutes.keystoreFileRestore, builder: (_, __) => const RestoreKeystoreFilePage()),
-      GoRoute(path: AppRoutes.rkRestore,         builder: (_, __) => const RestoreRKStorage()),
-
       GoRoute(path: AppRoutes.ledgerConnect,    builder: (_, __) => const LedgerConnectPage()),
       GoRoute(path: AppRoutes.addLedgerAccount, builder: (_, __) => const AddLedgerAccountPage()),
     ],
