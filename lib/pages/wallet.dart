@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
-import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/biometric_switch.dart';
@@ -17,7 +15,6 @@ import 'package:bearby/modals/manage_connections.dart';
 import 'package:bearby/modals/secret_recovery_modal.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/connections.dart';
-import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -60,7 +57,6 @@ class _WalletPageState extends State<WalletPage> {
   List<String> _authMethods = [];
   bool _biometricsAvailable = false;
   bool _isBiometricLoading = false;
-  int _selectedBipPurposeIndex = 1;
 
   @override
   void initState() {
@@ -69,7 +65,6 @@ class _WalletPageState extends State<WalletPage> {
     _walletNameController.text = appState.wallet!.walletName;
     appState.syncConnections();
     _checkAuthMethods();
-    _initializeBipPurpose(appState);
   }
 
   @override
@@ -92,59 +87,6 @@ class _WalletPageState extends State<WalletPage> {
         _authMethods = [];
         _biometricsAvailable = false;
       });
-    }
-  }
-
-  Future<void> _initializeBipPurpose(AppState appState) async {
-    if (!_isBitcoinWallet(appState) || appState.account?.addr == null) {
-      return;
-    }
-
-    final walletType = appState.wallet?.walletType ?? '';
-    final isSeedOrKey = walletType.contains(WalletType.SecretPhrase.name) ||
-        walletType.contains(WalletType.SecretKey.name);
-    if (!isSeedOrKey) return;
-
-    try {
-      final addressType = await bitcoinAddressTypeFromAddress(
-        addr: appState.account!.addr,
-      );
-      final index = _mapAddressTypeToBipIndex(addressType);
-
-      setState(() {
-        _selectedBipPurposeIndex = index;
-      });
-    } catch (e) {
-      debugPrint("Error determining BIP purpose: $e");
-    }
-  }
-
-  int _mapAddressTypeToBipIndex(String addressType) {
-    switch (addressType) {
-      case "p2tr":
-        return 0;
-      case "p2wpkh":
-      case "p2wsh":
-        return 1;
-      case "p2sh":
-        return 2;
-      case "p2pkh":
-      default:
-        return 3;
-    }
-  }
-
-  int _mapBipIndexToBipPurpose(int index) {
-    switch (index) {
-      case 0:
-        return kBip86Purpose;
-      case 1:
-        return kBip84Purpose;
-      case 2:
-        return kBip49Purpose;
-      case 3:
-      default:
-        return kBip44Purpose;
     }
   }
 
@@ -244,66 +186,6 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Future<void> _executeBitcoinAddressChange({
-    required AppState appState,
-    required int newBip,
-    required int newIndex,
-    String? password,
-  }) async {
-    await bitcoinChangeAddressType(
-      walletIndex: appState.selectedWalletIndex,
-      newBip: newBip,
-      password: password,
-    );
-
-    await appState.syncData();
-
-    if (mounted) {
-      setState(() {
-        _selectedBipPurposeIndex = newIndex;
-      });
-    }
-  }
-
-  Future<void> _handleBipPurposeChange(int newIndex, AppState appState) async {
-    if (newIndex == _selectedBipPurposeIndex) return;
-
-    final newBip = _mapBipIndexToBipPurpose(newIndex);
-    final wallet = appState.wallet;
-    if (wallet == null) return;
-
-    final biometricEnabled = wallet.authType != "none";
-
-    if (biometricEnabled && mounted) {
-      await _executeBitcoinAddressChange(
-        appState: appState,
-        newBip: newBip,
-        newIndex: newIndex,
-      );
-      return;
-    }
-
-    if (mounted) {
-      showConfirmPasswordModal(
-        context: context,
-        theme: appState.currentTheme,
-        onConfirm: (password) async {
-          try {
-            await _executeBitcoinAddressChange(
-              appState: appState,
-              newBip: newBip,
-              newIndex: newIndex,
-              password: password,
-            );
-            return null;
-          } catch (e) {
-            return e.toString();
-          }
-        },
-      );
-    }
-  }
-
   List<WalletPreferenceItem> _getPreferenceItems(AppState appState) {
     final l10n = AppLocalizations.of(context)!;
     final List<WalletPreferenceItem> items = [];
@@ -324,24 +206,6 @@ class _WalletPageState extends State<WalletPage> {
     );
 
     final walletType = appState.wallet!.walletType;
-    final isSeedOrKey = walletType.contains(WalletType.SecretPhrase.name) ||
-        walletType.contains(WalletType.SecretKey.name);
-
-    if (_isBitcoinWallet(appState) && isSeedOrKey) {
-      items.add(
-        WalletPreferenceItem(
-          title: l10n.bipPurposeSetupPageTitle,
-          iconPath: 'assets/icons/currency.svg',
-          onTap: () {
-            showBipPurposeModal(
-              context: context,
-              selectedIndex: _selectedBipPurposeIndex,
-              onSelect: (index) => _handleBipPurposeChange(index, appState),
-            );
-          },
-        ),
-      );
-    }
 
     if (!walletType.contains(WalletType.ledger.name)) {
       items.add(
@@ -687,7 +551,4 @@ class _WalletPageState extends State<WalletPage> {
     showSecretRecoveryModal(context: context, theme: theme);
   }
 
-  bool _isBitcoinWallet(AppState appState) {
-    return appState.wallet?.slip44 == kBitcoinlip44;
-  }
 }
