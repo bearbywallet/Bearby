@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use zilpay::rpc::network_config::ChainConfig;
 use zilpay::{background::bg_settings::SettingsManagement, crypto::slip44};
 pub use zilpay::{
     background::Background,
@@ -39,10 +40,10 @@ pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError
 
 pub fn pubkey_from_provider(
     pub_key: &str,
-    bip49: DerivationPath,
+    chain_config: &ChainConfig,
     zilliqa_legacy: bool,
 ) -> Result<PubKey, ServiceError> {
-    let pub_key = match bip49.slip44 {
+    let pub_key = match chain_config.slip_44 {
         slip44::SOLANA => {
             let bytes = hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
             let mut prefixed = vec![3u8];
@@ -55,13 +56,21 @@ pub fn pubkey_from_provider(
                 .try_into()
                 .map_err(|_| ServiceError::InvalidPublicKeyLength)?;
 
-            match (bip49.slip44, zilliqa_legacy) {
+            match (chain_config.slip_44, zilliqa_legacy) {
                 (slip44::ZILLIQA, true) => PubKey::Secp256k1Sha256(pub_key_bytes),
                 (slip44::ZILLIQA, false) => PubKey::Secp256k1Keccak256(pub_key_bytes),
                 (slip44::ETHEREUM, _) => PubKey::Secp256k1Keccak256(pub_key_bytes),
                 (slip44::BITCOIN, _) => {
-                    let network = bip49.network.unwrap_or(bitcoin::Network::Bitcoin);
-                    let addr_type = bip49.get_address_type();
+                    let network = chain_config
+                        .bitcoin_network()
+                        .unwrap_or(bitcoin::Network::Bitcoin);
+                    let addr_type = chain_config
+                        .ftokens
+                        .iter()
+                        .find(|t| t.native)
+                        .and_then(|t| t.addr.get_bitcoin_address_type().ok())
+                        .unwrap_or(bitcoin::AddressType::P2tr);
+
                     PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
                 }
                 (slip44::TRON, _) => PubKey::Secp256k1Tron(pub_key_bytes),
@@ -75,29 +84,34 @@ pub fn pubkey_from_provider(
 
 pub fn secretkey_from_provider(
     secret_key: &str,
-    bip49: DerivationPath,
+    chain_config: &ChainConfig,
 ) -> Result<SecretKey, ServiceError> {
     let trimmed = secret_key.trim();
 
-    let sk = match bip49.slip44 {
+    let sk = match chain_config.slip_44 {
         slip44::ETHEREUM | slip44::ZILLIQA => {
             let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
             let secret_key_bytes = decode_secret_key(&sk)?;
             SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes)
         }
         slip44::BITCOIN => {
-            let addr_type = bip49.get_address_type();
+            let addr_type = chain_config
+                .ftokens
+                .iter()
+                .find(|t| t.native)
+                .and_then(|t| t.addr.get_bitcoin_address_type().ok())
+                .unwrap_or(bitcoin::AddressType::P2tr);
+            let network = chain_config
+                .bitcoin_network()
+                .unwrap_or(bitcoin::Network::Bitcoin);
 
             if let Ok(sk_from_wif) = SecretKey::from_wif(trimmed, addr_type) {
                 sk_from_wif
             } else {
                 let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
                 let secret_key_bytes = decode_secret_key(&sk)?;
-                if let Some(net) = bip49.network {
-                    SecretKey::Secp256k1Bitcoin((secret_key_bytes, net, addr_type))
-                } else {
-                    return Err(ServiceError::DecodeSecretKey);
-                }
+
+                SecretKey::Secp256k1Bitcoin((secret_key_bytes, network, addr_type))
             }
         }
         slip44::TRON => {

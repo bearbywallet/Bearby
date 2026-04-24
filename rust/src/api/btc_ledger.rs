@@ -683,13 +683,14 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
 
                 let pubkey = if sig_info.pubkey.is_empty() {
                     // Extract pubkey from PSBT's bip32_derivation (set by btc_ledger_prepare_psbt)
-                    let (pk, _) = psbt.inputs[idx]
-                        .bip32_derivation
-                        .iter()
-                        .next()
-                        .ok_or_else(|| {
-                            format!("No pubkey in bip32_derivation for input {}", idx)
-                        })?;
+                    let (pk, _) =
+                        psbt.inputs[idx]
+                            .bip32_derivation
+                            .iter()
+                            .next()
+                            .ok_or_else(|| {
+                                format!("No pubkey in bip32_derivation for input {}", idx)
+                            })?;
                     bitcoin::PublicKey::new(*pk)
                 } else {
                     bitcoin::PublicKey::from_slice(&sig_info.pubkey)

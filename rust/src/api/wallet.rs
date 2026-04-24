@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use secrecy::zeroize::Zeroize;
-use secrecy::SecretString;
+use secrecy::{ExposeSecret, SecretString};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
 use zilpay::errors::background::BackgroundError;
@@ -17,7 +17,7 @@ pub use zilpay::{
 };
 pub use zilpay::{
     background::{BackgroundBip39Params, BackgroundSKParams},
-    crypto::bip49::{DerivationPath, DerivationType, DerivationTypeCodec},
+    crypto::bip49::{DerivationPath, DerivationType},
     proto::{pubkey::PubKey, secret_key::SecretKey},
 };
 
@@ -55,7 +55,6 @@ pub struct Bip39AddWalletParams {
     pub wallet_name: String,
     pub biometric_type: String,
     pub chain_hash: u64,
-    pub derive_path: String,
 }
 
 pub async fn add_bip39_wallet(
@@ -74,20 +73,20 @@ pub async fn add_bip39_wallet(
         .try_into()
         .map_err(ServiceError::SettingsError)?;
     let password = SecretString::new(params.password.into());
-    let dp = DerivationPath::try_from(params.derive_path.as_str()).map_err(|e| e.to_string())?;
+    let secret_mnemonic_str = SecretString::new(params.mnemonic_str.into());
+    let secret_passphrase = SecretString::new(params.passphrase.into());
+
     Arc::get_mut(&mut service.core)
         .ok_or(ServiceError::CoreAccess)?
         .add_bip39_wallet(BackgroundBip39Params {
             ftokens,
             wallet_settings,
-            bip: dp.bip,
-            derivation_type: dp.derivation.to_u8(),
             mnemonic_check: params.mnemonic_check,
             chain_hash: params.chain_hash,
             password: &password,
-            mnemonic_str: &params.mnemonic_str,
+            mnemonic_str: &secret_mnemonic_str,
             accounts: &params.accounts,
-            passphrase: &params.passphrase,
+            passphrase: &secret_passphrase,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
         })
@@ -128,15 +127,7 @@ pub async fn add_sk_wallet(
         .core
         .get_provider(params.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
-    let net = provider.config.bitcoin_network();
-    let bip49 = DerivationPath::new(
-        provider.config.slip_44,
-        DerivationType::AddressIndex(0, 0, 0),
-        params.bip_purpose,
-        net,
-    );
-
-    let secret_key = secretkey_from_provider(&params.sk, bip49)?;
+    let secret_key = secretkey_from_provider(&params.sk, &provider.config)?;
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
@@ -147,7 +138,6 @@ pub async fn add_sk_wallet(
             ftokens,
             secret_key,
             chain_hash: params.chain_hash,
-            bip: params.bip_purpose,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
             password: &password,
@@ -342,25 +332,6 @@ pub async fn set_biometric(
     Ok(())
 }
 
-pub async fn bitcoin_change_address_type(
-    wallet_index: usize,
-    new_bip: u32,
-    password: Option<String>,
-    _passphrase: Option<String>,
-) -> Result<(), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let password = password.map(|p| SecretString::new(p.into()));
-
-    service
-        .core
-        .select_bitcoin_address_format(wallet_index, new_bip, password.as_ref())
-        .await
-        .map_err(ServiceError::BackgroundError)?;
-
-    Ok(())
-}
-
 pub async fn reveal_keypair(
     wallet_index: usize,
     account_index: usize,
@@ -413,7 +384,7 @@ pub async fn reveal_bip39_phrase(
 
     password.zeroize();
 
-    Ok(m.to_string())
+    Ok(m.to_phrase().expose_secret().to_string())
 }
 
 pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Result<(), String> {

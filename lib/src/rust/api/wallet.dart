@@ -68,17 +68,6 @@ Future<void> setBiometric(
         password: password,
         newBiometricType: newBiometricType);
 
-Future<void> bitcoinChangeAddressType(
-        {required BigInt walletIndex,
-        required int newBip,
-        String? password,
-        String? passphrase}) =>
-    RustLib.instance.api.crateApiWalletBitcoinChangeAddressType(
-        walletIndex: walletIndex,
-        newBip: newBip,
-        password: password,
-        passphrase: passphrase);
-
 Future<KeyPairInfo> revealKeypair(
         {required BigInt walletIndex,
         required BigInt accountIndex,
@@ -222,7 +211,6 @@ class Bip39AddWalletParams {
   final String walletName;
   final String biometricType;
   final BigInt chainHash;
-  final String derivePath;
 
   const Bip39AddWalletParams({
     required this.password,
@@ -233,7 +221,6 @@ class Bip39AddWalletParams {
     required this.walletName,
     required this.biometricType,
     required this.chainHash,
-    required this.derivePath,
   });
 
   @override
@@ -245,8 +232,7 @@ class Bip39AddWalletParams {
       passphrase.hashCode ^
       walletName.hashCode ^
       biometricType.hashCode ^
-      chainHash.hashCode ^
-      derivePath.hashCode;
+      chainHash.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -260,6 +246,5 @@ class Bip39AddWalletParams {
           passphrase == other.passphrase &&
           walletName == other.walletName &&
           biometricType == other.biometricType &&
-          chainHash == other.chainHash &&
-          derivePath == other.derivePath;
+          chainHash == other.chainHash;
 }

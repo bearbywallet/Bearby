@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use flutter_rust_bridge::frb;
+use secrecy::{ExposeSecret, SecretString};
 use sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
 use zilpay::proto::address::Address;
@@ -64,12 +65,13 @@ pub fn get_currencies_tickets() -> Vec<(String, String)> {
 }
 
 pub fn bip39_checksum_valid(words: String) -> bool {
-    let mnemonic = match Mnemonic::parse_str(&EN_WORDS, &words) {
+    let secret_words = SecretString::new(words.into());
+    let mnemonic = match Mnemonic::parse_str(&EN_WORDS, &secret_words) {
         Ok(m) => m,
         Err(_) => return false,
     };
     let checksum = mnemonic.checksum();
-    let entropy: Vec<u8> = mnemonic.to_entropy().collect();
+    let entropy: Vec<u8> = mnemonic.to_entropy().expose_secret().to_vec();
 
     let mut hasher = Sha256::new();
     hasher.update(&entropy);

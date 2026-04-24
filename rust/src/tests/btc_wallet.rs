@@ -4,12 +4,11 @@ mod btc_wallet_tests {
 
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
-    use zilpay::crypto::bip49::DerivationPath;
     use zilpay::rpc::network_config::ChainConfig;
 
     use crate::api::wallet::{
-        add_bip39_wallet, add_next_bip39_account, bitcoin_change_address_type, get_wallets,
-        AddNextBip39AccountParams, Bip39AddWalletParams,
+        add_bip39_wallet, add_next_bip39_account, get_wallets, AddNextBip39AccountParams,
+        Bip39AddWalletParams,
     };
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
@@ -70,7 +69,6 @@ mod btc_wallet_tests {
             wallet_name: "Bitcoin Wallet".to_string(),
             biometric_type: "none".to_string(),
             chain_hash: btc_mainnet_provider.hash(),
-            derive_path: "m/84'/0'/0'/0/0".to_string(),
         };
 
         let wallet_address = add_bip39_wallet(params, wallet_settings, vec![])
@@ -101,128 +99,11 @@ mod btc_wallet_tests {
 
         println!("Added 2 additional accounts successfully!");
 
-        // Expected addresses for each BIP type
-        let expected_bip44 = vec![
-            "1Ei9UmLQv4o4UJTy5r5mnGFeC9auM3W5P1",
-            "14RBPsg6mBkLSJokkzeuoCkTtoeD3nK2Kz",
-            "1CvVq3DvykCiuKztE29EsLzvmgbbcWQWBr",
-        ];
-
-        let expected_bip49 = vec![
-            "39sr5B8UAdxeoXbnpdw4frfxXwWwEChwzp",
-            "37EtUYWDGFUYhF65JqZMkkiUd4dDmwHv8J",
-            "3B9F7Smod2KrRVT4tzodovWhxk4YEJyr7J",
-        ];
-
-        let expected_bip84 = vec![
-            "bc1q4qw42stdzjqs59xvlrlxr8526e3nunw7mp73te",
-            "bc1qp533522veg9uyhpx3sva9vqrnfzmt262n4lsuq",
-            "bc1qt3az9lwpqfvr466mezsewuzdc4d379ldv83d4c",
-        ];
-
         let expected_bip86 = vec![
             "bc1pfzhx49qe6s5exppe5hqljg3n6587xk0w75xqr70pgdt7ygnfkssqxqjd9l",
             "bc1p0lks35d0spqsvz2t3t0kqus38wrlpmcjtvvupkfkwdrzfh6zjyps9rvd6v",
             "bc1p6f0xvqe892y0fvm2hwnmmj6fzczp7lx6tluvwhymcca4d7a45jjsgzlsdv",
         ];
-
-        // Test BIP44 (Legacy P2PKH)
-        println!("\n=== Testing BIP44 (Legacy P2PKH) ===");
-        bitcoin_change_address_type(
-            0,
-            DerivationPath::BIP44_PURPOSE,
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
-
-        let wallets = get_wallets().await.unwrap();
-        let wallet = wallets.first().unwrap();
-        let accounts = wallet
-            .accounts
-            .get(&wallet.slip44)
-            .and_then(|m| m.get(&wallet.bip))
-            .unwrap();
-
-        println!("BIP44 addresses:");
-        for (i, account) in accounts.iter().take(3).enumerate() {
-            println!("  Account {}: {}", i, account.addr);
-            assert_eq!(
-                account.addr, expected_bip44[i],
-                "BIP44 Account {} address mismatch",
-                i
-            );
-        }
-
-        // Test BIP49 (Nested SegWit P2SH-P2WPKH)
-        println!("\n=== Testing BIP49 (Nested SegWit P2SH-P2WPKH) ===");
-        bitcoin_change_address_type(
-            0,
-            DerivationPath::BIP49_PURPOSE,
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
-
-        let wallets = get_wallets().await.unwrap();
-        let wallet = wallets.first().unwrap();
-        let accounts = wallet
-            .accounts
-            .get(&wallet.slip44)
-            .and_then(|m| m.get(&wallet.bip))
-            .unwrap();
-
-        println!("BIP49 addresses:");
-        for (i, account) in accounts.iter().take(3).enumerate() {
-            println!("  Account {}: {}", i, account.addr);
-            assert_eq!(
-                account.addr, expected_bip49[i],
-                "BIP49 Account {} address mismatch",
-                i
-            );
-        }
-
-        // Test BIP84 (Native SegWit Bech32 P2WPKH)
-        println!("\n=== Testing BIP84 (Native SegWit Bech32 P2WPKH) ===");
-        bitcoin_change_address_type(
-            0,
-            DerivationPath::BIP84_PURPOSE,
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
-
-        let wallets = get_wallets().await.unwrap();
-        let wallet = wallets.first().unwrap();
-        let accounts = wallet
-            .accounts
-            .get(&wallet.slip44)
-            .and_then(|m| m.get(&wallet.bip))
-            .unwrap();
-
-        println!("BIP84 addresses:");
-        for (i, account) in accounts.iter().take(3).enumerate() {
-            println!("  Account {}: {}", i, account.addr);
-            assert_eq!(
-                account.addr, expected_bip84[i],
-                "BIP84 Account {} address mismatch",
-                i
-            );
-        }
-
-        // Test BIP86 (Taproot Bech32m P2TR)
-        println!("\n=== Testing BIP86 (Taproot Bech32m P2TR) ===");
-        bitcoin_change_address_type(
-            0,
-            DerivationPath::BIP86_PURPOSE,
-            Some(PASSWORD.to_string()),
-            None,
-        )
-        .await
-        .unwrap();
 
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();

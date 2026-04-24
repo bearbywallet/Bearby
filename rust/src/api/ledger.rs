@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use zilpay::{
     background::bg_provider::ProvidersManagement,
-    crypto::bip49::{split_path, DerivationPath, DerivationTypeCodec},
+    crypto::bip49::{split_path, DerivationPath},
     proto::address::Address,
     wallet::wallet_storage::StorageOperations,
 };
@@ -49,9 +49,6 @@ pub async fn add_ledger_wallet(
         .core
         .get_provider(params.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
-    let dp = DerivationPath::try_from(params.derive_path.as_str()).map_err(|e| e.to_string())?;
-    let net = provider.config.bitcoin_network();
-    let bip49 = DerivationPath::new(provider.config.slip_44, dp.derivation, dp.bip, net);
     let is_bitcoin = provider.config.slip_44 == slip44::BITCOIN;
     let accounts = params
         .pub_keys
@@ -61,7 +58,8 @@ pub async fn add_ledger_wallet(
                 let addr = Address::from_bitcoin_address(&key_or_addr)?;
                 Ok((ledger_index, None, addr))
             } else {
-                let pub_key = pubkey_from_provider(&key_or_addr, bip49, params.zilliqa_legacy)?;
+                let pub_key =
+                    pubkey_from_provider(&key_or_addr, &provider.config, params.zilliqa_legacy)?;
                 let addr = pub_key.get_addr()?;
                 Ok((ledger_index, Some(pub_key), addr))
             }
@@ -79,8 +77,6 @@ pub async fn add_ledger_wallet(
         ftokens,
         accounts,
         wallet_settings,
-        bip: dp.bip,
-        derivation_type: dp.derivation.to_u8(),
         chain_hash: params.chain_hash,
         account_names: params.account_names,
         wallet_index: params.wallet_index,
@@ -111,30 +107,8 @@ pub async fn update_ledger_accounts(
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let selected_account = wallet_data
-            .get_selected_account()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core.get_provider(wallet_data.chain_hash)?;
         let is_bitcoin = provider.config.slip_44 == slip44::BITCOIN;
-
-        let bip49 = match selected_account.addr {
-            Address::Secp256k1Sha256(_)
-            | Address::Secp256k1Keccak256(_)
-            | Address::Secp256k1Tron(_)
-            | Address::Ed25519Solana(_) => {
-                DerivationPath::new(provider.config.slip_44, dp.derivation, dp.bip, None)
-            }
-            Address::Secp256k1Bitcoin(_) => {
-                let net = provider.config.bitcoin_network();
-                let btc_addr_type = selected_account.addr.get_bitcoin_address_type()?;
-                DerivationPath::new(
-                    provider.config.slip_44,
-                    dp.derivation,
-                    DerivationPath::bip_from_address_type(btc_addr_type),
-                    net,
-                )
-            }
-        };
         let mut accounts = accounts
             .into_iter()
             .map(|(ledger_index, key_or_addr, name)| {
@@ -142,7 +116,8 @@ pub async fn update_ledger_accounts(
                     let addr = Address::from_bitcoin_address(&key_or_addr)?;
                     Ok((ledger_index, None, addr, name))
                 } else {
-                    let pub_key = pubkey_from_provider(&key_or_addr, bip49, zilliqa_legacy)?;
+                    let pub_key =
+                        pubkey_from_provider(&key_or_addr, &provider.config, zilliqa_legacy)?;
                     let addr = pub_key.get_addr()?;
                     Ok((ledger_index, Some(pub_key), addr, name))
                 }

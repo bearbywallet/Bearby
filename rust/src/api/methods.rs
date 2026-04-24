@@ -1,13 +1,21 @@
 use crate::{models::keypair::KeyPairInfo, utils::utils::decode_secret_key};
-pub use zilpay::background::{bg_crypto::CryptoOperations, Background};
+use secrecy::{ExposeSecret, SecretString};
+use zilpay::background::bg_crypto::CryptoOperations;
+pub use zilpay::background::Background;
 use zilpay::proto::keypair::KeyPair;
 
 pub fn gen_bip39_words(count: u8) -> Result<String, String> {
-    Background::gen_bip39(count).map_err(|e| e.to_string())
+    Background::gen_bip39(count)
+        .map(|secret_words| secret_words.expose_secret().to_string())
+        .map_err(|e| e.to_string())
 }
 
 pub fn check_not_exists_bip39_words(words: Vec<String>, _lang: String) -> Vec<usize> {
     // TODO: add more lang for bip39.
+    let words = words
+        .into_iter()
+        .map(|w| SecretString::new(w.into()))
+        .collect::<Vec<SecretString>>();
     Background::find_invalid_bip39_words(&words)
 }
 

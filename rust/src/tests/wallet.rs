@@ -207,7 +207,6 @@ mod wallet_tests {
             wallet_name: "wallet name".to_string(),
             biometric_type: "faceid".to_string(),
             chain_hash: 0,
-            derive_path: "m/44'/60'/0'/0/0".to_string(),
         };
         let wallet_settings = WalletSettingsInfo {
             cipher_orders: vec![0, 1, 2],
@@ -256,7 +255,6 @@ mod wallet_tests {
             wallet_name: "ZIlliqa Wallet".to_string(),
             biometric_type: "none".to_string(),
             chain_hash: zil_chain_config.hash(),
-            derive_path: "m/44'/313'/0'/0/0".to_string(),
         };
         let wallet_settings = WalletSettingsInfo {
             cipher_orders: vec![0, 1, 2],
