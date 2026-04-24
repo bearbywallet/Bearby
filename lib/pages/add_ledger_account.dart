@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/bip_purpose_selector.dart';
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/enable_card.dart';
@@ -51,7 +50,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   NetworkConfigInfo? _network;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
-  int _selectedPurposeIndex = 0;
   bool _initialized = false;
 
   @override
@@ -121,15 +119,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           .toList()
         ..sort((a, b) => a.index.compareTo(b.index));
       _selectedAccounts = {for (var account in _accounts) account: true};
-
-      if (wallet != null && network.slip44 == kBitcoinlip44) {
-        final options = BipPurposeSelector.getBipPurposeOptions(
-            AppLocalizations.of(context)!);
-        final matchIndex = options.indexWhere((o) => o.purpose == wallet.bip);
-        if (matchIndex >= 0) {
-          _selectedPurposeIndex = matchIndex;
-        }
-      }
     }
 
     _initialized = true;
@@ -208,11 +197,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
-        final bipPurpose = _network?.slip44 == kBitcoinlip44
-            ? BipPurposeSelector.getBipPurposeOptions(
-                    l10n)[_selectedPurposeIndex]
-                .purpose
-            : kBip44Purpose;
+        final bipPurpose =
+            _network?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
+        final derivePath = "m/$bipPurpose'/${_network!.slip44}'/0'";
 
         await addLedgerWallet(
           params: LedgerParamsInput(
@@ -264,16 +251,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             .toList();
 
         final isZilliqaAppUpdate = appState.ledgerViewController.isZilliqaApp;
-        final updateBipPurpose = _network?.slip44 == kBitcoinlip44
-            ? BipPurposeSelector.getBipPurposeOptions(
-                    l10n)[_selectedPurposeIndex]
-                .purpose
-            : kBip44Purpose;
-
-        final updateDerivePath = defaultDerivePath(
-          bipPurpose: updateBipPurpose,
-          slip44: _network!.slip44,
-        );
+        final updateBipPurpose =
+            _network?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
+        final updateDerivePath = "m/$updateBipPurpose'/${_network!.slip44}'/0'";
 
         await updateLedgerAccounts(
           walletIndex: BigInt.from(walletIndex),
@@ -358,14 +338,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 ),
               ),
               const SizedBox(height: 16),
-              if (_network?.slip44 == kBitcoinlip44)
-                BipPurposeSelector(
-                  selectedIndex: _selectedPurposeIndex,
-                  onSelect: (index) =>
-                      setState(() => _selectedPurposeIndex = index),
-                  disabled: _loading,
-                ),
-              if (_network?.slip44 == kBitcoinlip44) const SizedBox(height: 16),
               const SizedBox(height: 16),
               RoundedLoadingButton(
                 color: theme.primaryPurple,
@@ -379,11 +351,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   _btnController.start();
 
                   try {
-                    final l10n = AppLocalizations.of(context)!;
                     final bipPurpose = _network?.slip44 == kBitcoinlip44
-                        ? BipPurposeSelector.getBipPurposeOptions(
-                                l10n)[_selectedPurposeIndex]
-                            .purpose
+                        ? kBip86Purpose
                         : kBip44Purpose;
                     final accounts =
                         await appState.ledgerViewController.getAccounts(

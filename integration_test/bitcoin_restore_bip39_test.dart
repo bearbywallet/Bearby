@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,9 +12,6 @@ import 'package:bearby/components/mnemonic_word_input.dart';
 import 'package:bearby/components/option_list.dart';
 import 'package:bearby/components/view_item.dart';
 import 'package:bearby/pages/restore_bip39.dart';
-import 'package:bearby/pages/setup_net.dart';
-import 'package:bearby/pages/new_wallet_options.dart';
-import 'package:bearby/pages/wallet_restore_options.dart';
 
 const _kMnemonic12 =
     'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
@@ -31,8 +27,7 @@ const _kMnemonicBadChecksum =
     'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon';
 const _kMnemonicInvalid =
     'zzzzz abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
-const _kMnemonic5Words =
-    'abandon abandon abandon abandon abandon';
+const _kMnemonic5Words = 'abandon abandon abandon abandon abandon';
 const _kMnemonic11Words =
     'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon';
 
@@ -158,8 +153,8 @@ void main() {
         await tester.drag(scrollable.first, const Offset(0, 300));
         await tester.pumpAndSettle(const Duration(milliseconds: 200));
       }
-      final w = tester.widget<MnemonicWordInput>(
-          find.byKey(const ValueKey('word_0')));
+      final w = tester
+          .widget<MnemonicWordInput>(find.byKey(const ValueKey('word_0')));
       expect(w.hasError, isTrue);
       expect(_isRestoreEnabled(tester), isFalse);
       debugPrint('✓ Test 1: Invalid word error');

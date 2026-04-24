@@ -1,3 +1,5 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bearby/config/ftokens.dart';
 import 'package:bearby/mixins/qrcode.dart';
@@ -137,7 +139,8 @@ void main() {
       });
 
       test('seed and key', () {
-        final result = parseQRSecretData('ETH:?seed=abandon abandon&key=0xpriv');
+        final result =
+            parseQRSecretData('ETH:?seed=abandon abandon&key=0xpriv');
         expect(result['chain'], 'ETH');
         expect(result['seed'], 'abandon abandon');
         expect(result['key'], '0xpriv');
@@ -395,8 +398,19 @@ void main() {
 
   group('parseAnyQrSecret', () {
     const _chains = [
-      'BTC', 'ETH', 'TRX', 'SOL', 'BNB', 'ZIL',
-      'AVAX', 'BASE', 'ARB', 'POL', 'KAIA', 'OP', 'S',
+      'BTC',
+      'ETH',
+      'TRX',
+      'SOL',
+      'BNB',
+      'ZIL',
+      'AVAX',
+      'BASE',
+      'ARB',
+      'POL',
+      'KAIA',
+      'OP',
+      'S',
     ];
     const _mnemonic12 =
         'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
@@ -439,7 +453,9 @@ void main() {
         });
       }
 
-      test('round-trip: generateQRSecretData seed → parseAnyQrSecret → parseQRSecretData recovers seed', () {
+      test(
+          'round-trip: generateQRSecretData seed → parseAnyQrSecret → parseQRSecretData recovers seed',
+          () {
         const raw =
             'ETH:?seed=abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
         final r = parseAnyQrSecret(raw);
@@ -448,7 +464,9 @@ void main() {
         expect(inner['seed'], startsWith('abandon'));
       });
 
-      test('round-trip: generateQRSecretData key → parseAnyQrSecret → parseQRSecretData recovers key', () {
+      test(
+          'round-trip: generateQRSecretData key → parseAnyQrSecret → parseQRSecretData recovers key',
+          () {
         final raw = generateQRSecretData(chain: 'ETH', privateKey: _hex64);
         final r = parseAnyQrSecret(raw);
         expect(r.kind, QrSecretKind.bearby);
@@ -572,7 +590,8 @@ void main() {
         expect(r.payload, _hex64);
       });
 
-      test('64 uppercase hex → hexPrivateKey, payload normalized to lowercase', () {
+      test('64 uppercase hex → hexPrivateKey, payload normalized to lowercase',
+          () {
         final r = parseAnyQrSecret(_hex64.toUpperCase());
         expect(r.kind, QrSecretKind.hexPrivateKey);
         expect(r.payload, _hex64);
@@ -605,7 +624,8 @@ void main() {
       });
 
       test('63 hex chars → unknown', () {
-        expect(parseAnyQrSecret(_hex64.substring(1)).kind, QrSecretKind.unknown);
+        expect(
+            parseAnyQrSecret(_hex64.substring(1)).kind, QrSecretKind.unknown);
       });
 
       test('65 hex chars → unknown', () {
@@ -638,7 +658,8 @@ void main() {
 
       test('plain payment URL with address → unknown', () {
         expect(
-          parseAnyQrSecret('ETH:0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045').kind,
+          parseAnyQrSecret('ETH:0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045')
+              .kind,
           QrSecretKind.unknown,
         );
       });
@@ -705,7 +726,8 @@ void main() {
     group('per-chain bearby round-trips', () {
       for (final chain in _chains) {
         test('$chain seed round-trip', () {
-          final qr = generateQRSecretData(chain: chain, seedPhrase: _mnemonic12);
+          final qr =
+              generateQRSecretData(chain: chain, seedPhrase: _mnemonic12);
           final r = parseAnyQrSecret(qr);
           expect(r.kind, QrSecretKind.bearby);
           expect(r.chain, chain);

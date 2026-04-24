@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/components/biometric_switch.dart';
-import 'package:bearby/components/bip_purpose_selector.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/glass_message.dart';
 import 'package:provider/provider.dart';
