@@ -4934,7 +4934,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       metadata: dco_decode_transaction_metadata_info(arr[1]),
       evm: dco_decode_opt_String(arr[2]),
       scilla: dco_decode_opt_String(arr[3]),
-      btc: dco_decode_opt_String(arr[4]),
+      btc: dco_decode_opt_box_autoadd_transaction_request_bitcoin(arr[4]),
       tron: dco_decode_opt_String(arr[5]),
       signedMessage: dco_decode_opt_String(arr[6]),
       timestamp: dco_decode_u_64(arr[7]),
@@ -5374,6 +5374,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         ? null
         : dco_decode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
             raw);
+  }
+
+  @protected
+  TransactionRequestBitcoin?
+      dco_decode_opt_box_autoadd_transaction_request_bitcoin(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_request_bitcoin(raw);
   }
 
   @protected
@@ -6576,7 +6585,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_metadata = sse_decode_transaction_metadata_info(deserializer);
     var var_evm = sse_decode_opt_String(deserializer);
     var var_scilla = sse_decode_opt_String(deserializer);
-    var var_btc = sse_decode_opt_String(deserializer);
+    var var_btc =
+        sse_decode_opt_box_autoadd_transaction_request_bitcoin(deserializer);
     var var_tron = sse_decode_opt_String(deserializer);
     var var_signedMessage = sse_decode_opt_String(deserializer);
     var var_timestamp = sse_decode_u_64(deserializer);
@@ -7268,6 +7278,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
           deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionRequestBitcoin?
+      sse_decode_opt_box_autoadd_transaction_request_bitcoin(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_request_bitcoin(deserializer));
     } else {
       return null;
     }
@@ -8397,7 +8420,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_transaction_metadata_info(self.metadata, serializer);
     sse_encode_opt_String(self.evm, serializer);
     sse_encode_opt_String(self.scilla, serializer);
-    sse_encode_opt_String(self.btc, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_bitcoin(
+        self.btc, serializer);
     sse_encode_opt_String(self.tron, serializer);
     sse_encode_opt_String(self.signedMessage, serializer);
     sse_encode_u_64(self.timestamp, serializer);
@@ -8941,6 +8965,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (self != null) {
       sse_encode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
           self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_bitcoin(
+      TransactionRequestBitcoin? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_request_bitcoin(self, serializer);
     }
   }
 
