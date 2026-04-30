@@ -196,12 +196,13 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         .map_err(ServiceError::BackgroundError)?;
     let network = chain.config.bitcoin_network();
 
+    let secret_passphrase = SecretString::new(params.passphrase.into());
     wallet
         .add_next_bip39_account(
             params.name,
             params.account_index,
             network,
-            &params.passphrase,
+            &secret_passphrase,
             &seed,
         )
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
@@ -351,8 +352,9 @@ pub async fn reveal_keypair(
         .core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
     let keypair = wallet
-        .reveal_keypair(account_index, &seed, passphrase.as_deref())
+        .reveal_keypair(account_index, &seed, &secret_passphrase)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
     password.zeroize();

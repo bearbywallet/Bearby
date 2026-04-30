@@ -120,12 +120,13 @@ pub async fn sign_send_transactions(
             _ => {}
         }
 
+        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
         let signed_tx = wallet
             .sign_transaction(
                 tx,
                 account_index,
                 &seed_bytes,
-                passphrase.as_ref().map(|m| m.as_str()),
+                &secret_passphrase,
             )
             .await
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -280,12 +281,13 @@ pub async fn sign_message(
             core.unlock_wallet_with_session(wallet_index).await
         }
         .map_err(ServiceError::BackgroundError)?;
+        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
         let signed = core
             .sign_message(
                 wallet_index,
                 account_index,
                 &seed_bytes,
-                passphrase.as_ref().map(|s| s.as_ref()),
+                &secret_passphrase,
                 &message,
                 title,
                 icon,
@@ -325,12 +327,13 @@ pub async fn sign_typed_data_eip712(
             core.unlock_wallet_with_session(wallet_index).await
         }
         .map_err(ServiceError::BackgroundError)?;
+        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
         let signed = core
             .sign_typed_data_eip712(
                 wallet_index,
                 account_index,
                 &seed_bytes,
-                passphrase.as_ref().map(|s| s.as_ref()),
+                &secret_passphrase,
                 &typed_data_json,
                 title,
                 icon,

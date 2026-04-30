@@ -190,6 +190,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
   @protected
+  (String, String) dco_decode_box_autoadd_record_string_string(dynamic raw);
+
+  @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
       dynamic raw);
 
@@ -411,6 +414,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
+
+  @protected
+  (String, String)? dco_decode_opt_box_autoadd_record_string_string(
+      dynamic raw);
 
   @protected
   TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
@@ -679,6 +686,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  (String, String) sse_decode_box_autoadd_record_string_string(
+      SseDeserializer deserializer);
+
+  @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
       SseDeserializer deserializer);
 
@@ -923,6 +934,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
+      SseDeserializer deserializer);
+
+  @protected
+  (String, String)? sse_decode_opt_box_autoadd_record_string_string(
       SseDeserializer deserializer);
 
   @protected
@@ -1213,6 +1228,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       QrConfigInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_record_string_string(
+      (String, String) self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer);
 
@@ -1469,6 +1488,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_f_token_info(
       FTokenInfo? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_record_string_string(
+      (String, String)? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_evm(

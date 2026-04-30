@@ -34,15 +34,9 @@ pub struct HistoricalTransactionInfo {
 
 impl From<HistoricalTransaction> for HistoricalTransactionInfo {
     fn from(value: HistoricalTransaction) -> Self {
-        let btc_witness_utxos = value
-            .metadata
-            .btc_witness_utxos
-            .and_then(|witness_utxos| serde_json::to_string(&witness_utxos).ok());
-
         Self {
             status: value.status.into(),
             metadata: TransactionMetadataInfo {
-                btc_witness_utxos,
                 chain_hash: value.metadata.chain_hash,
                 hash: value.metadata.hash,
                 info: value.metadata.info,

@@ -143,12 +143,11 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
         color: theme.cardBackground.withValues(alpha: 0.85),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border:
-            Border.all(color: Colors.white.withValues(alpha: 0.12), width: 1),
+            Border.all(color: theme.modalBorder, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
+            color: theme.primaryPurple.withValues(alpha: 0.15),
+            blurRadius: 30,
           ),
         ],
       ),
