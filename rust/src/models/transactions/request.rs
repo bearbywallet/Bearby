@@ -16,6 +16,7 @@ pub use zilpay::{
 
 use zilpay::proto::solana_tx::SolanaTransaction;
 
+use super::btc::BitcoinMetadataInfo;
 use super::btc::TransactionRequestBitcoin;
 use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
@@ -28,7 +29,7 @@ pub struct TransactionRequestInfo {
     pub metadata: TransactionMetadataInfo,
     pub scilla: Option<TransactionRequestScilla>,
     pub evm: Option<TransactionRequestEVM>,
-    pub btc: Option<(TransactionRequestBitcoin, String)>,
+    pub btc: Option<(TransactionRequestBitcoin, BitcoinMetadataInfo)>,
     pub tron: Option<String>,
     pub solana: Option<Vec<u8>>,
 }
@@ -44,15 +45,11 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
         } else if let Some(evm_tx) = value.evm {
             let tx_req = TransactionRequest::Ethereum((evm_tx.try_into()?, value.metadata.into()));
             Ok(tx_req)
-        } else if let Some((btc_tx, btc_meta_json)) = value.btc {
+        } else if let Some((btc_tx, btc_meta_info)) = value.btc {
             let native_tx: bitcoin::Transaction = btc_tx
                 .try_into()
                 .map_err(|e: TransactionErrors| e)?;
-            let btc_meta: BitcoinMetadata = serde_json::from_str(&btc_meta_json)
-                .unwrap_or(BitcoinMetadata {
-                    witness_utxos: Vec::new(),
-                    input_meta: Vec::new(),
-                });
+            let btc_meta: BitcoinMetadata = btc_meta_info.try_into()?;
             let tx_req = TransactionRequest::Bitcoin((native_tx, value.metadata.into(), btc_meta));
             Ok(tx_req)
         } else if let Some(tron_str) = value.tron {
@@ -103,12 +100,11 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 solana: None,
             },
             TransactionRequest::Bitcoin((tx, _, btc_meta)) => {
-                let btc_meta_json = serde_json::to_string(&btc_meta).unwrap_or_default();
                 Self {
                     metadata,
                     scilla: None,
                     evm: None,
-                    btc: Some((tx.into(), btc_meta_json)),
+                    btc: Some((tx.into(), btc_meta.into())),
                     tron: None,
                     solana: None,
                 }

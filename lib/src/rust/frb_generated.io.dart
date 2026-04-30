@@ -138,6 +138,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw);
 
   @protected
+  BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw);
+
+  @protected
   BlockEvent dco_decode_block_event(dynamic raw);
 
   @protected
@@ -191,9 +194,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
   @protected
-  (TransactionRequestBitcoin, String)
-      dco_decode_box_autoadd_record_transaction_request_bitcoin_string(
-          dynamic raw);
+  (
+    TransactionRequestBitcoin,
+    BitcoinMetadataInfo
+  ) dco_decode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+      dynamic raw);
 
   @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
@@ -273,6 +278,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  InputMetaInfo dco_decode_input_meta_info(dynamic raw);
+
+  @protected
   KeyPairInfo dco_decode_key_pair_info(dynamic raw);
 
   @protected
@@ -315,6 +323,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
       dynamic raw);
+
+  @protected
+  List<InputMetaInfo> dco_decode_list_input_meta_info(dynamic raw);
 
   @protected
   List<LedgerInputSignature> dco_decode_list_ledger_input_signature(
@@ -425,9 +436,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
 
   @protected
-  (TransactionRequestBitcoin, String)?
-      dco_decode_opt_box_autoadd_record_transaction_request_bitcoin_string(
-          dynamic raw);
+  (
+    TransactionRequestBitcoin,
+    BitcoinMetadataInfo
+  )? dco_decode_opt_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+      dynamic raw);
 
   @protected
   TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
@@ -477,8 +490,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, int) dco_decode_record_string_u_8(dynamic raw);
 
   @protected
-  (TransactionRequestBitcoin, String)
-      dco_decode_record_transaction_request_bitcoin_string(dynamic raw);
+  (TransactionRequestBitcoin, BitcoinMetadataInfo)
+      dco_decode_record_transaction_request_bitcoin_bitcoin_metadata_info(
+          dynamic raw);
 
   @protected
   (int, List<AccountInfo>) dco_decode_record_u_32_list_account_info(
@@ -650,6 +664,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(
+      SseDeserializer deserializer);
+
+  @protected
   BlockEvent sse_decode_block_event(SseDeserializer deserializer);
 
   @protected
@@ -712,9 +730,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  (TransactionRequestBitcoin, String)
-      sse_decode_box_autoadd_record_transaction_request_bitcoin_string(
-          SseDeserializer deserializer);
+  (
+    TransactionRequestBitcoin,
+    BitcoinMetadataInfo
+  ) sse_decode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+      SseDeserializer deserializer);
 
   @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
@@ -798,6 +818,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  InputMetaInfo sse_decode_input_meta_info(SseDeserializer deserializer);
+
+  @protected
   KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
 
   @protected
@@ -845,6 +868,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<InputMetaInfo> sse_decode_list_input_meta_info(
       SseDeserializer deserializer);
 
   @protected
@@ -970,9 +997,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  (TransactionRequestBitcoin, String)?
-      sse_decode_opt_box_autoadd_record_transaction_request_bitcoin_string(
-          SseDeserializer deserializer);
+  (
+    TransactionRequestBitcoin,
+    BitcoinMetadataInfo
+  )? sse_decode_opt_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+      SseDeserializer deserializer);
 
   @protected
   TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
@@ -1027,8 +1056,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, int) sse_decode_record_string_u_8(SseDeserializer deserializer);
 
   @protected
-  (TransactionRequestBitcoin, String)
-      sse_decode_record_transaction_request_bitcoin_string(
+  (TransactionRequestBitcoin, BitcoinMetadataInfo)
+      sse_decode_record_transaction_request_bitcoin_bitcoin_metadata_info(
           SseDeserializer deserializer);
 
   @protected
@@ -1217,6 +1246,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Bip39AddWalletParams self, SseSerializer serializer);
 
   @protected
+  void sse_encode_bitcoin_metadata_info(
+      BitcoinMetadataInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_block_event(BlockEvent self, SseSerializer serializer);
 
   @protected
@@ -1280,8 +1313,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       QrConfigInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_record_transaction_request_bitcoin_string(
-      (TransactionRequestBitcoin, String) self, SseSerializer serializer);
+  void
+      sse_encode_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+          (TransactionRequestBitcoin, BitcoinMetadataInfo) self,
+          SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_required_tx_params_info(
@@ -1368,6 +1403,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_input_meta_info(InputMetaInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
 
   @protected
@@ -1418,6 +1456,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_historical_transaction_info(
       List<HistoricalTransactionInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_input_meta_info(
+      List<InputMetaInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_ledger_input_signature(
@@ -1550,8 +1592,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FTokenInfo? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_record_transaction_request_bitcoin_string(
-      (TransactionRequestBitcoin, String)? self, SseSerializer serializer);
+  void
+      sse_encode_opt_box_autoadd_record_transaction_request_bitcoin_bitcoin_metadata_info(
+          (TransactionRequestBitcoin, BitcoinMetadataInfo)? self,
+          SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_evm(
@@ -1607,8 +1651,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       (String, int) self, SseSerializer serializer);
 
   @protected
-  void sse_encode_record_transaction_request_bitcoin_string(
-      (TransactionRequestBitcoin, String) self, SseSerializer serializer);
+  void sse_encode_record_transaction_request_bitcoin_bitcoin_metadata_info(
+      (TransactionRequestBitcoin, BitcoinMetadataInfo) self,
+      SseSerializer serializer);
 
   @protected
   void sse_encode_record_u_32_list_account_info(

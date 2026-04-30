@@ -6,6 +6,48 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class BitcoinMetadataInfo {
+  final List<TxOutInfo> witnessUtxos;
+  final List<InputMetaInfo> inputMeta;
+
+  const BitcoinMetadataInfo({
+    required this.witnessUtxos,
+    required this.inputMeta,
+  });
+
+  @override
+  int get hashCode => witnessUtxos.hashCode ^ inputMeta.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BitcoinMetadataInfo &&
+          runtimeType == other.runtimeType &&
+          witnessUtxos == other.witnessUtxos &&
+          inputMeta == other.inputMeta;
+}
+
+class InputMetaInfo {
+  final int addressType;
+  final String derivationPath;
+
+  const InputMetaInfo({
+    required this.addressType,
+    required this.derivationPath,
+  });
+
+  @override
+  int get hashCode => addressType.hashCode ^ derivationPath.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is InputMetaInfo &&
+          runtimeType == other.runtimeType &&
+          addressType == other.addressType &&
+          derivationPath == other.derivationPath;
+}
+
 class OutPointInfo {
   final String txid;
   final int vout;
