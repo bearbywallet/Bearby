@@ -9,6 +9,8 @@ use sha2::{Digest, Sha256};
 use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
 
+use crate::models::transactions::btc::{TransactionRequestBitcoin, TxOutInfo};
+
 // --- Merkle Tree ---
 
 /// Leaf hash: SHA256(0x00 || data)
@@ -786,20 +788,23 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
 
 // --- PSBT Building for Ledger ---
 
-/// Build PSBT bytes from a raw Bitcoin transaction hex and witness UTXOs JSON.
-/// This wraps the existing build_psbt from zilpay-core.
-pub fn btc_ledger_build_psbt_from_tx(
-    tx_hex: String,
-    witness_utxos_json: String,
+pub fn btc_ledger_build_psbt_from_struct(
+    tx: TransactionRequestBitcoin,
+    witness_utxos: Vec<TxOutInfo>,
 ) -> Result<Vec<u8>, String> {
-    let tx_bytes = hex::decode(&tx_hex).map_err(|e| format!("Invalid tx hex: {}", e))?;
-    let tx: BitcoinTransaction = btc_encode::deserialize(&tx_bytes)
-        .map_err(|e| format!("Failed to deserialize transaction: {}", e))?;
+    let native_tx: BitcoinTransaction = tx
+        .try_into()
+        .map_err(|e| format!("Failed to convert transaction: {:?}", e))?;
 
-    let witness_utxos: Vec<bitcoin::TxOut> = serde_json::from_str(&witness_utxos_json)
-        .map_err(|e| format!("Failed to parse witness UTXOs: {}", e))?;
+    let native_utxos: Vec<bitcoin::TxOut> = witness_utxos
+        .into_iter()
+        .map(|utxo| bitcoin::TxOut {
+            value: bitcoin::Amount::from_sat(utxo.value),
+            script_pubkey: bitcoin::ScriptBuf::from(utxo.script_pubkey),
+        })
+        .collect();
 
-    let psbt = zilpay::proto::btc_tx::build_psbt(tx, &witness_utxos)
+    let psbt = zilpay::proto::btc_tx::build_psbt(native_tx, &native_utxos)
         .map_err(|e| format!("Failed to build PSBT: {:?}", e))?;
 
     Ok(psbt.serialize())

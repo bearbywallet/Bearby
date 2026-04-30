@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/transactions/btc.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `add_preimage`, `build_merkle_map`, `build_merkle_tree`, `build_v2_global_map`, `build_v2_input_maps`, `build_v2_output_maps`, `compute_proof`, `descriptor_template_for_bip`, `encode_varint`, `hash_node`, `highest_power_of_2_less_than`
@@ -77,12 +78,11 @@ Future<FinalizedBtcTx> btcLedgerFinalizePsbtWithSigs(
     RustLib.instance.api.crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
         psbtBytes: psbtBytes, sigs: sigs, addrType: addrType);
 
-/// Build PSBT bytes from a raw Bitcoin transaction hex and witness UTXOs JSON.
-/// This wraps the existing build_psbt from zilpay-core.
-Future<Uint8List> btcLedgerBuildPsbtFromTx(
-        {required String txHex, required String witnessUtxosJson}) =>
-    RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromTx(
-        txHex: txHex, witnessUtxosJson: witnessUtxosJson);
+Future<Uint8List> btcLedgerBuildPsbtFromStruct(
+        {required TransactionRequestBitcoin tx,
+        required List<TxOutInfo> witnessUtxos}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+        tx: tx, witnessUtxos: witnessUtxos);
 
 /// Populate BIP32 derivation info into a PSBT for Ledger signing.
 /// Derives child keys from the account xpub and matches them against

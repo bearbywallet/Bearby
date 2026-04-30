@@ -209,6 +209,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  TransactionRequestBitcoin dco_decode_box_autoadd_transaction_request_bitcoin(
+      dynamic raw);
+
+  @protected
   TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(
       dynamic raw);
 
@@ -742,6 +746,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
+      SseDeserializer deserializer);
+
+  @protected
+  TransactionRequestBitcoin sse_decode_box_autoadd_transaction_request_bitcoin(
       SseDeserializer deserializer);
 
   @protected
@@ -1325,6 +1333,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_token_transfer_params_info(
       TokenTransferParamsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_bitcoin(
+      TransactionRequestBitcoin self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_transaction_request_evm(

@@ -106,7 +106,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 918362759;
+  int get rustContentHash => -1436396950;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -175,8 +175,9 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
       {required String addr});
 
-  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromTx(
-      {required String txHex, required String witnessUtxosJson});
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+      {required TransactionRequestBitcoin tx,
+      required List<TxOutInfo> witnessUtxos});
 
   Future<WalletPolicy> crateApiBtcLedgerBtcLedgerBuildWalletPolicy(
       {required String xpub,
@@ -1038,13 +1039,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromTx(
-      {required String txHex, required String witnessUtxosJson}) {
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+      {required TransactionRequestBitcoin tx,
+      required List<TxOutInfo> witnessUtxos}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(txHex, serializer);
-        sse_encode_String(witnessUtxosJson, serializer);
+        sse_encode_box_autoadd_transaction_request_bitcoin(tx, serializer);
+        sse_encode_list_tx_out_info(witnessUtxos, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 20, port: port_);
       },
@@ -1052,16 +1054,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBtcLedgerBtcLedgerBuildPsbtFromTxConstMeta,
-      argValues: [txHex, witnessUtxosJson],
+      constMeta: kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta,
+      argValues: [tx, witnessUtxos],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildPsbtFromTxConstMeta =>
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta =>
       const TaskConstMeta(
-        debugName: "btc_ledger_build_psbt_from_tx",
-        argNames: ["txHex", "witnessUtxosJson"],
+        debugName: "btc_ledger_build_psbt_from_struct",
+        argNames: ["tx", "witnessUtxos"],
       );
 
   @override
@@ -4679,6 +4681,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestBitcoin dco_decode_box_autoadd_transaction_request_bitcoin(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_bitcoin(raw);
+  }
+
+  @protected
   TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -6301,6 +6310,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_token_transfer_params_info(deserializer));
+  }
+
+  @protected
+  TransactionRequestBitcoin sse_decode_box_autoadd_transaction_request_bitcoin(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_bitcoin(deserializer));
   }
 
   @protected
@@ -8182,6 +8198,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       TokenTransferParamsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_token_transfer_params_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_bitcoin(
+      TransactionRequestBitcoin self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_bitcoin(self, serializer);
   }
 
   @protected

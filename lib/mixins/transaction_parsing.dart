@@ -459,19 +459,8 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   BigInt get fee {
-    if (btc != null && btcReceipt != null && metadata.btcWitnessUtxos != null) {
-      try {
-        final utxos = jsonDecode(metadata.btcWitnessUtxos!) as List<dynamic>;
-        BigInt inputTotal = BigInt.zero;
-        for (final utxo in utxos) {
-          final value = utxo['value'];
-          if (value is int) {
-            inputTotal += BigInt.from(value);
-          }
-        }
-        final outputTotal = btcReceipt!.totalOutputValue;
-        return inputTotal - outputTotal;
-      } catch (_) {}
+    if (btc != null) {
+      return btcReceipt?.fee ?? BigInt.zero;
     }
 
     if (evm != null) {
