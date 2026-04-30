@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
+pub use zilpay::crypto::bip49::DerivationPath;
 pub use zilpay::errors::tx::TransactionErrors;
+pub use zilpay::proto::btc_tx::BitcoinMetadata;
 
 #[derive(Debug, Clone)]
 pub struct OutPointInfo {
@@ -96,6 +98,71 @@ impl TryFrom<TransactionRequestBitcoin> for bitcoin::Transaction {
             lock_time: bitcoin::absolute::LockTime::from_consensus(value.lock_time),
             input,
             output,
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct InputMetaInfo {
+    pub address_type: u8,
+    pub derivation_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct BitcoinMetadataInfo {
+    pub witness_utxos: Vec<TxOutInfo>,
+    pub input_meta: Vec<InputMetaInfo>,
+}
+
+impl From<BitcoinMetadata> for BitcoinMetadataInfo {
+    fn from(value: BitcoinMetadata) -> Self {
+        Self {
+            witness_utxos: value
+                .witness_utxos
+                .into_iter()
+                .map(|tx_out| TxOutInfo {
+                    value: tx_out.value.to_sat(),
+                    script_pubkey: tx_out.script_pubkey.into_bytes(),
+                })
+                .collect(),
+            input_meta: value
+                .input_meta
+                .into_iter()
+                .map(|(addr_type, path)| InputMetaInfo {
+                    address_type: addr_type,
+                    derivation_path: path.to_string(),
+                })
+                .collect(),
+        }
+    }
+}
+
+impl TryFrom<BitcoinMetadataInfo> for BitcoinMetadata {
+    type Error = TransactionErrors;
+
+    fn try_from(value: BitcoinMetadataInfo) -> Result<Self, Self::Error> {
+        let witness_utxos = value
+            .witness_utxos
+            .into_iter()
+            .map(|tx_out| bitcoin::TxOut {
+                value: bitcoin::Amount::from_sat(tx_out.value),
+                script_pubkey: bitcoin::ScriptBuf::from(tx_out.script_pubkey),
+            })
+            .collect();
+
+        let input_meta = value
+            .input_meta
+            .into_iter()
+            .map(|meta| {
+                let path = DerivationPath::try_from(meta.derivation_path.as_str())
+                    .map_err(|e| TransactionErrors::ConvertTxError(e.to_string()))?;
+                Ok((meta.address_type, path))
+            })
+            .collect::<Result<Vec<_>, TransactionErrors>>()?;
+
+        Ok(BitcoinMetadata {
+            witness_utxos,
+            input_meta,
         })
     }
 }
