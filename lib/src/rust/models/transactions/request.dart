@@ -6,6 +6,7 @@
 import '../../frb_generated.dart';
 import 'access_list.dart';
 import 'base_token.dart';
+import 'btc.dart';
 import 'evm.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'scilla.dart';
@@ -15,7 +16,7 @@ class TransactionRequestInfo {
   final TransactionMetadataInfo metadata;
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
-  final (String, String)? btc;
+  final (TransactionRequestBitcoin, String)? btc;
   final String? tron;
   final Uint8List? solana;
 

@@ -16,6 +16,7 @@ pub use zilpay::{
 
 use zilpay::proto::solana_tx::SolanaTransaction;
 
+use super::btc::TransactionRequestBitcoin;
 use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
 use super::transaction_metadata::TransactionMetadataInfo;
@@ -27,7 +28,7 @@ pub struct TransactionRequestInfo {
     pub metadata: TransactionMetadataInfo,
     pub scilla: Option<TransactionRequestScilla>,
     pub evm: Option<TransactionRequestEVM>,
-    pub btc: Option<(String, String)>,
+    pub btc: Option<(TransactionRequestBitcoin, String)>,
     pub tron: Option<String>,
     pub solana: Option<Vec<u8>>,
 }
@@ -43,16 +44,16 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
         } else if let Some(evm_tx) = value.evm {
             let tx_req = TransactionRequest::Ethereum((evm_tx.try_into()?, value.metadata.into()));
             Ok(tx_req)
-        } else if let Some((btc_hex, btc_meta_json)) = value.btc {
-            let bytes = hex::decode(btc_hex).map_err(|_| TransactionErrors::InvalidTxHash)?;
-            let btc_tx = bitcoin::consensus::encode::deserialize(&bytes)
-                .map_err(|_| TransactionErrors::InvalidTxHash)?;
+        } else if let Some((btc_tx, btc_meta_json)) = value.btc {
+            let native_tx: bitcoin::Transaction = btc_tx
+                .try_into()
+                .map_err(|e: TransactionErrors| e)?;
             let btc_meta: BitcoinMetadata = serde_json::from_str(&btc_meta_json)
                 .unwrap_or(BitcoinMetadata {
                     witness_utxos: Vec::new(),
                     input_meta: Vec::new(),
                 });
-            let tx_req = TransactionRequest::Bitcoin((btc_tx, value.metadata.into(), btc_meta));
+            let tx_req = TransactionRequest::Bitcoin((native_tx, value.metadata.into(), btc_meta));
             Ok(tx_req)
         } else if let Some(tron_str) = value.tron {
             let sign_req_tron = serde_json::from_str::<TronWebTransaction>(&tron_str)
@@ -102,14 +103,12 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 solana: None,
             },
             TransactionRequest::Bitcoin((tx, _, btc_meta)) => {
-                let bytes = bitcoin::consensus::encode::serialize(&tx);
-                let hex = hex::encode(bytes);
                 let btc_meta_json = serde_json::to_string(&btc_meta).unwrap_or_default();
                 Self {
                     metadata,
                     scilla: None,
                     evm: None,
-                    btc: Some((hex, btc_meta_json)),
+                    btc: Some((tx.into(), btc_meta_json)),
                     tron: None,
                     solana: None,
                 }

@@ -1,5 +1,6 @@
 pub mod access_list;
 pub mod base_token;
+pub mod btc;
 pub mod evm;
 pub mod history;
 pub mod request;
