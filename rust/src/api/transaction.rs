@@ -88,23 +88,29 @@ pub async fn sign_send_transactions(
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
 
+    let seed_bytes = if let Some(mut pass) = password {
+        let key = core
+            .unlock_wallet_with_password(&pass, None, wallet_index)
+            .await;
+
+        pass.zeroize();
+
+        key
+    } else {
+        core.unlock_wallet_with_session(wallet_index).await
+    }
+    .map_err(ServiceError::BackgroundError)?;
+
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
+
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let sender_account = wallet_data
+        .get_account(account_index)
+        .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+
     let signed_tx = {
-        let seed_bytes = if let Some(mut pass) = password {
-            let key = core
-                .unlock_wallet_with_password(&pass, None, wallet_index)
-                .await;
-
-            pass.zeroize();
-
-            key
-        } else {
-            core.unlock_wallet_with_session(wallet_index).await
-        }
-        .map_err(ServiceError::BackgroundError)?;
-
-        let wallet_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let chain = core
             .get_provider(wallet_data.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
@@ -120,20 +126,12 @@ pub async fn sign_send_transactions(
             _ => {}
         }
 
-        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
-        let signed_tx = wallet
-            .sign_transaction(
-                tx,
-                account_index,
-                &seed_bytes,
-                &secret_passphrase,
-            )
+        wallet
+            .sign_transaction(tx, account_index, &seed_bytes, &secret_passphrase)
             .await
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?
+    };
 
-        Ok::<TransactionReceipt, ServiceError>(signed_tx)
-    }
-    .map_err(Into::<ServiceError>::into)?;
     let is_broadcast = signed_tx.get_metadata().broadcast;
 
     let tx = if is_broadcast {
@@ -154,6 +152,12 @@ pub async fn sign_send_transactions(
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         history.into()
     };
+
+    if let Address::Secp256k1Bitcoin(_) = &sender_account.addr {
+        core.rotate_btc_account(wallet_index, account_index, &seed_bytes, &secret_passphrase)
+            .await
+            .map_err(ServiceError::BackgroundError)?;
+    }
 
     Ok(tx)
 }
