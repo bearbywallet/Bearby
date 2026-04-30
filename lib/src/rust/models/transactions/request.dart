@@ -15,7 +15,7 @@ class TransactionRequestInfo {
   final TransactionMetadataInfo metadata;
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
-  final String? btc;
+  final (String, String)? btc;
   final String? tron;
   final Uint8List? solana;
 

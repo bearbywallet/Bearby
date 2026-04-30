@@ -6494,6 +6494,17 @@ impl SseDecode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseDecode for Option<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<(String, String)>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::models::transactions::evm::TransactionRequestEVM> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -6825,7 +6836,6 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
                 deserializer,
             );
-        let mut var_btcWitnessUtxos = <Option<String>>::sse_decode(deserializer);
         let mut var_broadcast = <bool>::sse_decode(deserializer);
         return crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
             chain_hash: var_chainHash,
@@ -6835,7 +6845,6 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             title: var_title,
             signer: var_signer,
             token_info: var_tokenInfo,
-            btc_witness_utxos: var_btcWitnessUtxos,
             broadcast: var_broadcast,
         };
     }
@@ -6889,7 +6898,7 @@ impl SseDecode for crate::models::transactions::request::TransactionRequestInfo 
             <Option<crate::models::transactions::evm::TransactionRequestEVM>>::sse_decode(
                 deserializer,
             );
-        let mut var_btc = <Option<String>>::sse_decode(deserializer);
+        let mut var_btc = <Option<(String, String)>>::sse_decode(deserializer);
         let mut var_tron = <Option<String>>::sse_decode(deserializer);
         let mut var_solana = <Option<Vec<u8>>>::sse_decode(deserializer);
         return crate::models::transactions::request::TransactionRequestInfo {
@@ -8477,7 +8486,6 @@ impl flutter_rust_bridge::IntoDart
             self.title.into_into_dart().into_dart(),
             self.signer.into_into_dart().into_dart(),
             self.token_info.into_into_dart().into_dart(),
-            self.btc_witness_utxos.into_into_dart().into_dart(),
             self.broadcast.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -9619,6 +9627,16 @@ impl SseEncode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseEncode for Option<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <(String, String)>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::models::transactions::evm::TransactionRequestEVM> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9876,7 +9894,6 @@ impl SseEncode for crate::models::transactions::transaction_metadata::Transactio
             self.token_info,
             serializer,
         );
-        <Option<String>>::sse_encode(self.btc_witness_utxos, serializer);
         <bool>::sse_encode(self.broadcast, serializer);
     }
 }
@@ -9917,7 +9934,7 @@ impl SseEncode for crate::models::transactions::request::TransactionRequestInfo 
         <Option<crate::models::transactions::evm::TransactionRequestEVM>>::sse_encode(
             self.evm, serializer,
         );
-        <Option<String>>::sse_encode(self.btc, serializer);
+        <Option<(String, String)>>::sse_encode(self.btc, serializer);
         <Option<String>>::sse_encode(self.tron, serializer);
         <Option<Vec<u8>>>::sse_encode(self.solana, serializer);
     }

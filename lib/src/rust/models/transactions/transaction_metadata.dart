@@ -15,7 +15,6 @@ class TransactionMetadataInfo {
   final String? title;
   final String? signer;
   final BaseTokenInfo? tokenInfo;
-  final String? btcWitnessUtxos;
   final bool broadcast;
 
   const TransactionMetadataInfo({
@@ -26,7 +25,6 @@ class TransactionMetadataInfo {
     this.title,
     this.signer,
     this.tokenInfo,
-    this.btcWitnessUtxos,
     required this.broadcast,
   });
 
@@ -39,7 +37,6 @@ class TransactionMetadataInfo {
       title.hashCode ^
       signer.hashCode ^
       tokenInfo.hashCode ^
-      btcWitnessUtxos.hashCode ^
       broadcast.hashCode;
 
   @override
@@ -54,6 +51,5 @@ class TransactionMetadataInfo {
           title == other.title &&
           signer == other.signer &&
           tokenInfo == other.tokenInfo &&
-          btcWitnessUtxos == other.btcWitnessUtxos &&
           broadcast == other.broadcast;
 }
