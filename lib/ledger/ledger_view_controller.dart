@@ -290,9 +290,10 @@ class LedgerViewController extends ChangeNotifier {
     } else if (transaction.btc != null) {
       final btcApp = BtcLedgerApp(_connectedTransport!);
 
-      final psbtBytes = await btc_ffi.btcLedgerBuildPsbtFromTx(
-        txHex: transaction.btc!,
-        witnessUtxosJson: transaction.metadata.btcWitnessUtxos ?? '[]',
+      final (btcTx, btcMeta) = transaction.btc!;
+      final psbtBytes = await btc_ffi.btcLedgerBuildPsbtFromStruct(
+        tx: btcTx,
+        witnessUtxos: btcMeta.witnessUtxos,
       );
 
       // Get fingerprint & xpub to prepare the PSBT with bip32_derivation
