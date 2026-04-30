@@ -8,6 +8,7 @@ import '../models/ftoken.dart';
 import '../models/stake.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
+import '../models/transactions/btc.dart';
 import '../models/transactions/evm.dart';
 import '../models/transactions/request.dart';
 import '../models/transactions/scilla.dart';
