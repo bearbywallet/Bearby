@@ -296,21 +296,26 @@ class _ConfirmTransactionContentState
     final wallet = appState.wallet!;
     final walletIndex = appState.selectedWalletIndex;
     final accountIndex = wallet.selectedAccount;
+    HistoricalTransactionInfo history;
 
     if (wallet.authType != "none") {
-      return await signSendTransactions(
+      history = await signSendTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         tx: tx,
       );
     } else {
-      return await signSendTransactions(
+      history = await signSendTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         tx: tx,
         password: _passwordController.text,
       );
     }
+
+    await appState.syncData();
+
+    return history;
   }
 
   Color? _parseColor(String? colorString) {

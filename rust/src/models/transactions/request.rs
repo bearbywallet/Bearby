@@ -100,10 +100,8 @@ impl From<TransactionRequest> for TransactionRequestInfo {
             },
             TransactionRequest::Bitcoin((tx, _, btc_meta)) => {
                 let btc_meta_info: BitcoinMetadataInfo = btc_meta.into();
-                let tx_info = TransactionBitcoin::from_tx_with_utxos(
-                    tx,
-                    &btc_meta_info.witness_utxos,
-                );
+                let tx_info =
+                    TransactionBitcoin::from_tx_with_utxos(tx, &btc_meta_info.witness_utxos);
                 Self {
                     metadata,
                     scilla: None,
@@ -112,7 +110,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                     tron: None,
                     solana: None,
                 }
-            },
+            }
             TransactionRequest::Tron((tx, _)) => {
                 // TODO: must be fixed!
                 let tron_web = tx.to_tron_web().unwrap();

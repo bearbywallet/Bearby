@@ -9,7 +9,8 @@ import 'package:bearby/components/glass_search_bar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
-import 'package:bearby/modals/transaction_details_modal.dart';
+import 'package:bearby/modals/btc_transaction_details_modal.dart';
+import 'package:bearby/modals/evm_transaction_details_modal.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/state/app_state.dart';
@@ -206,10 +207,17 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
             transaction: transaction,
             showDivider: !isLast,
             onTap: () {
-              showTransactionDetailsModal(
-                context: context,
-                transaction: transaction,
-              );
+              if (transaction.isBtcTransaction) {
+                showBtcTransactionDetailsModal(
+                  context: context,
+                  transaction: transaction,
+                );
+              } else {
+                showEvmTransactionDetailsModal(
+                  context: context,
+                  transaction: transaction,
+                );
+              }
             },
           );
         }).toList(),
