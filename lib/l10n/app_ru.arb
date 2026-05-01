@@ -110,8 +110,6 @@
   "secretKeyRestorePageKeyTitle": "Приватный ключ",
   "secretKeyRestorePageBackupLabel": "Я сделал резервную копию моего секретного ключа",
   "secretKeyRestorePageNextButton": "Далее",
-  "addAccountPageTitle": "Добавить новый аккаунт",
-  "addAccountPageSubtitle": "Создать BIP39 аккаунт",
   "addAccountPageDefaultName": "Аккаунт {index}",
   "addAccountPageNameHint": "Имя аккаунта",
   "addAccountPageBip39Index": "BIP39 индекс",

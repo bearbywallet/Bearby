@@ -447,14 +447,6 @@
   "@secretKeyRestorePageNextButton": {
     "description": "Text for the Next button on the Secret Key Restore page"
   },
-  "addAccountPageTitle": "Add New Account",
-  "@addAccountPageTitle": {
-    "description": "Title for the Add Account page"
-  },
-  "addAccountPageSubtitle": "Create BIP39 Account",
-  "@addAccountPageSubtitle": {
-    "description": "Subtitle for the Add Account page"
-  },
   "addAccountPageDefaultName": "Account {index}",
   "@addAccountPageDefaultName": {
     "description": "Default account name format for the Add Account page",

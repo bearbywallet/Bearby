@@ -12,7 +12,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Bearby Wallet';
 
   @override
+  String get initialPagerestoreZilPay => 'Restore ZilPay 1.0!';
+
+  @override
   String get initialPagegetStarted => 'Get Started';
+
+  @override
+  String get restoreRKStorageTitle => 'Migrate ZilPay 1.0 to 2.0';
+
+  @override
+  String get restoreRKStorageAccountsPrompt => 'Accounts to migrate to ZilPay 2.0. Enter password.';
+
+  @override
+  String get restoreRKStoragePasswordHint => 'Password';
+
+  @override
+  String get restoreRKStorageEnterPassword => 'Enter password';
+
+  @override
+  String get restoreRKStorageErrorPrefix => 'Error:';
+
+  @override
+  String get restoreRKStorageRestoreButton => 'Restore';
+
+  @override
+  String get restoreRKStorageSkipButton => 'Skip';
 
   @override
   String get accountItemBalanceLabel => 'Balance:';
@@ -322,12 +346,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get secretKeyRestorePageNextButton => 'Next';
-
-  @override
-  String get addAccountPageTitle => 'Add New Account';
-
-  @override
-  String get addAccountPageSubtitle => 'Create BIP39 Account';
 
   @override
   String addAccountPageDefaultName(Object index) {

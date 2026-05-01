@@ -110,8 +110,6 @@
   "secretKeyRestorePageKeyTitle": "개인 키",
   "secretKeyRestorePageBackupLabel": "비밀 키 백업 완료",
   "secretKeyRestorePageNextButton": "다음",
-  "addAccountPageTitle": "새 계정 추가",
-  "addAccountPageSubtitle": "BIP39 계정 생성",
   "addAccountPageDefaultName": "계정 {index}",
   "addAccountPageNameHint": "계정 이름",
   "addAccountPageBip39Index": "BIP39 인덱스",
