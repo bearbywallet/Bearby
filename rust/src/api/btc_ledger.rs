@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
 
-use crate::models::transactions::btc::{TransactionRequestBitcoin, TxOutInfo};
+use crate::models::transactions::btc::{TransactionBitcoin, TxOutInfo};
 
 // --- Merkle Tree ---
 
@@ -789,7 +789,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
 // --- PSBT Building for Ledger ---
 
 pub fn btc_ledger_build_psbt_from_struct(
-    tx: TransactionRequestBitcoin,
+    tx: TransactionBitcoin,
     witness_utxos: Vec<TxOutInfo>,
 ) -> Result<Vec<u8>, String> {
     let native_tx: BitcoinTransaction = tx

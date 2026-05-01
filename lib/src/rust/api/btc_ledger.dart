@@ -79,7 +79,7 @@ Future<FinalizedBtcTx> btcLedgerFinalizePsbtWithSigs(
         psbtBytes: psbtBytes, sigs: sigs, addrType: addrType);
 
 Future<Uint8List> btcLedgerBuildPsbtFromStruct(
-        {required TransactionRequestBitcoin tx,
+        {required TransactionBitcoin tx,
         required List<TxOutInfo> witnessUtxos}) =>
     RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
         tx: tx, witnessUtxos: witnessUtxos);

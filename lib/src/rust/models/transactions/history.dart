@@ -14,7 +14,7 @@ class HistoricalTransactionInfo {
   final TransactionMetadataInfo metadata;
   final String? evm;
   final String? scilla;
-  final TransactionRequestBitcoin? btc;
+  final TransactionBitcoin? btc;
   final String? tron;
   final String? signedMessage;
   final BigInt timestamp;

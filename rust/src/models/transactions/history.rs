@@ -1,5 +1,5 @@
 use super::base_token::BaseTokenInfo;
-use super::btc::TransactionRequestBitcoin;
+use super::btc::TransactionBitcoin;
 pub use super::transaction_metadata::TransactionMetadataInfo;
 use zilpay::history::status::TransactionStatus;
 pub use zilpay::history::transaction::HistoricalTransaction;
@@ -27,7 +27,7 @@ pub struct HistoricalTransactionInfo {
     pub metadata: TransactionMetadataInfo,
     pub evm: Option<String>,
     pub scilla: Option<String>,
-    pub btc: Option<TransactionRequestBitcoin>,
+    pub btc: Option<TransactionBitcoin>,
     pub tron: Option<String>,
     pub signed_message: Option<String>,
     pub timestamp: u64,
@@ -51,7 +51,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                     symbol: s,
                 }),
             },
-            btc: value.btc.map(TransactionRequestBitcoin::from),
+            btc: value.btc.map(TransactionBitcoin::from),
             tron: value.tron,
             evm: value.evm,
             scilla: value.scilla,

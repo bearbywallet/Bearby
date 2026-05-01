@@ -245,8 +245,7 @@ class _ConfirmTransactionContentState
 
     try {
       final appState = context.read<AppState>();
-      final balance =
-          widget.token.balances[appState.accountBalanceKey] ?? '-';
+      final balance = widget.token.balances[appState.accountBalanceKey] ?? '-';
 
       final updatedTx = await updateTxWithParams(
         tx: _currentTx,

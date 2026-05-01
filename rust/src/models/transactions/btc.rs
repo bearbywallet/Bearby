@@ -25,14 +25,25 @@ pub struct TxOutInfo {
 }
 
 #[derive(Debug, Clone)]
-pub struct TransactionRequestBitcoin {
+pub struct TransactionBitcoin {
     pub version: i32,
     pub lock_time: u32,
     pub input: Vec<TxInInfo>,
     pub output: Vec<TxOutInfo>,
+    pub fee: Option<u64>,
 }
 
-impl From<bitcoin::Transaction> for TransactionRequestBitcoin {
+impl TransactionBitcoin {
+    pub fn from_tx_with_utxos(tx: bitcoin::Transaction, witness_utxos: &[TxOutInfo]) -> Self {
+        let input_sum: u64 = witness_utxos.iter().map(|u| u.value).sum();
+        let output_sum: u64 = tx.output.iter().map(|o| o.value.to_sat()).sum();
+        let mut btc_tx = TransactionBitcoin::from(tx);
+        btc_tx.fee = input_sum.checked_sub(output_sum);
+        btc_tx
+    }
+}
+
+impl From<bitcoin::Transaction> for TransactionBitcoin {
     fn from(tx: bitcoin::Transaction) -> Self {
         Self {
             version: tx.version.0,
@@ -58,14 +69,15 @@ impl From<bitcoin::Transaction> for TransactionRequestBitcoin {
                     script_pubkey: tx_out.script_pubkey.into_bytes(),
                 })
                 .collect(),
+            fee: None,
         }
     }
 }
 
-impl TryFrom<TransactionRequestBitcoin> for bitcoin::Transaction {
+impl TryFrom<TransactionBitcoin> for bitcoin::Transaction {
     type Error = TransactionErrors;
 
-    fn try_from(value: TransactionRequestBitcoin) -> Result<Self, Self::Error> {
+    fn try_from(value: TransactionBitcoin) -> Result<Self, Self::Error> {
         let input = value
             .input
             .into_iter()
