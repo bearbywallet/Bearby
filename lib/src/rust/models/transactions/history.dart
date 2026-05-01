@@ -16,6 +16,7 @@ class HistoricalTransactionInfo {
   final String? scilla;
   final TransactionBitcoin? btc;
   final String? tron;
+  final String? solana;
   final String? signedMessage;
   final BigInt timestamp;
 
@@ -26,6 +27,7 @@ class HistoricalTransactionInfo {
     this.scilla,
     this.btc,
     this.tron,
+    this.solana,
     this.signedMessage,
     required this.timestamp,
   });
@@ -38,6 +40,7 @@ class HistoricalTransactionInfo {
       scilla.hashCode ^
       btc.hashCode ^
       tron.hashCode ^
+      solana.hashCode ^
       signedMessage.hashCode ^
       timestamp.hashCode;
 
@@ -52,6 +55,7 @@ class HistoricalTransactionInfo {
           scilla == other.scilla &&
           btc == other.btc &&
           tron == other.tron &&
+          solana == other.solana &&
           signedMessage == other.signedMessage &&
           timestamp == other.timestamp;
 }

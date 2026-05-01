@@ -8,7 +8,7 @@ import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
-import 'package:bearby/utils/utils.dart';
+
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -17,7 +17,7 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-void showTransactionDetailsModal({
+void showEvmTransactionDetailsModal({
   required BuildContext context,
   required HistoricalTransactionInfo transaction,
 }) {
@@ -34,16 +34,16 @@ void showTransactionDetailsModal({
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: TransactionDetailsModal(transaction: transaction),
+        child: EvmTransactionDetailsModal(transaction: transaction),
       );
     },
   );
 }
 
-class TransactionDetailsModal extends StatelessWidget {
+class EvmTransactionDetailsModal extends StatelessWidget {
   final HistoricalTransactionInfo transaction;
 
-  const TransactionDetailsModal({
+  const EvmTransactionDetailsModal({
     super.key,
     required this.transaction,
   });
@@ -112,10 +112,6 @@ class TransactionDetailsModal extends StatelessWidget {
 
     if (transaction.isSignedMessage) {
       return _buildSignedMessageDetails(context, appState, theme, l10n);
-    }
-
-    if (transaction.isBtcTransaction) {
-      return _buildBtcDetails(context, appState, theme, l10n);
     }
 
     return Column(
@@ -397,131 +393,6 @@ class TransactionDetailsModal extends StatelessWidget {
                 value: signedMsg!.decodedMessage,
                 theme: theme,
                 isCopyable: true,
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildBtcDetails(
-    BuildContext context,
-    AppState appState,
-    AppTheme theme,
-    AppLocalizations l10n,
-  ) {
-    final btcReceipt = transaction.btcReceipt;
-
-    return Column(
-      children: [
-        DetailGroupCard(
-          title: l10n.transactionDetailsModal_transaction,
-          theme: theme,
-          children: [
-            DetailItem(
-              label: l10n.transactionDetailsModal_hash,
-              value: transaction.transactionHash,
-              theme: theme,
-              isCopyable: true,
-            ),
-            DetailItem(
-              label: l10n.transactionDetailsModal_timestamp,
-              value: _formatTimestamp(),
-              theme: theme,
-            ),
-            if (btcReceipt?.lockTime != null)
-              DetailItem(
-                label: 'Lock Time',
-                value: btcReceipt!.lockTime.toString(),
-                theme: theme,
-              ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        if (btcReceipt?.input.isNotEmpty == true) ...[
-          DetailGroupCard(
-            title: 'Inputs (${btcReceipt!.input.length})',
-            theme: theme,
-            children: btcReceipt.input.take(3).map((input) {
-              return DetailItem(
-                label: 'TXID',
-                value:
-                    '${input.previousOutput.txid}:${input.previousOutput.vout}',
-                theme: theme,
-                isCopyable: true,
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (btcReceipt?.output.isNotEmpty == true) ...[
-          DetailGroupCard(
-            title: 'Outputs (${btcReceipt!.output.length})',
-            theme: theme,
-            children: btcReceipt.output.take(3).map((output) {
-              final token = appState.wallet?.tokens.first;
-              final decimals =
-                  transaction.tokenInfo?.decimals ?? token?.decimals ?? 8;
-              final symbol =
-                  transaction.tokenInfo?.symbol ?? token?.symbol ?? 'BTC';
-
-              final (formattedValue, _) = formatingAmount(
-                amount: output.value,
-                symbol: symbol,
-                decimals: decimals,
-                rate: 0,
-                appState: appState,
-              );
-
-              return DetailItem(
-                label: formattedValue,
-                value: bytesToHex(output.scriptPubkey),
-                theme: theme,
-                isCopyable: true,
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 12),
-        ],
-        DetailGroupCard(
-          title: l10n.transactionDetailsModal_network,
-          theme: theme,
-          children: [
-            DetailItem(
-              label: l10n.transactionDetailsModal_chainType,
-              value: transaction.chainType,
-              theme: theme,
-            ),
-            DetailItem(
-              label: l10n.transactionDetailsModal_networkName,
-              value: _getNetworkName(appState, transaction.chainHash),
-              theme: theme,
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        DetailGroupCard(
-          title: l10n.transactionDetailsModal_gasFees,
-          theme: theme,
-          children: [
-            DetailItem(
-              label: l10n.transactionDetailsModal_fee,
-              value: _formatFeeWidget(appState, theme),
-              theme: theme,
-            ),
-          ],
-        ),
-        if (transaction.error != null) ...[
-          const SizedBox(height: 12),
-          DetailGroupCard(
-            title: l10n.transactionDetailsModal_error,
-            theme: theme,
-            children: [
-              DetailItem(
-                label: l10n.transactionDetailsModal_errorMessage,
-                value: transaction.error!,
-                theme: theme,
               ),
             ],
           ),

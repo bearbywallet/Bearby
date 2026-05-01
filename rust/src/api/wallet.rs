@@ -8,6 +8,7 @@ use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
 use zilpay::proto::address::Address;
+use zilpay::rpc::network_config::ChainConfig;
 use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;
@@ -187,24 +188,23 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         .core
         .get_wallet_by_index(params.wallet_index)
         .map_err(ServiceError::BackgroundError)?;
-    let wallet_data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-    let chain = service
+    let chains: Vec<ChainConfig> = service
         .core
-        .get_provider(wallet_data.chain_hash)
-        .map_err(ServiceError::BackgroundError)?;
-    let network = chain.config.bitcoin_network();
+        .get_providers()
+        .into_iter()
+        .map(|p| p.config)
+        .collect();
 
     let secret_passphrase = SecretString::new(params.passphrase.into());
     wallet
         .add_next_bip39_account(
             params.name,
             params.account_index,
-            network,
             &secret_passphrase,
             &seed,
+            &chains,
         )
+        .await
         .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
     Ok(())
