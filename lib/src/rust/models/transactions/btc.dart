@@ -69,32 +69,39 @@ class OutPointInfo {
           vout == other.vout;
 }
 
-class TransactionRequestBitcoin {
+class TransactionBitcoin {
   final int version;
   final int lockTime;
   final List<TxInInfo> input;
   final List<TxOutInfo> output;
+  final BigInt? fee;
 
-  const TransactionRequestBitcoin({
+  const TransactionBitcoin({
     required this.version,
     required this.lockTime,
     required this.input,
     required this.output,
+    this.fee,
   });
 
   @override
   int get hashCode =>
-      version.hashCode ^ lockTime.hashCode ^ input.hashCode ^ output.hashCode;
+      version.hashCode ^
+      lockTime.hashCode ^
+      input.hashCode ^
+      output.hashCode ^
+      fee.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TransactionRequestBitcoin &&
+      other is TransactionBitcoin &&
           runtimeType == other.runtimeType &&
           version == other.version &&
           lockTime == other.lockTime &&
           input == other.input &&
-          output == other.output;
+          output == other.output &&
+          fee == other.fee;
 }
 
 class TxInInfo {

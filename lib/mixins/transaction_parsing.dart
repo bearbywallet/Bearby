@@ -373,12 +373,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   ParsedBtcReceipt? get btcReceipt {
     if (btc == null) return null;
-    try {
-      final json = jsonDecode(btc!) as Map<String, dynamic>;
-      return ParsedBtcReceipt.fromJson(json);
-    } catch (_) {
-      return null;
-    }
+    return null;
   }
 
   ParsedSignedMessage? get parsedSignedMessage {

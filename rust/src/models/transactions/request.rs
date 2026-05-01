@@ -1,8 +1,8 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
+pub use zilpay::proto::btc_tx::BitcoinMetadata;
 pub use zilpay::proto::tron_tx::TronTransaction;
 use zilpay::proto::tron_tx::TronWebTransaction;
-pub use zilpay::proto::btc_tx::BitcoinMetadata;
 pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
@@ -17,7 +17,7 @@ pub use zilpay::{
 use zilpay::proto::solana_tx::SolanaTransaction;
 
 use super::btc::BitcoinMetadataInfo;
-use super::btc::TransactionRequestBitcoin;
+use super::btc::TransactionBitcoin;
 use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
 use super::transaction_metadata::TransactionMetadataInfo;
@@ -29,7 +29,7 @@ pub struct TransactionRequestInfo {
     pub metadata: TransactionMetadataInfo,
     pub scilla: Option<TransactionRequestScilla>,
     pub evm: Option<TransactionRequestEVM>,
-    pub btc: Option<(TransactionRequestBitcoin, BitcoinMetadataInfo)>,
+    pub btc: Option<(TransactionBitcoin, BitcoinMetadataInfo)>,
     pub tron: Option<String>,
     pub solana: Option<Vec<u8>>,
 }
@@ -46,9 +46,8 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let tx_req = TransactionRequest::Ethereum((evm_tx.try_into()?, value.metadata.into()));
             Ok(tx_req)
         } else if let Some((btc_tx, btc_meta_info)) = value.btc {
-            let native_tx: bitcoin::Transaction = btc_tx
-                .try_into()
-                .map_err(|e: TransactionErrors| e)?;
+            let native_tx: bitcoin::Transaction =
+                btc_tx.try_into().map_err(|e: TransactionErrors| e)?;
             let btc_meta: BitcoinMetadata = btc_meta_info.try_into()?;
             let tx_req = TransactionRequest::Bitcoin((native_tx, value.metadata.into(), btc_meta));
             Ok(tx_req)
@@ -100,15 +99,20 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 solana: None,
             },
             TransactionRequest::Bitcoin((tx, _, btc_meta)) => {
+                let btc_meta_info: BitcoinMetadataInfo = btc_meta.into();
+                let tx_info = TransactionBitcoin::from_tx_with_utxos(
+                    tx,
+                    &btc_meta_info.witness_utxos,
+                );
                 Self {
                     metadata,
                     scilla: None,
                     evm: None,
-                    btc: Some((tx.into(), btc_meta.into())),
+                    btc: Some((tx_info, btc_meta_info)),
                     tron: None,
                     solana: None,
                 }
-            }
+            },
             TransactionRequest::Tron((tx, _)) => {
                 // TODO: must be fixed!
                 let tron_web = tx.to_tron_web().unwrap();

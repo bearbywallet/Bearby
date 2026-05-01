@@ -725,7 +725,7 @@ fn wire__crate__api__btc_ledger__btc_ledger_build_psbt_from_struct_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_tx = <crate::models::transactions::btc::TransactionRequestBitcoin>::sse_decode(
+            let api_tx = <crate::models::transactions::btc::TransactionBitcoin>::sse_decode(
                 &mut deserializer,
             );
             let api_witness_utxos =
@@ -5822,7 +5822,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
         let mut var_evm = <Option<String>>::sse_decode(deserializer);
         let mut var_scilla = <Option<String>>::sse_decode(deserializer);
         let mut var_btc =
-            <Option<crate::models::transactions::btc::TransactionRequestBitcoin>>::sse_decode(
+            <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_decode(
                 deserializer,
             );
         let mut var_tron = <Option<String>>::sse_decode(deserializer);
@@ -6568,7 +6568,7 @@ impl SseDecode for Option<crate::models::ftoken::FTokenInfo> {
 
 impl SseDecode
     for Option<(
-        crate::models::transactions::btc::TransactionRequestBitcoin,
+        crate::models::transactions::btc::TransactionBitcoin,
         crate::models::transactions::btc::BitcoinMetadataInfo,
     )>
 {
@@ -6576,7 +6576,7 @@ impl SseDecode
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<(
-                crate::models::transactions::btc::TransactionRequestBitcoin,
+                crate::models::transactions::btc::TransactionBitcoin,
                 crate::models::transactions::btc::BitcoinMetadataInfo,
             )>::sse_decode(deserializer));
         } else {
@@ -6585,14 +6585,12 @@ impl SseDecode
     }
 }
 
-impl SseDecode for Option<crate::models::transactions::btc::TransactionRequestBitcoin> {
+impl SseDecode for Option<crate::models::transactions::btc::TransactionBitcoin> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(
-                <crate::models::transactions::btc::TransactionRequestBitcoin>::sse_decode(
-                    deserializer,
-                ),
+                <crate::models::transactions::btc::TransactionBitcoin>::sse_decode(deserializer),
             );
         } else {
             return None;
@@ -6779,14 +6777,14 @@ impl SseDecode for (String, u8) {
 
 impl SseDecode
     for (
-        crate::models::transactions::btc::TransactionRequestBitcoin,
+        crate::models::transactions::btc::TransactionBitcoin,
         crate::models::transactions::btc::BitcoinMetadataInfo,
     )
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_field0 =
-            <crate::models::transactions::btc::TransactionRequestBitcoin>::sse_decode(deserializer);
+            <crate::models::transactions::btc::TransactionBitcoin>::sse_decode(deserializer);
         let mut var_field1 =
             <crate::models::transactions::btc::BitcoinMetadataInfo>::sse_decode(deserializer);
         return (var_field0, var_field1);
@@ -6946,6 +6944,26 @@ impl SseDecode for crate::api::transaction::TokenTransferParamsInfo {
     }
 }
 
+impl SseDecode for crate::models::transactions::btc::TransactionBitcoin {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_version = <i32>::sse_decode(deserializer);
+        let mut var_lockTime = <u32>::sse_decode(deserializer);
+        let mut var_input =
+            <Vec<crate::models::transactions::btc::TxInInfo>>::sse_decode(deserializer);
+        let mut var_output =
+            <Vec<crate::models::transactions::btc::TxOutInfo>>::sse_decode(deserializer);
+        let mut var_fee = <Option<u64>>::sse_decode(deserializer);
+        return crate::models::transactions::btc::TransactionBitcoin {
+            version: var_version,
+            lock_time: var_lockTime,
+            input: var_input,
+            output: var_output,
+            fee: var_fee,
+        };
+    }
+}
+
 impl SseDecode for crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -6969,24 +6987,6 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             signer: var_signer,
             token_info: var_tokenInfo,
             broadcast: var_broadcast,
-        };
-    }
-}
-
-impl SseDecode for crate::models::transactions::btc::TransactionRequestBitcoin {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_version = <i32>::sse_decode(deserializer);
-        let mut var_lockTime = <u32>::sse_decode(deserializer);
-        let mut var_input =
-            <Vec<crate::models::transactions::btc::TxInInfo>>::sse_decode(deserializer);
-        let mut var_output =
-            <Vec<crate::models::transactions::btc::TxOutInfo>>::sse_decode(deserializer);
-        return crate::models::transactions::btc::TransactionRequestBitcoin {
-            version: var_version,
-            lock_time: var_lockTime,
-            input: var_input,
-            output: var_output,
         };
     }
 }
@@ -7040,7 +7040,7 @@ impl SseDecode for crate::models::transactions::request::TransactionRequestInfo 
                 deserializer,
             );
         let mut var_btc = <Option<(
-            crate::models::transactions::btc::TransactionRequestBitcoin,
+            crate::models::transactions::btc::TransactionBitcoin,
             crate::models::transactions::btc::BitcoinMetadataInfo,
         )>>::sse_decode(deserializer);
         let mut var_tron = <Option<String>>::sse_decode(deserializer);
@@ -8710,6 +8710,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::transaction::TokenTransferPar
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::btc::TransactionBitcoin {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.version.into_into_dart().into_dart(),
+            self.lock_time.into_into_dart().into_dart(),
+            self.input.into_into_dart().into_dart(),
+            self.output.into_into_dart().into_dart(),
+            self.fee.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::btc::TransactionBitcoin
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::TransactionBitcoin>
+    for crate::models::transactions::btc::TransactionBitcoin
+{
+    fn into_into_dart(self) -> crate::models::transactions::btc::TransactionBitcoin {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
     for crate::models::transactions::transaction_metadata::TransactionMetadataInfo
 {
@@ -8739,29 +8763,6 @@ impl
     fn into_into_dart(
         self,
     ) -> crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::transactions::btc::TransactionRequestBitcoin {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.version.into_into_dart().into_dart(),
-            self.lock_time.into_into_dart().into_dart(),
-            self.input.into_into_dart().into_dart(),
-            self.output.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::transactions::btc::TransactionRequestBitcoin
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::TransactionRequestBitcoin>
-    for crate::models::transactions::btc::TransactionRequestBitcoin
-{
-    fn into_into_dart(self) -> crate::models::transactions::btc::TransactionRequestBitcoin {
         self
     }
 }
@@ -9429,7 +9430,7 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         );
         <Option<String>>::sse_encode(self.evm, serializer);
         <Option<String>>::sse_encode(self.scilla, serializer);
-        <Option<crate::models::transactions::btc::TransactionRequestBitcoin>>::sse_encode(
+        <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_encode(
             self.btc, serializer,
         );
         <Option<String>>::sse_encode(self.tron, serializer);
@@ -9986,7 +9987,7 @@ impl SseEncode for Option<crate::models::ftoken::FTokenInfo> {
 
 impl SseEncode
     for Option<(
-        crate::models::transactions::btc::TransactionRequestBitcoin,
+        crate::models::transactions::btc::TransactionBitcoin,
         crate::models::transactions::btc::BitcoinMetadataInfo,
     )>
 {
@@ -9995,21 +9996,19 @@ impl SseEncode
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <(
-                crate::models::transactions::btc::TransactionRequestBitcoin,
+                crate::models::transactions::btc::TransactionBitcoin,
                 crate::models::transactions::btc::BitcoinMetadataInfo,
             )>::sse_encode(value, serializer);
         }
     }
 }
 
-impl SseEncode for Option<crate::models::transactions::btc::TransactionRequestBitcoin> {
+impl SseEncode for Option<crate::models::transactions::btc::TransactionBitcoin> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
-            <crate::models::transactions::btc::TransactionRequestBitcoin>::sse_encode(
-                value, serializer,
-            );
+            <crate::models::transactions::btc::TransactionBitcoin>::sse_encode(value, serializer);
         }
     }
 }
@@ -10157,15 +10156,13 @@ impl SseEncode for (String, u8) {
 
 impl SseEncode
     for (
-        crate::models::transactions::btc::TransactionRequestBitcoin,
+        crate::models::transactions::btc::TransactionBitcoin,
         crate::models::transactions::btc::BitcoinMetadataInfo,
     )
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::models::transactions::btc::TransactionRequestBitcoin>::sse_encode(
-            self.0, serializer,
-        );
+        <crate::models::transactions::btc::TransactionBitcoin>::sse_encode(self.0, serializer);
         <crate::models::transactions::btc::BitcoinMetadataInfo>::sse_encode(self.1, serializer);
     }
 }
@@ -10281,6 +10278,17 @@ impl SseEncode for crate::api::transaction::TokenTransferParamsInfo {
     }
 }
 
+impl SseEncode for crate::models::transactions::btc::TransactionBitcoin {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.version, serializer);
+        <u32>::sse_encode(self.lock_time, serializer);
+        <Vec<crate::models::transactions::btc::TxInInfo>>::sse_encode(self.input, serializer);
+        <Vec<crate::models::transactions::btc::TxOutInfo>>::sse_encode(self.output, serializer);
+        <Option<u64>>::sse_encode(self.fee, serializer);
+    }
+}
+
 impl SseEncode for crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10295,16 +10303,6 @@ impl SseEncode for crate::models::transactions::transaction_metadata::Transactio
             serializer,
         );
         <bool>::sse_encode(self.broadcast, serializer);
-    }
-}
-
-impl SseEncode for crate::models::transactions::btc::TransactionRequestBitcoin {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.version, serializer);
-        <u32>::sse_encode(self.lock_time, serializer);
-        <Vec<crate::models::transactions::btc::TxInInfo>>::sse_encode(self.input, serializer);
-        <Vec<crate::models::transactions::btc::TxOutInfo>>::sse_encode(self.output, serializer);
     }
 }
 
@@ -10345,7 +10343,7 @@ impl SseEncode for crate::models::transactions::request::TransactionRequestInfo 
             self.evm, serializer,
         );
         <Option<(
-            crate::models::transactions::btc::TransactionRequestBitcoin,
+            crate::models::transactions::btc::TransactionBitcoin,
             crate::models::transactions::btc::BitcoinMetadataInfo,
         )>>::sse_encode(self.btc, serializer);
         <Option<String>>::sse_encode(self.tron, serializer);
