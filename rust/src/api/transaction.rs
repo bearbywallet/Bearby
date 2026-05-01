@@ -522,9 +522,9 @@ pub async fn start_history_worker(
             .await
             .map_err(|e| e.to_string())?;
 
-        if let Some(block_handle) = &service.block_handle {
-            block_handle.abort();
-            service.block_handle = None;
+        if let Some(history_handle) = &service.history_handle {
+            history_handle.abort();
+            service.history_handle = None;
         }
 
         service.history_handle = Some(handle);
