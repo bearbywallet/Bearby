@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/src/rust/models/transactions/btc.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 
@@ -137,156 +138,6 @@ class ParsedScillaReceipt {
   }
 }
 
-class BtcInput {
-  final String? txid;
-  final int? vout;
-  final Map<String, dynamic>? scriptSig;
-  final int? sequence;
-  final List<String>? txinwitness;
-
-  BtcInput({
-    this.txid,
-    this.vout,
-    this.scriptSig,
-    this.sequence,
-    this.txinwitness,
-  });
-
-  factory BtcInput.fromJson(Map<String, dynamic> json) {
-    return BtcInput(
-      txid: json['txid'] as String?,
-      vout: json['vout'] as int?,
-      scriptSig: json['scriptSig'] as Map<String, dynamic>?,
-      sequence: json['sequence'] as int?,
-      txinwitness: (json['txinwitness'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList(),
-    );
-  }
-
-  String? get scriptSigHex => scriptSig?['hex'] as String?;
-  String? get scriptSigAsm => scriptSig?['asm'] as String?;
-}
-
-class BtcOutput {
-  final int? n;
-  final Map<String, dynamic>? scriptPubKey;
-  final BigInt? value;
-
-  BtcOutput({
-    this.n,
-    this.scriptPubKey,
-    this.value,
-  });
-
-  factory BtcOutput.fromJson(Map<String, dynamic> json) {
-    return BtcOutput(
-      n: json['n'] as int?,
-      scriptPubKey: json['scriptPubKey'] as Map<String, dynamic>?,
-      value: _parseBtcValue(json['value']),
-    );
-  }
-
-  static BigInt? _parseBtcValue(dynamic value) {
-    if (value == null) return null;
-
-    if (value is int) return BigInt.from(value);
-
-    if (value is double) {
-      return BigInt.from((value * 100000000).round());
-    }
-
-    if (value is String) {
-      final intValue = BigInt.tryParse(value);
-      if (intValue != null) return intValue;
-
-      final doubleValue = double.tryParse(value);
-      if (doubleValue != null) {
-        return BigInt.from((doubleValue * 100000000).round());
-      }
-    }
-
-    return null;
-  }
-
-  String? get address => scriptPubKey?['address'] as String?;
-  String? get scriptPubKeyHex => scriptPubKey?['hex'] as String?;
-  String? get scriptPubKeyAsm => scriptPubKey?['asm'] as String?;
-  String? get scriptPubKeyType => scriptPubKey?['type'] as String?;
-}
-
-class ParsedBtcReceipt {
-  final String? txid;
-  final String? hash;
-  final int? version;
-  final int? locktime;
-  final int? size;
-  final int? vsize;
-  final int? weight;
-  final List<BtcInput>? inputs;
-  final List<BtcOutput>? outputs;
-  final int? confirmations;
-  final BigInt? fee;
-
-  ParsedBtcReceipt({
-    this.txid,
-    this.hash,
-    this.version,
-    this.locktime,
-    this.size,
-    this.vsize,
-    this.weight,
-    this.inputs,
-    this.outputs,
-    this.confirmations,
-    this.fee,
-  });
-
-  factory ParsedBtcReceipt.fromJson(Map<String, dynamic> json) {
-    final inputsList = (json['vin'] as List<dynamic>?)
-        ?.map((e) => BtcInput.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    final outputsList = (json['vout'] as List<dynamic>?)
-        ?.map((e) => BtcOutput.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    return ParsedBtcReceipt(
-      txid: json['txid'] as String?,
-      hash: json['hash'] as String?,
-      version: json['version'] as int?,
-      locktime: json['locktime'] as int?,
-      size: json['size'] as int?,
-      vsize: json['vsize'] as int?,
-      weight: json['weight'] as int?,
-      inputs: inputsList,
-      outputs: outputsList,
-      confirmations: json['confirmations'] as int?,
-      fee: _parseBigInt(json['fee']),
-    );
-  }
-
-  static BigInt? _parseBigInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return BigInt.from(value);
-    if (value is String) return BigInt.tryParse(value);
-    return null;
-  }
-
-  String? get transactionHash => txid ?? hash;
-  int? get lockTime => locktime;
-  int? get inputsCount => inputs?.length;
-  int? get outputsCount => outputs?.length;
-
-  BigInt get totalOutputValue {
-    return outputs?.fold<BigInt>(
-          BigInt.zero,
-          (sum, output) => sum + (output.value ?? BigInt.zero),
-        ) ??
-        BigInt.zero;
-  }
-}
-
 class ParsedSignedMessage {
   final String? type;
   final String? message;
@@ -371,10 +222,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
     }
   }
 
-  ParsedBtcReceipt? get btcReceipt {
-    if (btc == null) return null;
-    return null;
-  }
+  TransactionBitcoin? get btcReceipt => btc;
 
   ParsedSignedMessage? get parsedSignedMessage {
     if (signedMessage == null) return null;
@@ -402,7 +250,6 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
     return metadata.hash ??
         evmReceipt?.transactionHash ??
         scillaReceipt?.transactionHash ??
-        btcReceipt?.transactionHash ??
         '';
   }
 
@@ -413,14 +260,14 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String get sender {
     if (btc != null) {
-      return btcReceipt?.inputs?.firstOrNull?.txid ?? '';
+      return btc?.input.firstOrNull?.previousOutput.txid ?? '';
     }
     return evmReceipt?.sender ?? scillaReceipt?.sender ?? '';
   }
 
   String get recipient {
     if (btc != null) {
-      return btcReceipt?.outputs?.firstOrNull?.address ?? '';
+      return '';
     }
     return evmReceipt?.recipient ?? scillaReceipt?.recipient ?? '';
   }
@@ -445,7 +292,11 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String get amount {
     if (btc != null && metadata.tokenInfo?.value == null) {
-      return btcReceipt?.totalOutputValue.toString() ?? '0';
+      final total = btc!.output.fold<BigInt>(
+        BigInt.zero,
+        (sum, out) => sum + out.value,
+      );
+      return total.toString();
     }
     return metadata.tokenInfo?.value ??
         evmReceipt?.amount ??
@@ -455,7 +306,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   BigInt get fee {
     if (btc != null) {
-      return btcReceipt?.fee ?? BigInt.zero;
+      return btc?.fee ?? BigInt.zero;
     }
 
     if (evm != null) {
@@ -482,7 +333,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
       }
     }
 
-    return btcReceipt?.fee ?? BigInt.zero;
+    return btc?.fee ?? BigInt.zero;
   }
 
   String? get sig {
