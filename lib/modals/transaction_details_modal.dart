@@ -8,6 +8,7 @@ import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/utils/utils.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -424,12 +425,6 @@ class TransactionDetailsModal extends StatelessWidget {
               theme: theme,
               isCopyable: true,
             ),
-            if (btcReceipt?.confirmations != null)
-              DetailItem(
-                label: 'Confirmations',
-                value: btcReceipt!.confirmations.toString(),
-                theme: theme,
-              ),
             DetailItem(
               label: l10n.transactionDetailsModal_timestamp,
               value: _formatTimestamp(),
@@ -444,15 +439,15 @@ class TransactionDetailsModal extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        if (btcReceipt?.inputs != null && btcReceipt!.inputs!.isNotEmpty) ...[
+        if (btcReceipt?.input.isNotEmpty == true) ...[
           DetailGroupCard(
-            title:
-                'Inputs (${btcReceipt.inputsCount ?? btcReceipt.inputs!.length})',
+            title: 'Inputs (${btcReceipt!.input.length})',
             theme: theme,
-            children: btcReceipt.inputs!.take(3).map((input) {
+            children: btcReceipt.input.take(3).map((input) {
               return DetailItem(
                 label: 'TXID',
-                value: '${input.txid ?? 'N/A'}:${input.vout ?? 0}',
+                value:
+                    '${input.previousOutput.txid}:${input.previousOutput.vout}',
                 theme: theme,
                 isCopyable: true,
               );
@@ -460,12 +455,11 @@ class TransactionDetailsModal extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-        if (btcReceipt?.outputs != null && btcReceipt!.outputs!.isNotEmpty) ...[
+        if (btcReceipt?.output.isNotEmpty == true) ...[
           DetailGroupCard(
-            title:
-                'Outputs (${btcReceipt.outputsCount ?? btcReceipt.outputs!.length})',
+            title: 'Outputs (${btcReceipt!.output.length})',
             theme: theme,
-            children: btcReceipt.outputs!.take(3).map((output) {
+            children: btcReceipt.output.take(3).map((output) {
               final token = appState.wallet?.tokens.first;
               final decimals =
                   transaction.tokenInfo?.decimals ?? token?.decimals ?? 8;
@@ -473,7 +467,7 @@ class TransactionDetailsModal extends StatelessWidget {
                   transaction.tokenInfo?.symbol ?? token?.symbol ?? 'BTC';
 
               final (formattedValue, _) = formatingAmount(
-                amount: output.value ?? BigInt.zero,
+                amount: output.value,
                 symbol: symbol,
                 decimals: decimals,
                 rate: 0,
@@ -482,7 +476,7 @@ class TransactionDetailsModal extends StatelessWidget {
 
               return DetailItem(
                 label: formattedValue,
-                value: output.address ?? output.scriptPubKeyHex ?? 'N/A',
+                value: bytesToHex(output.scriptPubkey),
                 theme: theme,
                 isCopyable: true,
               );
