@@ -110,8 +110,6 @@
   "secretKeyRestorePageKeyTitle": "私钥",
   "secretKeyRestorePageBackupLabel": "我已备份我的私钥",
   "secretKeyRestorePageNextButton": "下一步",
-  "addAccountPageTitle": "添加新账户",
-  "addAccountPageSubtitle": "创建 BIP39 账户",
   "addAccountPageDefaultName": "账户 {index}",
   "addAccountPageNameHint": "账户名称",
   "addAccountPageBip39Index": "BIP39 索引",

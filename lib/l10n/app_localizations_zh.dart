@@ -12,7 +12,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appTitle => 'Bearby 钱包';
 
   @override
+  String get initialPagerestoreZilPay => '恢复 ZilPay 1.0！';
+
+  @override
   String get initialPagegetStarted => '开始使用';
+
+  @override
+  String get restoreRKStorageTitle => '将 ZilPay 1.0 迁移至 2.0';
+
+  @override
+  String get restoreRKStorageAccountsPrompt => '要迁移到 ZilPay 2.0 的账户。请输入密码。';
+
+  @override
+  String get restoreRKStoragePasswordHint => '密码';
+
+  @override
+  String get restoreRKStorageEnterPassword => '请输入密码';
+
+  @override
+  String get restoreRKStorageErrorPrefix => '错误：';
+
+  @override
+  String get restoreRKStorageRestoreButton => '恢复';
+
+  @override
+  String get restoreRKStorageSkipButton => '跳过';
 
   @override
   String get accountItemBalanceLabel => '余额：';
@@ -322,12 +346,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get secretKeyRestorePageNextButton => '下一步';
-
-  @override
-  String get addAccountPageTitle => '添加新账户';
-
-  @override
-  String get addAccountPageSubtitle => '创建 BIP39 账户';
 
   @override
   String addAccountPageDefaultName(Object index) {

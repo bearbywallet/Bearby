@@ -199,7 +199,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: l10n.addAccountPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                     actionIcon: _isCreating
                         ? SizedBox(
@@ -230,21 +229,24 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                       physics: const BouncingScrollPhysics(),
                       overscroll: true,
                     ),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              l10n.addAccountPageSubtitle,
-                              style: theme.titleLarge.copyWith(
-                                color: theme.textPrimary,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: adaptivePadding),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight,
                               ),
-                            ),
-                            SizedBox(height: adaptivePadding),
+                              child: Center(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+
                             SmartInput(
                               key: _accountNameInputKey,
                               controller: _accountNameController,
@@ -411,7 +413,11 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                       ),
                     ),
                   ),
-                ),
+                );
+              },
+            ),
+          ),
+        ),
               ],
             ),
           ),

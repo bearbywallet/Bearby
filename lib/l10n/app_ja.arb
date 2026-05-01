@@ -110,8 +110,6 @@
   "secretKeyRestorePageKeyTitle": "プライベートキー",
   "secretKeyRestorePageBackupLabel": "秘密鍵をバックアップしました",
   "secretKeyRestorePageNextButton": "次へ",
-  "addAccountPageTitle": "新しいアカウントを追加",
-  "addAccountPageSubtitle": "BIP39アカウントを作成",
   "addAccountPageDefaultName": "アカウント {index}",
   "addAccountPageNameHint": "アカウント名",
   "addAccountPageBip39Index": "BIP39インデックス",
