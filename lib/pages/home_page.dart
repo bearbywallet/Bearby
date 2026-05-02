@@ -36,6 +36,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with StatusBarMixin {
   String? _errorMessage;
   bool _isRefreshing = false;
+  bool _hasInitialSync = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_hasInitialSync) {
+      _hasInitialSync = true;
+      final appState = Provider.of<AppState>(context, listen: false);
+      _refreshData(appState);
+    }
+  }
 
   Future<void> _refreshData(AppState appState) async {
     if (_isRefreshing) return;

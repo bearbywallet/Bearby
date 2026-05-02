@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../components/bottom_nav_bar.dart';
-import '../src/rust/api/token.dart';
 import '../state/app_state.dart';
 
 class MainPage extends StatefulWidget {
@@ -30,11 +29,6 @@ class MainPageState extends State<MainPage> {
 
   Future<void> _loadInitialData() async {
     final appState = Provider.of<AppState>(context, listen: false);
-    final walletIndex = appState.selectedWalletIndex;
-
-    try {
-      await syncBalances(walletIndex: walletIndex);
-    } catch (_) {}
 
     await appState.syncRates();
     await appState.syncData();
