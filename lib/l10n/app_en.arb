@@ -686,10 +686,6 @@
   "@secretPhraseVerifyPageNextButton": {
     "description": "Text on the next button in the SecretPhraseVerifyPage component"
   },
-  "restoreSecretPhrasePageTitle": "Restore Wallet",
-  "@restoreSecretPhrasePageTitle": {
-    "description": "Title displayed in the app bar of the RestoreSecretPhrasePage component"
-  },
   "restoreSecretPhrasePageRestoreButton": "Restore",
   "@restoreSecretPhrasePageRestoreButton": {
     "description": "Text on the restore button in the RestoreSecretPhrasePage component"
@@ -758,10 +754,7 @@
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
   },
-  "passwordSetupPageTitle": "Password Setup",
-  "@passwordSetupPageTitle": {
-    "description": "Title displayed in the app bar of the PasswordSetupPage component"
-  },
+
   "passwordSetupPageSubtitle": "Create Password",
   "@passwordSetupPageSubtitle": {
     "description": "Subtitle text displayed at the top of the PasswordSetupPage component"

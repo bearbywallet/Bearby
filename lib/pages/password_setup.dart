@@ -346,7 +346,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
               child: Column(
                 children: [
                   CustomAppBar(
-                    title: AppLocalizations.of(context)!.passwordSetupPageTitle,
                     onBackPressed: () => context.pop(),
                   ),
                   Expanded(

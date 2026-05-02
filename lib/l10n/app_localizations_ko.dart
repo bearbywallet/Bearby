@@ -521,9 +521,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretPhraseVerifyPageNextButton => '다음';
 
   @override
-  String get restoreSecretPhrasePageTitle => '지갑 복원';
-
-  @override
   String get restoreSecretPhrasePageRestoreButton => '복원';
 
   @override
@@ -573,9 +570,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsPageAbout => '정보';
-
-  @override
-  String get passwordSetupPageTitle => '비밀번호 설정';
 
   @override
   String get passwordSetupPageSubtitle => '비밀번호 생성';

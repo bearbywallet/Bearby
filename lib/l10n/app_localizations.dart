@@ -1087,10 +1087,6 @@ abstract class AppLocalizations {
 
   /// Title displayed in the app bar of the RestoreSecretPhrasePage component
   ///
-  /// In en, this message translates to:
-  /// **'Restore Wallet'**
-  String get restoreSecretPhrasePageTitle;
-
   /// Text on the restore button in the RestoreSecretPhrasePage component
   ///
   /// In en, this message translates to:
@@ -1192,12 +1188,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get settingsPageAbout;
-
-  /// Title displayed in the app bar of the PasswordSetupPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Password Setup'**
-  String get passwordSetupPageTitle;
 
   /// Subtitle text displayed at the top of the PasswordSetupPage component
   ///

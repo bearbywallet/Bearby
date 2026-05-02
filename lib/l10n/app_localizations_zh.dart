@@ -521,9 +521,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretPhraseVerifyPageNextButton => '下一步';
 
   @override
-  String get restoreSecretPhrasePageTitle => '恢复钱包';
-
-  @override
   String get restoreSecretPhrasePageRestoreButton => '恢复';
 
   @override
@@ -573,9 +570,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsPageAbout => '关于';
-
-  @override
-  String get passwordSetupPageTitle => '密码设置';
 
   @override
   String get passwordSetupPageSubtitle => '创建密码';

@@ -521,9 +521,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretPhraseVerifyPageNextButton => 'Next';
 
   @override
-  String get restoreSecretPhrasePageTitle => 'Restore Wallet';
-
-  @override
   String get restoreSecretPhrasePageRestoreButton => 'Restore';
 
   @override
@@ -573,9 +570,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPageAbout => 'About';
-
-  @override
-  String get passwordSetupPageTitle => 'Password Setup';
 
   @override
   String get passwordSetupPageSubtitle => 'Create Password';
