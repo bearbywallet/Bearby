@@ -176,8 +176,8 @@ pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkCon
     let chains = json_value_list
         .as_array()
         .ok_or(ServiceError::SerdeSerror("json shoud be array".to_string()))?
-        .into_iter()
-        .map(|chain| NetworkConfigInfo::from_json_value(chain))
+        .iter()
+        .map(NetworkConfigInfo::from_json_value)
         .collect::<Result<Vec<NetworkConfigInfo>, ServiceError>>()?;
 
     Ok(chains)

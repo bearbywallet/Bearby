@@ -22,8 +22,6 @@ use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
 use super::transaction_metadata::TransactionMetadataInfo;
 
-extern crate bitcoin;
-
 #[derive(Debug, Clone)]
 pub struct TransactionRequestInfo {
     pub metadata: TransactionMetadataInfo,
@@ -98,10 +96,18 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                 tron: None,
                 solana: None,
             },
-            TransactionRequest::Bitcoin((tx, _, btc_meta)) => {
+            TransactionRequest::Bitcoin((tx, ref req_meta, btc_meta)) => {
+                let network = req_meta
+                    .signer
+                    .as_ref()
+                    .and_then(|s| s.get_bitcoin_network().ok())
+                    .unwrap_or(bitcoin::Network::Bitcoin);
                 let btc_meta_info: BitcoinMetadataInfo = btc_meta.into();
-                let tx_info =
-                    TransactionBitcoin::from_tx_with_utxos(tx, &btc_meta_info.witness_utxos);
+                let tx_info = TransactionBitcoin::from_tx_with_utxos(
+                    tx,
+                    &btc_meta_info.witness_utxos,
+                    network,
+                );
                 Self {
                     metadata,
                     scilla: None,

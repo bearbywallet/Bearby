@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
@@ -156,7 +157,7 @@ class BtcTransactionDetailsModal extends StatelessWidget {
       children: [
         _SectionHeader(title: 'Overview', theme: theme),
         const SizedBox(height: 8),
-        _FieldRow(label: 'Hash', value: transaction.transactionHash, theme: theme, copyable: true),
+        _FieldRow(label: 'Hash', value: transaction.transactionHash, theme: theme, copyable: true, copyWidget: CopyContent(address: transaction.transactionHash, isShort: false)),
         _Divider(theme: theme),
         _FieldRow(label: 'Status', value: transaction.status.name, theme: theme),
         _Divider(theme: theme),
@@ -202,7 +203,7 @@ class BtcTransactionDetailsModal extends StatelessWidget {
         _SectionHeader(title: 'From', theme: theme),
         const SizedBox(height: 6),
         ...btc.input.asMap().entries.map((e) {
-          final txidVout = '${e.value.previousOutput.txid}:${e.value.previousOutput.vout}';
+          final addr = e.value.address;
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
@@ -212,12 +213,16 @@ class BtcTransactionDetailsModal extends StatelessWidget {
                   child: Text('${e.key + 1}', style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.5))),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onLongPress: () {},
-                    child: Text(txidVout, style: theme.bodyText2.copyWith(color: theme.textPrimary), overflow: TextOverflow.ellipsis),
+                if (addr != null)
+                  CopyContent(address: addr)
+                else
+                  Expanded(
+                    child: Text(
+                      '${e.value.previousOutput.txid}:${e.value.previousOutput.vout}',
+                      style: theme.bodyText2.copyWith(color: theme.textPrimary),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
               ],
             ),
           );
@@ -240,6 +245,7 @@ class BtcTransactionDetailsModal extends StatelessWidget {
         _SectionHeader(title: 'To', theme: theme),
         const SizedBox(height: 6),
         ...btc.output.asMap().entries.map((e) {
+          final addr = e.value.address;
           final (formatted, _) = formatingAmount(
             amount: e.value.value, symbol: symbol, decimals: decimals, rate: 0, appState: appState,
           );
@@ -253,7 +259,14 @@ class BtcTransactionDetailsModal extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(formatted, style: theme.bodyText2.copyWith(color: theme.textPrimary)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (addr != null)
+                        CopyContent(address: addr),
+                      Text(formatted, style: theme.bodyText2.copyWith(color: theme.textPrimary)),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(symbol, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
@@ -378,6 +391,7 @@ class _FieldRow extends StatelessWidget {
   final String? value;
   final String? valueFiat;
   final bool copyable;
+  final Widget? copyWidget;
   final AppTheme theme;
 
   const _FieldRow({
@@ -386,6 +400,7 @@ class _FieldRow extends StatelessWidget {
     this.value,
     this.valueFiat,
     this.copyable = false,
+    this.copyWidget,
   });
 
   @override
@@ -401,7 +416,7 @@ class _FieldRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: copyable
+            child: copyWidget ?? (copyable
                 ? GestureDetector(
                     onLongPress: () {},
                     child: Text(value ?? '', style: theme.bodyText2.copyWith(color: theme.primaryPurple), overflow: TextOverflow.ellipsis),
@@ -413,7 +428,7 @@ class _FieldRow extends StatelessWidget {
                       if (valueFiat != null && valueFiat!.isNotEmpty && valueFiat != '0')
                         Text(valueFiat!, style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.7))),
                     ],
-                  ),
+                  )),
           ),
         ],
       ),

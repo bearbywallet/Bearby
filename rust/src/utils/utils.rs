@@ -20,7 +20,11 @@ use crate::{
 
 use super::errors::ServiceError;
 
-extern crate bitcoin;
+pub fn script_to_address(script: &[u8], network: bitcoin::Network) -> Option<String> {
+    bitcoin::Address::from_script(bitcoin::Script::from_bytes(script), network)
+        .ok()
+        .map(|a| a.to_string())
+}
 
 pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
     Address::from_str_hex(&addr).map_err(ServiceError::AddressError)
@@ -91,7 +95,7 @@ pub fn secretkey_from_provider(
     let sk = match chain_config.slip_44 {
         slip44::ETHEREUM | slip44::ZILLIQA => {
             let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
-            let secret_key_bytes = decode_secret_key(&sk)?;
+            let secret_key_bytes = decode_secret_key(sk)?;
             SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes)
         }
         slip44::BITCOIN => {
@@ -109,14 +113,14 @@ pub fn secretkey_from_provider(
                 sk_from_wif
             } else {
                 let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
-                let secret_key_bytes = decode_secret_key(&sk)?;
+                let secret_key_bytes = decode_secret_key(sk)?;
 
                 SecretKey::Secp256k1Bitcoin((secret_key_bytes, network, addr_type))
             }
         }
         slip44::TRON => {
             let sk = trimmed.strip_prefix("0x").unwrap_or(trimmed);
-            let secret_key_bytes = decode_secret_key(&sk)?;
+            let secret_key_bytes = decode_secret_key(sk)?;
             SecretKey::Secp256k1Tron(secret_key_bytes)
         }
         _ => {
