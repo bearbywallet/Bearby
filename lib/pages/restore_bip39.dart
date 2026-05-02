@@ -12,6 +12,7 @@ import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
 
