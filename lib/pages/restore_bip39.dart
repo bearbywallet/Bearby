@@ -12,7 +12,6 @@ import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
 
@@ -48,7 +47,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
     final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
-    if (chain == null) {
+    if (chain == null && _chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });
@@ -240,8 +239,6 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: AppLocalizations.of(context)!
-                        .restoreSecretPhrasePageTitle,
                     onBackPressed: () => context.pop(),
                   ),
                 ),

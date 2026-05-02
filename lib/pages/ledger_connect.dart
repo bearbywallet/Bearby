@@ -44,7 +44,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
     final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
-    if (chain == null) {
+    if (chain == null && _chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });

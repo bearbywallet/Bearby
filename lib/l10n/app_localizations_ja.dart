@@ -521,9 +521,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretPhraseVerifyPageNextButton => '次へ';
 
   @override
-  String get restoreSecretPhrasePageTitle => 'ウォレットを復元';
-
-  @override
   String get restoreSecretPhrasePageRestoreButton => '復元';
 
   @override
@@ -573,9 +570,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsPageAbout => 'アプリについて';
-
-  @override
-  String get passwordSetupPageTitle => 'パスワード設定';
 
   @override
   String get passwordSetupPageSubtitle => 'パスワードを作成';

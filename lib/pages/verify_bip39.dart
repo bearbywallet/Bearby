@@ -56,7 +56,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
     final bip39 = args?['bip39'] as List<String>?;
     final chain = args?['chain'] as NetworkConfigInfo?;
 
-    if (bip39 == null || bip39.isEmpty || chain == null) {
+    if ((bip39 == null || bip39.isEmpty || chain == null) && _chain == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.pushReplacement(AppRoutes.netSetup);
       });

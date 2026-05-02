@@ -521,9 +521,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get secretPhraseVerifyPageNextButton => 'Далее';
 
   @override
-  String get restoreSecretPhrasePageTitle => 'Восстановить кошелек';
-
-  @override
   String get restoreSecretPhrasePageRestoreButton => 'Восстановить';
 
   @override
@@ -573,9 +570,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsPageAbout => 'О приложении';
-
-  @override
-  String get passwordSetupPageTitle => 'Настройка пароля';
 
   @override
   String get passwordSetupPageSubtitle => 'Создать пароль';
