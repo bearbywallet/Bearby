@@ -108,6 +108,7 @@ impl TryFrom<WalletSettingsInfo> for WalletSettings {
     }
 }
 
+#[derive(Debug)]
 pub struct BrowserSettingsInfo {
     pub search_engine_index: u8,
 

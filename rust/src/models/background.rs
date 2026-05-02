@@ -4,6 +4,7 @@ use super::{
 };
 use std::collections::HashMap;
 
+#[derive(Debug)]
 pub struct BackgroundState {
     pub wallets: Vec<WalletInfo>,
     pub notifications_wallet_states: HashMap<usize, BackgroundNotificationState>,
