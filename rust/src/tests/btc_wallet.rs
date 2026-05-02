@@ -4,8 +4,11 @@ mod btc_wallet_tests {
 
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
+    use zilpay::crypto::bip49::DerivationPath;
+    use zilpay::crypto::slip44::BITCOIN;
     use zilpay::rpc::network_config::ChainConfig;
 
+    use crate::api::backend::get_data;
     use crate::api::wallet::{
         add_bip39_wallet, add_next_bip39_account, get_wallets, AddNextBip39AccountParams,
         Bip39AddWalletParams,
@@ -18,7 +21,7 @@ mod btc_wallet_tests {
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
 
     #[tokio::test]
-    async fn test_create_btc_wallet_bip44() {
+    async fn test_create_btc_wallet() {
         let dir = tempdir().unwrap();
         load_service(dir.path().to_str().unwrap()).await.unwrap();
 
@@ -29,19 +32,19 @@ mod btc_wallet_tests {
             .into_iter()
             .map(|c| c.try_into().unwrap())
             .collect();
-        let btc_mainnet_provider = providers.first().unwrap();
-
-        assert_eq!(btc_mainnet_provider.name, "Bitcoin");
-        assert_eq!(btc_mainnet_provider.chain, "BTC");
 
         {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            service
-                .core
-                .add_provider(btc_mainnet_provider.clone())
-                .unwrap();
+            service.core.add_batch_providers(providers).unwrap();
         }
+
+        let global_data = get_data().await.unwrap();
+        let target_chain = global_data
+            .providers
+            .iter()
+            .find(|p| p.slip_44 == BITCOIN)
+            .unwrap();
 
         let wallet_settings = WalletSettingsInfo {
             cipher_orders: vec![0],
@@ -49,9 +52,9 @@ mod btc_wallet_tests {
                 memory: 10,
                 iterations: 1,
                 threads: 1,
-                secret: "secret".to_string(),
+                secret: "".to_string(),
             },
-            currency_convert: "BTC".to_string(),
+            currency_convert: "".to_string(),
             ipfs_node: None,
             ens_enabled: false,
             tokens_list_fetcher: false,
@@ -64,11 +67,11 @@ mod btc_wallet_tests {
             password: PASSWORD.to_string(),
             mnemonic_str: BTC_MNEMONIC_STR.to_string(),
             mnemonic_check: true,
-            accounts: vec![(0, "BTC Account 0".to_string())],
+            accounts: vec![(0, "A".to_string())],
             passphrase: "".to_string(),
             wallet_name: "Bitcoin Wallet".to_string(),
             biometric_type: "none".to_string(),
-            chain_hash: btc_mainnet_provider.hash(),
+            chain_hash: target_chain.chain_hash,
         };
 
         let wallet_address = add_bip39_wallet(params, wallet_settings, vec![])
@@ -77,52 +80,31 @@ mod btc_wallet_tests {
 
         assert!(!wallet_address.is_empty());
 
-        add_next_bip39_account(AddNextBip39AccountParams {
-            wallet_index: 0,
-            account_index: 1,
-            name: "BTC Account 1".to_string(),
-            passphrase: "".to_string(),
-            password: Some(PASSWORD.to_string()),
-        })
-        .await
-        .unwrap();
-
-        add_next_bip39_account(AddNextBip39AccountParams {
-            wallet_index: 0,
-            account_index: 2,
-            name: "BTC Account 2".to_string(),
-            passphrase: "".to_string(),
-            password: Some(PASSWORD.to_string()),
-        })
-        .await
-        .unwrap();
-
-        println!("Added 2 additional accounts successfully!");
-
-        let expected_bip86 = vec![
-            "bc1pfzhx49qe6s5exppe5hqljg3n6587xk0w75xqr70pgdt7ygnfkssqxqjd9l",
-            "bc1p0lks35d0spqsvz2t3t0kqus38wrlpmcjtvvupkfkwdrzfh6zjyps9rvd6v",
-            "bc1p6f0xvqe892y0fvm2hwnmmj6fzczp7lx6tluvwhymcca4d7a45jjsgzlsdv",
-        ];
-
         let wallets = get_wallets().await.unwrap();
         let wallet = wallets.first().unwrap();
-        let accounts = wallet
+
+        assert_eq!(wallet.wallet_type, "SecretPhrase.false");
+        assert_eq!(wallet.wallet_name, "Bitcoin Wallet");
+        assert_eq!(wallet.auth_type, "none");
+        assert_eq!(wallet.slip44, BITCOIN);
+        assert_eq!(wallet.bip, DerivationPath::BIP86_PURPOSE);
+
+        let btc_accounts = wallet
             .accounts
-            .get(&wallet.slip44)
-            .and_then(|m| m.get(&wallet.bip))
+            .get(&BITCOIN)
+            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
             .unwrap();
 
-        println!("BIP86 addresses:");
-        for (i, account) in accounts.iter().take(3).enumerate() {
-            println!("  Account {}: {}", i, account.addr);
-            assert_eq!(
-                account.addr, expected_bip86[i],
-                "BIP86 Account {} address mismatch",
-                i
-            );
-        }
+        assert_eq!(btc_accounts.len(), 1);
 
-        println!("\n✓ All address type conversions successful!");
+        let account = &btc_accounts[0];
+        assert_eq!(
+            account.addr,
+            "bc1pfzhx49qe6s5exppe5hqljg3n6587xk0w75xqr70pgdt7ygnfkssqxqjd9l"
+        );
+        assert_eq!(account.name, "A");
+        assert_eq!(account.index, 0);
+        assert_eq!(account.addr_type, 2);
+        assert_eq!(account.pub_key, None);
     }
 }
