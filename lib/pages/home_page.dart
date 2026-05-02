@@ -165,7 +165,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   if (filteredTokens.isNotEmpty) {
                     final originalIndex =
                         appState.wallet!.tokens.indexOf(filteredTokens[0]);
-                    context.push(AppRoutes.send, extra: {'token_index': originalIndex});
+                    context.push(AppRoutes.send,
+                        extra: {'token_index': originalIndex});
                   }
                 },
                 backgroundColor: theme.cardBackground,
@@ -260,7 +261,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 children: [
                   NetworkDownButton(
                     onPressed: () {
-                      context.push(AppRoutes.networks, extra: {'popOnSelect': true});
+                      context.push(AppRoutes.networks,
+                          extra: {'popOnSelect': true});
                     },
                     chain: appState.chain!,
                   ),
@@ -327,10 +329,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final token = filteredTokens[index];
-                final tokenAmountValue =
-                    BigInt.tryParse(token.balances[appState.accountBalanceKey] ??
-                            '-') ??
-                        BigInt.zero;
+                final tokenAmountValue = BigInt.tryParse(
+                        token.balances[appState.accountBalanceKey] ?? '-') ??
+                    BigInt.zero;
 
                 return TokenCard(
                   ftoken: token,
@@ -341,7 +342,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   onTap: () {
                     final originalIndex =
                         appState.wallet!.tokens.indexOf(token);
-                    context.push(AppRoutes.send, extra: {'token_index': originalIndex});
+                    context.push(AppRoutes.send,
+                        extra: {'token_index': originalIndex});
                   },
                 );
               },
@@ -355,10 +357,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
             (context, index) {
               final token = filteredTokens[index];
               final isLast = index == filteredTokens.length - 1;
-              final tokenAmountValue =
-                  BigInt.tryParse(token.balances[appState.accountBalanceKey] ??
-                          '-') ??
-                      BigInt.zero;
+              final tokenAmountValue = BigInt.tryParse(
+                      token.balances[appState.accountBalanceKey] ?? '-') ??
+                  BigInt.zero;
 
               return TokenCard(
                 ftoken: token,
@@ -367,7 +368,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 showDivider: !isLast,
                 onTap: () {
                   final originalIndex = appState.wallet!.tokens.indexOf(token);
-                  context.push(AppRoutes.send, extra: {'token_index': originalIndex});
+                  context.push(AppRoutes.send,
+                      extra: {'token_index': originalIndex});
                 },
               );
             },

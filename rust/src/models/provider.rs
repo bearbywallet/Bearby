@@ -263,8 +263,7 @@ impl NetworkConfigInfo {
 
                 let ens = obj
                     .get("ens")
-                    .and_then(|v| v.as_str())
-                    .and_then(|str| Some(str.to_string()));
+                    .and_then(|v| v.as_str()).map(|str| str.to_string());
 
                 Ok(NetworkConfigInfo {
                     name: obj

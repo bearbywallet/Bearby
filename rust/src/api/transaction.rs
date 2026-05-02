@@ -60,7 +60,7 @@ pub async fn send_signed_transactions(
         .map_err(ServiceError::TransactionErrors)?;
 
     let tx = core
-        .broadcast_signed_transactions(wallet_index as usize, vec![signed_tx])
+        .broadcast_signed_transactions(wallet_index, vec![signed_tx])
         .await
         .map_err(ServiceError::BackgroundError)?
         .into_iter()
@@ -299,8 +299,7 @@ pub async fn sign_message(
             .map_err(ServiceError::BackgroundError)?;
 
         Ok::<(PubKey, Signature), ServiceError>(signed)
-    }
-    .map_err(Into::<ServiceError>::into)?;
+    }?;
     let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
@@ -346,8 +345,7 @@ pub async fn sign_typed_data_eip712(
             .map_err(ServiceError::BackgroundError)?;
 
         Ok::<(PubKey, Signature), ServiceError>(signed)
-    }
-    .map_err(Into::<ServiceError>::into)?;
+    }?;
     let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
@@ -430,7 +428,7 @@ pub async fn create_token_transfer(
     let final_amount = amount;
 
     let mut tx = core
-        .build_token_transfer(&token, &sender_account, recipient, final_amount)
+        .build_token_transfer(&token, sender_account, recipient, final_amount)
         .await
         .map_err(ServiceError::BackgroundError)?;
 
@@ -568,21 +566,18 @@ pub async fn update_tx_with_params(
     let params: RequiredTxParams = params.into();
     let balance: U256 = balance.parse().unwrap_or_default();
 
-    match tx {
-        TransactionRequest::Tron((ref mut tron_tx, _)) => {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-            let core = Arc::clone(&service.core);
+    if let TransactionRequest::Tron((ref mut tron_tx, _)) = tx {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        let core = Arc::clone(&service.core);
 
-            let provider = core
-                .get_provider(chain_hash)
-                .map_err(ServiceError::BackgroundError)?;
-            provider
-                .tron_fill_block_ref(tron_tx)
-                .await
-                .map_err(ServiceError::NetworkErrors)?;
-        }
-        _ => {}
+        let provider = core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
+        provider
+            .tron_fill_block_ref(tron_tx)
+            .await
+            .map_err(ServiceError::NetworkErrors)?;
     }
 
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;

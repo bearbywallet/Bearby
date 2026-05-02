@@ -12,6 +12,8 @@ mod btc_wallet_tests {
 
     use crate::api::backend::get_data;
     use crate::api::provider::select_accounts_chain;
+    use crate::api::token::sync_balances;
+    use crate::api::utils::address_to_hash;
     use crate::api::wallet::{add_bip39_wallet, get_wallets, Bip39AddWalletParams};
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
@@ -20,10 +22,10 @@ mod btc_wallet_tests {
     const PASSWORD: &str = "test_password";
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
 
-    const BTC_ADDR: &str = "bcrt1pv7es4n48mdqydrcf8kxn3fayrvptu0zj5awh9du9wak2drlhrvys0q86ns";
     const ETH_ADDR: &str = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
     const TRX_ADDR: &str = "TWer2Ygk5TEheHp3TPuYeqxmB6SsGZmaL6";
     const SOL_ADDR: &str = "oeYf6KAJkLYhBuR8CiGc6L4D4Xtfepr85fuDgA9kq96";
+    const BTC_ADDR: &str = "bcrt1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5ssm803es";
 
     const EXPECTED_ADDRS: [(u32, &str); 4] = [
         (BITCOIN, BTC_ADDR),
@@ -94,6 +96,15 @@ mod btc_wallet_tests {
             .await
             .unwrap();
 
+        let history = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let history = wallet.get_btc_addresses(0).unwrap();
+
+            history
+        };
+
         assert!(!wallet_address.is_empty());
 
         let wallets = get_wallets().await.unwrap();
@@ -115,9 +126,21 @@ mod btc_wallet_tests {
         assert_eq!(btc_accounts.len(), 1);
 
         let account = &btc_accounts[0];
-        dbg!(&btc_accounts);
+        let taproot_history = history.get(&bitcoin::AddressType::P2tr).unwrap();
 
-        assert_eq!(account.addr, BTC_ADDR);
+        assert!(taproot_history.get_internal().unwrap().history.is_empty());
+        assert!(taproot_history.get_internal().unwrap().utxos.is_empty());
+        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
+        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
+
+        assert_eq!(
+            account.addr,
+            taproot_history
+                .get_external()
+                .unwrap()
+                .address
+                .auto_format()
+        );
         assert_eq!(account.name, "A");
         assert_eq!(account.index, 0);
         assert_eq!(account.addr_type, 2);
@@ -185,10 +208,16 @@ mod btc_wallet_tests {
             .get(&BITCOIN)
             .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
             .unwrap();
-        dbg!(&btc_accounts);
-        assert_eq!(btc_accounts[0].addr, BTC_ADDR);
+        assert_eq!(
+            btc_accounts[0].addr,
+            taproot_history
+                .get_external()
+                .unwrap()
+                .address
+                .auto_format()
+        );
 
-        // sync_balances(0).await.unwrap();
+        sync_balances(0).await.unwrap();
 
         {
             let guard = BACKGROUND_SERVICE.read().await;
@@ -197,6 +226,44 @@ mod btc_wallet_tests {
             let history = wallet.get_btc_addresses(0).unwrap();
 
             dbg!(&history);
+        }
+
+        let wallets_after_sync = get_wallets().await.unwrap();
+        let wallet = wallets_after_sync.first().unwrap();
+        let btc_accounts = wallet
+            .accounts
+            .get(&BITCOIN)
+            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .unwrap();
+        let token = &wallet.tokens[0];
+
+        assert_eq!(btc_accounts.len(), 1);
+
+        let account = &btc_accounts[0];
+        let expected_balance: u64 = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let chains = wallet.get_btc_addresses(0).unwrap();
+            chains
+                .values()
+                .flat_map(|c| c.external.iter().chain(c.internal.iter()))
+                .flat_map(|e| e.utxos.iter())
+                .map(|u| u.value)
+                .sum()
+        };
+
+        if expected_balance > 0 {
+            let balance_str = token
+                .balances
+                .get(&address_to_hash(account.addr.clone()))
+                .cloned()
+                .unwrap_or_default();
+            let balance: u64 = balance_str.parse().unwrap_or(0);
+            assert_eq!(
+                balance, expected_balance,
+                "BTC balance should match sum of UTXOs"
+            );
         }
     }
 }

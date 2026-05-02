@@ -465,13 +465,13 @@ async fn fetch_zilliqa_tokens(
 
     match addr {
         Address::Secp256k1Bitcoin(_) => {
-            return Err("btc is not supporting".to_string());
+            Err("btc is not supporting".to_string())
         }
         Address::Secp256k1Tron(_) => {
-            return Err("tron token auto-discovery is not supported".to_string());
+            Err("tron token auto-discovery is not supported".to_string())
         }
         Address::Ed25519Solana(_) => {
-            return Err("solana token auto-discovery is not supported".to_string());
+            Err("solana token auto-discovery is not supported".to_string())
         }
         Address::Secp256k1Sha256(_) => {
             let response = client

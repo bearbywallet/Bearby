@@ -5794,13 +5794,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TxInInfo dco_decode_tx_in_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return TxInInfo(
       previousOutput: dco_decode_out_point_info(arr[0]),
       scriptSig: dco_decode_list_prim_u_8_strict(arr[1]),
       sequence: dco_decode_u_32(arr[2]),
       witness: dco_decode_list_list_prim_u_8_strict(arr[3]),
+      address: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -5808,11 +5809,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TxOutInfo dco_decode_tx_out_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return TxOutInfo(
       value: dco_decode_u_64(arr[0]),
       scriptPubkey: dco_decode_list_prim_u_8_strict(arr[1]),
+      address: dco_decode_opt_String(arr[2]),
     );
   }
 
@@ -7726,11 +7728,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_scriptSig = sse_decode_list_prim_u_8_strict(deserializer);
     var var_sequence = sse_decode_u_32(deserializer);
     var var_witness = sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_address = sse_decode_opt_String(deserializer);
     return TxInInfo(
         previousOutput: var_previousOutput,
         scriptSig: var_scriptSig,
         sequence: var_sequence,
-        witness: var_witness);
+        witness: var_witness,
+        address: var_address);
   }
 
   @protected
@@ -7738,7 +7742,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_value = sse_decode_u_64(deserializer);
     var var_scriptPubkey = sse_decode_list_prim_u_8_strict(deserializer);
-    return TxOutInfo(value: var_value, scriptPubkey: var_scriptPubkey);
+    var var_address = sse_decode_opt_String(deserializer);
+    return TxOutInfo(
+        value: var_value, scriptPubkey: var_scriptPubkey, address: var_address);
   }
 
   @protected
@@ -9299,6 +9305,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_prim_u_8_strict(self.scriptSig, serializer);
     sse_encode_u_32(self.sequence, serializer);
     sse_encode_list_list_prim_u_8_strict(self.witness, serializer);
+    sse_encode_opt_String(self.address, serializer);
   }
 
   @protected
@@ -9306,6 +9313,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.value, serializer);
     sse_encode_list_prim_u_8_strict(self.scriptPubkey, serializer);
+    sse_encode_opt_String(self.address, serializer);
   }
 
   @protected

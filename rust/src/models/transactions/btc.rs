@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use crate::utils::utils::script_to_address;
 pub use zilpay::crypto::bip49::DerivationPath;
 pub use zilpay::errors::tx::TransactionErrors;
 pub use zilpay::proto::btc_tx::BitcoinMetadata;
@@ -16,12 +17,14 @@ pub struct TxInInfo {
     pub script_sig: Vec<u8>,
     pub sequence: u32,
     pub witness: Vec<Vec<u8>>,
+    pub address: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct TxOutInfo {
     pub value: u64,
     pub script_pubkey: Vec<u8>,
+    pub address: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -34,11 +37,24 @@ pub struct TransactionBitcoin {
 }
 
 impl TransactionBitcoin {
-    pub fn from_tx_with_utxos(tx: bitcoin::Transaction, witness_utxos: &[TxOutInfo]) -> Self {
+    pub fn from_tx_with_utxos(
+        tx: bitcoin::Transaction,
+        witness_utxos: &[TxOutInfo],
+        network: bitcoin::Network,
+    ) -> Self {
         let input_sum: u64 = witness_utxos.iter().map(|u| u.value).sum();
         let output_sum: u64 = tx.output.iter().map(|o| o.value.to_sat()).sum();
         let mut btc_tx = TransactionBitcoin::from(tx);
         btc_tx.fee = input_sum.checked_sub(output_sum);
+
+        for tx_out in &mut btc_tx.output {
+            tx_out.address = script_to_address(&tx_out.script_pubkey, network);
+        }
+
+        for (tx_in, utxo) in btc_tx.input.iter_mut().zip(witness_utxos.iter()) {
+            tx_in.address = script_to_address(&utxo.script_pubkey, network);
+        }
+
         btc_tx
     }
 }
@@ -59,6 +75,7 @@ impl From<bitcoin::Transaction> for TransactionBitcoin {
                     script_sig: tx_in.script_sig.into_bytes(),
                     sequence: tx_in.sequence.0,
                     witness: tx_in.witness.to_vec(),
+                    address: None,
                 })
                 .collect(),
             output: tx
@@ -67,6 +84,7 @@ impl From<bitcoin::Transaction> for TransactionBitcoin {
                 .map(|tx_out| TxOutInfo {
                     value: tx_out.value.to_sat(),
                     script_pubkey: tx_out.script_pubkey.into_bytes(),
+                    address: None,
                 })
                 .collect(),
             fee: None,
@@ -135,6 +153,7 @@ impl From<BitcoinMetadata> for BitcoinMetadataInfo {
                 .map(|tx_out| TxOutInfo {
                     value: tx_out.value.to_sat(),
                     script_pubkey: tx_out.script_pubkey.into_bytes(),
+                    address: None,
                 })
                 .collect(),
             input_meta: value

@@ -109,12 +109,14 @@ class TxInInfo {
   final Uint8List scriptSig;
   final int sequence;
   final List<Uint8List> witness;
+  final String? address;
 
   const TxInInfo({
     required this.previousOutput,
     required this.scriptSig,
     required this.sequence,
     required this.witness,
+    this.address,
   });
 
   @override
@@ -122,7 +124,8 @@ class TxInInfo {
       previousOutput.hashCode ^
       scriptSig.hashCode ^
       sequence.hashCode ^
-      witness.hashCode;
+      witness.hashCode ^
+      address.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -132,20 +135,23 @@ class TxInInfo {
           previousOutput == other.previousOutput &&
           scriptSig == other.scriptSig &&
           sequence == other.sequence &&
-          witness == other.witness;
+          witness == other.witness &&
+          address == other.address;
 }
 
 class TxOutInfo {
   final BigInt value;
   final Uint8List scriptPubkey;
+  final String? address;
 
   const TxOutInfo({
     required this.value,
     required this.scriptPubkey,
+    this.address,
   });
 
   @override
-  int get hashCode => value.hashCode ^ scriptPubkey.hashCode;
+  int get hashCode => value.hashCode ^ scriptPubkey.hashCode ^ address.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -153,5 +159,6 @@ class TxOutInfo {
       other is TxOutInfo &&
           runtimeType == other.runtimeType &&
           value == other.value &&
-          scriptPubkey == other.scriptPubkey;
+          scriptPubkey == other.scriptPubkey &&
+          address == other.address;
 }

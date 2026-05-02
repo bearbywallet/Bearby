@@ -35,12 +35,19 @@ pub struct HistoricalTransactionInfo {
 
 impl From<HistoricalTransaction> for HistoricalTransactionInfo {
     fn from(value: HistoricalTransaction) -> Self {
+        let network = value
+            .metadata
+            .signer
+            .as_ref()
+            .and_then(|s| s.get_bitcoin_network().ok())
+            .unwrap_or(bitcoin::Network::Bitcoin);
+
         Self {
             status: value.status.into(),
             metadata: value.metadata.into(),
             btc: value.btc.map(|(tx, meta)| {
                 let meta = BitcoinMetadataInfo::from(meta);
-                TransactionBitcoin::from_tx_with_utxos(tx, &meta.witness_utxos)
+                TransactionBitcoin::from_tx_with_utxos(tx, &meta.witness_utxos, network)
             }),
             tron: value.tron,
             solana: value.solana,

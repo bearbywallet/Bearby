@@ -190,6 +190,12 @@ pub struct BleReceiveState {
     pub data: Vec<u8>,
 }
 
+impl Default for BleReceiveState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BleReceiveState {
     pub fn new() -> Self {
         BleReceiveState {

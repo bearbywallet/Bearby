@@ -200,16 +200,13 @@ impl BleLedgerTransport {
             // Try to read the MTU response with timeout
             if let Ok(mut notifs) = peripheral.notifications().await {
                 let timeout = tokio::time::timeout(Duration::from_secs(2), notifs.next()).await;
-                match &timeout {
-                    Ok(Some(notif)) => {
-                        if notif.value.len() >= 6 && notif.value[0] == MTU_NEGOTIATE_CMD {
-                            let negotiated = notif.value[5] as usize;
-                            if negotiated >= 23 && negotiated <= 517 {
-                                return negotiated;
-                            }
+                if let Ok(Some(notif)) = &timeout {
+                    if notif.value.len() >= 6 && notif.value[0] == MTU_NEGOTIATE_CMD {
+                        let negotiated = notif.value[5] as usize;
+                        if (23..=517).contains(&negotiated) {
+                            return negotiated;
                         }
                     }
-                    _ => {}
                 }
             }
         }
@@ -255,7 +252,7 @@ impl BleLedgerTransport {
                 .map_err(|_| {
                     LedgerError::Timeout
                 })?
-                .ok_or_else(|| {
+                .ok_or({
                     LedgerError::Disconnected
                 })?;
 

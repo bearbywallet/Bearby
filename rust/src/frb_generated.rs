@@ -7103,11 +7103,13 @@ impl SseDecode for crate::models::transactions::btc::TxInInfo {
         let mut var_scriptSig = <Vec<u8>>::sse_decode(deserializer);
         let mut var_sequence = <u32>::sse_decode(deserializer);
         let mut var_witness = <Vec<Vec<u8>>>::sse_decode(deserializer);
+        let mut var_address = <Option<String>>::sse_decode(deserializer);
         return crate::models::transactions::btc::TxInInfo {
             previous_output: var_previousOutput,
             script_sig: var_scriptSig,
             sequence: var_sequence,
             witness: var_witness,
+            address: var_address,
         };
     }
 }
@@ -7117,9 +7119,11 @@ impl SseDecode for crate::models::transactions::btc::TxOutInfo {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_value = <u64>::sse_decode(deserializer);
         let mut var_scriptPubkey = <Vec<u8>>::sse_decode(deserializer);
+        let mut var_address = <Option<String>>::sse_decode(deserializer);
         return crate::models::transactions::btc::TxOutInfo {
             value: var_value,
             script_pubkey: var_scriptPubkey,
+            address: var_address,
         };
     }
 }
@@ -8888,6 +8892,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::transactions::btc::TxInInf
             self.script_sig.into_into_dart().into_dart(),
             self.sequence.into_into_dart().into_dart(),
             self.witness.into_into_dart().into_dart(),
+            self.address.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8909,6 +8914,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::transactions::btc::TxOutIn
         [
             self.value.into_into_dart().into_dart(),
             self.script_pubkey.into_into_dart().into_dart(),
+            self.address.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -10396,6 +10402,7 @@ impl SseEncode for crate::models::transactions::btc::TxInInfo {
         <Vec<u8>>::sse_encode(self.script_sig, serializer);
         <u32>::sse_encode(self.sequence, serializer);
         <Vec<Vec<u8>>>::sse_encode(self.witness, serializer);
+        <Option<String>>::sse_encode(self.address, serializer);
     }
 }
 
@@ -10404,6 +10411,7 @@ impl SseEncode for crate::models::transactions::btc::TxOutInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u64>::sse_encode(self.value, serializer);
         <Vec<u8>>::sse_encode(self.script_pubkey, serializer);
+        <Option<String>>::sse_encode(self.address, serializer);
     }
 }
 

@@ -80,11 +80,7 @@ pub fn bip39_checksum_valid(words: String) -> bool {
     let word_count = mnemonic.word_count;
     let expected_checksum = digest[0] >> (8 - word_count / 3);
 
-    if checksum == expected_checksum {
-        true
-    } else {
-        false
-    }
+    checksum == expected_checksum
 }
 
 #[frb(sync)]
