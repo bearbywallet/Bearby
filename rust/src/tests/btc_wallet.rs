@@ -106,5 +106,25 @@ mod btc_wallet_tests {
         assert_eq!(account.index, 0);
         assert_eq!(account.addr_type, 2);
         assert_eq!(account.pub_key, None);
+
+        assert_eq!(wallet.tokens.len(), 1);
+        let token = &wallet.tokens[0];
+        assert_eq!(token.name, "Bitcoin");
+        assert_eq!(token.symbol, "BTC");
+        assert_eq!(token.decimals, 8);
+        assert_eq!(
+            token.addr,
+            "bc1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5sspknck9"
+        );
+        assert_eq!(token.addr_type, 2);
+        assert_eq!(
+            token.logo,
+            Some("https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp".to_string())
+        );
+        assert!(token.balances.is_empty());
+        assert_eq!(token.rate, 0.0);
+        assert!(!token.default);
+        assert!(token.native);
+        assert_eq!(token.chain_hash, 7125286628901439293);
     }
 }
