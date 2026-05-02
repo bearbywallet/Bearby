@@ -4,9 +4,11 @@ mod btc_wallet_tests {
 
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
+    use zilpay::background::bg_wallet::WalletManagement;
     use zilpay::crypto::bip49::DerivationPath;
     use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON};
     use zilpay::rpc::network_config::ChainConfig;
+    use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 
     use crate::api::backend::get_data;
     use crate::api::provider::select_accounts_chain;
@@ -18,7 +20,7 @@ mod btc_wallet_tests {
     const PASSWORD: &str = "test_password";
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
 
-    const BTC_ADDR: &str = "bc1pfzhx49qe6s5exppe5hqljg3n6587xk0w75xqr70pgdt7ygnfkssqxqjd9l";
+    const BTC_ADDR: &str = "bcrt1pv7es4n48mdqydrcf8kxn3fayrvptu0zj5awh9du9wak2drlhrvys0q86ns";
     const ETH_ADDR: &str = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
     const TRX_ADDR: &str = "TWer2Ygk5TEheHp3TPuYeqxmB6SsGZmaL6";
     const SOL_ADDR: &str = "oeYf6KAJkLYhBuR8CiGc6L4D4Xtfepr85fuDgA9kq96";
@@ -35,7 +37,7 @@ mod btc_wallet_tests {
         let dir = tempdir().unwrap();
         load_service(dir.path().to_str().unwrap()).await.unwrap();
 
-        let path = Path::new("../assets/chains/mainnet-chains.json");
+        let path = Path::new("../assets/chains/testnet-chains.json");
         let content = fs::read_to_string(path).unwrap();
         let providers: Vec<ChainConfig> = get_chains_providers_from_json(content)
             .unwrap()
@@ -113,6 +115,8 @@ mod btc_wallet_tests {
         assert_eq!(btc_accounts.len(), 1);
 
         let account = &btc_accounts[0];
+        dbg!(&btc_accounts);
+
         assert_eq!(account.addr, BTC_ADDR);
         assert_eq!(account.name, "A");
         assert_eq!(account.index, 0);
@@ -122,11 +126,11 @@ mod btc_wallet_tests {
         assert_eq!(wallet.tokens.len(), 1);
         let token = &wallet.tokens[0];
         assert_eq!(token.name, "Bitcoin");
-        assert_eq!(token.symbol, "BTC");
+        assert_eq!(token.symbol, "tBTC");
         assert_eq!(token.decimals, 8);
         assert_eq!(
             token.addr,
-            "bc1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5sspknck9"
+            "bcrt1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5ssm803es"
         );
         assert_eq!(token.addr_type, 2);
         assert_eq!(
@@ -181,6 +185,18 @@ mod btc_wallet_tests {
             .get(&BITCOIN)
             .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
             .unwrap();
+        dbg!(&btc_accounts);
         assert_eq!(btc_accounts[0].addr, BTC_ADDR);
+
+        // sync_balances(0).await.unwrap();
+
+        {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let history = wallet.get_btc_addresses(0).unwrap();
+
+            dbg!(&history);
+        }
     }
 }
