@@ -202,56 +202,47 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final config = networkItem.configInfo;
     final wallet = appState.wallet;
 
-    if (wallet?.accounts[networkItem.configInfo.slip44] == null) {
-      if (wallet?.authType == "none") {
-        showConfirmPasswordModal(
-          context: context,
-          theme: appState.currentTheme,
-          onConfirm: (password) async {
-            try {
-              await selectAccountsChain(
-                walletIndex: appState.selectedWalletIndex,
-                chainHash: config.chainHash,
-                password: password,
-              );
-            } catch (_) {}
-
-            if (_popOnSelect && mounted) {
-              context.go(AppRoutes.home);
-            }
-
-            await appState.syncData();
-
-            return null;
-          },
-        );
-      } else {
-        try {
-          await selectAccountsChain(
-            walletIndex: appState.selectedWalletIndex,
-            chainHash: config.chainHash,
-          );
-        } catch (_) {}
-
-        if (_popOnSelect && mounted) {
-          context.go(AppRoutes.home);
-        }
-
-        await appState.syncData();
-      }
-    } else {
+    Future<String?> selectChainAndFinish({String? password}) async {
       try {
         await selectAccountsChain(
           walletIndex: appState.selectedWalletIndex,
           chainHash: config.chainHash,
+          password: password,
         );
-      } catch (_) {}
+      } catch (e) {
+        debugPrint("select net: $e");
+        return e.toString();
+      }
 
       if (_popOnSelect && mounted) {
         context.go(AppRoutes.home);
       }
 
       await appState.syncData();
+
+      return null;
+    }
+
+    void promptPassword() {
+      showConfirmPasswordModal(
+        context: context,
+        theme: appState.currentTheme,
+        onConfirm: (password) => selectChainAndFinish(password: password),
+      );
+    }
+
+    final needsPassword = wallet?.accounts[config.slip44] == null &&
+        wallet?.authType == "none";
+
+    if (needsPassword) {
+      promptPassword();
+      return;
+    }
+
+    final result = await selectChainAndFinish();
+
+    if (result != null) {
+      promptPassword();
     }
   }
 
@@ -364,7 +355,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                       ),
                     ),
                     onActionPressed: () async {
-                      final added = await context.push<bool>(AppRoutes.addNetwork);
+                      final added =
+                          await context.push<bool>(AppRoutes.addNetwork);
                       if (added == true) {
                         _loadNetworks();
                       }
