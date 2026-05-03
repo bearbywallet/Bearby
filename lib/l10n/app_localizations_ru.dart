@@ -1281,6 +1281,60 @@ class AppLocalizationsRu extends AppLocalizations {
   String get transactionDetailsModal_errorMessage => 'Сообщение об ошибке';
 
   @override
+  String get transactionDetailsModal_from => 'Откуда';
+
+  @override
+  String get transactionDetailsModal_to => 'Куда';
+
+  @override
+  String get transactionDetailsModal_age => 'Возраст';
+
+  @override
+  String get transactionDetailsModal_inputValue => 'Сумма входов';
+
+  @override
+  String get transactionDetailsModal_outputValue => 'Сумма выходов';
+
+  @override
+  String get transactionDetailsModal_btcPrice => 'Цена BTC';
+
+  @override
+  String get transactionDetailsModal_coinbase => 'Coinbase';
+
+  @override
+  String get transactionDetailsModal_rbf => 'RBF';
+
+  @override
+  String get transactionDetailsModal_locktime => 'Locktime';
+
+  @override
+  String get transactionDetailsModal_version => 'Версия';
+
+  @override
+  String get transactionDetailsModal_feesProperties => 'Комиссия и свойства';
+
+  @override
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      inputCount,
+      locale: localeName,
+      other: '# входа',
+      many: '# входов',
+      few: '# входа',
+      one: '# вход',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      outputCount,
+      locale: localeName,
+      other: '# выхода',
+      many: '# выходов',
+      few: '# выхода',
+      one: '# выход',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get amountSection_transfer => 'Перевод';
 
   @override

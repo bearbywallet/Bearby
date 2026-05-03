@@ -415,6 +415,24 @@
   "transactionDetailsModal_blobGasPrice": "Blob Gas价格",
   "transactionDetailsModal_error": "错误",
   "transactionDetailsModal_errorMessage": "错误信息",
+  "transactionDetailsModal_from": "来源",
+  "transactionDetailsModal_to": "去向",
+  "transactionDetailsModal_age": "时长",
+  "transactionDetailsModal_inputValue": "输入合计",
+  "transactionDetailsModal_outputValue": "输出合计",
+  "transactionDetailsModal_btcPrice": "BTC 价格",
+  "transactionDetailsModal_coinbase": "Coinbase",
+  "transactionDetailsModal_rbf": "RBF",
+  "transactionDetailsModal_locktime": "锁定时间",
+  "transactionDetailsModal_version": "版本",
+  "transactionDetailsModal_feesProperties": "费用与属性",
+  "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{{inputCount} 个输入}} · {outputCount, plural, other{{outputCount} 个输出}}",
+  "@transactionDetailsModal_inputsOutputsSummary": {
+    "placeholders": {
+      "inputCount": { "type": "int" },
+      "outputCount": { "type": "int" }
+    }
+  },
   "amountSection_transfer": "转账",
   "amountSection_pending": "待处理",
   "amountSection_confirmed": "已确认",

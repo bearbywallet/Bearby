@@ -1281,6 +1281,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transactionDetailsModal_errorMessage => '错误信息';
 
   @override
+  String get transactionDetailsModal_from => '来源';
+
+  @override
+  String get transactionDetailsModal_to => '去向';
+
+  @override
+  String get transactionDetailsModal_age => '时长';
+
+  @override
+  String get transactionDetailsModal_inputValue => '输入合计';
+
+  @override
+  String get transactionDetailsModal_outputValue => '输出合计';
+
+  @override
+  String get transactionDetailsModal_btcPrice => 'BTC 价格';
+
+  @override
+  String get transactionDetailsModal_coinbase => 'Coinbase';
+
+  @override
+  String get transactionDetailsModal_rbf => 'RBF';
+
+  @override
+  String get transactionDetailsModal_locktime => '锁定时间';
+
+  @override
+  String get transactionDetailsModal_version => '版本';
+
+  @override
+  String get transactionDetailsModal_feesProperties => '费用与属性';
+
+  @override
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      inputCount,
+      locale: localeName,
+      other: '$inputCount 个输入',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      outputCount,
+      locale: localeName,
+      other: '$outputCount 个输出',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get amountSection_transfer => '转账';
 
   @override

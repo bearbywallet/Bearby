@@ -430,6 +430,24 @@
   "transactionDetailsModal_blobGasPrice": "ブロブガス価格",
   "transactionDetailsModal_error": "エラー",
   "transactionDetailsModal_errorMessage": "エラーメッセージ",
+  "transactionDetailsModal_from": "送信元",
+  "transactionDetailsModal_to": "送信先",
+  "transactionDetailsModal_age": "経過時間",
+  "transactionDetailsModal_inputValue": "入力合計",
+  "transactionDetailsModal_outputValue": "出力合計",
+  "transactionDetailsModal_btcPrice": "BTC価格",
+  "transactionDetailsModal_coinbase": "コインベース",
+  "transactionDetailsModal_rbf": "RBF",
+  "transactionDetailsModal_locktime": "ロックタイム",
+  "transactionDetailsModal_version": "バージョン",
+  "transactionDetailsModal_feesProperties": "手数料と属性",
+  "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{{inputCount}件の入力}} · {outputCount, plural, other{{outputCount}件の出力}}",
+  "@transactionDetailsModal_inputsOutputsSummary": {
+    "placeholders": {
+      "inputCount": { "type": "int" },
+      "outputCount": { "type": "int" }
+    }
+  },
   "amountSection_transfer": "送金",
   "amountSection_pending": "保留中",
   "amountSection_confirmed": "確認済み",

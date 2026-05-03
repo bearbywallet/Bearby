@@ -1698,6 +1698,58 @@
   "@transactionDetailsModal_errorMessage": {
     "description": "Label for error message in TransactionDetailsModal"
   },
+  "transactionDetailsModal_from": "From",
+  "@transactionDetailsModal_from": {
+    "description": "Title for the inputs (sources) section in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_to": "To",
+  "@transactionDetailsModal_to": {
+    "description": "Title for the outputs (recipients) section in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_age": "Age",
+  "@transactionDetailsModal_age": {
+    "description": "Label for relative time since transaction in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_inputValue": "Input Value",
+  "@transactionDetailsModal_inputValue": {
+    "description": "Label for total input value in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_outputValue": "Output Value",
+  "@transactionDetailsModal_outputValue": {
+    "description": "Label for total output value in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_btcPrice": "BTC Price",
+  "@transactionDetailsModal_btcPrice": {
+    "description": "Label for current BTC price in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_coinbase": "Coinbase",
+  "@transactionDetailsModal_coinbase": {
+    "description": "Label for coinbase flag in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_rbf": "RBF",
+  "@transactionDetailsModal_rbf": {
+    "description": "Label for Replace-By-Fee flag in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_locktime": "Locktime",
+  "@transactionDetailsModal_locktime": {
+    "description": "Label for locktime field in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_version": "Version",
+  "@transactionDetailsModal_version": {
+    "description": "Label for transaction version in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_feesProperties": "Fees & Properties",
+  "@transactionDetailsModal_feesProperties": {
+    "description": "Title for fees and properties section in BTC TransactionDetailsModal"
+  },
+  "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, =1{1 input} other{{inputCount} inputs}} · {outputCount, plural, =1{1 output} other{{outputCount} outputs}}",
+  "@transactionDetailsModal_inputsOutputsSummary": {
+    "description": "Subtitle showing input and output counts under the amount in BTC TransactionDetailsModal",
+    "placeholders": {
+      "inputCount": { "type": "int" },
+      "outputCount": { "type": "int" }
+    }
+  },
   "amountSection_transfer": "Transfer",
   "@amountSection_transfer": {
     "description": "Title for transfer section in _AmountSection"
