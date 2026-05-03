@@ -1809,4 +1809,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qrCodeInvalidKeyError => 'QR-код содержит недопустимый приватный ключ.';
+
+  @override
+  String get deprecatedLabel => '(Устарело)';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Устарело для Bitcoin. Используйте BIP39.';
 }

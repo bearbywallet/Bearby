@@ -599,5 +599,7 @@
   "qrCodeScanError": "QRコードの読み取りに失敗しました。再試行してください。",
   "qrCodeEmptySeedError": "QRコードにシードワードが含まれていません。",
   "qrCodeInvalidWordsError": "QRコードに無効なBIP39ワードが含まれています。",
-  "qrCodeInvalidKeyError": "QRコードに無効な秘密鍵が含まれています。"
+  "qrCodeInvalidKeyError": "QRコードに無効な秘密鍵が含まれています。",
+  "deprecatedLabel": "(非推奨)",
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoinでは非推奨です。BIP39を使用してください。"
 }

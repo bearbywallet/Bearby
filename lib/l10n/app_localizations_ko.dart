@@ -1803,4 +1803,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get qrCodeInvalidKeyError => 'QR 코드에 유효하지 않은 개인 키가 있습니다.';
+
+  @override
+  String get deprecatedLabel => '(사용 중단)';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoin에서 사용 중단됨. BIP39를 사용하세요.';
 }

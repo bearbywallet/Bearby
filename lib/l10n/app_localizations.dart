@@ -3580,6 +3580,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'QR code contains an invalid private key.'**
   String get qrCodeInvalidKeyError;
+
+  /// Deprecated badge label shown next to deprecated options
+  ///
+  /// In en, this message translates to:
+  /// **'(Deprecated)'**
+  String get deprecatedLabel;
+
+  /// Subtitle for Private Key restore option when Bitcoin network is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Deprecated for Bitcoin. Use BIP39 instead.'**
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

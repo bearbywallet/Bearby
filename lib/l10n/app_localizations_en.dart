@@ -1805,4 +1805,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrCodeInvalidKeyError => 'QR code contains an invalid private key.';
+
+  @override
+  String get deprecatedLabel => '(Deprecated)';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Deprecated for Bitcoin. Use BIP39 instead.';
 }

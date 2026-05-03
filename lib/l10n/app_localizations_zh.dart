@@ -1803,4 +1803,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get qrCodeInvalidKeyError => '二维码包含无效的私钥。';
+
+  @override
+  String get deprecatedLabel => '(已弃用)';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoin 网络已弃用。请使用 BIP39。';
 }
