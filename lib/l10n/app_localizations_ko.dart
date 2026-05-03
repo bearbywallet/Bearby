@@ -1281,6 +1281,54 @@ class AppLocalizationsKo extends AppLocalizations {
   String get transactionDetailsModal_errorMessage => '오류 메시지';
 
   @override
+  String get transactionDetailsModal_from => '보낸 곳';
+
+  @override
+  String get transactionDetailsModal_to => '받는 곳';
+
+  @override
+  String get transactionDetailsModal_age => '경과 시간';
+
+  @override
+  String get transactionDetailsModal_inputValue => '입력 합계';
+
+  @override
+  String get transactionDetailsModal_outputValue => '출력 합계';
+
+  @override
+  String get transactionDetailsModal_btcPrice => 'BTC 가격';
+
+  @override
+  String get transactionDetailsModal_coinbase => '코인베이스';
+
+  @override
+  String get transactionDetailsModal_rbf => 'RBF';
+
+  @override
+  String get transactionDetailsModal_locktime => '잠금 시간';
+
+  @override
+  String get transactionDetailsModal_version => '버전';
+
+  @override
+  String get transactionDetailsModal_feesProperties => '수수료 및 속성';
+
+  @override
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      inputCount,
+      locale: localeName,
+      other: '입력 $inputCount개',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      outputCount,
+      locale: localeName,
+      other: '출력 $outputCount개',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get amountSection_transfer => '전송';
 
   @override

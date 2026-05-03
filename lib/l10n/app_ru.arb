@@ -427,6 +427,24 @@
   "transactionDetailsModal_blobGasPrice": "Цена блоб-газа",
   "transactionDetailsModal_error": "Ошибка",
   "transactionDetailsModal_errorMessage": "Сообщение об ошибке",
+  "transactionDetailsModal_from": "Откуда",
+  "transactionDetailsModal_to": "Куда",
+  "transactionDetailsModal_age": "Возраст",
+  "transactionDetailsModal_inputValue": "Сумма входов",
+  "transactionDetailsModal_outputValue": "Сумма выходов",
+  "transactionDetailsModal_btcPrice": "Цена BTC",
+  "transactionDetailsModal_coinbase": "Coinbase",
+  "transactionDetailsModal_rbf": "RBF",
+  "transactionDetailsModal_locktime": "Locktime",
+  "transactionDetailsModal_version": "Версия",
+  "transactionDetailsModal_feesProperties": "Комиссия и свойства",
+  "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, one{# вход} few{# входа} many{# входов} other{# входа}} · {outputCount, plural, one{# выход} few{# выхода} many{# выходов} other{# выхода}}",
+  "@transactionDetailsModal_inputsOutputsSummary": {
+    "placeholders": {
+      "inputCount": { "type": "int" },
+      "outputCount": { "type": "int" }
+    }
+  },
   "amountSection_transfer": "Перевод",
   "amountSection_pending": "В ожидании",
   "amountSection_confirmed": "Подтверждено",

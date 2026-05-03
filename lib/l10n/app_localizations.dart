@@ -1085,8 +1085,6 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get secretPhraseVerifyPageNextButton;
 
-  /// Title displayed in the app bar of the RestoreSecretPhrasePage component
-  ///
   /// Text on the restore button in the RestoreSecretPhrasePage component
   ///
   /// In en, this message translates to:
@@ -2598,6 +2596,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error Message'**
   String get transactionDetailsModal_errorMessage;
+
+  /// Title for the inputs (sources) section in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get transactionDetailsModal_from;
+
+  /// Title for the outputs (recipients) section in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get transactionDetailsModal_to;
+
+  /// Label for relative time since transaction in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get transactionDetailsModal_age;
+
+  /// Label for total input value in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Input Value'**
+  String get transactionDetailsModal_inputValue;
+
+  /// Label for total output value in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Output Value'**
+  String get transactionDetailsModal_outputValue;
+
+  /// Label for current BTC price in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'BTC Price'**
+  String get transactionDetailsModal_btcPrice;
+
+  /// Label for coinbase flag in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Coinbase'**
+  String get transactionDetailsModal_coinbase;
+
+  /// Label for Replace-By-Fee flag in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'RBF'**
+  String get transactionDetailsModal_rbf;
+
+  /// Label for locktime field in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Locktime'**
+  String get transactionDetailsModal_locktime;
+
+  /// Label for transaction version in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get transactionDetailsModal_version;
+
+  /// Title for fees and properties section in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Fees & Properties'**
+  String get transactionDetailsModal_feesProperties;
+
+  /// Subtitle showing input and output counts under the amount in BTC TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'{inputCount, plural, =1{1 input} other{{inputCount} inputs}} · {outputCount, plural, =1{1 output} other{{outputCount} outputs}}'**
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount);
 
   /// Title for transfer section in _AmountSection
   ///

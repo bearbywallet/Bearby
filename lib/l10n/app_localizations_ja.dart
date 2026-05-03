@@ -1281,6 +1281,54 @@ class AppLocalizationsJa extends AppLocalizations {
   String get transactionDetailsModal_errorMessage => 'エラーメッセージ';
 
   @override
+  String get transactionDetailsModal_from => '送信元';
+
+  @override
+  String get transactionDetailsModal_to => '送信先';
+
+  @override
+  String get transactionDetailsModal_age => '経過時間';
+
+  @override
+  String get transactionDetailsModal_inputValue => '入力合計';
+
+  @override
+  String get transactionDetailsModal_outputValue => '出力合計';
+
+  @override
+  String get transactionDetailsModal_btcPrice => 'BTC価格';
+
+  @override
+  String get transactionDetailsModal_coinbase => 'コインベース';
+
+  @override
+  String get transactionDetailsModal_rbf => 'RBF';
+
+  @override
+  String get transactionDetailsModal_locktime => 'ロックタイム';
+
+  @override
+  String get transactionDetailsModal_version => 'バージョン';
+
+  @override
+  String get transactionDetailsModal_feesProperties => '手数料と属性';
+
+  @override
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      inputCount,
+      locale: localeName,
+      other: '$inputCount件の入力',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      outputCount,
+      locale: localeName,
+      other: '$outputCount件の出力',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get amountSection_transfer => '送金';
 
   @override

@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:bearby/components/copy_content.dart';
+import 'package:bearby/components/detail_group_card.dart';
+import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
@@ -30,8 +36,7 @@ extension BtcTransactionDetailsExt on TransactionBitcoin {
   bool get isRbf => input.any((i) => BigInt.from(i.sequence) < _kMaxSequence);
   BigInt get outputValue =>
       output.fold<BigInt>(BigInt.zero, (sum, o) => sum + o.value);
-  BigInt get inputValue =>
-      fee != null ? outputValue + fee! : outputValue;
+  BigInt get inputValue => fee != null ? outputValue + fee! : outputValue;
 }
 
 void showBtcTransactionDetailsModal({
@@ -56,18 +61,17 @@ void showBtcTransactionDetailsModal({
 class BtcTransactionDetailsModal extends StatelessWidget {
   final HistoricalTransactionInfo transaction;
 
-  const BtcTransactionDetailsModal({
-    super.key,
-    required this.transaction,
-  });
+  const BtcTransactionDetailsModal({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
     final pad = AdaptiveSize.getAdaptivePadding(context, 16);
     final bottomPad = MediaQuery.of(context).padding.bottom;
     final maxH = MediaQuery.of(context).size.height * 0.9;
+    final btc = transaction.btcReceipt;
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxH),
@@ -78,7 +82,7 @@ class BtcTransactionDetailsModal extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _dragHandle(theme, pad),
+          _DragHandle(theme: theme, padding: pad),
           if (transaction.title?.isNotEmpty == true)
             Padding(
               padding: EdgeInsets.fromLTRB(pad, 0, pad, 12),
@@ -91,35 +95,155 @@ class BtcTransactionDetailsModal extends StatelessWidget {
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: pad),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _StatusAmountRow(theme: theme, transaction: transaction, appState: appState),
-                  const SizedBox(height: 20),
-                  _buildFromSection(theme),
-                  const SizedBox(height: 16),
-                  _buildToSection(appState, theme),
-                  const SizedBox(height: 16),
-                  _buildOverview(context, appState, theme),
-                  const SizedBox(height: 16),
-                  _buildNetwork(appState, theme),
+                  _AmountCard(
+                    transaction: transaction,
+                    appState: appState,
+                    theme: theme,
+                    l10n: l10n,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildTransactionGroup(context, theme, l10n),
+                  if (btc != null && !btc.isCoinbase && btc.input.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildFromGroup(btc, theme, l10n),
+                  ],
+                  if (btc != null && btc.output.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _buildToGroup(btc, appState, theme, l10n),
+                  ],
+                  const SizedBox(height: 12),
+                  _buildNetworkGroup(appState, theme, l10n),
+                  const SizedBox(height: 12),
+                  _buildFeesPropertiesGroup(appState, theme, l10n),
                   if (transaction.error != null) ...[
                     const SizedBox(height: 12),
-                    _SectionHeader(title: 'Error', theme: theme),
-                    const SizedBox(height: 8),
-                    _FieldRow(label: 'Error Message', value: transaction.error!, theme: theme),
+                    _buildErrorGroup(theme, l10n),
                   ],
                   SizedBox(height: bottomPad + 16),
                 ],
               ),
             ),
           ),
-          _buildExplorerFooter(appState, pad),
+          _ExplorerFooter(
+            transaction: transaction,
+            appState: appState,
+            padding: pad,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildOverview(BuildContext context, AppState appState, AppTheme theme) {
+  Widget _buildTransactionGroup(
+    BuildContext context,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_transaction,
+      theme: theme,
+      children: [
+        DetailItem(
+          label: l10n.transactionDetailsModal_hash,
+          value: transaction.transactionHash,
+          theme: theme,
+          isCopyable: true,
+        ),
+        DetailItem(
+          label: l10n.transactionDetailsModal_timestamp,
+          value: _formatTimestamp(context),
+          theme: theme,
+        ),
+        DetailItem(
+          label: l10n.transactionDetailsModal_age,
+          value: _formatAge(),
+          theme: theme,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFromGroup(
+    TransactionBitcoin btc,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_from,
+      theme: theme,
+      children: [
+        const SizedBox(height: 4),
+        ...btc.input.asMap().entries.map(
+              (e) => _InputRow(
+                index: e.key + 1,
+                input: e.value,
+                theme: theme,
+              ),
+            ),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  Widget _buildToGroup(
+    TransactionBitcoin btc,
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    final baseToken = appState.wallet?.tokens.first;
+    final decimals = baseToken?.decimals ?? 8;
+    final symbol = baseToken?.symbol ?? 'BTC';
+
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_to,
+      theme: theme,
+      children: [
+        const SizedBox(height: 4),
+        ...btc.output.asMap().entries.map(
+              (e) => _OutputRow(
+                index: e.key + 1,
+                output: e.value,
+                theme: theme,
+                appState: appState,
+                decimals: decimals,
+                symbol: symbol,
+              ),
+            ),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  Widget _buildNetworkGroup(
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_network,
+      theme: theme,
+      children: [
+        DetailItem(
+          label: l10n.transactionDetailsModal_chainType,
+          value: transaction.chainType,
+          theme: theme,
+        ),
+        DetailItem(
+          label: l10n.transactionDetailsModal_networkName,
+          value: appState.getChain(transaction.chainHash)?.chain ?? 'Unknown',
+          theme: theme,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeesPropertiesGroup(
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
     final btc = transaction.btcReceipt;
     final baseToken = appState.wallet?.tokens.first;
     final decimals = baseToken?.decimals ?? 8;
@@ -127,177 +251,545 @@ class BtcTransactionDetailsModal extends StatelessWidget {
     final rate = baseToken?.rate ?? 0;
 
     final feeKnown = btc?.fee != null;
-
     final (feeStr, feeFiat) = feeKnown
         ? formatingAmount(
-            amount: transaction.fee, symbol: symbol, decimals: decimals, rate: rate, appState: appState,
+            amount: transaction.fee,
+            symbol: symbol,
+            decimals: decimals,
+            rate: rate,
+            appState: appState,
           )
         : ('—', '');
 
-    final (inputValueStr, inputValueFiat) = btc != null
+    final inputValueStr = btc != null
         ? formatingAmount(
-            amount: btc.inputValue, symbol: symbol, decimals: decimals, rate: rate, appState: appState,
-          )
-        : ('0', '');
-
-    final (outputValueStr, outputValueFiat) = btc != null
-        ? formatingAmount(
-            amount: btc.outputValue, symbol: symbol, decimals: decimals, rate: rate, appState: appState,
-          )
-        : ('0', '');
-
-    final btcPrice = rate > 0
-        ? formatingAmount(
-            amount: BigInt.from(10).pow(decimals), symbol: symbol, decimals: decimals, rate: rate, appState: appState,
+            amount: btc.inputValue,
+            symbol: symbol,
+            decimals: decimals,
+            rate: rate,
+            appState: appState,
           ).$1
-        : null;
+        : '0';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final outputValueStr = btc != null
+        ? formatingAmount(
+            amount: btc.outputValue,
+            symbol: symbol,
+            decimals: decimals,
+            rate: rate,
+            appState: appState,
+          ).$1
+        : '0';
+
+    final btcPriceFiat = rate > 0
+        ? formatingAmount(
+            amount: BigInt.from(10).pow(decimals),
+            symbol: symbol,
+            decimals: decimals,
+            rate: rate,
+            appState: appState,
+          ).$2
+        : '';
+    final showBtcPrice = btcPriceFiat.isNotEmpty && btcPriceFiat != '0';
+
+    final showCoinbase = btc?.isCoinbase == true;
+    final showRbf = btc?.isRbf == true;
+    final showLocktime = btc != null && btc.lockTime > 0;
+
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_feesProperties,
+      theme: theme,
       children: [
-        _SectionHeader(title: 'Overview', theme: theme),
-        const SizedBox(height: 8),
-        _FieldRow(label: 'Hash', value: transaction.transactionHash, theme: theme, copyable: true, copyWidget: CopyContent(address: transaction.transactionHash, isShort: false)),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Status', value: transaction.status.name, theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Time', value: _formatTimestamp(), theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Age', value: _formatAge(), theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Inputs', value: '${btc?.input.length ?? 0}', theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Input Value', value: inputValueStr, valueFiat: inputValueFiat, theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Outputs', value: '${btc?.output.length ?? 0}', theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Output Value', value: outputValueStr, valueFiat: outputValueFiat, theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Fee', value: feeStr, valueFiat: feeFiat, theme: theme),
-        _Divider(theme: theme),
-        if (btc != null) ...[
-          _FieldRow(label: 'Coinbase', value: btc.isCoinbase ? 'Yes' : 'No', theme: theme),
-          _Divider(theme: theme),
-          _FieldRow(label: 'Witness', value: btc.hasWitness ? 'Yes' : 'No', theme: theme),
-          _Divider(theme: theme),
-          _FieldRow(label: 'RBF', value: btc.isRbf ? 'Yes' : 'No', theme: theme),
-          _Divider(theme: theme),
-          _FieldRow(label: 'Locktime', value: '${btc.lockTime}', theme: theme),
-          _Divider(theme: theme),
-          _FieldRow(label: 'Version', value: '${btc.version}', theme: theme),
-          _Divider(theme: theme),
-        ],
-        if (btcPrice != null)
-          _FieldRow(label: 'BTC Price', value: '\$$btcPrice', theme: theme),
+        DetailItem(
+          label: l10n.transactionDetailsModal_fee,
+          theme: theme,
+          valueWidget: _AmountValue(amount: feeStr, fiat: feeFiat, theme: theme),
+        ),
+        DetailItem(
+          label: l10n.transactionDetailsModal_inputValue,
+          value: inputValueStr,
+          theme: theme,
+        ),
+        DetailItem(
+          label: l10n.transactionDetailsModal_outputValue,
+          value: outputValueStr,
+          theme: theme,
+        ),
+        if (showBtcPrice)
+          DetailItem(
+            label: l10n.transactionDetailsModal_btcPrice,
+            value: btcPriceFiat,
+            theme: theme,
+          ),
+        if (showCoinbase)
+          DetailItem(
+            label: l10n.transactionDetailsModal_coinbase,
+            value: l10n.chainInfoModalContentYes,
+            theme: theme,
+          ),
+        if (showRbf)
+          DetailItem(
+            label: l10n.transactionDetailsModal_rbf,
+            value: l10n.chainInfoModalContentYes,
+            theme: theme,
+          ),
+        if (showLocktime)
+          DetailItem(
+            label: l10n.transactionDetailsModal_locktime,
+            value: btc.lockTime.toString(),
+            theme: theme,
+          ),
+        if (btc != null)
+          DetailItem(
+            label: l10n.transactionDetailsModal_version,
+            value: btc.version.toString(),
+            theme: theme,
+          ),
       ],
     );
   }
 
-  Widget _buildFromSection(AppTheme theme) {
-    final btc = transaction.btcReceipt;
-    if (btc == null || btc.input.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildErrorGroup(AppTheme theme, AppLocalizations l10n) {
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_error,
+      theme: theme,
       children: [
-        _SectionHeader(title: 'From', theme: theme),
-        const SizedBox(height: 6),
-        ...btc.input.asMap().entries.map((e) {
-          final addr = e.value.address;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
+        DetailItem(
+          label: l10n.transactionDetailsModal_errorMessage,
+          value: transaction.error!,
+          theme: theme,
+        ),
+      ],
+    );
+  }
+
+  String _formatTimestamp(BuildContext context) {
+    final dt = DateTime.fromMillisecondsSinceEpoch(
+      transaction.timestamp.toInt() * 1000,
+    );
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat('dd MMM yyyy HH:mm', locale).format(dt);
+  }
+
+  String _formatAge() {
+    final diff = DateTime.now().difference(
+      DateTime.fromMillisecondsSinceEpoch(transaction.timestamp.toInt() * 1000),
+    );
+    final d = diff.inDays;
+    final h = diff.inHours % 24;
+    final m = diff.inMinutes % 60;
+    final s = diff.inSeconds % 60;
+    if (d > 0) return '${d}d ${h}h';
+    if (h > 0) return '${h}h ${m}m';
+    if (m > 0) return '${m}m ${s}s';
+    return '${s}s';
+  }
+}
+
+class _AmountCard extends StatelessWidget {
+  final HistoricalTransactionInfo transaction;
+  final AppState appState;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+
+  const _AmountCard({
+    required this.transaction,
+    required this.appState,
+    required this.theme,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DetailGroupCard(
+      title: l10n.amountSection_transfer,
+      theme: theme,
+      headerTrailing: _StatusBadge(status: transaction.status, theme: theme, l10n: l10n),
+      children: [_buildBody()],
+    );
+  }
+
+  Widget _buildBody() {
+    final (amount, fiat) = _formatAmount();
+    final btc = transaction.btcReceipt;
+
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          _buildIcon(),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 20,
-                  child: Text('${e.key + 1}', style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.5))),
+                Text(
+                  amount,
+                  style: theme.titleMedium.copyWith(color: theme.textPrimary),
                 ),
-                const SizedBox(width: 12),
-                if (addr != null)
-                  CopyContent(address: addr)
-                else
-                  Expanded(
+                if (fiat.isNotEmpty && fiat != '0')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
                     child: Text(
-                      '${e.value.previousOutput.txid}:${e.value.previousOutput.vout}',
-                      style: theme.bodyText2.copyWith(color: theme.textPrimary),
-                      overflow: TextOverflow.ellipsis,
+                      fiat,
+                      style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                    ),
+                  ),
+                if (btc != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      l10n.transactionDetailsModal_inputsOutputsSummary(
+                        btc.input.length,
+                        btc.output.length,
+                      ),
+                      style: theme.caption.copyWith(
+                        color: theme.textSecondary.withValues(alpha: 0.7),
+                      ),
                     ),
                   ),
               ],
             ),
-          );
-        }),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildToSection(AppState appState, AppTheme theme) {
-    final btc = transaction.btcReceipt;
-    if (btc == null || btc.output.isEmpty) return const SizedBox.shrink();
-
-    final baseToken = appState.wallet?.tokens.first;
-    final decimals = baseToken?.decimals ?? 8;
-    final symbol = baseToken?.symbol ?? 'BTC';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SectionHeader(title: 'To', theme: theme),
-        const SizedBox(height: 6),
-        ...btc.output.asMap().entries.map((e) {
-          final addr = e.value.address;
-          final (formatted, _) = formatingAmount(
-            amount: e.value.value, symbol: symbol, decimals: decimals, rate: 0, appState: appState,
-          );
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  child: Text('${e.key + 1}', style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.5))),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (addr != null)
-                        CopyContent(address: addr),
-                      Text(formatted, style: theme.bodyText2.copyWith(color: theme.textPrimary)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(symbol, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
-              ],
+  Widget _buildIcon() {
+    final token = _findMatchingToken();
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: theme.primaryPurple.withValues(alpha: 0.12),
+          width: 1.5,
+        ),
+      ),
+      child: ClipOval(
+        child: AsyncImage(
+          url: transaction.icon ??
+              (token != null
+                  ? processTokenLogo(
+                      token: token,
+                      shortName: appState.chain?.shortName ?? '',
+                      theme: theme.value,
+                    )
+                  : null),
+          width: 44,
+          height: 44,
+          fit: BoxFit.contain,
+          errorWidget: SvgPicture.asset(
+            'assets/icons/warning.svg',
+            width: 18,
+            height: 18,
+            colorFilter:
+                ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+          ),
+          loadingWidget: const Center(
+            child: SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          );
-        }),
-      ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildNetwork(AppState appState, AppTheme theme) {
+  (String, String) _formatAmount() {
+    final token = appState.wallet?.tokens.first;
+    final amount =
+        BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
+            BigInt.zero;
+    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
+    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? '';
+    return formatingAmount(
+      amount: amount,
+      symbol: symbol,
+      decimals: decimals,
+      rate: token?.rate ?? 0,
+      appState: appState,
+    );
+  }
+
+  FTokenInfo? _findMatchingToken() {
+    if (appState.wallet == null ||
+        transaction.tokenInfo == null ||
+        appState.account == null) {
+      return null;
+    }
+    try {
+      return appState.wallet!.tokens.firstWhere((t) =>
+          t.symbol == transaction.tokenInfo?.symbol &&
+          t.addrType == appState.account?.addrType);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final TransactionStatusInfo status;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+
+  const _StatusBadge({
+    required this.status,
+    required this.theme,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    switch (status) {
+      case TransactionStatusInfo.pending:
+        return _wrap(
+          color: Colors.orange,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.amountSection_pending,
+                style: theme.labelMedium.copyWith(color: Colors.orange),
+              ),
+            ],
+          ),
+        );
+      case TransactionStatusInfo.success:
+        return _wrap(
+          color: theme.success,
+          child: Text(
+            l10n.amountSection_confirmed,
+            style: theme.labelMedium.copyWith(color: theme.success),
+          ),
+        );
+      case TransactionStatusInfo.failed:
+        return _wrap(
+          color: theme.danger,
+          child: Text(
+            l10n.amountSection_rejected,
+            style: theme.labelMedium.copyWith(color: theme.danger),
+          ),
+        );
+    }
+  }
+
+  Widget _wrap({required Color color, required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _AmountValue extends StatelessWidget {
+  final String amount;
+  final String fiat;
+  final AppTheme theme;
+
+  const _AmountValue({
+    required this.amount,
+    required this.fiat,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _SectionHeader(title: 'Network', theme: theme),
-        const SizedBox(height: 6),
-        _FieldRow(label: 'Chain', value: 'BTC', theme: theme),
-        _Divider(theme: theme),
-        _FieldRow(label: 'Network', value: _getNetworkName(appState, transaction.chainHash), theme: theme),
+        Text(
+          amount,
+          style: theme.bodyText2.copyWith(color: theme.textPrimary),
+          textAlign: TextAlign.right,
+        ),
+        if (fiat.isNotEmpty && fiat != '0')
+          Text(
+            fiat,
+            style: theme.bodyText2.copyWith(
+              color: theme.textSecondary.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.right,
+          ),
       ],
     );
   }
+}
 
-  Widget _buildExplorerFooter(AppState appState, double pad) {
+class _InputRow extends StatelessWidget {
+  final int index;
+  final TxInInfo input;
+  final AppTheme theme;
+
+  const _InputRow({
+    required this.index,
+    required this.input,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final addr = input.address;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 22,
+            child: Text(
+              '$index',
+              style: theme.bodyText2.copyWith(
+                color: theme.textSecondary.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          if (addr != null)
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: CopyContent(address: addr),
+              ),
+            )
+          else
+            Expanded(
+              child: Text(
+                '${shortenAddress(input.previousOutput.txid)}:${input.previousOutput.vout}',
+                style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                textAlign: TextAlign.right,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OutputRow extends StatelessWidget {
+  final int index;
+  final TxOutInfo output;
+  final AppTheme theme;
+  final AppState appState;
+  final int decimals;
+  final String symbol;
+
+  const _OutputRow({
+    required this.index,
+    required this.output,
+    required this.theme,
+    required this.appState,
+    required this.decimals,
+    required this.symbol,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final addr = output.address;
+    final (formatted, _) = formatingAmount(
+      amount: output.value,
+      symbol: symbol,
+      decimals: decimals,
+      rate: 0,
+      appState: appState,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 22,
+            child: Text(
+              '$index',
+              style: theme.bodyText2.copyWith(
+                color: theme.textSecondary.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: addr != null
+                  ? CopyContent(address: addr)
+                  : Text(
+                      '—',
+                      style:
+                          theme.bodyText2.copyWith(color: theme.textSecondary),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            formatted,
+            style: theme.bodyText2.copyWith(color: theme.textPrimary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DragHandle extends StatelessWidget {
+  final AppTheme theme;
+  final double padding;
+
+  const _DragHandle({required this.theme, required this.padding});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 36,
+        height: 4,
+        margin: EdgeInsets.only(top: padding, bottom: padding / 2),
+        decoration: BoxDecoration(
+          color: theme.modalBorder,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExplorerFooter extends StatelessWidget {
+  final HistoricalTransactionInfo transaction;
+  final AppState appState;
+  final double padding;
+
+  const _ExplorerFooter({
+    required this.transaction,
+    required this.appState,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = appState.currentTheme;
     final explorers = appState.getChain(transaction.chainHash)?.explorers ?? [];
     if (explorers.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      padding: EdgeInsets.all(pad),
+      width: double.infinity,
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: theme.background.withValues(alpha: 0.6),
         border: Border(top: BorderSide(color: theme.modalBorder, width: 1)),
@@ -306,9 +798,7 @@ class BtcTransactionDetailsModal extends StatelessWidget {
         top: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: explorers
-              .map((e) => _explorerBtn(e, theme))
-              .toList(),
+          children: explorers.map((e) => _explorerBtn(e, theme)).toList(),
         ),
       ),
     );
@@ -333,217 +823,15 @@ class BtcTransactionDetailsModal extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: explorer.icon != null
-              ? AsyncImage(url: processUrl(explorer.icon!, theme.value), width: 22, height: 22, fit: BoxFit.contain)
+              ? AsyncImage(
+                  url: processUrl(explorer.icon!, theme.value),
+                  width: 22,
+                  height: 22,
+                  fit: BoxFit.contain,
+                )
               : Icon(Icons.open_in_new, size: 18, color: theme.primaryPurple),
         ),
       ),
     );
   }
-
-  String _formatTimestamp() {
-    final dt = DateTime.fromMillisecondsSinceEpoch(transaction.timestamp.toInt() * 1000);
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
-  }
-
-  String _formatAge() {
-    final diff = DateTime.now().difference(
-      DateTime.fromMillisecondsSinceEpoch(transaction.timestamp.toInt() * 1000),
-    );
-    final d = diff.inDays;
-    final h = diff.inHours % 24;
-    final m = diff.inMinutes % 60;
-    final s = diff.inSeconds % 60;
-    if (d > 0) return '${d}d ${h}h';
-    if (h > 0) return '${h}h ${m}m';
-    if (m > 0) return '${m}m ${s}s';
-    return '${s}s';
-  }
-
-  String _getNetworkName(AppState appState, BigInt chainHash) {
-    return appState.getChain(chainHash)?.chain ?? 'Unknown';
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final AppTheme theme;
-  const _SectionHeader({required this.title, required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(title, style: theme.bodyText1.copyWith(color: theme.textPrimary, fontWeight: FontWeight.w600));
-  }
-}
-
-class _Divider extends StatelessWidget {
-  final AppTheme theme;
-  const _Divider({required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(height: 1, color: theme.modalBorder);
-  }
-}
-
-class _FieldRow extends StatelessWidget {
-  final String label;
-  final String? value;
-  final String? valueFiat;
-  final bool copyable;
-  final Widget? copyWidget;
-  final AppTheme theme;
-
-  const _FieldRow({
-    required this.label,
-    required this.theme,
-    this.value,
-    this.valueFiat,
-    this.copyable = false,
-    this.copyWidget,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.7))),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: copyWidget ?? (copyable
-                ? GestureDetector(
-                    onLongPress: () {},
-                    child: Text(value ?? '', style: theme.bodyText2.copyWith(color: theme.primaryPurple), overflow: TextOverflow.ellipsis),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(value ?? '', style: theme.bodyText2.copyWith(color: theme.textPrimary)),
-                      if (valueFiat != null && valueFiat!.isNotEmpty && valueFiat != '0')
-                        Text(valueFiat!, style: theme.bodyText2.copyWith(color: theme.textSecondary.withValues(alpha: 0.7))),
-                    ],
-                  )),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusAmountRow extends StatelessWidget {
-  final AppTheme theme;
-  final HistoricalTransactionInfo transaction;
-  final AppState appState;
-
-  const _StatusAmountRow({required this.theme, required this.transaction, required this.appState});
-
-  @override
-  Widget build(BuildContext context) {
-    final (amount, fiat) = _formatAmount();
-    final btc = transaction.btcReceipt;
-
-    return Row(
-      children: [
-        _buildTokenIcon(),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(amount, style: theme.titleMedium.copyWith(color: theme.textPrimary)),
-                  const SizedBox(width: 8),
-                  _statusBadge(transaction.status, theme),
-                ],
-              ),
-              if (fiat.isNotEmpty && fiat != '0')
-                Text(fiat, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
-              if (btc != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    '${btc.input.length} input${btc.input.length > 1 ? 's' : ''} · ${btc.output.length} output${btc.output.length > 1 ? 's' : ''}',
-                    style: theme.caption.copyWith(color: theme.textSecondary.withValues(alpha: 0.7)),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _statusBadge(TransactionStatusInfo status, AppTheme theme) {
-    final (color, text) = switch (status) {
-      TransactionStatusInfo.pending => (Colors.orange, 'Pending'),
-      TransactionStatusInfo.success => (theme.success, 'Confirmed'),
-      TransactionStatusInfo.failed => (theme.danger, 'Rejected'),
-    };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(text, style: theme.caption.copyWith(color: color, fontWeight: FontWeight.w600)),
-    );
-  }
-
-  Widget _buildTokenIcon() {
-    final token = _findMatchingToken();
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: theme.primaryPurple.withValues(alpha: 0.1), width: 1.5),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: transaction.icon ??
-              (token != null ? processTokenLogo(token: token, shortName: appState.chain?.shortName ?? "", theme: theme.value) : null),
-          width: 40,
-          height: 40,
-          fit: BoxFit.contain,
-          errorWidget: SvgPicture.asset('assets/icons/warning.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn)),
-          loadingWidget: const Center(child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))),
-        ),
-      ),
-    );
-  }
-
-  (String, String) _formatAmount() {
-    final token = appState.wallet?.tokens.first;
-    final amount = BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ?? BigInt.zero;
-    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
-    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
-    return formatingAmount(amount: amount, symbol: symbol, decimals: decimals, rate: token?.rate ?? 0, appState: appState);
-  }
-
-  FTokenInfo? _findMatchingToken() {
-    if (appState.wallet == null || transaction.tokenInfo == null || appState.account == null) return null;
-    try {
-      return appState.wallet!.tokens.firstWhere((t) => t.symbol == transaction.tokenInfo?.symbol && t.addrType == appState.account?.addrType);
-    } catch (_) {
-      return null;
-    }
-  }
-}
-
-Widget _dragHandle(AppTheme theme, double pad) {
-  return Center(
-    child: Container(
-      width: 36,
-      height: 4,
-      margin: EdgeInsets.only(top: pad, bottom: pad / 2),
-      decoration: BoxDecoration(color: theme.modalBorder, borderRadius: BorderRadius.circular(2)),
-    ),
-  );
 }

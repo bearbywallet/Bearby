@@ -1281,6 +1281,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionDetailsModal_errorMessage => 'Error Message';
 
   @override
+  String get transactionDetailsModal_from => 'From';
+
+  @override
+  String get transactionDetailsModal_to => 'To';
+
+  @override
+  String get transactionDetailsModal_age => 'Age';
+
+  @override
+  String get transactionDetailsModal_inputValue => 'Input Value';
+
+  @override
+  String get transactionDetailsModal_outputValue => 'Output Value';
+
+  @override
+  String get transactionDetailsModal_btcPrice => 'BTC Price';
+
+  @override
+  String get transactionDetailsModal_coinbase => 'Coinbase';
+
+  @override
+  String get transactionDetailsModal_rbf => 'RBF';
+
+  @override
+  String get transactionDetailsModal_locktime => 'Locktime';
+
+  @override
+  String get transactionDetailsModal_version => 'Version';
+
+  @override
+  String get transactionDetailsModal_feesProperties => 'Fees & Properties';
+
+  @override
+  String transactionDetailsModal_inputsOutputsSummary(int inputCount, int outputCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      inputCount,
+      locale: localeName,
+      other: '$inputCount inputs',
+      one: '1 input',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      outputCount,
+      locale: localeName,
+      other: '$outputCount outputs',
+      one: '1 output',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
   String get amountSection_transfer => 'Transfer';
 
   @override
