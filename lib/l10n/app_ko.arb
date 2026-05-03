@@ -229,7 +229,7 @@
   "addWalletOptionsNewWalletTitle": "새 지갑",
   "addWalletOptionsNewWalletSubtitle": "새 지갑 생성",
   "addWalletOptionsExistingWalletTitle": "기존 지갑",
-  "addWalletOptionsExistingWalletSubtitle": "24개의 비밀 복구 단어로 지갑 가져오기",
+  "addWalletOptionsExistingWalletSubtitle": "비밀 복구 구문으로 지갑 가져오기",
   "addWalletOptionsPairWithLedgerTitle": "Ledger 페어링",
   "addWalletOptionsPairWithLedgerSubtitle": "하드웨어 모듈, Bluetooth",
   "addWalletOptionsOtherOptions": "기타 옵션",

@@ -229,7 +229,7 @@
   "addWalletOptionsNewWalletTitle": "新しいウォレット",
   "addWalletOptionsNewWalletSubtitle": "新しいウォレットを作成",
   "addWalletOptionsExistingWalletTitle": "既存のウォレット",
-  "addWalletOptionsExistingWalletSubtitle": "24の秘密回復単語でウォレットをインポート",
+  "addWalletOptionsExistingWalletSubtitle": "シークレットフレーズでウォレットをインポート",
   "addWalletOptionsPairWithLedgerTitle": "Ledgerとペアリング",
   "addWalletOptionsPairWithLedgerSubtitle": "ハードウェアモジュール、Bluetooth",
   "addWalletOptionsOtherOptions": "その他のオプション",

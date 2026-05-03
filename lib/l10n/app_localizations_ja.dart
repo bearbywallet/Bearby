@@ -719,7 +719,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => '既存のウォレット';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle => '24の秘密回復単語でウォレットをインポート';
+  String get addWalletOptionsExistingWalletSubtitle => 'シークレットフレーズでウォレットをインポート';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => 'Ledgerとペアリング';

@@ -951,7 +951,7 @@
   "@addWalletOptionsExistingWalletTitle": {
     "description": "Title for existing wallet option"
   },
-  "addWalletOptionsExistingWalletSubtitle": "Import wallet with a 24 secret recovery words",
+  "addWalletOptionsExistingWalletSubtitle": "Import wallet with Secret Phrase",
   "@addWalletOptionsExistingWalletSubtitle": {
     "description": "Subtitle for existing wallet option"
   },

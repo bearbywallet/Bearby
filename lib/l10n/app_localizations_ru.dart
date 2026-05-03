@@ -719,7 +719,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => 'Существующий кошелек';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle => 'Импортировать кошелек с 24 секретными словами';
+  String get addWalletOptionsExistingWalletSubtitle => 'Импортировать кошелек с секретной фразой';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => 'Подключить Ledger';

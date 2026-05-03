@@ -229,7 +229,7 @@
   "addWalletOptionsNewWalletTitle": "Новый кошелек",
   "addWalletOptionsNewWalletSubtitle": "Создать новый кошелек",
   "addWalletOptionsExistingWalletTitle": "Существующий кошелек",
-  "addWalletOptionsExistingWalletSubtitle": "Импортировать кошелек с 24 секретными словами",
+  "addWalletOptionsExistingWalletSubtitle": "Импортировать кошелек с секретной фразой",
   "addWalletOptionsPairWithLedgerTitle": "Подключить Ledger",
   "addWalletOptionsPairWithLedgerSubtitle": "Аппаратный модуль, Bluetooth",
   "addWalletOptionsOtherOptions": "Другие варианты",

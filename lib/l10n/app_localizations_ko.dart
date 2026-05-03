@@ -719,7 +719,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => '기존 지갑';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle => '24개의 비밀 복구 단어로 지갑 가져오기';
+  String get addWalletOptionsExistingWalletSubtitle => '비밀 복구 구문으로 지갑 가져오기';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => 'Ledger 페어링';
