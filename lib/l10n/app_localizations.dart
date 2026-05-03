@@ -1484,7 +1484,7 @@ abstract class AppLocalizations {
   /// Subtitle for existing wallet option
   ///
   /// In en, this message translates to:
-  /// **'Import wallet with a 24 secret recovery words'**
+  /// **'Import wallet with Secret Phrase'**
   String get addWalletOptionsExistingWalletSubtitle;
 
   /// Title for pair with Ledger option

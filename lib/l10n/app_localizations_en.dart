@@ -719,7 +719,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => 'Existing Wallet';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle => 'Import wallet with a 24 secret recovery words';
+  String get addWalletOptionsExistingWalletSubtitle => 'Import wallet with Secret Phrase';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => 'Pair with Ledger';

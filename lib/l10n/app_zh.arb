@@ -229,7 +229,7 @@
   "addWalletOptionsNewWalletTitle": "新钱包",
   "addWalletOptionsNewWalletSubtitle": "创建新钱包",
   "addWalletOptionsExistingWalletTitle": "现有钱包",
-  "addWalletOptionsExistingWalletSubtitle": "使用 24 个助记词导入钱包",
+  "addWalletOptionsExistingWalletSubtitle": "使用助记词导入钱包",
   "addWalletOptionsPairWithLedgerTitle": "与 Ledger 配对",
   "addWalletOptionsPairWithLedgerSubtitle": "硬件模块，蓝牙",
   "addWalletOptionsOtherOptions": "其他选项",

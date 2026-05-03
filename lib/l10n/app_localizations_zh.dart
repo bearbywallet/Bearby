@@ -719,7 +719,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addWalletOptionsExistingWalletTitle => '现有钱包';
 
   @override
-  String get addWalletOptionsExistingWalletSubtitle => '使用 24 个助记词导入钱包';
+  String get addWalletOptionsExistingWalletSubtitle => '使用助记词导入钱包';
 
   @override
   String get addWalletOptionsPairWithLedgerTitle => '与 Ledger 配对';
