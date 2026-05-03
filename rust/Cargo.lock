@@ -4421,6 +4421,7 @@ dependencies = [
  "history",
  "prost 0.13.5",
  "proto",
+ "rand 0.10.1",
  "reqwest 0.12.28",
  "rmp-serde",
  "rpc",
