@@ -100,7 +100,7 @@ mod btc_wallet_tests {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
             let wallet = service.core.get_wallet_by_index(0).unwrap();
-            let history = wallet.get_btc_addresses(0).unwrap();
+            let history = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
 
             history
         };
@@ -223,9 +223,9 @@ mod btc_wallet_tests {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
             let wallet = service.core.get_wallet_by_index(0).unwrap();
-            let history = wallet.get_btc_addresses(0).unwrap();
+            let _history = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
 
-            dbg!(&history);
+            // dbg!(&history);
         }
 
         let wallets_after_sync = get_wallets().await.unwrap();
@@ -244,7 +244,7 @@ mod btc_wallet_tests {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
             let wallet = service.core.get_wallet_by_index(0).unwrap();
-            let chains = wallet.get_btc_addresses(0).unwrap();
+            let chains = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
             chains
                 .values()
                 .flat_map(|c| c.external.iter().chain(c.internal.iter()))

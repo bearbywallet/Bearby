@@ -657,19 +657,25 @@ class _ConfirmTransactionContentState
               widget.token.balances[appState.accountBalanceKey] ?? '-') ??
           BigInt.zero;
 
+      final isBtc = widget.tx.btc != null;
+
       return Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TransactionAmountDisplay(
-              amount: amount,
-              fee: _calculateCurrentFee(),
-              token: widget.token,
-              balance: balance,
-              textColor: textColor,
-            ),
-            const SizedBox(height: 16),
+            if (!isBtc) ...[
+              TransactionAmountDisplay(
+                amount: amount,
+                fee: _calculateCurrentFee(),
+                token: widget.token,
+                balance: balance,
+                textColor: textColor,
+              ),
+              const SizedBox(height: 16),
+            ],
             TokenTransferInfo(
+              tx: widget.tx,
+              token: token,
               fromAddress: signer.addr,
               fromName: signer.name,
               toAddress: widget.to,
