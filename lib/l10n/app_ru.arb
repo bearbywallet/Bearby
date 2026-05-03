@@ -596,5 +596,7 @@
   "qrCodeScanError": "Не удалось прочитать QR-код. Попробуйте ещё раз.",
   "qrCodeEmptySeedError": "QR-код не содержит слов сид-фразы.",
   "qrCodeInvalidWordsError": "QR-код содержит недопустимые слова BIP39.",
-  "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ."
+  "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ.",
+  "deprecatedLabel": "(Устарело)",
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Устарело для Bitcoin. Используйте BIP39."
 }

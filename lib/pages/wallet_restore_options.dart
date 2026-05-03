@@ -10,6 +10,7 @@ import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
+import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:go_router/go_router.dart';
@@ -192,8 +193,12 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                           onTap: () => _handleBip39Restore(context),
                         ),
                         WalletListItem(
-                          title: l10n.restoreWalletOptionsPrivateKeyTitle,
-                          subtitle: l10n.restoreWalletOptionsPrivateKeySubtitle,
+                          title: _chain!.slip44 == kBitcoinlip44
+                              ? '${l10n.restoreWalletOptionsPrivateKeyTitle} ${l10n.deprecatedLabel}'
+                              : l10n.restoreWalletOptionsPrivateKeyTitle,
+                          subtitle: _chain!.slip44 == kBitcoinlip44
+                              ? l10n.restoreWalletOptionsPrivateKeyDeprecatedSubtitle
+                              : l10n.restoreWalletOptionsPrivateKeySubtitle,
                           icon: SvgPicture.asset(
                             'assets/icons/bincode.svg',
                             width: 35,

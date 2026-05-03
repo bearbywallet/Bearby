@@ -584,5 +584,7 @@
   "qrCodeScanError": "QR 코드를 읽지 못했습니다. 다시 시도하세요.",
   "qrCodeEmptySeedError": "QR 코드에 시드 단어가 없습니다.",
   "qrCodeInvalidWordsError": "QR 코드에 유효하지 않은 BIP39 단어가 있습니다.",
-  "qrCodeInvalidKeyError": "QR 코드에 유효하지 않은 개인 키가 있습니다."
+  "qrCodeInvalidKeyError": "QR 코드에 유효하지 않은 개인 키가 있습니다.",
+  "deprecatedLabel": "(사용 중단)",
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoin에서 사용 중단됨. BIP39를 사용하세요."
 }

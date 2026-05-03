@@ -6,6 +6,7 @@ import 'package:bearby/components/view_item.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:go_router/go_router.dart';
@@ -95,6 +96,7 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                         WalletListItem(
                           title: l10n.genWalletOptionsPrivateKeyTitle,
                           subtitle: l10n.genWalletOptionsPrivateKeySubtitle,
+                          disabled: _chain!.slip44 == kBitcoinlip44,
                           icon: SvgPicture.asset(
                             'assets/icons/bincode.svg',
                             width: 35,

@@ -584,5 +584,7 @@
   "qrCodeScanError": "读取二维码失败，请重试。",
   "qrCodeEmptySeedError": "二维码不包含助记词。",
   "qrCodeInvalidWordsError": "二维码包含无效的 BIP39 单词。",
-  "qrCodeInvalidKeyError": "二维码包含无效的私钥。"
+  "qrCodeInvalidKeyError": "二维码包含无效的私钥。",
+  "deprecatedLabel": "(已弃用)",
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoin 网络已弃用。请使用 BIP39。"
 }

@@ -2392,5 +2392,13 @@
   "qrCodeInvalidKeyError": "QR code contains an invalid private key.",
   "@qrCodeInvalidKeyError": {
     "description": "Error when QR code private key cannot be parsed"
+  },
+  "deprecatedLabel": "(Deprecated)",
+  "@deprecatedLabel": {
+    "description": "Deprecated badge label shown next to deprecated options"
+  },
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Deprecated for Bitcoin. Use BIP39 instead.",
+  "@restoreWalletOptionsPrivateKeyDeprecatedSubtitle": {
+    "description": "Subtitle for Private Key restore option when Bitcoin network is selected"
   }
 }

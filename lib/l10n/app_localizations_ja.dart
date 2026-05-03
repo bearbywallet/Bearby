@@ -1803,4 +1803,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get qrCodeInvalidKeyError => 'QRコードに無効な秘密鍵が含まれています。';
+
+  @override
+  String get deprecatedLabel => '(非推奨)';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoinでは非推奨です。BIP39を使用してください。';
 }
