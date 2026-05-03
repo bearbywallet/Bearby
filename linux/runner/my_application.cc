@@ -52,7 +52,16 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "bearby");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+  gtk_window_set_default_size(window, 430, 900);
+
+  GdkGeometry geometry_hints;
+  geometry_hints.min_width = 360;
+  geometry_hints.min_height = 640;
+  geometry_hints.max_width = 600;
+  geometry_hints.max_height = 1100;
+  gtk_window_set_geometry_hints(
+      window, nullptr, &geometry_hints,
+      static_cast<GdkWindowHints>(GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(
