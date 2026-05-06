@@ -845,7 +845,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => 'Failed to load transfer details';
 
   @override
-  String get confirmTransactionEditGasButtonText => 'Edit gas';
+  String get confirmTransactionAdvancedGasButtonText => 'Advanced';
 
   @override
   String get authReason => 'Please authenticate';

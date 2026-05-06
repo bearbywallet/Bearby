@@ -271,7 +271,7 @@
   "confirmTransactionContentConfirm": "確認",
   "confirmTransactionContentNoActiveAccount": "アクティブなアカウントがありません",
   "confirmTransactionContentFailedLoadTransfer": "送金詳細の読み込みに失敗",
-  "confirmTransactionEditGasButtonText": "編集",
+  "confirmTransactionAdvancedGasButtonText": "詳細設定",
   "authReason": "認証してください",
   "addChainModalContentWarning": "ネットワーク詐欺とセキュリティリスクに注意してください。",
   "addChainModalContentApprove": "承認",

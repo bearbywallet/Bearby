@@ -1119,9 +1119,9 @@
   "@confirmTransactionContentFailedLoadTransfer": {
     "description": "Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal."
   },
-  "confirmTransactionEditGasButtonText": "Edit gas",
-  "@confirmTransactionEditGasButtonText": {
-    "description": "Text displayed on the edit gas button in the ConfirmTransactionContent modal."
+  "confirmTransactionAdvancedGasButtonText": "Advanced",
+  "@confirmTransactionAdvancedGasButtonText": {
+    "description": "Text displayed on the advanced gas-settings button in the ConfirmTransactionContent modal."
   },
   "authReason": "Please authenticate",
   "@authReason": {

@@ -271,7 +271,7 @@
   "confirmTransactionContentConfirm": "确认",
   "confirmTransactionContentNoActiveAccount": "无活动账户",
   "confirmTransactionContentFailedLoadTransfer": "加载转账详情失败",
-  "confirmTransactionEditGasButtonText": "编辑",
+  "confirmTransactionAdvancedGasButtonText": "高级",
   "authReason": "请进行认证",
   "addChainModalContentWarning": "警惕网络诈骗和安全风险。",
   "addChainModalContentApprove": "批准",

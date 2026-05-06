@@ -845,7 +845,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => '送金詳細の読み込みに失敗';
 
   @override
-  String get confirmTransactionEditGasButtonText => '編集';
+  String get confirmTransactionAdvancedGasButtonText => '詳細設定';
 
   @override
   String get authReason => '認証してください';

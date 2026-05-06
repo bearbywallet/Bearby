@@ -1733,11 +1733,11 @@ abstract class AppLocalizations {
   /// **'Failed to load transfer details'**
   String get confirmTransactionContentFailedLoadTransfer;
 
-  /// Text displayed on the edit gas button in the ConfirmTransactionContent modal.
+  /// Text displayed on the advanced gas-settings button in the ConfirmTransactionContent modal.
   ///
   /// In en, this message translates to:
-  /// **'Edit gas'**
-  String get confirmTransactionEditGasButtonText;
+  /// **'Advanced'**
+  String get confirmTransactionAdvancedGasButtonText;
 
   /// Reason text displayed during authentication prompt in the ConfirmTransactionContent modal.
   ///

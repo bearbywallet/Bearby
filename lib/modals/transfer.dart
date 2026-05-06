@@ -404,6 +404,7 @@ class _ConfirmTransactionContentState
                                 appState.chain?.diffBlockTime.toInt() ?? 10,
                             txParamsInfo: _txParamsInfo,
                             isFeeFixed: isBTC || isTron,
+                            isBTC: isBTC,
                             disabled: _isDisabled,
                             onGasOptionChanged: (option, selectedValue) async {
                               final currentParams = _txParamsInfo;
@@ -428,89 +429,90 @@ class _ConfirmTransactionContentState
                             textColor: textColor,
                             secondaryColor: secondaryColor,
                           ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: InkWell(
-                              splashFactory: NoSplash.splashFactory,
-                              highlightColor: Colors.transparent,
-                              onTap: () {
-                                final currentParams = _txParamsInfo;
-                                if (currentParams == null) return;
+                          if (!isBTC)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                splashFactory: NoSplash.splashFactory,
+                                highlightColor: Colors.transparent,
+                                onTap: () {
+                                  final currentParams = _txParamsInfo;
+                                  if (currentParams == null) return;
 
-                                showDialog<void>(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (context) => EditGasDialog(
-                                    txParamsInfo: currentParams,
-                                    initialGasPrice: currentParams.gasPrice,
-                                    initialNonce: currentParams.nonce,
-                                    initialMaxPriorityFee:
-                                        currentParams.maxPriorityFee,
-                                    data: widget.tx.evm?.data != null
-                                        ? bytesToHex(widget.tx.evm!.data!)
-                                        : null,
-                                    initialGasLimit:
-                                        currentParams.txEstimateGas,
-                                    onSave: (
-                                      gasPrice,
-                                      maxPriorityFee,
-                                      gasLimit,
-                                      nonce,
-                                    ) async {
-                                      if (!mounted) return;
+                                  showDialog<void>(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => EditGasDialog(
+                                      txParamsInfo: currentParams,
+                                      initialGasPrice: currentParams.gasPrice,
+                                      initialNonce: currentParams.nonce,
+                                      initialMaxPriorityFee:
+                                          currentParams.maxPriorityFee,
+                                      data: widget.tx.evm?.data != null
+                                          ? bytesToHex(widget.tx.evm!.data!)
+                                          : null,
+                                      initialGasLimit:
+                                          currentParams.txEstimateGas,
+                                      onSave: (
+                                        gasPrice,
+                                        maxPriorityFee,
+                                        gasLimit,
+                                        nonce,
+                                      ) async {
+                                        if (!mounted) return;
 
-                                      final params = _txParamsInfo;
-                                      if (params == null) return;
+                                        final params = _txParamsInfo;
+                                        if (params == null) return;
 
-                                      final updatedParams =
-                                          RequiredTxParamsInfo(
-                                        gasPrice: gasPrice,
-                                        maxPriorityFee: maxPriorityFee,
-                                        feeHistory: params.feeHistory,
-                                        txEstimateGas: gasLimit,
-                                        blobBaseFee: params.blobBaseFee,
-                                        nonce: nonce,
-                                        slow: params.slow,
-                                        market: params.market,
-                                        fast: params.fast,
-                                        current: params.current,
-                                      );
+                                        final updatedParams =
+                                            RequiredTxParamsInfo(
+                                          gasPrice: gasPrice,
+                                          maxPriorityFee: maxPriorityFee,
+                                          feeHistory: params.feeHistory,
+                                          txEstimateGas: gasLimit,
+                                          blobBaseFee: params.blobBaseFee,
+                                          nonce: nonce,
+                                          slow: params.slow,
+                                          market: params.market,
+                                          fast: params.fast,
+                                          current: params.current,
+                                        );
 
-                                      await _updateTxParams(updatedParams);
-                                    },
-                                    primaryColor: primaryColor,
-                                    textColor: textColor,
-                                    secondaryColor: secondaryColor,
+                                        await _updateTxParams(updatedParams);
+                                      },
+                                      primaryColor: primaryColor,
+                                      textColor: textColor,
+                                      secondaryColor: secondaryColor,
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 8, right: 8, bottom: 8),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/edit.svg',
+                                        width: 16,
+                                        height: 16,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.warning,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        l10n.confirmTransactionAdvancedGasButtonText,
+                                        style: theme.labelMedium.copyWith(
+                                          color: theme.warning,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 8, right: 8, bottom: 8),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/icons/edit.svg',
-                                      width: 16,
-                                      height: 16,
-                                      colorFilter: ColorFilter.mode(
-                                        theme.warning,
-                                        BlendMode.srcIn,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      l10n.confirmTransactionEditGasButtonText,
-                                      style: theme.labelMedium.copyWith(
-                                        color: theme.warning,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ),

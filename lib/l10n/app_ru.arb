@@ -271,7 +271,7 @@
   "confirmTransactionContentConfirm": "Подтвердить",
   "confirmTransactionContentNoActiveAccount": "Нет активного аккаунта",
   "confirmTransactionContentFailedLoadTransfer": "Не удалось загрузить детали перевода",
-  "confirmTransactionEditGasButtonText": "Изменить Газ",
+  "confirmTransactionAdvancedGasButtonText": "Расширенные",
   "authReason": "Пожалуйста, пройдите аутентификацию",
   "addChainModalContentWarning": "Остерегайтесь сетевых мошенничеств и рисков безопасности.",
   "addChainModalContentApprove": "Подтвердить",
