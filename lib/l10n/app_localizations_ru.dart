@@ -845,7 +845,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => 'Не удалось загрузить детали перевода';
 
   @override
-  String get confirmTransactionEditGasButtonText => 'Изменить Газ';
+  String get confirmTransactionAdvancedGasButtonText => 'Расширенные';
 
   @override
   String get authReason => 'Пожалуйста, пройдите аутентификацию';

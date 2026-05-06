@@ -845,7 +845,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => '전송 세부 정보 로드 실패';
 
   @override
-  String get confirmTransactionEditGasButtonText => '가스 수정';
+  String get confirmTransactionAdvancedGasButtonText => '고급 설정';
 
   @override
   String get authReason => '인증하세요';

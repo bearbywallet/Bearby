@@ -271,7 +271,7 @@
   "confirmTransactionContentConfirm": "확인",
   "confirmTransactionContentNoActiveAccount": "활성 계정 없음",
   "confirmTransactionContentFailedLoadTransfer": "전송 세부 정보 로드 실패",
-  "confirmTransactionEditGasButtonText": "가스 수정",
+  "confirmTransactionAdvancedGasButtonText": "고급 설정",
   "authReason": "인증하세요",
   "addChainModalContentWarning": "네트워크 사기 및 보안 위험 주의.",
   "addChainModalContentApprove": "승인",

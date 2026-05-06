@@ -62,6 +62,7 @@ class GasDetails extends StatelessWidget {
   final AppTheme theme;
   final bool disabled;
   final bool isFeeFixed;
+  final bool isBTC;
   final Color? textColor;
   final Color? secondaryColor;
 
@@ -73,6 +74,7 @@ class GasDetails extends StatelessWidget {
     required this.theme,
     required this.disabled,
     this.isFeeFixed = false,
+    this.isBTC = false,
     this.textColor,
     this.secondaryColor,
   });
@@ -96,7 +98,7 @@ class GasDetails extends StatelessWidget {
     final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
     final params = txParamsInfo;
 
-    if (params == null) {
+    if (params == null || isBTC) {
       return const SizedBox.shrink();
     }
 
@@ -205,6 +207,7 @@ class GasEIP1559 extends StatefulWidget {
   final bool disabled;
   final int timeDiffBlock;
   final bool isFeeFixed;
+  final bool isBTC;
   final Color? primaryColor;
   final Color? textColor;
   final Color? secondaryColor;
@@ -215,6 +218,7 @@ class GasEIP1559 extends StatefulWidget {
     required this.onGasOptionChanged,
     required this.timeDiffBlock,
     this.isFeeFixed = false,
+    this.isBTC = false,
     this.disabled = false,
     this.primaryColor,
     this.textColor,
@@ -457,6 +461,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           theme: theme,
                           disabled: widget.disabled,
                           isFeeFixed: widget.isFeeFixed,
+                          isBTC: widget.isBTC,
                           textColor: effectiveTextColor,
                           secondaryColor: effectiveSecondaryColor,
                         ),

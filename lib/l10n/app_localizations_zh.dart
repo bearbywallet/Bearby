@@ -845,7 +845,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => '加载转账详情失败';
 
   @override
-  String get confirmTransactionEditGasButtonText => '编辑';
+  String get confirmTransactionAdvancedGasButtonText => '高级';
 
   @override
   String get authReason => '请进行认证';
