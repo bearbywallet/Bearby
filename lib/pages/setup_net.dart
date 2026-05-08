@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/option_list.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/config/pq.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -110,6 +112,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
       NetworkConfigInfo chain, AppTheme theme, int index) {
     final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 10);
+    final isPq = PostQuantumChains.contains(chain);
 
     return OptionItem(
       child: Row(
@@ -147,6 +150,20 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
               ],
             ),
           ),
+          if (isPq)
+            Padding(
+              padding: const EdgeInsets.only(left: 8, right: 4),
+              child: Tooltip(
+                message: 'Post-quantum protected',
+                child: SvgPicture.asset(
+                  'assets/icons/atom.svg',
+                  width: 18,
+                  height: 18,
+                  colorFilter:
+                      ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                ),
+              ),
+            ),
         ],
       ),
       isSelected: selectedNetworkIndex == index,
