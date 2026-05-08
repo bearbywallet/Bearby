@@ -47,8 +47,6 @@ Future<void> _enterGenBip39(WidgetTester tester) async {
 }
 
 Future<void> _selectWordCount(WidgetTester tester, int count) async {
-  if (count == 12) return;
-
   final countText = find.descendant(
     of: find.byType(WordCountSelector),
     matching: find.text(count.toString()),
