@@ -345,22 +345,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   child: CustomAppBar(
                     title: l10n.networkPageTitle,
                     onBackPressed: () => context.pop(),
-                    actionIcon: SvgPicture.asset(
-                      'assets/icons/plus.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        theme.textPrimary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onActionPressed: () async {
-                      final added =
-                          await context.push<bool>(AppRoutes.addNetwork);
-                      if (added == true) {
-                        _loadNetworks();
-                      }
-                    },
+                    // TODO: adding network feature not yet implemented
                   ),
                 ),
                 Padding(
