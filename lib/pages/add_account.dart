@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/glass_message.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -412,11 +413,11 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                       ),
                                     if (_errorMessage != null) ...[
                                       SizedBox(height: adaptivePadding),
-                                      Text(
-                                        _errorMessage!,
-                                        style: theme.bodyText2.copyWith(
-                                          color: theme.danger,
-                                        ),
+                                      GlassMessage(
+                                        message: _errorMessage!,
+                                        type: GlassMessageType.error,
+                                        onDismiss: () =>
+                                            setState(() => _errorMessage = null),
                                       ),
                                     ],
                                     SizedBox(height: adaptivePadding),
