@@ -64,15 +64,14 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
   Future<void> _loadChains() async {
     try {
-      final appState = Provider.of<AppState>(context, listen: false);
-      final storedProviders = appState.state.providers;
-
       final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
       final (mainnetChains, _) = await getNetworks(
           mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+
+      final storedProviders = await getProviders();
 
       setState(() {
         networks = _appendUniqueNetworks(storedProviders, mainnetChains);
@@ -105,7 +104,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
   }
 
   String _createNetworkIdentifier(NetworkConfigInfo network) {
-    return '${network.slip44}|${network.chainId}';
+    return '${network.slip44}|${network.chain}';
   }
 
   OptionItem _buildNetworkItem(
