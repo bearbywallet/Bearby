@@ -54,6 +54,7 @@
     "chain": "ETH",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
+      "https://eth.bearby.ru",
       "https://rpc.mevblocker.io",
       "https://eth.merkle.io",
       "https://singapore.rpc.blxrbdn.com",
