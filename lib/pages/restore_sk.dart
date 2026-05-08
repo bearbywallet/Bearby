@@ -8,7 +8,6 @@ import 'package:bearby/components/hex_key.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/modals/backup_confirmation_modal.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -27,7 +26,6 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
     with StatusBarMixin {
   final TextEditingController _privateKeyController = TextEditingController();
   String? _errorMessage;
-  bool _hasBackup = false;
   bool _isValidating = false;
   KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
   NetworkConfigInfo? _chain;
@@ -198,40 +196,6 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                            splashFactory: NoSplash.splashFactory,
-                            highlightColor: Colors.transparent,
-                          ),
-                          child: CheckboxListTile(
-                            title: Text(
-                              l10n.secretKeyRestorePageBackupLabel,
-                              style: theme.bodyText2.copyWith(
-                                color: theme.textSecondary,
-                              ),
-                            ),
-                            value: _hasBackup,
-                            onChanged: (value) {
-                              if (!_hasBackup) {
-                                showBackupConfirmationModal(
-                                  context: context,
-                                  onConfirmed: (confirmed) {
-                                    setState(() {
-                                      _hasBackup = confirmed;
-                                    });
-                                  },
-                                );
-                              }
-                            },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            activeColor: theme.primaryPurple,
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 16),
                       Padding(
                         padding: EdgeInsets.only(
@@ -243,7 +207,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
                           text: l10n.secretKeyRestorePageNextButton,
-                          onPressed: _keyPair.sk.isNotEmpty && _hasBackup
+                          onPressed: _keyPair.sk.isNotEmpty
                               ? () {
                                   context.push(AppRoutes.passSetup, extra: {
                                     'keys': _keyPair,
@@ -253,7 +217,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                               : null,
                           borderRadius: 30.0,
                           height: 56.0,
-                          disabled: !(_keyPair.sk.isNotEmpty && _hasBackup),
+                          disabled: !_keyPair.sk.isNotEmpty,
                         ),
                       ),
                     ],
