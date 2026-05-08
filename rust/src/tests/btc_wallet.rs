@@ -6,15 +6,18 @@ mod btc_wallet_tests {
     use zilpay::background::bg_provider::ProvidersManagement;
     use zilpay::background::bg_wallet::WalletManagement;
     use zilpay::crypto::bip49::DerivationPath;
-    use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON};
+    use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
     use zilpay::rpc::network_config::ChainConfig;
     use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 
     use crate::api::backend::get_data;
-    use crate::api::provider::select_accounts_chain;
+    use crate::api::provider::{get_providers, select_accounts_chain};
     use crate::api::token::sync_balances;
     use crate::api::utils::address_to_hash;
-    use crate::api::wallet::{add_bip39_wallet, get_wallets, Bip39AddWalletParams};
+    use crate::api::wallet::{
+        add_bip39_wallet, add_next_bip39_account, get_wallets, AddNextBip39AccountParams,
+        Bip39AddWalletParams,
+    };
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
     use crate::service::service::BACKGROUND_SERVICE;
@@ -265,5 +268,87 @@ mod btc_wallet_tests {
                 "BTC balance should match sum of UTXOs"
             );
         }
+
+        let providers = get_providers().await.unwrap();
+        let tron_chain = providers.iter().find(|p| p.slip_44 == TRON).unwrap();
+
+        select_accounts_chain(0, tron_chain.chain_hash, None)
+            .await
+            .unwrap();
+
+        add_next_bip39_account(AddNextBip39AccountParams {
+            wallet_index: 0,
+            account_index: 1,
+            name: "Acc 1".into(),
+            passphrase: String::new(),
+            password: Some(PASSWORD.to_string()),
+        })
+        .await
+        .unwrap();
+
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        let tron_chain_hash = *chain_by_slip44.get(&TRON).unwrap();
+        assert_eq!(wallet.chain_hash, tron_chain_hash);
+        assert_eq!(wallet.slip44, TRON);
+        assert_eq!(wallet.bip, DerivationPath::BIP44_PURPOSE);
+
+        for &slip44 in &[BITCOIN, ETHEREUM, TRON, SOLANA, ZILLIQA] {
+            let bip = DerivationPath::default_bip(slip44);
+            let accounts = wallet
+                .accounts
+                .get(&slip44)
+                .and_then(|m| m.get(&bip))
+                .unwrap_or_else(|| panic!("missing accounts for slip44 {}", slip44));
+            assert_eq!(
+                accounts.len(),
+                2,
+                "slip44 {} should have 2 accounts after add_next_bip39_account",
+                slip44
+            );
+            assert_eq!(accounts[0].name, "A");
+            assert_eq!(accounts[0].index, 0);
+            assert_eq!(accounts[1].name, "Acc 1");
+            assert_eq!(accounts[1].index, 1);
+        }
+
+        let new_addrs: HashMap<u32, &str> = HashMap::from([
+            (ETHEREUM, "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"),
+            (TRON, "TPjjvMwjPoDC32V2dGDYTkLH4E5LAtBZ6C"),
+            (SOLANA, "AqynRZwvVqUPRwRJXvm6odUb3t93fDjnWe3p6BeuUFxD"),
+            (ZILLIQA, "0x9E546758fBDcdCd3926d946ad628d0ED7A419106"),
+        ]);
+        for (&slip44, &expected_addr) in new_addrs.iter() {
+            let bip = DerivationPath::default_bip(slip44);
+            let accounts = wallet.accounts.get(&slip44).unwrap().get(&bip).unwrap();
+            assert_eq!(
+                accounts[1].addr, expected_addr,
+                "slip44 {} acc-1 addr mismatch",
+                slip44
+            );
+        }
+
+        let zilliqa_accounts = wallet
+            .accounts
+            .get(&ZILLIQA)
+            .and_then(|m| m.get(&DerivationPath::BIP44_PURPOSE))
+            .unwrap();
+        assert!(zilliqa_accounts[1].pub_key.is_some());
+
+        let btc_accounts = wallet
+            .accounts
+            .get(&BITCOIN)
+            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .unwrap();
+        assert_eq!(btc_accounts[1].addr_type, 2);
+        assert_eq!(btc_accounts[1].pub_key, None);
+        assert!(!btc_accounts[1].addr.is_empty());
+
+        assert_eq!(wallet.tokens.len(), 1);
+        let token = &wallet.tokens[0];
+        assert_eq!(token.symbol, "TRX");
+        assert_eq!(token.chain_hash, tron_chain_hash);
+        assert!(token.native);
     }
 }
