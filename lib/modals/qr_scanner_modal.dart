@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -43,6 +45,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   late final MobileScannerController controller;
   String? _lastScannedCode;
   DateTime? _lastScanTime;
+  bool _permissionError = false;
   static const Duration _scanCooldown = Duration(milliseconds: 1000);
 
   @override
@@ -76,7 +79,16 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   }
 
   Future<void> _requestCameraPermission() async {
-    await Permission.camera.request();
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      return;
+    }
+    try {
+      await Permission.camera.request();
+    } on MissingPluginException {
+      if (mounted) setState(() => _permissionError = true);
+    } on PlatformException {
+      if (mounted) setState(() => _permissionError = true);
+    }
   }
 
   void _onBarcodeDetected(BarcodeCapture capture) {
@@ -183,13 +195,15 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(13),
-            child: MobileScanner(
-              controller: controller,
-              onDetect: _onBarcodeDetected,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error) =>
-                  _buildErrorView(error, theme, l10n),
-            ),
+            child: _permissionError
+                ? _buildErrorView(null, theme, l10n)
+                : MobileScanner(
+                    controller: controller,
+                    onDetect: _onBarcodeDetected,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error) =>
+                        _buildErrorView(error, theme, l10n),
+                  ),
           ),
         ),
         const SizedBox(height: 24),
@@ -224,7 +238,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   }
 
   Widget _buildErrorView(
-      MobileScannerException error, AppTheme theme, AppLocalizations l10n) {
+      MobileScannerException? error, AppTheme theme, AppLocalizations l10n) {
     return Container(
       color: Colors.black,
       child: Center(
