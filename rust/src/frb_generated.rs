@@ -5296,6 +5296,31 @@ impl SseDecode for std::collections::HashMap<u32, Vec<crate::models::account::Ac
     }
 }
 
+impl SseDecode
+    for std::collections::HashMap<
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <Vec<(
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        )>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
+impl SseDecode for std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner =
+            <Vec<(u8, crate::models::btc_chain::AddressChainInfo)>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode for std::collections::HashMap<usize, String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5445,6 +5470,20 @@ impl SseDecode for crate::models::book::AddressBookEntryInfo {
     }
 }
 
+impl SseDecode for crate::models::btc_chain::AddressChainInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_external_ =
+            <Vec<crate::models::btc_chain::BtcAddressEntryInfo>>::sse_decode(deserializer);
+        let mut var_internal =
+            <Vec<crate::models::btc_chain::BtcAddressEntryInfo>>::sse_decode(deserializer);
+        return crate::models::btc_chain::AddressChainInfo {
+            external: var_external_,
+            internal: var_internal,
+        };
+    }
+}
+
 impl SseDecode for crate::models::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5588,6 +5627,33 @@ impl SseDecode for crate::models::settings::BrowserSettingsInfo {
             allow_microphone: var_allowMicrophone,
             allow_auto_play: var_allowAutoPlay,
         };
+    }
+}
+
+impl SseDecode for crate::models::btc_chain::BtcAddressEntryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_address = <String>::sse_decode(deserializer);
+        let mut var_path = <String>::sse_decode(deserializer);
+        let mut var_history = <Vec<String>>::sse_decode(deserializer);
+        let mut var_utxos = <Vec<crate::models::btc_chain::UtxoInfo>>::sse_decode(deserializer);
+        return crate::models::btc_chain::BtcAddressEntryInfo {
+            address: var_address,
+            path: var_path,
+            history: var_history,
+            utxos: var_utxos,
+        };
+    }
+}
+
+impl SseDecode for crate::models::btc_chain::BtcChainsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <std::collections::HashMap<
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        >>::sse_decode(deserializer);
+        return crate::models::btc_chain::BtcChainsInfo(var_field0);
     }
 }
 
@@ -5906,7 +5972,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_zilliqaLegacy = <bool>::sse_decode(deserializer);
-        let mut var_derivePath = <String>::sse_decode(deserializer);
+        let mut var_btcChains = <crate::models::btc_chain::BtcChainsInfo>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
             pub_keys: var_pubKeys,
             wallet_index: var_walletIndex,
@@ -5916,7 +5982,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
             biometric_type: var_biometricType,
             chain_hash: var_chainHash,
             zilliqa_legacy: var_zilliqaLegacy,
-            derive_path: var_derivePath,
+            btc_chains: var_btcChains,
         };
     }
 }
@@ -5970,6 +6036,20 @@ impl SseDecode for Vec<crate::models::book::AddressBookEntryInfo> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::models::book::AddressBookEntryInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::btc_chain::BtcAddressEntryInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::btc_chain::BtcAddressEntryInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -6255,6 +6335,38 @@ impl SseDecode
     }
 }
 
+impl SseDecode for Vec<(u8, crate::models::btc_chain::AddressChainInfo)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(u8, crate::models::btc_chain::AddressChainInfo)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode
+    for Vec<(
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<(
+                u8,
+                std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+            )>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<(u8, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -6360,6 +6472,20 @@ impl SseDecode for Vec<crate::models::transactions::btc::TxOutInfo> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::models::transactions::btc::TxOutInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::btc_chain::UtxoInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::btc_chain::UtxoInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -6819,6 +6945,32 @@ impl SseDecode
     }
 }
 
+impl SseDecode for (u8, crate::models::btc_chain::AddressChainInfo) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <u8>::sse_decode(deserializer);
+        let mut var_field1 = <crate::models::btc_chain::AddressChainInfo>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode
+    for (
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <u8>::sse_decode(deserializer);
+        let mut var_field1 = <std::collections::HashMap<
+            u8,
+            crate::models::btc_chain::AddressChainInfo,
+        >>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode for (u8, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7165,6 +7317,22 @@ impl SseDecode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _
+    }
+}
+
+impl SseDecode for crate::models::btc_chain::UtxoInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_txid = <String>::sse_decode(deserializer);
+        let mut var_vout = <u32>::sse_decode(deserializer);
+        let mut var_value = <u64>::sse_decode(deserializer);
+        let mut var_height = <u32>::sse_decode(deserializer);
+        return crate::models::btc_chain::UtxoInfo {
+            txid: var_txid,
+            vout: var_vout,
+            value: var_value,
+            height: var_height,
+        };
     }
 }
 
@@ -7877,6 +8045,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::book::AddressBookEntryInfo
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::AddressChainInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.external.into_into_dart().into_dart(),
+            self.internal.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::btc_chain::AddressChainInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::AddressChainInfo>
+    for crate::models::btc_chain::AddressChainInfo
+{
+    fn into_into_dart(self) -> crate::models::btc_chain::AddressChainInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::notification::BackgroundNotificationState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -8048,6 +8237,46 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::BrowserSettingsI
     for crate::models::settings::BrowserSettingsInfo
 {
     fn into_into_dart(self) -> crate::models::settings::BrowserSettingsInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::BtcAddressEntryInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.address.into_into_dart().into_dart(),
+            self.path.into_into_dart().into_dart(),
+            self.history.into_into_dart().into_dart(),
+            self.utxos.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::btc_chain::BtcAddressEntryInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::BtcAddressEntryInfo>
+    for crate::models::btc_chain::BtcAddressEntryInfo
+{
+    fn into_into_dart(self) -> crate::models::btc_chain::BtcAddressEntryInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::BtcChainsInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [self.0.into_into_dart().into_dart()].into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::btc_chain::BtcChainsInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::BtcChainsInfo>
+    for crate::models::btc_chain::BtcChainsInfo
+{
+    fn into_into_dart(self) -> crate::models::btc_chain::BtcChainsInfo {
         self
     }
 }
@@ -8417,7 +8646,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
             self.biometric_type.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.zilliqa_legacy.into_into_dart().into_dart(),
-            self.derive_path.into_into_dart().into_dart(),
+            self.btc_chains.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -8931,6 +9160,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::TxOutIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::UtxoInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.txid.into_into_dart().into_dart(),
+            self.vout.into_into_dart().into_dart(),
+            self.value.into_into_dart().into_dart(),
+            self.height.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::btc_chain::UtxoInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::UtxoInfo>
+    for crate::models::btc_chain::UtxoInfo
+{
+    fn into_into_dart(self) -> crate::models::btc_chain::UtxoInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::settings::WalletArgonParamsInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -9076,6 +9328,31 @@ impl SseEncode for std::collections::HashMap<u32, Vec<crate::models::account::Ac
     }
 }
 
+impl SseEncode
+    for std::collections::HashMap<
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        )>>::sse_encode(self.into_iter().collect(), serializer);
+    }
+}
+
+impl SseEncode for std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(u8, crate::models::btc_chain::AddressChainInfo)>>::sse_encode(
+            self.into_iter().collect(),
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for std::collections::HashMap<usize, String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9188,6 +9465,14 @@ impl SseEncode for crate::models::book::AddressBookEntryInfo {
     }
 }
 
+impl SseEncode for crate::models::btc_chain::AddressChainInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::models::btc_chain::BtcAddressEntryInfo>>::sse_encode(self.external, serializer);
+        <Vec<crate::models::btc_chain::BtcAddressEntryInfo>>::sse_encode(self.internal, serializer);
+    }
+}
+
 impl SseEncode for crate::models::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9281,6 +9566,26 @@ impl SseEncode for crate::models::settings::BrowserSettingsInfo {
         <bool>::sse_encode(self.allow_camera, serializer);
         <bool>::sse_encode(self.allow_microphone, serializer);
         <bool>::sse_encode(self.allow_auto_play, serializer);
+    }
+}
+
+impl SseEncode for crate::models::btc_chain::BtcAddressEntryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.address, serializer);
+        <String>::sse_encode(self.path, serializer);
+        <Vec<String>>::sse_encode(self.history, serializer);
+        <Vec<crate::models::btc_chain::UtxoInfo>>::sse_encode(self.utxos, serializer);
+    }
+}
+
+impl SseEncode for crate::models::btc_chain::BtcChainsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <std::collections::HashMap<
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        >>::sse_encode(self.0, serializer);
     }
 }
 
@@ -9499,7 +9804,7 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.biometric_type, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <bool>::sse_encode(self.zilliqa_legacy, serializer);
-        <String>::sse_encode(self.derive_path, serializer);
+        <crate::models::btc_chain::BtcChainsInfo>::sse_encode(self.btc_chains, serializer);
     }
 }
 
@@ -9541,6 +9846,16 @@ impl SseEncode for Vec<crate::models::book::AddressBookEntryInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::book::AddressBookEntryInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::btc_chain::BtcAddressEntryInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::btc_chain::BtcAddressEntryInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -9765,6 +10080,34 @@ impl SseEncode
     }
 }
 
+impl SseEncode for Vec<(u8, crate::models::btc_chain::AddressChainInfo)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(u8, crate::models::btc_chain::AddressChainInfo)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode
+    for Vec<(
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    )>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(
+                u8,
+                std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+            )>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<(u8, String)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9849,6 +10192,16 @@ impl SseEncode for Vec<crate::models::transactions::btc::TxOutInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::transactions::btc::TxOutInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::btc_chain::UtxoInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::btc_chain::UtxoInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -10200,6 +10553,29 @@ impl SseEncode
     }
 }
 
+impl SseEncode for (u8, crate::models::btc_chain::AddressChainInfo) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u8>::sse_encode(self.0, serializer);
+        <crate::models::btc_chain::AddressChainInfo>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode
+    for (
+        u8,
+        std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u8>::sse_encode(self.0, serializer);
+        <std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>>::sse_encode(
+            self.1, serializer,
+        );
+    }
+}
+
 impl SseEncode for (u8, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10455,6 +10831,16 @@ impl SseEncode for usize {
             .cursor
             .write_u64::<NativeEndian>(self as _)
             .unwrap();
+    }
+}
+
+impl SseEncode for crate::models::btc_chain::UtxoInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.txid, serializer);
+        <u32>::sse_encode(self.vout, serializer);
+        <u64>::sse_encode(self.value, serializer);
+        <u32>::sse_encode(self.height, serializer);
     }
 }
 

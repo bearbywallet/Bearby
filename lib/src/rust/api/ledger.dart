@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/btc_chain.dart';
 import '../models/ftoken.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -38,7 +39,7 @@ class LedgerParamsInput {
   final String biometricType;
   final BigInt chainHash;
   final bool zilliqaLegacy;
-  final String derivePath;
+  final BtcChainsInfo btcChains;
 
   const LedgerParamsInput({
     required this.pubKeys,
@@ -49,7 +50,7 @@ class LedgerParamsInput {
     required this.biometricType,
     required this.chainHash,
     required this.zilliqaLegacy,
-    required this.derivePath,
+    required this.btcChains,
   });
 
   @override
@@ -62,7 +63,7 @@ class LedgerParamsInput {
       biometricType.hashCode ^
       chainHash.hashCode ^
       zilliqaLegacy.hashCode ^
-      derivePath.hashCode;
+      btcChains.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -77,5 +78,5 @@ class LedgerParamsInput {
           biometricType == other.biometricType &&
           chainHash == other.chainHash &&
           zilliqaLegacy == other.zilliqaLegacy &&
-          derivePath == other.derivePath;
+          btcChains == other.btcChains;
 }

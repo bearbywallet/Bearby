@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use zilpay::{
@@ -17,7 +18,7 @@ pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 use zilpay::crypto::slip44;
 
 use crate::{
-    models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
+    models::{btc_chain::BtcChainsInfo, ftoken::FTokenInfo, settings::WalletSettingsInfo},
     service::service::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
@@ -34,7 +35,7 @@ pub struct LedgerParamsInput {
     pub biometric_type: String,
     pub chain_hash: u64,
     pub zilliqa_legacy: bool,
-    pub derive_path: String,
+    pub btc_chains: BtcChainsInfo,
 }
 
 pub async fn add_ledger_wallet(
@@ -73,6 +74,13 @@ pub async fn add_ledger_wallet(
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
+    let btc_chains: HashMap<
+        u8,
+        HashMap<bitcoin::AddressType, zilpay::proto::btc_utils::AddressChain>,
+    > = params
+        .btc_chains
+        .try_into()
+        .map_err(|e: ServiceError| e.to_string())?;
     let params = BackgroundLedgerParams {
         ftokens,
         accounts,
@@ -83,6 +91,7 @@ pub async fn add_ledger_wallet(
         wallet_name: params.wallet_name,
         ledger_id: params.ledger_id.as_bytes().to_vec(),
         biometric_type: params.biometric_type.into(),
+        btc_chains,
     };
 
     Arc::get_mut(&mut service.core)
