@@ -1437,9 +1437,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editGasDialogInvalidGasValues => '燃料值无效。请检查您的输入。';
 
   @override
-  String get addLedgerAccountPageAppBarTitle => '添加Ledger账户';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => '获取账户';
 
   @override

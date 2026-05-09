@@ -1437,9 +1437,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editGasDialogInvalidGasValues => '無効なガス値です。入力を確認してください。';
 
   @override
-  String get addLedgerAccountPageAppBarTitle => 'Ledgerアカウントを追加';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'アカウントを取得';
 
   @override

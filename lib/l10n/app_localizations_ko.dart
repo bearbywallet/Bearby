@@ -1437,9 +1437,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get editGasDialogInvalidGasValues => '잘못된 가스 값. 입력 확인.';
 
   @override
-  String get addLedgerAccountPageAppBarTitle => 'Ledger 계정 추가';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => '계정 가져오기';
 
   @override

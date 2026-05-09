@@ -484,7 +484,6 @@
   "editGasDialogMaxPriorityFee": "最大優先手数料",
   "editGasDialogGasLimit": "ガスリミット",
   "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。",
-  "addLedgerAccountPageAppBarTitle": "Ledgerアカウントを追加",
   "addLedgerAccountPageGetAccountsButton": "アカウントを取得",
   "addLedgerAccountPageCreateButton": "作成",
   "addLedgerAccountPageAddButton": "追加",

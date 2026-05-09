@@ -1439,9 +1439,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editGasDialogInvalidGasValues => 'Invalid gas values. Please check your inputs.';
 
   @override
-  String get addLedgerAccountPageAppBarTitle => 'Add Ledger Account';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'Get Accounts';
 
   @override

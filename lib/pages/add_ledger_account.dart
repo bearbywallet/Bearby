@@ -530,7 +530,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                       padding:
                           EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: CustomAppBar(
-                        title: l10n.addLedgerAccountPageAppBarTitle,
                         onBackPressed: () => context.pop(),
                       ),
                     ),

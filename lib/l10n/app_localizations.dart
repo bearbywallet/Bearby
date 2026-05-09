@@ -2885,12 +2885,6 @@ abstract class AppLocalizations {
   /// **'Invalid gas values. Please check your inputs.'**
   String get editGasDialogInvalidGasValues;
 
-  /// Title for the app bar in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Add Ledger Account'**
-  String get addLedgerAccountPageAppBarTitle;
-
   /// Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component
   ///
   /// In en, this message translates to:
