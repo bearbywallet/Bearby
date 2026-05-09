@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/btc_account_card.dart';
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/enable_card.dart';
@@ -21,6 +22,7 @@ import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/src/rust/api/ledger.dart';
 import 'package:bearby/src/rust/api/provider.dart';
+import 'package:bearby/src/rust/models/btc_chain.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/settings.dart';
@@ -50,7 +52,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   NetworkConfigInfo? _network;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
+  Map<int, Map<int, AddressChainInfo>> _btcChains = {};
   bool _initialized = false;
+
+  bool get _isBtcFlow => _network?.slip44 == kBitcoinlip44;
 
   @override
   void initState() {
@@ -180,26 +185,24 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       List<FTokenInfo> ftokens = [];
 
       if (_createWallet) {
-        final selectedAccounts = _selectedAccounts.entries
-            .where((entry) => entry.value)
-            .map((entry) => entry.key)
-            .toList();
+        final selectedAccounts = _isBtcFlow
+            ? _accounts
+            : _selectedAccounts.entries
+                .where((entry) => entry.value)
+                .map((entry) => entry.key)
+                .toList();
 
         if (selectedAccounts.isEmpty) {
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
-        final isBitcoin = _network?.slip44 == kBitcoinlip44;
         final pubKeys = selectedAccounts
-            .map((a) => (a.index, isBitcoin ? a.address : a.publicKey!))
+            .map((a) => (a.index, a.publicKey ?? ''))
             .toList();
         final accountNames = selectedAccounts
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
         final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
-        final bipPurpose =
-            _network?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
-        final derivePath = "m/$bipPurpose'/${_network!.slip44}'/0'";
 
         await addLedgerWallet(
           params: LedgerParamsInput(
@@ -211,7 +214,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             biometricType: "none",
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
-            derivePath: derivePath,
+            btcChains: _isBtcFlow
+                ? _btcChains
+                : <int, Map<int, AddressChainInfo>>{},
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -351,9 +356,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   _btnController.start();
 
                   try {
-                    final bipPurpose = _network?.slip44 == kBitcoinlip44
-                        ? kBip86Purpose
-                        : kBip44Purpose;
+                    final bipPurpose =
+                        _isBtcFlow ? kBip86Purpose : kBip44Purpose;
                     final accounts =
                         await appState.ledgerViewController.getAccounts(
                       device:
@@ -364,6 +368,26 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                       bipPurpose: bipPurpose,
                     );
 
+                    final btcChains = <int, Map<int, AddressChainInfo>>{};
+
+                    if (_isBtcFlow) {
+                      final btcApp = appState.ledgerViewController.btcApp;
+                      if (btcApp == null) {
+                        throw Exception('Ledger transport not connected');
+                      }
+
+                      for (final a in accounts) {
+                        final xpubs =
+                            await btcApp.getAccountXpubs(accountIndex: a.index);
+                        final chains = await scanBtcAccountHistory(
+                          xpubs: xpubs,
+                          ledgerIndex: a.index,
+                          chainHash: _network!.chainHash,
+                        );
+                        btcChains[a.index] = chains;
+                      }
+                    }
+
                     final newSelectedAccounts = {
                       for (var account in accounts) account: true
                     };
@@ -371,6 +395,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                     setState(() {
                       _accounts = accounts;
                       _selectedAccounts = newSelectedAccounts;
+                      _btcChains = btcChains;
                     });
                     _btnController.success();
                   } catch (e) {
@@ -415,6 +440,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ..._accounts.map((account) {
+            if (_isBtcFlow) {
+              return BtcAccountCard(
+                network: _network!,
+                chains: _btcChains[account.index] ?? const {},
+              );
+            }
             final shortAddress =
                 "${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}";
             return EnableCard(
