@@ -9,6 +9,13 @@ import '../models/ftoken.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<Map<int, AddressChainInfo>> scanBtcAccountHistory(
+        {required BtcAccountXpubsInputInfo xpubs,
+        required int ledgerIndex,
+        required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiLedgerScanBtcAccountHistory(
+        xpubs: xpubs, ledgerIndex: ledgerIndex, chainHash: chainHash);
+
 Future<String> addLedgerWallet(
         {required LedgerParamsInput params,
         required WalletSettingsInfo walletSettings,
@@ -39,7 +46,7 @@ class LedgerParamsInput {
   final String biometricType;
   final BigInt chainHash;
   final bool zilliqaLegacy;
-  final BtcChainsInfo btcChains;
+  final Map<int, Map<int, AddressChainInfo>> btcChains;
 
   const LedgerParamsInput({
     required this.pubKeys,

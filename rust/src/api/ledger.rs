@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use zilpay::background::bg_bitcoin::BitcoinManagement;
 use zilpay::{
     background::bg_provider::ProvidersManagement,
     crypto::bip49::{split_path, DerivationPath},
     proto::address::Address,
+    proto::btc_utils::ByteCodec,
     wallet::wallet_storage::StorageOperations,
 };
 pub use zilpay::{
@@ -18,13 +20,36 @@ pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 use zilpay::crypto::slip44;
 
 use crate::{
-    models::{btc_chain::BtcChainsInfo, ftoken::FTokenInfo, settings::WalletSettingsInfo},
+    models::btc_chain::{AddressChainInfo, BtcAccountXpubsInputInfo},
     service::service::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
         utils::{get_last_wallet, pubkey_from_provider, with_service},
     },
 };
+
+pub async fn scan_btc_account_history(
+    xpubs: BtcAccountXpubsInputInfo,
+    ledger_index: u8,
+    chain_hash: u64,
+) -> Result<HashMap<u8, AddressChainInfo>, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+
+    let xpubs = zilpay::proto::btc_utils::BtcAccountXpubsInput::try_from(xpubs)
+        .map_err(|e: ServiceError| e.to_string())?;
+
+    let core_result = service
+        .core
+        .scan_btc_account_history(&xpubs, ledger_index, chain_hash)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(core_result
+        .into_iter()
+        .map(|(addr_type, chain)| (addr_type.to_byte(), chain.into()))
+        .collect())
+}
 
 pub struct LedgerParamsInput {
     pub pub_keys: Vec<(u8, String)>,
@@ -35,13 +60,13 @@ pub struct LedgerParamsInput {
     pub biometric_type: String,
     pub chain_hash: u64,
     pub zilliqa_legacy: bool,
-    pub btc_chains: BtcChainsInfo,
+    pub btc_chains: HashMap<u8, HashMap<u8, AddressChainInfo>>,
 }
 
 pub async fn add_ledger_wallet(
     params: LedgerParamsInput,
-    wallet_settings: WalletSettingsInfo,
-    ftokens: Vec<FTokenInfo>,
+    wallet_settings: crate::models::settings::WalletSettingsInfo,
+    ftokens: Vec<crate::models::ftoken::FTokenInfo>,
 ) -> Result<String, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
@@ -74,13 +99,30 @@ pub async fn add_ledger_wallet(
     let wallet_settings = wallet_settings
         .try_into()
         .map_err(ServiceError::SettingsError)?;
+
     let btc_chains: HashMap<
         u8,
         HashMap<bitcoin::AddressType, zilpay::proto::btc_utils::AddressChain>,
     > = params
         .btc_chains
-        .try_into()
+        .into_iter()
+        .map(|(ledger_index, inner)| {
+            let core_inner = inner
+                .into_iter()
+                .map(|(addr_type_byte, chain_info)| {
+                    let addr_type =
+                        bitcoin::AddressType::from_byte(addr_type_byte).map_err(|e| {
+                            ServiceError::ParseError("address_type".into(), e.to_string())
+                        })?;
+                    let chain = chain_info.try_into()?;
+                    Ok((addr_type, chain))
+                })
+                .collect::<Result<HashMap<_, _>, ServiceError>>()?;
+            Ok((ledger_index, core_inner))
+        })
+        .collect::<Result<HashMap<_, _>, ServiceError>>()
         .map_err(|e: ServiceError| e.to_string())?;
+
     let params = BackgroundLedgerParams {
         ftokens,
         accounts,
@@ -106,7 +148,7 @@ pub async fn add_ledger_wallet(
 
 pub async fn update_ledger_accounts(
     wallet_index: usize,
-    accounts: Vec<(u8, String, String)>, // index, pubkey_or_address, name
+    accounts: Vec<(u8, String, String)>,
     zilliqa_legacy: bool,
     derive_path: String,
 ) -> Result<(), String> {

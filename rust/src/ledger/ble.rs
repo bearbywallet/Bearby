@@ -228,9 +228,7 @@ impl BleLedgerTransport {
             self.peripheral
                 .write(char_to_use, chunk, write_type)
                 .await
-                .map_err(|e| {
-                    LedgerError::Io(format!("BLE write failed: {}", e))
-                })?;
+                .map_err(|e| LedgerError::Io(format!("BLE write failed: {}", e)))?;
 
             // Small delay between chunks (matching Android's 20ms)
             tokio::time::sleep(Duration::from_millis(20)).await;
@@ -249,12 +247,8 @@ impl BleLedgerTransport {
         loop {
             let notif = tokio::time::timeout(timeout_duration, notifs.next())
                 .await
-                .map_err(|_| {
-                    LedgerError::Timeout
-                })?
-                .ok_or({
-                    LedgerError::Disconnected
-                })?;
+                .map_err(|_| LedgerError::Timeout)?
+                .ok_or(LedgerError::Disconnected)?;
 
             // Skip non-data notifications (MTU responses, etc.)
             if notif.uuid != self.notify_char.uuid {
@@ -276,10 +270,7 @@ impl BleLedgerTransport {
     }
 
     pub async fn close(&self) -> Result<(), LedgerError> {
-        self.peripheral
-            .unsubscribe(&self.notify_char)
-            .await
-            .ok();
+        self.peripheral.unsubscribe(&self.notify_char).await.ok();
         self.peripheral
             .disconnect()
             .await
