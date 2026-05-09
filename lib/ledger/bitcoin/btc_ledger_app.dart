@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:bearby/config/bip_purposes.dart';
 import 'package:bearby/ledger/bitcoin/btc_constants.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/src/rust/api/btc_ledger.dart' as btc_ffi;
+import 'package:bearby/src/rust/models/btc_chain.dart';
 
 class BtcLedgerApp {
   final Transport transport;
@@ -86,6 +88,25 @@ class BtcLedgerApp {
     }
 
     return String.fromCharCodes(result.finalResponse);
+  }
+
+  Future<BtcAccountXpubsInputInfo> getAccountXpubs({
+    required int accountIndex,
+  }) async {
+    final bip44 =
+        await getExtendedPubkey(path: "m/$kBip44Purpose'/0'/$accountIndex'");
+    final bip49 =
+        await getExtendedPubkey(path: "m/$kBip49Purpose'/0'/$accountIndex'");
+    final bip84 =
+        await getExtendedPubkey(path: "m/$kBip84Purpose'/0'/$accountIndex'");
+    final bip86 =
+        await getExtendedPubkey(path: "m/$kBip86Purpose'/0'/$accountIndex'");
+    return BtcAccountXpubsInputInfo(
+      bip44Xpub: bip44,
+      bip49Xpub: bip49,
+      bip84Xpub: bip84,
+      bip86Xpub: bip86,
+    );
   }
 
   Future<List<LedgerAccount>> getAccounts({

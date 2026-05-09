@@ -81,6 +81,8 @@ class LedgerViewController extends ChangeNotifier {
   bool get isEthApp => _detectedAppType == LedgerAppType.ethereum;
   bool get isTronApp => _detectedAppType == LedgerAppType.tron;
   bool get isBtcApp => _detectedAppType == LedgerAppType.bitcoin;
+  BtcLedgerApp? get btcApp =>
+      _connectedTransport == null ? null : BtcLedgerApp(_connectedTransport!);
 
   Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
