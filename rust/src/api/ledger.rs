@@ -81,16 +81,14 @@ pub async fn add_ledger_wallet(
         .into_iter()
         .map(|(ledger_index, key_or_addr)| {
             if is_bitcoin {
-                let addr = Address::from_bitcoin_address(&key_or_addr)?;
-                Ok((ledger_index, None, addr))
+                Ok((ledger_index, None))
             } else {
                 let pub_key =
                     pubkey_from_provider(&key_or_addr, &provider.config, params.zilliqa_legacy)?;
-                let addr = pub_key.get_addr()?;
-                Ok((ledger_index, Some(pub_key), addr))
+                Ok((ledger_index, Some(pub_key)))
             }
         })
-        .collect::<Result<Vec<(u8, Option<PubKey>, Address)>, ServiceError>>()?;
+        .collect::<Result<Vec<(u8, Option<PubKey>)>, ServiceError>>()?;
     let ftokens = ftokens
         .into_iter()
         .map(TryFrom::try_from)
