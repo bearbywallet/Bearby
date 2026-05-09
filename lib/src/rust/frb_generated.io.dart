@@ -179,6 +179,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(dynamic raw);
 
   @protected
+  BtcAccountXpubsInputInfo dco_decode_box_autoadd_btc_account_xpubs_input_info(
+      dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
 
   @protected
@@ -243,10 +247,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
 
   @protected
-  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
+  BtcAccountXpubsInputInfo dco_decode_btc_account_xpubs_input_info(dynamic raw);
 
   @protected
-  BtcChainsInfo dco_decode_btc_chains_info(dynamic raw);
+  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
 
   @protected
   Category dco_decode_category(dynamic raw);
@@ -756,6 +760,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  BtcAccountXpubsInputInfo sse_decode_box_autoadd_btc_account_xpubs_input_info(
+      SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -828,11 +836,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+  BtcAccountXpubsInputInfo sse_decode_btc_account_xpubs_input_info(
       SseDeserializer deserializer);
 
   @protected
-  BtcChainsInfo sse_decode_btc_chains_info(SseDeserializer deserializer);
+  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+      SseDeserializer deserializer);
 
   @protected
   Category sse_decode_category(SseDeserializer deserializer);
@@ -1390,6 +1399,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       BrowserSettingsInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_colors_info(
       ColorsInfo self, SseSerializer serializer);
 
@@ -1463,11 +1476,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       BrowserSettingsInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_btc_address_entry_info(
-      BtcAddressEntryInfo self, SseSerializer serializer);
+  void sse_encode_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_btc_chains_info(BtcChainsInfo self, SseSerializer serializer);
+  void sse_encode_btc_address_entry_info(
+      BtcAddressEntryInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_category(Category self, SseSerializer serializer);

@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1436396950;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1458713094;
 
 // Section: executor
 
@@ -3855,6 +3855,50 @@ fn wire__crate__api__token__rm_ftoken_impl(
         },
     )
 }
+fn wire__crate__api__ledger__scan_btc_account_history_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "scan_btc_account_history",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_xpubs =
+                <crate::models::btc_chain::BtcAccountXpubsInputInfo>::sse_decode(&mut deserializer);
+            let api_ledger_index = <u8>::sse_decode(&mut deserializer);
+            let api_chain_hash = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::ledger::scan_btc_account_history(
+                            api_xpubs,
+                            api_ledger_index,
+                            api_chain_hash,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__wallet__select_account_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -5630,6 +5674,22 @@ impl SseDecode for crate::models::settings::BrowserSettingsInfo {
     }
 }
 
+impl SseDecode for crate::models::btc_chain::BtcAccountXpubsInputInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_bip44Xpub = <String>::sse_decode(deserializer);
+        let mut var_bip49Xpub = <String>::sse_decode(deserializer);
+        let mut var_bip84Xpub = <String>::sse_decode(deserializer);
+        let mut var_bip86Xpub = <String>::sse_decode(deserializer);
+        return crate::models::btc_chain::BtcAccountXpubsInputInfo {
+            bip44_xpub: var_bip44Xpub,
+            bip49_xpub: var_bip49Xpub,
+            bip84_xpub: var_bip84Xpub,
+            bip86_xpub: var_bip86Xpub,
+        };
+    }
+}
+
 impl SseDecode for crate::models::btc_chain::BtcAddressEntryInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5643,17 +5703,6 @@ impl SseDecode for crate::models::btc_chain::BtcAddressEntryInfo {
             history: var_history,
             utxos: var_utxos,
         };
-    }
-}
-
-impl SseDecode for crate::models::btc_chain::BtcChainsInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 = <std::collections::HashMap<
-            u8,
-            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
-        >>::sse_decode(deserializer);
-        return crate::models::btc_chain::BtcChainsInfo(var_field0);
     }
 }
 
@@ -5972,7 +6021,10 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_zilliqaLegacy = <bool>::sse_decode(deserializer);
-        let mut var_btcChains = <crate::models::btc_chain::BtcChainsInfo>::sse_decode(deserializer);
+        let mut var_btcChains = <std::collections::HashMap<
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        >>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
             pub_keys: var_pubKeys,
             wallet_index: var_walletIndex,
@@ -7776,120 +7828,126 @@ fn pde_ffi_dispatcher_primary_impl(
         }
         101 => wire__crate__api__wallet__reveal_keypair_impl(port, ptr, rust_vec_len, data_len),
         102 => wire__crate__api__token__rm_ftoken_impl(port, ptr, rust_vec_len, data_len),
-        103 => wire__crate__api__wallet__select_account_impl(port, ptr, rust_vec_len, data_len),
-        104 => wire__crate__api__provider__select_accounts_chain_impl(
+        103 => wire__crate__api__ledger__scan_btc_account_history_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        105 => wire__crate__api__transaction__send_signed_transactions_impl(
+        104 => wire__crate__api__wallet__select_account_impl(port, ptr, rust_vec_len, data_len),
+        105 => wire__crate__api__provider__select_accounts_chain_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        106 => wire__crate__api__wallet__set_biometric_impl(port, ptr, rust_vec_len, data_len),
-        107 => {
+        106 => wire__crate__api__transaction__send_signed_transactions_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        107 => wire__crate__api__wallet__set_biometric_impl(port, ptr, rust_vec_len, data_len),
+        108 => {
             wire__crate__api__settings__set_browser_settings_impl(port, ptr, rust_vec_len, data_len)
         }
-        108 => {
+        109 => {
             wire__crate__api__settings__set_default_locale_impl(port, ptr, rust_vec_len, data_len)
         }
-        109 => wire__crate__api__settings__set_global_notifications_impl(
+        110 => wire__crate__api__settings__set_global_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        110 => wire__crate__api__settings__set_rate_engine_impl(port, ptr, rust_vec_len, data_len),
-        111 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
-        112 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        113 => wire__crate__api__settings__set_tokens_list_fetcher_impl(
+        111 => wire__crate__api__settings__set_rate_engine_impl(port, ptr, rust_vec_len, data_len),
+        112 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        113 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        114 => wire__crate__api__settings__set_tokens_list_fetcher_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        114 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        115 => {
+        115 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
+        116 => {
             wire__crate__api__settings__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
-        116 => wire__crate__api__settings__set_wallet_node_ranking_impl(
+        117 => wire__crate__api__settings__set_wallet_node_ranking_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        117 => wire__crate__api__settings__set_wallet_notifications_impl(
+        118 => wire__crate__api__settings__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        118 => wire__crate__api__transaction__sign_message_impl(port, ptr, rust_vec_len, data_len),
-        119 => wire__crate__api__transaction__sign_send_transactions_impl(
+        119 => wire__crate__api__transaction__sign_message_impl(port, ptr, rust_vec_len, data_len),
+        120 => wire__crate__api__transaction__sign_send_transactions_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        120 => wire__crate__api__transaction__sign_typed_data_eip712_impl(
+        121 => wire__crate__api__transaction__sign_typed_data_eip712_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        121 => {
+        122 => {
             wire__crate__api__backend__start_block_worker_impl(port, ptr, rust_vec_len, data_len)
         }
-        122 => wire__crate__api__transaction__start_history_worker_impl(
+        123 => wire__crate__api__transaction__start_history_worker_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        123 => wire__crate__api__backend__stop_block_worker_impl(port, ptr, rust_vec_len, data_len),
-        124 => wire__crate__api__transaction__stop_history_worker_impl(
+        124 => wire__crate__api__backend__stop_block_worker_impl(port, ptr, rust_vec_len, data_len),
+        125 => wire__crate__api__transaction__stop_history_worker_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        125 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        126 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        128 => {
+        126 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        127 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        129 => {
             wire__crate__api__auth__try_unlock_with_password_impl(port, ptr, rust_vec_len, data_len)
         }
-        129 => {
+        130 => {
             wire__crate__api__auth__try_unlock_with_session_impl(port, ptr, rust_vec_len, data_len)
         }
-        130 => {
+        131 => {
             wire__crate__api__ledger__update_ledger_accounts_impl(port, ptr, rust_vec_len, data_len)
         }
-        131 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
-        132 => wire__crate__api__transaction__update_tx_with_params_impl(
+        132 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
+        133 => wire__crate__api__transaction__update_tx_with_params_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        133 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        134 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        134 => {
+        135 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        135 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        136 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        136 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        137 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -7905,7 +7963,7 @@ fn pde_ffi_dispatcher_sync_impl(
         16 => wire__crate__api__utils__address_to_hash_impl(ptr, rust_vec_len, data_len),
         55 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
         77 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
-        127 => wire__crate__api__utils__to_wei_impl(ptr, rust_vec_len, data_len),
+        128 => wire__crate__api__utils__to_wei_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -8241,6 +8299,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::BrowserSettingsI
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::BtcAccountXpubsInputInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.bip44_xpub.into_into_dart().into_dart(),
+            self.bip49_xpub.into_into_dart().into_dart(),
+            self.bip84_xpub.into_into_dart().into_dart(),
+            self.bip86_xpub.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::btc_chain::BtcAccountXpubsInputInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::BtcAccountXpubsInputInfo>
+    for crate::models::btc_chain::BtcAccountXpubsInputInfo
+{
+    fn into_into_dart(self) -> crate::models::btc_chain::BtcAccountXpubsInputInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::BtcAddressEntryInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -8260,23 +8341,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::BtcAddressEntry
     for crate::models::btc_chain::BtcAddressEntryInfo
 {
     fn into_into_dart(self) -> crate::models::btc_chain::BtcAddressEntryInfo {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::btc_chain::BtcChainsInfo {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.0.into_into_dart().into_dart()].into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::btc_chain::BtcChainsInfo
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::models::btc_chain::BtcChainsInfo>
-    for crate::models::btc_chain::BtcChainsInfo
-{
-    fn into_into_dart(self) -> crate::models::btc_chain::BtcChainsInfo {
         self
     }
 }
@@ -9569,6 +9633,16 @@ impl SseEncode for crate::models::settings::BrowserSettingsInfo {
     }
 }
 
+impl SseEncode for crate::models::btc_chain::BtcAccountXpubsInputInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.bip44_xpub, serializer);
+        <String>::sse_encode(self.bip49_xpub, serializer);
+        <String>::sse_encode(self.bip84_xpub, serializer);
+        <String>::sse_encode(self.bip86_xpub, serializer);
+    }
+}
+
 impl SseEncode for crate::models::btc_chain::BtcAddressEntryInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9576,16 +9650,6 @@ impl SseEncode for crate::models::btc_chain::BtcAddressEntryInfo {
         <String>::sse_encode(self.path, serializer);
         <Vec<String>>::sse_encode(self.history, serializer);
         <Vec<crate::models::btc_chain::UtxoInfo>>::sse_encode(self.utxos, serializer);
-    }
-}
-
-impl SseEncode for crate::models::btc_chain::BtcChainsInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <std::collections::HashMap<
-            u8,
-            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
-        >>::sse_encode(self.0, serializer);
     }
 }
 
@@ -9804,7 +9868,10 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.biometric_type, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <bool>::sse_encode(self.zilliqa_legacy, serializer);
-        <crate::models::btc_chain::BtcChainsInfo>::sse_encode(self.btc_chains, serializer);
+        <std::collections::HashMap<
+            u8,
+            std::collections::HashMap<u8, crate::models::btc_chain::AddressChainInfo>,
+        >>::sse_encode(self.btc_chains, serializer);
     }
 }
 

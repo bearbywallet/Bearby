@@ -27,6 +27,37 @@ class AddressChainInfo {
           internal == other.internal;
 }
 
+class BtcAccountXpubsInputInfo {
+  final String bip44Xpub;
+  final String bip49Xpub;
+  final String bip84Xpub;
+  final String bip86Xpub;
+
+  const BtcAccountXpubsInputInfo({
+    required this.bip44Xpub,
+    required this.bip49Xpub,
+    required this.bip84Xpub,
+    required this.bip86Xpub,
+  });
+
+  @override
+  int get hashCode =>
+      bip44Xpub.hashCode ^
+      bip49Xpub.hashCode ^
+      bip84Xpub.hashCode ^
+      bip86Xpub.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BtcAccountXpubsInputInfo &&
+          runtimeType == other.runtimeType &&
+          bip44Xpub == other.bip44Xpub &&
+          bip49Xpub == other.bip49Xpub &&
+          bip84Xpub == other.bip84Xpub &&
+          bip86Xpub == other.bip86Xpub;
+}
+
 class BtcAddressEntryInfo {
   final String address;
   final String path;
@@ -53,24 +84,6 @@ class BtcAddressEntryInfo {
           path == other.path &&
           history == other.history &&
           utxos == other.utxos;
-}
-
-class BtcChainsInfo {
-  final Map<int, Map<int, AddressChainInfo>> field0;
-
-  const BtcChainsInfo({
-    required this.field0,
-  });
-
-  @override
-  int get hashCode => field0.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BtcChainsInfo &&
-          runtimeType == other.runtimeType &&
-          field0 == other.field0;
 }
 
 class UtxoInfo {
