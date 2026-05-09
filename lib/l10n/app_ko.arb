@@ -469,7 +469,6 @@
   "editGasDialogMaxPriorityFee": "최대 우선 수수료",
   "editGasDialogGasLimit": "가스 제한",
   "editGasDialogInvalidGasValues": "잘못된 가스 값. 입력 확인.",
-  "addLedgerAccountPageAppBarTitle": "Ledger 계정 추가",
   "addLedgerAccountPageGetAccountsButton": "계정 가져오기",
   "addLedgerAccountPageCreateButton": "생성",
   "addLedgerAccountPageAddButton": "업데이트",

@@ -481,7 +481,6 @@
   "editGasDialogMaxPriorityFee": "Макс. приоритетная комиссия",
   "editGasDialogGasLimit": "Лимит газа",
   "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные.",
-  "addLedgerAccountPageAppBarTitle": "Добавить аккаунт Ledger",
   "addLedgerAccountPageGetAccountsButton": "Получить аккаунты",
   "addLedgerAccountPageCreateButton": "Создать",
   "addLedgerAccountPageAddButton": "Обновить",

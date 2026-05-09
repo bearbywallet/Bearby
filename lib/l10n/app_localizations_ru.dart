@@ -1443,9 +1443,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get editGasDialogInvalidGasValues => 'Недопустимые значения газа. Проверьте ваши данные.';
 
   @override
-  String get addLedgerAccountPageAppBarTitle => 'Добавить аккаунт Ledger';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'Получить аккаунты';
 
   @override

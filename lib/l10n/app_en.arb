@@ -1888,10 +1888,6 @@
   "@editGasDialogInvalidGasValues": {
     "description": "Error message shown when invalid gas values are entered"
   },
-  "addLedgerAccountPageAppBarTitle": "Add Ledger Account",
-  "@addLedgerAccountPageAppBarTitle": {
-    "description": "Title for the app bar in the AddLedgerAccountPage component"
-  },
   "addLedgerAccountPageGetAccountsButton": "Get Accounts",
   "@addLedgerAccountPageGetAccountsButton": {
     "description": "Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component"

@@ -469,7 +469,6 @@
   "editGasDialogMaxPriorityFee": "最大优先费用",
   "editGasDialogGasLimit": "燃料限制",
   "editGasDialogInvalidGasValues": "燃料值无效。请检查您的输入。",
-  "addLedgerAccountPageAppBarTitle": "添加Ledger账户",
   "addLedgerAccountPageGetAccountsButton": "获取账户",
   "addLedgerAccountPageCreateButton": "创建",
   "addLedgerAccountPageAddButton": "添加",
