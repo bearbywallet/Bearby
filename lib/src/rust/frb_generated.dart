@@ -29,6 +29,7 @@ import 'frb_generated.io.dart'
 import 'models/account.dart';
 import 'models/background.dart';
 import 'models/book.dart';
+import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -4339,6 +4340,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Map<int, Map<int, AddressChainInfo>>
+      dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+        dco_decode_list_record_u_8_map_u_8_address_chain_info_none(raw)
+            .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_u_8_address_chain_info(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
   Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Map.fromEntries(dco_decode_list_record_usize_string(raw)
@@ -4463,6 +4481,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       addr: dco_decode_String(arr[1]),
       net: dco_decode_usize(arr[2]),
       slip44: dco_decode_u_32(arr[3]),
+    );
+  }
+
+  @protected
+  AddressChainInfo dco_decode_address_chain_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return AddressChainInfo(
+      external_: dco_decode_list_btc_address_entry_info(arr[0]),
+      internal: dco_decode_list_btc_address_entry_info(arr[1]),
     );
   }
 
@@ -4737,6 +4767,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return BtcAddressEntryInfo(
+      address: dco_decode_String(arr[0]),
+      path: dco_decode_String(arr[1]),
+      history: dco_decode_list_String(arr[2]),
+      utxos: dco_decode_list_utxo_info(arr[3]),
+    );
+  }
+
+  @protected
+  BtcChainsInfo dco_decode_btc_chains_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return BtcChainsInfo(
+      field0: dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(arr[0]),
+    );
+  }
+
+  @protected
   Category dco_decode_category(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5001,7 +5056,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       biometricType: dco_decode_String(arr[5]),
       chainHash: dco_decode_u_64(arr[6]),
       zilliqaLegacy: dco_decode_bool(arr[7]),
-      derivePath: dco_decode_String(arr[8]),
+      btcChains: dco_decode_btc_chains_info(arr[8]),
     );
   }
 
@@ -5029,6 +5084,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_address_book_entry_info)
+        .toList();
+  }
+
+  @protected
+  List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_btc_address_entry_info)
         .toList();
   }
 
@@ -5182,6 +5246,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_8_address_chain_info)
+        .toList();
+  }
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_8_map_u_8_address_chain_info_none)
+        .toList();
+  }
+
+  @protected
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList();
@@ -5239,6 +5321,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_tx_out_info).toList();
+  }
+
+  @protected
+  List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_utxo_info).toList();
   }
 
   @protected
@@ -5573,6 +5661,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, AddressChainInfo) dco_decode_record_u_8_address_chain_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_address_chain_info(arr[1]),
+    );
+  }
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_Map_u_8_address_chain_info_None(arr[1]),
+    );
+  }
+
+  @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5855,6 +5971,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UtxoInfo dco_decode_utxo_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return UtxoInfo(
+      txid: dco_decode_String(arr[0]),
+      vout: dco_decode_u_32(arr[1]),
+      value: dco_decode_u_64(arr[2]),
+      height: dco_decode_u_32(arr[3]),
+    );
+  }
+
+  @protected
   WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5965,6 +6095,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_record_u_32_list_account_info(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+        deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_8_address_chain_info(deserializer);
     return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
   }
 
@@ -6093,6 +6241,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_slip44 = sse_decode_u_32(deserializer);
     return AddressBookEntryInfo(
         name: var_name, addr: var_addr, net: var_net, slip44: var_slip44);
+  }
+
+  @protected
+  AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_external_ = sse_decode_list_btc_address_entry_info(deserializer);
+    var var_internal = sse_decode_list_btc_address_entry_info(deserializer);
+    return AddressChainInfo(external_: var_external_, internal: var_internal);
   }
 
   @protected
@@ -6385,6 +6541,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_address = sse_decode_String(deserializer);
+    var var_path = sse_decode_String(deserializer);
+    var var_history = sse_decode_list_String(deserializer);
+    var var_utxos = sse_decode_list_utxo_info(deserializer);
+    return BtcAddressEntryInfo(
+        address: var_address,
+        path: var_path,
+        history: var_history,
+        utxos: var_utxos);
+  }
+
+  @protected
+  BtcChainsInfo sse_decode_btc_chains_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 =
+        sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(deserializer);
+    return BtcChainsInfo(field0: var_field0);
+  }
+
+  @protected
   Category sse_decode_category(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_name = sse_decode_String(deserializer);
@@ -6649,7 +6828,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_biometricType = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_zilliqaLegacy = sse_decode_bool(deserializer);
-    var var_derivePath = sse_decode_String(deserializer);
+    var var_btcChains = sse_decode_btc_chains_info(deserializer);
     return LedgerParamsInput(
         pubKeys: var_pubKeys,
         walletIndex: var_walletIndex,
@@ -6659,7 +6838,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         biometricType: var_biometricType,
         chainHash: var_chainHash,
         zilliqaLegacy: var_zilliqaLegacy,
-        derivePath: var_derivePath);
+        btcChains: var_btcChains);
   }
 
   @protected
@@ -6708,6 +6887,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <AddressBookEntryInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_address_book_entry_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <BtcAddressEntryInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_btc_address_entry_info(deserializer));
     }
     return ans_;
   }
@@ -6962,6 +7154,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(int, AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, AddressChainInfo)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_8_address_chain_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, Map<int, AddressChainInfo>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_record_u_8_map_u_8_address_chain_info_none(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<(int, String)> sse_decode_list_record_u_8_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7061,6 +7281,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <TxOutInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_tx_out_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <UtxoInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_utxo_info(deserializer));
     }
     return ans_;
   }
@@ -7477,6 +7709,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (int, AddressChainInfo) sse_decode_record_u_8_address_chain_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_address_chain_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      sse_decode_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_Map_u_8_address_chain_info_None(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_u_8(deserializer);
@@ -7783,6 +8034,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_txid = sse_decode_String(deserializer);
+    var var_vout = sse_decode_u_32(deserializer);
+    var var_value = sse_decode_u_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
+    return UtxoInfo(
+        txid: var_txid, vout: var_vout, value: var_value, height: var_height);
+  }
+
+  @protected
   WalletArgonParamsInfo sse_decode_wallet_argon_params_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7913,6 +8175,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+      Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_8_address_chain_info(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
   void sse_encode_Map_usize_String_None(
       Map<BigInt, String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8025,6 +8303,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.addr, serializer);
     sse_encode_usize(self.net, serializer);
     sse_encode_u_32(self.slip44, serializer);
+  }
+
+  @protected
+  void sse_encode_address_chain_info(
+      AddressChainInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_btc_address_entry_info(self.external_, serializer);
+    sse_encode_list_btc_address_entry_info(self.internal, serializer);
   }
 
   @protected
@@ -8280,6 +8566,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_btc_address_entry_info(
+      BtcAddressEntryInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.address, serializer);
+    sse_encode_String(self.path, serializer);
+    sse_encode_list_String(self.history, serializer);
+    sse_encode_list_utxo_info(self.utxos, serializer);
+  }
+
+  @protected
+  void sse_encode_btc_chains_info(
+      BtcChainsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+        self.field0, serializer);
+  }
+
+  @protected
   void sse_encode_category(Category self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.name, serializer);
@@ -8473,7 +8777,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.biometricType, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_bool(self.zilliqaLegacy, serializer);
-    sse_encode_String(self.derivePath, serializer);
+    sse_encode_btc_chains_info(self.btcChains, serializer);
   }
 
   @protected
@@ -8512,6 +8816,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_address_book_entry_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_btc_address_entry_info(
+      List<BtcAddressEntryInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_btc_address_entry_info(item, serializer);
     }
   }
 
@@ -8723,6 +9037,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_record_u_8_address_chain_info(
+      List<(int, AddressChainInfo)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_address_chain_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+      List<(int, Map<int, AddressChainInfo>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_map_u_8_address_chain_info_none(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_record_u_8_string(
       List<(int, String)> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8800,6 +9134,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_tx_out_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_utxo_info(
+      List<UtxoInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_utxo_info(item, serializer);
     }
   }
 
@@ -9137,6 +9481,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_record_u_8_address_chain_info(
+      (int, AddressChainInfo) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_address_chain_info(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_8_map_u_8_address_chain_info_none(
+      (int, Map<int, AddressChainInfo>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_Map_u_8_address_chain_info_None(self.$2, serializer);
+  }
+
+  @protected
   void sse_encode_record_u_8_string(
       (int, String) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9349,6 +9709,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
+  void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.txid, serializer);
+    sse_encode_u_32(self.vout, serializer);
+    sse_encode_u_64(self.value, serializer);
+    sse_encode_u_32(self.height, serializer);
   }
 
   @protected

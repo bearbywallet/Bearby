@@ -28,6 +28,7 @@ import 'frb_generated.dart';
 import 'models/account.dart';
 import 'models/background.dart';
 import 'models/book.dart';
+import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -82,6 +83,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  Map<int, Map<int, AddressChainInfo>>
+      dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw);
+
+  @protected
+  Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(
+      dynamic raw);
+
+  @protected
   Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw);
 
   @protected
@@ -123,6 +132,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw);
+
+  @protected
+  AddressChainInfo dco_decode_address_chain_info(dynamic raw);
 
   @protected
   BackgroundNotificationState dco_decode_background_notification_state(
@@ -231,6 +243,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
 
   @protected
+  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
+
+  @protected
+  BtcChainsInfo dco_decode_btc_chains_info(dynamic raw);
+
+  @protected
   Category dco_decode_category(dynamic raw);
 
   @protected
@@ -304,6 +322,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(dynamic raw);
+
+  @protected
   List<Category> dco_decode_list_category(dynamic raw);
 
   @protected
@@ -375,6 +396,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw);
 
   @protected
+  List<(int, AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(
+      dynamic raw);
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
+
+  @protected
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw);
 
   @protected
@@ -399,6 +428,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw);
+
+  @protected
+  List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw);
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
@@ -507,6 +539,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw);
 
   @protected
+  (int, AddressChainInfo) dco_decode_record_u_8_address_chain_info(dynamic raw);
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
+
+  @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw);
 
   @protected
@@ -574,6 +613,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  UtxoInfo dco_decode_utxo_info(dynamic raw);
+
+  @protected
   WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw);
 
   @protected
@@ -605,6 +647,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(
+      SseDeserializer deserializer);
+
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(
+          SseDeserializer deserializer);
+
+  @protected
+  Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(
       SseDeserializer deserializer);
 
   @protected
@@ -652,6 +703,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   AddressBookEntryInfo sse_decode_address_book_entry_info(
       SseDeserializer deserializer);
+
+  @protected
+  AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer);
 
   @protected
   BackgroundNotificationState sse_decode_background_notification_state(
@@ -774,6 +828,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+      SseDeserializer deserializer);
+
+  @protected
+  BtcChainsInfo sse_decode_btc_chains_info(SseDeserializer deserializer);
+
+  @protected
   Category sse_decode_category(SseDeserializer deserializer);
 
   @protected
@@ -849,6 +910,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(
       SseDeserializer deserializer);
 
   @protected
@@ -932,6 +997,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  List<(int, AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer);
+
+  @protected
   List<(int, String)> sse_decode_list_record_u_8_string(
       SseDeserializer deserializer);
 
@@ -961,6 +1035,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<TxOutInfo> sse_decode_list_tx_out_info(SseDeserializer deserializer);
+
+  @protected
+  List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer);
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
@@ -1080,6 +1157,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  (int, AddressChainInfo) sse_decode_record_u_8_address_chain_info(
+      SseDeserializer deserializer);
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      sse_decode_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer);
+
+  @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer);
 
   @protected
@@ -1159,6 +1245,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
+  UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer);
+
+  @protected
   WalletArgonParamsInfo sse_decode_wallet_argon_params_info(
       SseDeserializer deserializer);
 
@@ -1193,6 +1282,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_Map_u_32_list_account_info_None(
       Map<int, List<AccountInfo>> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+      Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_Map_usize_String_None(
@@ -1239,6 +1336,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_address_book_entry_info(
       AddressBookEntryInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_address_chain_info(
+      AddressChainInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_background_notification_state(
@@ -1362,6 +1463,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       BrowserSettingsInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_btc_address_entry_info(
+      BtcAddressEntryInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_btc_chains_info(BtcChainsInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_category(Category self, SseSerializer serializer);
 
   @protected
@@ -1442,6 +1550,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_address_book_entry_info(
       List<AddressBookEntryInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_btc_address_entry_info(
+      List<BtcAddressEntryInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_category(List<Category> self, SseSerializer serializer);
@@ -1529,6 +1641,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(int, Map<int, List<AccountInfo>>)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_u_8_address_chain_info(
+      List<(int, AddressChainInfo)> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+      List<(int, Map<int, AddressChainInfo>)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_record_u_8_string(
       List<(int, String)> self, SseSerializer serializer);
 
@@ -1560,6 +1680,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_tx_out_info(
       List<TxOutInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_utxo_info(List<UtxoInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_wallet_info(
@@ -1679,6 +1802,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       (int, Map<int, List<AccountInfo>>) self, SseSerializer serializer);
 
   @protected
+  void sse_encode_record_u_8_address_chain_info(
+      (int, AddressChainInfo) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_u_8_map_u_8_address_chain_info_none(
+      (int, Map<int, AddressChainInfo>) self, SseSerializer serializer);
+
+  @protected
   void sse_encode_record_u_8_string(
       (int, String) self, SseSerializer serializer);
 
@@ -1757,6 +1888,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_wallet_argon_params_info(
