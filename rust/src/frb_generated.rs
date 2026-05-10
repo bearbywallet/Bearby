@@ -4062,6 +4062,7 @@ fn wire__crate__api__transaction__send_signed_transactions_impl(
                 &mut deserializer,
             );
             let api_sig = <Vec<u8>>::sse_decode(&mut deserializer);
+            let api_bip86_xpub = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -4071,6 +4072,7 @@ fn wire__crate__api__transaction__send_signed_transactions_impl(
                             api_account_index,
                             api_tx,
                             api_sig,
+                            api_bip86_xpub,
                         )
                         .await?;
                         Ok(output_ok)

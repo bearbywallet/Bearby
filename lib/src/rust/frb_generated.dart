@@ -475,7 +475,8 @@ abstract class RustLibApi extends BaseApi {
       {required int walletIndex,
       required int accountIndex,
       required TransactionRequestInfo tx,
-      required List<int> sig});
+      required List<int> sig,
+      String? bip86Xpub});
 
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
@@ -3441,7 +3442,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required int walletIndex,
       required int accountIndex,
       required TransactionRequestInfo tx,
-      required List<int> sig}) {
+      required List<int> sig,
+      String? bip86Xpub}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -3449,6 +3451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_8(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         sse_encode_list_prim_u_8_loose(sig, serializer);
+        sse_encode_opt_String(bip86Xpub, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 107, port: port_);
       },
@@ -3457,7 +3460,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionSendSignedTransactionsConstMeta,
-      argValues: [walletIndex, accountIndex, tx, sig],
+      argValues: [walletIndex, accountIndex, tx, sig, bip86Xpub],
       apiImpl: this,
     ));
   }
@@ -3465,7 +3468,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTransactionSendSignedTransactionsConstMeta =>
       const TaskConstMeta(
         debugName: "send_signed_transactions",
-        argNames: ["walletIndex", "accountIndex", "tx", "sig"],
+        argNames: ["walletIndex", "accountIndex", "tx", "sig", "bip86Xpub"],
       );
 
   @override
