@@ -1,9 +1,26 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use zilpay::proto::address::Address;
-use zilpay::proto::btc_utils::{AddressChain, BtcAccountXpubsInput, BtcAddressEntry, Utxo};
+use zilpay::proto::btc_utils::{
+    AddressChain, BtcAccountXpubsInput, BtcAddressEntry, ByteCodec, Utxo,
+};
 
 use crate::utils::errors::ServiceError;
+
+pub fn btc_chain_info_map_to_core(
+    input: HashMap<u8, AddressChainInfo>,
+) -> Result<HashMap<bitcoin::AddressType, AddressChain>, ServiceError> {
+    input
+        .into_iter()
+        .map(|(addr_type_byte, chain_info)| {
+            let addr_type = bitcoin::AddressType::from_byte(addr_type_byte)
+                .map_err(|e| ServiceError::ParseError("address_type".into(), e.to_string()))?;
+            let chain = chain_info.try_into()?;
+            Ok((addr_type, chain))
+        })
+        .collect()
+}
 
 #[derive(Debug, PartialEq)]
 pub struct BtcAccountXpubsInputInfo {

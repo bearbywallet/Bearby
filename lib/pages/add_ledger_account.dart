@@ -236,33 +236,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addAccountPageIndexExists(_ledgerIndex));
         }
 
-        final isBtcUpdate = _ledger.isBtcApp;
-        final existingTuples = appState.accounts
-            .map((a) => (
-                  a.index.toInt(),
-                  isBtcUpdate ? a.addr : (a.pubKey ?? ''),
-                  a.name,
-                ))
-            .toList();
-
-        final newTuple = (
-          account.index,
-          isBtcUpdate ? account.address : (account.publicKey ?? ''),
-          "ledger ${account.index + 1}",
-        );
-
-        final accountsToUpdate = [...existingTuples, newTuple];
-
-        final isZilliqaAppUpdate = _ledger.isZilliqaApp;
-        final updateBipPurpose =
-            _network?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
-        final updateDerivePath = "m/$updateBipPurpose'/${_network!.slip44}'/0'";
-
-        await updateLedgerAccounts(
+        await addLedgerAccount(
           walletIndex: BigInt.from(walletIndex),
-          accounts: accountsToUpdate,
-          zilliqaLegacy: isZilliqaAppUpdate,
-          derivePath: updateDerivePath,
+          ledgerIndex: account.index,
+          name: "ledger ${account.index + 1}",
+          keyOrAddr: _isBtcFlow ? null : account.publicKey,
+          zilliqaLegacy: _ledger.isZilliqaApp,
+          btcChain: _isBtcFlow ? _btcChain : null,
         );
 
         await appState.syncData();
