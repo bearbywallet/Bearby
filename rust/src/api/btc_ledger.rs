@@ -9,7 +9,8 @@ use sha2::{Digest, Sha256};
 use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
 
-use crate::models::transactions::btc::{TransactionBitcoin, TxOutInfo};
+use crate::models::transactions::btc::{InputMetaInfo, TransactionBitcoin, TxOutInfo};
+use zilpay::proto::btc_utils::ByteCodec;
 
 // --- Merkle Tree ---
 
@@ -637,27 +638,33 @@ pub fn btc_ledger_build_wallet_policy(
 /// Finalize a PSBT with signatures collected from Ledger device.
 /// `psbt_bytes`: original PSBT bytes
 /// `sigs`: list of (input_index, signature_bytes, pubkey_bytes)
-/// `addr_type`: address type as BIP purpose (44=P2PKH, 49=P2SH-P2WPKH, 84=P2WPKH, 86=P2TR)
+/// `input_meta`: per-input (address_type, derivation_path), aligned with
+///   `psbt.unsigned_tx.input[]`. Each input is finalized using its own type,
+///   so a single PSBT may mix P2PKH/P2SH-P2WPKH/P2WPKH/P2TR inputs.
 pub fn btc_ledger_finalize_psbt_with_sigs(
     psbt_bytes: Vec<u8>,
     sigs: Vec<LedgerInputSignature>,
-    addr_type: u32,
+    input_meta: Vec<InputMetaInfo>,
 ) -> Result<FinalizedBtcTx, String> {
     let mut psbt: Psbt =
         Psbt::deserialize(&psbt_bytes).map_err(|e| format!("Failed to parse PSBT: {}", e))?;
 
-    let btc_addr_type = match addr_type {
-        DerivationPath::BIP44_PURPOSE => bitcoin::AddressType::P2pkh,
-        DerivationPath::BIP49_PURPOSE => bitcoin::AddressType::P2sh,
-        DerivationPath::BIP84_PURPOSE => bitcoin::AddressType::P2wpkh,
-        DerivationPath::BIP86_PURPOSE => bitcoin::AddressType::P2tr,
-        _ => {
-            return Err(format!(
-                "Unknown address type for BIP purpose: {}",
-                addr_type
-            ))
-        }
-    };
+    if input_meta.len() != psbt.inputs.len() {
+        return Err(format!(
+            "input_meta length {} does not match PSBT input count {}",
+            input_meta.len(),
+            psbt.inputs.len()
+        ));
+    }
+
+    let addr_types: Vec<bitcoin::AddressType> = input_meta
+        .iter()
+        .enumerate()
+        .map(|(i, m)| {
+            bitcoin::AddressType::from_byte(m.address_type)
+                .map_err(|e| format!("Invalid address_type byte for input {}: {:?}", i, e))
+        })
+        .collect::<Result<_, _>>()?;
 
     // Insert signatures into PSBT inputs
     for sig_info in &sigs {
@@ -670,21 +677,17 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
             ));
         }
 
-        match btc_addr_type {
+        match addr_types[idx] {
             bitcoin::AddressType::P2tr => {
-                // Taproot: signature goes into tap_key_sig
-                // Signature is 64 bytes (SIGHASH_DEFAULT) or 65 bytes (with sighash byte)
                 let schnorr_sig = bitcoin::taproot::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
                 psbt.inputs[idx].tap_key_sig = Some(schnorr_sig);
             }
             _ => {
-                // ECDSA: signature goes into partial_sigs
                 let ecdsa_sig = bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
 
                 let pubkey = if sig_info.pubkey.is_empty() {
-                    // Extract pubkey from PSBT's bip32_derivation (set by btc_ledger_prepare_psbt)
                     let (pk, _) =
                         psbt.inputs[idx]
                             .bip32_derivation
@@ -704,9 +707,9 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         }
     }
 
-    // Finalize each input
-    for input in &mut psbt.inputs {
-        match btc_addr_type {
+    // Finalize each input using its own address type
+    for (idx, input) in psbt.inputs.iter_mut().enumerate() {
+        match addr_types[idx] {
             bitcoin::AddressType::P2tr => {
                 if let Some(sig) = input.tap_key_sig.take() {
                     input.final_script_witness = Some(Witness::p2tr_key_spend(&sig));
@@ -722,17 +725,13 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                 input.partial_sigs.clear();
             }
             bitcoin::AddressType::P2sh => {
-                // P2SH-P2WPKH (wrapped segwit)
                 if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
-                    // Witness
                     let mut witness = Witness::new();
                     witness.push(sig.serialize());
                     witness.push(pubkey.to_bytes());
                     input.final_script_witness = Some(witness);
 
-                    // ScriptSig = push(redeemScript) where redeemScript = OP_0 <pubkey_hash>
                     if let Some(redeem_script) = &input.redeem_script {
-                        // Build scriptSig manually: <len> <redeem_script>
                         let rs_bytes = redeem_script.as_bytes();
                         let mut script_bytes = Vec::new();
                         script_bytes.push(rs_bytes.len() as u8);
@@ -743,9 +742,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                 input.partial_sigs.clear();
             }
             bitcoin::AddressType::P2pkh => {
-                // Legacy P2PKH
                 if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
-                    // Build scriptSig: <sig_len> <sig> <pubkey_len> <pubkey>
                     let sig_bytes = sig.serialize();
                     let pk_bytes = pubkey.to_bytes();
                     let mut script_bytes = Vec::new();
@@ -760,7 +757,6 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
             _ => {}
         }
 
-        // Clean up PSBT fields after finalization
         input.witness_utxo = None;
         input.non_witness_utxo = None;
         input.sighash_type = None;
@@ -866,74 +862,57 @@ pub fn btc_ledger_prepare_psbt(
         }
     }
 
-    // Match inputs
-    for (i, input) in psbt.inputs.iter_mut().enumerate() {
-        // Debug: log input state
-        eprintln!(
-            "BTC PREPARE input {}: witness_utxo={}, non_witness_utxo={}, bip_purpose={}",
-            i,
-            input.witness_utxo.is_some(),
-            input.non_witness_utxo.is_some(),
-            bip_purpose
-        );
-        if let Some(ref utxo) = input.witness_utxo {
-            eprintln!(
-                "  script_pubkey: {}",
-                hex::encode(utxo.script_pubkey.as_bytes())
-            );
-        }
-
-        let script_pubkey = if let Some(ref utxo) = input.witness_utxo {
-            utxo.script_pubkey.clone()
-        } else {
-            eprintln!("  WARNING: witness_utxo is None, skipping input {}", i);
-            continue;
+    // Match inputs. Only attempt inputs whose witness_utxo script form matches
+    // `bip_purpose` — others belong to a different chain and will be filled in
+    // by a separate call. Skipping them quietly makes this function safe to
+    // invoke once per BIP purpose used in the PSBT.
+    let total_inputs = psbt.inputs.len();
+    let mut matched_count: usize = 0;
+    for input in psbt.inputs.iter_mut() {
+        let script_pubkey = match input.witness_utxo {
+            Some(ref utxo) => utxo.script_pubkey.clone(),
+            None => continue,
         };
+
+        let purpose_matches_script = match bip_purpose {
+            DerivationPath::BIP86_PURPOSE => script_pubkey.is_p2tr(),
+            DerivationPath::BIP84_PURPOSE => script_pubkey.is_p2wpkh(),
+            DerivationPath::BIP49_PURPOSE => script_pubkey.is_p2sh(),
+            DerivationPath::BIP44_PURPOSE => script_pubkey.is_p2pkh(),
+            _ => false,
+        };
+        if !purpose_matches_script {
+            continue;
+        }
 
         for (pubkey, full_path) in &derived_keys {
             let matched = match bip_purpose {
                 DerivationPath::BIP86_PURPOSE => {
-                    // Taproot: compute p2tr script from x-only key
                     let (xonly, _parity) = pubkey.x_only_public_key();
-                    let expected = bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None);
-                    expected == script_pubkey
+                    bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None) == script_pubkey
                 }
                 DerivationPath::BIP84_PURPOSE => {
-                    // Native SegWit: p2wpkh
                     let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
-                    if let Ok(cpk) = cpk {
-                        let expected = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        expected == script_pubkey
-                    } else {
-                        false
+                    match bitcoin::CompressedPublicKey::try_from(btc_pubkey) {
+                        Ok(cpk) => {
+                            bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == script_pubkey
+                        }
+                        Err(_) => false,
                     }
                 }
                 DerivationPath::BIP49_PURPOSE => {
-                    // Nested SegWit: p2sh-p2wpkh
                     let btc_pk = bitcoin::PublicKey::new(*pubkey);
-                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pk);
-                    if let Ok(cpk) = cpk {
-                        let wpkh_script = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        let expected = bitcoin::ScriptBuf::new_p2sh(&wpkh_script.script_hash());
-                        expected == script_pubkey
-                    } else {
-                        false
+                    match bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                        Ok(cpk) => {
+                            let wpkh = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                            bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == script_pubkey
+                        }
+                        Err(_) => false,
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
-                    // Legacy: p2pkh
                     let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    let expected = bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash());
-                    if full_path.last() == Some(&ChildNumber::from_normal_idx(0).unwrap()) {
-                        eprintln!(
-                            "  BIP44 try: expected={}, actual={}, match={}",
-                            hex::encode(expected.as_bytes()),
-                            hex::encode(script_pubkey.as_bytes()),
-                            expected == script_pubkey
-                        );
-                    }
-                    expected == script_pubkey
+                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == script_pubkey
                 }
                 _ => false,
             };
@@ -949,7 +928,6 @@ pub fn btc_ledger_prepare_psbt(
                         .insert(xonly, (vec![], (fp, deriv_path)));
                 } else {
                     input.bip32_derivation.insert(*pubkey, (fp, deriv_path));
-                    // BIP49 (P2SH-P2WPKH): set redeemScript = OP_0 <hash160(pubkey)>
                     if bip_purpose == DerivationPath::BIP49_PURPOSE {
                         let btc_pk = bitcoin::PublicKey::new(*pubkey);
                         if let Ok(cpk) = bitcoin::CompressedPublicKey::try_from(btc_pk) {
@@ -958,23 +936,16 @@ pub fn btc_ledger_prepare_psbt(
                         }
                     }
                 }
+                matched_count += 1;
                 break;
             }
         }
-
-        if bip_purpose == DerivationPath::BIP86_PURPOSE && input.tap_key_origins.is_empty() {
-            return Err(format!(
-                "Could not match input {} to any derived key (gap_limit={})",
-                i, GAP_LIMIT
-            ));
-        } else if bip_purpose != DerivationPath::BIP86_PURPOSE && input.bip32_derivation.is_empty()
-        {
-            return Err(format!(
-                "Could not match input {} to any derived key (gap_limit={})",
-                i, GAP_LIMIT
-            ));
-        }
     }
+
+    eprintln!(
+        "BTC PREPARE purpose={} matched={}/{} (gap_limit={})",
+        bip_purpose, matched_count, total_inputs, GAP_LIMIT
+    );
 
     // Match outputs (for change output detection)
     for (_i, txout) in psbt.unsigned_tx.output.iter().enumerate() {

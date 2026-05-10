@@ -70,13 +70,15 @@ Future<WalletPolicy> btcLedgerBuildWalletPolicy(
 /// Finalize a PSBT with signatures collected from Ledger device.
 /// `psbt_bytes`: original PSBT bytes
 /// `sigs`: list of (input_index, signature_bytes, pubkey_bytes)
-/// `addr_type`: address type as BIP purpose (44=P2PKH, 49=P2SH-P2WPKH, 84=P2WPKH, 86=P2TR)
+/// `input_meta`: per-input (address_type, derivation_path), aligned with
+///   `psbt.unsigned_tx.input[]`. Each input is finalized using its own type,
+///   so a single PSBT may mix P2PKH/P2SH-P2WPKH/P2WPKH/P2TR inputs.
 Future<FinalizedBtcTx> btcLedgerFinalizePsbtWithSigs(
         {required List<int> psbtBytes,
         required List<LedgerInputSignature> sigs,
-        required int addrType}) =>
+        required List<InputMetaInfo> inputMeta}) =>
     RustLib.instance.api.crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
-        psbtBytes: psbtBytes, sigs: sigs, addrType: addrType);
+        psbtBytes: psbtBytes, sigs: sigs, inputMeta: inputMeta);
 
 Future<Uint8List> btcLedgerBuildPsbtFromStruct(
         {required TransactionBitcoin tx,

@@ -202,7 +202,7 @@ abstract class RustLibApi extends BaseApi {
   Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
       {required List<int> psbtBytes,
       required List<LedgerInputSignature> sigs,
-      required int addrType});
+      required List<InputMetaInfo> inputMeta});
 
   Future<PlatformInt64> crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex(
       {required List<Uint8List> leafHashes, required List<int> targetHash});
@@ -1210,13 +1210,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
       {required List<int> psbtBytes,
       required List<LedgerInputSignature> sigs,
-      required int addrType}) {
+      required List<InputMetaInfo> inputMeta}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
         sse_encode_list_ledger_input_signature(sigs, serializer);
-        sse_encode_u_32(addrType, serializer);
+        sse_encode_list_input_meta_info(inputMeta, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 25, port: port_);
       },
@@ -1225,7 +1225,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta,
-      argValues: [psbtBytes, sigs, addrType],
+      argValues: [psbtBytes, sigs, inputMeta],
       apiImpl: this,
     ));
   }
@@ -1233,7 +1233,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta =>
       const TaskConstMeta(
         debugName: "btc_ledger_finalize_psbt_with_sigs",
-        argNames: ["psbtBytes", "sigs", "addrType"],
+        argNames: ["psbtBytes", "sigs", "inputMeta"],
       );
 
   @override
