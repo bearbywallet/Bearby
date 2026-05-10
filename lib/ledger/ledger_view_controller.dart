@@ -298,39 +298,58 @@ class LedgerViewController extends ChangeNotifier {
         witnessUtxos: btcMeta.witnessUtxos,
       );
 
-      // Get fingerprint & xpub to prepare the PSBT with bip32_derivation
+      const addrByteToPurpose = <int, int>{
+        0: kBip44Purpose,
+        1: kBip49Purpose,
+        2: kBip84Purpose,
+        4: kBip86Purpose,
+      };
+      final purposes = <int>{};
+      for (final m in btcMeta.inputMeta) {
+        final p = addrByteToPurpose[m.addressType];
+        if (p == null) {
+          throw 'Unsupported BTC address_type ${m.addressType} in input_meta';
+        }
+        purposes.add(p);
+      }
+      final orderedPurposes = purposes.toList()..sort();
+
       final fingerprint = await btcApp.getMasterFingerprint();
-      final accountPath = "m/$bipPurpose'/0'/$accountIndex'";
-      final xpub = await btcApp.getExtendedPubkey(path: accountPath);
+      Uint8List currentPsbt = psbtBytes;
+      final allSigs = <int, Uint8List>{};
 
-      // Prepare PSBT: populates bip32_derivation (pubkeys) for non-Taproot
-      final preparedPsbt = await btc_ffi.btcLedgerPreparePsbt(
-        psbtBytes: psbtBytes,
-        masterFingerprint: fingerprint,
-        bipPurpose: bipPurpose,
-        accountIndex: accountIndex,
-        xpub: xpub,
-      );
+      for (final purpose in orderedPurposes) {
+        final accountPath = "m/$purpose'/0'/$accountIndex'";
+        final xpub = await btcApp.getExtendedPubkey(path: accountPath);
 
-      final signatures = await btcApp.signPsbt(
-        psbtBytes: preparedPsbt,
-        bipPurpose: bipPurpose,
-        accountIndex: accountIndex,
-      );
+        currentPsbt = await btc_ffi.btcLedgerPreparePsbt(
+          psbtBytes: currentPsbt,
+          masterFingerprint: fingerprint,
+          bipPurpose: purpose,
+          accountIndex: accountIndex,
+          xpub: xpub,
+        );
 
-      final ledgerSigs = <btc_ffi.LedgerInputSignature>[];
-      for (int i = 0; i < signatures.length; i++) {
-        ledgerSigs.add(btc_ffi.LedgerInputSignature(
-          inputIndex: i,
-          signature: signatures[i],
-          pubkey: Uint8List(0),
-        ));
+        final sigMap = await btcApp.signPsbt(
+          psbtBytes: currentPsbt,
+          bipPurpose: purpose,
+          accountIndex: accountIndex,
+        );
+        allSigs.addAll(sigMap);
       }
 
+      final ledgerSigs = allSigs.entries
+          .map((e) => btc_ffi.LedgerInputSignature(
+                inputIndex: e.key,
+                signature: e.value,
+                pubkey: Uint8List(0),
+              ))
+          .toList();
+
       final finalized = await btc_ffi.btcLedgerFinalizePsbtWithSigs(
-        psbtBytes: preparedPsbt,
+        psbtBytes: currentPsbt,
         sigs: ledgerSigs,
-        addrType: bipPurpose,
+        inputMeta: btcMeta.inputMeta,
       );
 
       return Uint8List.fromList(finalized.psbtBytes);

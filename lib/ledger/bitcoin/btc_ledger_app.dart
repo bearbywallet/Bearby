@@ -145,7 +145,7 @@ class BtcLedgerApp {
     return accounts;
   }
 
-  Future<List<Uint8List>> signPsbt({
+  Future<Map<int, Uint8List>> signPsbt({
     required Uint8List psbtBytes,
     required int bipPurpose,
     required int accountIndex,
@@ -162,13 +162,7 @@ class BtcLedgerApp {
       accountIndex: accountIndex,
     );
 
-    final preparedPsbt = await btc_ffi.btcLedgerPreparePsbt(
-      psbtBytes: psbtBytes,
-      masterFingerprint: fingerprint,
-      bipPurpose: bipPurpose,
-      accountIndex: accountIndex,
-      xpub: xpub,
-    );
+    final preparedPsbt = psbtBytes;
 
     final merkelized = await btc_ffi.btcLedgerMerkelisePsbt(
       psbtBytes: preparedPsbt,
@@ -273,12 +267,7 @@ class BtcLedgerApp {
       sigMap[inputIndex] = signature;
     }
 
-    final sortedSigs = <Uint8List>[];
-    final keys = sigMap.keys.toList()..sort();
-    for (final key in keys) {
-      sortedSigs.add(sigMap[key]!);
-    }
-    return sortedSigs;
+    return sigMap;
   }
 
   Future<Uint8List> signMessage({

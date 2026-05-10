@@ -928,14 +928,16 @@ fn wire__crate__api__btc_ledger__btc_ledger_finalize_psbt_with_sigs_impl(
             let api_psbt_bytes = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_sigs =
                 <Vec<crate::api::btc_ledger::LedgerInputSignature>>::sse_decode(&mut deserializer);
-            let api_addr_type = <u32>::sse_decode(&mut deserializer);
+            let api_input_meta = <Vec<crate::models::transactions::btc::InputMetaInfo>>::sse_decode(
+                &mut deserializer,
+            );
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, String>((move || {
                     let output_ok = crate::api::btc_ledger::btc_ledger_finalize_psbt_with_sigs(
                         api_psbt_bytes,
                         api_sigs,
-                        api_addr_type,
+                        api_input_meta,
                     )?;
                     Ok(output_ok)
                 })())
