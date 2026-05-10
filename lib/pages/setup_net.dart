@@ -34,7 +34,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  int selectedNetworkIndex = 0;
+  NetworkConfigInfo? selectedNetwork;
   bool optionsDisabled = false;
   List<NetworkConfigInfo> networks = [];
 
@@ -75,6 +75,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
       setState(() {
         networks = _appendUniqueNetworks(storedProviders, mainnetChains);
+        selectedNetwork ??= networks.isNotEmpty ? networks.first : null;
       });
     } catch (e) {
       setState(() {
@@ -107,8 +108,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
     return '${network.slip44}|${network.chain}';
   }
 
-  OptionItem _buildNetworkItem(
-      NetworkConfigInfo chain, AppTheme theme, int index) {
+  OptionItem _buildNetworkItem(NetworkConfigInfo chain, AppTheme theme) {
     final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 10);
     final isPq = PostQuantumChains.contains(chain);
@@ -165,8 +165,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
             ),
         ],
       ),
-      isSelected: selectedNetworkIndex == index,
-      onSelect: () => setState(() => selectedNetworkIndex = index),
+      isSelected: selectedNetwork == chain,
+      onSelect: () => setState(() => selectedNetwork = chain),
     );
   }
 
@@ -249,11 +249,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                             const SizedBox(height: 16),
                             OptionsList(
                               disabled: optionsDisabled,
-                              options: List.generate(
-                                filteredNetworks.length,
-                                (index) => _buildNetworkItem(
-                                    filteredNetworks[index], theme, index),
-                              ),
+                              options: filteredNetworks
+                                  .map((chain) =>
+                                      _buildNetworkItem(chain, theme))
+                                  .toList(),
                               unselectedOpacity: 0.5,
                             ),
                           ],
@@ -267,11 +266,12 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     textColor: theme.buttonText,
                     backgroundColor: theme.primaryPurple,
                     text: l10n.setupNetworkSettingsPageNextButton,
-                    onPressed: filteredNetworks.isEmpty
+                    onPressed: (filteredNetworks.isEmpty ||
+                            selectedNetwork == null)
                         ? () {}
                         : () {
-                            final chain = networks[selectedNetworkIndex];
-                            context.push(AppRoutes.newWalletOptions, extra: {'chain': chain});
+                            context.push(AppRoutes.newWalletOptions,
+                                extra: {'chain': selectedNetwork!});
                           },
                     borderRadius: 30.0,
                     height: 56.0,
