@@ -452,7 +452,12 @@ class LedgerViewController extends ChangeNotifier {
     int bipPurpose = kBip86Purpose,
   }) async {
     if (_connectedTransport == null) {
-      await open(device);
+      final transport = await open(device);
+      if (transport == null) {
+        throw LedgerAppDetectionError(
+          _errorDetails ?? 'Failed to open Ledger device',
+        );
+      }
     }
 
     await detectLedgerApp();

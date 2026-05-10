@@ -17,6 +17,7 @@ import 'package:bearby/utils/utils.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ledger_connector.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
+import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
@@ -54,6 +55,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   Map<LedgerAccount, bool> _selectedAccounts = {};
   Map<int, Map<int, AddressChainInfo>> _btcChains = {};
   bool _initialized = false;
+  late final LedgerViewController _ledger;
 
   bool get _isBtcFlow => _network?.slip44 == kBitcoinlip44;
 
@@ -61,9 +63,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
+    _ledger = appState.ledgerViewController;
 
-    if (appState.ledgerViewController.status == LedgerStatus.initializing) {
-      appState.ledgerViewController.scan();
+    if (!_ledger.isScanning &&
+        !_ledger.isConnecting &&
+        _ledger.connectedTransport == null) {
+      _ledger
+          .scanAndAutoConnect(timeout: const Duration(seconds: 60))
+          .then((_) {
+        if (mounted) setState(() {});
+      });
     }
   }
 
@@ -73,10 +82,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     if (_initialized) return;
 
     final appState = context.read<AppState>();
-    final discoveredDevice =
-        appState.ledgerViewController.discoveredDevices.firstOrNull;
-    final productName = appState.ledgerViewController.connectedTransport
-            ?.deviceModel?.productName ??
+    final discoveredDevice = _ledger.discoveredDevices.firstOrNull;
+    final productName = _ledger.connectedTransport?.deviceModel?.productName ??
         discoveredDevice?.deviceModelProducName ??
         discoveredDevice?.name ??
         discoveredDevice?.deviceModelId ??
@@ -144,6 +151,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     });
   }
 
+  Future<void> _onDeviceOpen(DiscoveredDevice device) async {
+    await _ledger.open(device);
+    if (mounted) setState(() {});
+  }
+
   Future<void> _saveSelectedAccounts() async {
     setState(() {
       _loading = true;
@@ -155,8 +167,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       final appState = Provider.of<AppState>(context, listen: false);
       final l10n = AppLocalizations.of(context)!;
       final BigInt? chainHash;
-      final model =
-          appState.ledgerViewController.connectedTransport?.deviceModel;
+      final model = _ledger.connectedTransport?.deviceModel;
 
       List<NetworkConfigInfo> chains = await getProviders();
       final matches = chains
@@ -196,13 +207,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
-        final pubKeys = selectedAccounts
-            .map((a) => (a.index, a.publicKey ?? ''))
-            .toList();
+        final pubKeys =
+            selectedAccounts.map((a) => (a.index, a.publicKey ?? '')).toList();
         final accountNames = selectedAccounts
             .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
             .toList();
-        final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
+        final isZilliqaApp = _ledger.isZilliqaApp;
 
         await addLedgerWallet(
           params: LedgerParamsInput(
@@ -214,9 +224,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             biometricType: "none",
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
-            btcChains: _isBtcFlow
-                ? _btcChains
-                : <int, Map<int, AddressChainInfo>>{},
+            btcChains:
+                _isBtcFlow ? _btcChains : <int, Map<int, AddressChainInfo>>{},
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -245,7 +254,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
-        final isBtcUpdate = appState.ledgerViewController.isBtcApp;
+        final isBtcUpdate = _ledger.isBtcApp;
         final accountsToUpdate = _selectedAccounts.entries
             .where((entry) => entry.value)
             .map((entry) => (
@@ -255,7 +264,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 ))
             .toList();
 
-        final isZilliqaAppUpdate = appState.ledgerViewController.isZilliqaApp;
+        final isZilliqaAppUpdate = _ledger.isZilliqaApp;
         final updateBipPurpose =
             _network?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
         final updateDerivePath = "m/$updateBipPurpose'/${_network!.slip44}'/0'";
@@ -344,78 +353,86 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
               ),
               const SizedBox(height: 16),
               const SizedBox(height: 16),
-              RoundedLoadingButton(
-                color: theme.primaryPurple,
-                valueColor: theme.buttonText,
-                controller: _btnController,
-                onPressed: () async {
-                  setState(() {
-                    _errorMessage = '';
-                  });
+              ListenableBuilder(
+                listenable: _ledger,
+                builder: (context, _) {
+                  final isConnected = _ledger.connectedTransport != null;
+                  return RoundedLoadingButton(
+                    color: theme.primaryPurple,
+                    valueColor: theme.buttonText,
+                    controller: _btnController,
+                    onPressed: isConnected
+                        ? () async {
+                            setState(() {
+                              _errorMessage = '';
+                            });
 
-                  _btnController.start();
+                            _btnController.start();
 
-                  try {
-                    final bipPurpose =
-                        _isBtcFlow ? kBip86Purpose : kBip44Purpose;
-                    final accounts =
-                        await appState.ledgerViewController.getAccounts(
-                      device:
-                          appState.ledgerViewController.discoveredDevices.first,
-                      slip44: _network!.slip44,
-                      count: _accountCount,
-                      chainId: _network!.chainId.toInt(),
-                      bipPurpose: bipPurpose,
-                    );
+                            try {
+                              final bipPurpose =
+                                  _isBtcFlow ? kBip86Purpose : kBip44Purpose;
+                              final accounts = await _ledger.getAccounts(
+                                device: _ledger.discoveredDevices.first,
+                                slip44: _network!.slip44,
+                                count: _accountCount,
+                                chainId: _network!.chainId.toInt(),
+                                bipPurpose: bipPurpose,
+                              );
 
-                    final btcChains = <int, Map<int, AddressChainInfo>>{};
+                              final btcChains =
+                                  <int, Map<int, AddressChainInfo>>{};
 
-                    if (_isBtcFlow) {
-                      final btcApp = appState.ledgerViewController.btcApp;
-                      if (btcApp == null) {
-                        throw Exception('Ledger transport not connected');
-                      }
+                              if (_isBtcFlow) {
+                                final btcApp = _ledger.btcApp;
+                                if (btcApp == null) {
+                                  throw Exception(
+                                      'Ledger transport not connected');
+                                }
 
-                      for (final a in accounts) {
-                        final xpubs =
-                            await btcApp.getAccountXpubs(accountIndex: a.index);
-                        final chains = await scanBtcAccountHistory(
-                          xpubs: xpubs,
-                          ledgerIndex: a.index,
-                          chainHash: _network!.chainHash,
-                        );
-                        btcChains[a.index] = chains;
-                      }
-                    }
+                                for (final a in accounts) {
+                                  final xpubs = await btcApp.getAccountXpubs(
+                                      accountIndex: a.index);
+                                  final chains = await scanBtcAccountHistory(
+                                    xpubs: xpubs,
+                                    ledgerIndex: a.index,
+                                    chainHash: _network!.chainHash,
+                                  );
+                                  btcChains[a.index] = chains;
+                                }
+                              }
 
-                    final newSelectedAccounts = {
-                      for (var account in accounts) account: true
-                    };
+                              final newSelectedAccounts = {
+                                for (var account in accounts) account: true
+                              };
 
-                    setState(() {
-                      _accounts = accounts;
-                      _selectedAccounts = newSelectedAccounts;
-                      _btcChains = btcChains;
-                    });
-                    _btnController.success();
-                  } catch (e) {
-                    debugPrint("getAccounts: $e");
-                    _btnController.error();
-                    String message;
-                    message = e.toString();
-                    setState(() {
-                      _errorMessage = message;
-                    });
-                  } finally {
-                    _btnController.reset();
-                  }
+                              setState(() {
+                                _accounts = accounts;
+                                _selectedAccounts = newSelectedAccounts;
+                                _btcChains = btcChains;
+                              });
+                              _btnController.success();
+                            } catch (e) {
+                              debugPrint("getAccounts: $e");
+                              _btnController.error();
+                              String message;
+                              message = e.toString();
+                              setState(() {
+                                _errorMessage = message;
+                              });
+                            } finally {
+                              _btnController.reset();
+                            }
+                          }
+                        : null,
+                    child: Text(
+                      l10n.addLedgerAccountPageGetAccountsButton,
+                      style: theme.titleSmall.copyWith(
+                        color: theme.buttonText,
+                      ),
+                    ),
+                  );
                 },
-                child: Text(
-                  l10n.addLedgerAccountPageGetAccountsButton,
-                  style: theme.titleSmall.copyWith(
-                    color: theme.buttonText,
-                  ),
-                ),
               ),
             ],
           ),
@@ -535,7 +552,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                     ),
                     Expanded(
                       child: RefreshIndicator(
-                        onRefresh: appState.ledgerViewController.scan,
+                        onRefresh: _ledger.scan,
                         color: theme.primaryPurple,
                         backgroundColor: theme.cardBackground,
                         child: SingleChildScrollView(
@@ -546,8 +563,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 LedgerConnector(
-                                  disabled: _createWallet,
-                                  controller: appState.ledgerViewController,
+                                  controller: _ledger,
+                                  onOpen: _onDeviceOpen,
                                 ),
                                 if (_errorMessage.isNotEmpty) ...[
                                   const SizedBox(height: 16),
