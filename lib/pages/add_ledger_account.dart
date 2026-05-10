@@ -49,15 +49,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   String _errorMessage = '';
   bool _createWallet = true;
   NetworkConfigInfo? _network;
-  LedgerAccount? _account;
-  Map<int, AddressChainInfo>? _btcChain;
+  Map<int, LedgerAccount> _accounts = {};
+  Map<int, Map<int, AddressChainInfo>> _btcChains = {};
   bool _initialized = false;
   late final LedgerViewController _ledger;
 
   bool get _isBtcFlow => _network?.slip44 == kBitcoinlip44;
 
   bool _indexExists(AppState appState) {
-    return appState.accounts.any((a) => a.index.toInt() == _ledgerIndex);
+    return _accounts.keys.any(
+        (i) => appState.accounts.any((a) => a.index.toInt() == i));
   }
 
   @override
@@ -175,16 +176,17 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       List<FTokenInfo> ftokens = [];
 
       if (_createWallet) {
-        final account = _account;
-        if (account == null) {
+        if (_accounts.isEmpty) {
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
-        final btcChain = _btcChain;
-        final pubKeys = [(account.index, account.publicKey ?? '')];
-        final accountNames = [
-          "${model?.productName ?? 'ledger'} ${account.index + 1}"
-        ];
+        final pubKeys = _accounts.entries
+            .map((e) => (e.key, e.value.publicKey ?? ''))
+            .toList();
+        final accountNames = _accounts.entries
+            .map((e) =>
+                "${model?.productName ?? 'ledger'} ${e.key + 1}")
+            .toList();
         final isZilliqaApp = _ledger.isZilliqaApp;
 
         await addLedgerWallet(
@@ -197,8 +199,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             biometricType: "none",
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
-            btcChains: _isBtcFlow && btcChain != null
-                ? {account.index: btcChain}
+            btcChains: _isBtcFlow
+                ? _btcChains
                 : <int, Map<int, AddressChainInfo>>{},
           ),
           walletSettings: settings,
@@ -228,22 +230,23 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
-        final account = _account;
-        if (account == null) {
+        if (_accounts.isEmpty) {
           throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
         if (_indexExists(appState)) {
           throw Exception(l10n.addAccountPageIndexExists(_ledgerIndex));
         }
 
-        await addLedgerAccount(
-          walletIndex: BigInt.from(walletIndex),
-          ledgerIndex: account.index,
-          name: "ledger ${account.index + 1}",
-          keyOrAddr: _isBtcFlow ? null : account.publicKey,
-          zilliqaLegacy: _ledger.isZilliqaApp,
-          btcChain: _isBtcFlow ? _btcChain : null,
-        );
+        for (final entry in _accounts.entries) {
+          await addLedgerAccount(
+            walletIndex: BigInt.from(walletIndex),
+            ledgerIndex: entry.key,
+            name: "ledger ${entry.key + 1}",
+            keyOrAddr: _isBtcFlow ? null : entry.value.publicKey,
+            zilliqaLegacy: _ledger.isZilliqaApp,
+            btcChain: _isBtcFlow ? _btcChains[entry.key] : null,
+          );
+        }
 
         await appState.syncData();
         _createBtnController.success();
@@ -325,10 +328,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   ),
                   onChanged: !_loading
                       ? (value) {
+                          if (value == _ledgerIndex) return;
                           setState(() {
                             _ledgerIndex = value;
-                            _account = null;
-                            _btcChain = null;
                             _errorMessage = '';
                           });
                         }
@@ -397,8 +399,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                           }
 
                           setState(() {
-                            _account = account;
-                            _btcChain = btcChain;
+                            _accounts[account.index] = account;
+                            if (btcChain != null) {
+                              _btcChains[account.index] = btcChain;
+                            }
                           });
                           _btnController.success();
                         } catch (e) {
@@ -425,12 +429,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     );
   }
 
-  Widget _buildAccountCard(AppTheme theme) {
-    final account = _account;
-    if (account == null) return const SizedBox();
-
+  Widget _buildSingleAccountCard(AppTheme theme, LedgerAccount account) {
     if (_isBtcFlow) {
-      final btcChain = _btcChain;
+      final btcChain = _btcChains[account.index];
       if (btcChain == null) return const SizedBox();
 
       return Container(
@@ -579,10 +580,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                                 ],
                                 const SizedBox(height: 16),
                                 _buildWalletInfoCard(appState, l10n),
-                                if (_account != null) ...[
-                                  const SizedBox(height: 16),
-                                  _buildAccountCard(theme),
-                                ],
+                                ..._accounts.entries.map((entry) => Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: _buildSingleAccountCard(theme, entry.value),
+                                )),
                                 const SizedBox(height: 80),
                               ],
                             ),
@@ -592,7 +593,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                     ),
                   ],
                 ),
-                if (_account != null)
+                if (_accounts.isNotEmpty)
                   Positioned(
                     bottom: 0,
                     left: 0,
