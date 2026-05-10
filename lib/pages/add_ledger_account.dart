@@ -122,6 +122,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
     if (isLedgerWallet && !_createWallet) {
       final existingAccounts = appState.accounts;
+      debugPrint('[AddLedger] didChangeDependencies: existingAccounts=${existingAccounts.length}');
       _accounts = existingAccounts
           .map((account) => LedgerAccount(
                 index: account.index.toInt(),
@@ -130,6 +131,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
               ))
           .toList()
         ..sort((a, b) => a.index.compareTo(b.index));
+      debugPrint('[AddLedger] didChangeDependencies: _accounts=${_accounts.length}');
+      for (final a in _accounts) {
+        debugPrint('[AddLedger]   account[${a.index}]: addr="${a.address}" pubKey="${a.publicKey}"');
+      }
       _selectedAccounts = {for (var account in _accounts) account: true};
     }
 
@@ -380,6 +385,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                                 bipPurpose: bipPurpose,
                               );
 
+                              debugPrint('[AddLedger] getAccounts returned ${accounts.length} accounts');
+                              for (final a in accounts) {
+                                debugPrint('[AddLedger]   account[${a.index}]: addr="${a.address}" pubKey="${a.publicKey}"');
+                              }
+
                               final btcChains =
                                   <int, Map<int, AddressChainInfo>>{};
 
@@ -443,6 +453,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
 
   Widget _buildAccountsCard(AppTheme theme) {
     if (_accounts.isEmpty) return const SizedBox();
+    if (_isBtcFlow && _btcChains.isEmpty) return const SizedBox();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
