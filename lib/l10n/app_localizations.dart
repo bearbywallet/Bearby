@@ -2915,6 +2915,12 @@ abstract class AppLocalizations {
   /// **'No wallet selected'**
   String get addLedgerAccountPageNoWalletSelectedError;
 
+  /// Label for the ledger account index selector in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger Index'**
+  String get addLedgerAccountPageLedgerIndex;
+
   /// Title for the transaction history toggle in the address book settings.
   ///
   /// In en, this message translates to:

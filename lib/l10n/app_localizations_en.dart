@@ -1454,6 +1454,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addLedgerAccountPageNoWalletSelectedError => 'No wallet selected';
 
   @override
+  String get addLedgerAccountPageLedgerIndex => 'Ledger Index';
+
+  @override
   String get transactionHistoryTitle => 'Transaction History';
 
   @override

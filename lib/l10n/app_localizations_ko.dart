@@ -1452,6 +1452,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get addLedgerAccountPageNoWalletSelectedError => '선택된 지갑 없음';
 
   @override
+  String get addLedgerAccountPageLedgerIndex => 'Ledger 인덱스';
+
+  @override
   String get transactionHistoryTitle => '거래 내역';
 
   @override

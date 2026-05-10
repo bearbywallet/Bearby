@@ -486,6 +486,7 @@
   "addLedgerAccountPageAddButton": "Обновить",
   "addLedgerAccountPageNoAccountsSelectedError": "Аккаунты не выбраны",
   "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран",
+  "addLedgerAccountPageLedgerIndex": "Индекс Ledger",
   "transactionHistoryTitle": "История транзакций",
   "transactionHistoryDescription": "Показывать адреса из истории транзакций",
   "zilStakePageTitle": "Стейкинг Zilliqa",

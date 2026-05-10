@@ -1908,6 +1908,10 @@
   "@addLedgerAccountPageNoWalletSelectedError": {
     "description": "Error message displayed when no wallet is selected for adding accounts in the AddLedgerAccountPage component"
   },
+  "addLedgerAccountPageLedgerIndex": "Ledger Index",
+  "@addLedgerAccountPageLedgerIndex": {
+    "description": "Label for the ledger account index selector in the AddLedgerAccountPage component"
+  },
   "transactionHistoryTitle": "Transaction History",
   "@transactionHistoryTitle": {
     "description": "Title for the transaction history toggle in the address book settings."
