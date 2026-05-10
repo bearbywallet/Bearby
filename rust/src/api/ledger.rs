@@ -4,8 +4,7 @@ use std::sync::Arc;
 use zilpay::background::bg_bitcoin::BitcoinManagement;
 use zilpay::{
     background::bg_provider::ProvidersManagement,
-    crypto::bip49::{split_path, DerivationPath},
-    proto::address::Address,
+    crypto::bip49::split_path,
     proto::btc_utils::ByteCodec,
     wallet::wallet_storage::StorageOperations,
 };
@@ -20,7 +19,7 @@ pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 use zilpay::crypto::slip44;
 
 use crate::{
-    models::btc_chain::{AddressChainInfo, BtcAccountXpubsInputInfo},
+    models::btc_chain::{btc_chain_info_map_to_core, AddressChainInfo, BtcAccountXpubsInputInfo},
     service::service::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
@@ -105,17 +104,7 @@ pub async fn add_ledger_wallet(
         .btc_chains
         .into_iter()
         .map(|(ledger_index, inner)| {
-            let core_inner = inner
-                .into_iter()
-                .map(|(addr_type_byte, chain_info)| {
-                    let addr_type =
-                        bitcoin::AddressType::from_byte(addr_type_byte).map_err(|e| {
-                            ServiceError::ParseError("address_type".into(), e.to_string())
-                        })?;
-                    let chain = chain_info.try_into()?;
-                    Ok((addr_type, chain))
-                })
-                .collect::<Result<HashMap<_, _>, ServiceError>>()?;
+            let core_inner = btc_chain_info_map_to_core(inner)?;
             Ok((ledger_index, core_inner))
         })
         .collect::<Result<HashMap<_, _>, ServiceError>>()
@@ -144,39 +133,35 @@ pub async fn add_ledger_wallet(
     Ok(hex::encode(wallet.wallet_address))
 }
 
-pub async fn update_ledger_accounts(
+pub async fn add_ledger_account(
     wallet_index: usize,
-    accounts: Vec<(u8, String, String)>,
+    ledger_index: u8,
+    name: String,
+    key_or_addr: Option<String>,
     zilliqa_legacy: bool,
-    derive_path: String,
+    btc_chain: Option<HashMap<u8, AddressChainInfo>>,
 ) -> Result<(), String> {
     with_service(|core| {
-        let dp = DerivationPath::try_from(derive_path.as_str())?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core.get_provider(wallet_data.chain_hash)?;
         let is_bitcoin = provider.config.slip_44 == slip44::BITCOIN;
-        let mut accounts = accounts
-            .into_iter()
-            .map(|(ledger_index, key_or_addr, name)| {
-                if is_bitcoin {
-                    let addr = Address::from_bitcoin_address(&key_or_addr)?;
-                    Ok((ledger_index, None, addr, name))
-                } else {
-                    let pub_key =
-                        pubkey_from_provider(&key_or_addr, &provider.config, zilliqa_legacy)?;
-                    let addr = pub_key.get_addr()?;
-                    Ok((ledger_index, Some(pub_key), addr, name))
-                }
-            })
-            .collect::<Result<Vec<(u8, Option<PubKey>, Address, String)>, ServiceError>>()?;
 
-        accounts.dedup_by(|a, b| a.0 == b.0 && a.2 == b.2);
+        let pub_key = if is_bitcoin {
+            None
+        } else {
+            let raw = key_or_addr.as_deref().ok_or(ServiceError::DecodePublicKey)?;
+            Some(pubkey_from_provider(raw, &provider.config, zilliqa_legacy)?)
+        };
+
+        let btc_chains = btc_chain
+            .map(btc_chain_info_map_to_core)
+            .transpose()?;
 
         wallet
-            .update_ledger_accounts(accounts, &provider.config, dp.bip)
+            .add_ledger_account(name, ledger_index, pub_key, btc_chains, &provider.config)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())

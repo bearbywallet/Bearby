@@ -23,16 +23,20 @@ Future<String> addLedgerWallet(
     RustLib.instance.api.crateApiLedgerAddLedgerWallet(
         params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-Future<void> updateLedgerAccounts(
+Future<void> addLedgerAccount(
         {required BigInt walletIndex,
-        required List<(int, String, String)> accounts,
+        required int ledgerIndex,
+        required String name,
+        String? keyOrAddr,
         required bool zilliqaLegacy,
-        required String derivePath}) =>
-    RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
+        Map<int, AddressChainInfo>? btcChain}) =>
+    RustLib.instance.api.crateApiLedgerAddLedgerAccount(
         walletIndex: walletIndex,
-        accounts: accounts,
+        ledgerIndex: ledgerIndex,
+        name: name,
+        keyOrAddr: keyOrAddr,
         zilliqaLegacy: zilliqaLegacy,
-        derivePath: derivePath);
+        btcChain: btcChain);
 
 Future<Uint32List> ledgerSplitPath({required String path}) =>
     RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
