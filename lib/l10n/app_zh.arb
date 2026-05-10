@@ -474,6 +474,7 @@
   "addLedgerAccountPageAddButton": "添加",
   "addLedgerAccountPageNoAccountsSelectedError": "未选择任何账户",
   "addLedgerAccountPageNoWalletSelectedError": "未选择钱包",
+  "addLedgerAccountPageLedgerIndex": "Ledger 索引",
   "transactionHistoryTitle": "交易历史",
   "transactionHistoryDescription": "在地址簿中显示来自交易历史的地址。",
   "zilStakePageTitle": "Zilliqa 质押",

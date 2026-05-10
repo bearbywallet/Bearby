@@ -474,6 +474,7 @@
   "addLedgerAccountPageAddButton": "업데이트",
   "addLedgerAccountPageNoAccountsSelectedError": "선택된 계정 없음",
   "addLedgerAccountPageNoWalletSelectedError": "선택된 지갑 없음",
+  "addLedgerAccountPageLedgerIndex": "Ledger 인덱스",
   "transactionHistoryTitle": "거래 내역",
   "transactionHistoryDescription": "주소록에 거래 내역 주소 표시.",
   "zilStakePageTitle": "Zilliqa 스테이킹",

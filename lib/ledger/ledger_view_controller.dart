@@ -447,7 +447,7 @@ class LedgerViewController extends ChangeNotifier {
   Future<List<LedgerAccount>> getAccounts({
     required DiscoveredDevice device,
     required int slip44,
-    required int count,
+    required List<int> indices,
     required int chainId,
     int bipPurpose = kBip86Purpose,
   }) async {
@@ -466,26 +466,23 @@ class LedgerViewController extends ChangeNotifier {
 
     if (_detectedAppType == LedgerAppType.zilliqa && slip44 == kZilliqaSlip44) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
-      accounts = await zilliqaApp
-          .getPublicAddress(List<int>.generate(count, (i) => i));
+      accounts = await zilliqaApp.getPublicAddress(indices);
     } else if (_detectedAppType == LedgerAppType.tron &&
         slip44 == kTronSlip44) {
       final tronApp = TronLedgerApp(_connectedTransport!);
-      accounts = await tronApp.getAccounts(
-        indices: List<int>.generate(count, (i) => i),
-      );
+      accounts = await tronApp.getAccounts(indices: indices);
     } else if (_detectedAppType == LedgerAppType.bitcoin &&
         slip44 == kBitcoinlip44) {
       final btcApp = BtcLedgerApp(_connectedTransport!);
       accounts = await btcApp.getAccounts(
-        indices: List<int>.generate(count, (i) => i),
+        indices: indices,
         bipPurpose: bipPurpose,
       );
     } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       accounts = await evmApp.getAccounts(
         chainId: chainId,
-        indices: List<int>.generate(count, (i) => i),
+        indices: indices,
       );
     }
 

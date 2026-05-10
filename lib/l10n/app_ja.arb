@@ -489,6 +489,7 @@
   "addLedgerAccountPageAddButton": "追加",
   "addLedgerAccountPageNoAccountsSelectedError": "アカウントが選択されていません",
   "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません",
+  "addLedgerAccountPageLedgerIndex": "Ledgerインデックス",
   "transactionHistoryTitle": "取引履歴",
   "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。",
   "zilStakePageTitle": "Zilliqa ステーキング",
