@@ -358,6 +358,13 @@ class LedgerViewController extends ChangeNotifier {
     }
   }
 
+  Future<String> getBtcBip86Xpub({required int accountIndex}) async {
+    final btcApp = BtcLedgerApp(_connectedTransport!);
+    return btcApp.getExtendedPubkey(
+      path: "m/$kBip86Purpose'/0'/$accountIndex'",
+    );
+  }
+
   Future<String> signMesage({
     required String message,
     required AccountInfo account,
