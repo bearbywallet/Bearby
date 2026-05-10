@@ -281,11 +281,17 @@ class _ConfirmTransactionContentState
       bipPurpose: appState.wallet!.bip,
     );
 
+    final bip86Xpub = tx.btc != null
+        ? await appState.ledgerViewController
+            .getBtcBip86Xpub(accountIndex: accountIndex)
+        : null;
+
     return await sendSignedTransactions(
       tx: tx,
       sig: sig,
       walletIndex: appState.selectedWallet,
       accountIndex: accountIndex,
+      bip86Xpub: bip86Xpub,
     );
   }
 

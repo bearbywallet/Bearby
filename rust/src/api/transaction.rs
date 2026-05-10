@@ -20,6 +20,7 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
+use bitcoin::bip32::Xpub;
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
@@ -49,6 +50,12 @@ pub async fn send_signed_transactions(
     let wallet_index = wallet_index as usize;
     let account_index = account_index as usize;
 
+    let parsed_bip86_xpub = bip86_xpub
+        .as_deref()
+        .map(Xpub::from_str)
+        .transpose()
+        .map_err(|e| ServiceError::ParseError("bip86_xpub".into(), e.to_string()))?;
+
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
@@ -65,7 +72,7 @@ pub async fn send_signed_transactions(
         .with_signature(sig, sender_account.pub_key.as_ref())
         .map_err(ServiceError::TransactionErrors)?;
 
-    let tx = core
+    let receipt = core
         .broadcast_signed_transactions(wallet_index, vec![signed_tx])
         .await
         .map_err(ServiceError::BackgroundError)?
@@ -76,19 +83,24 @@ pub async fn send_signed_transactions(
             zilpay::errors::tx::TransactionErrors::InvalidTxHash,
         ))?;
 
-    if matches!(sender_account.addr, Address::Secp256k1Bitcoin(_))
-        && matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
-    {
-        if let Some(xpub_str) = bip86_xpub {
-            let xpub = bitcoin::bip32::Xpub::from_str(&xpub_str)
-                .map_err(|e| ServiceError::ParseError("bip86_xpub".into(), e.to_string()))?;
-            core.rotate_btc_account(wallet_index, account_index, &xpub)
-                .await
-                .map_err(ServiceError::BackgroundError)?;
+    let is_btc = matches!(sender_account.addr, Address::Secp256k1Bitcoin(_));
+    let is_bip86 = wallet_data.bip == DerivationPath::BIP86_PURPOSE;
+
+    if is_btc && is_bip86 {
+        match (&wallet_data.wallet_type, parsed_bip86_xpub) {
+            (WalletTypes::Ledger(_), None) => {
+                eprintln!("[btc] BIP86 Ledger BTC tx but bip86_xpub not provided — address rotation skipped");
+            }
+            (WalletTypes::Ledger(_), Some(xpub)) => {
+                if let Err(e) = core.rotate_btc_account(wallet_index, account_index, &xpub).await {
+                    eprintln!("[btc] rotate failed after broadcast: {e}");
+                }
+            }
+            _ => {}
         }
     }
 
-    Ok(tx)
+    Ok(receipt)
 }
 
 pub async fn sign_send_transactions(
@@ -172,6 +184,7 @@ pub async fn sign_send_transactions(
     };
 
     if matches!(sender_account.addr, Address::Secp256k1Bitcoin(_))
+        && wallet_data.bip == DerivationPath::BIP86_PURPOSE
         && matches!(wallet_data.wallet_type, WalletTypes::SecretPhrase(_))
     {
         let network = sender_account
@@ -191,9 +204,9 @@ pub async fn sign_send_transactions(
         )
         .map_err(ServiceError::from)?
         .bip86_xpub;
-        core.rotate_btc_account(wallet_index, account_index, &bip86_xpub)
-            .await
-            .map_err(ServiceError::BackgroundError)?;
+        if let Err(e) = core.rotate_btc_account(wallet_index, account_index, &bip86_xpub).await {
+            eprintln!("[btc] rotate failed after broadcast: {e}");
+        }
     }
 
     Ok(tx)
