@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use std::sync::Arc;
 
 use crate::frb_generated::StreamSink;
@@ -11,6 +12,7 @@ use crate::utils::utils::{parse_address, with_service};
 use secrecy::zeroize::Zeroize;
 use secrecy::SecretString;
 use tokio::sync::mpsc;
+use zilpay::background::bg_bitcoin::BitcoinManagement;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;
 use zilpay::background::bg_tx::update_tx_from_params;
@@ -23,6 +25,7 @@ pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
 use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
+use zilpay::proto::btc_utils::BtcAccountXpubsInput;
 use zilpay::proto::pubkey::PubKey;
 use zilpay::proto::signature::Signature;
 pub use zilpay::proto::tx::TransactionReceipt;
@@ -30,7 +33,9 @@ pub use zilpay::proto::tx::TransactionRequest;
 use zilpay::proto::utils::safe_chunk_transaction;
 pub use zilpay::proto::U256;
 use zilpay::token::ft::FToken;
+use zilpay::wallet::wallet_crypto::WalletCrypto;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
+use zilpay::wallet::wallet_types::WalletTypes;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
 pub async fn send_signed_transactions(
@@ -38,6 +43,7 @@ pub async fn send_signed_transactions(
     account_index: u8,
     tx: TransactionRequestInfo,
     sig: Vec<u8>,
+    bip86_xpub: Option<String>,
 ) -> Result<HistoricalTransactionInfo, String> {
     let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
     let wallet_index = wallet_index as usize;
@@ -69,6 +75,18 @@ pub async fn send_signed_transactions(
         .ok_or(ServiceError::TransactionErrors(
             zilpay::errors::tx::TransactionErrors::InvalidTxHash,
         ))?;
+
+    if matches!(sender_account.addr, Address::Secp256k1Bitcoin(_))
+        && matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
+    {
+        if let Some(xpub_str) = bip86_xpub {
+            let xpub = bitcoin::bip32::Xpub::from_str(&xpub_str)
+                .map_err(|e| ServiceError::ParseError("bip86_xpub".into(), e.to_string()))?;
+            core.rotate_btc_account(wallet_index, account_index, &xpub)
+                .await
+                .map_err(ServiceError::BackgroundError)?;
+        }
+    }
 
     Ok(tx)
 }
@@ -153,8 +171,27 @@ pub async fn sign_send_transactions(
         history.into()
     };
 
-    if let Address::Secp256k1Bitcoin(_) = &sender_account.addr {
-        core.rotate_btc_account(wallet_index, account_index, &seed_bytes, &secret_passphrase)
+    if matches!(sender_account.addr, Address::Secp256k1Bitcoin(_))
+        && matches!(wallet_data.wallet_type, WalletTypes::SecretPhrase(_))
+    {
+        let network = sender_account
+            .addr
+            .get_bitcoin_network()
+            .map_err(ServiceError::from)?;
+        let mnemonic = wallet
+            .reveal_mnemonic(&seed_bytes)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let seed_secret = mnemonic
+            .to_seed(&secret_passphrase)
+            .map_err(|e| ServiceError::ParseError("bip39_seed".into(), format!("{:?}", e)))?;
+        let bip86_xpub = BtcAccountXpubsInput::from_seed(
+            &seed_secret,
+            account_index as u32,
+            network,
+        )
+        .map_err(ServiceError::from)?
+        .bip86_xpub;
+        core.rotate_btc_account(wallet_index, account_index, &bip86_xpub)
             .await
             .map_err(ServiceError::BackgroundError)?;
     }
