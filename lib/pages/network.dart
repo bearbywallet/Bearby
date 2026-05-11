@@ -100,6 +100,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         testnetJson: testnetJsonData,
       );
 
+      if (!mounted) return;
       setState(() {
         allNetworks.clear();
 
@@ -140,6 +141,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         if (_shortName != null) _trySelectNetworkByShortName();
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         isLoading = false;
         errorMessage = e.toString();
@@ -240,6 +242,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
     final result = await selectChainAndFinish();
 
+    if (!mounted) return;
+
     if (result != null) {
       promptPassword();
     }
@@ -248,6 +252,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   void _handleEditNetwork(NetworkItem networkItem) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final config = networkItem.configInfo;
+    final addErrorPrefix = AppLocalizations.of(context)!.networkPageAddError;
 
     if (!networkItem.isAdded) {
       try {
@@ -255,9 +260,9 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         await appState.syncData();
         await _loadNetworks();
       } catch (e) {
+        if (!mounted) return;
         setState(() {
-          errorMessage =
-              '${AppLocalizations.of(context)!.networkPageAddError}$e';
+          errorMessage = '$addErrorPrefix$e';
         });
         return;
       }
