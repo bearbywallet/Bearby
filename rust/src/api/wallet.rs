@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use secrecy::zeroize::Zeroize;
-use secrecy::{ExposeSecret, SecretString};
+use zilpay::secrecy::zeroize::Zeroize;
+use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
 use zilpay::errors::background::BackgroundError;

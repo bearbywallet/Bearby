@@ -3,7 +3,7 @@ use crate::{
     service::background::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, helpers::with_service},
 };
-use secrecy::SecretString;
+use zilpay::secrecy::SecretString;
 use serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,

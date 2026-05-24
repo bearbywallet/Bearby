@@ -1,5 +1,5 @@
 use crate::{models::keypair::KeyPairInfo, utils::helpers::decode_secret_key};
-use secrecy::{ExposeSecret, SecretString};
+use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::background::bg_crypto::CryptoOperations;
 pub use zilpay::background::Background;
 use zilpay::proto::keypair::KeyPair;

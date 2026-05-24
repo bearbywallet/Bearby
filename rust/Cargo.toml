@@ -19,7 +19,7 @@ tokio = { version = "1.47.1", features = ["macros"], default-features = false }
 # zilpay_core = { git = "https://github.com/zilpay/zilpay-core.git", branch = "master" }
 zilpay_core = { path = "/Users/hicaru/projects/bearby/bearby-core" }
 
-secrecy = "0.10.3"
+
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 hidapi = "2.6"

@@ -5953,7 +5953,6 @@ dependencies = [
  "hidapi",
  "lazy_static",
  "once_cell",
- "secrecy",
  "serde",
  "serde_json",
  "tempfile",
