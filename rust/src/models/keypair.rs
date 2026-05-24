@@ -9,24 +9,24 @@ impl From<KeyPair> for KeyPairInfo {
     fn from(value: KeyPair) -> Self {
         match value {
             KeyPair::Secp256k1Sha256((pk, sk)) => Self {
-                sk: hex::encode(sk),
-                pk: hex::encode(pk),
+                sk: zilpay::alloy::hex::encode(sk),
+                pk: zilpay::alloy::hex::encode(pk),
             },
             KeyPair::Secp256k1Keccak256((pk, sk)) => Self {
-                sk: hex::encode(sk),
-                pk: hex::encode(pk),
+                sk: zilpay::alloy::hex::encode(sk),
+                pk: zilpay::alloy::hex::encode(pk),
             },
             KeyPair::Secp256k1Bitcoin((pk, sk, _, _)) => Self {
-                sk: hex::encode(sk),
-                pk: hex::encode(pk),
+                sk: zilpay::alloy::hex::encode(sk),
+                pk: zilpay::alloy::hex::encode(pk),
             },
             KeyPair::Secp256k1Tron((pk, sk)) => Self {
-                sk: hex::encode(sk),
-                pk: hex::encode(pk),
+                sk: zilpay::alloy::hex::encode(sk),
+                pk: zilpay::alloy::hex::encode(pk),
             },
             KeyPair::Ed25519Solana((pk, sk)) => Self {
-                sk: hex::encode(sk),
-                pk: hex::encode(pk),
+                sk: zilpay::alloy::hex::encode(sk),
+                pk: zilpay::alloy::hex::encode(pk),
             },
         }
     }

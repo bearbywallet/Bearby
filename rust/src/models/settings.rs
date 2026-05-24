@@ -25,7 +25,7 @@ impl From<ArgonParams> for WalletArgonParamsInfo {
             memory: value.memory,
             iterations: value.iterations,
             threads: value.threads,
-            secret: hex::encode(value.secret),
+            secret: zilpay::alloy::hex::encode(value.secret),
         }
     }
 }
@@ -34,7 +34,7 @@ impl TryFrom<WalletArgonParamsInfo> for ArgonParams {
     type Error = SettingsErrors;
 
     fn try_from(value: WalletArgonParamsInfo) -> Result<Self, Self::Error> {
-        let secret: [u8; SHA256_SIZE] = match hex::decode(&value.secret) {
+        let secret: [u8; SHA256_SIZE] = match zilpay::alloy::hex::decode(&value.secret) {
             Ok(hex) => hex
                 .try_into()
                 .unwrap_or(ArgonParams::hash_secret(&value.secret)),

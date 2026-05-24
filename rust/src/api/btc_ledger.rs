@@ -146,7 +146,7 @@ pub fn btc_ledger_get_preimage(
     }
     Err(format!(
         "Preimage not found for hash: {}",
-        hex::encode(&requested_hash)
+        zilpay::alloy::hex::encode(&requested_hash)
     ))
 }
 
@@ -600,7 +600,7 @@ pub fn btc_ledger_build_wallet_policy(
 
     // Key info format: [fingerprint/purpose'/cointype'/account']xpub
     // Bitcoin mainnet coin type = 0, testnet = 1
-    let fp_hex = hex::encode(&master_fingerprint);
+    let fp_hex = zilpay::alloy::hex::encode(&master_fingerprint);
     let key_info = format!(
         "[{}/{}'/0'/{}']{}/**",
         fp_hex, bip_purpose, account_index, xpub
@@ -778,7 +778,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
     let tx_hash = signed_tx.compute_txid().to_string();
 
     Ok(FinalizedBtcTx {
-        raw_tx_hex: hex::encode(&tx_bytes),
+        raw_tx_hex: zilpay::alloy::hex::encode(&tx_bytes),
         tx_hash,
         psbt_bytes,
     })

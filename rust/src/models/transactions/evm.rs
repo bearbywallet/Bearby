@@ -53,7 +53,7 @@ impl From<ETHTransactionRequest> for TransactionRequestEVM {
                 .map(|list| list.iter().map(|item| item.clone().into()).collect()),
             blob_versioned_hashes: value
                 .blob_versioned_hashes
-                .map(|hashes| hashes.iter().map(|h| hex::encode(h.0)).collect()),
+                .map(|hashes| hashes.iter().map(|h| zilpay::alloy::hex::encode(h.0)).collect()),
             max_fee_per_blob_gas: value.max_fee_per_blob_gas,
         }
     }
@@ -98,7 +98,7 @@ impl TryFrom<TransactionRequestEVM> for ETHTransactionRequest {
                         .into_iter()
                         .map(|hash| {
                             let bytes =
-                                hex::decode(hash).map_err(|_| TransactionErrors::InvalidHash)?;
+                                zilpay::alloy::hex::decode(hash).map_err(|_| TransactionErrors::InvalidHash)?;
                             if bytes.len() != SHA256_SIZE {
                                 return Err(TransactionErrors::InvalidHash);
                             }

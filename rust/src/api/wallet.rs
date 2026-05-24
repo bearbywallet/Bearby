@@ -99,7 +99,7 @@ pub async fn add_bip39_wallet(
         .last()
         .ok_or(ServiceError::FailToSaveWallet)?;
 
-    Ok(hex::encode(wallet.wallet_address))
+    Ok(zilpay::alloy::hex::encode(wallet.wallet_address))
 }
 
 pub struct AddSKWalletParams {
@@ -152,7 +152,7 @@ pub async fn add_sk_wallet(
         .last()
         .ok_or(ServiceError::FailToSaveWallet)?;
 
-    Ok(hex::encode(wallet.wallet_address))
+    Ok(zilpay::alloy::hex::encode(wallet.wallet_address))
 }
 
 pub struct AddNextBip39AccountParams {
@@ -563,5 +563,5 @@ pub async fn restore_from_keystore(
 
     password.zeroize();
 
-    Ok(hex::encode(wallet.wallet_address))
+    Ok(zilpay::alloy::hex::encode(wallet.wallet_address))
 }

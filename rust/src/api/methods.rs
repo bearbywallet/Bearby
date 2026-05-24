@@ -30,8 +30,8 @@ pub fn keypair_from_sk(sk: String) -> Result<KeyPairInfo, String> {
     let (pk, sk) = KeyPair::from_sk_bytes(sk).map_err(|e| e.to_string())?;
 
     Ok(KeyPairInfo {
-        sk: hex::encode(sk),
-        pk: hex::encode(pk),
+        sk: zilpay::alloy::hex::encode(sk),
+        pk: zilpay::alloy::hex::encode(pk),
     })
 }
 

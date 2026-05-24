@@ -140,8 +140,8 @@ impl From<TokenError> for ServiceError {
     }
 }
 
-impl From<hex::FromHexError> for ServiceError {
-    fn from(_: hex::FromHexError) -> Self {
+impl From<zilpay::alloy::hex::FromHexError> for ServiceError {
+    fn from(_: zilpay::alloy::hex::FromHexError) -> Self {
         ServiceError::DecodeSecretKey
     }
 }
