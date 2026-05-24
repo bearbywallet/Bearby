@@ -14,10 +14,10 @@ pub use zilpay::{
 use crate::{
     frb_generated::StreamSink,
     models::background::BackgroundState,
-    service::service::{ServiceBackground, BACKGROUND_SERVICE},
+    service::background::{ServiceBackground, BACKGROUND_SERVICE},
     utils::{
         errors::ServiceError,
-        utils::{get_background_state, with_service},
+        helpers::{get_background_state, with_service},
     },
 };
 

@@ -12,41 +12,36 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'scilla.dart';
 import 'transaction_metadata.dart';
 
-class TransactionRequestInfo {
-  final TransactionMetadataInfo metadata;
-  final TransactionRequestScilla? scilla;
-  final TransactionRequestEVM? evm;
-  final (TransactionBitcoin, BitcoinMetadataInfo)? btc;
-  final String? tron;
-  final Uint8List? solana;
 
-  const TransactionRequestInfo({
-    required this.metadata,
-    this.scilla,
-    this.evm,
-    this.btc,
-    this.tron,
-    this.solana,
-  });
+            
 
-  @override
-  int get hashCode =>
-      metadata.hashCode ^
-      scilla.hashCode ^
-      evm.hashCode ^
-      btc.hashCode ^
-      tron.hashCode ^
-      solana.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TransactionRequestInfo &&
-          runtimeType == other.runtimeType &&
-          metadata == other.metadata &&
-          scilla == other.scilla &&
-          evm == other.evm &&
-          btc == other.btc &&
-          tron == other.tron &&
-          solana == other.solana;
-}
+            class TransactionRequestInfo  {
+                final TransactionMetadataInfo metadata;
+final TransactionRequestScilla? scilla;
+final TransactionRequestEVM? evm;
+final (TransactionBitcoin,BitcoinMetadataInfo)? btc;
+final String? tron;
+final Uint8List? solana;
+
+                const TransactionRequestInfo({required this.metadata ,this.scilla ,this.evm ,this.btc ,this.tron ,this.solana ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => metadata.hashCode^scilla.hashCode^evm.hashCode^btc.hashCode^tron.hashCode^solana.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TransactionRequestInfo &&
+                runtimeType == other.runtimeType
+                && metadata == other.metadata&& scilla == other.scilla&& evm == other.evm&& btc == other.btc&& tron == other.tron&& solana == other.solana;
+        
+            }
+            

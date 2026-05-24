@@ -1,9 +1,9 @@
 use crate::{
     models::ftoken::FTokenInfo,
-    service::service::BACKGROUND_SERVICE,
+    service::background::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        utils::{parse_address, with_service},
+        helpers::{parse_address, with_service},
     },
 };
 use serde::Deserialize;

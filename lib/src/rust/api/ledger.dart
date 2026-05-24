@@ -9,85 +9,45 @@ import '../models/ftoken.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<Map<int, AddressChainInfo>> scanBtcAccountHistory(
-        {required BtcAccountXpubsInputInfo xpubs,
-        required int ledgerIndex,
-        required BigInt chainHash}) =>
-    RustLib.instance.api.crateApiLedgerScanBtcAccountHistory(
-        xpubs: xpubs, ledgerIndex: ledgerIndex, chainHash: chainHash);
 
-Future<String> addLedgerWallet(
-        {required LedgerParamsInput params,
-        required WalletSettingsInfo walletSettings,
-        required List<FTokenInfo> ftokens}) =>
-    RustLib.instance.api.crateApiLedgerAddLedgerWallet(
-        params: params, walletSettings: walletSettings, ftokens: ftokens);
+            
 
-Future<void> addLedgerAccount(
-        {required BigInt walletIndex,
-        required int ledgerIndex,
-        required String name,
-        String? keyOrAddr,
-        required bool zilliqaLegacy,
-        Map<int, AddressChainInfo>? btcChain}) =>
-    RustLib.instance.api.crateApiLedgerAddLedgerAccount(
-        walletIndex: walletIndex,
-        ledgerIndex: ledgerIndex,
-        name: name,
-        keyOrAddr: keyOrAddr,
-        zilliqaLegacy: zilliqaLegacy,
-        btcChain: btcChain);
+            Future<Map<int, AddressChainInfo>>  scanBtcAccountHistory({required BtcAccountXpubsInputInfo xpubs , required int ledgerIndex , required BigInt chainHash }) => RustLib.instance.api.crateApiLedgerScanBtcAccountHistory(xpubs: xpubs, ledgerIndex: ledgerIndex, chainHash: chainHash);
 
-Future<Uint32List> ledgerSplitPath({required String path}) =>
-    RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
+Future<String>  addLedgerWallet({required LedgerParamsInput params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens }) => RustLib.instance.api.crateApiLedgerAddLedgerWallet(params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-class LedgerParamsInput {
-  final List<(int, String)> pubKeys;
-  final BigInt walletIndex;
-  final String walletName;
-  final String ledgerId;
-  final List<String> accountNames;
-  final String biometricType;
-  final BigInt chainHash;
-  final bool zilliqaLegacy;
-  final Map<int, Map<int, AddressChainInfo>> btcChains;
+Future<void>  addLedgerAccount({required BigInt walletIndex , required int ledgerIndex , required String name , String? keyOrAddr , required bool zilliqaLegacy , Map<int, AddressChainInfo>? btcChain }) => RustLib.instance.api.crateApiLedgerAddLedgerAccount(walletIndex: walletIndex, ledgerIndex: ledgerIndex, name: name, keyOrAddr: keyOrAddr, zilliqaLegacy: zilliqaLegacy, btcChain: btcChain);
 
-  const LedgerParamsInput({
-    required this.pubKeys,
-    required this.walletIndex,
-    required this.walletName,
-    required this.ledgerId,
-    required this.accountNames,
-    required this.biometricType,
-    required this.chainHash,
-    required this.zilliqaLegacy,
-    required this.btcChains,
-  });
+Future<Uint32List>  ledgerSplitPath({required String path }) => RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
 
-  @override
-  int get hashCode =>
-      pubKeys.hashCode ^
-      walletIndex.hashCode ^
-      walletName.hashCode ^
-      ledgerId.hashCode ^
-      accountNames.hashCode ^
-      biometricType.hashCode ^
-      chainHash.hashCode ^
-      zilliqaLegacy.hashCode ^
-      btcChains.hashCode;
+            class LedgerParamsInput  {
+                final List<(int,String)> pubKeys;
+final BigInt walletIndex;
+final String walletName;
+final String ledgerId;
+final List<String> accountNames;
+final String biometricType;
+final BigInt chainHash;
+final bool zilliqaLegacy;
+final Map<int, Map<int, AddressChainInfo>> btcChains;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LedgerParamsInput &&
-          runtimeType == other.runtimeType &&
-          pubKeys == other.pubKeys &&
-          walletIndex == other.walletIndex &&
-          walletName == other.walletName &&
-          ledgerId == other.ledgerId &&
-          accountNames == other.accountNames &&
-          biometricType == other.biometricType &&
-          chainHash == other.chainHash &&
-          zilliqaLegacy == other.zilliqaLegacy &&
-          btcChains == other.btcChains;
-}
+                const LedgerParamsInput({required this.pubKeys ,required this.walletIndex ,required this.walletName ,required this.ledgerId ,required this.accountNames ,required this.biometricType ,required this.chainHash ,required this.zilliqaLegacy ,required this.btcChains ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => pubKeys.hashCode^walletIndex.hashCode^walletName.hashCode^ledgerId.hashCode^accountNames.hashCode^biometricType.hashCode^chainHash.hashCode^zilliqaLegacy.hashCode^btcChains.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is LedgerParamsInput &&
+                runtimeType == other.runtimeType
+                && pubKeys == other.pubKeys&& walletIndex == other.walletIndex&& walletName == other.walletName&& ledgerId == other.ledgerId&& accountNames == other.accountNames&& biometricType == other.biometricType&& chainHash == other.chainHash&& zilliqaLegacy == other.zilliqaLegacy&& btcChains == other.btcChains;
+        
+            }
+            

@@ -302,7 +302,9 @@ fn build_v2_global_map(psbt: &Psbt) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
 }
 
 /// Build PSBTv2 input map key-value pairs from a PSBTv0 Psbt.
-fn build_v2_input_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
+type PsbtKeyValueMaps = Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)>;
+
+fn build_v2_input_maps(psbt: &Psbt) -> PsbtKeyValueMaps {
     let mut maps = Vec::new();
 
     for (i, txin) in psbt.unsigned_tx.input.iter().enumerate() {
@@ -388,7 +390,7 @@ fn build_v2_input_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
 }
 
 /// Build PSBTv2 output map key-value pairs from a PSBTv0 Psbt.
-fn build_v2_output_maps(psbt: &Psbt) -> Vec<(Vec<Vec<u8>>, Vec<Vec<u8>>)> {
+fn build_v2_output_maps(psbt: &Psbt) -> PsbtKeyValueMaps {
     let mut maps = Vec::new();
 
     for (i, txout) in psbt.unsigned_tx.output.iter().enumerate() {
@@ -1150,7 +1152,7 @@ mod tests {
     #[test]
     fn test_merkle_root_matches_js_3_leaves() {
         let (leaves, root) = merkle_of_count(3);
-        let left_root = leaves[0..2].iter().map(|l| l.clone()).collect::<Vec<_>>();
+        let left_root = leaves[0..2].to_vec();
         let left = build_merkle_tree_with_hasher(&left_root, &test_hasher);
         let right = leaves[2].clone();
         let expected = test_hasher(&[&[0x01], &left[..], &right[..]].concat());
@@ -1470,7 +1472,7 @@ mod tests {
         let data = vec![0x01, 0x02, 0x03];
         let leaf_hash = btc_ledger_hash_leaf(data.clone());
         let plain_hash =
-            btc_ledger_sha256(vec![0x00].into_iter().chain(data.into_iter()).collect());
+            btc_ledger_sha256(vec![0x00].into_iter().chain(data).collect());
         assert_eq!(leaf_hash, plain_hash);
     }
 

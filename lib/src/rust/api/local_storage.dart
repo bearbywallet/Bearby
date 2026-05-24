@@ -6,28 +6,43 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>
-abstract class LocalStorageImpl
-    implements RustOpaqueInterface, KeyValueStorage {
-  @override
-  Future<String?> get_({required String key});
+
+            
+
+            
+
+            
+                // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LocalStorageImpl>>
+                abstract class LocalStorageImpl implements RustOpaqueInterface, KeyValueStorage {
+                     Future<String?>  get_({required String key });
+
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<LocalStorageImpl> newInstance({required String pathDir}) =>
-      RustLib.instance.api
-          .crateApiLocalStorageLocalStorageImplNew(pathDir: pathDir);
+static Future<LocalStorageImpl>  newInstance({required String pathDir })=>RustLib.instance.api.crateApiLocalStorageLocalStorageImplNew(pathDir: pathDir);
 
-  @override
-  Future<void> rm({required String key});
 
-  @override
-  Future<void> set_({required String key, required String value});
-}
+ Future<void>  rm({required String key });
 
-abstract class KeyValueStorage {
-  Future<String?> get_({required String key});
 
-  Future<void> rm({required String key});
+ Future<void>  set_({required String key , required String value });
 
-  Future<void> set_({required String key, required String value});
-}
+
+
+                    
+                }
+                
+
+
+                abstract class KeyValueStorage {
+                     Future<String?>  get_({required String key });
+
+
+ Future<void>  rm({required String key });
+
+
+ Future<void>  set_({required String key , required String value });
+
+
+                }
+                
+            

@@ -13,41 +13,42 @@ import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<BackgroundState> loadService({required String path}) =>
-    RustLib.instance.api.crateApiBackendLoadService(path: path);
 
-Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
+            
 
-Future<bool> isServiceRunning() =>
-    RustLib.instance.api.crateApiBackendIsServiceRunning();
+            Future<BackgroundState>  loadService({required String path }) => RustLib.instance.api.crateApiBackendLoadService(path: path);
 
-Future<void> stopBlockWorker() =>
-    RustLib.instance.api.crateApiBackendStopBlockWorker();
+Future<void>  stopService() => RustLib.instance.api.crateApiBackendStopService();
 
-Stream<BlockEvent> startBlockWorker({required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiBackendStartBlockWorker(walletIndex: walletIndex);
+Future<bool>  isServiceRunning() => RustLib.instance.api.crateApiBackendIsServiceRunning();
 
-Future<BackgroundState> getData() =>
-    RustLib.instance.api.crateApiBackendGetData();
+Future<void>  stopBlockWorker() => RustLib.instance.api.crateApiBackendStopBlockWorker();
 
-class BlockEvent {
-  final BigInt? blockNumber;
-  final String? error;
+Stream<BlockEvent>  startBlockWorker({required BigInt walletIndex }) => RustLib.instance.api.crateApiBackendStartBlockWorker(walletIndex: walletIndex);
 
-  const BlockEvent({
-    this.blockNumber,
-    this.error,
-  });
+Future<BackgroundState>  getData() => RustLib.instance.api.crateApiBackendGetData();
 
-  @override
-  int get hashCode => blockNumber.hashCode ^ error.hashCode;
+            class BlockEvent  {
+                final BigInt? blockNumber;
+final String? error;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BlockEvent &&
-          runtimeType == other.runtimeType &&
-          blockNumber == other.blockNumber &&
-          error == other.error;
-}
+                const BlockEvent({this.blockNumber ,this.error ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => blockNumber.hashCode^error.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is BlockEvent &&
+                runtimeType == other.runtimeType
+                && blockNumber == other.blockNumber&& error == other.error;
+        
+            }
+            

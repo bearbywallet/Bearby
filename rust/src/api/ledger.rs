@@ -20,10 +20,10 @@ use zilpay::crypto::slip44;
 
 use crate::{
     models::btc_chain::{btc_chain_info_map_to_core, AddressChainInfo, BtcAccountXpubsInputInfo},
-    service::service::BACKGROUND_SERVICE,
+    service::background::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        utils::{get_last_wallet, pubkey_from_provider, with_service},
+        helpers::{get_last_wallet, pubkey_from_provider, with_service},
     },
 };
 

@@ -1,7 +1,7 @@
 use crate::{
     models::provider::NetworkConfigInfo,
-    service::service::BACKGROUND_SERVICE,
-    utils::{errors::ServiceError, utils::with_service},
+    service::background::BACKGROUND_SERVICE,
+    utils::{errors::ServiceError, helpers::with_service},
 };
 use secrecy::SecretString;
 use serde_json::Value;

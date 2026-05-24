@@ -15,7 +15,7 @@ pub use zilpay::{
 
 use crate::{
     models::{background::BackgroundState, wallet::WalletInfo},
-    service::service::BACKGROUND_SERVICE,
+    service::background::BACKGROUND_SERVICE,
 };
 
 use super::errors::ServiceError;

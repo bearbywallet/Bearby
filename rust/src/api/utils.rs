@@ -7,7 +7,7 @@ pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
 use zilpay::proto::address::Address;
 use zilpay::{background::Mnemonic, config::bip39::EN_WORDS, proto::U256};
 
-use crate::utils::utils::parse_address;
+use crate::utils::helpers::parse_address;
 
 pub fn is_valid_address(addr: String) -> bool {
     parse_address(addr).is_ok()
@@ -32,6 +32,7 @@ pub fn bitcoin_address_type_from_address(addr: String) -> Result<String, String>
     Err("invalid addr".to_string())
 }
 
+#[allow(clippy::too_many_arguments)]
 #[frb(sync)]
 pub fn intl_number_formating(
     value: String,

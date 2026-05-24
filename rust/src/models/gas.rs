@@ -62,7 +62,7 @@ impl From<RequiredTxParamsInfo> for RequiredTxParams {
         Self {
             gas_price: value.gas_price.try_into().unwrap_or_default(),
             max_priority_fee: value.max_priority_fee.try_into().unwrap_or_default(),
-            fee_history: value.fee_history.try_into().unwrap_or_default(),
+            fee_history: value.fee_history.into(),
             tx_estimate_gas: value.tx_estimate_gas.try_into().unwrap_or_default(),
             blob_base_fee: value.blob_base_fee.try_into().unwrap_or_default(),
             nonce: value.nonce,

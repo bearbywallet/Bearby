@@ -11,240 +11,131 @@ import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<WalletInfo>> getWallets() =>
-    RustLib.instance.api.crateApiWalletGetWallets();
 
-Future<String> addBip39Wallet(
-        {required Bip39AddWalletParams params,
-        required WalletSettingsInfo walletSettings,
-        required List<FTokenInfo> additionalFtokens}) =>
-    RustLib.instance.api.crateApiWalletAddBip39Wallet(
-        params: params,
-        walletSettings: walletSettings,
-        additionalFtokens: additionalFtokens);
+            
 
-Future<String> addSkWallet(
-        {required AddSKWalletParams params,
-        required WalletSettingsInfo walletSettings,
-        required List<FTokenInfo> ftokens}) =>
-    RustLib.instance.api.crateApiWalletAddSkWallet(
-        params: params, walletSettings: walletSettings, ftokens: ftokens);
+            Future<List<WalletInfo>>  getWallets() => RustLib.instance.api.crateApiWalletGetWallets();
 
-Future<void> addNextBip39Account({required AddNextBip39AccountParams params}) =>
-    RustLib.instance.api.crateApiWalletAddNextBip39Account(params: params);
+Future<String>  addBip39Wallet({required Bip39AddWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> additionalFtokens }) => RustLib.instance.api.crateApiWalletAddBip39Wallet(params: params, walletSettings: walletSettings, additionalFtokens: additionalFtokens);
 
-Future<void> selectAccount(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletSelectAccount(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+Future<String>  addSkWallet({required AddSKWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens }) => RustLib.instance.api.crateApiWalletAddSkWallet(params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-Future<void> changeAccountName(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required String newName}) =>
-    RustLib.instance.api.crateApiWalletChangeAccountName(
-        walletIndex: walletIndex, accountIndex: accountIndex, newName: newName);
+Future<void>  addNextBip39Account({required AddNextBip39AccountParams params }) => RustLib.instance.api.crateApiWalletAddNextBip39Account(params: params);
 
-Future<void> changeWalletName(
-        {required BigInt walletIndex, required String newName}) =>
-    RustLib.instance.api.crateApiWalletChangeWalletName(
-        walletIndex: walletIndex, newName: newName);
+Future<void>  selectAccount({required BigInt walletIndex , required BigInt accountIndex }) => RustLib.instance.api.crateApiWalletSelectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<void> deleteWallet({required BigInt walletIndex, String? password}) =>
-    RustLib.instance.api.crateApiWalletDeleteWallet(
-        walletIndex: walletIndex, password: password);
+Future<void>  changeAccountName({required BigInt walletIndex , required BigInt accountIndex , required String newName }) => RustLib.instance.api.crateApiWalletChangeAccountName(walletIndex: walletIndex, accountIndex: accountIndex, newName: newName);
 
-Future<void> deleteAccount(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletDeleteAccount(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+Future<void>  changeWalletName({required BigInt walletIndex , required String newName }) => RustLib.instance.api.crateApiWalletChangeWalletName(walletIndex: walletIndex, newName: newName);
 
-Future<void> setBiometric(
-        {required BigInt walletIndex,
-        String? password,
-        required String newBiometricType}) =>
-    RustLib.instance.api.crateApiWalletSetBiometric(
-        walletIndex: walletIndex,
-        password: password,
-        newBiometricType: newBiometricType);
+Future<void>  deleteWallet({required BigInt walletIndex , String? password }) => RustLib.instance.api.crateApiWalletDeleteWallet(walletIndex: walletIndex, password: password);
 
-Future<KeyPairInfo> revealKeypair(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required String password,
-        String? passphrase}) =>
-    RustLib.instance.api.crateApiWalletRevealKeypair(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        password: password,
-        passphrase: passphrase);
+Future<void>  deleteAccount({required BigInt walletIndex , required BigInt accountIndex }) => RustLib.instance.api.crateApiWalletDeleteAccount(walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<String> revealBip39Phrase(
-        {required BigInt walletIndex,
-        required String password,
-        String? passphrase}) =>
-    RustLib.instance.api.crateApiWalletRevealBip39Phrase(
-        walletIndex: walletIndex, password: password, passphrase: passphrase);
+Future<void>  setBiometric({required BigInt walletIndex , String? password , required String newBiometricType }) => RustLib.instance.api.crateApiWalletSetBiometric(walletIndex: walletIndex, password: password, newBiometricType: newBiometricType);
 
-Future<void> zilliqaSwapChain(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletZilliqaSwapChain(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+Future<KeyPairInfo>  revealKeypair({required BigInt walletIndex , required BigInt accountIndex , required String password , String? passphrase }) => RustLib.instance.api.crateApiWalletRevealKeypair(walletIndex: walletIndex, accountIndex: accountIndex, password: password, passphrase: passphrase);
 
-Future<(String, String)> zilliqaGetBech32Base16Address(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+Future<String>  revealBip39Phrase({required BigInt walletIndex , required String password , String? passphrase }) => RustLib.instance.api.crateApiWalletRevealBip39Phrase(walletIndex: walletIndex, password: password, passphrase: passphrase);
 
-Future<List<String>> getZilEthChecksumAddresses(
-        {required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiWalletGetZilEthChecksumAddresses(walletIndex: walletIndex);
+Future<void>  zilliqaSwapChain({required BigInt walletIndex , required BigInt accountIndex }) => RustLib.instance.api.crateApiWalletZilliqaSwapChain(walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<List<String>> getZilBech32Addresses({required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiWalletGetZilBech32Addresses(walletIndex: walletIndex);
+Future<(String,String)>  zilliqaGetBech32Base16Address({required BigInt walletIndex , required BigInt accountIndex }) => RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<String> zilliqaLegacyBase16ToBech32({required String base16}) =>
-    RustLib.instance.api
-        .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
+Future<List<String>>  getZilEthChecksumAddresses({required BigInt walletIndex }) => RustLib.instance.api.crateApiWalletGetZilEthChecksumAddresses(walletIndex: walletIndex);
 
-Future<String> zilliqaGetNFormat(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletZilliqaGetNFormat(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+Future<List<String>>  getZilBech32Addresses({required BigInt walletIndex }) => RustLib.instance.api.crateApiWalletGetZilBech32Addresses(walletIndex: walletIndex);
 
-Future<Uint8List> makeKeystoreFile(
-        {required BigInt walletIndex, required String password}) =>
-    RustLib.instance.api.crateApiWalletMakeKeystoreFile(
-        walletIndex: walletIndex, password: password);
+Future<String>  zilliqaLegacyBase16ToBech32({required String base16 }) => RustLib.instance.api.crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
 
-Future<String> restoreFromKeystore(
-        {required List<int> keystoreBytes,
-        required String password,
-        required String biometricType}) =>
-    RustLib.instance.api.crateApiWalletRestoreFromKeystore(
-        keystoreBytes: keystoreBytes,
-        password: password,
-        biometricType: biometricType);
+Future<String>  zilliqaGetNFormat({required BigInt walletIndex , required BigInt accountIndex }) => RustLib.instance.api.crateApiWalletZilliqaGetNFormat(walletIndex: walletIndex, accountIndex: accountIndex);
 
-class AddNextBip39AccountParams {
-  final BigInt walletIndex;
-  final BigInt accountIndex;
-  final String name;
-  final String passphrase;
-  final String? password;
+Future<Uint8List>  makeKeystoreFile({required BigInt walletIndex , required String password }) => RustLib.instance.api.crateApiWalletMakeKeystoreFile(walletIndex: walletIndex, password: password);
 
-  const AddNextBip39AccountParams({
-    required this.walletIndex,
-    required this.accountIndex,
-    required this.name,
-    required this.passphrase,
-    this.password,
-  });
+Future<String>  restoreFromKeystore({required List<int> keystoreBytes , required String password , required String biometricType }) => RustLib.instance.api.crateApiWalletRestoreFromKeystore(keystoreBytes: keystoreBytes, password: password, biometricType: biometricType);
 
-  @override
-  int get hashCode =>
-      walletIndex.hashCode ^
-      accountIndex.hashCode ^
-      name.hashCode ^
-      passphrase.hashCode ^
-      password.hashCode;
+            class AddNextBip39AccountParams  {
+                final BigInt walletIndex;
+final BigInt accountIndex;
+final String name;
+final String passphrase;
+final String? password;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AddNextBip39AccountParams &&
-          runtimeType == other.runtimeType &&
-          walletIndex == other.walletIndex &&
-          accountIndex == other.accountIndex &&
-          name == other.name &&
-          passphrase == other.passphrase &&
-          password == other.password;
-}
+                const AddNextBip39AccountParams({required this.walletIndex ,required this.accountIndex ,required this.name ,required this.passphrase ,this.password ,});
 
-class AddSKWalletParams {
-  final String sk;
-  final String password;
-  final String walletName;
-  final String biometricType;
-  final BigInt chainHash;
-  final int bipPurpose;
+                
+                
 
-  const AddSKWalletParams({
-    required this.sk,
-    required this.password,
-    required this.walletName,
-    required this.biometricType,
-    required this.chainHash,
-    required this.bipPurpose,
-  });
+                
+        @override
+        int get hashCode => walletIndex.hashCode^accountIndex.hashCode^name.hashCode^passphrase.hashCode^password.hashCode;
+        
 
-  @override
-  int get hashCode =>
-      sk.hashCode ^
-      password.hashCode ^
-      walletName.hashCode ^
-      biometricType.hashCode ^
-      chainHash.hashCode ^
-      bipPurpose.hashCode;
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is AddNextBip39AccountParams &&
+                runtimeType == other.runtimeType
+                && walletIndex == other.walletIndex&& accountIndex == other.accountIndex&& name == other.name&& passphrase == other.passphrase&& password == other.password;
+        
+            }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AddSKWalletParams &&
-          runtimeType == other.runtimeType &&
-          sk == other.sk &&
-          password == other.password &&
-          walletName == other.walletName &&
-          biometricType == other.biometricType &&
-          chainHash == other.chainHash &&
-          bipPurpose == other.bipPurpose;
-}
+class AddSKWalletParams  {
+                final String sk;
+final String password;
+final String walletName;
+final String biometricType;
+final BigInt chainHash;
+final int bipPurpose;
 
-class Bip39AddWalletParams {
-  final String password;
-  final String mnemonicStr;
-  final bool mnemonicCheck;
-  final List<(BigInt, String)> accounts;
-  final String passphrase;
-  final String walletName;
-  final String biometricType;
-  final BigInt chainHash;
+                const AddSKWalletParams({required this.sk ,required this.password ,required this.walletName ,required this.biometricType ,required this.chainHash ,required this.bipPurpose ,});
 
-  const Bip39AddWalletParams({
-    required this.password,
-    required this.mnemonicStr,
-    required this.mnemonicCheck,
-    required this.accounts,
-    required this.passphrase,
-    required this.walletName,
-    required this.biometricType,
-    required this.chainHash,
-  });
+                
+                
 
-  @override
-  int get hashCode =>
-      password.hashCode ^
-      mnemonicStr.hashCode ^
-      mnemonicCheck.hashCode ^
-      accounts.hashCode ^
-      passphrase.hashCode ^
-      walletName.hashCode ^
-      biometricType.hashCode ^
-      chainHash.hashCode;
+                
+        @override
+        int get hashCode => sk.hashCode^password.hashCode^walletName.hashCode^biometricType.hashCode^chainHash.hashCode^bipPurpose.hashCode;
+        
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Bip39AddWalletParams &&
-          runtimeType == other.runtimeType &&
-          password == other.password &&
-          mnemonicStr == other.mnemonicStr &&
-          mnemonicCheck == other.mnemonicCheck &&
-          accounts == other.accounts &&
-          passphrase == other.passphrase &&
-          walletName == other.walletName &&
-          biometricType == other.biometricType &&
-          chainHash == other.chainHash;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is AddSKWalletParams &&
+                runtimeType == other.runtimeType
+                && sk == other.sk&& password == other.password&& walletName == other.walletName&& biometricType == other.biometricType&& chainHash == other.chainHash&& bipPurpose == other.bipPurpose;
+        
+            }
+
+class Bip39AddWalletParams  {
+                final String password;
+final String mnemonicStr;
+final bool mnemonicCheck;
+final List<(BigInt,String)> accounts;
+final String passphrase;
+final String walletName;
+final String biometricType;
+final BigInt chainHash;
+
+                const Bip39AddWalletParams({required this.password ,required this.mnemonicStr ,required this.mnemonicCheck ,required this.accounts ,required this.passphrase ,required this.walletName ,required this.biometricType ,required this.chainHash ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => password.hashCode^mnemonicStr.hashCode^mnemonicCheck.hashCode^accounts.hashCode^passphrase.hashCode^walletName.hashCode^biometricType.hashCode^chainHash.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is Bip39AddWalletParams &&
+                runtimeType == other.runtimeType
+                && password == other.password&& mnemonicStr == other.mnemonicStr&& mnemonicCheck == other.mnemonicCheck&& accounts == other.accounts&& passphrase == other.passphrase&& walletName == other.walletName&& biometricType == other.biometricType&& chainHash == other.chainHash;
+        
+            }
+            

@@ -8,11 +8,7 @@ pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<Exch
         return Vec::with_capacity(0);
     }
 
-    let candidates = [
-        ExchangeProvider::Thorchain(Default::default()),
-        ExchangeProvider::CurveFi(Default::default()),
-        ExchangeProvider::Uniswap(Default::default()),
-    ];
+    let candidates = [ExchangeProvider::Thorchain(Default::default())];
 
     let mut result = Vec::with_capacity(candidates.len());
 

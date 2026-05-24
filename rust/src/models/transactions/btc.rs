@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::utils::utils::script_to_address;
+use crate::utils::helpers::script_to_address;
 pub use zilpay::crypto::bip49::DerivationPath;
 pub use zilpay::errors::tx::TransactionErrors;
 pub use zilpay::proto::btc_tx::BitcoinMetadata;

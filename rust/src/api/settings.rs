@@ -2,7 +2,7 @@ use crate::{
     models::settings::BrowserSettingsInfo,
     utils::{
         errors::ServiceError,
-        utils::{with_service, with_wallet},
+        helpers::{with_service, with_wallet},
     },
 };
 pub use zilpay::settings::{

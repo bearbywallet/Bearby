@@ -8,46 +8,28 @@ import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<(List<NetworkConfigInfo>, List<NetworkConfigInfo>)> getNetworks(
-        {required String mainnetJson, required String testnetJson}) =>
-    RustLib.instance.api.crateApiProviderGetNetworks(
-        mainnetJson: mainnetJson, testnetJson: testnetJson);
 
-Future<List<NetworkConfigInfo>> getProviders() =>
-    RustLib.instance.api.crateApiProviderGetProviders();
+            
 
-Future<NetworkConfigInfo> getProvider({required BigInt chainHash}) =>
-    RustLib.instance.api.crateApiProviderGetProvider(chainHash: chainHash);
+            Future<(List<NetworkConfigInfo>,List<NetworkConfigInfo>)>  getNetworks({required String mainnetJson , required String testnetJson }) => RustLib.instance.api.crateApiProviderGetNetworks(mainnetJson: mainnetJson, testnetJson: testnetJson);
 
-Future<String> providerReqProxy(
-        {required String payload, required BigInt chainHash}) =>
-    RustLib.instance.api.crateApiProviderProviderReqProxy(
-        payload: payload, chainHash: chainHash);
+Future<List<NetworkConfigInfo>>  getProviders() => RustLib.instance.api.crateApiProviderGetProviders();
 
-Future<BigInt> addProvider({required NetworkConfigInfo providerConfig}) =>
-    RustLib.instance.api
-        .crateApiProviderAddProvider(providerConfig: providerConfig);
+Future<NetworkConfigInfo>  getProvider({required BigInt chainHash }) => RustLib.instance.api.crateApiProviderGetProvider(chainHash: chainHash);
 
-Future<void> removeProvider({required BigInt chainHash}) =>
-    RustLib.instance.api.crateApiProviderRemoveProvider(chainHash: chainHash);
+Future<String>  providerReqProxy({required String payload , required BigInt chainHash }) => RustLib.instance.api.crateApiProviderProviderReqProxy(payload: payload, chainHash: chainHash);
 
-Future<void> addProvidersList(
-        {required List<NetworkConfigInfo> providerConfig}) =>
-    RustLib.instance.api
-        .crateApiProviderAddProvidersList(providerConfig: providerConfig);
+Future<BigInt>  addProvider({required NetworkConfigInfo providerConfig }) => RustLib.instance.api.crateApiProviderAddProvider(providerConfig: providerConfig);
 
-Future<void> createOrUpdateChain({required NetworkConfigInfo providerConfig}) =>
-    RustLib.instance.api
-        .crateApiProviderCreateOrUpdateChain(providerConfig: providerConfig);
+Future<void>  removeProvider({required BigInt chainHash }) => RustLib.instance.api.crateApiProviderRemoveProvider(chainHash: chainHash);
 
-Future<void> selectAccountsChain(
-        {required BigInt walletIndex,
-        required BigInt chainHash,
-        String? password}) =>
-    RustLib.instance.api.crateApiProviderSelectAccountsChain(
-        walletIndex: walletIndex, chainHash: chainHash, password: password);
+Future<void>  addProvidersList({required List<NetworkConfigInfo> providerConfig }) => RustLib.instance.api.crateApiProviderAddProvidersList(providerConfig: providerConfig);
 
-Future<List<NetworkConfigInfo>> getChainsProvidersFromJson(
-        {required String jsonStr}) =>
-    RustLib.instance.api
-        .crateApiProviderGetChainsProvidersFromJson(jsonStr: jsonStr);
+Future<void>  createOrUpdateChain({required NetworkConfigInfo providerConfig }) => RustLib.instance.api.crateApiProviderCreateOrUpdateChain(providerConfig: providerConfig);
+
+Future<void>  selectAccountsChain({required BigInt walletIndex , required BigInt chainHash , String? password }) => RustLib.instance.api.crateApiProviderSelectAccountsChain(walletIndex: walletIndex, chainHash: chainHash, password: password);
+
+Future<List<NetworkConfigInfo>>  getChainsProvidersFromJson({required String jsonStr }) => RustLib.instance.api.crateApiProviderGetChainsProvidersFromJson(jsonStr: jsonStr);
+
+            
+            

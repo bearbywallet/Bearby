@@ -1,6 +1,6 @@
 use crate::{
     models::connection::ConnectionInfo,
-    utils::{errors::ServiceError, utils::with_service},
+    utils::{errors::ServiceError, helpers::with_service},
 };
 pub use zilpay::background::bg_connections::ConnectionManagement;
 pub use zilpay::background::book::AddressBookEntry;

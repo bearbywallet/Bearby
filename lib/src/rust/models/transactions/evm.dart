@@ -7,69 +7,43 @@ import '../../frb_generated.dart';
 import 'access_list.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class TransactionRequestEVM {
-  final BigInt? nonce;
-  final String? from;
-  final String? to;
-  final String? value;
-  final BigInt? gasLimit;
-  final Uint8List? data;
-  final BigInt? maxFeePerGas;
-  final BigInt? maxPriorityFeePerGas;
-  final BigInt? gasPrice;
-  final BigInt? chainId;
-  final List<AccessListItem>? accessList;
-  final List<String>? blobVersionedHashes;
-  final BigInt? maxFeePerBlobGas;
 
-  const TransactionRequestEVM({
-    this.nonce,
-    this.from,
-    this.to,
-    this.value,
-    this.gasLimit,
-    this.data,
-    this.maxFeePerGas,
-    this.maxPriorityFeePerGas,
-    this.gasPrice,
-    this.chainId,
-    this.accessList,
-    this.blobVersionedHashes,
-    this.maxFeePerBlobGas,
-  });
+            
 
-  @override
-  int get hashCode =>
-      nonce.hashCode ^
-      from.hashCode ^
-      to.hashCode ^
-      value.hashCode ^
-      gasLimit.hashCode ^
-      data.hashCode ^
-      maxFeePerGas.hashCode ^
-      maxPriorityFeePerGas.hashCode ^
-      gasPrice.hashCode ^
-      chainId.hashCode ^
-      accessList.hashCode ^
-      blobVersionedHashes.hashCode ^
-      maxFeePerBlobGas.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TransactionRequestEVM &&
-          runtimeType == other.runtimeType &&
-          nonce == other.nonce &&
-          from == other.from &&
-          to == other.to &&
-          value == other.value &&
-          gasLimit == other.gasLimit &&
-          data == other.data &&
-          maxFeePerGas == other.maxFeePerGas &&
-          maxPriorityFeePerGas == other.maxPriorityFeePerGas &&
-          gasPrice == other.gasPrice &&
-          chainId == other.chainId &&
-          accessList == other.accessList &&
-          blobVersionedHashes == other.blobVersionedHashes &&
-          maxFeePerBlobGas == other.maxFeePerBlobGas;
-}
+            class TransactionRequestEVM  {
+                final BigInt? nonce;
+final String? from;
+final String? to;
+final String? value;
+final BigInt? gasLimit;
+final Uint8List? data;
+final BigInt? maxFeePerGas;
+final BigInt? maxPriorityFeePerGas;
+final BigInt? gasPrice;
+final BigInt? chainId;
+final List<AccessListItem>? accessList;
+final List<String>? blobVersionedHashes;
+final BigInt? maxFeePerBlobGas;
+
+                const TransactionRequestEVM({this.nonce ,this.from ,this.to ,this.value ,this.gasLimit ,this.data ,this.maxFeePerGas ,this.maxPriorityFeePerGas ,this.gasPrice ,this.chainId ,this.accessList ,this.blobVersionedHashes ,this.maxFeePerBlobGas ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => nonce.hashCode^from.hashCode^to.hashCode^value.hashCode^gasLimit.hashCode^data.hashCode^maxFeePerGas.hashCode^maxPriorityFeePerGas.hashCode^gasPrice.hashCode^chainId.hashCode^accessList.hashCode^blobVersionedHashes.hashCode^maxFeePerBlobGas.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TransactionRequestEVM &&
+                runtimeType == other.runtimeType
+                && nonce == other.nonce&& from == other.from&& to == other.to&& value == other.value&& gasLimit == other.gasLimit&& data == other.data&& maxFeePerGas == other.maxFeePerGas&& maxPriorityFeePerGas == other.maxPriorityFeePerGas&& gasPrice == other.gasPrice&& chainId == other.chainId&& accessList == other.accessList&& blobVersionedHashes == other.blobVersionedHashes&& maxFeePerBlobGas == other.maxFeePerBlobGas;
+        
+            }
+            
