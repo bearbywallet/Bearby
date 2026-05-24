@@ -221,7 +221,7 @@ pub async fn fetch_thorchain_data(
     amount: &str,
     destination: &str,
 ) -> Result<MetadataThorchain, String> {
-    let client = reqwest::Client::new();
+    let client = zilpay::reqwest::Client::new();
     let inbound_addresses = fetch_inbound_addresses(&client).await?;
     let swap_quote = fetch_swap_quote(&client, from_asset, to_asset, amount, destination).await?;
     Ok(MetadataThorchain {
@@ -231,7 +231,7 @@ pub async fn fetch_thorchain_data(
 }
 
 async fn fetch_inbound_addresses(
-    client: &reqwest::Client,
+    client: &zilpay::reqwest::Client,
 ) -> Result<Vec<ThorchainInbound>, String> {
     let mut last_err = String::new();
 
@@ -246,7 +246,7 @@ async fn fetch_inbound_addresses(
 }
 
 async fn fetch_swap_quote(
-    client: &reqwest::Client,
+    client: &zilpay::reqwest::Client,
     from_asset: &str,
     to_asset: &str,
     amount: &str,
@@ -268,7 +268,7 @@ async fn fetch_swap_quote(
 
 async fn try_fetch_inbound_addresses(
     base_url: &str,
-    client: &reqwest::Client,
+    client: &zilpay::reqwest::Client,
 ) -> Result<Vec<ThorchainInbound>, String> {
     let url = format!("{base_url}/thorchain/inbound_addresses");
     let resp = client
@@ -293,7 +293,7 @@ async fn try_fetch_inbound_addresses(
 
 async fn try_fetch_swap_quote(
     base_url: &str,
-    client: &reqwest::Client,
+    client: &zilpay::reqwest::Client,
     from_asset: &str,
     to_asset: &str,
     amount: &str,

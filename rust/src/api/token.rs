@@ -202,7 +202,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 symbol_id,
                 currency.to_lowercase()
             );
-            let client = reqwest::Client::new();
+            let client = zilpay::reqwest::Client::new();
             let response = client
                 .get(&coingecko_url)
                 .header("User-Agent", "Bearby/1.0")
@@ -227,7 +227,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 native_token.symbol,
                 currency.to_uppercase()
             );
-            let client = reqwest::Client::new();
+            let client = zilpay::reqwest::Client::new();
             let response = client
                 .get(&cryptocompare_url)
                 .send()
@@ -269,7 +269,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             }
 
             let zilstream_url = "https://api-v2.zilstream.com/tokens?page=1&per_page=500";
-            let client = reqwest::Client::new();
+            let client = zilpay::reqwest::Client::new();
             let response = client
                 .get(zilstream_url)
                 .send()
@@ -342,7 +342,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 chain_id, addresses_param, currency.to_uppercase()
             );
 
-            let client = reqwest::Client::new();
+            let client = zilpay::reqwest::Client::new();
             let response = client
                 .get(&endpoint_url)
                 .send()
@@ -406,7 +406,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
                 COINGECKO_API_URL, symbols_param, currency_lower
             );
 
-            let client = reqwest::Client::new();
+            let client = zilpay::reqwest::Client::new();
             let response = client
                 .get(&coingecko_url)
                 .header("User-Agent", "Bearby/1.0")
@@ -461,7 +461,7 @@ async fn fetch_zilliqa_tokens(
     default_logo: Option<String>,
     chain_hash: u64,
 ) -> Result<Vec<FTokenInfo>, String> {
-    let client = reqwest::Client::new();
+    let client = zilpay::reqwest::Client::new();
 
     match addr {
         Address::Secp256k1Bitcoin(_) => {
@@ -554,7 +554,7 @@ async fn fetch_tron_tokens(
     addr_type: u8,
     selected_account: usize,
 ) -> Result<Vec<FTokenInfo>, String> {
-    let client = reqwest::Client::new();
+    let client = zilpay::reqwest::Client::new();
     let url = format!(
         "{}?show=2&hidden=0&sortBy=2&sortType=1&limit=200&start=0&address={}",
         TRON_ACCOUNT_TOKENS_API, addr
@@ -609,7 +609,7 @@ async fn fetch_solana_tokens(
     default_logo: Option<String>,
     chain_hash: u64,
 ) -> Result<Vec<FTokenInfo>, String> {
-    let client = reqwest::Client::new();
+    let client = zilpay::reqwest::Client::new();
     let response = client
         .get(SOLANA_TOKEN_LIST_API)
         .send()
@@ -712,7 +712,7 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         }
     });
 
-    let client = reqwest::Client::new();
+    let client = zilpay::reqwest::Client::new();
     let response = client
         .post(UNISWAP_API_URL)
         .header("Content-Type", "application/json")
