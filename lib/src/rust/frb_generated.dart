@@ -186,8 +186,10 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
       {required String addr});
 
-  List<ExchangeProviderId> crateApiExchangeBootstrapExchangeProviders(
-      {required List<NetworkConfigInfo> configs});
+  Future<(List<ExchangeProviderId>, List<FTokenInfo>)>
+      crateApiExchangeBootstrapExchangeProviders(
+          {required List<NetworkConfigInfo> configs,
+          required BigInt walletIndex});
 
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
       {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos});
@@ -317,7 +319,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
       {required ExchangeProviderId provider,
-      required List<NetworkConfigInfo> configs});
+      required List<NetworkConfigInfo> configs,
+      required List<FTokenInfo> walletTokens});
 
   Future<ExchangeQuoteResult> crateApiExchangeFetchExchangeQuote(
       {required ExchangeProviderId provider,
@@ -1113,20 +1116,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<ExchangeProviderId> crateApiExchangeBootstrapExchangeProviders(
-      {required List<NetworkConfigInfo> configs}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
+  Future<(List<ExchangeProviderId>, List<FTokenInfo>)>
+      crateApiExchangeBootstrapExchangeProviders(
+          {required List<NetworkConfigInfo> configs,
+          required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_network_config_info(configs, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 21, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_exchange_provider_id,
-        decodeErrorData: null,
+        decodeSuccessData:
+            sse_decode_record_list_exchange_provider_id_list_f_token_info,
+        decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
-      argValues: [configs],
+      argValues: [configs, walletIndex],
       apiImpl: this,
     ));
   }
@@ -1134,7 +1142,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta =>
       const TaskConstMeta(
         debugName: "bootstrap_exchange_providers",
-        argNames: ["configs"],
+        argNames: ["configs", "walletIndex"],
       );
 
   @override
@@ -2071,12 +2079,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
       {required ExchangeProviderId provider,
-      required List<NetworkConfigInfo> configs}) {
+      required List<NetworkConfigInfo> configs,
+      required List<FTokenInfo> walletTokens}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_exchange_provider_id(provider, serializer);
         sse_encode_list_network_config_info(configs, serializer);
+        sse_encode_list_f_token_info(walletTokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 55, port: port_);
       },
@@ -2085,7 +2095,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeAssetsConstMeta,
-      argValues: [provider, configs],
+      argValues: [provider, configs, walletTokens],
       apiImpl: this,
     ));
   }
@@ -2093,7 +2103,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeFetchExchangeAssetsConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_exchange_assets",
-        argNames: ["provider", "configs"],
+        argNames: ["provider", "configs", "walletTokens"],
       );
 
   @override
@@ -5850,6 +5860,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (
+    List<ExchangeProviderId>,
+    List<FTokenInfo>
+  ) dco_decode_record_list_exchange_provider_id_list_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_list_exchange_provider_id(arr[0]),
+      dco_decode_list_f_token_info(arr[1]),
+    );
+  }
+
+  @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
       dco_decode_record_list_network_config_info_list_network_config_info(
           dynamic raw) {
@@ -8089,6 +8115,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (List<ExchangeProviderId>, List<FTokenInfo>)
+      sse_decode_record_list_exchange_provider_id_list_f_token_info(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_exchange_provider_id(deserializer);
+    var var_field1 = sse_decode_list_f_token_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
       sse_decode_record_list_network_config_info_list_network_config_info(
           SseDeserializer deserializer) {
@@ -9990,6 +10026,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.color, serializer);
     sse_encode_u_8(self.eyeShape, serializer);
     sse_encode_u_8(self.dataModuleShape, serializer);
+  }
+
+  @protected
+  void sse_encode_record_list_exchange_provider_id_list_f_token_info(
+      (List<ExchangeProviderId>, List<FTokenInfo>) self,
+      SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_exchange_provider_id(self.$1, serializer);
+    sse_encode_list_f_token_info(self.$2, serializer);
   }
 
   @protected

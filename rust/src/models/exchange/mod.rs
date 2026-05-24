@@ -94,9 +94,12 @@ impl ExchangeProviderId {
 pub fn build_exchange_chain_groups(
     configs: &[NetworkConfigInfo],
     metadata: &ExchangeProviderMetadata,
+    wallet_tokens: &[FTokenInfo],
 ) -> Vec<ExchangeChainGroup> {
     match metadata {
-        ExchangeProviderMetadata::Thorchain(meta) => build_thorchain_groups(configs, meta),
+        ExchangeProviderMetadata::Thorchain(meta) => {
+            build_thorchain_groups(configs, meta, wallet_tokens)
+        }
     }
 }
 
@@ -111,6 +114,7 @@ fn prepare_exchange_token(t: &FTokenInfo) -> FTokenInfo {
 fn build_thorchain_groups(
     configs: &[NetworkConfigInfo],
     meta: &ThorchainMetadata,
+    wallet_tokens: &[FTokenInfo],
 ) -> Vec<ExchangeChainGroup> {
     let config_by_chain: HashMap<&str, &NetworkConfigInfo> = {
         let mut map = HashMap::with_capacity(configs.len());
@@ -145,29 +149,41 @@ fn build_thorchain_groups(
         let is_native = pool.token_addr.is_empty();
 
         let token = if is_native {
-            match config.ftokens.iter().find(|t| t.native) {
-                Some(t) => prepare_exchange_token(t),
-                None => continue,
+            match wallet_tokens
+                .iter()
+                .find(|t| t.chain_hash == config.chain_hash && t.native)
+            {
+                Some(t) => t.clone(),
+                None => match config.ftokens.iter().find(|t| t.native) {
+                    Some(t) => prepare_exchange_token(t),
+                    None => continue,
+                },
             }
         } else {
-            match config
-                .ftokens
-                .iter()
-                .find(|t| t.addr.eq_ignore_ascii_case(&pool.token_addr))
-            {
-                Some(t) => prepare_exchange_token(t),
-                None => FTokenInfo {
-                    name: pool.symbol.clone(),
-                    symbol: pool.symbol.clone(),
-                    decimals: pool.decimals,
-                    addr: pool.token_addr.clone(),
-                    addr_type: 0,
-                    logo: None,
-                    balances: HashMap::with_capacity(0),
-                    rate: 0.0,
-                    default: false,
-                    native: false,
-                    chain_hash: config.chain_hash,
+            match wallet_tokens.iter().find(|t| {
+                t.chain_hash == config.chain_hash
+                    && t.addr.eq_ignore_ascii_case(&pool.token_addr)
+            }) {
+                Some(t) => t.clone(),
+                None => match config
+                    .ftokens
+                    .iter()
+                    .find(|t| t.addr.eq_ignore_ascii_case(&pool.token_addr))
+                {
+                    Some(t) => prepare_exchange_token(t),
+                    None => FTokenInfo {
+                        name: pool.symbol.clone(),
+                        symbol: pool.symbol.clone(),
+                        decimals: pool.decimals,
+                        addr: pool.token_addr.clone(),
+                        addr_type: 0,
+                        logo: None,
+                        balances: HashMap::with_capacity(0),
+                        rate: 0.0,
+                        default: false,
+                        native: false,
+                        chain_hash: config.chain_hash,
+                    },
                 },
             }
         };

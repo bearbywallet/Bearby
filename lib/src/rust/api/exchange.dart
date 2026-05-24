@@ -9,16 +9,18 @@ import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-List<ExchangeProviderId> bootstrapExchangeProviders(
-        {required List<NetworkConfigInfo> configs}) =>
-    RustLib.instance.api
-        .crateApiExchangeBootstrapExchangeProviders(configs: configs);
+Future<(List<ExchangeProviderId>, List<FTokenInfo>)> bootstrapExchangeProviders(
+        {required List<NetworkConfigInfo> configs,
+        required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(
+        configs: configs, walletIndex: walletIndex);
 
 Future<List<ExchangeChainGroup>> fetchExchangeAssets(
         {required ExchangeProviderId provider,
-        required List<NetworkConfigInfo> configs}) =>
+        required List<NetworkConfigInfo> configs,
+        required List<FTokenInfo> walletTokens}) =>
     RustLib.instance.api.crateApiExchangeFetchExchangeAssets(
-        provider: provider, configs: configs);
+        provider: provider, configs: configs, walletTokens: walletTokens);
 
 Future<ExchangeQuoteResult> fetchExchangeQuote(
         {required ExchangeProviderId provider,
