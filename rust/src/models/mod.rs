@@ -3,6 +3,7 @@ pub mod background;
 pub mod book;
 pub mod btc_chain;
 pub mod connection;
+pub mod exchange;
 pub mod ftoken;
 pub mod gas;
 pub mod keypair;
