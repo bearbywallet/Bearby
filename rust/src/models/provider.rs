@@ -3,7 +3,7 @@ use std::{
     hash::{DefaultHasher, Hash, Hasher},
 };
 
-use serde_json::Value;
+use zilpay::serde_json::Value;
 use zilpay::proto::address::Address;
 pub use zilpay::{
     errors::network::NetworkErrors,

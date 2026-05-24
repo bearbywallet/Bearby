@@ -1,5 +1,5 @@
 use flutter_rust_bridge::frb;
-use serde::Deserialize;
+use zilpay::serde::Deserialize;
 
 use crate::models::provider::NetworkConfigInfo;
 
@@ -10,6 +10,7 @@ const THORCHAIN_BASE_URLS: &[&str] = &[
 
 #[frb(ignore)]
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 pub struct InboundAddressRaw {
     #[serde(default)]
     pub chain: String,
@@ -35,6 +36,7 @@ pub struct InboundAddressRaw {
 
 #[frb(ignore)]
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 pub struct QuoteSwapRaw {
     #[serde(default)]
     pub inbound_address: String,
@@ -80,6 +82,7 @@ pub struct QuoteSwapRaw {
 
 #[frb(ignore)]
 #[derive(Debug, Default, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 pub struct QuoteFeesRaw {
     #[serde(default)]
     pub asset: String,
