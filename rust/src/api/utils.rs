@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use flutter_rust_bridge::frb;
 use secrecy::{ExposeSecret, SecretString};
-use sha2::{Digest, Sha256};
+use zilpay::sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
 use zilpay::proto::address::Address;
 use zilpay::{background::Mnemonic, config::bip39::EN_WORDS, proto::U256};

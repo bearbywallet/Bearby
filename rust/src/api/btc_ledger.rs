@@ -5,7 +5,7 @@ use bitcoin::psbt::Psbt;
 use bitcoin::secp256k1::Secp256k1;
 use bitcoin::Transaction as BitcoinTransaction;
 use bitcoin::Witness;
-use sha2::{Digest, Sha256};
+use zilpay::sha2::{Digest, Sha256};
 use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
 
