@@ -15,14 +15,18 @@ mod exchange_tests {
         let path = Path::new("../assets/chains/testnet-chains.json");
         let content = fs::read_to_string(path).unwrap();
         let configs = get_chains_providers_from_json(content).unwrap();
-        let exchange_providers = bootstrap_exchange_providers(configs.clone());
+
+        let (exchange_providers, wallet_tokens) = match bootstrap_exchange_providers(configs.clone(), 0).await {
+            Ok(result) => result,
+            Err(_) => return,
+        };
 
         let provider = match exchange_providers.into_iter().next() {
             Some(p) => p,
             None => return,
         };
 
-        match fetch_exchange_assets(provider, configs).await {
+        match fetch_exchange_assets(provider, configs, wallet_tokens).await {
             Ok(groups) => {
                 for group in &groups {
                     eprintln!(
@@ -47,7 +51,11 @@ mod exchange_tests {
         let path = Path::new("../assets/chains/testnet-chains.json");
         let content = fs::read_to_string(path).unwrap();
         let configs = get_chains_providers_from_json(content).unwrap();
-        let exchange_providers = bootstrap_exchange_providers(configs);
+
+        let (exchange_providers, _) = match bootstrap_exchange_providers(configs, 0).await {
+            Ok(result) => result,
+            Err(_) => return,
+        };
 
         let provider = match exchange_providers.into_iter().next() {
             Some(ExchangeProviderId::Thorchain) => ExchangeProviderId::Thorchain,
