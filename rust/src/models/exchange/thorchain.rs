@@ -8,6 +8,10 @@ const THORCHAIN_BASE_URLS: &[&str] = &[
     "https://gateway.liquify.com/chain/thorchain_api",
 ];
 
+const SUPPORTED_CHAINS: &[&str] = &[
+    "BTC", "LTC", "BCH", "DOGE", "ETH", "BNB", "AVAX", "BASE", "TRX", "SOL", "XRP",
+];
+
 #[frb(ignore)]
 #[derive(Debug, Deserialize)]
 #[serde(crate = "zilpay::serde")]
@@ -101,12 +105,6 @@ pub struct QuoteFeesRaw {
 }
 
 #[derive(Debug, Default)]
-pub struct MetadataThorchain {
-    pub inbound_addresses: Vec<ThorchainInbound>,
-    pub swap_quote: ThorchainSwapQuote,
-}
-
-#[derive(Debug, Default)]
 pub struct ThorchainInbound {
     pub chain: String,
     pub address: String,
@@ -153,6 +151,10 @@ pub struct ThorchainFees {
     pub total: String,
     pub slippage_bps: i64,
     pub total_bps: i64,
+}
+
+pub fn is_chain_supported(config: &NetworkConfigInfo) -> bool {
+    SUPPORTED_CHAINS.contains(&config.chain.as_str())
 }
 
 impl From<InboundAddressRaw> for ThorchainInbound {
@@ -207,33 +209,29 @@ impl From<QuoteSwapRaw> for ThorchainSwapQuote {
     }
 }
 
-impl MetadataThorchain {
-    pub fn is_supported(config: &NetworkConfigInfo) -> bool {
-        matches!(
-            config.chain.as_str(),
-            "BTC" | "LTC" | "BCH" | "DOGE" | "ETH"
-                | "BNB" | "AVAX" | "BASE" | "TRX" | "SOL" | "XRP"
-        )
-    }
+#[frb(ignore)]
+pub async fn fetch_thorchain_inbound() -> Result<Vec<ThorchainInbound>, String> {
+    let client = zilpay::reqwest::Client::new();
+    let all = fetch_inbound_addresses_raw(&client).await?;
+    let active: Vec<ThorchainInbound> = all
+        .into_iter()
+        .filter(|ib| !ib.halted && !ib.global_trading_paused && !ib.chain_trading_paused)
+        .collect();
+    Ok(active)
 }
 
 #[frb(ignore)]
-pub async fn fetch_thorchain_data(
+pub async fn fetch_thorchain_swap_quote(
     from_asset: &str,
     to_asset: &str,
     amount: &str,
     destination: &str,
-) -> Result<MetadataThorchain, String> {
+) -> Result<ThorchainSwapQuote, String> {
     let client = zilpay::reqwest::Client::new();
-    let inbound_addresses = fetch_inbound_addresses(&client).await?;
-    let swap_quote = fetch_swap_quote(&client, from_asset, to_asset, amount, destination).await?;
-    Ok(MetadataThorchain {
-        inbound_addresses,
-        swap_quote,
-    })
+    fetch_swap_quote(&client, from_asset, to_asset, amount, destination).await
 }
 
-async fn fetch_inbound_addresses(
+async fn fetch_inbound_addresses_raw(
     client: &zilpay::reqwest::Client,
 ) -> Result<Vec<ThorchainInbound>, String> {
     let mut last_err = String::new();
@@ -274,11 +272,7 @@ async fn try_fetch_inbound_addresses(
     client: &zilpay::reqwest::Client,
 ) -> Result<Vec<ThorchainInbound>, String> {
     let url = format!("{base_url}/thorchain/inbound_addresses");
-    let resp = client
-        .get(&url)
-        .send()
-        .await
-        .map_err(|e| format!("{e}"))?;
+    let resp = client.get(&url).send().await.map_err(|e| format!("{e}"))?;
 
     if !resp.status().is_success() {
         let body = resp.text().await.unwrap_or_default();
@@ -307,11 +301,7 @@ async fn try_fetch_swap_quote(
          from_asset={from_asset}&to_asset={to_asset}\
          &amount={amount}&destination={destination}"
     );
-    let resp = client
-        .get(&url)
-        .send()
-        .await
-        .map_err(|e| format!("{e}"))?;
+    let resp = client.get(&url).send().await.map_err(|e| format!("{e}"))?;
 
     if !resp.status().is_success() {
         let body = resp.text().await.unwrap_or_default();

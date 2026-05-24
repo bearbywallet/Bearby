@@ -6,27 +6,6 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class MetadataThorchain {
-  final List<ThorchainInbound> inboundAddresses;
-  final ThorchainSwapQuote swapQuote;
-
-  const MetadataThorchain({
-    required this.inboundAddresses,
-    required this.swapQuote,
-  });
-
-  @override
-  int get hashCode => inboundAddresses.hashCode ^ swapQuote.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MetadataThorchain &&
-          runtimeType == other.runtimeType &&
-          inboundAddresses == other.inboundAddresses &&
-          swapQuote == other.swapQuote;
-}
-
 class ThorchainFees {
   final String asset;
   final String affiliate;

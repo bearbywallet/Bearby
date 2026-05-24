@@ -10,24 +10,25 @@ import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-List<ExchangeProvider> bootstrapExchangeProviders(
+List<ExchangeProviderId> bootstrapExchangeProviders(
         {required List<NetworkConfigInfo> configs}) =>
     RustLib.instance.api
         .crateApiExchangeBootstrapExchangeProviders(configs: configs);
 
-Future<ExchangeProvider> fetchExchangeProviderData(
-        {required ExchangeProvider provider,
+Future<ExchangeProviderMetadata> fetchExchangeMetadata(
+        {required ExchangeProviderId provider}) =>
+    RustLib.instance.api
+        .crateApiExchangeFetchExchangeMetadata(provider: provider);
+
+Future<ExchangeProviderQuote> fetchExchangeQuote(
+        {required ExchangeProviderId provider,
         required String fromAsset,
         required String toAsset,
         required String amount,
         required String destination}) =>
-    RustLib.instance.api.crateApiExchangeFetchExchangeProviderData(
+    RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
         provider: provider,
         fromAsset: fromAsset,
         toAsset: toAsset,
         amount: amount,
         destination: destination);
-
-Future<String> buildExchangeTransaction({required ExchangeProvider provider}) =>
-    RustLib.instance.api
-        .crateApiExchangeBuildExchangeTransaction(provider: provider);
