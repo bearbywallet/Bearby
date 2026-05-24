@@ -5957,7 +5957,6 @@ dependencies = [
  "btleplug",
  "flutter_rust_bridge",
  "futures",
- "hex",
  "hidapi",
  "lazy_static",
  "once_cell",

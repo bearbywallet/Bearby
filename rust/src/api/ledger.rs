@@ -130,7 +130,7 @@ pub async fn add_ledger_wallet(
         .map_err(ServiceError::BackgroundError)?;
     let wallet = get_last_wallet(&service.core)?;
 
-    Ok(hex::encode(wallet.wallet_address))
+    Ok(zilpay::alloy::hex::encode(wallet.wallet_address))
 }
 
 pub async fn add_ledger_account(

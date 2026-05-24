@@ -59,7 +59,7 @@ impl TryFrom<&Wallet> for WalletInfo {
             auth_type: data.biometric_type.into(),
             wallet_name: data.wallet_name,
             wallet_type: data.wallet_type.to_str(),
-            wallet_address: hex::encode(w.wallet_address),
+            wallet_address: zilpay::alloy::hex::encode(w.wallet_address),
             selected_account: data.selected_account,
             tokens: ftokens,
             settings: data.settings.into(),
