@@ -1,4 +1,4 @@
-use tokio::sync::mpsc;
+use zilpay::tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},

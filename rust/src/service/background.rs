@@ -1,8 +1,7 @@
 use crate::utils::errors::ServiceError;
-use lazy_static::lazy_static;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use tokio::task::JoinHandle;
+use std::sync::{Arc, LazyLock};
+use zilpay::tokio::sync::RwLock;
+use zilpay::tokio::task::JoinHandle;
 use zilpay::background::{bg_storage::StorageManagement, Background};
 
 pub struct ServiceBackground {
@@ -12,9 +11,8 @@ pub struct ServiceBackground {
     pub core: Arc<Background>,
 }
 
-lazy_static! {
-    pub static ref BACKGROUND_SERVICE: RwLock<Option<ServiceBackground>> = RwLock::new(None);
-}
+pub static BACKGROUND_SERVICE: LazyLock<RwLock<Option<ServiceBackground>>> =
+    LazyLock::new(|| RwLock::new(None));
 
 impl ServiceBackground {
     pub fn from_path(path: &str) -> Result<Self, ServiceError> {

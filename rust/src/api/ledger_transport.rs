@@ -19,10 +19,7 @@ pub struct RustLedgerBleDevice {
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::collections::HashMap;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-use std::sync::{Arc, Mutex, RwLock};
-
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
-use lazy_static::lazy_static;
+use std::sync::{Arc, LazyLock, Mutex, RwLock};
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use crate::ledger::ble::BleLedgerTransport;
@@ -32,7 +29,7 @@ use crate::ledger::hid::{self, HidLedgerTransport};
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 enum TransportEntry {
     Hid(Mutex<HidLedgerTransport>),
-    Ble(Box<tokio::sync::Mutex<BleLedgerTransport>>),
+    Ble(Box<zilpay::tokio::sync::Mutex<BleLedgerTransport>>),
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -41,10 +38,8 @@ unsafe impl Sync for TransportEntry {}
 unsafe impl Send for TransportEntry {}
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-lazy_static! {
-    static ref TRANSPORT_REGISTRY: RwLock<HashMap<String, Arc<TransportEntry>>> =
-        RwLock::new(HashMap::new());
-}
+static TRANSPORT_REGISTRY: LazyLock<RwLock<HashMap<String, Arc<TransportEntry>>>> =
+    LazyLock::new(|| RwLock::new(HashMap::new()));
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 fn next_connection_id() -> String {
@@ -140,7 +135,7 @@ pub async fn ledger_ble_open(device_id: String) -> Result<String, String> {
         .map_err(|e| e.to_string())?;
     registry.insert(
         conn_id.clone(),
-        Arc::new(TransportEntry::Ble(Box::new(tokio::sync::Mutex::new(transport)))),
+        Arc::new(TransportEntry::Ble(Box::new(zilpay::tokio::sync::Mutex::new(transport)))),
     );
     Ok(conn_id)
 }
