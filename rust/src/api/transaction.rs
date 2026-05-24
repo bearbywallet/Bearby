@@ -637,7 +637,7 @@ pub async fn update_tx_with_params(
 
 #[cfg(test)]
 mod tests_ledger {
-    use serde_json::from_str;
+    use zilpay::serde_json::from_str;
     use zilpay::{
         config::key::PUB_KEY_SIZE,
         crypto::bip49::{components_to_derivation_path, split_path},

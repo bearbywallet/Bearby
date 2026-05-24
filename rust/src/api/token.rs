@@ -6,8 +6,8 @@ use crate::{
         helpers::{parse_address, with_service},
     },
 };
-use serde::Deserialize;
-use serde_json::Value;
+use zilpay::serde::Deserialize;
+use zilpay::serde_json::Value;
 use std::{collections::HashMap, sync::Arc};
 pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
@@ -30,11 +30,13 @@ const SOLANA_TOKEN_LIST_API: &str =
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ProtectionInfo {
     result: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct TokenMetadata {
     #[serde(rename = "logoUrl")]
     logo_url: Option<String>,
@@ -43,6 +45,7 @@ struct TokenMetadata {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct PortfolioToken {
     address: Option<String>,
     symbol: Option<String>,
@@ -54,27 +57,32 @@ struct PortfolioToken {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct TokenAmount {
     raw: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct PortfolioBalance {
     token: Option<PortfolioToken>,
     amount: Option<TokenAmount>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct Portfolio {
     balances: Option<Vec<PortfolioBalance>>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct PortfolioResponse {
     portfolio: Option<Portfolio>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ZilliqaEvmTokenResponse {
     address: String,
     decimals: u8,
@@ -83,6 +91,7 @@ struct ZilliqaEvmTokenResponse {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ZilliqaScillaTokenResponse {
     bech32: String,
     name: String,
@@ -91,22 +100,26 @@ struct ZilliqaScillaTokenResponse {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ZilliqaScillaApiResponse {
     list: Vec<ZilliqaScillaTokenResponse>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ZilstreamToken {
     symbol: String,
     price_eth: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct ZilstreamResponse {
     data: Vec<ZilstreamToken>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct TronAccountToken {
     #[serde(rename = "tokenId")]
     token_id: String,
@@ -122,11 +135,13 @@ struct TronAccountToken {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct TronAccountResponse {
     data: Vec<TronAccountToken>,
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct SolanaTokenEntry {
     address: String,
     name: String,
@@ -137,6 +152,7 @@ struct SolanaTokenEntry {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
 struct SolanaTokenListResponse {
     content: Vec<SolanaTokenEntry>,
 }
@@ -699,7 +715,7 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         return fetch_solana_tokens(default_logo, chain_hash).await;
     }
 
-    let request_body = serde_json::json!({
+    let request_body = zilpay::serde_json::json!({
         "walletAccount": {
             "platformAddresses": [
                 { "address": addr }

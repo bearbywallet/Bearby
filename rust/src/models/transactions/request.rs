@@ -50,7 +50,7 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let tx_req = TransactionRequest::Bitcoin((native_tx, value.metadata.into(), btc_meta));
             Ok(tx_req)
         } else if let Some(tron_str) = value.tron {
-            let sign_req_tron = serde_json::from_str::<TronWebTransaction>(&tron_str)
+            let sign_req_tron = zilpay::serde_json::from_str::<TronWebTransaction>(&tron_str)
                 .map_err(|e| TransactionErrors::ConvertTxError(e.to_string()))?;
             let req_tron_tx = TronTransaction::from_tron_web(&sign_req_tron)?;
             let tx_req = TransactionRequest::Tron((req_tron_tx, value.metadata.into()));
@@ -120,7 +120,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
             TransactionRequest::Tron((tx, _)) => {
                 // TODO: must be fixed!
                 let tron_web = tx.to_tron_web().unwrap();
-                let json = serde_json::to_string(&tron_web).unwrap_or_default();
+                let json = zilpay::serde_json::to_string(&tron_web).unwrap_or_default();
 
                 Self {
                     metadata,

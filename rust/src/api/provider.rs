@@ -4,7 +4,7 @@ use crate::{
     utils::{errors::ServiceError, helpers::with_service},
 };
 use zilpay::secrecy::SecretString;
-use serde_json::Value;
+use zilpay::serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
@@ -171,7 +171,7 @@ pub async fn select_accounts_chain(
 }
 
 pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkConfigInfo>, String> {
-    let json_value_list: Value = serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
+    let json_value_list: Value = zilpay::serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
 
     let chains = json_value_list
         .as_array()
