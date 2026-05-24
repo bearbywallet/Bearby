@@ -2,7 +2,9 @@ use flutter_rust_bridge::frb;
 
 use crate::models::{
     exchange::{
-        thorchain, ExchangeProviderId, ExchangeProviderMetadata, ExchangeProviderQuote,
+        thorchain,
+        ExchangeProviderId, ExchangeProviderMetadata, ExchangeChainGroup,
+        ExchangeQuoteResult, build_exchange_chain_groups,
     },
     provider::NetworkConfigInfo,
 };
@@ -14,7 +16,6 @@ pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<Exch
     }
 
     let candidates = [ExchangeProviderId::Thorchain];
-
     let mut result = Vec::with_capacity(candidates.len());
 
     for candidate in candidates {
@@ -26,13 +27,15 @@ pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<Exch
     result
 }
 
-pub async fn fetch_exchange_metadata(
+pub async fn fetch_exchange_assets(
     provider: ExchangeProviderId,
-) -> Result<ExchangeProviderMetadata, String> {
+    configs: Vec<NetworkConfigInfo>,
+) -> Result<Vec<ExchangeChainGroup>, String> {
     match provider {
         ExchangeProviderId::Thorchain => {
-            let inbound = thorchain::fetch_thorchain_inbound().await?;
-            Ok(ExchangeProviderMetadata::Thorchain(inbound))
+            let meta = thorchain::fetch_thorchain_metadata().await?;
+            let metadata = ExchangeProviderMetadata::Thorchain(meta);
+            Ok(build_exchange_chain_groups(&configs, &metadata))
         }
     }
 }
@@ -43,7 +46,7 @@ pub async fn fetch_exchange_quote(
     to_asset: String,
     amount: String,
     destination: String,
-) -> Result<ExchangeProviderQuote, String> {
+) -> Result<ExchangeQuoteResult, String> {
     match provider {
         ExchangeProviderId::Thorchain => {
             let quote = thorchain::fetch_thorchain_swap_quote(
@@ -53,7 +56,7 @@ pub async fn fetch_exchange_quote(
                 &destination,
             )
             .await?;
-            Ok(ExchangeProviderQuote::Thorchain(quote))
+            Ok(quote.into_quote_result())
         }
     }
 }

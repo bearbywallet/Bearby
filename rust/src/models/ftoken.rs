@@ -5,7 +5,7 @@ use zilpay::{
     token::ft::FToken,
 };
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct FTokenInfo {
     pub name: String,
     pub symbol: String,
