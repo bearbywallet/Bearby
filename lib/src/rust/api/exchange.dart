@@ -5,7 +5,6 @@
 
 import '../frb_generated.dart';
 import '../models/exchange.dart';
-import '../models/exchange/thorchain.dart';
 import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -15,12 +14,13 @@ List<ExchangeProviderId> bootstrapExchangeProviders(
     RustLib.instance.api
         .crateApiExchangeBootstrapExchangeProviders(configs: configs);
 
-Future<ExchangeProviderMetadata> fetchExchangeMetadata(
-        {required ExchangeProviderId provider}) =>
-    RustLib.instance.api
-        .crateApiExchangeFetchExchangeMetadata(provider: provider);
+Future<List<ExchangeChainGroup>> fetchExchangeAssets(
+        {required ExchangeProviderId provider,
+        required List<NetworkConfigInfo> configs}) =>
+    RustLib.instance.api.crateApiExchangeFetchExchangeAssets(
+        provider: provider, configs: configs);
 
-Future<ExchangeProviderQuote> fetchExchangeQuote(
+Future<ExchangeQuoteResult> fetchExchangeQuote(
         {required ExchangeProviderId provider,
         required String fromAsset,
         required String toAsset,

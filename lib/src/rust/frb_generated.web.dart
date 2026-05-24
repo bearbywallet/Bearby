@@ -34,7 +34,6 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
-import 'models/exchange/thorchain.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -224,7 +223,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
-  ThorchainSwapQuote dco_decode_box_autoadd_thorchain_swap_quote(dynamic raw);
+  ThorchainTxParams dco_decode_box_autoadd_thorchain_tx_params(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
@@ -279,13 +278,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Entry dco_decode_entry(dynamic raw);
 
   @protected
+  ExchangeAsset dco_decode_exchange_asset(dynamic raw);
+
+  @protected
+  ExchangeChainGroup dco_decode_exchange_chain_group(dynamic raw);
+
+  @protected
+  ExchangeFees dco_decode_exchange_fees(dynamic raw);
+
+  @protected
   ExchangeProviderId dco_decode_exchange_provider_id(dynamic raw);
 
   @protected
-  ExchangeProviderMetadata dco_decode_exchange_provider_metadata(dynamic raw);
+  ExchangeQuoteResult dco_decode_exchange_quote_result(dynamic raw);
 
   @protected
-  ExchangeProviderQuote dco_decode_exchange_provider_quote(dynamic raw);
+  ExchangeTiming dco_decode_exchange_timing(dynamic raw);
+
+  @protected
+  ExchangeTxParams dco_decode_exchange_tx_params(dynamic raw);
 
   @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
@@ -353,6 +364,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Entry> dco_decode_list_entry(dynamic raw);
+
+  @protected
+  List<ExchangeAsset> dco_decode_list_exchange_asset(dynamic raw);
+
+  @protected
+  List<ExchangeChainGroup> dco_decode_list_exchange_chain_group(dynamic raw);
 
   @protected
   List<ExchangeProviderId> dco_decode_list_exchange_provider_id(dynamic raw);
@@ -442,9 +459,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
-
-  @protected
-  List<ThorchainInbound> dco_decode_list_thorchain_inbound(dynamic raw);
 
   @protected
   List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw);
@@ -592,13 +606,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
 
   @protected
-  ThorchainFees dco_decode_thorchain_fees(dynamic raw);
-
-  @protected
-  ThorchainInbound dco_decode_thorchain_inbound(dynamic raw);
-
-  @protected
-  ThorchainSwapQuote dco_decode_thorchain_swap_quote(dynamic raw);
+  ThorchainTxParams dco_decode_thorchain_tx_params(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
@@ -834,7 +842,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  ThorchainSwapQuote sse_decode_box_autoadd_thorchain_swap_quote(
+  ThorchainTxParams sse_decode_box_autoadd_thorchain_tx_params(
       SseDeserializer deserializer);
 
   @protected
@@ -895,16 +903,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Entry sse_decode_entry(SseDeserializer deserializer);
 
   @protected
+  ExchangeAsset sse_decode_exchange_asset(SseDeserializer deserializer);
+
+  @protected
+  ExchangeChainGroup sse_decode_exchange_chain_group(
+      SseDeserializer deserializer);
+
+  @protected
+  ExchangeFees sse_decode_exchange_fees(SseDeserializer deserializer);
+
+  @protected
   ExchangeProviderId sse_decode_exchange_provider_id(
       SseDeserializer deserializer);
 
   @protected
-  ExchangeProviderMetadata sse_decode_exchange_provider_metadata(
+  ExchangeQuoteResult sse_decode_exchange_quote_result(
       SseDeserializer deserializer);
 
   @protected
-  ExchangeProviderQuote sse_decode_exchange_provider_quote(
-      SseDeserializer deserializer);
+  ExchangeTiming sse_decode_exchange_timing(SseDeserializer deserializer);
+
+  @protected
+  ExchangeTxParams sse_decode_exchange_tx_params(SseDeserializer deserializer);
 
   @protected
   ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
@@ -979,6 +999,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Entry> sse_decode_list_entry(SseDeserializer deserializer);
+
+  @protected
+  List<ExchangeAsset> sse_decode_list_exchange_asset(
+      SseDeserializer deserializer);
+
+  @protected
+  List<ExchangeChainGroup> sse_decode_list_exchange_chain_group(
+      SseDeserializer deserializer);
 
   @protected
   List<ExchangeProviderId> sse_decode_list_exchange_provider_id(
@@ -1082,10 +1110,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(
-      SseDeserializer deserializer);
-
-  @protected
-  List<ThorchainInbound> sse_decode_list_thorchain_inbound(
       SseDeserializer deserializer);
 
   @protected
@@ -1251,13 +1275,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  ThorchainFees sse_decode_thorchain_fees(SseDeserializer deserializer);
-
-  @protected
-  ThorchainInbound sse_decode_thorchain_inbound(SseDeserializer deserializer);
-
-  @protected
-  ThorchainSwapQuote sse_decode_thorchain_swap_quote(
+  ThorchainTxParams sse_decode_thorchain_tx_params(
       SseDeserializer deserializer);
 
   @protected
@@ -1504,8 +1522,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       RequiredTxParamsInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_thorchain_swap_quote(
-      ThorchainSwapQuote self, SseSerializer serializer);
+  void sse_encode_box_autoadd_thorchain_tx_params(
+      ThorchainTxParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_token_transfer_params_info(
@@ -1566,16 +1584,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_entry(Entry self, SseSerializer serializer);
 
   @protected
+  void sse_encode_exchange_asset(ExchangeAsset self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_exchange_chain_group(
+      ExchangeChainGroup self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_exchange_fees(ExchangeFees self, SseSerializer serializer);
+
+  @protected
   void sse_encode_exchange_provider_id(
       ExchangeProviderId self, SseSerializer serializer);
 
   @protected
-  void sse_encode_exchange_provider_metadata(
-      ExchangeProviderMetadata self, SseSerializer serializer);
+  void sse_encode_exchange_quote_result(
+      ExchangeQuoteResult self, SseSerializer serializer);
 
   @protected
-  void sse_encode_exchange_provider_quote(
-      ExchangeProviderQuote self, SseSerializer serializer);
+  void sse_encode_exchange_timing(
+      ExchangeTiming self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_exchange_tx_params(
+      ExchangeTxParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
@@ -1653,6 +1685,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_entry(List<Entry> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_exchange_asset(
+      List<ExchangeAsset> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_exchange_chain_group(
+      List<ExchangeChainGroup> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_exchange_provider_id(
@@ -1761,10 +1801,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_rust_ledger_hid_device(
       List<RustLedgerHidDevice> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_thorchain_inbound(
-      List<ThorchainInbound> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_tx_in_info(
@@ -1931,15 +1967,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       RustLedgerHidDevice self, SseSerializer serializer);
 
   @protected
-  void sse_encode_thorchain_fees(ThorchainFees self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_thorchain_inbound(
-      ThorchainInbound self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_thorchain_swap_quote(
-      ThorchainSwapQuote self, SseSerializer serializer);
+  void sse_encode_thorchain_tx_params(
+      ThorchainTxParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(

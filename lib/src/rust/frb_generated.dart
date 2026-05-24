@@ -33,7 +33,6 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
-import 'models/exchange/thorchain.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -110,7 +109,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 214274192;
+  int get rustContentHash => 1350098091;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -316,10 +315,11 @@ abstract class RustLibApi extends BaseApi {
   Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
       {required BigInt walletIndex, required BigInt accountIndex});
 
-  Future<ExchangeProviderMetadata> crateApiExchangeFetchExchangeMetadata(
-      {required ExchangeProviderId provider});
+  Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
+      {required ExchangeProviderId provider,
+      required List<NetworkConfigInfo> configs});
 
-  Future<ExchangeProviderQuote> crateApiExchangeFetchExchangeQuote(
+  Future<ExchangeQuoteResult> crateApiExchangeFetchExchangeQuote(
       {required ExchangeProviderId provider,
       required String fromAsset,
       required String toAsset,
@@ -2069,33 +2069,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<ExchangeProviderMetadata> crateApiExchangeFetchExchangeMetadata(
-      {required ExchangeProviderId provider}) {
+  Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
+      {required ExchangeProviderId provider,
+      required List<NetworkConfigInfo> configs}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_exchange_provider_id(provider, serializer);
+        sse_encode_list_network_config_info(configs, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 55, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_exchange_provider_metadata,
+        decodeSuccessData: sse_decode_list_exchange_chain_group,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeFetchExchangeMetadataConstMeta,
-      argValues: [provider],
+      constMeta: kCrateApiExchangeFetchExchangeAssetsConstMeta,
+      argValues: [provider, configs],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeFetchExchangeMetadataConstMeta =>
+  TaskConstMeta get kCrateApiExchangeFetchExchangeAssetsConstMeta =>
       const TaskConstMeta(
-        debugName: "fetch_exchange_metadata",
-        argNames: ["provider"],
+        debugName: "fetch_exchange_assets",
+        argNames: ["provider", "configs"],
       );
 
   @override
-  Future<ExchangeProviderQuote> crateApiExchangeFetchExchangeQuote(
+  Future<ExchangeQuoteResult> crateApiExchangeFetchExchangeQuote(
       {required ExchangeProviderId provider,
       required String fromAsset,
       required String toAsset,
@@ -2113,7 +2115,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 56, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_exchange_provider_quote,
+        decodeSuccessData: sse_decode_exchange_quote_result,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeQuoteConstMeta,
@@ -4866,9 +4868,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ThorchainSwapQuote dco_decode_box_autoadd_thorchain_swap_quote(dynamic raw) {
+  ThorchainTxParams dco_decode_box_autoadd_thorchain_tx_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_thorchain_swap_quote(raw);
+    return dco_decode_thorchain_tx_params(raw);
   }
 
   @protected
@@ -5052,31 +5054,90 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeAsset dco_decode_exchange_asset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ExchangeAsset(
+      token: dco_decode_f_token_info(arr[0]),
+      providerAssetId: dco_decode_String(arr[1]),
+      provider: dco_decode_exchange_provider_id(arr[2]),
+      halted: dco_decode_bool(arr[3]),
+    );
+  }
+
+  @protected
+  ExchangeChainGroup dco_decode_exchange_chain_group(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ExchangeChainGroup(
+      chainHash: dco_decode_u_64(arr[0]),
+      assets: dco_decode_list_exchange_asset(arr[1]),
+    );
+  }
+
+  @protected
+  ExchangeFees dco_decode_exchange_fees(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return ExchangeFees(
+      total: dco_decode_String(arr[0]),
+      outbound: dco_decode_String(arr[1]),
+      liquidity: dco_decode_String(arr[2]),
+      affiliate: dco_decode_String(arr[3]),
+      slippageBps: dco_decode_i_64(arr[4]),
+      totalBps: dco_decode_i_64(arr[5]),
+    );
+  }
+
+  @protected
   ExchangeProviderId dco_decode_exchange_provider_id(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ExchangeProviderId.values[raw as int];
   }
 
   @protected
-  ExchangeProviderMetadata dco_decode_exchange_provider_metadata(dynamic raw) {
+  ExchangeQuoteResult dco_decode_exchange_quote_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return ExchangeProviderMetadata_Thorchain(
-          dco_decode_list_thorchain_inbound(raw[1]),
-        );
-      default:
-        throw Exception("unreachable");
-    }
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return ExchangeQuoteResult(
+      expectedAmountOut: dco_decode_String(arr[0]),
+      minAmountIn: dco_decode_String(arr[1]),
+      fees: dco_decode_exchange_fees(arr[2]),
+      timing: dco_decode_exchange_timing(arr[3]),
+      warning: dco_decode_String(arr[4]),
+      notes: dco_decode_String(arr[5]),
+      txParams: dco_decode_exchange_tx_params(arr[6]),
+    );
   }
 
   @protected
-  ExchangeProviderQuote dco_decode_exchange_provider_quote(dynamic raw) {
+  ExchangeTiming dco_decode_exchange_timing(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ExchangeTiming(
+      inboundSeconds: dco_decode_i_64(arr[0]),
+      outboundSeconds: dco_decode_i_64(arr[1]),
+      totalSeconds: dco_decode_i_64(arr[2]),
+    );
+  }
+
+  @protected
+  ExchangeTxParams dco_decode_exchange_tx_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ExchangeProviderQuote_Thorchain(
-          dco_decode_box_autoadd_thorchain_swap_quote(raw[1]),
+        return ExchangeTxParams_Thorchain(
+          dco_decode_box_autoadd_thorchain_tx_params(raw[1]),
         );
       default:
         throw Exception("unreachable");
@@ -5324,6 +5385,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ExchangeAsset> dco_decode_list_exchange_asset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_exchange_asset).toList();
+  }
+
+  @protected
+  List<ExchangeChainGroup> dco_decode_list_exchange_chain_group(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_exchange_chain_group).toList();
+  }
+
+  @protected
   List<ExchangeProviderId> dco_decode_list_exchange_provider_id(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_exchange_provider_id).toList();
@@ -5515,12 +5588,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (raw as List<dynamic>)
         .map(dco_decode_rust_ledger_hid_device)
         .toList();
-  }
-
-  @protected
-  List<ThorchainInbound> dco_decode_list_thorchain_inbound(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_thorchain_inbound).toList();
   }
 
   @protected
@@ -5998,69 +6065,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ThorchainFees dco_decode_thorchain_fees(dynamic raw) {
+  ThorchainTxParams dco_decode_thorchain_tx_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return ThorchainFees(
-      asset: dco_decode_String(arr[0]),
-      affiliate: dco_decode_String(arr[1]),
-      outbound: dco_decode_String(arr[2]),
-      liquidity: dco_decode_String(arr[3]),
-      total: dco_decode_String(arr[4]),
-      slippageBps: dco_decode_i_64(arr[5]),
-      totalBps: dco_decode_i_64(arr[6]),
-    );
-  }
-
-  @protected
-  ThorchainInbound dco_decode_thorchain_inbound(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
-    return ThorchainInbound(
-      chain: dco_decode_String(arr[0]),
-      address: dco_decode_String(arr[1]),
-      router: dco_decode_String(arr[2]),
-      halted: dco_decode_bool(arr[3]),
-      globalTradingPaused: dco_decode_bool(arr[4]),
-      chainTradingPaused: dco_decode_bool(arr[5]),
-      gasRate: dco_decode_String(arr[6]),
-      gasRateUnits: dco_decode_String(arr[7]),
-      outboundFee: dco_decode_String(arr[8]),
-      dustThreshold: dco_decode_String(arr[9]),
-    );
-  }
-
-  @protected
-  ThorchainSwapQuote dco_decode_thorchain_swap_quote(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 20)
-      throw Exception('unexpected arr length: expect 20 but see ${arr.length}');
-    return ThorchainSwapQuote(
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return ThorchainTxParams(
       inboundAddress: dco_decode_String(arr[0]),
       router: dco_decode_String(arr[1]),
       memo: dco_decode_String(arr[2]),
-      expectedAmountOut: dco_decode_String(arr[3]),
-      expiry: dco_decode_i_64(arr[4]),
-      inboundConfirmationBlocks: dco_decode_i_64(arr[5]),
-      inboundConfirmationSeconds: dco_decode_i_64(arr[6]),
-      outboundDelayBlocks: dco_decode_i_64(arr[7]),
-      outboundDelaySeconds: dco_decode_i_64(arr[8]),
-      totalSwapSeconds: dco_decode_i_64(arr[9]),
-      maxStreamingQuantity: dco_decode_i_64(arr[10]),
-      streamingSwapBlocks: dco_decode_i_64(arr[11]),
-      streamingSwapSeconds: dco_decode_i_64(arr[12]),
-      fees: dco_decode_thorchain_fees(arr[13]),
-      dustThreshold: dco_decode_String(arr[14]),
-      recommendedMinAmountIn: dco_decode_String(arr[15]),
-      recommendedGasRate: dco_decode_String(arr[16]),
-      gasRateUnits: dco_decode_String(arr[17]),
-      warning: dco_decode_String(arr[18]),
-      notes: dco_decode_String(arr[19]),
+      expiry: dco_decode_i_64(arr[3]),
+      recommendedGasRate: dco_decode_String(arr[4]),
+      gasRateUnits: dco_decode_String(arr[5]),
     );
   }
 
@@ -6743,10 +6759,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ThorchainSwapQuote sse_decode_box_autoadd_thorchain_swap_quote(
+  ThorchainTxParams sse_decode_box_autoadd_thorchain_tx_params(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_thorchain_swap_quote(deserializer));
+    return (sse_decode_thorchain_tx_params(deserializer));
   }
 
   @protected
@@ -6934,6 +6950,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeAsset sse_decode_exchange_asset(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_token = sse_decode_f_token_info(deserializer);
+    var var_providerAssetId = sse_decode_String(deserializer);
+    var var_provider = sse_decode_exchange_provider_id(deserializer);
+    var var_halted = sse_decode_bool(deserializer);
+    return ExchangeAsset(
+        token: var_token,
+        providerAssetId: var_providerAssetId,
+        provider: var_provider,
+        halted: var_halted);
+  }
+
+  @protected
+  ExchangeChainGroup sse_decode_exchange_chain_group(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_assets = sse_decode_list_exchange_asset(deserializer);
+    return ExchangeChainGroup(chainHash: var_chainHash, assets: var_assets);
+  }
+
+  @protected
+  ExchangeFees sse_decode_exchange_fees(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_total = sse_decode_String(deserializer);
+    var var_outbound = sse_decode_String(deserializer);
+    var var_liquidity = sse_decode_String(deserializer);
+    var var_affiliate = sse_decode_String(deserializer);
+    var var_slippageBps = sse_decode_i_64(deserializer);
+    var var_totalBps = sse_decode_i_64(deserializer);
+    return ExchangeFees(
+        total: var_total,
+        outbound: var_outbound,
+        liquidity: var_liquidity,
+        affiliate: var_affiliate,
+        slippageBps: var_slippageBps,
+        totalBps: var_totalBps);
+  }
+
+  @protected
   ExchangeProviderId sse_decode_exchange_provider_id(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6942,31 +6999,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ExchangeProviderMetadata sse_decode_exchange_provider_metadata(
+  ExchangeQuoteResult sse_decode_exchange_quote_result(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_field0 = sse_decode_list_thorchain_inbound(deserializer);
-        return ExchangeProviderMetadata_Thorchain(var_field0);
-      default:
-        throw UnimplementedError('');
-    }
+    var var_expectedAmountOut = sse_decode_String(deserializer);
+    var var_minAmountIn = sse_decode_String(deserializer);
+    var var_fees = sse_decode_exchange_fees(deserializer);
+    var var_timing = sse_decode_exchange_timing(deserializer);
+    var var_warning = sse_decode_String(deserializer);
+    var var_notes = sse_decode_String(deserializer);
+    var var_txParams = sse_decode_exchange_tx_params(deserializer);
+    return ExchangeQuoteResult(
+        expectedAmountOut: var_expectedAmountOut,
+        minAmountIn: var_minAmountIn,
+        fees: var_fees,
+        timing: var_timing,
+        warning: var_warning,
+        notes: var_notes,
+        txParams: var_txParams);
   }
 
   @protected
-  ExchangeProviderQuote sse_decode_exchange_provider_quote(
-      SseDeserializer deserializer) {
+  ExchangeTiming sse_decode_exchange_timing(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_inboundSeconds = sse_decode_i_64(deserializer);
+    var var_outboundSeconds = sse_decode_i_64(deserializer);
+    var var_totalSeconds = sse_decode_i_64(deserializer);
+    return ExchangeTiming(
+        inboundSeconds: var_inboundSeconds,
+        outboundSeconds: var_outboundSeconds,
+        totalSeconds: var_totalSeconds);
+  }
+
+  @protected
+  ExchangeTxParams sse_decode_exchange_tx_params(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
         var var_field0 =
-            sse_decode_box_autoadd_thorchain_swap_quote(deserializer);
-        return ExchangeProviderQuote_Thorchain(var_field0);
+            sse_decode_box_autoadd_thorchain_tx_params(deserializer);
+        return ExchangeTxParams_Thorchain(var_field0);
       default:
         throw UnimplementedError('');
     }
@@ -7270,6 +7344,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Entry>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_entry(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ExchangeAsset> sse_decode_list_exchange_asset(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ExchangeAsset>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_exchange_asset(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ExchangeChainGroup> sse_decode_list_exchange_chain_group(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ExchangeChainGroup>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_exchange_chain_group(deserializer));
     }
     return ans_;
   }
@@ -7590,19 +7690,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <RustLedgerHidDevice>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_rust_ledger_hid_device(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<ThorchainInbound> sse_decode_list_thorchain_inbound(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ThorchainInbound>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_thorchain_inbound(deserializer));
     }
     return ans_;
   }
@@ -8174,96 +8261,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ThorchainFees sse_decode_thorchain_fees(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_asset = sse_decode_String(deserializer);
-    var var_affiliate = sse_decode_String(deserializer);
-    var var_outbound = sse_decode_String(deserializer);
-    var var_liquidity = sse_decode_String(deserializer);
-    var var_total = sse_decode_String(deserializer);
-    var var_slippageBps = sse_decode_i_64(deserializer);
-    var var_totalBps = sse_decode_i_64(deserializer);
-    return ThorchainFees(
-        asset: var_asset,
-        affiliate: var_affiliate,
-        outbound: var_outbound,
-        liquidity: var_liquidity,
-        total: var_total,
-        slippageBps: var_slippageBps,
-        totalBps: var_totalBps);
-  }
-
-  @protected
-  ThorchainInbound sse_decode_thorchain_inbound(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_chain = sse_decode_String(deserializer);
-    var var_address = sse_decode_String(deserializer);
-    var var_router = sse_decode_String(deserializer);
-    var var_halted = sse_decode_bool(deserializer);
-    var var_globalTradingPaused = sse_decode_bool(deserializer);
-    var var_chainTradingPaused = sse_decode_bool(deserializer);
-    var var_gasRate = sse_decode_String(deserializer);
-    var var_gasRateUnits = sse_decode_String(deserializer);
-    var var_outboundFee = sse_decode_String(deserializer);
-    var var_dustThreshold = sse_decode_String(deserializer);
-    return ThorchainInbound(
-        chain: var_chain,
-        address: var_address,
-        router: var_router,
-        halted: var_halted,
-        globalTradingPaused: var_globalTradingPaused,
-        chainTradingPaused: var_chainTradingPaused,
-        gasRate: var_gasRate,
-        gasRateUnits: var_gasRateUnits,
-        outboundFee: var_outboundFee,
-        dustThreshold: var_dustThreshold);
-  }
-
-  @protected
-  ThorchainSwapQuote sse_decode_thorchain_swap_quote(
+  ThorchainTxParams sse_decode_thorchain_tx_params(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_inboundAddress = sse_decode_String(deserializer);
     var var_router = sse_decode_String(deserializer);
     var var_memo = sse_decode_String(deserializer);
-    var var_expectedAmountOut = sse_decode_String(deserializer);
     var var_expiry = sse_decode_i_64(deserializer);
-    var var_inboundConfirmationBlocks = sse_decode_i_64(deserializer);
-    var var_inboundConfirmationSeconds = sse_decode_i_64(deserializer);
-    var var_outboundDelayBlocks = sse_decode_i_64(deserializer);
-    var var_outboundDelaySeconds = sse_decode_i_64(deserializer);
-    var var_totalSwapSeconds = sse_decode_i_64(deserializer);
-    var var_maxStreamingQuantity = sse_decode_i_64(deserializer);
-    var var_streamingSwapBlocks = sse_decode_i_64(deserializer);
-    var var_streamingSwapSeconds = sse_decode_i_64(deserializer);
-    var var_fees = sse_decode_thorchain_fees(deserializer);
-    var var_dustThreshold = sse_decode_String(deserializer);
-    var var_recommendedMinAmountIn = sse_decode_String(deserializer);
     var var_recommendedGasRate = sse_decode_String(deserializer);
     var var_gasRateUnits = sse_decode_String(deserializer);
-    var var_warning = sse_decode_String(deserializer);
-    var var_notes = sse_decode_String(deserializer);
-    return ThorchainSwapQuote(
+    return ThorchainTxParams(
         inboundAddress: var_inboundAddress,
         router: var_router,
         memo: var_memo,
-        expectedAmountOut: var_expectedAmountOut,
         expiry: var_expiry,
-        inboundConfirmationBlocks: var_inboundConfirmationBlocks,
-        inboundConfirmationSeconds: var_inboundConfirmationSeconds,
-        outboundDelayBlocks: var_outboundDelayBlocks,
-        outboundDelaySeconds: var_outboundDelaySeconds,
-        totalSwapSeconds: var_totalSwapSeconds,
-        maxStreamingQuantity: var_maxStreamingQuantity,
-        streamingSwapBlocks: var_streamingSwapBlocks,
-        streamingSwapSeconds: var_streamingSwapSeconds,
-        fees: var_fees,
-        dustThreshold: var_dustThreshold,
-        recommendedMinAmountIn: var_recommendedMinAmountIn,
         recommendedGasRate: var_recommendedGasRate,
-        gasRateUnits: var_gasRateUnits,
-        warning: var_warning,
-        notes: var_notes);
+        gasRateUnits: var_gasRateUnits);
   }
 
   @protected
@@ -8949,10 +8962,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_thorchain_swap_quote(
-      ThorchainSwapQuote self, SseSerializer serializer) {
+  void sse_encode_box_autoadd_thorchain_tx_params(
+      ThorchainTxParams self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_thorchain_swap_quote(self, serializer);
+    sse_encode_thorchain_tx_params(self, serializer);
   }
 
   @protected
@@ -9096,6 +9109,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_exchange_asset(ExchangeAsset self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_token_info(self.token, serializer);
+    sse_encode_String(self.providerAssetId, serializer);
+    sse_encode_exchange_provider_id(self.provider, serializer);
+    sse_encode_bool(self.halted, serializer);
+  }
+
+  @protected
+  void sse_encode_exchange_chain_group(
+      ExchangeChainGroup self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_list_exchange_asset(self.assets, serializer);
+  }
+
+  @protected
+  void sse_encode_exchange_fees(ExchangeFees self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.total, serializer);
+    sse_encode_String(self.outbound, serializer);
+    sse_encode_String(self.liquidity, serializer);
+    sse_encode_String(self.affiliate, serializer);
+    sse_encode_i_64(self.slippageBps, serializer);
+    sse_encode_i_64(self.totalBps, serializer);
+  }
+
+  @protected
   void sse_encode_exchange_provider_id(
       ExchangeProviderId self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9103,24 +9144,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_exchange_provider_metadata(
-      ExchangeProviderMetadata self, SseSerializer serializer) {
+  void sse_encode_exchange_quote_result(
+      ExchangeQuoteResult self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case ExchangeProviderMetadata_Thorchain(field0: final field0):
-        sse_encode_i_32(0, serializer);
-        sse_encode_list_thorchain_inbound(field0, serializer);
-    }
+    sse_encode_String(self.expectedAmountOut, serializer);
+    sse_encode_String(self.minAmountIn, serializer);
+    sse_encode_exchange_fees(self.fees, serializer);
+    sse_encode_exchange_timing(self.timing, serializer);
+    sse_encode_String(self.warning, serializer);
+    sse_encode_String(self.notes, serializer);
+    sse_encode_exchange_tx_params(self.txParams, serializer);
   }
 
   @protected
-  void sse_encode_exchange_provider_quote(
-      ExchangeProviderQuote self, SseSerializer serializer) {
+  void sse_encode_exchange_timing(
+      ExchangeTiming self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.inboundSeconds, serializer);
+    sse_encode_i_64(self.outboundSeconds, serializer);
+    sse_encode_i_64(self.totalSeconds, serializer);
+  }
+
+  @protected
+  void sse_encode_exchange_tx_params(
+      ExchangeTxParams self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case ExchangeProviderQuote_Thorchain(field0: final field0):
+      case ExchangeTxParams_Thorchain(field0: final field0):
         sse_encode_i_32(0, serializer);
-        sse_encode_box_autoadd_thorchain_swap_quote(field0, serializer);
+        sse_encode_box_autoadd_thorchain_tx_params(field0, serializer);
     }
   }
 
@@ -9341,6 +9393,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_entry(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_exchange_asset(
+      List<ExchangeAsset> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_exchange_asset(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_exchange_chain_group(
+      List<ExchangeChainGroup> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_exchange_chain_group(item, serializer);
     }
   }
 
@@ -9601,16 +9673,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_rust_ledger_hid_device(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_thorchain_inbound(
-      List<ThorchainInbound> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_thorchain_inbound(item, serializer);
     }
   }
 
@@ -10067,57 +10129,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_thorchain_fees(ThorchainFees self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.asset, serializer);
-    sse_encode_String(self.affiliate, serializer);
-    sse_encode_String(self.outbound, serializer);
-    sse_encode_String(self.liquidity, serializer);
-    sse_encode_String(self.total, serializer);
-    sse_encode_i_64(self.slippageBps, serializer);
-    sse_encode_i_64(self.totalBps, serializer);
-  }
-
-  @protected
-  void sse_encode_thorchain_inbound(
-      ThorchainInbound self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.chain, serializer);
-    sse_encode_String(self.address, serializer);
-    sse_encode_String(self.router, serializer);
-    sse_encode_bool(self.halted, serializer);
-    sse_encode_bool(self.globalTradingPaused, serializer);
-    sse_encode_bool(self.chainTradingPaused, serializer);
-    sse_encode_String(self.gasRate, serializer);
-    sse_encode_String(self.gasRateUnits, serializer);
-    sse_encode_String(self.outboundFee, serializer);
-    sse_encode_String(self.dustThreshold, serializer);
-  }
-
-  @protected
-  void sse_encode_thorchain_swap_quote(
-      ThorchainSwapQuote self, SseSerializer serializer) {
+  void sse_encode_thorchain_tx_params(
+      ThorchainTxParams self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.inboundAddress, serializer);
     sse_encode_String(self.router, serializer);
     sse_encode_String(self.memo, serializer);
-    sse_encode_String(self.expectedAmountOut, serializer);
     sse_encode_i_64(self.expiry, serializer);
-    sse_encode_i_64(self.inboundConfirmationBlocks, serializer);
-    sse_encode_i_64(self.inboundConfirmationSeconds, serializer);
-    sse_encode_i_64(self.outboundDelayBlocks, serializer);
-    sse_encode_i_64(self.outboundDelaySeconds, serializer);
-    sse_encode_i_64(self.totalSwapSeconds, serializer);
-    sse_encode_i_64(self.maxStreamingQuantity, serializer);
-    sse_encode_i_64(self.streamingSwapBlocks, serializer);
-    sse_encode_i_64(self.streamingSwapSeconds, serializer);
-    sse_encode_thorchain_fees(self.fees, serializer);
-    sse_encode_String(self.dustThreshold, serializer);
-    sse_encode_String(self.recommendedMinAmountIn, serializer);
     sse_encode_String(self.recommendedGasRate, serializer);
     sse_encode_String(self.gasRateUnits, serializer);
-    sse_encode_String(self.warning, serializer);
-    sse_encode_String(self.notes, serializer);
   }
 
   @protected
