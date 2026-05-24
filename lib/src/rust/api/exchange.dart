@@ -4,14 +4,16 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/exchange.dart';
+import '../models/exchange/thorchain.dart';
+import '../models/ftoken.dart';
+import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 
             
 
-            Future<String>  getImageName({required String dir , required String url }) => RustLib.instance.api.crateApiCacheGetImageName(dir: dir, url: url);
-
-Future<(Uint8List,String)>  getImageBytes({required String dir , required String url }) => RustLib.instance.api.crateApiCacheGetImageBytes(dir: dir, url: url);
+            List<ExchangeProvider>  bootstrapExchangeProviders({required List<NetworkConfigInfo> configs }) => RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(configs: configs);
 
             
             

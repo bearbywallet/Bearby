@@ -25,11 +25,11 @@ pub use zilpay::{
 use crate::models::ftoken::FTokenInfo;
 use crate::models::keypair::KeyPairInfo;
 use crate::models::settings::WalletSettingsInfo;
-use crate::service::service::BACKGROUND_SERVICE;
-use crate::utils::utils::{secretkey_from_provider, with_wallet};
+use crate::service::background::BACKGROUND_SERVICE;
+use crate::utils::helpers::{secretkey_from_provider, with_wallet};
 use crate::{
     models::wallet::WalletInfo,
-    utils::{errors::ServiceError, utils::with_service},
+    utils::{errors::ServiceError, helpers::with_service},
 };
 
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {

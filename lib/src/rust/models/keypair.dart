@@ -6,23 +6,32 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class KeyPairInfo {
-  final String sk;
-  final String pk;
 
-  const KeyPairInfo({
-    required this.sk,
-    required this.pk,
-  });
+            
 
-  @override
-  int get hashCode => sk.hashCode ^ pk.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is KeyPairInfo &&
-          runtimeType == other.runtimeType &&
-          sk == other.sk &&
-          pk == other.pk;
-}
+            class KeyPairInfo  {
+                final String sk;
+final String pk;
+
+                const KeyPairInfo({required this.sk ,required this.pk ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => sk.hashCode^pk.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is KeyPairInfo &&
+                runtimeType == other.runtimeType
+                && sk == other.sk&& pk == other.pk;
+        
+            }
+            

@@ -9,61 +9,41 @@ import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'settings.dart';
 
-class WalletInfo {
-  final String walletType;
-  final String walletName;
-  final String authType;
-  final String walletAddress;
-  final Map<int, Map<int, List<AccountInfo>>> accounts;
-  final BigInt selectedAccount;
-  final List<FTokenInfo> tokens;
-  final WalletSettingsInfo settings;
-  final BigInt chainHash;
-  final int slip44;
-  final int bip;
 
-  const WalletInfo({
-    required this.walletType,
-    required this.walletName,
-    required this.authType,
-    required this.walletAddress,
-    required this.accounts,
-    required this.selectedAccount,
-    required this.tokens,
-    required this.settings,
-    required this.chainHash,
-    required this.slip44,
-    required this.bip,
-  });
+            
 
-  @override
-  int get hashCode =>
-      walletType.hashCode ^
-      walletName.hashCode ^
-      authType.hashCode ^
-      walletAddress.hashCode ^
-      accounts.hashCode ^
-      selectedAccount.hashCode ^
-      tokens.hashCode ^
-      settings.hashCode ^
-      chainHash.hashCode ^
-      slip44.hashCode ^
-      bip.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WalletInfo &&
-          runtimeType == other.runtimeType &&
-          walletType == other.walletType &&
-          walletName == other.walletName &&
-          authType == other.authType &&
-          walletAddress == other.walletAddress &&
-          accounts == other.accounts &&
-          selectedAccount == other.selectedAccount &&
-          tokens == other.tokens &&
-          settings == other.settings &&
-          chainHash == other.chainHash &&
-          slip44 == other.slip44 &&
-          bip == other.bip;
-}
+            class WalletInfo  {
+                final String walletType;
+final String walletName;
+final String authType;
+final String walletAddress;
+final Map<int, Map<int, List<AccountInfo>>> accounts;
+final BigInt selectedAccount;
+final List<FTokenInfo> tokens;
+final WalletSettingsInfo settings;
+final BigInt chainHash;
+final int slip44;
+final int bip;
+
+                const WalletInfo({required this.walletType ,required this.walletName ,required this.authType ,required this.walletAddress ,required this.accounts ,required this.selectedAccount ,required this.tokens ,required this.settings ,required this.chainHash ,required this.slip44 ,required this.bip ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => walletType.hashCode^walletName.hashCode^authType.hashCode^walletAddress.hashCode^accounts.hashCode^selectedAccount.hashCode^tokens.hashCode^settings.hashCode^chainHash.hashCode^slip44.hashCode^bip.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is WalletInfo &&
+                runtimeType == other.runtimeType
+                && walletType == other.walletType&& walletName == other.walletName&& authType == other.authType&& walletAddress == other.walletAddress&& accounts == other.accounts&& selectedAccount == other.selectedAccount&& tokens == other.tokens&& settings == other.settings&& chainHash == other.chainHash&& slip44 == other.slip44&& bip == other.bip;
+        
+            }
+            

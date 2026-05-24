@@ -7,18 +7,18 @@ import '../frb_generated.dart';
 import '../models/keypair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<String> genBip39Words({required int count}) =>
-    RustLib.instance.api.crateApiMethodsGenBip39Words(count: count);
 
-Future<Uint64List> checkNotExistsBip39Words(
-        {required List<String> words, required String lang}) =>
-    RustLib.instance.api
-        .crateApiMethodsCheckNotExistsBip39Words(words: words, lang: lang);
+            
 
-Future<KeyPairInfo> genKeypair() =>
-    RustLib.instance.api.crateApiMethodsGenKeypair();
+            Future<String>  genBip39Words({required int count }) => RustLib.instance.api.crateApiMethodsGenBip39Words(count: count);
 
-Future<KeyPairInfo> keypairFromSk({required String sk}) =>
-    RustLib.instance.api.crateApiMethodsKeypairFromSk(sk: sk);
+Future<Uint64List>  checkNotExistsBip39Words({required List<String> words , required String lang }) => RustLib.instance.api.crateApiMethodsCheckNotExistsBip39Words(words: words, lang: lang);
 
-Future<void> initApp() => RustLib.instance.api.crateApiMethodsInitApp();
+Future<KeyPairInfo>  genKeypair() => RustLib.instance.api.crateApiMethodsGenKeypair();
+
+Future<KeyPairInfo>  keypairFromSk({required String sk }) => RustLib.instance.api.crateApiMethodsKeypairFromSk(sk: sk);
+
+Future<void>  initApp() => RustLib.instance.api.crateApiMethodsInitApp();
+
+            
+            

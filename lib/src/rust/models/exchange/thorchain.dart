@@ -11,27 +11,26 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
             
 
-            class AccessListItem  {
-                final String address;
-final List<String> storageKeys;
+            class MetadataThorchain  {
+                final int dummy;
 
-                const AccessListItem({required this.address ,required this.storageKeys ,});
+                const MetadataThorchain({required this.dummy ,});
 
                 
                 
 
                 
         @override
-        int get hashCode => address.hashCode^storageKeys.hashCode;
+        int get hashCode => dummy.hashCode;
         
 
                 
         @override
         bool operator ==(Object other) =>
             identical(this, other) ||
-            other is AccessListItem &&
+            other is MetadataThorchain &&
                 runtimeType == other.runtimeType
-                && address == other.address&& storageKeys == other.storageKeys;
+                && dummy == other.dummy;
         
             }
             

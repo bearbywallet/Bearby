@@ -32,7 +32,7 @@ use crate::ledger::hid::{self, HidLedgerTransport};
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 enum TransportEntry {
     Hid(Mutex<HidLedgerTransport>),
-    Ble(tokio::sync::Mutex<BleLedgerTransport>),
+    Ble(Box<tokio::sync::Mutex<BleLedgerTransport>>),
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -140,7 +140,7 @@ pub async fn ledger_ble_open(device_id: String) -> Result<String, String> {
         .map_err(|e| e.to_string())?;
     registry.insert(
         conn_id.clone(),
-        Arc::new(TransportEntry::Ble(tokio::sync::Mutex::new(transport))),
+        Arc::new(TransportEntry::Ble(Box::new(tokio::sync::Mutex::new(transport)))),
     );
     Ok(conn_id)
 }

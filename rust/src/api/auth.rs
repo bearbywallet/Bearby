@@ -1,4 +1,4 @@
-use crate::{service::service::BACKGROUND_SERVICE, utils::errors::ServiceError};
+use crate::{service::background::BACKGROUND_SERVICE, utils::errors::ServiceError};
 use secrecy::{zeroize::Zeroize, SecretString};
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::session;

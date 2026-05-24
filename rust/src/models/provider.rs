@@ -79,7 +79,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
             ftokens: value
                 .ftokens
                 .into_iter()
-                .filter_map(|t| t.try_into().ok())
+                .map(Into::into)
                 .collect(),
             logo: value.logo,
             diff_block_time: value.diff_block_time,
@@ -173,8 +173,8 @@ impl NetworkConfigInfo {
                                     .get("standard")
                                     .and_then(|v| v.as_str())
                                     .map(|s| {
-                                        if s.starts_with("EIP") {
-                                            s[3..].parse::<u16>().unwrap_or(0)
+                                        if let Some(s) = s.strip_prefix("EIP") {
+                                            s.parse::<u16>().unwrap_or(0)
                                         } else {
                                             0
                                         }
@@ -201,8 +201,8 @@ impl NetworkConfigInfo {
                         .iter()
                         .filter_map(|f| {
                             if let Some(feature_str) = f.as_str() {
-                                if feature_str.starts_with("EIP") {
-                                    feature_str[3..].parse::<u16>().ok()
+                                if let Some(stripped) = feature_str.strip_prefix("EIP") {
+                                    stripped.parse::<u16>().ok()
                                 } else {
                                     None
                                 }

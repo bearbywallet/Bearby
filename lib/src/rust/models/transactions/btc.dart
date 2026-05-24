@@ -6,159 +6,159 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class BitcoinMetadataInfo {
-  final List<TxOutInfo> witnessUtxos;
-  final List<InputMetaInfo> inputMeta;
 
-  const BitcoinMetadataInfo({
-    required this.witnessUtxos,
-    required this.inputMeta,
-  });
+            
 
-  @override
-  int get hashCode => witnessUtxos.hashCode ^ inputMeta.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BitcoinMetadataInfo &&
-          runtimeType == other.runtimeType &&
-          witnessUtxos == other.witnessUtxos &&
-          inputMeta == other.inputMeta;
-}
+            class BitcoinMetadataInfo  {
+                final List<TxOutInfo> witnessUtxos;
+final List<InputMetaInfo> inputMeta;
 
-class InputMetaInfo {
-  final int addressType;
-  final String derivationPath;
+                const BitcoinMetadataInfo({required this.witnessUtxos ,required this.inputMeta ,});
 
-  const InputMetaInfo({
-    required this.addressType,
-    required this.derivationPath,
-  });
+                
+                
 
-  @override
-  int get hashCode => addressType.hashCode ^ derivationPath.hashCode;
+                
+        @override
+        int get hashCode => witnessUtxos.hashCode^inputMeta.hashCode;
+        
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is InputMetaInfo &&
-          runtimeType == other.runtimeType &&
-          addressType == other.addressType &&
-          derivationPath == other.derivationPath;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is BitcoinMetadataInfo &&
+                runtimeType == other.runtimeType
+                && witnessUtxos == other.witnessUtxos&& inputMeta == other.inputMeta;
+        
+            }
 
-class OutPointInfo {
-  final String txid;
-  final int vout;
+class InputMetaInfo  {
+                final int addressType;
+final String derivationPath;
 
-  const OutPointInfo({
-    required this.txid,
-    required this.vout,
-  });
+                const InputMetaInfo({required this.addressType ,required this.derivationPath ,});
 
-  @override
-  int get hashCode => txid.hashCode ^ vout.hashCode;
+                
+                
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is OutPointInfo &&
-          runtimeType == other.runtimeType &&
-          txid == other.txid &&
-          vout == other.vout;
-}
+                
+        @override
+        int get hashCode => addressType.hashCode^derivationPath.hashCode;
+        
 
-class TransactionBitcoin {
-  final int version;
-  final int lockTime;
-  final List<TxInInfo> input;
-  final List<TxOutInfo> output;
-  final BigInt? fee;
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is InputMetaInfo &&
+                runtimeType == other.runtimeType
+                && addressType == other.addressType&& derivationPath == other.derivationPath;
+        
+            }
 
-  const TransactionBitcoin({
-    required this.version,
-    required this.lockTime,
-    required this.input,
-    required this.output,
-    this.fee,
-  });
+class OutPointInfo  {
+                final String txid;
+final int vout;
 
-  @override
-  int get hashCode =>
-      version.hashCode ^
-      lockTime.hashCode ^
-      input.hashCode ^
-      output.hashCode ^
-      fee.hashCode;
+                const OutPointInfo({required this.txid ,required this.vout ,});
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TransactionBitcoin &&
-          runtimeType == other.runtimeType &&
-          version == other.version &&
-          lockTime == other.lockTime &&
-          input == other.input &&
-          output == other.output &&
-          fee == other.fee;
-}
+                
+                
 
-class TxInInfo {
-  final OutPointInfo previousOutput;
-  final Uint8List scriptSig;
-  final int sequence;
-  final List<Uint8List> witness;
-  final String? address;
+                
+        @override
+        int get hashCode => txid.hashCode^vout.hashCode;
+        
 
-  const TxInInfo({
-    required this.previousOutput,
-    required this.scriptSig,
-    required this.sequence,
-    required this.witness,
-    this.address,
-  });
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is OutPointInfo &&
+                runtimeType == other.runtimeType
+                && txid == other.txid&& vout == other.vout;
+        
+            }
 
-  @override
-  int get hashCode =>
-      previousOutput.hashCode ^
-      scriptSig.hashCode ^
-      sequence.hashCode ^
-      witness.hashCode ^
-      address.hashCode;
+class TransactionBitcoin  {
+                final int version;
+final int lockTime;
+final List<TxInInfo> input;
+final List<TxOutInfo> output;
+final BigInt? fee;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TxInInfo &&
-          runtimeType == other.runtimeType &&
-          previousOutput == other.previousOutput &&
-          scriptSig == other.scriptSig &&
-          sequence == other.sequence &&
-          witness == other.witness &&
-          address == other.address;
-}
+                const TransactionBitcoin({required this.version ,required this.lockTime ,required this.input ,required this.output ,this.fee ,});
 
-class TxOutInfo {
-  final BigInt value;
-  final Uint8List scriptPubkey;
-  final String? address;
+                
+                
 
-  const TxOutInfo({
-    required this.value,
-    required this.scriptPubkey,
-    this.address,
-  });
+                
+        @override
+        int get hashCode => version.hashCode^lockTime.hashCode^input.hashCode^output.hashCode^fee.hashCode;
+        
 
-  @override
-  int get hashCode => value.hashCode ^ scriptPubkey.hashCode ^ address.hashCode;
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TransactionBitcoin &&
+                runtimeType == other.runtimeType
+                && version == other.version&& lockTime == other.lockTime&& input == other.input&& output == other.output&& fee == other.fee;
+        
+            }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TxOutInfo &&
-          runtimeType == other.runtimeType &&
-          value == other.value &&
-          scriptPubkey == other.scriptPubkey &&
-          address == other.address;
-}
+class TxInInfo  {
+                final OutPointInfo previousOutput;
+final Uint8List scriptSig;
+final int sequence;
+final List<Uint8List> witness;
+final String? address;
+
+                const TxInInfo({required this.previousOutput ,required this.scriptSig ,required this.sequence ,required this.witness ,this.address ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => previousOutput.hashCode^scriptSig.hashCode^sequence.hashCode^witness.hashCode^address.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TxInInfo &&
+                runtimeType == other.runtimeType
+                && previousOutput == other.previousOutput&& scriptSig == other.scriptSig&& sequence == other.sequence&& witness == other.witness&& address == other.address;
+        
+            }
+
+class TxOutInfo  {
+                final BigInt value;
+final Uint8List scriptPubkey;
+final String? address;
+
+                const TxOutInfo({required this.value ,required this.scriptPubkey ,this.address ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => value.hashCode^scriptPubkey.hashCode^address.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TxOutInfo &&
+                runtimeType == other.runtimeType
+                && value == other.value&& scriptPubkey == other.scriptPubkey&& address == other.address;
+        
+            }
+            

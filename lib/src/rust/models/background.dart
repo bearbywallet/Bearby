@@ -12,49 +12,38 @@ import 'provider.dart';
 import 'settings.dart';
 import 'wallet.dart';
 
-class BackgroundState {
-  final List<WalletInfo> wallets;
-  final Map<BigInt, BackgroundNotificationState> notificationsWalletStates;
-  final bool notificationsGlobalEnabled;
-  final String? locale;
-  final int appearances;
-  final bool abbreviatedNumber;
-  final BrowserSettingsInfo browserSettings;
-  final List<NetworkConfigInfo> providers;
 
-  const BackgroundState({
-    required this.wallets,
-    required this.notificationsWalletStates,
-    required this.notificationsGlobalEnabled,
-    this.locale,
-    required this.appearances,
-    required this.abbreviatedNumber,
-    required this.browserSettings,
-    required this.providers,
-  });
+            
 
-  @override
-  int get hashCode =>
-      wallets.hashCode ^
-      notificationsWalletStates.hashCode ^
-      notificationsGlobalEnabled.hashCode ^
-      locale.hashCode ^
-      appearances.hashCode ^
-      abbreviatedNumber.hashCode ^
-      browserSettings.hashCode ^
-      providers.hashCode;
+            
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BackgroundState &&
-          runtimeType == other.runtimeType &&
-          wallets == other.wallets &&
-          notificationsWalletStates == other.notificationsWalletStates &&
-          notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
-          locale == other.locale &&
-          appearances == other.appearances &&
-          abbreviatedNumber == other.abbreviatedNumber &&
-          browserSettings == other.browserSettings &&
-          providers == other.providers;
-}
+            class BackgroundState  {
+                final List<WalletInfo> wallets;
+final Map<BigInt, BackgroundNotificationState> notificationsWalletStates;
+final bool notificationsGlobalEnabled;
+final String? locale;
+final int appearances;
+final bool abbreviatedNumber;
+final BrowserSettingsInfo browserSettings;
+final List<NetworkConfigInfo> providers;
+
+                const BackgroundState({required this.wallets ,required this.notificationsWalletStates ,required this.notificationsGlobalEnabled ,this.locale ,required this.appearances ,required this.abbreviatedNumber ,required this.browserSettings ,required this.providers ,});
+
+                
+                
+
+                
+        @override
+        int get hashCode => wallets.hashCode^notificationsWalletStates.hashCode^notificationsGlobalEnabled.hashCode^locale.hashCode^appearances.hashCode^abbreviatedNumber.hashCode^browserSettings.hashCode^providers.hashCode;
+        
+
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is BackgroundState &&
+                runtimeType == other.runtimeType
+                && wallets == other.wallets&& notificationsWalletStates == other.notificationsWalletStates&& notificationsGlobalEnabled == other.notificationsGlobalEnabled&& locale == other.locale&& appearances == other.appearances&& abbreviatedNumber == other.abbreviatedNumber&& browserSettings == other.browserSettings&& providers == other.providers;
+        
+            }
+            

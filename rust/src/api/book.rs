@@ -2,7 +2,7 @@ use crate::{
     models::book::AddressBookEntryInfo,
     utils::{
         errors::ServiceError,
-        utils::{parse_address, with_service},
+        helpers::{parse_address, with_service},
     },
 };
 pub use zilpay::background::bg_book::AddressBookManagement;
