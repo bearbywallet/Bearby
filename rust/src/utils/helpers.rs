@@ -20,8 +20,8 @@ use crate::{
 
 use super::errors::ServiceError;
 
-pub fn script_to_address(script: &[u8], network: bitcoin::Network) -> Option<String> {
-    bitcoin::Address::from_script(bitcoin::Script::from_bytes(script), network)
+pub fn script_to_address(script: &[u8], network: zilpay::bitcoin::Network) -> Option<String> {
+    zilpay::bitcoin::Address::from_script(zilpay::bitcoin::Script::from_bytes(script), network)
         .ok()
         .map(|a| a.to_string())
 }
@@ -67,13 +67,13 @@ pub fn pubkey_from_provider(
                 (slip44::BITCOIN, _) => {
                     let network = chain_config
                         .bitcoin_network()
-                        .unwrap_or(bitcoin::Network::Bitcoin);
+                        .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
                     let addr_type = chain_config
                         .ftokens
                         .iter()
                         .find(|t| t.native)
                         .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                        .unwrap_or(bitcoin::AddressType::P2tr);
+                        .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
 
                     PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
                 }
@@ -104,10 +104,10 @@ pub fn secretkey_from_provider(
                 .iter()
                 .find(|t| t.native)
                 .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                .unwrap_or(bitcoin::AddressType::P2tr);
+                .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
             let network = chain_config
                 .bitcoin_network()
-                .unwrap_or(bitcoin::Network::Bitcoin);
+                .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
 
             if let Ok(sk_from_wif) = SecretKey::from_wif(trimmed, addr_type) {
                 sk_from_wif

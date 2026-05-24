@@ -40,7 +40,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
             .signer
             .as_ref()
             .and_then(|s| s.get_bitcoin_network().ok())
-            .unwrap_or(bitcoin::Network::Bitcoin);
+            .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
 
         Self {
             status: value.status.into(),

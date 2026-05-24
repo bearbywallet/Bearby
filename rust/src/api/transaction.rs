@@ -20,7 +20,7 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
-use bitcoin::bip32::Xpub;
+use zilpay::bitcoin::bip32::Xpub;
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;

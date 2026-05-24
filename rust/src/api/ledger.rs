@@ -99,7 +99,7 @@ pub async fn add_ledger_wallet(
 
     let btc_chains: HashMap<
         u8,
-        HashMap<bitcoin::AddressType, zilpay::proto::btc_utils::AddressChain>,
+        HashMap<zilpay::bitcoin::AddressType, zilpay::proto::btc_utils::AddressChain>,
     > = params
         .btc_chains
         .into_iter()

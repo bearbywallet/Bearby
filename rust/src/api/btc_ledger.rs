@@ -1,10 +1,10 @@
-use bitcoin::bip32::{ChildNumber, Fingerprint, Xpub};
-use bitcoin::consensus::encode as btc_encode;
-use bitcoin::hashes::Hash;
-use bitcoin::psbt::Psbt;
-use bitcoin::secp256k1::Secp256k1;
-use bitcoin::Transaction as BitcoinTransaction;
-use bitcoin::Witness;
+use zilpay::bitcoin::bip32::{ChildNumber, Fingerprint, Xpub};
+use zilpay::bitcoin::consensus::encode as btc_encode;
+use zilpay::bitcoin::hashes::Hash;
+use zilpay::bitcoin::psbt::Psbt;
+use zilpay::bitcoin::secp256k1::Secp256k1;
+use zilpay::bitcoin::Transaction as BitcoinTransaction;
+use zilpay::bitcoin::Witness;
 use zilpay::sha2::{Digest, Sha256};
 use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
@@ -659,11 +659,11 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         ));
     }
 
-    let addr_types: Vec<bitcoin::AddressType> = input_meta
+    let addr_types: Vec<zilpay::bitcoin::AddressType> = input_meta
         .iter()
         .enumerate()
         .map(|(i, m)| {
-            bitcoin::AddressType::from_byte(m.address_type)
+            zilpay::bitcoin::AddressType::from_byte(m.address_type)
                 .map_err(|e| format!("Invalid address_type byte for input {}: {:?}", i, e))
         })
         .collect::<Result<_, _>>()?;
@@ -680,13 +680,13 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
         }
 
         match addr_types[idx] {
-            bitcoin::AddressType::P2tr => {
-                let schnorr_sig = bitcoin::taproot::Signature::from_slice(&sig_info.signature)
+            zilpay::bitcoin::AddressType::P2tr => {
+                let schnorr_sig = zilpay::bitcoin::taproot::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
                 psbt.inputs[idx].tap_key_sig = Some(schnorr_sig);
             }
             _ => {
-                let ecdsa_sig = bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
+                let ecdsa_sig = zilpay::bitcoin::ecdsa::Signature::from_slice(&sig_info.signature)
                     .map_err(|e| format!("Invalid ECDSA signature: {}", e))?;
 
                 let pubkey = if sig_info.pubkey.is_empty() {
@@ -698,9 +698,9 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                             .ok_or_else(|| {
                                 format!("No pubkey in bip32_derivation for input {}", idx)
                             })?;
-                    bitcoin::PublicKey::new(*pk)
+                    zilpay::bitcoin::PublicKey::new(*pk)
                 } else {
-                    bitcoin::PublicKey::from_slice(&sig_info.pubkey)
+                    zilpay::bitcoin::PublicKey::from_slice(&sig_info.pubkey)
                         .map_err(|e| format!("Invalid public key: {}", e))?
                 };
 
@@ -712,12 +712,12 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
     // Finalize each input using its own address type
     for (idx, input) in psbt.inputs.iter_mut().enumerate() {
         match addr_types[idx] {
-            bitcoin::AddressType::P2tr => {
+            zilpay::bitcoin::AddressType::P2tr => {
                 if let Some(sig) = input.tap_key_sig.take() {
                     input.final_script_witness = Some(Witness::p2tr_key_spend(&sig));
                 }
             }
-            bitcoin::AddressType::P2wpkh => {
+            zilpay::bitcoin::AddressType::P2wpkh => {
                 if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
                     let mut witness = Witness::new();
                     witness.push(sig.serialize());
@@ -726,7 +726,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                 }
                 input.partial_sigs.clear();
             }
-            bitcoin::AddressType::P2sh => {
+            zilpay::bitcoin::AddressType::P2sh => {
                 if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
                     let mut witness = Witness::new();
                     witness.push(sig.serialize());
@@ -738,12 +738,12 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                         let mut script_bytes = Vec::new();
                         script_bytes.push(rs_bytes.len() as u8);
                         script_bytes.extend_from_slice(rs_bytes);
-                        input.final_script_sig = Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                        input.final_script_sig = Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
                     }
                 }
                 input.partial_sigs.clear();
             }
-            bitcoin::AddressType::P2pkh => {
+            zilpay::bitcoin::AddressType::P2pkh => {
                 if let Some((&pubkey, sig)) = input.partial_sigs.iter().next() {
                     let sig_bytes = sig.serialize();
                     let pk_bytes = pubkey.to_bytes();
@@ -752,7 +752,7 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                     script_bytes.extend_from_slice(&sig_bytes);
                     script_bytes.push(pk_bytes.len() as u8);
                     script_bytes.extend_from_slice(&pk_bytes);
-                    input.final_script_sig = Some(bitcoin::ScriptBuf::from_bytes(script_bytes));
+                    input.final_script_sig = Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
                 }
                 input.partial_sigs.clear();
             }
@@ -794,11 +794,11 @@ pub fn btc_ledger_build_psbt_from_struct(
         .try_into()
         .map_err(|e| format!("Failed to convert transaction: {:?}", e))?;
 
-    let native_utxos: Vec<bitcoin::TxOut> = witness_utxos
+    let native_utxos: Vec<zilpay::bitcoin::TxOut> = witness_utxos
         .into_iter()
-        .map(|utxo| bitcoin::TxOut {
-            value: bitcoin::Amount::from_sat(utxo.value),
-            script_pubkey: bitcoin::ScriptBuf::from(utxo.script_pubkey),
+        .map(|utxo| zilpay::bitcoin::TxOut {
+            value: zilpay::bitcoin::Amount::from_sat(utxo.value),
+            script_pubkey: zilpay::bitcoin::ScriptBuf::from(utxo.script_pubkey),
         })
         .collect();
 
@@ -842,7 +842,7 @@ pub fn btc_ledger_prepare_psbt(
 
     // Pre-derive child keys for change=0,1 and index=0..GAP_LIMIT
     const GAP_LIMIT: u32 = 30;
-    let mut derived_keys: Vec<(bitcoin::secp256k1::PublicKey, Vec<ChildNumber>)> = Vec::new();
+    let mut derived_keys: Vec<(zilpay::bitcoin::secp256k1::PublicKey, Vec<ChildNumber>)> = Vec::new();
 
     for change in 0..=1u32 {
         let change_child = ChildNumber::from_normal_idx(change).map_err(|e| e.to_string())?;
@@ -891,36 +891,36 @@ pub fn btc_ledger_prepare_psbt(
             let matched = match bip_purpose {
                 DerivationPath::BIP86_PURPOSE => {
                     let (xonly, _parity) = pubkey.x_only_public_key();
-                    bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None) == script_pubkey
+                    zilpay::bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None) == script_pubkey
                 }
                 DerivationPath::BIP84_PURPOSE => {
-                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    match bitcoin::CompressedPublicKey::try_from(btc_pubkey) {
+                    let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    match zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey) {
                         Ok(cpk) => {
-                            bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == script_pubkey
+                            zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == script_pubkey
                         }
                         Err(_) => false,
                     }
                 }
                 DerivationPath::BIP49_PURPOSE => {
-                    let btc_pk = bitcoin::PublicKey::new(*pubkey);
-                    match bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                    let btc_pk = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    match zilpay::bitcoin::CompressedPublicKey::try_from(btc_pk) {
                         Ok(cpk) => {
-                            let wpkh = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                            bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == script_pubkey
+                            let wpkh = zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                            zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == script_pubkey
                         }
                         Err(_) => false,
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
-                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == script_pubkey
+                    let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == script_pubkey
                 }
                 _ => false,
             };
 
             if matched {
-                let deriv_path = bitcoin::bip32::DerivationPath::from(full_path.clone());
+                let deriv_path = zilpay::bitcoin::bip32::DerivationPath::from(full_path.clone());
 
                 if bip_purpose == DerivationPath::BIP86_PURPOSE {
                     let (xonly, _) = pubkey.x_only_public_key();
@@ -931,10 +931,10 @@ pub fn btc_ledger_prepare_psbt(
                 } else {
                     input.bip32_derivation.insert(*pubkey, (fp, deriv_path));
                     if bip_purpose == DerivationPath::BIP49_PURPOSE {
-                        let btc_pk = bitcoin::PublicKey::new(*pubkey);
-                        if let Ok(cpk) = bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                        let btc_pk = zilpay::bitcoin::PublicKey::new(*pubkey);
+                        if let Ok(cpk) = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pk) {
                             input.redeem_script =
-                                Some(bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
+                                Some(zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
                         }
                     }
                 }
@@ -957,37 +957,37 @@ pub fn btc_ledger_prepare_psbt(
             let matched = match bip_purpose {
                 DerivationPath::BIP86_PURPOSE => {
                     let (xonly, _) = pubkey.x_only_public_key();
-                    let expected = bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None);
+                    let expected = zilpay::bitcoin::ScriptBuf::new_p2tr(&secp, xonly, None);
                     expected == txout.script_pubkey
                 }
                 DerivationPath::BIP84_PURPOSE => {
-                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
+                    let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    let cpk = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
-                        bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == txout.script_pubkey
+                        zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == txout.script_pubkey
                     } else {
                         false
                     }
                 }
                 DerivationPath::BIP49_PURPOSE => {
-                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    let cpk = bitcoin::CompressedPublicKey::try_from(btc_pubkey);
+                    let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    let cpk = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
-                        let wpkh = bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == txout.script_pubkey
+                        let wpkh = zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
+                        zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == txout.script_pubkey
                     } else {
                         false
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
-                    let btc_pubkey = bitcoin::PublicKey::new(*pubkey);
-                    bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == txout.script_pubkey
+                    let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
+                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == txout.script_pubkey
                 }
                 _ => false,
             };
 
             if matched {
-                let deriv_path = bitcoin::bip32::DerivationPath::from(full_path.clone());
+                let deriv_path = zilpay::bitcoin::bip32::DerivationPath::from(full_path.clone());
 
                 if bip_purpose == DerivationPath::BIP86_PURPOSE {
                     let (xonly, _) = pubkey.x_only_public_key();
@@ -998,10 +998,10 @@ pub fn btc_ledger_prepare_psbt(
                     output.bip32_derivation.insert(*pubkey, (fp, deriv_path));
                     // BIP49 (P2SH-P2WPKH): set redeemScript on change output
                     if bip_purpose == DerivationPath::BIP49_PURPOSE {
-                        let btc_pk = bitcoin::PublicKey::new(*pubkey);
-                        if let Ok(cpk) = bitcoin::CompressedPublicKey::try_from(btc_pk) {
+                        let btc_pk = zilpay::bitcoin::PublicKey::new(*pubkey);
+                        if let Ok(cpk) = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pk) {
                             output.redeem_script =
-                                Some(bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
+                                Some(zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()));
                         }
                     }
                 }

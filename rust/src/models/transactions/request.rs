@@ -44,7 +44,7 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let tx_req = TransactionRequest::Ethereum((evm_tx.try_into()?, value.metadata.into()));
             Ok(tx_req)
         } else if let Some((btc_tx, btc_meta_info)) = value.btc {
-            let native_tx: bitcoin::Transaction =
+            let native_tx: zilpay::bitcoin::Transaction =
                 btc_tx.try_into().map_err(|e: TransactionErrors| e)?;
             let btc_meta: BitcoinMetadata = btc_meta_info.try_into()?;
             let tx_req = TransactionRequest::Bitcoin((native_tx, value.metadata.into(), btc_meta));
@@ -101,7 +101,7 @@ impl From<TransactionRequest> for TransactionRequestInfo {
                     .signer
                     .as_ref()
                     .and_then(|s| s.get_bitcoin_network().ok())
-                    .unwrap_or(bitcoin::Network::Bitcoin);
+                    .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
                 let btc_meta_info: BitcoinMetadataInfo = btc_meta.into();
                 let tx_info = TransactionBitcoin::from_tx_with_utxos(
                     tx,

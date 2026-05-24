@@ -38,9 +38,9 @@ pub struct TransactionBitcoin {
 
 impl TransactionBitcoin {
     pub fn from_tx_with_utxos(
-        tx: bitcoin::Transaction,
+        tx: zilpay::bitcoin::Transaction,
         witness_utxos: &[TxOutInfo],
-        network: bitcoin::Network,
+        network: zilpay::bitcoin::Network,
     ) -> Self {
         let input_sum: u64 = witness_utxos.iter().map(|u| u.value).sum();
         let output_sum: u64 = tx.output.iter().map(|o| o.value.to_sat()).sum();
@@ -59,8 +59,8 @@ impl TransactionBitcoin {
     }
 }
 
-impl From<bitcoin::Transaction> for TransactionBitcoin {
-    fn from(tx: bitcoin::Transaction) -> Self {
+impl From<zilpay::bitcoin::Transaction> for TransactionBitcoin {
+    fn from(tx: zilpay::bitcoin::Transaction) -> Self {
         Self {
             version: tx.version.0,
             lock_time: tx.lock_time.to_consensus_u32(),
@@ -92,7 +92,7 @@ impl From<bitcoin::Transaction> for TransactionBitcoin {
     }
 }
 
-impl TryFrom<TransactionBitcoin> for bitcoin::Transaction {
+impl TryFrom<TransactionBitcoin> for zilpay::bitcoin::Transaction {
     type Error = TransactionErrors;
 
     fn try_from(value: TransactionBitcoin) -> Result<Self, Self::Error> {
@@ -100,16 +100,16 @@ impl TryFrom<TransactionBitcoin> for bitcoin::Transaction {
             .input
             .into_iter()
             .map(|tx_in| {
-                let txid = bitcoin::Txid::from_str(&tx_in.previous_output.txid)
+                let txid = zilpay::bitcoin::Txid::from_str(&tx_in.previous_output.txid)
                     .map_err(|e| TransactionErrors::ConvertTxError(e.to_string()))?;
-                Ok(bitcoin::TxIn {
-                    previous_output: bitcoin::OutPoint {
+                Ok(zilpay::bitcoin::TxIn {
+                    previous_output: zilpay::bitcoin::OutPoint {
                         txid,
                         vout: tx_in.previous_output.vout,
                     },
-                    script_sig: bitcoin::ScriptBuf::from(tx_in.script_sig),
-                    sequence: bitcoin::Sequence(tx_in.sequence),
-                    witness: bitcoin::Witness::from_slice(&tx_in.witness),
+                    script_sig: zilpay::bitcoin::ScriptBuf::from(tx_in.script_sig),
+                    sequence: zilpay::bitcoin::Sequence(tx_in.sequence),
+                    witness: zilpay::bitcoin::Witness::from_slice(&tx_in.witness),
                 })
             })
             .collect::<Result<Vec<_>, TransactionErrors>>()?;
@@ -117,15 +117,15 @@ impl TryFrom<TransactionBitcoin> for bitcoin::Transaction {
         let output = value
             .output
             .into_iter()
-            .map(|tx_out| bitcoin::TxOut {
-                value: bitcoin::Amount::from_sat(tx_out.value),
-                script_pubkey: bitcoin::ScriptBuf::from(tx_out.script_pubkey),
+            .map(|tx_out| zilpay::bitcoin::TxOut {
+                value: zilpay::bitcoin::Amount::from_sat(tx_out.value),
+                script_pubkey: zilpay::bitcoin::ScriptBuf::from(tx_out.script_pubkey),
             })
             .collect();
 
-        Ok(bitcoin::Transaction {
-            version: bitcoin::transaction::Version(value.version),
-            lock_time: bitcoin::absolute::LockTime::from_consensus(value.lock_time),
+        Ok(zilpay::bitcoin::Transaction {
+            version: zilpay::bitcoin::transaction::Version(value.version),
+            lock_time: zilpay::bitcoin::absolute::LockTime::from_consensus(value.lock_time),
             input,
             output,
         })
@@ -175,9 +175,9 @@ impl TryFrom<BitcoinMetadataInfo> for BitcoinMetadata {
         let witness_utxos = value
             .witness_utxos
             .into_iter()
-            .map(|tx_out| bitcoin::TxOut {
-                value: bitcoin::Amount::from_sat(tx_out.value),
-                script_pubkey: bitcoin::ScriptBuf::from(tx_out.script_pubkey),
+            .map(|tx_out| zilpay::bitcoin::TxOut {
+                value: zilpay::bitcoin::Amount::from_sat(tx_out.value),
+                script_pubkey: zilpay::bitcoin::ScriptBuf::from(tx_out.script_pubkey),
             })
             .collect();
 
