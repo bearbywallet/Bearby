@@ -21,7 +21,7 @@ pub fn address_to_hash(addr: String) -> usize {
 }
 
 pub fn bitcoin_address_type_from_address(addr: String) -> Result<String, String> {
-    let addr = bitcoin::Address::from_str(&addr)
+    let addr = zilpay::bitcoin::Address::from_str(&addr)
         .map_err(|e| e.to_string())?
         .assume_checked();
 

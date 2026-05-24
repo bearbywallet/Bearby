@@ -10,11 +10,11 @@ use crate::utils::errors::ServiceError;
 
 pub fn btc_chain_info_map_to_core(
     input: HashMap<u8, AddressChainInfo>,
-) -> Result<HashMap<bitcoin::AddressType, AddressChain>, ServiceError> {
+) -> Result<HashMap<zilpay::bitcoin::AddressType, AddressChain>, ServiceError> {
     input
         .into_iter()
         .map(|(addr_type_byte, chain_info)| {
-            let addr_type = bitcoin::AddressType::from_byte(addr_type_byte)
+            let addr_type = zilpay::bitcoin::AddressType::from_byte(addr_type_byte)
                 .map_err(|e| ServiceError::ParseError("address_type".into(), e.to_string()))?;
             let chain = chain_info.try_into()?;
             Ok((addr_type, chain))
@@ -57,13 +57,13 @@ impl TryFrom<BtcAccountXpubsInputInfo> for BtcAccountXpubsInput {
 
     fn try_from(value: BtcAccountXpubsInputInfo) -> Result<Self, Self::Error> {
         Ok(Self {
-            bip44_xpub: bitcoin::bip32::Xpub::from_str(&value.bip44_xpub)
+            bip44_xpub: zilpay::bitcoin::bip32::Xpub::from_str(&value.bip44_xpub)
                 .map_err(|e| ServiceError::ParseError("bip44_xpub".into(), e.to_string()))?,
-            bip49_xpub: bitcoin::bip32::Xpub::from_str(&value.bip49_xpub)
+            bip49_xpub: zilpay::bitcoin::bip32::Xpub::from_str(&value.bip49_xpub)
                 .map_err(|e| ServiceError::ParseError("bip49_xpub".into(), e.to_string()))?,
-            bip84_xpub: bitcoin::bip32::Xpub::from_str(&value.bip84_xpub)
+            bip84_xpub: zilpay::bitcoin::bip32::Xpub::from_str(&value.bip84_xpub)
                 .map_err(|e| ServiceError::ParseError("bip84_xpub".into(), e.to_string()))?,
-            bip86_xpub: bitcoin::bip32::Xpub::from_str(&value.bip86_xpub)
+            bip86_xpub: zilpay::bitcoin::bip32::Xpub::from_str(&value.bip86_xpub)
                 .map_err(|e| ServiceError::ParseError("bip86_xpub".into(), e.to_string()))?,
         })
     }
@@ -85,7 +85,7 @@ impl TryFrom<UtxoInfo> for Utxo {
 
     fn try_from(value: UtxoInfo) -> Result<Self, Self::Error> {
         Ok(Self {
-            txid: bitcoin::Txid::from_str(&value.txid)
+            txid: zilpay::bitcoin::Txid::from_str(&value.txid)
                 .map_err(|e| ServiceError::ParseError("txid".into(), e.to_string()))?,
             vout: value.vout,
             value: value.value,
@@ -117,7 +117,7 @@ impl TryFrom<BtcAddressEntryInfo> for BtcAddressEntry {
                 .history
                 .into_iter()
                 .map(|h| {
-                    bitcoin::Txid::from_str(&h)
+                    zilpay::bitcoin::Txid::from_str(&h)
                         .map_err(|e| ServiceError::ParseError("txid".into(), e.to_string()))
                 })
                 .collect::<Result<Vec<_>, ServiceError>>()?,

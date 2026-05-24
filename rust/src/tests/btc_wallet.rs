@@ -127,7 +127,7 @@ mod btc_wallet_tests {
         assert_eq!(btc_accounts.len(), 1);
 
         let account = &btc_accounts[0];
-        let taproot_history = history.get(&bitcoin::AddressType::P2tr).unwrap();
+        let taproot_history = history.get(&zilpay::bitcoin::AddressType::P2tr).unwrap();
 
         assert!(taproot_history.get_internal().unwrap().history.is_empty());
         assert!(taproot_history.get_internal().unwrap().utxos.is_empty());

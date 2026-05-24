@@ -5947,7 +5947,6 @@ dependencies = [
 name = "rust_lib_zilpay"
 version = "0.1.0"
 dependencies = [
- "bitcoin",
  "btleplug",
  "flutter_rust_bridge",
  "futures",
