@@ -1,24 +1,28 @@
 pub mod thorchain;
 
-use thorchain::MetadataThorchain;
+use thorchain::{ThorchainInbound, ThorchainSwapQuote};
 
 use super::provider::NetworkConfigInfo;
 
 #[derive(Debug)]
-pub enum ExchangeProvider {
-    Thorchain(MetadataThorchain),
+pub enum ExchangeProviderId {
+    Thorchain,
 }
 
-impl Default for ExchangeProvider {
-    fn default() -> Self {
-        Self::Thorchain(MetadataThorchain::default())
-    }
+#[derive(Debug)]
+pub enum ExchangeProviderMetadata {
+    Thorchain(Vec<ThorchainInbound>),
 }
 
-impl ExchangeProvider {
+#[derive(Debug)]
+pub enum ExchangeProviderQuote {
+    Thorchain(ThorchainSwapQuote),
+}
+
+impl ExchangeProviderId {
     pub fn is_supported(&self, config: &NetworkConfigInfo) -> bool {
         match self {
-            Self::Thorchain(_) => MetadataThorchain::is_supported(config),
+            Self::Thorchain => thorchain::is_chain_supported(config),
         }
     }
 }

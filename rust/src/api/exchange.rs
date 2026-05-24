@@ -1,17 +1,19 @@
 use flutter_rust_bridge::frb;
 
 use crate::models::{
-    exchange::{thorchain, ExchangeProvider},
+    exchange::{
+        thorchain, ExchangeProviderId, ExchangeProviderMetadata, ExchangeProviderQuote,
+    },
     provider::NetworkConfigInfo,
 };
 
 #[frb(sync)]
-pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<ExchangeProvider> {
+pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<ExchangeProviderId> {
     if configs.is_empty() {
         return Vec::with_capacity(0);
     }
 
-    let candidates = [ExchangeProvider::Thorchain(Default::default())];
+    let candidates = [ExchangeProviderId::Thorchain];
 
     let mut result = Vec::with_capacity(candidates.len());
 
@@ -24,29 +26,34 @@ pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<Exch
     result
 }
 
-pub async fn fetch_exchange_provider_data(
-    provider: ExchangeProvider,
+pub async fn fetch_exchange_metadata(
+    provider: ExchangeProviderId,
+) -> Result<ExchangeProviderMetadata, String> {
+    match provider {
+        ExchangeProviderId::Thorchain => {
+            let inbound = thorchain::fetch_thorchain_inbound().await?;
+            Ok(ExchangeProviderMetadata::Thorchain(inbound))
+        }
+    }
+}
+
+pub async fn fetch_exchange_quote(
+    provider: ExchangeProviderId,
     from_asset: String,
     to_asset: String,
     amount: String,
     destination: String,
-) -> Result<ExchangeProvider, String> {
+) -> Result<ExchangeProviderQuote, String> {
     match provider {
-        ExchangeProvider::Thorchain(_) => {
-            let metadata = thorchain::fetch_thorchain_data(
+        ExchangeProviderId::Thorchain => {
+            let quote = thorchain::fetch_thorchain_swap_quote(
                 &from_asset,
                 &to_asset,
                 &amount,
                 &destination,
             )
             .await?;
-            Ok(ExchangeProvider::Thorchain(metadata))
+            Ok(ExchangeProviderQuote::Thorchain(quote))
         }
     }
-}
-
-pub async fn build_exchange_transaction(
-    _provider: ExchangeProvider,
-) -> Result<String, String> {
-    todo!()
 }

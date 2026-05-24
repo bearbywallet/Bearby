@@ -9,11 +9,25 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'exchange.freezed.dart';
 
-@freezed
-sealed class ExchangeProvider with _$ExchangeProvider {
-  const ExchangeProvider._();
+enum ExchangeProviderId {
+  thorchain,
+  ;
+}
 
-  const factory ExchangeProvider.thorchain(
-    MetadataThorchain field0,
-  ) = ExchangeProvider_Thorchain;
+@freezed
+sealed class ExchangeProviderMetadata with _$ExchangeProviderMetadata {
+  const ExchangeProviderMetadata._();
+
+  const factory ExchangeProviderMetadata.thorchain(
+    List<ThorchainInbound> field0,
+  ) = ExchangeProviderMetadata_Thorchain;
+}
+
+@freezed
+sealed class ExchangeProviderQuote with _$ExchangeProviderQuote {
+  const ExchangeProviderQuote._();
+
+  const factory ExchangeProviderQuote.thorchain(
+    ThorchainSwapQuote field0,
+  ) = ExchangeProviderQuote_Thorchain;
 }
