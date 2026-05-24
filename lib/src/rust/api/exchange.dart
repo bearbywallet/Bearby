@@ -14,3 +14,20 @@ List<ExchangeProvider> bootstrapExchangeProviders(
         {required List<NetworkConfigInfo> configs}) =>
     RustLib.instance.api
         .crateApiExchangeBootstrapExchangeProviders(configs: configs);
+
+Future<ExchangeProvider> fetchExchangeProviderData(
+        {required ExchangeProvider provider,
+        required String fromAsset,
+        required String toAsset,
+        required String amount,
+        required String destination}) =>
+    RustLib.instance.api.crateApiExchangeFetchExchangeProviderData(
+        provider: provider,
+        fromAsset: fromAsset,
+        toAsset: toAsset,
+        amount: amount,
+        destination: destination);
+
+Future<String> buildExchangeTransaction({required ExchangeProvider provider}) =>
+    RustLib.instance.api
+        .crateApiExchangeBuildExchangeTransaction(provider: provider);

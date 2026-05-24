@@ -7,19 +7,215 @@ import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class MetadataThorchain {
-  final int dummy;
+  final List<ThorchainInbound> inboundAddresses;
+  final ThorchainSwapQuote swapQuote;
 
   const MetadataThorchain({
-    required this.dummy,
+    required this.inboundAddresses,
+    required this.swapQuote,
   });
 
   @override
-  int get hashCode => dummy.hashCode;
+  int get hashCode => inboundAddresses.hashCode ^ swapQuote.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MetadataThorchain &&
           runtimeType == other.runtimeType &&
-          dummy == other.dummy;
+          inboundAddresses == other.inboundAddresses &&
+          swapQuote == other.swapQuote;
+}
+
+class ThorchainFees {
+  final String asset;
+  final String affiliate;
+  final String outbound;
+  final String liquidity;
+  final String total;
+  final PlatformInt64 slippageBps;
+  final PlatformInt64 totalBps;
+
+  const ThorchainFees({
+    required this.asset,
+    required this.affiliate,
+    required this.outbound,
+    required this.liquidity,
+    required this.total,
+    required this.slippageBps,
+    required this.totalBps,
+  });
+
+  @override
+  int get hashCode =>
+      asset.hashCode ^
+      affiliate.hashCode ^
+      outbound.hashCode ^
+      liquidity.hashCode ^
+      total.hashCode ^
+      slippageBps.hashCode ^
+      totalBps.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThorchainFees &&
+          runtimeType == other.runtimeType &&
+          asset == other.asset &&
+          affiliate == other.affiliate &&
+          outbound == other.outbound &&
+          liquidity == other.liquidity &&
+          total == other.total &&
+          slippageBps == other.slippageBps &&
+          totalBps == other.totalBps;
+}
+
+class ThorchainInbound {
+  final String chain;
+  final String address;
+  final String router;
+  final bool halted;
+  final bool globalTradingPaused;
+  final bool chainTradingPaused;
+  final String gasRate;
+  final String gasRateUnits;
+  final String outboundFee;
+  final String dustThreshold;
+
+  const ThorchainInbound({
+    required this.chain,
+    required this.address,
+    required this.router,
+    required this.halted,
+    required this.globalTradingPaused,
+    required this.chainTradingPaused,
+    required this.gasRate,
+    required this.gasRateUnits,
+    required this.outboundFee,
+    required this.dustThreshold,
+  });
+
+  @override
+  int get hashCode =>
+      chain.hashCode ^
+      address.hashCode ^
+      router.hashCode ^
+      halted.hashCode ^
+      globalTradingPaused.hashCode ^
+      chainTradingPaused.hashCode ^
+      gasRate.hashCode ^
+      gasRateUnits.hashCode ^
+      outboundFee.hashCode ^
+      dustThreshold.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThorchainInbound &&
+          runtimeType == other.runtimeType &&
+          chain == other.chain &&
+          address == other.address &&
+          router == other.router &&
+          halted == other.halted &&
+          globalTradingPaused == other.globalTradingPaused &&
+          chainTradingPaused == other.chainTradingPaused &&
+          gasRate == other.gasRate &&
+          gasRateUnits == other.gasRateUnits &&
+          outboundFee == other.outboundFee &&
+          dustThreshold == other.dustThreshold;
+}
+
+class ThorchainSwapQuote {
+  final String inboundAddress;
+  final String router;
+  final String memo;
+  final String expectedAmountOut;
+  final PlatformInt64 expiry;
+  final PlatformInt64 inboundConfirmationBlocks;
+  final PlatformInt64 inboundConfirmationSeconds;
+  final PlatformInt64 outboundDelayBlocks;
+  final PlatformInt64 outboundDelaySeconds;
+  final PlatformInt64 totalSwapSeconds;
+  final PlatformInt64 maxStreamingQuantity;
+  final PlatformInt64 streamingSwapBlocks;
+  final PlatformInt64 streamingSwapSeconds;
+  final ThorchainFees fees;
+  final String dustThreshold;
+  final String recommendedMinAmountIn;
+  final String recommendedGasRate;
+  final String gasRateUnits;
+  final String warning;
+  final String notes;
+
+  const ThorchainSwapQuote({
+    required this.inboundAddress,
+    required this.router,
+    required this.memo,
+    required this.expectedAmountOut,
+    required this.expiry,
+    required this.inboundConfirmationBlocks,
+    required this.inboundConfirmationSeconds,
+    required this.outboundDelayBlocks,
+    required this.outboundDelaySeconds,
+    required this.totalSwapSeconds,
+    required this.maxStreamingQuantity,
+    required this.streamingSwapBlocks,
+    required this.streamingSwapSeconds,
+    required this.fees,
+    required this.dustThreshold,
+    required this.recommendedMinAmountIn,
+    required this.recommendedGasRate,
+    required this.gasRateUnits,
+    required this.warning,
+    required this.notes,
+  });
+
+  @override
+  int get hashCode =>
+      inboundAddress.hashCode ^
+      router.hashCode ^
+      memo.hashCode ^
+      expectedAmountOut.hashCode ^
+      expiry.hashCode ^
+      inboundConfirmationBlocks.hashCode ^
+      inboundConfirmationSeconds.hashCode ^
+      outboundDelayBlocks.hashCode ^
+      outboundDelaySeconds.hashCode ^
+      totalSwapSeconds.hashCode ^
+      maxStreamingQuantity.hashCode ^
+      streamingSwapBlocks.hashCode ^
+      streamingSwapSeconds.hashCode ^
+      fees.hashCode ^
+      dustThreshold.hashCode ^
+      recommendedMinAmountIn.hashCode ^
+      recommendedGasRate.hashCode ^
+      gasRateUnits.hashCode ^
+      warning.hashCode ^
+      notes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ThorchainSwapQuote &&
+          runtimeType == other.runtimeType &&
+          inboundAddress == other.inboundAddress &&
+          router == other.router &&
+          memo == other.memo &&
+          expectedAmountOut == other.expectedAmountOut &&
+          expiry == other.expiry &&
+          inboundConfirmationBlocks == other.inboundConfirmationBlocks &&
+          inboundConfirmationSeconds == other.inboundConfirmationSeconds &&
+          outboundDelayBlocks == other.outboundDelayBlocks &&
+          outboundDelaySeconds == other.outboundDelaySeconds &&
+          totalSwapSeconds == other.totalSwapSeconds &&
+          maxStreamingQuantity == other.maxStreamingQuantity &&
+          streamingSwapBlocks == other.streamingSwapBlocks &&
+          streamingSwapSeconds == other.streamingSwapSeconds &&
+          fees == other.fees &&
+          dustThreshold == other.dustThreshold &&
+          recommendedMinAmountIn == other.recommendedMinAmountIn &&
+          recommendedGasRate == other.recommendedGasRate &&
+          gasRateUnits == other.gasRateUnits &&
+          warning == other.warning &&
+          notes == other.notes;
 }
