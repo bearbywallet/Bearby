@@ -11,7 +11,7 @@ use crate::utils::errors::ServiceError;
 use crate::utils::helpers::{parse_address, with_service};
 use zilpay::secrecy::zeroize::Zeroize;
 use zilpay::secrecy::SecretString;
-use tokio::sync::mpsc;
+use zilpay::tokio::sync::mpsc;
 use zilpay::background::bg_bitcoin::BitcoinManagement;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;

@@ -8,6 +8,7 @@ mod btc_wallet_tests {
     use zilpay::crypto::bip49::DerivationPath;
     use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
     use zilpay::rpc::network_config::ChainConfig;
+    use zilpay::tokio;
     use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 
     use crate::api::backend::get_data;
@@ -37,7 +38,7 @@ mod btc_wallet_tests {
         (SOLANA, SOL_ADDR),
     ];
 
-    #[tokio::test]
+    #[zilpay::tokio::test]
     async fn test_create_btc_wallet() {
         let dir = tempdir().unwrap();
         load_service(dir.path().to_str().unwrap()).await.unwrap();

@@ -5951,11 +5951,8 @@ dependencies = [
  "flutter_rust_bridge",
  "futures",
  "hidapi",
- "lazy_static",
- "once_cell",
  "tempfile",
  "thiserror 1.0.69",
- "tokio",
  "uuid",
  "zilpay_core",
 ]

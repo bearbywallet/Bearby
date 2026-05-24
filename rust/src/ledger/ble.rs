@@ -3,7 +3,7 @@ use std::time::Duration;
 use btleplug::api::{Central, Manager as _, Peripheral as _, ScanFilter, WriteType};
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::StreamExt;
-use tokio::sync::OnceCell;
+use zilpay::tokio::sync::OnceCell;
 use uuid::Uuid;
 
 use crate::ledger::device::{identify_ble_service_uuid, BLE_DEVICES};
@@ -63,7 +63,7 @@ pub async fn scan_devices() -> Result<Vec<BleDeviceInfo>, LedgerError> {
         .await
         .map_err(|e| LedgerError::Io(format!("Scan start failed: {}", e)))?;
 
-    tokio::time::sleep(Duration::from_secs(5)).await;
+    zilpay::tokio::time::sleep(Duration::from_secs(5)).await;
 
     adapter.stop_scan().await.ok();
 
@@ -199,7 +199,7 @@ impl BleLedgerTransport {
         {
             // Try to read the MTU response with timeout
             if let Ok(mut notifs) = peripheral.notifications().await {
-                let timeout = tokio::time::timeout(Duration::from_secs(2), notifs.next()).await;
+                let timeout = zilpay::tokio::time::timeout(Duration::from_secs(2), notifs.next()).await;
                 if let Ok(Some(notif)) = &timeout {
                     if notif.value.len() >= 6 && notif.value[0] == MTU_NEGOTIATE_CMD {
                         let negotiated = notif.value[5] as usize;
@@ -231,7 +231,7 @@ impl BleLedgerTransport {
                 .map_err(|e| LedgerError::Io(format!("BLE write failed: {}", e)))?;
 
             // Small delay between chunks (matching Android's 20ms)
-            tokio::time::sleep(Duration::from_millis(20)).await;
+            zilpay::tokio::time::sleep(Duration::from_millis(20)).await;
         }
 
         // Read response notifications
@@ -245,7 +245,7 @@ impl BleLedgerTransport {
         let timeout_duration = Duration::from_secs(30);
 
         loop {
-            let notif = tokio::time::timeout(timeout_duration, notifs.next())
+            let notif = zilpay::tokio::time::timeout(timeout_duration, notifs.next())
                 .await
                 .map_err(|_| LedgerError::Timeout)?
                 .ok_or(LedgerError::Disconnected)?;
