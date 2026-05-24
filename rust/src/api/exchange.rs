@@ -1,6 +1,9 @@
 use flutter_rust_bridge::frb;
 
-use crate::models::{exchange::ExchangeProvider, provider::NetworkConfigInfo};
+use crate::models::{
+    exchange::{thorchain, ExchangeProvider},
+    provider::NetworkConfigInfo,
+};
 
 #[frb(sync)]
 pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<ExchangeProvider> {
@@ -19,4 +22,31 @@ pub fn bootstrap_exchange_providers(configs: Vec<NetworkConfigInfo>) -> Vec<Exch
     }
 
     result
+}
+
+pub async fn fetch_exchange_provider_data(
+    provider: ExchangeProvider,
+    from_asset: String,
+    to_asset: String,
+    amount: String,
+    destination: String,
+) -> Result<ExchangeProvider, String> {
+    match provider {
+        ExchangeProvider::Thorchain(_) => {
+            let metadata = thorchain::fetch_thorchain_data(
+                &from_asset,
+                &to_asset,
+                &amount,
+                &destination,
+            )
+            .await?;
+            Ok(ExchangeProvider::Thorchain(metadata))
+        }
+    }
+}
+
+pub async fn build_exchange_transaction(
+    _provider: ExchangeProvider,
+) -> Result<String, String> {
+    todo!()
 }

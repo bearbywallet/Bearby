@@ -11,7 +11,7 @@ pub enum ExchangeProvider {
 
 impl Default for ExchangeProvider {
     fn default() -> Self {
-        Self::Thorchain(MetadataThorchain { dummy: 0 })
+        Self::Thorchain(MetadataThorchain::default())
     }
 }
 

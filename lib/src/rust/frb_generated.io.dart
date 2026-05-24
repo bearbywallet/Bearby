@@ -192,6 +192,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
 
   @protected
+  ExchangeProvider dco_decode_box_autoadd_exchange_provider(dynamic raw);
+
+  @protected
   double dco_decode_box_autoadd_f_32(dynamic raw);
 
   @protected
@@ -436,6 +439,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
 
   @protected
+  List<ThorchainInbound> dco_decode_list_thorchain_inbound(dynamic raw);
+
+  @protected
   List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw);
 
   @protected
@@ -582,6 +588,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
+
+  @protected
+  ThorchainFees dco_decode_thorchain_fees(dynamic raw);
+
+  @protected
+  ThorchainInbound dco_decode_thorchain_inbound(dynamic raw);
+
+  @protected
+  ThorchainSwapQuote dco_decode_thorchain_swap_quote(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
@@ -780,6 +795,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ConnectionInfo sse_decode_box_autoadd_connection_info(
+      SseDeserializer deserializer);
+
+  @protected
+  ExchangeProvider sse_decode_box_autoadd_exchange_provider(
       SseDeserializer deserializer);
 
   @protected
@@ -1059,6 +1078,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<ThorchainInbound> sse_decode_list_thorchain_inbound(
+      SseDeserializer deserializer);
+
+  @protected
   List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer);
 
   @protected
@@ -1221,6 +1244,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
+      SseDeserializer deserializer);
+
+  @protected
+  ThorchainFees sse_decode_thorchain_fees(SseDeserializer deserializer);
+
+  @protected
+  ThorchainInbound sse_decode_thorchain_inbound(SseDeserializer deserializer);
+
+  @protected
+  ThorchainSwapQuote sse_decode_thorchain_swap_quote(
       SseDeserializer deserializer);
 
   @protected
@@ -1431,6 +1464,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_connection_info(
       ConnectionInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_exchange_provider(
+      ExchangeProvider self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer);
@@ -1718,6 +1755,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<RustLedgerHidDevice> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_thorchain_inbound(
+      List<ThorchainInbound> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_tx_in_info(
       List<TxInInfo> self, SseSerializer serializer);
 
@@ -1884,6 +1925,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_rust_ledger_hid_device(
       RustLedgerHidDevice self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_thorchain_fees(ThorchainFees self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_thorchain_inbound(
+      ThorchainInbound self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_thorchain_swap_quote(
+      ThorchainSwapQuote self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(
