@@ -6,35 +6,37 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class AccountInfo {
+  final String addr;
+  final String? pubKey;
+  final int addrType;
+  final String name;
+  final BigInt index;
 
-            
+  const AccountInfo({
+    required this.addr,
+    this.pubKey,
+    required this.addrType,
+    required this.name,
+    required this.index,
+  });
 
-            
+  @override
+  int get hashCode =>
+      addr.hashCode ^
+      pubKey.hashCode ^
+      addrType.hashCode ^
+      name.hashCode ^
+      index.hashCode;
 
-            class AccountInfo  {
-                final String addr;
-final String? pubKey;
-final int addrType;
-final String name;
-final BigInt index;
-
-                const AccountInfo({required this.addr ,this.pubKey ,required this.addrType ,required this.name ,required this.index ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => addr.hashCode^pubKey.hashCode^addrType.hashCode^name.hashCode^index.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is AccountInfo &&
-                runtimeType == other.runtimeType
-                && addr == other.addr&& pubKey == other.pubKey&& addrType == other.addrType&& name == other.name&& index == other.index;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AccountInfo &&
+          runtimeType == other.runtimeType &&
+          addr == other.addr &&
+          pubKey == other.pubKey &&
+          addrType == other.addrType &&
+          name == other.name &&
+          index == other.index;
+}

@@ -9,47 +9,60 @@ import 'btc.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'transaction_metadata.dart';
 
+class HistoricalTransactionInfo {
+  final TransactionStatusInfo status;
+  final TransactionMetadataInfo metadata;
+  final String? evm;
+  final String? scilla;
+  final TransactionBitcoin? btc;
+  final String? tron;
+  final String? solana;
+  final String? signedMessage;
+  final BigInt timestamp;
 
-            
+  const HistoricalTransactionInfo({
+    required this.status,
+    required this.metadata,
+    this.evm,
+    this.scilla,
+    this.btc,
+    this.tron,
+    this.solana,
+    this.signedMessage,
+    required this.timestamp,
+  });
 
-            
+  @override
+  int get hashCode =>
+      status.hashCode ^
+      metadata.hashCode ^
+      evm.hashCode ^
+      scilla.hashCode ^
+      btc.hashCode ^
+      tron.hashCode ^
+      solana.hashCode ^
+      signedMessage.hashCode ^
+      timestamp.hashCode;
 
-            class HistoricalTransactionInfo  {
-                final TransactionStatusInfo status;
-final TransactionMetadataInfo metadata;
-final String? evm;
-final String? scilla;
-final TransactionBitcoin? btc;
-final String? tron;
-final String? solana;
-final String? signedMessage;
-final BigInt timestamp;
-
-                const HistoricalTransactionInfo({required this.status ,required this.metadata ,this.evm ,this.scilla ,this.btc ,this.tron ,this.solana ,this.signedMessage ,required this.timestamp ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => status.hashCode^metadata.hashCode^evm.hashCode^scilla.hashCode^btc.hashCode^tron.hashCode^solana.hashCode^signedMessage.hashCode^timestamp.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is HistoricalTransactionInfo &&
-                runtimeType == other.runtimeType
-                && status == other.status&& metadata == other.metadata&& evm == other.evm&& scilla == other.scilla&& btc == other.btc&& tron == other.tron&& solana == other.solana&& signedMessage == other.signedMessage&& timestamp == other.timestamp;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HistoricalTransactionInfo &&
+          runtimeType == other.runtimeType &&
+          status == other.status &&
+          metadata == other.metadata &&
+          evm == other.evm &&
+          scilla == other.scilla &&
+          btc == other.btc &&
+          tron == other.tron &&
+          solana == other.solana &&
+          signedMessage == other.signedMessage &&
+          timestamp == other.timestamp;
+}
 
 enum TransactionStatusInfo {
-                    pending,
-success,
-failed,
-                    ;
-                    
-                }
-            
+  pending,
+  success,
+  failed,
+  ;
+}

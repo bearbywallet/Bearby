@@ -6,33 +6,26 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class BaseTokenInfo {
+  final String value;
+  final String symbol;
+  final int decimals;
 
-            
+  const BaseTokenInfo({
+    required this.value,
+    required this.symbol,
+    required this.decimals,
+  });
 
-            
+  @override
+  int get hashCode => value.hashCode ^ symbol.hashCode ^ decimals.hashCode;
 
-            class BaseTokenInfo  {
-                final String value;
-final String symbol;
-final int decimals;
-
-                const BaseTokenInfo({required this.value ,required this.symbol ,required this.decimals ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => value.hashCode^symbol.hashCode^decimals.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is BaseTokenInfo &&
-                runtimeType == other.runtimeType
-                && value == other.value&& symbol == other.symbol&& decimals == other.decimals;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BaseTokenInfo &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          symbol == other.symbol &&
+          decimals == other.decimals;
+}

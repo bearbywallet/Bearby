@@ -16,113 +16,206 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
-            // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
+Future<HistoricalTransactionInfo> sendSignedTransactions(
+        {required int walletIndex,
+        required int accountIndex,
+        required TransactionRequestInfo tx,
+        required List<int> sig,
+        String? bip86Xpub}) =>
+    RustLib.instance.api.crateApiTransactionSendSignedTransactions(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        tx: tx,
+        sig: sig,
+        bip86Xpub: bip86Xpub);
 
+Future<HistoricalTransactionInfo> signSendTransactions(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        String? password,
+        String? passphrase,
+        required TransactionRequestInfo tx}) =>
+    RustLib.instance.api.crateApiTransactionSignSendTransactions(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        password: password,
+        passphrase: passphrase,
+        tx: tx);
 
-            Future<HistoricalTransactionInfo>  sendSignedTransactions({required int walletIndex , required int accountIndex , required TransactionRequestInfo tx , required List<int> sig , String? bip86Xpub }) => RustLib.instance.api.crateApiTransactionSendSignedTransactions(walletIndex: walletIndex, accountIndex: accountIndex, tx: tx, sig: sig, bip86Xpub: bip86Xpub);
+Future<EncodedRLPTx> encodeTxRlp(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required TransactionRequestInfo tx,
+        required int slip44}) =>
+    RustLib.instance.api.crateApiTransactionEncodeTxRlp(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        tx: tx,
+        slip44: slip44);
 
-Future<HistoricalTransactionInfo>  signSendTransactions({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required TransactionRequestInfo tx }) => RustLib.instance.api.crateApiTransactionSignSendTransactions(walletIndex: walletIndex, accountIndex: accountIndex, password: password, passphrase: passphrase, tx: tx);
+Future<Uint8List> prepareMessage(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required String message}) =>
+    RustLib.instance.api.crateApiTransactionPrepareMessage(
+        walletIndex: walletIndex, accountIndex: accountIndex, message: message);
 
-Future<EncodedRLPTx>  encodeTxRlp({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo tx , required int slip44 }) => RustLib.instance.api.crateApiTransactionEncodeTxRlp(walletIndex: walletIndex, accountIndex: accountIndex, tx: tx, slip44: slip44);
+Future<Eip712Hashes> prepareEip712Message({required String typedDataJson}) =>
+    RustLib.instance.api
+        .crateApiTransactionPrepareEip712Message(typedDataJson: typedDataJson);
 
-Future<Uint8List>  prepareMessage({required BigInt walletIndex , required BigInt accountIndex , required String message }) => RustLib.instance.api.crateApiTransactionPrepareMessage(walletIndex: walletIndex, accountIndex: accountIndex, message: message);
+Future<(String, String)> signMessage(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        String? password,
+        String? passphrase,
+        required String message,
+        String? title,
+        String? icon}) =>
+    RustLib.instance.api.crateApiTransactionSignMessage(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        password: password,
+        passphrase: passphrase,
+        message: message,
+        title: title,
+        icon: icon);
 
-Future<Eip712Hashes>  prepareEip712Message({required String typedDataJson }) => RustLib.instance.api.crateApiTransactionPrepareEip712Message(typedDataJson: typedDataJson);
+Future<(String, String)> signTypedDataEip712(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        String? password,
+        String? passphrase,
+        required String typedDataJson,
+        String? title,
+        String? icon}) =>
+    RustLib.instance.api.crateApiTransactionSignTypedDataEip712(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        password: password,
+        passphrase: passphrase,
+        typedDataJson: typedDataJson,
+        title: title,
+        icon: icon);
 
-Future<(String,String)>  signMessage({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String message , String? title , String? icon }) => RustLib.instance.api.crateApiTransactionSignMessage(walletIndex: walletIndex, accountIndex: accountIndex, password: password, passphrase: passphrase, message: message, title: title, icon: icon);
+Future<List<HistoricalTransactionInfo>> getHistory(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionGetHistory(walletIndex: walletIndex);
 
-Future<(String,String)>  signTypedDataEip712({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String typedDataJson , String? title , String? icon }) => RustLib.instance.api.crateApiTransactionSignTypedDataEip712(walletIndex: walletIndex, accountIndex: accountIndex, password: password, passphrase: passphrase, typedDataJson: typedDataJson, title: title, icon: icon);
+Future<void> clearHistory({required BigInt walletIndex}) => RustLib.instance.api
+    .crateApiTransactionClearHistory(walletIndex: walletIndex);
 
-Future<List<HistoricalTransactionInfo>>  getHistory({required BigInt walletIndex }) => RustLib.instance.api.crateApiTransactionGetHistory(walletIndex: walletIndex);
+Future<TransactionRequestInfo> createTokenTransfer(
+        {required TokenTransferParamsInfo params}) =>
+    RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);
 
-Future<void>  clearHistory({required BigInt walletIndex }) => RustLib.instance.api.crateApiTransactionClearHistory(walletIndex: walletIndex);
+Future<RequiredTxParamsInfo> caclGasFee(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required TransactionRequestInfo params}) =>
+    RustLib.instance.api.crateApiTransactionCaclGasFee(
+        walletIndex: walletIndex, accountIndex: accountIndex, params: params);
 
-Future<TransactionRequestInfo>  createTokenTransfer({required TokenTransferParamsInfo params }) => RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);
+Future<List<HistoricalTransactionInfo>> checkPendingTranasctions(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionCheckPendingTranasctions(walletIndex: walletIndex);
 
-Future<RequiredTxParamsInfo>  caclGasFee({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo params }) => RustLib.instance.api.crateApiTransactionCaclGasFee(walletIndex: walletIndex, accountIndex: accountIndex, params: params);
+Stream<String> startHistoryWorker({required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionStartHistoryWorker(walletIndex: walletIndex);
 
-Future<List<HistoricalTransactionInfo>>  checkPendingTranasctions({required BigInt walletIndex }) => RustLib.instance.api.crateApiTransactionCheckPendingTranasctions(walletIndex: walletIndex);
+Future<void> stopHistoryWorker() =>
+    RustLib.instance.api.crateApiTransactionStopHistoryWorker();
 
-Stream<String>  startHistoryWorker({required BigInt walletIndex }) => RustLib.instance.api.crateApiTransactionStartHistoryWorker(walletIndex: walletIndex);
+Future<TransactionRequestInfo> updateTxWithParams(
+        {required TransactionRequestInfo tx,
+        required RequiredTxParamsInfo params,
+        required String balance,
+        required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiTransactionUpdateTxWithParams(
+        tx: tx, params: params, balance: balance, chainHash: chainHash);
 
-Future<void>  stopHistoryWorker() => RustLib.instance.api.crateApiTransactionStopHistoryWorker();
+class Eip712Hashes {
+  final Uint8List domainSeparator;
+  final Uint8List hashStructMessage;
 
-Future<TransactionRequestInfo>  updateTxWithParams({required TransactionRequestInfo tx , required RequiredTxParamsInfo params , required String balance , required BigInt chainHash }) => RustLib.instance.api.crateApiTransactionUpdateTxWithParams(tx: tx, params: params, balance: balance, chainHash: chainHash);
+  const Eip712Hashes({
+    required this.domainSeparator,
+    required this.hashStructMessage,
+  });
 
-            class Eip712Hashes  {
-                final Uint8List domainSeparator;
-final Uint8List hashStructMessage;
+  @override
+  int get hashCode => domainSeparator.hashCode ^ hashStructMessage.hashCode;
 
-                const Eip712Hashes({required this.domainSeparator ,required this.hashStructMessage ,});
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Eip712Hashes &&
+          runtimeType == other.runtimeType &&
+          domainSeparator == other.domainSeparator &&
+          hashStructMessage == other.hashStructMessage;
+}
 
-                
-                
+class EncodedRLPTx {
+  final Uint8List bytes;
+  final List<Uint8List> chunksBytes;
 
-                
-        @override
-        int get hashCode => domainSeparator.hashCode^hashStructMessage.hashCode;
-        
+  const EncodedRLPTx({
+    required this.bytes,
+    required this.chunksBytes,
+  });
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is Eip712Hashes &&
-                runtimeType == other.runtimeType
-                && domainSeparator == other.domainSeparator&& hashStructMessage == other.hashStructMessage;
-        
-            }
+  @override
+  int get hashCode => bytes.hashCode ^ chunksBytes.hashCode;
 
-class EncodedRLPTx  {
-                final Uint8List bytes;
-final List<Uint8List> chunksBytes;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EncodedRLPTx &&
+          runtimeType == other.runtimeType &&
+          bytes == other.bytes &&
+          chunksBytes == other.chunksBytes;
+}
 
-                const EncodedRLPTx({required this.bytes ,required this.chunksBytes ,});
+class TokenTransferParamsInfo {
+  final BigInt walletIndex;
+  final BigInt accountIndex;
+  final FTokenInfo token;
+  final String amount;
+  final String recipient;
+  final String icon;
 
-                
-                
+  const TokenTransferParamsInfo({
+    required this.walletIndex,
+    required this.accountIndex,
+    required this.token,
+    required this.amount,
+    required this.recipient,
+    required this.icon,
+  });
 
-                
-        @override
-        int get hashCode => bytes.hashCode^chunksBytes.hashCode;
-        
+  @override
+  int get hashCode =>
+      walletIndex.hashCode ^
+      accountIndex.hashCode ^
+      token.hashCode ^
+      amount.hashCode ^
+      recipient.hashCode ^
+      icon.hashCode;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is EncodedRLPTx &&
-                runtimeType == other.runtimeType
-                && bytes == other.bytes&& chunksBytes == other.chunksBytes;
-        
-            }
-
-class TokenTransferParamsInfo  {
-                final BigInt walletIndex;
-final BigInt accountIndex;
-final FTokenInfo token;
-final String amount;
-final String recipient;
-final String icon;
-
-                const TokenTransferParamsInfo({required this.walletIndex ,required this.accountIndex ,required this.token ,required this.amount ,required this.recipient ,required this.icon ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => walletIndex.hashCode^accountIndex.hashCode^token.hashCode^amount.hashCode^recipient.hashCode^icon.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is TokenTransferParamsInfo &&
-                runtimeType == other.runtimeType
-                && walletIndex == other.walletIndex&& accountIndex == other.accountIndex&& token == other.token&& amount == other.amount&& recipient == other.recipient&& icon == other.icon;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TokenTransferParamsInfo &&
+          runtimeType == other.runtimeType &&
+          walletIndex == other.walletIndex &&
+          accountIndex == other.accountIndex &&
+          token == other.token &&
+          amount == other.amount &&
+          recipient == other.recipient &&
+          icon == other.icon;
+}

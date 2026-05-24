@@ -6,41 +6,61 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class FTokenInfo {
+  final String name;
+  final String symbol;
+  final int decimals;
+  final String addr;
+  final int addrType;
+  final String? logo;
+  final Map<BigInt, String> balances;
+  final double rate;
+  final bool default_;
+  final bool native;
+  final BigInt chainHash;
 
-            
+  const FTokenInfo({
+    required this.name,
+    required this.symbol,
+    required this.decimals,
+    required this.addr,
+    required this.addrType,
+    this.logo,
+    required this.balances,
+    required this.rate,
+    required this.default_,
+    required this.native,
+    required this.chainHash,
+  });
 
-            
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      symbol.hashCode ^
+      decimals.hashCode ^
+      addr.hashCode ^
+      addrType.hashCode ^
+      logo.hashCode ^
+      balances.hashCode ^
+      rate.hashCode ^
+      default_.hashCode ^
+      native.hashCode ^
+      chainHash.hashCode;
 
-            class FTokenInfo  {
-                final String name;
-final String symbol;
-final int decimals;
-final String addr;
-final int addrType;
-final String? logo;
-final Map<BigInt, String> balances;
-final double rate;
-final bool default_;
-final bool native;
-final BigInt chainHash;
-
-                const FTokenInfo({required this.name ,required this.symbol ,required this.decimals ,required this.addr ,required this.addrType ,this.logo ,required this.balances ,required this.rate ,required this.default_ ,required this.native ,required this.chainHash ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => name.hashCode^symbol.hashCode^decimals.hashCode^addr.hashCode^addrType.hashCode^logo.hashCode^balances.hashCode^rate.hashCode^default_.hashCode^native.hashCode^chainHash.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is FTokenInfo &&
-                runtimeType == other.runtimeType
-                && name == other.name&& symbol == other.symbol&& decimals == other.decimals&& addr == other.addr&& addrType == other.addrType&& logo == other.logo&& balances == other.balances&& rate == other.rate&& default_ == other.default_&& native == other.native&& chainHash == other.chainHash;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FTokenInfo &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          symbol == other.symbol &&
+          decimals == other.decimals &&
+          addr == other.addr &&
+          addrType == other.addrType &&
+          logo == other.logo &&
+          balances == other.balances &&
+          rate == other.rate &&
+          default_ == other.default_ &&
+          native == other.native &&
+          chainHash == other.chainHash;
+}

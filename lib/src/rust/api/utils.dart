@@ -6,24 +6,42 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<bool> isValidAddress({required String addr}) =>
+    RustLib.instance.api.crateApiUtilsIsValidAddress(addr: addr);
 
-            
+BigInt addressToHash({required String addr}) =>
+    RustLib.instance.api.crateApiUtilsAddressToHash(addr: addr);
 
-            Future<bool>  isValidAddress({required String addr }) => RustLib.instance.api.crateApiUtilsIsValidAddress(addr: addr);
+Future<String> bitcoinAddressTypeFromAddress({required String addr}) =>
+    RustLib.instance.api.crateApiUtilsBitcoinAddressTypeFromAddress(addr: addr);
 
-BigInt  addressToHash({required String addr }) => RustLib.instance.api.crateApiUtilsAddressToHash(addr: addr);
+(String, String) intlNumberFormating(
+        {required String value,
+        required int decimals,
+        required String localeStr,
+        required String nativeSymbolStr,
+        required String convertedSymbolStr,
+        required double threshold,
+        required bool compact,
+        required double converted}) =>
+    RustLib.instance.api.crateApiUtilsIntlNumberFormating(
+        value: value,
+        decimals: decimals,
+        localeStr: localeStr,
+        nativeSymbolStr: nativeSymbolStr,
+        convertedSymbolStr: convertedSymbolStr,
+        threshold: threshold,
+        compact: compact,
+        converted: converted);
 
-Future<String>  bitcoinAddressTypeFromAddress({required String addr }) => RustLib.instance.api.crateApiUtilsBitcoinAddressTypeFromAddress(addr: addr);
+Future<List<(String, String)>> getCurrenciesTickets() =>
+    RustLib.instance.api.crateApiUtilsGetCurrenciesTickets();
 
-(String,String)  intlNumberFormating({required String value , required int decimals , required String localeStr , required String nativeSymbolStr , required String convertedSymbolStr , required double threshold , required bool compact , required double converted }) => RustLib.instance.api.crateApiUtilsIntlNumberFormating(value: value, decimals: decimals, localeStr: localeStr, nativeSymbolStr: nativeSymbolStr, convertedSymbolStr: convertedSymbolStr, threshold: threshold, compact: compact, converted: converted);
+Future<bool> bip39ChecksumValid({required String words}) =>
+    RustLib.instance.api.crateApiUtilsBip39ChecksumValid(words: words);
 
-Future<List<(String,String)>>  getCurrenciesTickets() => RustLib.instance.api.crateApiUtilsGetCurrenciesTickets();
+(String, int) toWei({required String value, required int decimals}) =>
+    RustLib.instance.api.crateApiUtilsToWei(value: value, decimals: decimals);
 
-Future<bool>  bip39ChecksumValid({required String words }) => RustLib.instance.api.crateApiUtilsBip39ChecksumValid(words: words);
-
-(String,int)  toWei({required String value , required int decimals }) => RustLib.instance.api.crateApiUtilsToWei(value: value, decimals: decimals);
-
-String  fromWei({required String value , required int decimals }) => RustLib.instance.api.crateApiUtilsFromWei(value: value, decimals: decimals);
-
-            
-            
+String fromWei({required String value, required int decimals}) =>
+    RustLib.instance.api.crateApiUtilsFromWei(value: value, decimals: decimals);

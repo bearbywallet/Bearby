@@ -10,10 +10,7 @@ import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-
-            
-
-            List<ExchangeProvider>  bootstrapExchangeProviders({required List<NetworkConfigInfo> configs }) => RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(configs: configs);
-
-            
-            
+List<ExchangeProvider> bootstrapExchangeProviders(
+        {required List<NetworkConfigInfo> configs}) =>
+    RustLib.instance.api
+        .crateApiExchangeBootstrapExchangeProviders(configs: configs);

@@ -6,79 +6,106 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-
-            // These functions are ignored because they are not marked as `pub`: `next_connection_id`
+// These functions are ignored because they are not marked as `pub`: `next_connection_id`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `TRANSPORT_REGISTRY`, `TransportEntry`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `initialize`
 
+Future<List<RustLedgerHidDevice>> ledgerHidList() =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerHidList();
 
-            Future<List<RustLedgerHidDevice>>  ledgerHidList() => RustLib.instance.api.crateApiLedgerTransportLedgerHidList();
+Future<String> ledgerHidOpen({required String deviceId}) => RustLib.instance.api
+    .crateApiLedgerTransportLedgerHidOpen(deviceId: deviceId);
 
-Future<String>  ledgerHidOpen({required String deviceId }) => RustLib.instance.api.crateApiLedgerTransportLedgerHidOpen(deviceId: deviceId);
+Future<Uint8List> ledgerHidExchange(
+        {required String connectionId, required List<int> apdu}) =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerHidExchange(
+        connectionId: connectionId, apdu: apdu);
 
-Future<Uint8List>  ledgerHidExchange({required String connectionId , required List<int> apdu }) => RustLib.instance.api.crateApiLedgerTransportLedgerHidExchange(connectionId: connectionId, apdu: apdu);
+Future<void> ledgerHidClose({required String connectionId}) =>
+    RustLib.instance.api
+        .crateApiLedgerTransportLedgerHidClose(connectionId: connectionId);
 
-Future<void>  ledgerHidClose({required String connectionId }) => RustLib.instance.api.crateApiLedgerTransportLedgerHidClose(connectionId: connectionId);
+Future<List<RustLedgerBleDevice>> ledgerBleScan() =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerBleScan();
 
-Future<List<RustLedgerBleDevice>>  ledgerBleScan() => RustLib.instance.api.crateApiLedgerTransportLedgerBleScan();
+Future<String> ledgerBleOpen({required String deviceId}) => RustLib.instance.api
+    .crateApiLedgerTransportLedgerBleOpen(deviceId: deviceId);
 
-Future<String>  ledgerBleOpen({required String deviceId }) => RustLib.instance.api.crateApiLedgerTransportLedgerBleOpen(deviceId: deviceId);
+Future<Uint8List> ledgerBleExchange(
+        {required String connectionId, required List<int> apdu}) =>
+    RustLib.instance.api.crateApiLedgerTransportLedgerBleExchange(
+        connectionId: connectionId, apdu: apdu);
 
-Future<Uint8List>  ledgerBleExchange({required String connectionId , required List<int> apdu }) => RustLib.instance.api.crateApiLedgerTransportLedgerBleExchange(connectionId: connectionId, apdu: apdu);
+Future<void> ledgerBleClose({required String connectionId}) =>
+    RustLib.instance.api
+        .crateApiLedgerTransportLedgerBleClose(connectionId: connectionId);
 
-Future<void>  ledgerBleClose({required String connectionId }) => RustLib.instance.api.crateApiLedgerTransportLedgerBleClose(connectionId: connectionId);
+class RustLedgerBleDevice {
+  final String deviceId;
+  final String name;
+  final String serviceUuid;
+  final String modelId;
+  final String productName;
 
-            class RustLedgerBleDevice  {
-                final String deviceId;
-final String name;
-final String serviceUuid;
-final String modelId;
-final String productName;
+  const RustLedgerBleDevice({
+    required this.deviceId,
+    required this.name,
+    required this.serviceUuid,
+    required this.modelId,
+    required this.productName,
+  });
 
-                const RustLedgerBleDevice({required this.deviceId ,required this.name ,required this.serviceUuid ,required this.modelId ,required this.productName ,});
+  @override
+  int get hashCode =>
+      deviceId.hashCode ^
+      name.hashCode ^
+      serviceUuid.hashCode ^
+      modelId.hashCode ^
+      productName.hashCode;
 
-                
-                
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RustLedgerBleDevice &&
+          runtimeType == other.runtimeType &&
+          deviceId == other.deviceId &&
+          name == other.name &&
+          serviceUuid == other.serviceUuid &&
+          modelId == other.modelId &&
+          productName == other.productName;
+}
 
-                
-        @override
-        int get hashCode => deviceId.hashCode^name.hashCode^serviceUuid.hashCode^modelId.hashCode^productName.hashCode;
-        
+class RustLedgerHidDevice {
+  final String deviceId;
+  final int vendorId;
+  final int productId;
+  final String productName;
+  final String modelId;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is RustLedgerBleDevice &&
-                runtimeType == other.runtimeType
-                && deviceId == other.deviceId&& name == other.name&& serviceUuid == other.serviceUuid&& modelId == other.modelId&& productName == other.productName;
-        
-            }
+  const RustLedgerHidDevice({
+    required this.deviceId,
+    required this.vendorId,
+    required this.productId,
+    required this.productName,
+    required this.modelId,
+  });
 
-class RustLedgerHidDevice  {
-                final String deviceId;
-final int vendorId;
-final int productId;
-final String productName;
-final String modelId;
+  @override
+  int get hashCode =>
+      deviceId.hashCode ^
+      vendorId.hashCode ^
+      productId.hashCode ^
+      productName.hashCode ^
+      modelId.hashCode;
 
-                const RustLedgerHidDevice({required this.deviceId ,required this.vendorId ,required this.productId ,required this.productName ,required this.modelId ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => deviceId.hashCode^vendorId.hashCode^productId.hashCode^productName.hashCode^modelId.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is RustLedgerHidDevice &&
-                runtimeType == other.runtimeType
-                && deviceId == other.deviceId&& vendorId == other.vendorId&& productId == other.productId&& productName == other.productName&& modelId == other.modelId;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RustLedgerHidDevice &&
+          runtimeType == other.runtimeType &&
+          deviceId == other.deviceId &&
+          vendorId == other.vendorId &&
+          productId == other.productId &&
+          productName == other.productName &&
+          modelId == other.modelId;
+}

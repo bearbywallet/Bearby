@@ -6,34 +6,33 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class BackgroundNotificationState {
+  final bool transactions;
+  final bool price;
+  final bool security;
+  final bool balance;
 
-            
+  const BackgroundNotificationState({
+    required this.transactions,
+    required this.price,
+    required this.security,
+    required this.balance,
+  });
 
-            
+  @override
+  int get hashCode =>
+      transactions.hashCode ^
+      price.hashCode ^
+      security.hashCode ^
+      balance.hashCode;
 
-            class BackgroundNotificationState  {
-                final bool transactions;
-final bool price;
-final bool security;
-final bool balance;
-
-                const BackgroundNotificationState({required this.transactions ,required this.price ,required this.security ,required this.balance ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => transactions.hashCode^price.hashCode^security.hashCode^balance.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is BackgroundNotificationState &&
-                runtimeType == other.runtimeType
-                && transactions == other.transactions&& price == other.price&& security == other.security&& balance == other.balance;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BackgroundNotificationState &&
+          runtimeType == other.runtimeType &&
+          transactions == other.transactions &&
+          price == other.price &&
+          security == other.security &&
+          balance == other.balance;
+}

@@ -7,38 +7,49 @@ import '../../frb_generated.dart';
 import 'base_token.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class TransactionMetadataInfo {
+  final BigInt chainHash;
+  final String? hash;
+  final String? info;
+  final String? icon;
+  final String? title;
+  final String? signer;
+  final BaseTokenInfo? tokenInfo;
+  final bool broadcast;
 
-            
+  const TransactionMetadataInfo({
+    required this.chainHash,
+    this.hash,
+    this.info,
+    this.icon,
+    this.title,
+    this.signer,
+    this.tokenInfo,
+    required this.broadcast,
+  });
 
-            
+  @override
+  int get hashCode =>
+      chainHash.hashCode ^
+      hash.hashCode ^
+      info.hashCode ^
+      icon.hashCode ^
+      title.hashCode ^
+      signer.hashCode ^
+      tokenInfo.hashCode ^
+      broadcast.hashCode;
 
-            class TransactionMetadataInfo  {
-                final BigInt chainHash;
-final String? hash;
-final String? info;
-final String? icon;
-final String? title;
-final String? signer;
-final BaseTokenInfo? tokenInfo;
-final bool broadcast;
-
-                const TransactionMetadataInfo({required this.chainHash ,this.hash ,this.info ,this.icon ,this.title ,this.signer ,this.tokenInfo ,required this.broadcast ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => chainHash.hashCode^hash.hashCode^info.hashCode^icon.hashCode^title.hashCode^signer.hashCode^tokenInfo.hashCode^broadcast.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is TransactionMetadataInfo &&
-                runtimeType == other.runtimeType
-                && chainHash == other.chainHash&& hash == other.hash&& info == other.info&& icon == other.icon&& title == other.title&& signer == other.signer&& tokenInfo == other.tokenInfo&& broadcast == other.broadcast;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransactionMetadataInfo &&
+          runtimeType == other.runtimeType &&
+          chainHash == other.chainHash &&
+          hash == other.hash &&
+          info == other.info &&
+          icon == other.icon &&
+          title == other.title &&
+          signer == other.signer &&
+          tokenInfo == other.tokenInfo &&
+          broadcast == other.broadcast;
+}
