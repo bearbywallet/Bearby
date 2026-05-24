@@ -6,65 +6,81 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class GasFeeHistoryInfo {
+  final BigInt maxFee;
+  final BigInt priorityFee;
+  final BigInt baseFee;
 
-            
+  const GasFeeHistoryInfo({
+    required this.maxFee,
+    required this.priorityFee,
+    required this.baseFee,
+  });
 
-            
+  @override
+  int get hashCode => maxFee.hashCode ^ priorityFee.hashCode ^ baseFee.hashCode;
 
-            class GasFeeHistoryInfo  {
-                final BigInt maxFee;
-final BigInt priorityFee;
-final BigInt baseFee;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GasFeeHistoryInfo &&
+          runtimeType == other.runtimeType &&
+          maxFee == other.maxFee &&
+          priorityFee == other.priorityFee &&
+          baseFee == other.baseFee;
+}
 
-                const GasFeeHistoryInfo({required this.maxFee ,required this.priorityFee ,required this.baseFee ,});
+class RequiredTxParamsInfo {
+  final BigInt gasPrice;
+  final BigInt maxPriorityFee;
+  final GasFeeHistoryInfo feeHistory;
+  final BigInt txEstimateGas;
+  final BigInt blobBaseFee;
+  final BigInt nonce;
+  final String slow;
+  final String market;
+  final String fast;
+  final String current;
 
-                
-                
+  const RequiredTxParamsInfo({
+    required this.gasPrice,
+    required this.maxPriorityFee,
+    required this.feeHistory,
+    required this.txEstimateGas,
+    required this.blobBaseFee,
+    required this.nonce,
+    required this.slow,
+    required this.market,
+    required this.fast,
+    required this.current,
+  });
 
-                
-        @override
-        int get hashCode => maxFee.hashCode^priorityFee.hashCode^baseFee.hashCode;
-        
+  @override
+  int get hashCode =>
+      gasPrice.hashCode ^
+      maxPriorityFee.hashCode ^
+      feeHistory.hashCode ^
+      txEstimateGas.hashCode ^
+      blobBaseFee.hashCode ^
+      nonce.hashCode ^
+      slow.hashCode ^
+      market.hashCode ^
+      fast.hashCode ^
+      current.hashCode;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is GasFeeHistoryInfo &&
-                runtimeType == other.runtimeType
-                && maxFee == other.maxFee&& priorityFee == other.priorityFee&& baseFee == other.baseFee;
-        
-            }
-
-class RequiredTxParamsInfo  {
-                final BigInt gasPrice;
-final BigInt maxPriorityFee;
-final GasFeeHistoryInfo feeHistory;
-final BigInt txEstimateGas;
-final BigInt blobBaseFee;
-final BigInt nonce;
-final String slow;
-final String market;
-final String fast;
-final String current;
-
-                const RequiredTxParamsInfo({required this.gasPrice ,required this.maxPriorityFee ,required this.feeHistory ,required this.txEstimateGas ,required this.blobBaseFee ,required this.nonce ,required this.slow ,required this.market ,required this.fast ,required this.current ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => gasPrice.hashCode^maxPriorityFee.hashCode^feeHistory.hashCode^txEstimateGas.hashCode^blobBaseFee.hashCode^nonce.hashCode^slow.hashCode^market.hashCode^fast.hashCode^current.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is RequiredTxParamsInfo &&
-                runtimeType == other.runtimeType
-                && gasPrice == other.gasPrice&& maxPriorityFee == other.maxPriorityFee&& feeHistory == other.feeHistory&& txEstimateGas == other.txEstimateGas&& blobBaseFee == other.blobBaseFee&& nonce == other.nonce&& slow == other.slow&& market == other.market&& fast == other.fast&& current == other.current;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RequiredTxParamsInfo &&
+          runtimeType == other.runtimeType &&
+          gasPrice == other.gasPrice &&
+          maxPriorityFee == other.maxPriorityFee &&
+          feeHistory == other.feeHistory &&
+          txEstimateGas == other.txEstimateGas &&
+          blobBaseFee == other.blobBaseFee &&
+          nonce == other.nonce &&
+          slow == other.slow &&
+          market == other.market &&
+          fast == other.fast &&
+          current == other.current;
+}

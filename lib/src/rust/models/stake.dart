@@ -7,69 +7,98 @@ import '../frb_generated.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class FinalOutputInfo {
+  final String name;
+  final String address;
+  final FTokenInfo? token;
+  final String delegAmt;
+  final String rewards;
+  final String claimableAmount;
+  final double? apr;
+  final double? commission;
+  final BigInt? unbondingPeriodSeconds;
+  final double? lstPriceChangePercent;
+  final BigInt? avgBlockTimeMs;
+  final String tag;
+  final BigInt? currentBlock;
+  final List<PendingWithdrawalInfo> pendingWithdrawals;
 
-            
+  const FinalOutputInfo({
+    required this.name,
+    required this.address,
+    this.token,
+    required this.delegAmt,
+    required this.rewards,
+    required this.claimableAmount,
+    this.apr,
+    this.commission,
+    this.unbondingPeriodSeconds,
+    this.lstPriceChangePercent,
+    this.avgBlockTimeMs,
+    required this.tag,
+    this.currentBlock,
+    required this.pendingWithdrawals,
+  });
 
-            
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      address.hashCode ^
+      token.hashCode ^
+      delegAmt.hashCode ^
+      rewards.hashCode ^
+      claimableAmount.hashCode ^
+      apr.hashCode ^
+      commission.hashCode ^
+      unbondingPeriodSeconds.hashCode ^
+      lstPriceChangePercent.hashCode ^
+      avgBlockTimeMs.hashCode ^
+      tag.hashCode ^
+      currentBlock.hashCode ^
+      pendingWithdrawals.hashCode;
 
-            class FinalOutputInfo  {
-                final String name;
-final String address;
-final FTokenInfo? token;
-final String delegAmt;
-final String rewards;
-final String claimableAmount;
-final double? apr;
-final double? commission;
-final BigInt? unbondingPeriodSeconds;
-final double? lstPriceChangePercent;
-final BigInt? avgBlockTimeMs;
-final String tag;
-final BigInt? currentBlock;
-final List<PendingWithdrawalInfo> pendingWithdrawals;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FinalOutputInfo &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          address == other.address &&
+          token == other.token &&
+          delegAmt == other.delegAmt &&
+          rewards == other.rewards &&
+          claimableAmount == other.claimableAmount &&
+          apr == other.apr &&
+          commission == other.commission &&
+          unbondingPeriodSeconds == other.unbondingPeriodSeconds &&
+          lstPriceChangePercent == other.lstPriceChangePercent &&
+          avgBlockTimeMs == other.avgBlockTimeMs &&
+          tag == other.tag &&
+          currentBlock == other.currentBlock &&
+          pendingWithdrawals == other.pendingWithdrawals;
+}
 
-                const FinalOutputInfo({required this.name ,required this.address ,this.token ,required this.delegAmt ,required this.rewards ,required this.claimableAmount ,this.apr ,this.commission ,this.unbondingPeriodSeconds ,this.lstPriceChangePercent ,this.avgBlockTimeMs ,required this.tag ,this.currentBlock ,required this.pendingWithdrawals ,});
+class PendingWithdrawalInfo {
+  final String amount;
+  final BigInt withdrawalBlock;
+  final bool claimable;
 
-                
-                
+  const PendingWithdrawalInfo({
+    required this.amount,
+    required this.withdrawalBlock,
+    required this.claimable,
+  });
 
-                
-        @override
-        int get hashCode => name.hashCode^address.hashCode^token.hashCode^delegAmt.hashCode^rewards.hashCode^claimableAmount.hashCode^apr.hashCode^commission.hashCode^unbondingPeriodSeconds.hashCode^lstPriceChangePercent.hashCode^avgBlockTimeMs.hashCode^tag.hashCode^currentBlock.hashCode^pendingWithdrawals.hashCode;
-        
+  @override
+  int get hashCode =>
+      amount.hashCode ^ withdrawalBlock.hashCode ^ claimable.hashCode;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is FinalOutputInfo &&
-                runtimeType == other.runtimeType
-                && name == other.name&& address == other.address&& token == other.token&& delegAmt == other.delegAmt&& rewards == other.rewards&& claimableAmount == other.claimableAmount&& apr == other.apr&& commission == other.commission&& unbondingPeriodSeconds == other.unbondingPeriodSeconds&& lstPriceChangePercent == other.lstPriceChangePercent&& avgBlockTimeMs == other.avgBlockTimeMs&& tag == other.tag&& currentBlock == other.currentBlock&& pendingWithdrawals == other.pendingWithdrawals;
-        
-            }
-
-class PendingWithdrawalInfo  {
-                final String amount;
-final BigInt withdrawalBlock;
-final bool claimable;
-
-                const PendingWithdrawalInfo({required this.amount ,required this.withdrawalBlock ,required this.claimable ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => amount.hashCode^withdrawalBlock.hashCode^claimable.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is PendingWithdrawalInfo &&
-                runtimeType == other.runtimeType
-                && amount == other.amount&& withdrawalBlock == other.withdrawalBlock&& claimable == other.claimable;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PendingWithdrawalInfo &&
+          runtimeType == other.runtimeType &&
+          amount == other.amount &&
+          withdrawalBlock == other.withdrawalBlock &&
+          claimable == other.claimable;
+}

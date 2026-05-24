@@ -25,7 +25,8 @@ import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
-import 'frb_generated.io.dart' if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'frb_generated.io.dart'
+    if (dart.library.js_interop) 'frb_generated.web.dart';
 import 'models/account.dart';
 import 'models/background.dart';
 import 'models/book.dart';
@@ -52,7007 +53,9959 @@ import 'models/transactions/transaction_metadata.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+/// Main entrypoint of the Rust API
+class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
+  @internal
+  static final instance = RustLib._();
+
+  RustLib._();
+
+  /// Initialize flutter_rust_bridge
+  static Future<void> init({
+    RustLibApi? api,
+    BaseHandler? handler,
+    ExternalLibrary? externalLibrary,
+    bool forceSameCodegenVersion = true,
+  }) async {
+    await instance.initImpl(
+      api: api,
+      handler: handler,
+      externalLibrary: externalLibrary,
+      forceSameCodegenVersion: forceSameCodegenVersion,
+    );
+  }
+
+  /// Initialize flutter_rust_bridge in mock mode.
+  /// No libraries for FFI are loaded.
+  static void initMock({
+    required RustLibApi api,
+  }) {
+    instance.initMockImpl(
+      api: api,
+    );
+  }
+
+  /// Dispose flutter_rust_bridge
+  ///
+  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
+  /// is automatically disposed when the app stops.
+  static void dispose() => instance.disposeImpl();
+
+  @override
+  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
+      RustLibApiImpl.new;
+
+  @override
+  WireConstructor<RustLibWire> get wireConstructor =>
+      RustLibWire.fromExternalLibrary;
+
+  @override
+  Future<void> executeRustInitializers() async {}
+
+  @override
+  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
+      kDefaultExternalLibraryLoaderConfig;
+
+  @override
+  String get codegenVersion => '2.12.0';
+
+  @override
+  int get rustContentHash => -1230365977;
+
+  static const kDefaultExternalLibraryLoaderConfig =
+      ExternalLibraryLoaderConfig(
+    stem: 'rust_lib_zilpay',
+    ioDirectory: 'rust/target/release/',
+    webPrefix: 'pkg/',
+    wasmBindgenName: 'wasm_bindgen',
+  );
+}
+
+abstract class RustLibApi extends BaseApi {
+  Future<String?> crateApiLocalStorageLocalStorageImplGet(
+      {required LocalStorageImpl that, required String key});
+
+  Future<LocalStorageImpl> crateApiLocalStorageLocalStorageImplNew(
+      {required String pathDir});
+
+  Future<void> crateApiLocalStorageLocalStorageImplRm(
+      {required LocalStorageImpl that, required String key});
+
+  Future<void> crateApiLocalStorageLocalStorageImplSet(
+      {required LocalStorageImpl that,
+      required String key,
+      required String value});
+
+  Future<String> crateApiWalletAddBip39Wallet(
+      {required Bip39AddWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> additionalFtokens});
+
+  Future<List<FTokenInfo>> crateApiTokenAddFtoken(
+      {required FTokenInfo meta, required BigInt walletIndex});
+
+  Future<void> crateApiLedgerAddLedgerAccount(
+      {required BigInt walletIndex,
+      required int ledgerIndex,
+      required String name,
+      String? keyOrAddr,
+      required bool zilliqaLegacy,
+      Map<int, AddressChainInfo>? btcChain});
+
+  Future<String> crateApiLedgerAddLedgerWallet(
+      {required LedgerParamsInput params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens});
 
-                /// Main entrypoint of the Rust API
-                class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
-                  @internal
-                  static final instance = RustLib._();
+  Future<void> crateApiBookAddNewBookAddress(
+      {required String name,
+      required String addr,
+      required BigInt net,
+      required int slip44});
 
-                  RustLib._();
+  Future<void> crateApiWalletAddNextBip39Account(
+      {required AddNextBip39AccountParams params});
 
-                  /// Initialize flutter_rust_bridge
-                  static Future<void> init({
-                    RustLibApi? api,
-                    BaseHandler? handler,
-                    ExternalLibrary? externalLibrary,
-                    bool forceSameCodegenVersion = true,
-                  }) async {
-                    await instance.initImpl(
-                      api: api,
-                      handler: handler,
-                      externalLibrary: externalLibrary,
-                      forceSameCodegenVersion: forceSameCodegenVersion,
-                    );
-                  }
+  Future<BigInt> crateApiProviderAddProvider(
+      {required NetworkConfigInfo providerConfig});
 
-                  /// Initialize flutter_rust_bridge in mock mode.
-                  /// No libraries for FFI are loaded.
-                  static void initMock({
-                    required RustLibApi api,
-                  }) {
-                    instance.initMockImpl(
-                      api: api,
-                    );
-                  }
+  Future<void> crateApiProviderAddProvidersList(
+      {required List<NetworkConfigInfo> providerConfig});
 
-                  /// Dispose flutter_rust_bridge
-                  ///
-                  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
-                  /// is automatically disposed when the app stops.
-                  static void dispose() => instance.disposeImpl();
+  Future<String> crateApiWalletAddSkWallet(
+      {required AddSKWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens});
 
-                  @override
-                  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor => RustLibApiImpl.new;
+  BigInt crateApiUtilsAddressToHash({required String addr});
 
-                  @override
-                  WireConstructor<RustLibWire> get wireConstructor => RustLibWire.fromExternalLibrary;
+  Future<List<FTokenInfo>> crateApiTokenAutoHintTokens(
+      {required BigInt walletIndex});
 
-                  @override
-                  Future<void> executeRustInitializers() async {
-                    
-                  }
+  Future<bool> crateApiUtilsBip39ChecksumValid({required String words});
 
-                  @override
-                  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig => kDefaultExternalLibraryLoaderConfig;
+  Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
+      {required String addr});
 
-                  @override
-                  String get codegenVersion => '2.12.0';
+  List<ExchangeProvider> crateApiExchangeBootstrapExchangeProviders(
+      {required List<NetworkConfigInfo> configs});
 
-                  @override
-                  int get rustContentHash => -1230365977;
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+      {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos});
 
-                  static const kDefaultExternalLibraryLoaderConfig = ExternalLibraryLoaderConfig(
-                    stem: 'rust_lib_zilpay',
-                    ioDirectory: 'rust/target/release/',
-                    webPrefix: 'pkg/',
-                    wasmBindgenName: 'wasm_bindgen',
-                  );
-                }
-                
+  Future<WalletPolicy> crateApiBtcLedgerBtcLedgerBuildWalletPolicy(
+      {required String xpub,
+      required List<int> masterFingerprint,
+      required int bipPurpose,
+      required int accountIndex});
 
-                abstract class RustLibApi extends BaseApi {
-                  Future<String?> crateApiLocalStorageLocalStorageImplGet({required LocalStorageImpl that , required String key });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerComputeMerkleRoot(
+      {required List<Uint8List> leafHashes});
 
-Future<LocalStorageImpl> crateApiLocalStorageLocalStorageImplNew({required String pathDir });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerEncodePath(
+      {required String path});
 
-Future<void> crateApiLocalStorageLocalStorageImplRm({required LocalStorageImpl that , required String key });
+  Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
+      {required List<int> psbtBytes,
+      required List<LedgerInputSignature> sigs,
+      required List<InputMetaInfo> inputMeta});
 
-Future<void> crateApiLocalStorageLocalStorageImplSet({required LocalStorageImpl that , required String key , required String value });
+  Future<PlatformInt64> crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex(
+      {required List<Uint8List> leafHashes, required List<int> targetHash});
 
-Future<String> crateApiWalletAddBip39Wallet({required Bip39AddWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> additionalFtokens });
+  Future<MerkleProof> crateApiBtcLedgerBtcLedgerGetMerkleProof(
+      {required List<Uint8List> leafHashes, required int leafIndex});
 
-Future<List<FTokenInfo>> crateApiTokenAddFtoken({required FTokenInfo meta , required BigInt walletIndex });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerGetPreimage(
+      {required List<Uint8List> preimageHashes,
+      required List<Uint8List> preimageData,
+      required List<int> requestedHash});
 
-Future<void> crateApiLedgerAddLedgerAccount({required BigInt walletIndex , required int ledgerIndex , required String name , String? keyOrAddr , required bool zilliqaLegacy , Map<int, AddressChainInfo>? btcChain });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerHashLeaf(
+      {required List<int> data});
 
-Future<String> crateApiLedgerAddLedgerWallet({required LedgerParamsInput params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens });
+  Future<MerkelizedPsbt> crateApiBtcLedgerBtcLedgerMerkelisePsbt(
+      {required List<int> psbtBytes});
 
-Future<void> crateApiBookAddNewBookAddress({required String name , required String addr , required BigInt net , required int slip44 });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerPreparePsbt(
+      {required List<int> psbtBytes,
+      required List<int> masterFingerprint,
+      required int bipPurpose,
+      required int accountIndex,
+      required String xpub});
 
-Future<void> crateApiWalletAddNextBip39Account({required AddNextBip39AccountParams params });
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerSha256({required List<int> data});
 
-Future<BigInt> crateApiProviderAddProvider({required NetworkConfigInfo providerConfig });
+  Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
-Future<void> crateApiProviderAddProvidersList({required List<NetworkConfigInfo> providerConfig });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake});
 
-Future<String> crateApiWalletAddSkWallet({required AddSKWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake});
 
-BigInt crateApiUtilsAddressToHash({required String addr });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake,
+      required String amount});
 
-Future<List<FTokenInfo>> crateApiTokenAutoHintTokens({required BigInt walletIndex });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake,
+      required String amountToUnstake});
 
-Future<bool> crateApiUtilsBip39ChecksumValid({required String words });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
-Future<String> crateApiUtilsBitcoinAddressTypeFromAddress({required String addr });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake(
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
-List<ExchangeProvider> crateApiExchangeBootstrapExchangeProviders({required List<NetworkConfigInfo> configs });
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely(
+      {required BigInt walletIndex, required FinalOutputInfo stake});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct({required TransactionBitcoin tx , required List<TxOutInfo> witnessUtxos });
+  Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo params});
 
-Future<WalletPolicy> crateApiBtcLedgerBtcLedgerBuildWalletPolicy({required String xpub , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex });
+  Future<void> crateApiWalletChangeAccountName(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String newName});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerComputeMerkleRoot({required List<Uint8List> leafHashes });
+  Future<void> crateApiWalletChangeWalletName(
+      {required BigInt walletIndex, required String newName});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerEncodePath({required String path });
+  Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words(
+      {required List<String> words, required String lang});
 
-Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs({required List<int> psbtBytes , required List<LedgerInputSignature> sigs , required List<InputMetaInfo> inputMeta });
+  Future<List<HistoricalTransactionInfo>>
+      crateApiTransactionCheckPendingTranasctions(
+          {required BigInt walletIndex});
 
-Future<PlatformInt64> crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex({required List<Uint8List> leafHashes , required List<int> targetHash });
+  Future<void> crateApiTransactionClearHistory({required BigInt walletIndex});
 
-Future<MerkleProof> crateApiBtcLedgerBtcLedgerGetMerkleProof({required List<Uint8List> leafHashes , required int leafIndex });
+  Future<void> crateApiProviderCreateOrUpdateChain(
+      {required NetworkConfigInfo providerConfig});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerGetPreimage({required List<Uint8List> preimageHashes , required List<Uint8List> preimageData , required List<int> requestedHash });
+  Future<TransactionRequestInfo> crateApiTransactionCreateTokenTransfer(
+      {required TokenTransferParamsInfo params});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerHashLeaf({required List<int> data });
+  Future<void> crateApiConnectionsCreateUpdateConnection(
+      {required BigInt walletIndex, required ConnectionInfo conn});
 
-Future<MerkelizedPsbt> crateApiBtcLedgerBtcLedgerMerkelisePsbt({required List<int> psbtBytes });
+  Future<void> crateApiWalletDeleteAccount(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerPreparePsbt({required List<int> psbtBytes , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex , required String xpub });
+  Future<void> crateApiWalletDeleteWallet(
+      {required BigInt walletIndex, String? password});
 
-Future<Uint8List> crateApiBtcLedgerBtcLedgerSha256({required List<int> data });
+  Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo tx,
+      required int slip44});
 
-Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx({required BigInt walletIndex , required FinalOutputInfo stake });
+  Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake });
+  Future<List<FinalOutputInfo>> crateApiStakeFetchScillaStake(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake });
+  Future<FTokenInfo> crateApiTokenFetchTokenMeta(
+      {required String addr, required BigInt walletIndex});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake , required String amount });
+  String crateApiUtilsFromWei({required String value, required int decimals});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake , required String amountToUnstake });
+  Future<String> crateApiMethodsGenBip39Words({required int count});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal({required BigInt walletIndex , required FinalOutputInfo stake });
+  Future<KeyPairInfo> crateApiMethodsGenKeypair();
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake({required BigInt walletIndex , required FinalOutputInfo stake });
+  Future<Uint8List> crateApiQrcodeGenPngQrcode(
+      {required String data, required QrConfigInfo config});
 
-Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely({required BigInt walletIndex , required FinalOutputInfo stake });
+  Future<String> crateApiQrcodeGenSvgQrcode(
+      {required String data, required QrConfigInfo config});
 
-Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo params });
+  Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList();
 
-Future<void> crateApiWalletChangeAccountName({required BigInt walletIndex , required BigInt accountIndex , required String newName });
+  Future<List<String>> crateApiAuthGetBiometricType();
 
-Future<void> crateApiWalletChangeWalletName({required BigInt walletIndex , required String newName });
+  Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson(
+      {required String jsonStr});
 
-Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words({required List<String> words , required String lang });
+  Future<List<Category>> crateApiBookGetCombineSortAddresses(
+      {required BigInt walletIndex});
 
-Future<List<HistoricalTransactionInfo>> crateApiTransactionCheckPendingTranasctions({required BigInt walletIndex });
+  Future<List<ConnectionInfo>> crateApiConnectionsGetConnectionsList(
+      {required BigInt walletIndex});
 
-Future<void> crateApiTransactionClearHistory({required BigInt walletIndex });
+  Future<List<(String, String)>> crateApiUtilsGetCurrenciesTickets();
 
-Future<void> crateApiProviderCreateOrUpdateChain({required NetworkConfigInfo providerConfig });
+  Future<BackgroundState> crateApiBackendGetData();
 
-Future<TransactionRequestInfo> crateApiTransactionCreateTokenTransfer({required TokenTransferParamsInfo params });
+  Future<List<HistoricalTransactionInfo>> crateApiTransactionGetHistory(
+      {required BigInt walletIndex});
 
-Future<void> crateApiConnectionsCreateUpdateConnection({required BigInt walletIndex , required ConnectionInfo conn });
+  Future<(Uint8List, String)> crateApiCacheGetImageBytes(
+      {required String dir, required String url});
 
-Future<void> crateApiWalletDeleteAccount({required BigInt walletIndex , required BigInt accountIndex });
+  Future<String> crateApiCacheGetImageName(
+      {required String dir, required String url});
 
-Future<void> crateApiWalletDeleteWallet({required BigInt walletIndex , String? password });
+  Future<(List<NetworkConfigInfo>, List<NetworkConfigInfo>)>
+      crateApiProviderGetNetworks(
+          {required String mainnetJson, required String testnetJson});
 
-Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo tx , required int slip44 });
+  Future<NetworkConfigInfo> crateApiProviderGetProvider(
+      {required BigInt chainHash});
 
-Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake({required BigInt walletIndex , required BigInt accountIndex });
+  Future<List<NetworkConfigInfo>> crateApiProviderGetProviders();
 
-Future<List<FinalOutputInfo>> crateApiStakeFetchScillaStake({required BigInt walletIndex , required BigInt accountIndex });
+  Future<List<WalletInfo>> crateApiWalletGetWallets();
 
-Future<FTokenInfo> crateApiTokenFetchTokenMeta({required String addr , required BigInt walletIndex });
+  Future<List<String>> crateApiWalletGetZilBech32Addresses(
+      {required BigInt walletIndex});
 
-String crateApiUtilsFromWei({required String value , required int decimals });
+  Future<List<String>> crateApiWalletGetZilEthChecksumAddresses(
+      {required BigInt walletIndex});
 
-Future<String> crateApiMethodsGenBip39Words({required int count });
+  Future<void> crateApiMethodsInitApp();
 
-Future<KeyPairInfo> crateApiMethodsGenKeypair();
+  (String, String) crateApiUtilsIntlNumberFormating(
+      {required String value,
+      required int decimals,
+      required String localeStr,
+      required String nativeSymbolStr,
+      required String convertedSymbolStr,
+      required double threshold,
+      required bool compact,
+      required double converted});
 
-Future<Uint8List> crateApiQrcodeGenPngQrcode({required String data , required QrConfigInfo config });
+  Future<bool> crateApiBackendIsServiceRunning();
 
-Future<String> crateApiQrcodeGenSvgQrcode({required String data , required QrConfigInfo config });
+  Future<bool> crateApiUtilsIsValidAddress({required String addr});
 
-Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList();
+  Future<KeyPairInfo> crateApiMethodsKeypairFromSk({required String sk});
 
-Future<List<String>> crateApiAuthGetBiometricType();
+  Future<void> crateApiLedgerTransportLedgerBleClose(
+      {required String connectionId});
 
-Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson({required String jsonStr });
+  Future<Uint8List> crateApiLedgerTransportLedgerBleExchange(
+      {required String connectionId, required List<int> apdu});
 
-Future<List<Category>> crateApiBookGetCombineSortAddresses({required BigInt walletIndex });
+  Future<String> crateApiLedgerTransportLedgerBleOpen(
+      {required String deviceId});
 
-Future<List<ConnectionInfo>> crateApiConnectionsGetConnectionsList({required BigInt walletIndex });
+  Future<List<RustLedgerBleDevice>> crateApiLedgerTransportLedgerBleScan();
 
-Future<List<(String,String)>> crateApiUtilsGetCurrenciesTickets();
+  Future<void> crateApiLedgerTransportLedgerHidClose(
+      {required String connectionId});
 
-Future<BackgroundState> crateApiBackendGetData();
+  Future<Uint8List> crateApiLedgerTransportLedgerHidExchange(
+      {required String connectionId, required List<int> apdu});
 
-Future<List<HistoricalTransactionInfo>> crateApiTransactionGetHistory({required BigInt walletIndex });
+  Future<List<RustLedgerHidDevice>> crateApiLedgerTransportLedgerHidList();
 
-Future<(Uint8List,String)> crateApiCacheGetImageBytes({required String dir , required String url });
+  Future<String> crateApiLedgerTransportLedgerHidOpen(
+      {required String deviceId});
 
-Future<String> crateApiCacheGetImageName({required String dir , required String url });
+  Future<Uint32List> crateApiLedgerLedgerSplitPath({required String path});
 
-Future<(List<NetworkConfigInfo>,List<NetworkConfigInfo>)> crateApiProviderGetNetworks({required String mainnetJson , required String testnetJson });
+  Future<BackgroundState> crateApiBackendLoadService({required String path});
 
-Future<NetworkConfigInfo> crateApiProviderGetProvider({required BigInt chainHash });
+  Future<Uint8List> crateApiWalletMakeKeystoreFile(
+      {required BigInt walletIndex, required String password});
 
-Future<List<NetworkConfigInfo>> crateApiProviderGetProviders();
+  Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr(
+      {required String data});
 
-Future<List<WalletInfo>> crateApiWalletGetWallets();
+  Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
+      {required String typedDataJson});
 
-Future<List<String>> crateApiWalletGetZilBech32Addresses({required BigInt walletIndex });
+  Future<Uint8List> crateApiTransactionPrepareMessage(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String message});
 
-Future<List<String>> crateApiWalletGetZilEthChecksumAddresses({required BigInt walletIndex });
+  Future<String> crateApiProviderProviderReqProxy(
+      {required String payload, required BigInt chainHash});
 
-Future<void> crateApiMethodsInitApp();
+  Future<void> crateApiConnectionsRemoveConnections(
+      {required BigInt walletIndex, required String domain});
 
-(String,String) crateApiUtilsIntlNumberFormating({required String value , required int decimals , required String localeStr , required String nativeSymbolStr , required String convertedSymbolStr , required double threshold , required bool compact , required double converted });
+  Future<void> crateApiBookRemoveFromAddressBook({required String addr});
 
-Future<bool> crateApiBackendIsServiceRunning();
+  Future<void> crateApiProviderRemoveProvider({required BigInt chainHash});
 
-Future<bool> crateApiUtilsIsValidAddress({required String addr });
+  Future<String> crateApiWalletRestoreFromKeystore(
+      {required List<int> keystoreBytes,
+      required String password,
+      required String biometricType});
 
-Future<KeyPairInfo> crateApiMethodsKeypairFromSk({required String sk });
+  Future<String> crateApiWalletRevealBip39Phrase(
+      {required BigInt walletIndex,
+      required String password,
+      String? passphrase});
 
-Future<void> crateApiLedgerTransportLedgerBleClose({required String connectionId });
+  Future<KeyPairInfo> crateApiWalletRevealKeypair(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String password,
+      String? passphrase});
 
-Future<Uint8List> crateApiLedgerTransportLedgerBleExchange({required String connectionId , required List<int> apdu });
+  Future<void> crateApiTokenRmFtoken(
+      {required BigInt walletIndex, required String tokenAddress});
 
-Future<String> crateApiLedgerTransportLedgerBleOpen({required String deviceId });
+  Future<Map<int, AddressChainInfo>> crateApiLedgerScanBtcAccountHistory(
+      {required BtcAccountXpubsInputInfo xpubs,
+      required int ledgerIndex,
+      required BigInt chainHash});
 
-Future<List<RustLedgerBleDevice>> crateApiLedgerTransportLedgerBleScan();
+  Future<void> crateApiWalletSelectAccount(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<void> crateApiLedgerTransportLedgerHidClose({required String connectionId });
+  Future<void> crateApiProviderSelectAccountsChain(
+      {required BigInt walletIndex,
+      required BigInt chainHash,
+      String? password});
 
-Future<Uint8List> crateApiLedgerTransportLedgerHidExchange({required String connectionId , required List<int> apdu });
+  Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions(
+      {required int walletIndex,
+      required int accountIndex,
+      required TransactionRequestInfo tx,
+      required List<int> sig,
+      String? bip86Xpub});
 
-Future<List<RustLedgerHidDevice>> crateApiLedgerTransportLedgerHidList();
+  Future<void> crateApiWalletSetBiometric(
+      {required BigInt walletIndex,
+      String? password,
+      required String newBiometricType});
 
-Future<String> crateApiLedgerTransportLedgerHidOpen({required String deviceId });
+  Future<void> crateApiSettingsSetBrowserSettings(
+      {required BrowserSettingsInfo browserSettings});
 
-Future<Uint32List> crateApiLedgerLedgerSplitPath({required String path });
+  Future<void> crateApiSettingsSetDefaultLocale({String? locale});
 
-Future<BackgroundState> crateApiBackendLoadService({required String path });
+  Future<void> crateApiSettingsSetGlobalNotifications(
+      {required bool globalEnabled});
 
-Future<Uint8List> crateApiWalletMakeKeystoreFile({required BigInt walletIndex , required String password });
+  Future<void> crateApiSettingsSetRateEngine(
+      {required BigInt walletIndex, required int engineCode});
 
-Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr({required String data });
+  Future<void> crateApiSettingsSetRateFetcher(
+      {required BigInt walletIndex, required String currency});
 
-Future<Eip712Hashes> crateApiTransactionPrepareEip712Message({required String typedDataJson });
+  Future<void> crateApiSettingsSetTheme(
+      {required int appearancesCode, required bool compactNumbers});
 
-Future<Uint8List> crateApiTransactionPrepareMessage({required BigInt walletIndex , required BigInt accountIndex , required String message });
+  Future<void> crateApiSettingsSetTokensListFetcher(
+      {required BigInt walletIndex, required bool enabled});
 
-Future<String> crateApiProviderProviderReqProxy({required String payload , required BigInt chainHash });
+  Future<void> crateApiSettingsSetWalletEns(
+      {required BigInt walletIndex, required bool ensEnabled});
 
-Future<void> crateApiConnectionsRemoveConnections({required BigInt walletIndex , required String domain });
+  Future<void> crateApiSettingsSetWalletIpfsNode(
+      {required BigInt walletIndex, String? node});
 
-Future<void> crateApiBookRemoveFromAddressBook({required String addr });
+  Future<void> crateApiSettingsSetWalletNodeRanking(
+      {required BigInt walletIndex, required bool enabled});
 
-Future<void> crateApiProviderRemoveProvider({required BigInt chainHash });
+  Future<void> crateApiSettingsSetWalletNotifications(
+      {required BigInt walletIndex,
+      required bool transactions,
+      required bool price,
+      required bool security,
+      required bool balance});
 
-Future<String> crateApiWalletRestoreFromKeystore({required List<int> keystoreBytes , required String password , required String biometricType });
+  Future<(String, String)> crateApiTransactionSignMessage(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required String message,
+      String? title,
+      String? icon});
 
-Future<String> crateApiWalletRevealBip39Phrase({required BigInt walletIndex , required String password , String? passphrase });
+  Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required TransactionRequestInfo tx});
 
-Future<KeyPairInfo> crateApiWalletRevealKeypair({required BigInt walletIndex , required BigInt accountIndex , required String password , String? passphrase });
+  Future<(String, String)> crateApiTransactionSignTypedDataEip712(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required String typedDataJson,
+      String? title,
+      String? icon});
 
-Future<void> crateApiTokenRmFtoken({required BigInt walletIndex , required String tokenAddress });
+  Stream<BlockEvent> crateApiBackendStartBlockWorker(
+      {required BigInt walletIndex});
 
-Future<Map<int, AddressChainInfo>> crateApiLedgerScanBtcAccountHistory({required BtcAccountXpubsInputInfo xpubs , required int ledgerIndex , required BigInt chainHash });
+  Stream<String> crateApiTransactionStartHistoryWorker(
+      {required BigInt walletIndex});
 
-Future<void> crateApiWalletSelectAccount({required BigInt walletIndex , required BigInt accountIndex });
+  Future<void> crateApiBackendStopBlockWorker();
 
-Future<void> crateApiProviderSelectAccountsChain({required BigInt walletIndex , required BigInt chainHash , String? password });
+  Future<void> crateApiTransactionStopHistoryWorker();
 
-Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions({required int walletIndex , required int accountIndex , required TransactionRequestInfo tx , required List<int> sig , String? bip86Xpub });
+  Future<void> crateApiBackendStopService();
 
-Future<void> crateApiWalletSetBiometric({required BigInt walletIndex , String? password , required String newBiometricType });
+  Future<void> crateApiTokenSyncBalances({required BigInt walletIndex});
 
-Future<void> crateApiSettingsSetBrowserSettings({required BrowserSettingsInfo browserSettings });
+  (String, int) crateApiUtilsToWei(
+      {required String value, required int decimals});
 
-Future<void> crateApiSettingsSetDefaultLocale({String? locale });
+  Future<bool> crateApiAuthTryUnlockWithPassword(
+      {required String password,
+      required BigInt walletIndex,
+      List<String>? identifiers});
 
-Future<void> crateApiSettingsSetGlobalNotifications({required bool globalEnabled });
+  Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex});
 
-Future<void> crateApiSettingsSetRateEngine({required BigInt walletIndex , required int engineCode });
+  Future<void> crateApiTokenUpdateRates({required BigInt walletIndex});
 
-Future<void> crateApiSettingsSetRateFetcher({required BigInt walletIndex , required String currency });
+  Future<TransactionRequestInfo> crateApiTransactionUpdateTxWithParams(
+      {required TransactionRequestInfo tx,
+      required RequiredTxParamsInfo params,
+      required String balance,
+      required BigInt chainHash});
 
-Future<void> crateApiSettingsSetTheme({required int appearancesCode , required bool compactNumbers });
+  Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<void> crateApiSettingsSetTokensListFetcher({required BigInt walletIndex , required bool enabled });
+  Future<String> crateApiWalletZilliqaGetNFormat(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<void> crateApiSettingsSetWalletEns({required BigInt walletIndex , required bool ensEnabled });
+  Future<String> crateApiWalletZilliqaLegacyBase16ToBech32(
+      {required String base16});
 
-Future<void> crateApiSettingsSetWalletIpfsNode({required BigInt walletIndex , String? node });
+  Future<void> crateApiWalletZilliqaSwapChain(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
-Future<void> crateApiSettingsSetWalletNodeRanking({required BigInt walletIndex , required bool enabled });
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_LocalStorageImpl;
 
-Future<void> crateApiSettingsSetWalletNotifications({required BigInt walletIndex , required bool transactions , required bool price , required bool security , required bool balance });
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_LocalStorageImpl;
 
-Future<(String,String)> crateApiTransactionSignMessage({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String message , String? title , String? icon });
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_LocalStorageImplPtr;
+}
 
-Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required TransactionRequestInfo tx });
-
-Future<(String,String)> crateApiTransactionSignTypedDataEip712({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String typedDataJson , String? title , String? icon });
-
-Stream<BlockEvent> crateApiBackendStartBlockWorker({required BigInt walletIndex });
-
-Stream<String> crateApiTransactionStartHistoryWorker({required BigInt walletIndex });
-
-Future<void> crateApiBackendStopBlockWorker();
-
-Future<void> crateApiTransactionStopHistoryWorker();
-
-Future<void> crateApiBackendStopService();
-
-Future<void> crateApiTokenSyncBalances({required BigInt walletIndex });
-
-(String,int) crateApiUtilsToWei({required String value , required int decimals });
-
-Future<bool> crateApiAuthTryUnlockWithPassword({required String password , required BigInt walletIndex , List<String>? identifiers });
-
-Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex });
-
-Future<void> crateApiTokenUpdateRates({required BigInt walletIndex });
-
-Future<TransactionRequestInfo> crateApiTransactionUpdateTxWithParams({required TransactionRequestInfo tx , required RequiredTxParamsInfo params , required String balance , required BigInt chainHash });
-
-Future<(String,String)> crateApiWalletZilliqaGetBech32Base16Address({required BigInt walletIndex , required BigInt accountIndex });
-
-Future<String> crateApiWalletZilliqaGetNFormat({required BigInt walletIndex , required BigInt accountIndex });
-
-Future<String> crateApiWalletZilliqaLegacyBase16ToBech32({required String base16 });
-
-Future<void> crateApiWalletZilliqaSwapChain({required BigInt walletIndex , required BigInt accountIndex });
-
-RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_LocalStorageImpl;
-
-RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_LocalStorageImpl;
-
-CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_LocalStorageImplPtr;
-
-
-                }
-                
-
-                class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
-                  RustLibApiImpl({
-                    required super.handler,
-                    required super.wire,
-                    required super.generalizedFrbRustBinding,
-                    required super.portManager,
-                  });
-
-                  @override Future<String?> crateApiLocalStorageLocalStorageImplGet({required LocalStorageImpl that , required String key })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(that, serializer);
-sse_encode_String(key, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_opt_String,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiLocalStorageLocalStorageImplGetConstMeta,
-            argValues: [that, key],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLocalStorageLocalStorageImplGetConstMeta => const TaskConstMeta(
-            debugName: "LocalStorageImpl_get",
-            argNames: ["that", "key"],
+class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
+  RustLibApiImpl({
+    required super.handler,
+    required super.wire,
+    required super.generalizedFrbRustBinding,
+    required super.portManager,
+  });
+
+  @override
+  Future<String?> crateApiLocalStorageLocalStorageImplGet(
+      {required LocalStorageImpl that, required String key}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+            that, serializer);
+        sse_encode_String(key, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 1, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiLocalStorageLocalStorageImplGetConstMeta,
+      argValues: [that, key],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLocalStorageLocalStorageImplGetConstMeta =>
+      const TaskConstMeta(
+        debugName: "LocalStorageImpl_get",
+        argNames: ["that", "key"],
+      );
+
+  @override
+  Future<LocalStorageImpl> crateApiLocalStorageLocalStorageImplNew(
+      {required String pathDir}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(pathDir, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 2, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLocalStorageLocalStorageImplNewConstMeta,
+      argValues: [pathDir],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLocalStorageLocalStorageImplNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "LocalStorageImpl_new",
+        argNames: ["pathDir"],
+      );
+
+  @override
+  Future<void> crateApiLocalStorageLocalStorageImplRm(
+      {required LocalStorageImpl that, required String key}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+            that, serializer);
+        sse_encode_String(key, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 3, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLocalStorageLocalStorageImplRmConstMeta,
+      argValues: [that, key],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLocalStorageLocalStorageImplRmConstMeta =>
+      const TaskConstMeta(
+        debugName: "LocalStorageImpl_rm",
+        argNames: ["that", "key"],
+      );
+
+  @override
+  Future<void> crateApiLocalStorageLocalStorageImplSet(
+      {required LocalStorageImpl that,
+      required String key,
+      required String value}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+            that, serializer);
+        sse_encode_String(key, serializer);
+        sse_encode_String(value, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 4, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLocalStorageLocalStorageImplSetConstMeta,
+      argValues: [that, key, value],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLocalStorageLocalStorageImplSetConstMeta =>
+      const TaskConstMeta(
+        debugName: "LocalStorageImpl_set",
+        argNames: ["that", "key", "value"],
+      );
+
+  @override
+  Future<String> crateApiWalletAddBip39Wallet(
+      {required Bip39AddWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> additionalFtokens}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_bip_39_add_wallet_params(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(additionalFtokens, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 8, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletAddBip39WalletConstMeta,
+      argValues: [params, walletSettings, additionalFtokens],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletAddBip39WalletConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_bip39_wallet",
+        argNames: ["params", "walletSettings", "additionalFtokens"],
+      );
+
+  @override
+  Future<List<FTokenInfo>> crateApiTokenAddFtoken(
+      {required FTokenInfo meta, required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_f_token_info(meta, serializer);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 9, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_f_token_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenAddFtokenConstMeta,
+      argValues: [meta, walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenAddFtokenConstMeta => const TaskConstMeta(
+        debugName: "add_ftoken",
+        argNames: ["meta", "walletIndex"],
+      );
+
+  @override
+  Future<void> crateApiLedgerAddLedgerAccount(
+      {required BigInt walletIndex,
+      required int ledgerIndex,
+      required String name,
+      String? keyOrAddr,
+      required bool zilliqaLegacy,
+      Map<int, AddressChainInfo>? btcChain}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_u_8(ledgerIndex, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_opt_String(keyOrAddr, serializer);
+        sse_encode_bool(zilliqaLegacy, serializer);
+        sse_encode_opt_Map_u_8_address_chain_info_None(btcChain, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerAddLedgerAccountConstMeta,
+      argValues: [
+        walletIndex,
+        ledgerIndex,
+        name,
+        keyOrAddr,
+        zilliqaLegacy,
+        btcChain
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerAddLedgerAccountConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_ledger_account",
+        argNames: [
+          "walletIndex",
+          "ledgerIndex",
+          "name",
+          "keyOrAddr",
+          "zilliqaLegacy",
+          "btcChain"
+        ],
+      );
+
+  @override
+  Future<String> crateApiLedgerAddLedgerWallet(
+      {required LedgerParamsInput params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_ledger_params_input(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(ftokens, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 11, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerAddLedgerWalletConstMeta,
+      argValues: [params, walletSettings, ftokens],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerAddLedgerWalletConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_ledger_wallet",
+        argNames: ["params", "walletSettings", "ftokens"],
+      );
+
+  @override
+  Future<void> crateApiBookAddNewBookAddress(
+      {required String name,
+      required String addr,
+      required BigInt net,
+      required int slip44}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(name, serializer);
+        sse_encode_String(addr, serializer);
+        sse_encode_usize(net, serializer);
+        sse_encode_u_32(slip44, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 12, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBookAddNewBookAddressConstMeta,
+      argValues: [name, addr, net, slip44],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBookAddNewBookAddressConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_new_book_address",
+        argNames: ["name", "addr", "net", "slip44"],
+      );
+
+  @override
+  Future<void> crateApiWalletAddNextBip39Account(
+      {required AddNextBip39AccountParams params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_add_next_bip_39_account_params(
+            params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 13, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletAddNextBip39AccountConstMeta,
+      argValues: [params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletAddNextBip39AccountConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_next_bip39_account",
+        argNames: ["params"],
+      );
+
+  @override
+  Future<BigInt> crateApiProviderAddProvider(
+      {required NetworkConfigInfo providerConfig}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 14, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_64,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderAddProviderConstMeta,
+      argValues: [providerConfig],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderAddProviderConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_provider",
+        argNames: ["providerConfig"],
+      );
+
+  @override
+  Future<void> crateApiProviderAddProvidersList(
+      {required List<NetworkConfigInfo> providerConfig}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_network_config_info(providerConfig, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 15, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderAddProvidersListConstMeta,
+      argValues: [providerConfig],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderAddProvidersListConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_providers_list",
+        argNames: ["providerConfig"],
+      );
+
+  @override
+  Future<String> crateApiWalletAddSkWallet(
+      {required AddSKWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_add_sk_wallet_params(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(ftokens, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 16, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletAddSkWalletConstMeta,
+      argValues: [params, walletSettings, ftokens],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletAddSkWalletConstMeta => const TaskConstMeta(
+        debugName: "add_sk_wallet",
+        argNames: ["params", "walletSettings", "ftokens"],
+      );
+
+  @override
+  BigInt crateApiUtilsAddressToHash({required String addr}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(addr, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_usize,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiUtilsAddressToHashConstMeta,
+      argValues: [addr],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsAddressToHashConstMeta => const TaskConstMeta(
+        debugName: "address_to_hash",
+        argNames: ["addr"],
+      );
+
+  @override
+  Future<List<FTokenInfo>> crateApiTokenAutoHintTokens(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 18, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_f_token_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenAutoHintTokensConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenAutoHintTokensConstMeta =>
+      const TaskConstMeta(
+        debugName: "auto_hint_tokens",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<bool> crateApiUtilsBip39ChecksumValid({required String words}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(words, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 19, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiUtilsBip39ChecksumValidConstMeta,
+      argValues: [words],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsBip39ChecksumValidConstMeta =>
+      const TaskConstMeta(
+        debugName: "bip39_checksum_valid",
+        argNames: ["words"],
+      );
+
+  @override
+  Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
+      {required String addr}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(addr, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 20, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUtilsBitcoinAddressTypeFromAddressConstMeta,
+      argValues: [addr],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsBitcoinAddressTypeFromAddressConstMeta =>
+      const TaskConstMeta(
+        debugName: "bitcoin_address_type_from_address",
+        argNames: ["addr"],
+      );
+
+  @override
+  List<ExchangeProvider> crateApiExchangeBootstrapExchangeProviders(
+      {required List<NetworkConfigInfo> configs}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_network_config_info(configs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_exchange_provider,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
+      argValues: [configs],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta =>
+      const TaskConstMeta(
+        debugName: "bootstrap_exchange_providers",
+        argNames: ["configs"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+      {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_transaction_bitcoin(tx, serializer);
+        sse_encode_list_tx_out_info(witnessUtxos, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 22, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta,
+      argValues: [tx, witnessUtxos],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_build_psbt_from_struct",
+        argNames: ["tx", "witnessUtxos"],
+      );
+
+  @override
+  Future<WalletPolicy> crateApiBtcLedgerBtcLedgerBuildWalletPolicy(
+      {required String xpub,
+      required List<int> masterFingerprint,
+      required int bipPurpose,
+      required int accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(xpub, serializer);
+        sse_encode_list_prim_u_8_loose(masterFingerprint, serializer);
+        sse_encode_u_32(bipPurpose, serializer);
+        sse_encode_u_32(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 23, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_wallet_policy,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerBuildWalletPolicyConstMeta,
+      argValues: [xpub, masterFingerprint, bipPurpose, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildWalletPolicyConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_build_wallet_policy",
+        argNames: ["xpub", "masterFingerprint", "bipPurpose", "accountIndex"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerComputeMerkleRoot(
+      {required List<Uint8List> leafHashes}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 24, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerComputeMerkleRootConstMeta,
+      argValues: [leafHashes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerComputeMerkleRootConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_compute_merkle_root",
+        argNames: ["leafHashes"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerEncodePath(
+      {required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 25, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerEncodePathConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerEncodePathConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_encode_path",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
+      {required List<int> psbtBytes,
+      required List<LedgerInputSignature> sigs,
+      required List<InputMetaInfo> inputMeta}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
+        sse_encode_list_ledger_input_signature(sigs, serializer);
+        sse_encode_list_input_meta_info(inputMeta, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 26, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_finalized_btc_tx,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta,
+      argValues: [psbtBytes, sigs, inputMeta],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_finalize_psbt_with_sigs",
+        argNames: ["psbtBytes", "sigs", "inputMeta"],
+      );
+
+  @override
+  Future<PlatformInt64> crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex(
+      {required List<Uint8List> leafHashes, required List<int> targetHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
+        sse_encode_list_prim_u_8_loose(targetHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 27, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_i_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerGetMerkleLeafIndexConstMeta,
+      argValues: [leafHashes, targetHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetMerkleLeafIndexConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_get_merkle_leaf_index",
+        argNames: ["leafHashes", "targetHash"],
+      );
+
+  @override
+  Future<MerkleProof> crateApiBtcLedgerBtcLedgerGetMerkleProof(
+      {required List<Uint8List> leafHashes, required int leafIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
+        sse_encode_u_32(leafIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 28, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_merkle_proof,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerGetMerkleProofConstMeta,
+      argValues: [leafHashes, leafIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetMerkleProofConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_get_merkle_proof",
+        argNames: ["leafHashes", "leafIndex"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerGetPreimage(
+      {required List<Uint8List> preimageHashes,
+      required List<Uint8List> preimageData,
+      required List<int> requestedHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_list_prim_u_8_strict(preimageHashes, serializer);
+        sse_encode_list_list_prim_u_8_strict(preimageData, serializer);
+        sse_encode_list_prim_u_8_loose(requestedHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 29, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerGetPreimageConstMeta,
+      argValues: [preimageHashes, preimageData, requestedHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetPreimageConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_get_preimage",
+        argNames: ["preimageHashes", "preimageData", "requestedHash"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerHashLeaf(
+      {required List<int> data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 30, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerHashLeafConstMeta,
+      argValues: [data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerHashLeafConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_hash_leaf",
+        argNames: ["data"],
+      );
+
+  @override
+  Future<MerkelizedPsbt> crateApiBtcLedgerBtcLedgerMerkelisePsbt(
+      {required List<int> psbtBytes}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 31, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_merkelized_psbt,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerMerkelisePsbtConstMeta,
+      argValues: [psbtBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerMerkelisePsbtConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_merkelise_psbt",
+        argNames: ["psbtBytes"],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerPreparePsbt(
+      {required List<int> psbtBytes,
+      required List<int> masterFingerprint,
+      required int bipPurpose,
+      required int accountIndex,
+      required String xpub}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
+        sse_encode_list_prim_u_8_loose(masterFingerprint, serializer);
+        sse_encode_u_32(bipPurpose, serializer);
+        sse_encode_u_32(accountIndex, serializer);
+        sse_encode_String(xpub, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 32, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerPreparePsbtConstMeta,
+      argValues: [psbtBytes, masterFingerprint, bipPurpose, accountIndex, xpub],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerPreparePsbtConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_prepare_psbt",
+        argNames: [
+          "psbtBytes",
+          "masterFingerprint",
+          "bipPurpose",
+          "accountIndex",
+          "xpub"
+        ],
+      );
+
+  @override
+  Future<Uint8List> crateApiBtcLedgerBtcLedgerSha256(
+      {required List<int> data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 33, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBtcLedgerBtcLedgerSha256ConstMeta,
+      argValues: [data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBtcLedgerBtcLedgerSha256ConstMeta =>
+      const TaskConstMeta(
+        debugName: "btc_ledger_sha256",
+        argNames: ["data"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 34, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta,
+      argValues: [walletIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_claim_scilla_staking_rewards_tx",
+        argNames: ["walletIndex", "stake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 35, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxClaimRewardRequestConstMeta,
+      argValues: [walletIndex, accountIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxClaimRewardRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_claim_reward_request",
+        argNames: ["walletIndex", "accountIndex", "stake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 36, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta,
+      argValues: [walletIndex, accountIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_claim_unstake_request",
+        argNames: ["walletIndex", "accountIndex", "stake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake,
+      required String amount}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        sse_encode_String(amount, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 37, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxEvmStakeRequestConstMeta,
+      argValues: [walletIndex, accountIndex, stake, amount],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxEvmStakeRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_evm_stake_request",
+        argNames: ["walletIndex", "accountIndex", "stake", "amount"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake,
+      required String amountToUnstake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        sse_encode_String(amountToUnstake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 38, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta,
+      argValues: [walletIndex, accountIndex, stake, amountToUnstake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_evm_unstake_request",
+        argNames: ["walletIndex", "accountIndex", "stake", "amountToUnstake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 39, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta,
+      argValues: [walletIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_scilla_complete_withdrawal",
+        argNames: ["walletIndex", "stake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake(
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 40, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxScillaInitUnstakeConstMeta,
+      argValues: [walletIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxScillaInitUnstakeConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_scilla_init_unstake",
+        argNames: ["walletIndex", "stake"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely(
+      {required BigInt walletIndex, required FinalOutputInfo stake}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_box_autoadd_final_output_info(stake, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 41, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta,
+      argValues: [walletIndex, stake],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_scilla_withdraw_stake_avely",
+        argNames: ["walletIndex", "stake"],
+      );
+
+  @override
+  Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_transaction_request_info(params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 42, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_required_tx_params_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionCaclGasFeeConstMeta,
+      argValues: [walletIndex, accountIndex, params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionCaclGasFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "cacl_gas_fee",
+        argNames: ["walletIndex", "accountIndex", "params"],
+      );
+
+  @override
+  Future<void> crateApiWalletChangeAccountName(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String newName}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_String(newName, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 43, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletChangeAccountNameConstMeta,
+      argValues: [walletIndex, accountIndex, newName],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletChangeAccountNameConstMeta =>
+      const TaskConstMeta(
+        debugName: "change_account_name",
+        argNames: ["walletIndex", "accountIndex", "newName"],
+      );
+
+  @override
+  Future<void> crateApiWalletChangeWalletName(
+      {required BigInt walletIndex, required String newName}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(newName, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 44, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletChangeWalletNameConstMeta,
+      argValues: [walletIndex, newName],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletChangeWalletNameConstMeta =>
+      const TaskConstMeta(
+        debugName: "change_wallet_name",
+        argNames: ["walletIndex", "newName"],
+      );
+
+  @override
+  Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words(
+      {required List<String> words, required String lang}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_String(words, serializer);
+        sse_encode_String(lang, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 45, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_usize_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiMethodsCheckNotExistsBip39WordsConstMeta,
+      argValues: [words, lang],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsCheckNotExistsBip39WordsConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_not_exists_bip39_words",
+        argNames: ["words", "lang"],
+      );
+
+  @override
+  Future<List<HistoricalTransactionInfo>>
+      crateApiTransactionCheckPendingTranasctions(
+          {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 46, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_historical_transaction_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionCheckPendingTranasctionsConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionCheckPendingTranasctionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_pending_tranasctions",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<void> crateApiTransactionClearHistory({required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 47, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionClearHistoryConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionClearHistoryConstMeta =>
+      const TaskConstMeta(
+        debugName: "clear_history",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<void> crateApiProviderCreateOrUpdateChain(
+      {required NetworkConfigInfo providerConfig}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 48, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderCreateOrUpdateChainConstMeta,
+      argValues: [providerConfig],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderCreateOrUpdateChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_or_update_chain",
+        argNames: ["providerConfig"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiTransactionCreateTokenTransfer(
+      {required TokenTransferParamsInfo params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_token_transfer_params_info(params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 49, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionCreateTokenTransferConstMeta,
+      argValues: [params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionCreateTokenTransferConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_token_transfer",
+        argNames: ["params"],
+      );
+
+  @override
+  Future<void> crateApiConnectionsCreateUpdateConnection(
+      {required BigInt walletIndex, required ConnectionInfo conn}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_box_autoadd_connection_info(conn, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 50, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiConnectionsCreateUpdateConnectionConstMeta,
+      argValues: [walletIndex, conn],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiConnectionsCreateUpdateConnectionConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_update_connection",
+        argNames: ["walletIndex", "conn"],
+      );
+
+  @override
+  Future<void> crateApiWalletDeleteAccount(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 51, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletDeleteAccountConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletDeleteAccountConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_account",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<void> crateApiWalletDeleteWallet(
+      {required BigInt walletIndex, String? password}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_opt_String(password, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 52, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletDeleteWalletConstMeta,
+      argValues: [walletIndex, password],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletDeleteWalletConstMeta => const TaskConstMeta(
+        debugName: "delete_wallet",
+        argNames: ["walletIndex", "password"],
+      );
+
+  @override
+  Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo tx,
+      required int slip44}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_transaction_request_info(tx, serializer);
+        sse_encode_u_32(slip44, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 53, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_encoded_rlp_tx,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionEncodeTxRlpConstMeta,
+      argValues: [walletIndex, accountIndex, tx, slip44],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionEncodeTxRlpConstMeta =>
+      const TaskConstMeta(
+        debugName: "encode_tx_rlp",
+        argNames: ["walletIndex", "accountIndex", "tx", "slip44"],
+      );
+
+  @override
+  Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 54, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_final_output_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeFetchEvmStakeConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeFetchEvmStakeConstMeta => const TaskConstMeta(
+        debugName: "fetch_evm_stake",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<List<FinalOutputInfo>> crateApiStakeFetchScillaStake(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 55, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_final_output_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiStakeFetchScillaStakeConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiStakeFetchScillaStakeConstMeta =>
+      const TaskConstMeta(
+        debugName: "fetch_scilla_stake",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<FTokenInfo> crateApiTokenFetchTokenMeta(
+      {required String addr, required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(addr, serializer);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 56, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_token_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenFetchTokenMetaConstMeta,
+      argValues: [addr, walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenFetchTokenMetaConstMeta =>
+      const TaskConstMeta(
+        debugName: "fetch_token_meta",
+        argNames: ["addr", "walletIndex"],
+      );
+
+  @override
+  String crateApiUtilsFromWei({required String value, required int decimals}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(value, serializer);
+        sse_encode_u_8(decimals, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUtilsFromWeiConstMeta,
+      argValues: [value, decimals],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsFromWeiConstMeta => const TaskConstMeta(
+        debugName: "from_wei",
+        argNames: ["value", "decimals"],
+      );
+
+  @override
+  Future<String> crateApiMethodsGenBip39Words({required int count}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8(count, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 58, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiMethodsGenBip39WordsConstMeta,
+      argValues: [count],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsGenBip39WordsConstMeta =>
+      const TaskConstMeta(
+        debugName: "gen_bip39_words",
+        argNames: ["count"],
+      );
+
+  @override
+  Future<KeyPairInfo> crateApiMethodsGenKeypair() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 59, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_key_pair_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiMethodsGenKeypairConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsGenKeypairConstMeta => const TaskConstMeta(
+        debugName: "gen_keypair",
+        argNames: [],
+      );
+
+  @override
+  Future<Uint8List> crateApiQrcodeGenPngQrcode(
+      {required String data, required QrConfigInfo config}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(data, serializer);
+        sse_encode_box_autoadd_qr_config_info(config, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 60, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiQrcodeGenPngQrcodeConstMeta,
+      argValues: [data, config],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiQrcodeGenPngQrcodeConstMeta => const TaskConstMeta(
+        debugName: "gen_png_qrcode",
+        argNames: ["data", "config"],
+      );
+
+  @override
+  Future<String> crateApiQrcodeGenSvgQrcode(
+      {required String data, required QrConfigInfo config}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(data, serializer);
+        sse_encode_box_autoadd_qr_config_info(config, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 61, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiQrcodeGenSvgQrcodeConstMeta,
+      argValues: [data, config],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiQrcodeGenSvgQrcodeConstMeta => const TaskConstMeta(
+        debugName: "gen_svg_qrcode",
+        argNames: ["data", "config"],
+      );
+
+  @override
+  Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 62, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_address_book_entry_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBookGetAddressBookListConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBookGetAddressBookListConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_address_book_list",
+        argNames: [],
+      );
+
+  @override
+  Future<List<String>> crateApiAuthGetBiometricType() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 63, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiAuthGetBiometricTypeConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiAuthGetBiometricTypeConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_biometric_type",
+        argNames: [],
+      );
+
+  @override
+  Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson(
+      {required String jsonStr}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(jsonStr, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 64, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_network_config_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderGetChainsProvidersFromJsonConstMeta,
+      argValues: [jsonStr],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderGetChainsProvidersFromJsonConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_chains_providers_from_json",
+        argNames: ["jsonStr"],
+      );
+
+  @override
+  Future<List<Category>> crateApiBookGetCombineSortAddresses(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 65, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_category,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBookGetCombineSortAddressesConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBookGetCombineSortAddressesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_combine_sort_addresses",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<List<ConnectionInfo>> crateApiConnectionsGetConnectionsList(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 66, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_connection_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiConnectionsGetConnectionsListConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiConnectionsGetConnectionsListConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_connections_list",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<List<(String, String)>> crateApiUtilsGetCurrenciesTickets() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 67, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_record_string_string,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiUtilsGetCurrenciesTicketsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsGetCurrenciesTicketsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_currencies_tickets",
+        argNames: [],
+      );
+
+  @override
+  Future<BackgroundState> crateApiBackendGetData() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 68, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_background_state,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendGetDataConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendGetDataConstMeta => const TaskConstMeta(
+        debugName: "get_data",
+        argNames: [],
+      );
+
+  @override
+  Future<List<HistoricalTransactionInfo>> crateApiTransactionGetHistory(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 69, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_historical_transaction_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionGetHistoryConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionGetHistoryConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_history",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<(Uint8List, String)> crateApiCacheGetImageBytes(
+      {required String dir, required String url}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(dir, serializer);
+        sse_encode_String(url, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 70, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_list_prim_u_8_strict_string,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCacheGetImageBytesConstMeta,
+      argValues: [dir, url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheGetImageBytesConstMeta => const TaskConstMeta(
+        debugName: "get_image_bytes",
+        argNames: ["dir", "url"],
+      );
+
+  @override
+  Future<String> crateApiCacheGetImageName(
+      {required String dir, required String url}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(dir, serializer);
+        sse_encode_String(url, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 71, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCacheGetImageNameConstMeta,
+      argValues: [dir, url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheGetImageNameConstMeta => const TaskConstMeta(
+        debugName: "get_image_name",
+        argNames: ["dir", "url"],
+      );
+
+  @override
+  Future<(List<NetworkConfigInfo>, List<NetworkConfigInfo>)>
+      crateApiProviderGetNetworks(
+          {required String mainnetJson, required String testnetJson}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(mainnetJson, serializer);
+        sse_encode_String(testnetJson, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 72, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_list_network_config_info_list_network_config_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderGetNetworksConstMeta,
+      argValues: [mainnetJson, testnetJson],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderGetNetworksConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_networks",
+        argNames: ["mainnetJson", "testnetJson"],
+      );
+
+  @override
+  Future<NetworkConfigInfo> crateApiProviderGetProvider(
+      {required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 73, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_network_config_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderGetProviderConstMeta,
+      argValues: [chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderGetProviderConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_provider",
+        argNames: ["chainHash"],
+      );
+
+  @override
+  Future<List<NetworkConfigInfo>> crateApiProviderGetProviders() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 74, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_network_config_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderGetProvidersConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderGetProvidersConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_providers",
+        argNames: [],
+      );
+
+  @override
+  Future<List<WalletInfo>> crateApiWalletGetWallets() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 75, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_wallet_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletGetWalletsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletGetWalletsConstMeta => const TaskConstMeta(
+        debugName: "get_wallets",
+        argNames: [],
+      );
+
+  @override
+  Future<List<String>> crateApiWalletGetZilBech32Addresses(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 76, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletGetZilBech32AddressesConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletGetZilBech32AddressesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_zil_bech32_addresses",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<List<String>> crateApiWalletGetZilEthChecksumAddresses(
+      {required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 77, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletGetZilEthChecksumAddressesConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletGetZilEthChecksumAddressesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_zil_eth_checksum_addresses",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<void> crateApiMethodsInitApp() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 78, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiMethodsInitAppConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsInitAppConstMeta => const TaskConstMeta(
+        debugName: "init_app",
+        argNames: [],
+      );
+
+  @override
+  (String, String) crateApiUtilsIntlNumberFormating(
+      {required String value,
+      required int decimals,
+      required String localeStr,
+      required String nativeSymbolStr,
+      required String convertedSymbolStr,
+      required double threshold,
+      required bool compact,
+      required double converted}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(value, serializer);
+        sse_encode_u_8(decimals, serializer);
+        sse_encode_String(localeStr, serializer);
+        sse_encode_String(nativeSymbolStr, serializer);
+        sse_encode_String(convertedSymbolStr, serializer);
+        sse_encode_f_64(threshold, serializer);
+        sse_encode_bool(compact, serializer);
+        sse_encode_f_64(converted, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 79)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiUtilsIntlNumberFormatingConstMeta,
+      argValues: [
+        value,
+        decimals,
+        localeStr,
+        nativeSymbolStr,
+        convertedSymbolStr,
+        threshold,
+        compact,
+        converted
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsIntlNumberFormatingConstMeta =>
+      const TaskConstMeta(
+        debugName: "intl_number_formating",
+        argNames: [
+          "value",
+          "decimals",
+          "localeStr",
+          "nativeSymbolStr",
+          "convertedSymbolStr",
+          "threshold",
+          "compact",
+          "converted"
+        ],
+      );
+
+  @override
+  Future<bool> crateApiBackendIsServiceRunning() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 80, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBackendIsServiceRunningConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendIsServiceRunningConstMeta =>
+      const TaskConstMeta(
+        debugName: "is_service_running",
+        argNames: [],
+      );
+
+  @override
+  Future<bool> crateApiUtilsIsValidAddress({required String addr}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(addr, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 81, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiUtilsIsValidAddressConstMeta,
+      argValues: [addr],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsIsValidAddressConstMeta =>
+      const TaskConstMeta(
+        debugName: "is_valid_address",
+        argNames: ["addr"],
+      );
+
+  @override
+  Future<KeyPairInfo> crateApiMethodsKeypairFromSk({required String sk}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(sk, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 82, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_key_pair_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiMethodsKeypairFromSkConstMeta,
+      argValues: [sk],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsKeypairFromSkConstMeta =>
+      const TaskConstMeta(
+        debugName: "keypair_from_sk",
+        argNames: ["sk"],
+      );
+
+  @override
+  Future<void> crateApiLedgerTransportLedgerBleClose(
+      {required String connectionId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(connectionId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 83, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerBleCloseConstMeta,
+      argValues: [connectionId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerBleCloseConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_ble_close",
+        argNames: ["connectionId"],
+      );
+
+  @override
+  Future<Uint8List> crateApiLedgerTransportLedgerBleExchange(
+      {required String connectionId, required List<int> apdu}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(connectionId, serializer);
+        sse_encode_list_prim_u_8_loose(apdu, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 84, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerBleExchangeConstMeta,
+      argValues: [connectionId, apdu],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerBleExchangeConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_ble_exchange",
+        argNames: ["connectionId", "apdu"],
+      );
+
+  @override
+  Future<String> crateApiLedgerTransportLedgerBleOpen(
+      {required String deviceId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(deviceId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 85, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerBleOpenConstMeta,
+      argValues: [deviceId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerBleOpenConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_ble_open",
+        argNames: ["deviceId"],
+      );
+
+  @override
+  Future<List<RustLedgerBleDevice>> crateApiLedgerTransportLedgerBleScan() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 86, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_rust_ledger_ble_device,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerBleScanConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerBleScanConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_ble_scan",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiLedgerTransportLedgerHidClose(
+      {required String connectionId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(connectionId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 87, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerHidCloseConstMeta,
+      argValues: [connectionId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerHidCloseConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_hid_close",
+        argNames: ["connectionId"],
+      );
+
+  @override
+  Future<Uint8List> crateApiLedgerTransportLedgerHidExchange(
+      {required String connectionId, required List<int> apdu}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(connectionId, serializer);
+        sse_encode_list_prim_u_8_loose(apdu, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 88, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerHidExchangeConstMeta,
+      argValues: [connectionId, apdu],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerHidExchangeConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_hid_exchange",
+        argNames: ["connectionId", "apdu"],
+      );
+
+  @override
+  Future<List<RustLedgerHidDevice>> crateApiLedgerTransportLedgerHidList() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 89, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_rust_ledger_hid_device,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerHidListConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerHidListConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_hid_list",
+        argNames: [],
+      );
+
+  @override
+  Future<String> crateApiLedgerTransportLedgerHidOpen(
+      {required String deviceId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(deviceId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 90, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerTransportLedgerHidOpenConstMeta,
+      argValues: [deviceId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerTransportLedgerHidOpenConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_hid_open",
+        argNames: ["deviceId"],
+      );
+
+  @override
+  Future<Uint32List> crateApiLedgerLedgerSplitPath({required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 91, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_32_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerLedgerSplitPathConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerLedgerSplitPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "ledger_split_path",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<BackgroundState> crateApiBackendLoadService({required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 92, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_background_state,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendLoadServiceConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendLoadServiceConstMeta => const TaskConstMeta(
+        debugName: "load_service",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<Uint8List> crateApiWalletMakeKeystoreFile(
+      {required BigInt walletIndex, required String password}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(password, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 93, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletMakeKeystoreFileConstMeta,
+      argValues: [walletIndex, password],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletMakeKeystoreFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "make_keystore_file",
+        argNames: ["walletIndex", "password"],
+      );
+
+  @override
+  Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr(
+      {required String data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 94, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_q_rcode_scan_result_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiQrcodeParseQrcodeStrConstMeta,
+      argValues: [data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiQrcodeParseQrcodeStrConstMeta =>
+      const TaskConstMeta(
+        debugName: "parse_qrcode_str",
+        argNames: ["data"],
+      );
+
+  @override
+  Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
+      {required String typedDataJson}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(typedDataJson, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 95, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_eip_712_hashes,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionPrepareEip712MessageConstMeta,
+      argValues: [typedDataJson],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionPrepareEip712MessageConstMeta =>
+      const TaskConstMeta(
+        debugName: "prepare_eip712_message",
+        argNames: ["typedDataJson"],
+      );
+
+  @override
+  Future<Uint8List> crateApiTransactionPrepareMessage(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String message}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_String(message, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 96, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionPrepareMessageConstMeta,
+      argValues: [walletIndex, accountIndex, message],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionPrepareMessageConstMeta =>
+      const TaskConstMeta(
+        debugName: "prepare_message",
+        argNames: ["walletIndex", "accountIndex", "message"],
+      );
+
+  @override
+  Future<String> crateApiProviderProviderReqProxy(
+      {required String payload, required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(payload, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 97, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderProviderReqProxyConstMeta,
+      argValues: [payload, chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderProviderReqProxyConstMeta =>
+      const TaskConstMeta(
+        debugName: "provider_req_proxy",
+        argNames: ["payload", "chainHash"],
+      );
+
+  @override
+  Future<void> crateApiConnectionsRemoveConnections(
+      {required BigInt walletIndex, required String domain}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(domain, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 98, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiConnectionsRemoveConnectionsConstMeta,
+      argValues: [walletIndex, domain],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiConnectionsRemoveConnectionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_connections",
+        argNames: ["walletIndex", "domain"],
+      );
+
+  @override
+  Future<void> crateApiBookRemoveFromAddressBook({required String addr}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(addr, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 99, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBookRemoveFromAddressBookConstMeta,
+      argValues: [addr],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBookRemoveFromAddressBookConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_from_address_book",
+        argNames: ["addr"],
+      );
+
+  @override
+  Future<void> crateApiProviderRemoveProvider({required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 100, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderRemoveProviderConstMeta,
+      argValues: [chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderRemoveProviderConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_provider",
+        argNames: ["chainHash"],
+      );
+
+  @override
+  Future<String> crateApiWalletRestoreFromKeystore(
+      {required List<int> keystoreBytes,
+      required String password,
+      required String biometricType}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(keystoreBytes, serializer);
+        sse_encode_String(password, serializer);
+        sse_encode_String(biometricType, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 101, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletRestoreFromKeystoreConstMeta,
+      argValues: [keystoreBytes, password, biometricType],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletRestoreFromKeystoreConstMeta =>
+      const TaskConstMeta(
+        debugName: "restore_from_keystore",
+        argNames: ["keystoreBytes", "password", "biometricType"],
+      );
+
+  @override
+  Future<String> crateApiWalletRevealBip39Phrase(
+      {required BigInt walletIndex,
+      required String password,
+      String? passphrase}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 102, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletRevealBip39PhraseConstMeta,
+      argValues: [walletIndex, password, passphrase],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletRevealBip39PhraseConstMeta =>
+      const TaskConstMeta(
+        debugName: "reveal_bip39_phrase",
+        argNames: ["walletIndex", "password", "passphrase"],
+      );
+
+  @override
+  Future<KeyPairInfo> crateApiWalletRevealKeypair(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required String password,
+      String? passphrase}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 103, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_key_pair_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletRevealKeypairConstMeta,
+      argValues: [walletIndex, accountIndex, password, passphrase],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletRevealKeypairConstMeta =>
+      const TaskConstMeta(
+        debugName: "reveal_keypair",
+        argNames: ["walletIndex", "accountIndex", "password", "passphrase"],
+      );
+
+  @override
+  Future<void> crateApiTokenRmFtoken(
+      {required BigInt walletIndex, required String tokenAddress}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(tokenAddress, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 104, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenRmFtokenConstMeta,
+      argValues: [walletIndex, tokenAddress],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenRmFtokenConstMeta => const TaskConstMeta(
+        debugName: "rm_ftoken",
+        argNames: ["walletIndex", "tokenAddress"],
+      );
+
+  @override
+  Future<Map<int, AddressChainInfo>> crateApiLedgerScanBtcAccountHistory(
+      {required BtcAccountXpubsInputInfo xpubs,
+      required int ledgerIndex,
+      required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_btc_account_xpubs_input_info(xpubs, serializer);
+        sse_encode_u_8(ledgerIndex, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 105, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_Map_u_8_address_chain_info_None,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiLedgerScanBtcAccountHistoryConstMeta,
+      argValues: [xpubs, ledgerIndex, chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiLedgerScanBtcAccountHistoryConstMeta =>
+      const TaskConstMeta(
+        debugName: "scan_btc_account_history",
+        argNames: ["xpubs", "ledgerIndex", "chainHash"],
+      );
+
+  @override
+  Future<void> crateApiWalletSelectAccount(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 106, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletSelectAccountConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletSelectAccountConstMeta =>
+      const TaskConstMeta(
+        debugName: "select_account",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<void> crateApiProviderSelectAccountsChain(
+      {required BigInt walletIndex,
+      required BigInt chainHash,
+      String? password}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        sse_encode_opt_String(password, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 107, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiProviderSelectAccountsChainConstMeta,
+      argValues: [walletIndex, chainHash, password],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiProviderSelectAccountsChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "select_accounts_chain",
+        argNames: ["walletIndex", "chainHash", "password"],
+      );
+
+  @override
+  Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions(
+      {required int walletIndex,
+      required int accountIndex,
+      required TransactionRequestInfo tx,
+      required List<int> sig,
+      String? bip86Xpub}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8(walletIndex, serializer);
+        sse_encode_u_8(accountIndex, serializer);
+        sse_encode_box_autoadd_transaction_request_info(tx, serializer);
+        sse_encode_list_prim_u_8_loose(sig, serializer);
+        sse_encode_opt_String(bip86Xpub, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 108, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_historical_transaction_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionSendSignedTransactionsConstMeta,
+      argValues: [walletIndex, accountIndex, tx, sig, bip86Xpub],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionSendSignedTransactionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "send_signed_transactions",
+        argNames: ["walletIndex", "accountIndex", "tx", "sig", "bip86Xpub"],
+      );
+
+  @override
+  Future<void> crateApiWalletSetBiometric(
+      {required BigInt walletIndex,
+      String? password,
+      required String newBiometricType}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_String(newBiometricType, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 109, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletSetBiometricConstMeta,
+      argValues: [walletIndex, password, newBiometricType],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletSetBiometricConstMeta => const TaskConstMeta(
+        debugName: "set_biometric",
+        argNames: ["walletIndex", "password", "newBiometricType"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetBrowserSettings(
+      {required BrowserSettingsInfo browserSettings}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_browser_settings_info(
+            browserSettings, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 110, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetBrowserSettingsConstMeta,
+      argValues: [browserSettings],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetBrowserSettingsConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_browser_settings",
+        argNames: ["browserSettings"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetDefaultLocale({String? locale}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_opt_String(locale, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 111, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetDefaultLocaleConstMeta,
+      argValues: [locale],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetDefaultLocaleConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_default_locale",
+        argNames: ["locale"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetGlobalNotifications(
+      {required bool globalEnabled}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_bool(globalEnabled, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 112, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetGlobalNotificationsConstMeta,
+      argValues: [globalEnabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetGlobalNotificationsConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_global_notifications",
+        argNames: ["globalEnabled"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetRateEngine(
+      {required BigInt walletIndex, required int engineCode}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_u_8(engineCode, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 113, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetRateEngineConstMeta,
+      argValues: [walletIndex, engineCode],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetRateEngineConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_rate_engine",
+        argNames: ["walletIndex", "engineCode"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetRateFetcher(
+      {required BigInt walletIndex, required String currency}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_String(currency, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 114, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetRateFetcherConstMeta,
+      argValues: [walletIndex, currency],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetRateFetcherConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_rate_fetcher",
+        argNames: ["walletIndex", "currency"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetTheme(
+      {required int appearancesCode, required bool compactNumbers}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8(appearancesCode, serializer);
+        sse_encode_bool(compactNumbers, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 115, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetThemeConstMeta,
+      argValues: [appearancesCode, compactNumbers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetThemeConstMeta => const TaskConstMeta(
+        debugName: "set_theme",
+        argNames: ["appearancesCode", "compactNumbers"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetTokensListFetcher(
+      {required BigInt walletIndex, required bool enabled}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_bool(enabled, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 116, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetTokensListFetcherConstMeta,
+      argValues: [walletIndex, enabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetTokensListFetcherConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_tokens_list_fetcher",
+        argNames: ["walletIndex", "enabled"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetWalletEns(
+      {required BigInt walletIndex, required bool ensEnabled}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_bool(ensEnabled, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 117, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetWalletEnsConstMeta,
+      argValues: [walletIndex, ensEnabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetWalletEnsConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_wallet_ens",
+        argNames: ["walletIndex", "ensEnabled"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetWalletIpfsNode(
+      {required BigInt walletIndex, String? node}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_opt_String(node, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 118, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetWalletIpfsNodeConstMeta,
+      argValues: [walletIndex, node],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetWalletIpfsNodeConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_wallet_ipfs_node",
+        argNames: ["walletIndex", "node"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetWalletNodeRanking(
+      {required BigInt walletIndex, required bool enabled}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_bool(enabled, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 119, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetWalletNodeRankingConstMeta,
+      argValues: [walletIndex, enabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetWalletNodeRankingConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_wallet_node_ranking",
+        argNames: ["walletIndex", "enabled"],
+      );
+
+  @override
+  Future<void> crateApiSettingsSetWalletNotifications(
+      {required BigInt walletIndex,
+      required bool transactions,
+      required bool price,
+      required bool security,
+      required bool balance}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_bool(transactions, serializer);
+        sse_encode_bool(price, serializer);
+        sse_encode_bool(security, serializer);
+        sse_encode_bool(balance, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 120, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetWalletNotificationsConstMeta,
+      argValues: [walletIndex, transactions, price, security, balance],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetWalletNotificationsConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_wallet_notifications",
+        argNames: [
+          "walletIndex",
+          "transactions",
+          "price",
+          "security",
+          "balance"
+        ],
+      );
+
+  @override
+  Future<(String, String)> crateApiTransactionSignMessage(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required String message,
+      String? title,
+      String? icon}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        sse_encode_String(message, serializer);
+        sse_encode_opt_String(title, serializer);
+        sse_encode_opt_String(icon, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 121, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionSignMessageConstMeta,
+      argValues: [
+        walletIndex,
+        accountIndex,
+        password,
+        passphrase,
+        message,
+        title,
+        icon
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionSignMessageConstMeta =>
+      const TaskConstMeta(
+        debugName: "sign_message",
+        argNames: [
+          "walletIndex",
+          "accountIndex",
+          "password",
+          "passphrase",
+          "message",
+          "title",
+          "icon"
+        ],
+      );
+
+  @override
+  Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required TransactionRequestInfo tx}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        sse_encode_box_autoadd_transaction_request_info(tx, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 122, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_historical_transaction_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionSignSendTransactionsConstMeta,
+      argValues: [walletIndex, accountIndex, password, passphrase, tx],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionSignSendTransactionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sign_send_transactions",
+        argNames: [
+          "walletIndex",
+          "accountIndex",
+          "password",
+          "passphrase",
+          "tx"
+        ],
+      );
+
+  @override
+  Future<(String, String)> crateApiTransactionSignTypedDataEip712(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      String? password,
+      String? passphrase,
+      required String typedDataJson,
+      String? title,
+      String? icon}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        sse_encode_String(typedDataJson, serializer);
+        sse_encode_opt_String(title, serializer);
+        sse_encode_opt_String(icon, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 123, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionSignTypedDataEip712ConstMeta,
+      argValues: [
+        walletIndex,
+        accountIndex,
+        password,
+        passphrase,
+        typedDataJson,
+        title,
+        icon
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionSignTypedDataEip712ConstMeta =>
+      const TaskConstMeta(
+        debugName: "sign_typed_data_eip712",
+        argNames: [
+          "walletIndex",
+          "accountIndex",
+          "password",
+          "passphrase",
+          "typedDataJson",
+          "title",
+          "icon"
+        ],
+      );
+
+  @override
+  Stream<BlockEvent> crateApiBackendStartBlockWorker(
+      {required BigInt walletIndex}) {
+    final sink = RustStreamSink<BlockEvent>();
+    unawaited(handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_StreamSink_block_event_Sse(sink, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 124, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendStartBlockWorkerConstMeta,
+      argValues: [walletIndex, sink],
+      apiImpl: this,
+    )));
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiBackendStartBlockWorkerConstMeta =>
+      const TaskConstMeta(
+        debugName: "start_block_worker",
+        argNames: ["walletIndex", "sink"],
+      );
+
+  @override
+  Stream<String> crateApiTransactionStartHistoryWorker(
+      {required BigInt walletIndex}) {
+    final sink = RustStreamSink<String>();
+    unawaited(handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_StreamSink_String_Sse(sink, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 125, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionStartHistoryWorkerConstMeta,
+      argValues: [walletIndex, sink],
+      apiImpl: this,
+    )));
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiTransactionStartHistoryWorkerConstMeta =>
+      const TaskConstMeta(
+        debugName: "start_history_worker",
+        argNames: ["walletIndex", "sink"],
+      );
+
+  @override
+  Future<void> crateApiBackendStopBlockWorker() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 126, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendStopBlockWorkerConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendStopBlockWorkerConstMeta =>
+      const TaskConstMeta(
+        debugName: "stop_block_worker",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiTransactionStopHistoryWorker() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 127, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionStopHistoryWorkerConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionStopHistoryWorkerConstMeta =>
+      const TaskConstMeta(
+        debugName: "stop_history_worker",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiBackendStopService() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 128, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendStopServiceConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendStopServiceConstMeta => const TaskConstMeta(
+        debugName: "stop_service",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiTokenSyncBalances({required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 129, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenSyncBalancesConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenSyncBalancesConstMeta => const TaskConstMeta(
+        debugName: "sync_balances",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  (String, int) crateApiUtilsToWei(
+      {required String value, required int decimals}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(value, serializer);
+        sse_encode_u_8(decimals, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 130)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_u_8,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUtilsToWeiConstMeta,
+      argValues: [value, decimals],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsToWeiConstMeta => const TaskConstMeta(
+        debugName: "to_wei",
+        argNames: ["value", "decimals"],
+      );
+
+  @override
+  Future<bool> crateApiAuthTryUnlockWithPassword(
+      {required String password,
+      required BigInt walletIndex,
+      List<String>? identifiers}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(password, serializer);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_opt_list_String(identifiers, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 131, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiAuthTryUnlockWithPasswordConstMeta,
+      argValues: [password, walletIndex, identifiers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiAuthTryUnlockWithPasswordConstMeta =>
+      const TaskConstMeta(
+        debugName: "try_unlock_with_password",
+        argNames: ["password", "walletIndex", "identifiers"],
+      );
+
+  @override
+  Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 132, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiAuthTryUnlockWithSessionConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiAuthTryUnlockWithSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "try_unlock_with_session",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<void> crateApiTokenUpdateRates({required BigInt walletIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 133, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTokenUpdateRatesConstMeta,
+      argValues: [walletIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTokenUpdateRatesConstMeta => const TaskConstMeta(
+        debugName: "update_rates",
+        argNames: ["walletIndex"],
+      );
+
+  @override
+  Future<TransactionRequestInfo> crateApiTransactionUpdateTxWithParams(
+      {required TransactionRequestInfo tx,
+      required RequiredTxParamsInfo params,
+      required String balance,
+      required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_transaction_request_info(tx, serializer);
+        sse_encode_box_autoadd_required_tx_params_info(params, serializer);
+        sse_encode_String(balance, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 134, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionUpdateTxWithParamsConstMeta,
+      argValues: [tx, params, balance, chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionUpdateTxWithParamsConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_tx_with_params",
+        argNames: ["tx", "params", "balance", "chainHash"],
+      );
+
+  @override
+  Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 135, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaGetBech32Base16AddressConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaGetBech32Base16AddressConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_get_bech32_base16_address",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<String> crateApiWalletZilliqaGetNFormat(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 136, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaGetNFormatConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaGetNFormatConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_get_n_format",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<String> crateApiWalletZilliqaLegacyBase16ToBech32(
+      {required String base16}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(base16, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 137, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaLegacyBase16ToBech32ConstMeta,
+      argValues: [base16],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaLegacyBase16ToBech32ConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_legacy_base16_to_bech32",
+        argNames: ["base16"],
+      );
+
+  @override
+  Future<void> crateApiWalletZilliqaSwapChain(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 138, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaSwapChainConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaSwapChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_swap_chain",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_LocalStorageImpl => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_LocalStorageImpl => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl;
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+        dco_decode_list_record_u_32_map_u_32_list_account_info_none(raw)
+            .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_u_32_list_account_info(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+        dco_decode_list_record_u_8_map_u_8_address_chain_info_none(raw)
+            .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_u_8_address_chain_info(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_usize_string(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<BigInt, BackgroundNotificationState>
+      dco_decode_Map_usize_background_notification_state_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+        dco_decode_list_record_usize_background_notification_state(raw)
+            .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  LocalStorageImpl
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  String dco_decode_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as String;
+  }
+
+  @protected
+  KeyValueStorage dco_decode_TraitDef_KeyValueStorage(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  BigInt dco_decode_U128(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return BigInt.parse(raw);
+  }
+
+  @protected
+  AccessListItem dco_decode_access_list_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return AccessListItem(
+      address: dco_decode_String(arr[0]),
+      storageKeys: dco_decode_list_String(arr[1]),
+    );
+  }
+
+  @protected
+  AccountInfo dco_decode_account_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return AccountInfo(
+      addr: dco_decode_String(arr[0]),
+      pubKey: dco_decode_opt_String(arr[1]),
+      addrType: dco_decode_u_8(arr[2]),
+      name: dco_decode_String(arr[3]),
+      index: dco_decode_usize(arr[4]),
+    );
+  }
+
+  @protected
+  AddNextBip39AccountParams dco_decode_add_next_bip_39_account_params(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return AddNextBip39AccountParams(
+      walletIndex: dco_decode_usize(arr[0]),
+      accountIndex: dco_decode_usize(arr[1]),
+      name: dco_decode_String(arr[2]),
+      passphrase: dco_decode_String(arr[3]),
+      password: dco_decode_opt_String(arr[4]),
+    );
+  }
+
+  @protected
+  AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return AddSKWalletParams(
+      sk: dco_decode_String(arr[0]),
+      password: dco_decode_String(arr[1]),
+      walletName: dco_decode_String(arr[2]),
+      biometricType: dco_decode_String(arr[3]),
+      chainHash: dco_decode_u_64(arr[4]),
+      bipPurpose: dco_decode_u_32(arr[5]),
+    );
+  }
+
+  @protected
+  AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return AddressBookEntryInfo(
+      name: dco_decode_String(arr[0]),
+      addr: dco_decode_String(arr[1]),
+      net: dco_decode_usize(arr[2]),
+      slip44: dco_decode_u_32(arr[3]),
+    );
+  }
+
+  @protected
+  AddressChainInfo dco_decode_address_chain_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return AddressChainInfo(
+      external_: dco_decode_list_btc_address_entry_info(arr[0]),
+      internal: dco_decode_list_btc_address_entry_info(arr[1]),
+    );
+  }
+
+  @protected
+  BackgroundNotificationState dco_decode_background_notification_state(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return BackgroundNotificationState(
+      transactions: dco_decode_bool(arr[0]),
+      price: dco_decode_bool(arr[1]),
+      security: dco_decode_bool(arr[2]),
+      balance: dco_decode_bool(arr[3]),
+    );
+  }
+
+  @protected
+  BackgroundState dco_decode_background_state(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return BackgroundState(
+      wallets: dco_decode_list_wallet_info(arr[0]),
+      notificationsWalletStates:
+          dco_decode_Map_usize_background_notification_state_None(arr[1]),
+      notificationsGlobalEnabled: dco_decode_bool(arr[2]),
+      locale: dco_decode_opt_String(arr[3]),
+      appearances: dco_decode_u_8(arr[4]),
+      abbreviatedNumber: dco_decode_bool(arr[5]),
+      browserSettings: dco_decode_browser_settings_info(arr[6]),
+      providers: dco_decode_list_network_config_info(arr[7]),
+    );
+  }
+
+  @protected
+  BaseTokenInfo dco_decode_base_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return BaseTokenInfo(
+      value: dco_decode_String(arr[0]),
+      symbol: dco_decode_String(arr[1]),
+      decimals: dco_decode_u_8(arr[2]),
+    );
+  }
+
+  @protected
+  Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return Bip39AddWalletParams(
+      password: dco_decode_String(arr[0]),
+      mnemonicStr: dco_decode_String(arr[1]),
+      mnemonicCheck: dco_decode_bool(arr[2]),
+      accounts: dco_decode_list_record_usize_string(arr[3]),
+      passphrase: dco_decode_String(arr[4]),
+      walletName: dco_decode_String(arr[5]),
+      biometricType: dco_decode_String(arr[6]),
+      chainHash: dco_decode_u_64(arr[7]),
+    );
+  }
+
+  @protected
+  BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return BitcoinMetadataInfo(
+      witnessUtxos: dco_decode_list_tx_out_info(arr[0]),
+      inputMeta: dco_decode_list_input_meta_info(arr[1]),
+    );
+  }
+
+  @protected
+  BlockEvent dco_decode_block_event(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return BlockEvent(
+      blockNumber: dco_decode_opt_box_autoadd_u_64(arr[0]),
+      error: dco_decode_opt_String(arr[1]),
+    );
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  AddNextBip39AccountParams
+      dco_decode_box_autoadd_add_next_bip_39_account_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_add_next_bip_39_account_params(raw);
+  }
+
+  @protected
+  AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_add_sk_wallet_params(raw);
+  }
+
+  @protected
+  BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_base_token_info(raw);
+  }
+
+  @protected
+  Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_bip_39_add_wallet_params(raw);
+  }
+
+  @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_browser_settings_info(raw);
+  }
+
+  @protected
+  BtcAccountXpubsInputInfo dco_decode_box_autoadd_btc_account_xpubs_input_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_btc_account_xpubs_input_info(raw);
+  }
+
+  @protected
+  ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_colors_info(raw);
+  }
+
+  @protected
+  ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_connection_info(raw);
+  }
+
+  @protected
+  double dco_decode_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  double dco_decode_box_autoadd_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_f_token_info(raw);
+  }
+
+  @protected
+  FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_final_output_info(raw);
+  }
+
+  @protected
+  LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_ledger_params_input(raw);
+  }
+
+  @protected
+  MetadataThorchain dco_decode_box_autoadd_metadata_thorchain(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_metadata_thorchain(raw);
+  }
+
+  @protected
+  NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_network_config_info(raw);
+  }
+
+  @protected
+  QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_qr_config_info(raw);
+  }
+
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as (TransactionBitcoin, BitcoinMetadataInfo);
+  }
+
+  @protected
+  RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_required_tx_params_info(raw);
+  }
+
+  @protected
+  TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_token_transfer_params_info(raw);
+  }
+
+  @protected
+  TransactionBitcoin dco_decode_box_autoadd_transaction_bitcoin(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_bitcoin(raw);
+  }
+
+  @protected
+  TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_evm(raw);
+  }
+
+  @protected
+  TransactionRequestInfo dco_decode_box_autoadd_transaction_request_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_info(raw);
+  }
+
+  @protected
+  TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_scilla(raw);
+  }
+
+  @protected
+  BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_u_64(raw);
+  }
+
+  @protected
+  WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_wallet_settings_info(raw);
+  }
+
+  @protected
+  BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return BrowserSettingsInfo(
+      searchEngineIndex: dco_decode_u_8(arr[0]),
+      cacheEnabled: dco_decode_bool(arr[1]),
+      cookiesEnabled: dco_decode_bool(arr[2]),
+      contentBlocking: dco_decode_u_8(arr[3]),
+      doNotTrack: dco_decode_bool(arr[4]),
+      incognitoMode: dco_decode_bool(arr[5]),
+      textScalingFactor: dco_decode_f_32(arr[6]),
+      allowGeolocation: dco_decode_bool(arr[7]),
+      allowCamera: dco_decode_bool(arr[8]),
+      allowMicrophone: dco_decode_bool(arr[9]),
+      allowAutoPlay: dco_decode_bool(arr[10]),
+    );
+  }
+
+  @protected
+  BtcAccountXpubsInputInfo dco_decode_btc_account_xpubs_input_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return BtcAccountXpubsInputInfo(
+      bip44Xpub: dco_decode_String(arr[0]),
+      bip49Xpub: dco_decode_String(arr[1]),
+      bip84Xpub: dco_decode_String(arr[2]),
+      bip86Xpub: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
+  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return BtcAddressEntryInfo(
+      address: dco_decode_String(arr[0]),
+      path: dco_decode_String(arr[1]),
+      history: dco_decode_list_String(arr[2]),
+      utxos: dco_decode_list_utxo_info(arr[3]),
+    );
+  }
+
+  @protected
+  Category dco_decode_category(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return Category(
+      name: dco_decode_String(arr[0]),
+      entries: dco_decode_list_entry(arr[1]),
+    );
+  }
+
+  @protected
+  ColorsInfo dco_decode_colors_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ColorsInfo(
+      primary: dco_decode_opt_String(arr[0]),
+      secondary: dco_decode_opt_String(arr[1]),
+      background: dco_decode_opt_String(arr[2]),
+      text: dco_decode_opt_String(arr[3]),
+    );
+  }
+
+  @protected
+  ConnectionInfo dco_decode_connection_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return ConnectionInfo(
+      domain: dco_decode_String(arr[0]),
+      accountIndexes: dco_decode_list_prim_usize_strict(arr[1]),
+      favicon: dco_decode_opt_String(arr[2]),
+      title: dco_decode_String(arr[3]),
+      description: dco_decode_opt_String(arr[4]),
+      colors: dco_decode_opt_box_autoadd_colors_info(arr[5]),
+      lastConnected: dco_decode_u_64(arr[6]),
+      canReadAccounts: dco_decode_bool(arr[7]),
+      canRequestSignatures: dco_decode_bool(arr[8]),
+      canSuggestTokens: dco_decode_bool(arr[9]),
+      canSuggestTransactions: dco_decode_bool(arr[10]),
+    );
+  }
+
+  @protected
+  Eip712Hashes dco_decode_eip_712_hashes(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return Eip712Hashes(
+      domainSeparator: dco_decode_list_prim_u_8_strict(arr[0]),
+      hashStructMessage: dco_decode_list_prim_u_8_strict(arr[1]),
+    );
+  }
+
+  @protected
+  EncodedRLPTx dco_decode_encoded_rlp_tx(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return EncodedRLPTx(
+      bytes: dco_decode_list_prim_u_8_strict(arr[0]),
+      chunksBytes: dco_decode_list_list_prim_u_8_strict(arr[1]),
+    );
+  }
+
+  @protected
+  Entry dco_decode_entry(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return Entry(
+      name: dco_decode_String(arr[0]),
+      address: dco_decode_String(arr[1]),
+      tag: dco_decode_opt_String(arr[2]),
+    );
+  }
+
+  @protected
+  ExchangeProvider dco_decode_exchange_provider(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return ExchangeProvider_Thorchain(
+          dco_decode_box_autoadd_metadata_thorchain(raw[1]),
         );
-        
+      default:
+        throw Exception("unreachable");
+    }
+  }
 
-@override Future<LocalStorageImpl> crateApiLocalStorageLocalStorageImplNew({required String pathDir })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(pathDir, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLocalStorageLocalStorageImplNewConstMeta,
-            argValues: [pathDir],
-            apiImpl: this,
-        )); }
+  @protected
+  ExplorerInfo dco_decode_explorer_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ExplorerInfo(
+      name: dco_decode_String(arr[0]),
+      url: dco_decode_String(arr[1]),
+      icon: dco_decode_opt_String(arr[2]),
+      standard: dco_decode_u_16(arr[3]),
+    );
+  }
 
+  @protected
+  double dco_decode_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
 
-        TaskConstMeta get kCrateApiLocalStorageLocalStorageImplNewConstMeta => const TaskConstMeta(
-            debugName: "LocalStorageImpl_new",
-            argNames: ["pathDir"],
-        );
-        
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
 
-@override Future<void> crateApiLocalStorageLocalStorageImplRm({required LocalStorageImpl that , required String key })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(that, serializer);
-sse_encode_String(key, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLocalStorageLocalStorageImplRmConstMeta,
-            argValues: [that, key],
-            apiImpl: this,
-        )); }
+  @protected
+  FTokenInfo dco_decode_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return FTokenInfo(
+      name: dco_decode_String(arr[0]),
+      symbol: dco_decode_String(arr[1]),
+      decimals: dco_decode_u_8(arr[2]),
+      addr: dco_decode_String(arr[3]),
+      addrType: dco_decode_u_8(arr[4]),
+      logo: dco_decode_opt_String(arr[5]),
+      balances: dco_decode_Map_usize_String_None(arr[6]),
+      rate: dco_decode_f_64(arr[7]),
+      default_: dco_decode_bool(arr[8]),
+      native: dco_decode_bool(arr[9]),
+      chainHash: dco_decode_u_64(arr[10]),
+    );
+  }
 
+  @protected
+  FinalOutputInfo dco_decode_final_output_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
+    return FinalOutputInfo(
+      name: dco_decode_String(arr[0]),
+      address: dco_decode_String(arr[1]),
+      token: dco_decode_opt_box_autoadd_f_token_info(arr[2]),
+      delegAmt: dco_decode_String(arr[3]),
+      rewards: dco_decode_String(arr[4]),
+      claimableAmount: dco_decode_String(arr[5]),
+      apr: dco_decode_opt_box_autoadd_f_64(arr[6]),
+      commission: dco_decode_opt_box_autoadd_f_64(arr[7]),
+      unbondingPeriodSeconds: dco_decode_opt_box_autoadd_u_64(arr[8]),
+      lstPriceChangePercent: dco_decode_opt_box_autoadd_f_32(arr[9]),
+      avgBlockTimeMs: dco_decode_opt_box_autoadd_u_64(arr[10]),
+      tag: dco_decode_String(arr[11]),
+      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
+      pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[13]),
+    );
+  }
 
-        TaskConstMeta get kCrateApiLocalStorageLocalStorageImplRmConstMeta => const TaskConstMeta(
-            debugName: "LocalStorageImpl_rm",
-            argNames: ["that", "key"],
-        );
-        
+  @protected
+  FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return FinalizedBtcTx(
+      rawTxHex: dco_decode_String(arr[0]),
+      txHash: dco_decode_String(arr[1]),
+      psbtBytes: dco_decode_list_prim_u_8_strict(arr[2]),
+    );
+  }
 
-@override Future<void> crateApiLocalStorageLocalStorageImplSet({required LocalStorageImpl that , required String key , required String value })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(that, serializer);
-sse_encode_String(key, serializer);
-sse_encode_String(value, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLocalStorageLocalStorageImplSetConstMeta,
-            argValues: [that, key, value],
-            apiImpl: this,
-        )); }
+  @protected
+  GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return GasFeeHistoryInfo(
+      maxFee: dco_decode_U128(arr[0]),
+      priorityFee: dco_decode_U128(arr[1]),
+      baseFee: dco_decode_U128(arr[2]),
+    );
+  }
 
+  @protected
+  HistoricalTransactionInfo dco_decode_historical_transaction_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return HistoricalTransactionInfo(
+      status: dco_decode_transaction_status_info(arr[0]),
+      metadata: dco_decode_transaction_metadata_info(arr[1]),
+      evm: dco_decode_opt_String(arr[2]),
+      scilla: dco_decode_opt_String(arr[3]),
+      btc: dco_decode_opt_box_autoadd_transaction_bitcoin(arr[4]),
+      tron: dco_decode_opt_String(arr[5]),
+      solana: dco_decode_opt_String(arr[6]),
+      signedMessage: dco_decode_opt_String(arr[7]),
+      timestamp: dco_decode_u_64(arr[8]),
+    );
+  }
 
-        TaskConstMeta get kCrateApiLocalStorageLocalStorageImplSetConstMeta => const TaskConstMeta(
-            debugName: "LocalStorageImpl_set",
-            argNames: ["that", "key", "value"],
-        );
-        
+  @protected
+  int dco_decode_i_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
 
-@override Future<String> crateApiWalletAddBip39Wallet({required Bip39AddWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> additionalFtokens })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_bip_39_add_wallet_params(params, serializer);
-sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
-sse_encode_list_f_token_info(additionalFtokens, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeI64(raw);
+  }
+
+  @protected
+  InputMetaInfo dco_decode_input_meta_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return InputMetaInfo(
+      addressType: dco_decode_u_8(arr[0]),
+      derivationPath: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  KeyPairInfo dco_decode_key_pair_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return KeyPairInfo(
+      sk: dco_decode_String(arr[0]),
+      pk: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  LedgerInputSignature dco_decode_ledger_input_signature(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return LedgerInputSignature(
+      inputIndex: dco_decode_u_32(arr[0]),
+      signature: dco_decode_list_prim_u_8_strict(arr[1]),
+      pubkey: dco_decode_list_prim_u_8_strict(arr[2]),
+    );
+  }
+
+  @protected
+  LedgerParamsInput dco_decode_ledger_params_input(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return LedgerParamsInput(
+      pubKeys: dco_decode_list_record_u_8_string(arr[0]),
+      walletIndex: dco_decode_usize(arr[1]),
+      walletName: dco_decode_String(arr[2]),
+      ledgerId: dco_decode_String(arr[3]),
+      accountNames: dco_decode_list_String(arr[4]),
+      biometricType: dco_decode_String(arr[5]),
+      chainHash: dco_decode_u_64(arr[6]),
+      zilliqaLegacy: dco_decode_bool(arr[7]),
+      btcChains:
+          dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(arr[8]),
+    );
+  }
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<AccessListItem> dco_decode_list_access_list_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_access_list_item).toList();
+  }
+
+  @protected
+  List<AccountInfo> dco_decode_list_account_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_account_info).toList();
+  }
+
+  @protected
+  List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_address_book_entry_info)
+        .toList();
+  }
+
+  @protected
+  List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_btc_address_entry_info)
+        .toList();
+  }
+
+  @protected
+  List<Category> dco_decode_list_category(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_category).toList();
+  }
+
+  @protected
+  List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_connection_info).toList();
+  }
+
+  @protected
+  List<Entry> dco_decode_list_entry(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_entry).toList();
+  }
+
+  @protected
+  List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_exchange_provider).toList();
+  }
+
+  @protected
+  List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_explorer_info).toList();
+  }
+
+  @protected
+  List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_f_token_info).toList();
+  }
+
+  @protected
+  List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_final_output_info).toList();
+  }
+
+  @protected
+  List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_historical_transaction_info)
+        .toList();
+  }
+
+  @protected
+  List<InputMetaInfo> dco_decode_list_input_meta_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_input_meta_info).toList();
+  }
+
+  @protected
+  List<LedgerInputSignature> dco_decode_list_ledger_input_signature(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_ledger_input_signature)
+        .toList();
+  }
+
+  @protected
+  List<List<Uint8List>> dco_decode_list_list_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_list_list_prim_u_8_strict)
+        .toList();
+  }
+
+  @protected
+  List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_list_prim_u_8_strict).toList();
+  }
+
+  @protected
+  List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_network_config_info).toList();
+  }
+
+  @protected
+  List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_pending_withdrawal_info)
+        .toList();
+  }
+
+  @protected
+  Uint16List dco_decode_list_prim_u_16_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint16List;
+  }
+
+  @protected
+  Uint32List dco_decode_list_prim_u_32_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint32List;
+  }
+
+  @protected
+  Uint64List dco_decode_list_prim_u_64_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeUint64List(raw);
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
+  }
+
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint8List;
+  }
+
+  @protected
+  Uint64List dco_decode_list_prim_usize_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint64List;
+  }
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
+  }
+
+  @protected
+  List<(int, List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_32_list_account_info)
+        .toList();
+  }
+
+  @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_32_map_u_32_list_account_info_none)
+        .toList();
+  }
+
+  @protected
+  List<(int, AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_8_address_chain_info)
+        .toList();
+  }
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_u_8_map_u_8_address_chain_info_none)
+        .toList();
+  }
+
+  @protected
+  List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList();
+  }
+
+  @protected
+  List<(BigInt, BackgroundNotificationState)>
+      dco_decode_list_record_usize_background_notification_state(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_record_usize_background_notification_state)
+        .toList();
+  }
+
+  @protected
+  List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_usize_string).toList();
+  }
+
+  @protected
+  List<RustLedgerBleDevice> dco_decode_list_rust_ledger_ble_device(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_rust_ledger_ble_device)
+        .toList();
+  }
+
+  @protected
+  List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_rust_ledger_hid_device)
+        .toList();
+  }
+
+  @protected
+  List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tx_in_info).toList();
+  }
+
+  @protected
+  List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tx_out_info).toList();
+  }
+
+  @protected
+  List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_utxo_info).toList();
+  }
+
+  @protected
+  List<WalletInfo> dco_decode_list_wallet_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_wallet_info).toList();
+  }
+
+  @protected
+  MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 16)
+      throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
+    return MerkelizedPsbt(
+      globalMapCommitment: dco_decode_list_prim_u_8_strict(arr[0]),
+      globalMapKeysLeaves: dco_decode_list_list_prim_u_8_strict(arr[1]),
+      globalMapValuesLeaves: dco_decode_list_list_prim_u_8_strict(arr[2]),
+      inputMapCommitments: dco_decode_list_list_prim_u_8_strict(arr[3]),
+      inputMapKeysLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[4]),
+      inputMapValuesLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[5]),
+      outputMapCommitments: dco_decode_list_list_prim_u_8_strict(arr[6]),
+      outputMapKeysLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[7]),
+      outputMapValuesLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[8]),
+      inputMapsRoot: dco_decode_list_prim_u_8_strict(arr[9]),
+      outputMapsRoot: dco_decode_list_prim_u_8_strict(arr[10]),
+      preimageHashes: dco_decode_list_list_prim_u_8_strict(arr[11]),
+      preimageData: dco_decode_list_list_prim_u_8_strict(arr[12]),
+      inputCount: dco_decode_u_32(arr[13]),
+      outputCount: dco_decode_u_32(arr[14]),
+      psbtBytes: dco_decode_list_prim_u_8_strict(arr[15]),
+    );
+  }
+
+  @protected
+  MerkleProof dco_decode_merkle_proof(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return MerkleProof(
+      leafHash: dco_decode_list_prim_u_8_strict(arr[0]),
+      proofHashes: dco_decode_list_list_prim_u_8_strict(arr[1]),
+    );
+  }
+
+  @protected
+  MetadataThorchain dco_decode_metadata_thorchain(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return MetadataThorchain(
+      dummy: dco_decode_u_8(arr[0]),
+    );
+  }
+
+  @protected
+  NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 16)
+      throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
+    return NetworkConfigInfo(
+      name: dco_decode_String(arr[0]),
+      logo: dco_decode_String(arr[1]),
+      chain: dco_decode_String(arr[2]),
+      shortName: dco_decode_String(arr[3]),
+      rpc: dco_decode_list_String(arr[4]),
+      features: dco_decode_list_prim_u_16_strict(arr[5]),
+      chainId: dco_decode_u_64(arr[6]),
+      chainIds: dco_decode_list_prim_u_64_strict(arr[7]),
+      slip44: dco_decode_u_32(arr[8]),
+      diffBlockTime: dco_decode_u_64(arr[9]),
+      chainHash: dco_decode_u_64(arr[10]),
+      ens: dco_decode_opt_String(arr[11]),
+      explorers: dco_decode_list_explorer_info(arr[12]),
+      fallbackEnabled: dco_decode_bool(arr[13]),
+      testnet: dco_decode_opt_box_autoadd_bool(arr[14]),
+      ftokens: dco_decode_list_f_token_info(arr[15]),
+    );
+  }
+
+  @protected
+  Map<int, AddressChainInfo>? dco_decode_opt_Map_u_8_address_chain_info_None(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_Map_u_8_address_chain_info_None(raw);
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  BigInt? dco_decode_opt_U128(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_U128(raw);
+  }
+
+  @protected
+  BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_base_token_info(raw);
+  }
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_bool(raw);
+  }
+
+  @protected
+  ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_colors_info(raw);
+  }
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_32(raw);
+  }
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_64(raw);
+  }
+
+  @protected
+  FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_token_info(raw);
+  }
+
+  @protected
+  (
+    TransactionBitcoin,
+    BitcoinMetadataInfo
+  )? dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+            raw);
+  }
+
+  @protected
+  TransactionBitcoin? dco_decode_opt_box_autoadd_transaction_bitcoin(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_transaction_bitcoin(raw);
+  }
+
+  @protected
+  TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_request_evm(raw);
+  }
+
+  @protected
+  TransactionRequestScilla?
+      dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_request_scilla(raw);
+  }
+
+  @protected
+  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
+  }
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_String(raw);
+  }
+
+  @protected
+  List<AccessListItem>? dco_decode_opt_list_access_list_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_access_list_item(raw);
+  }
+
+  @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
+  }
+
+  @protected
+  OutPointInfo dco_decode_out_point_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return OutPointInfo(
+      txid: dco_decode_String(arr[0]),
+      vout: dco_decode_u_32(arr[1]),
+    );
+  }
+
+  @protected
+  PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PendingWithdrawalInfo(
+      amount: dco_decode_String(arr[0]),
+      withdrawalBlock: dco_decode_u_64(arr[1]),
+      claimable: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
+  QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return QRcodeScanResultInfo(
+      recipient: dco_decode_String(arr[0]),
+      provider: dco_decode_opt_String(arr[1]),
+      tokenAddress: dco_decode_opt_String(arr[2]),
+      amount: dco_decode_opt_String(arr[3]),
+    );
+  }
+
+  @protected
+  QrConfigInfo dco_decode_qr_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return QrConfigInfo(
+      size: dco_decode_u_32(arr[0]),
+      gapless: dco_decode_bool(arr[1]),
+      color: dco_decode_u_32(arr[2]),
+      eyeShape: dco_decode_u_8(arr[3]),
+      dataModuleShape: dco_decode_u_8(arr[4]),
+    );
+  }
+
+  @protected
+  (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
+      dco_decode_record_list_network_config_info_list_network_config_info(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_list_network_config_info(arr[0]),
+      dco_decode_list_network_config_info(arr[1]),
+    );
+  }
+
+  @protected
+  (Uint8List, String) dco_decode_record_list_prim_u_8_strict_string(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_list_prim_u_8_strict(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_String(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  (String, int) dco_decode_record_string_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_String(arr[0]),
+      dco_decode_u_8(arr[1]),
+    );
+  }
+
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      dco_decode_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_transaction_bitcoin(arr[0]),
+      dco_decode_bitcoin_metadata_info(arr[1]),
+    );
+  }
+
+  @protected
+  (int, List<AccountInfo>) dco_decode_record_u_32_list_account_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_32(arr[0]),
+      dco_decode_list_account_info(arr[1]),
+    );
+  }
+
+  @protected
+  (int, Map<int, List<AccountInfo>>)
+      dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_32(arr[0]),
+      dco_decode_Map_u_32_list_account_info_None(arr[1]),
+    );
+  }
+
+  @protected
+  (int, AddressChainInfo) dco_decode_record_u_8_address_chain_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_address_chain_info(arr[1]),
+    );
+  }
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_Map_u_8_address_chain_info_None(arr[1]),
+    );
+  }
+
+  @protected
+  (int, String) dco_decode_record_u_8_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  (BigInt, BackgroundNotificationState)
+      dco_decode_record_usize_background_notification_state(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_usize(arr[0]),
+      dco_decode_background_notification_state(arr[1]),
+    );
+  }
+
+  @protected
+  (BigInt, String) dco_decode_record_usize_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_usize(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    return RequiredTxParamsInfo(
+      gasPrice: dco_decode_U128(arr[0]),
+      maxPriorityFee: dco_decode_U128(arr[1]),
+      feeHistory: dco_decode_gas_fee_history_info(arr[2]),
+      txEstimateGas: dco_decode_u_64(arr[3]),
+      blobBaseFee: dco_decode_U128(arr[4]),
+      nonce: dco_decode_u_64(arr[5]),
+      slow: dco_decode_String(arr[6]),
+      market: dco_decode_String(arr[7]),
+      fast: dco_decode_String(arr[8]),
+      current: dco_decode_String(arr[9]),
+    );
+  }
+
+  @protected
+  RustLedgerBleDevice dco_decode_rust_ledger_ble_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return RustLedgerBleDevice(
+      deviceId: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+      serviceUuid: dco_decode_String(arr[2]),
+      modelId: dco_decode_String(arr[3]),
+      productName: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return RustLedgerHidDevice(
+      deviceId: dco_decode_String(arr[0]),
+      vendorId: dco_decode_u_16(arr[1]),
+      productId: dco_decode_u_16(arr[2]),
+      productName: dco_decode_String(arr[3]),
+      modelId: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return TokenTransferParamsInfo(
+      walletIndex: dco_decode_usize(arr[0]),
+      accountIndex: dco_decode_usize(arr[1]),
+      token: dco_decode_f_token_info(arr[2]),
+      amount: dco_decode_String(arr[3]),
+      recipient: dco_decode_String(arr[4]),
+      icon: dco_decode_String(arr[5]),
+    );
+  }
+
+  @protected
+  TransactionBitcoin dco_decode_transaction_bitcoin(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return TransactionBitcoin(
+      version: dco_decode_i_32(arr[0]),
+      lockTime: dco_decode_u_32(arr[1]),
+      input: dco_decode_list_tx_in_info(arr[2]),
+      output: dco_decode_list_tx_out_info(arr[3]),
+      fee: dco_decode_opt_box_autoadd_u_64(arr[4]),
+    );
+  }
+
+  @protected
+  TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return TransactionMetadataInfo(
+      chainHash: dco_decode_u_64(arr[0]),
+      hash: dco_decode_opt_String(arr[1]),
+      info: dco_decode_opt_String(arr[2]),
+      icon: dco_decode_opt_String(arr[3]),
+      title: dco_decode_opt_String(arr[4]),
+      signer: dco_decode_opt_String(arr[5]),
+      tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[6]),
+      broadcast: dco_decode_bool(arr[7]),
+    );
+  }
+
+  @protected
+  TransactionRequestEVM dco_decode_transaction_request_evm(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    return TransactionRequestEVM(
+      nonce: dco_decode_opt_box_autoadd_u_64(arr[0]),
+      from: dco_decode_opt_String(arr[1]),
+      to: dco_decode_opt_String(arr[2]),
+      value: dco_decode_opt_String(arr[3]),
+      gasLimit: dco_decode_opt_box_autoadd_u_64(arr[4]),
+      data: dco_decode_opt_list_prim_u_8_strict(arr[5]),
+      maxFeePerGas: dco_decode_opt_U128(arr[6]),
+      maxPriorityFeePerGas: dco_decode_opt_U128(arr[7]),
+      gasPrice: dco_decode_opt_U128(arr[8]),
+      chainId: dco_decode_opt_box_autoadd_u_64(arr[9]),
+      accessList: dco_decode_opt_list_access_list_item(arr[10]),
+      blobVersionedHashes: dco_decode_opt_list_String(arr[11]),
+      maxFeePerBlobGas: dco_decode_opt_U128(arr[12]),
+    );
+  }
+
+  @protected
+  TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return TransactionRequestInfo(
+      metadata: dco_decode_transaction_metadata_info(arr[0]),
+      scilla: dco_decode_opt_box_autoadd_transaction_request_scilla(arr[1]),
+      evm: dco_decode_opt_box_autoadd_transaction_request_evm(arr[2]),
+      btc:
+          dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+              arr[3]),
+      tron: dco_decode_opt_String(arr[4]),
+      solana: dco_decode_opt_list_prim_u_8_strict(arr[5]),
+    );
+  }
+
+  @protected
+  TransactionRequestScilla dco_decode_transaction_request_scilla(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return TransactionRequestScilla(
+      chainId: dco_decode_u_16(arr[0]),
+      nonce: dco_decode_u_64(arr[1]),
+      gasPrice: dco_decode_U128(arr[2]),
+      gasLimit: dco_decode_u_64(arr[3]),
+      toAddr: dco_decode_String(arr[4]),
+      amount: dco_decode_U128(arr[5]),
+      code: dco_decode_String(arr[6]),
+      data: dco_decode_String(arr[7]),
+    );
+  }
+
+  @protected
+  TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TransactionStatusInfo.values[raw as int];
+  }
+
+  @protected
+  TxInInfo dco_decode_tx_in_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return TxInInfo(
+      previousOutput: dco_decode_out_point_info(arr[0]),
+      scriptSig: dco_decode_list_prim_u_8_strict(arr[1]),
+      sequence: dco_decode_u_32(arr[2]),
+      witness: dco_decode_list_list_prim_u_8_strict(arr[3]),
+      address: dco_decode_opt_String(arr[4]),
+    );
+  }
+
+  @protected
+  TxOutInfo dco_decode_tx_out_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return TxOutInfo(
+      value: dco_decode_u_64(arr[0]),
+      scriptPubkey: dco_decode_list_prim_u_8_strict(arr[1]),
+      address: dco_decode_opt_String(arr[2]),
+    );
+  }
+
+  @protected
+  int dco_decode_u_16(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  int dco_decode_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
+  }
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  UtxoInfo dco_decode_utxo_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return UtxoInfo(
+      txid: dco_decode_String(arr[0]),
+      vout: dco_decode_u_32(arr[1]),
+      value: dco_decode_u_64(arr[2]),
+      height: dco_decode_u_32(arr[3]),
+    );
+  }
+
+  @protected
+  WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return WalletArgonParamsInfo(
+      memory: dco_decode_u_32(arr[0]),
+      iterations: dco_decode_u_32(arr[1]),
+      threads: dco_decode_u_32(arr[2]),
+      secret: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
+  WalletInfo dco_decode_wallet_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return WalletInfo(
+      walletType: dco_decode_String(arr[0]),
+      walletName: dco_decode_String(arr[1]),
+      authType: dco_decode_String(arr[2]),
+      walletAddress: dco_decode_String(arr[3]),
+      accounts:
+          dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(arr[4]),
+      selectedAccount: dco_decode_usize(arr[5]),
+      tokens: dco_decode_list_f_token_info(arr[6]),
+      settings: dco_decode_wallet_settings_info(arr[7]),
+      chainHash: dco_decode_u_64(arr[8]),
+      slip44: dco_decode_u_32(arr[9]),
+      bip: dco_decode_u_32(arr[10]),
+    );
+  }
+
+  @protected
+  WalletPolicy dco_decode_wallet_policy(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return WalletPolicy(
+      descriptorTemplate: dco_decode_String(arr[0]),
+      keysInfo: dco_decode_list_String(arr[1]),
+      policyId: dco_decode_list_prim_u_8_strict(arr[2]),
+      policyHmac: dco_decode_list_prim_u_8_strict(arr[3]),
+      serialized: dco_decode_list_prim_u_8_strict(arr[4]),
+    );
+  }
+
+  @protected
+  WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    return WalletSettingsInfo(
+      cipherOrders: dco_decode_list_prim_u_8_strict(arr[0]),
+      argonParams: dco_decode_wallet_argon_params_info(arr[1]),
+      currencyConvert: dco_decode_String(arr[2]),
+      ipfsNode: dco_decode_opt_String(arr[3]),
+      ensEnabled: dco_decode_bool(arr[4]),
+      tokensListFetcher: dco_decode_bool(arr[5]),
+      nodeRankingEnabled: dco_decode_bool(arr[6]),
+      maxConnections: dco_decode_u_8(arr[7]),
+      requestTimeoutSecs: dco_decode_u_32(arr[8]),
+      ratesApiOptions: dco_decode_u_8(arr[9]),
+    );
+  }
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
+  LocalStorageImpl
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  LocalStorageImpl
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_32_map_u_32_list_account_info_none(
+        deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_32_list_account_info(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+        deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_u_8_address_chain_info(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<BigInt, String> sse_decode_Map_usize_String_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_usize_string(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  Map<BigInt, BackgroundNotificationState>
+      sse_decode_Map_usize_background_notification_state_None(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_usize_background_notification_state(
+        deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  LocalStorageImpl
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return LocalStorageImplImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  RustStreamSink<String> sse_decode_StreamSink_String_Sse(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  String sse_decode_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  BigInt sse_decode_U128(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return BigInt.parse(inner);
+  }
+
+  @protected
+  AccessListItem sse_decode_access_list_item(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_address = sse_decode_String(deserializer);
+    var var_storageKeys = sse_decode_list_String(deserializer);
+    return AccessListItem(address: var_address, storageKeys: var_storageKeys);
+  }
+
+  @protected
+  AccountInfo sse_decode_account_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_addr = sse_decode_String(deserializer);
+    var var_pubKey = sse_decode_opt_String(deserializer);
+    var var_addrType = sse_decode_u_8(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_index = sse_decode_usize(deserializer);
+    return AccountInfo(
+        addr: var_addr,
+        pubKey: var_pubKey,
+        addrType: var_addrType,
+        name: var_name,
+        index: var_index);
+  }
+
+  @protected
+  AddNextBip39AccountParams sse_decode_add_next_bip_39_account_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_walletIndex = sse_decode_usize(deserializer);
+    var var_accountIndex = sse_decode_usize(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_passphrase = sse_decode_String(deserializer);
+    var var_password = sse_decode_opt_String(deserializer);
+    return AddNextBip39AccountParams(
+        walletIndex: var_walletIndex,
+        accountIndex: var_accountIndex,
+        name: var_name,
+        passphrase: var_passphrase,
+        password: var_password);
+  }
+
+  @protected
+  AddSKWalletParams sse_decode_add_sk_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sk = sse_decode_String(deserializer);
+    var var_password = sse_decode_String(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_bipPurpose = sse_decode_u_32(deserializer);
+    return AddSKWalletParams(
+        sk: var_sk,
+        password: var_password,
+        walletName: var_walletName,
+        biometricType: var_biometricType,
+        chainHash: var_chainHash,
+        bipPurpose: var_bipPurpose);
+  }
+
+  @protected
+  AddressBookEntryInfo sse_decode_address_book_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_addr = sse_decode_String(deserializer);
+    var var_net = sse_decode_usize(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
+    return AddressBookEntryInfo(
+        name: var_name, addr: var_addr, net: var_net, slip44: var_slip44);
+  }
+
+  @protected
+  AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_external_ = sse_decode_list_btc_address_entry_info(deserializer);
+    var var_internal = sse_decode_list_btc_address_entry_info(deserializer);
+    return AddressChainInfo(external_: var_external_, internal: var_internal);
+  }
+
+  @protected
+  BackgroundNotificationState sse_decode_background_notification_state(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_transactions = sse_decode_bool(deserializer);
+    var var_price = sse_decode_bool(deserializer);
+    var var_security = sse_decode_bool(deserializer);
+    var var_balance = sse_decode_bool(deserializer);
+    return BackgroundNotificationState(
+        transactions: var_transactions,
+        price: var_price,
+        security: var_security,
+        balance: var_balance);
+  }
+
+  @protected
+  BackgroundState sse_decode_background_state(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_wallets = sse_decode_list_wallet_info(deserializer);
+    var var_notificationsWalletStates =
+        sse_decode_Map_usize_background_notification_state_None(deserializer);
+    var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
+    var var_locale = sse_decode_opt_String(deserializer);
+    var var_appearances = sse_decode_u_8(deserializer);
+    var var_abbreviatedNumber = sse_decode_bool(deserializer);
+    var var_browserSettings = sse_decode_browser_settings_info(deserializer);
+    var var_providers = sse_decode_list_network_config_info(deserializer);
+    return BackgroundState(
+        wallets: var_wallets,
+        notificationsWalletStates: var_notificationsWalletStates,
+        notificationsGlobalEnabled: var_notificationsGlobalEnabled,
+        locale: var_locale,
+        appearances: var_appearances,
+        abbreviatedNumber: var_abbreviatedNumber,
+        browserSettings: var_browserSettings,
+        providers: var_providers);
+  }
+
+  @protected
+  BaseTokenInfo sse_decode_base_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_value = sse_decode_String(deserializer);
+    var var_symbol = sse_decode_String(deserializer);
+    var var_decimals = sse_decode_u_8(deserializer);
+    return BaseTokenInfo(
+        value: var_value, symbol: var_symbol, decimals: var_decimals);
+  }
+
+  @protected
+  Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_password = sse_decode_String(deserializer);
+    var var_mnemonicStr = sse_decode_String(deserializer);
+    var var_mnemonicCheck = sse_decode_bool(deserializer);
+    var var_accounts = sse_decode_list_record_usize_string(deserializer);
+    var var_passphrase = sse_decode_String(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    return Bip39AddWalletParams(
+        password: var_password,
+        mnemonicStr: var_mnemonicStr,
+        mnemonicCheck: var_mnemonicCheck,
+        accounts: var_accounts,
+        passphrase: var_passphrase,
+        walletName: var_walletName,
+        biometricType: var_biometricType,
+        chainHash: var_chainHash);
+  }
+
+  @protected
+  BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_witnessUtxos = sse_decode_list_tx_out_info(deserializer);
+    var var_inputMeta = sse_decode_list_input_meta_info(deserializer);
+    return BitcoinMetadataInfo(
+        witnessUtxos: var_witnessUtxos, inputMeta: var_inputMeta);
+  }
+
+  @protected
+  BlockEvent sse_decode_block_event(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_blockNumber = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_error = sse_decode_opt_String(deserializer);
+    return BlockEvent(blockNumber: var_blockNumber, error: var_error);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  AddNextBip39AccountParams
+      sse_decode_box_autoadd_add_next_bip_39_account_params(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_add_next_bip_39_account_params(deserializer));
+  }
+
+  @protected
+  AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_add_sk_wallet_params(deserializer));
+  }
+
+  @protected
+  BaseTokenInfo sse_decode_box_autoadd_base_token_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_base_token_info(deserializer));
+  }
+
+  @protected
+  Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_bip_39_add_wallet_params(deserializer));
+  }
+
+  @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_bool(deserializer));
+  }
+
+  @protected
+  BrowserSettingsInfo sse_decode_box_autoadd_browser_settings_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_browser_settings_info(deserializer));
+  }
+
+  @protected
+  BtcAccountXpubsInputInfo sse_decode_box_autoadd_btc_account_xpubs_input_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_btc_account_xpubs_input_info(deserializer));
+  }
+
+  @protected
+  ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_colors_info(deserializer));
+  }
+
+  @protected
+  ConnectionInfo sse_decode_box_autoadd_connection_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_connection_info(deserializer));
+  }
+
+  @protected
+  double sse_decode_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_32(deserializer));
+  }
+
+  @protected
+  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_64(deserializer));
+  }
+
+  @protected
+  FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_token_info(deserializer));
+  }
+
+  @protected
+  FinalOutputInfo sse_decode_box_autoadd_final_output_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_final_output_info(deserializer));
+  }
+
+  @protected
+  LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_ledger_params_input(deserializer));
+  }
+
+  @protected
+  MetadataThorchain sse_decode_box_autoadd_metadata_thorchain(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_metadata_thorchain(deserializer));
+  }
+
+  @protected
+  NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_network_config_info(deserializer));
+  }
+
+  @protected
+  QrConfigInfo sse_decode_box_autoadd_qr_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_qr_config_info(deserializer));
+  }
+
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(
+        deserializer));
+  }
+
+  @protected
+  RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_required_tx_params_info(deserializer));
+  }
+
+  @protected
+  TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_token_transfer_params_info(deserializer));
+  }
+
+  @protected
+  TransactionBitcoin sse_decode_box_autoadd_transaction_bitcoin(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_bitcoin(deserializer));
+  }
+
+  @protected
+  TransactionRequestEVM sse_decode_box_autoadd_transaction_request_evm(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_evm(deserializer));
+  }
+
+  @protected
+  TransactionRequestInfo sse_decode_box_autoadd_transaction_request_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_info(deserializer));
+  }
+
+  @protected
+  TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_scilla(deserializer));
+  }
+
+  @protected
+  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_64(deserializer));
+  }
+
+  @protected
+  WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_wallet_settings_info(deserializer));
+  }
+
+  @protected
+  BrowserSettingsInfo sse_decode_browser_settings_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_searchEngineIndex = sse_decode_u_8(deserializer);
+    var var_cacheEnabled = sse_decode_bool(deserializer);
+    var var_cookiesEnabled = sse_decode_bool(deserializer);
+    var var_contentBlocking = sse_decode_u_8(deserializer);
+    var var_doNotTrack = sse_decode_bool(deserializer);
+    var var_incognitoMode = sse_decode_bool(deserializer);
+    var var_textScalingFactor = sse_decode_f_32(deserializer);
+    var var_allowGeolocation = sse_decode_bool(deserializer);
+    var var_allowCamera = sse_decode_bool(deserializer);
+    var var_allowMicrophone = sse_decode_bool(deserializer);
+    var var_allowAutoPlay = sse_decode_bool(deserializer);
+    return BrowserSettingsInfo(
+        searchEngineIndex: var_searchEngineIndex,
+        cacheEnabled: var_cacheEnabled,
+        cookiesEnabled: var_cookiesEnabled,
+        contentBlocking: var_contentBlocking,
+        doNotTrack: var_doNotTrack,
+        incognitoMode: var_incognitoMode,
+        textScalingFactor: var_textScalingFactor,
+        allowGeolocation: var_allowGeolocation,
+        allowCamera: var_allowCamera,
+        allowMicrophone: var_allowMicrophone,
+        allowAutoPlay: var_allowAutoPlay);
+  }
+
+  @protected
+  BtcAccountXpubsInputInfo sse_decode_btc_account_xpubs_input_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_bip44Xpub = sse_decode_String(deserializer);
+    var var_bip49Xpub = sse_decode_String(deserializer);
+    var var_bip84Xpub = sse_decode_String(deserializer);
+    var var_bip86Xpub = sse_decode_String(deserializer);
+    return BtcAccountXpubsInputInfo(
+        bip44Xpub: var_bip44Xpub,
+        bip49Xpub: var_bip49Xpub,
+        bip84Xpub: var_bip84Xpub,
+        bip86Xpub: var_bip86Xpub);
+  }
+
+  @protected
+  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_address = sse_decode_String(deserializer);
+    var var_path = sse_decode_String(deserializer);
+    var var_history = sse_decode_list_String(deserializer);
+    var var_utxos = sse_decode_list_utxo_info(deserializer);
+    return BtcAddressEntryInfo(
+        address: var_address,
+        path: var_path,
+        history: var_history,
+        utxos: var_utxos);
+  }
+
+  @protected
+  Category sse_decode_category(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_entries = sse_decode_list_entry(deserializer);
+    return Category(name: var_name, entries: var_entries);
+  }
+
+  @protected
+  ColorsInfo sse_decode_colors_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_primary = sse_decode_opt_String(deserializer);
+    var var_secondary = sse_decode_opt_String(deserializer);
+    var var_background = sse_decode_opt_String(deserializer);
+    var var_text = sse_decode_opt_String(deserializer);
+    return ColorsInfo(
+        primary: var_primary,
+        secondary: var_secondary,
+        background: var_background,
+        text: var_text);
+  }
+
+  @protected
+  ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_domain = sse_decode_String(deserializer);
+    var var_accountIndexes = sse_decode_list_prim_usize_strict(deserializer);
+    var var_favicon = sse_decode_opt_String(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_description = sse_decode_opt_String(deserializer);
+    var var_colors = sse_decode_opt_box_autoadd_colors_info(deserializer);
+    var var_lastConnected = sse_decode_u_64(deserializer);
+    var var_canReadAccounts = sse_decode_bool(deserializer);
+    var var_canRequestSignatures = sse_decode_bool(deserializer);
+    var var_canSuggestTokens = sse_decode_bool(deserializer);
+    var var_canSuggestTransactions = sse_decode_bool(deserializer);
+    return ConnectionInfo(
+        domain: var_domain,
+        accountIndexes: var_accountIndexes,
+        favicon: var_favicon,
+        title: var_title,
+        description: var_description,
+        colors: var_colors,
+        lastConnected: var_lastConnected,
+        canReadAccounts: var_canReadAccounts,
+        canRequestSignatures: var_canRequestSignatures,
+        canSuggestTokens: var_canSuggestTokens,
+        canSuggestTransactions: var_canSuggestTransactions);
+  }
+
+  @protected
+  Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_domainSeparator = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_hashStructMessage = sse_decode_list_prim_u_8_strict(deserializer);
+    return Eip712Hashes(
+        domainSeparator: var_domainSeparator,
+        hashStructMessage: var_hashStructMessage);
+  }
+
+  @protected
+  EncodedRLPTx sse_decode_encoded_rlp_tx(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_bytes = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_chunksBytes = sse_decode_list_list_prim_u_8_strict(deserializer);
+    return EncodedRLPTx(bytes: var_bytes, chunksBytes: var_chunksBytes);
+  }
+
+  @protected
+  Entry sse_decode_entry(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_address = sse_decode_String(deserializer);
+    var var_tag = sse_decode_opt_String(deserializer);
+    return Entry(name: var_name, address: var_address, tag: var_tag);
+  }
+
+  @protected
+  ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 =
+            sse_decode_box_autoadd_metadata_thorchain(deserializer);
+        return ExchangeProvider_Thorchain(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_url = sse_decode_String(deserializer);
+    var var_icon = sse_decode_opt_String(deserializer);
+    var var_standard = sse_decode_u_16(deserializer);
+    return ExplorerInfo(
+        name: var_name, url: var_url, icon: var_icon, standard: var_standard);
+  }
+
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat32();
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
+  FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_symbol = sse_decode_String(deserializer);
+    var var_decimals = sse_decode_u_8(deserializer);
+    var var_addr = sse_decode_String(deserializer);
+    var var_addrType = sse_decode_u_8(deserializer);
+    var var_logo = sse_decode_opt_String(deserializer);
+    var var_balances = sse_decode_Map_usize_String_None(deserializer);
+    var var_rate = sse_decode_f_64(deserializer);
+    var var_default_ = sse_decode_bool(deserializer);
+    var var_native = sse_decode_bool(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    return FTokenInfo(
+        name: var_name,
+        symbol: var_symbol,
+        decimals: var_decimals,
+        addr: var_addr,
+        addrType: var_addrType,
+        logo: var_logo,
+        balances: var_balances,
+        rate: var_rate,
+        default_: var_default_,
+        native: var_native,
+        chainHash: var_chainHash);
+  }
+
+  @protected
+  FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_address = sse_decode_String(deserializer);
+    var var_token = sse_decode_opt_box_autoadd_f_token_info(deserializer);
+    var var_delegAmt = sse_decode_String(deserializer);
+    var var_rewards = sse_decode_String(deserializer);
+    var var_claimableAmount = sse_decode_String(deserializer);
+    var var_apr = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_unbondingPeriodSeconds =
+        sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_lstPriceChangePercent =
+        sse_decode_opt_box_autoadd_f_32(deserializer);
+    var var_avgBlockTimeMs = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_tag = sse_decode_String(deserializer);
+    var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_pendingWithdrawals =
+        sse_decode_list_pending_withdrawal_info(deserializer);
+    return FinalOutputInfo(
+        name: var_name,
+        address: var_address,
+        token: var_token,
+        delegAmt: var_delegAmt,
+        rewards: var_rewards,
+        claimableAmount: var_claimableAmount,
+        apr: var_apr,
+        commission: var_commission,
+        unbondingPeriodSeconds: var_unbondingPeriodSeconds,
+        lstPriceChangePercent: var_lstPriceChangePercent,
+        avgBlockTimeMs: var_avgBlockTimeMs,
+        tag: var_tag,
+        currentBlock: var_currentBlock,
+        pendingWithdrawals: var_pendingWithdrawals);
+  }
+
+  @protected
+  FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_rawTxHex = sse_decode_String(deserializer);
+    var var_txHash = sse_decode_String(deserializer);
+    var var_psbtBytes = sse_decode_list_prim_u_8_strict(deserializer);
+    return FinalizedBtcTx(
+        rawTxHex: var_rawTxHex, txHash: var_txHash, psbtBytes: var_psbtBytes);
+  }
+
+  @protected
+  GasFeeHistoryInfo sse_decode_gas_fee_history_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_maxFee = sse_decode_U128(deserializer);
+    var var_priorityFee = sse_decode_U128(deserializer);
+    var var_baseFee = sse_decode_U128(deserializer);
+    return GasFeeHistoryInfo(
+        maxFee: var_maxFee, priorityFee: var_priorityFee, baseFee: var_baseFee);
+  }
+
+  @protected
+  HistoricalTransactionInfo sse_decode_historical_transaction_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_status = sse_decode_transaction_status_info(deserializer);
+    var var_metadata = sse_decode_transaction_metadata_info(deserializer);
+    var var_evm = sse_decode_opt_String(deserializer);
+    var var_scilla = sse_decode_opt_String(deserializer);
+    var var_btc = sse_decode_opt_box_autoadd_transaction_bitcoin(deserializer);
+    var var_tron = sse_decode_opt_String(deserializer);
+    var var_solana = sse_decode_opt_String(deserializer);
+    var var_signedMessage = sse_decode_opt_String(deserializer);
+    var var_timestamp = sse_decode_u_64(deserializer);
+    return HistoricalTransactionInfo(
+        status: var_status,
+        metadata: var_metadata,
+        evm: var_evm,
+        scilla: var_scilla,
+        btc: var_btc,
+        tron: var_tron,
+        solana: var_solana,
+        signedMessage: var_signedMessage,
+        timestamp: var_timestamp);
+  }
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getPlatformInt64();
+  }
+
+  @protected
+  InputMetaInfo sse_decode_input_meta_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_addressType = sse_decode_u_8(deserializer);
+    var var_derivationPath = sse_decode_String(deserializer);
+    return InputMetaInfo(
+        addressType: var_addressType, derivationPath: var_derivationPath);
+  }
+
+  @protected
+  KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sk = sse_decode_String(deserializer);
+    var var_pk = sse_decode_String(deserializer);
+    return KeyPairInfo(sk: var_sk, pk: var_pk);
+  }
+
+  @protected
+  LedgerInputSignature sse_decode_ledger_input_signature(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_inputIndex = sse_decode_u_32(deserializer);
+    var var_signature = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_pubkey = sse_decode_list_prim_u_8_strict(deserializer);
+    return LedgerInputSignature(
+        inputIndex: var_inputIndex,
+        signature: var_signature,
+        pubkey: var_pubkey);
+  }
+
+  @protected
+  LedgerParamsInput sse_decode_ledger_params_input(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_pubKeys = sse_decode_list_record_u_8_string(deserializer);
+    var var_walletIndex = sse_decode_usize(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_ledgerId = sse_decode_String(deserializer);
+    var var_accountNames = sse_decode_list_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_zilliqaLegacy = sse_decode_bool(deserializer);
+    var var_btcChains =
+        sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(deserializer);
+    return LedgerParamsInput(
+        pubKeys: var_pubKeys,
+        walletIndex: var_walletIndex,
+        walletName: var_walletName,
+        ledgerId: var_ledgerId,
+        accountNames: var_accountNames,
+        biometricType: var_biometricType,
+        chainHash: var_chainHash,
+        zilliqaLegacy: var_zilliqaLegacy,
+        btcChains: var_btcChains);
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AccessListItem> sse_decode_list_access_list_item(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AccessListItem>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_access_list_item(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AccountInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_account_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AddressBookEntryInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_address_book_entry_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <BtcAddressEntryInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_btc_address_entry_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Category> sse_decode_list_category(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Category>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_category(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ConnectionInfo> sse_decode_list_connection_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ConnectionInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_connection_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Entry> sse_decode_list_entry(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Entry>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_entry(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ExchangeProvider> sse_decode_list_exchange_provider(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ExchangeProvider>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_exchange_provider(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ExplorerInfo> sse_decode_list_explorer_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ExplorerInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_explorer_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FTokenInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_f_token_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<FinalOutputInfo> sse_decode_list_final_output_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FinalOutputInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_final_output_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <HistoricalTransactionInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_historical_transaction_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<InputMetaInfo> sse_decode_list_input_meta_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <InputMetaInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_input_meta_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<LedgerInputSignature> sse_decode_list_ledger_input_signature(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <LedgerInputSignature>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_ledger_input_signature(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<List<Uint8List>> sse_decode_list_list_list_prim_u_8_strict(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <List<Uint8List>>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_list_prim_u_8_strict(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Uint8List> sse_decode_list_list_prim_u_8_strict(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Uint8List>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_prim_u_8_strict(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<NetworkConfigInfo> sse_decode_list_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <NetworkConfigInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_network_config_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <PendingWithdrawalInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_pending_withdrawal_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint16List(len_);
+  }
+
+  @protected
+  Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint32List(len_);
+  }
+
+  @protected
+  Uint64List sse_decode_list_prim_u_64_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint64List(len_);
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint64List(len_);
+  }
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, List<AccountInfo>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_32_list_account_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      sse_decode_list_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, Map<int, List<AccountInfo>>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_record_u_32_map_u_32_list_account_info_none(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, AddressChainInfo)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_8_address_chain_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, Map<int, AddressChainInfo>)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_record_u_8_map_u_8_address_chain_info_none(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, String)> sse_decode_list_record_u_8_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_8_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(BigInt, BackgroundNotificationState)>
+      sse_decode_list_record_usize_background_notification_state(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(BigInt, BackgroundNotificationState)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_record_usize_background_notification_state(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(BigInt, String)> sse_decode_list_record_usize_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(BigInt, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_usize_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<RustLedgerBleDevice> sse_decode_list_rust_ledger_ble_device(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RustLedgerBleDevice>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_rust_ledger_ble_device(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RustLedgerHidDevice>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_rust_ledger_hid_device(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TxInInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tx_in_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<TxOutInfo> sse_decode_list_tx_out_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TxOutInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tx_out_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <UtxoInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_utxo_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WalletInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_wallet_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_globalMapCommitment = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_globalMapKeysLeaves =
+        sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_globalMapValuesLeaves =
+        sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_inputMapCommitments =
+        sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_inputMapKeysLeaves =
+        sse_decode_list_list_list_prim_u_8_strict(deserializer);
+    var var_inputMapValuesLeaves =
+        sse_decode_list_list_list_prim_u_8_strict(deserializer);
+    var var_outputMapCommitments =
+        sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_outputMapKeysLeaves =
+        sse_decode_list_list_list_prim_u_8_strict(deserializer);
+    var var_outputMapValuesLeaves =
+        sse_decode_list_list_list_prim_u_8_strict(deserializer);
+    var var_inputMapsRoot = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_outputMapsRoot = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_preimageHashes = sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_preimageData = sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_inputCount = sse_decode_u_32(deserializer);
+    var var_outputCount = sse_decode_u_32(deserializer);
+    var var_psbtBytes = sse_decode_list_prim_u_8_strict(deserializer);
+    return MerkelizedPsbt(
+        globalMapCommitment: var_globalMapCommitment,
+        globalMapKeysLeaves: var_globalMapKeysLeaves,
+        globalMapValuesLeaves: var_globalMapValuesLeaves,
+        inputMapCommitments: var_inputMapCommitments,
+        inputMapKeysLeaves: var_inputMapKeysLeaves,
+        inputMapValuesLeaves: var_inputMapValuesLeaves,
+        outputMapCommitments: var_outputMapCommitments,
+        outputMapKeysLeaves: var_outputMapKeysLeaves,
+        outputMapValuesLeaves: var_outputMapValuesLeaves,
+        inputMapsRoot: var_inputMapsRoot,
+        outputMapsRoot: var_outputMapsRoot,
+        preimageHashes: var_preimageHashes,
+        preimageData: var_preimageData,
+        inputCount: var_inputCount,
+        outputCount: var_outputCount,
+        psbtBytes: var_psbtBytes);
+  }
+
+  @protected
+  MerkleProof sse_decode_merkle_proof(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_leafHash = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_proofHashes = sse_decode_list_list_prim_u_8_strict(deserializer);
+    return MerkleProof(leafHash: var_leafHash, proofHashes: var_proofHashes);
+  }
+
+  @protected
+  MetadataThorchain sse_decode_metadata_thorchain(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_dummy = sse_decode_u_8(deserializer);
+    return MetadataThorchain(dummy: var_dummy);
+  }
+
+  @protected
+  NetworkConfigInfo sse_decode_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_logo = sse_decode_String(deserializer);
+    var var_chain = sse_decode_String(deserializer);
+    var var_shortName = sse_decode_String(deserializer);
+    var var_rpc = sse_decode_list_String(deserializer);
+    var var_features = sse_decode_list_prim_u_16_strict(deserializer);
+    var var_chainId = sse_decode_u_64(deserializer);
+    var var_chainIds = sse_decode_list_prim_u_64_strict(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
+    var var_diffBlockTime = sse_decode_u_64(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_ens = sse_decode_opt_String(deserializer);
+    var var_explorers = sse_decode_list_explorer_info(deserializer);
+    var var_fallbackEnabled = sse_decode_bool(deserializer);
+    var var_testnet = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_ftokens = sse_decode_list_f_token_info(deserializer);
+    return NetworkConfigInfo(
+        name: var_name,
+        logo: var_logo,
+        chain: var_chain,
+        shortName: var_shortName,
+        rpc: var_rpc,
+        features: var_features,
+        chainId: var_chainId,
+        chainIds: var_chainIds,
+        slip44: var_slip44,
+        diffBlockTime: var_diffBlockTime,
+        chainHash: var_chainHash,
+        ens: var_ens,
+        explorers: var_explorers,
+        fallbackEnabled: var_fallbackEnabled,
+        testnet: var_testnet,
+        ftokens: var_ftokens);
+  }
+
+  @protected
+  Map<int, AddressChainInfo>? sse_decode_opt_Map_u_8_address_chain_info_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_Map_u_8_address_chain_info_None(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BigInt? sse_decode_opt_U128(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_U128(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BaseTokenInfo? sse_decode_opt_box_autoadd_base_token_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_base_token_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_bool(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ColorsInfo? sse_decode_opt_box_autoadd_colors_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_colors_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_token_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  (
+    TransactionBitcoin,
+    BitcoinMetadataInfo
+  )? sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionBitcoin? sse_decode_opt_box_autoadd_transaction_bitcoin(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_bitcoin(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_request_evm(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionRequestScilla?
+      sse_decode_opt_box_autoadd_transaction_request_scilla(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_request_scilla(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<AccessListItem>? sse_decode_opt_list_access_list_item(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_access_list_item(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_prim_u_8_strict(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_txid = sse_decode_String(deserializer);
+    var var_vout = sse_decode_u_32(deserializer);
+    return OutPointInfo(txid: var_txid, vout: var_vout);
+  }
+
+  @protected
+  PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_amount = sse_decode_String(deserializer);
+    var var_withdrawalBlock = sse_decode_u_64(deserializer);
+    var var_claimable = sse_decode_bool(deserializer);
+    return PendingWithdrawalInfo(
+        amount: var_amount,
+        withdrawalBlock: var_withdrawalBlock,
+        claimable: var_claimable);
+  }
+
+  @protected
+  QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_recipient = sse_decode_String(deserializer);
+    var var_provider = sse_decode_opt_String(deserializer);
+    var var_tokenAddress = sse_decode_opt_String(deserializer);
+    var var_amount = sse_decode_opt_String(deserializer);
+    return QRcodeScanResultInfo(
+        recipient: var_recipient,
+        provider: var_provider,
+        tokenAddress: var_tokenAddress,
+        amount: var_amount);
+  }
+
+  @protected
+  QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_size = sse_decode_u_32(deserializer);
+    var var_gapless = sse_decode_bool(deserializer);
+    var var_color = sse_decode_u_32(deserializer);
+    var var_eyeShape = sse_decode_u_8(deserializer);
+    var var_dataModuleShape = sse_decode_u_8(deserializer);
+    return QrConfigInfo(
+        size: var_size,
+        gapless: var_gapless,
+        color: var_color,
+        eyeShape: var_eyeShape,
+        dataModuleShape: var_dataModuleShape);
+  }
+
+  @protected
+  (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
+      sse_decode_record_list_network_config_info_list_network_config_info(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_network_config_info(deserializer);
+    var var_field1 = sse_decode_list_network_config_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (Uint8List, String) sse_decode_record_list_prim_u_8_strict_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, String) sse_decode_record_string_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, int) sse_decode_record_string_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_u_8(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_transaction_bitcoin(deserializer);
+    var var_field1 = sse_decode_bitcoin_metadata_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, List<AccountInfo>) sse_decode_record_u_32_list_account_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_32(deserializer);
+    var var_field1 = sse_decode_list_account_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, Map<int, List<AccountInfo>>)
+      sse_decode_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_32(deserializer);
+    var var_field1 = sse_decode_Map_u_32_list_account_info_None(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, AddressChainInfo) sse_decode_record_u_8_address_chain_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_address_chain_info(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      sse_decode_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_Map_u_8_address_chain_info_None(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (BigInt, BackgroundNotificationState)
+      sse_decode_record_usize_background_notification_state(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
+    var var_field1 = sse_decode_background_notification_state(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (BigInt, String) sse_decode_record_usize_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  RequiredTxParamsInfo sse_decode_required_tx_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_gasPrice = sse_decode_U128(deserializer);
+    var var_maxPriorityFee = sse_decode_U128(deserializer);
+    var var_feeHistory = sse_decode_gas_fee_history_info(deserializer);
+    var var_txEstimateGas = sse_decode_u_64(deserializer);
+    var var_blobBaseFee = sse_decode_U128(deserializer);
+    var var_nonce = sse_decode_u_64(deserializer);
+    var var_slow = sse_decode_String(deserializer);
+    var var_market = sse_decode_String(deserializer);
+    var var_fast = sse_decode_String(deserializer);
+    var var_current = sse_decode_String(deserializer);
+    return RequiredTxParamsInfo(
+        gasPrice: var_gasPrice,
+        maxPriorityFee: var_maxPriorityFee,
+        feeHistory: var_feeHistory,
+        txEstimateGas: var_txEstimateGas,
+        blobBaseFee: var_blobBaseFee,
+        nonce: var_nonce,
+        slow: var_slow,
+        market: var_market,
+        fast: var_fast,
+        current: var_current);
+  }
+
+  @protected
+  RustLedgerBleDevice sse_decode_rust_ledger_ble_device(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_deviceId = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_serviceUuid = sse_decode_String(deserializer);
+    var var_modelId = sse_decode_String(deserializer);
+    var var_productName = sse_decode_String(deserializer);
+    return RustLedgerBleDevice(
+        deviceId: var_deviceId,
+        name: var_name,
+        serviceUuid: var_serviceUuid,
+        modelId: var_modelId,
+        productName: var_productName);
+  }
+
+  @protected
+  RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_deviceId = sse_decode_String(deserializer);
+    var var_vendorId = sse_decode_u_16(deserializer);
+    var var_productId = sse_decode_u_16(deserializer);
+    var var_productName = sse_decode_String(deserializer);
+    var var_modelId = sse_decode_String(deserializer);
+    return RustLedgerHidDevice(
+        deviceId: var_deviceId,
+        vendorId: var_vendorId,
+        productId: var_productId,
+        productName: var_productName,
+        modelId: var_modelId);
+  }
+
+  @protected
+  TokenTransferParamsInfo sse_decode_token_transfer_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_walletIndex = sse_decode_usize(deserializer);
+    var var_accountIndex = sse_decode_usize(deserializer);
+    var var_token = sse_decode_f_token_info(deserializer);
+    var var_amount = sse_decode_String(deserializer);
+    var var_recipient = sse_decode_String(deserializer);
+    var var_icon = sse_decode_String(deserializer);
+    return TokenTransferParamsInfo(
+        walletIndex: var_walletIndex,
+        accountIndex: var_accountIndex,
+        token: var_token,
+        amount: var_amount,
+        recipient: var_recipient,
+        icon: var_icon);
+  }
+
+  @protected
+  TransactionBitcoin sse_decode_transaction_bitcoin(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_version = sse_decode_i_32(deserializer);
+    var var_lockTime = sse_decode_u_32(deserializer);
+    var var_input = sse_decode_list_tx_in_info(deserializer);
+    var var_output = sse_decode_list_tx_out_info(deserializer);
+    var var_fee = sse_decode_opt_box_autoadd_u_64(deserializer);
+    return TransactionBitcoin(
+        version: var_version,
+        lockTime: var_lockTime,
+        input: var_input,
+        output: var_output,
+        fee: var_fee);
+  }
+
+  @protected
+  TransactionMetadataInfo sse_decode_transaction_metadata_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_hash = sse_decode_opt_String(deserializer);
+    var var_info = sse_decode_opt_String(deserializer);
+    var var_icon = sse_decode_opt_String(deserializer);
+    var var_title = sse_decode_opt_String(deserializer);
+    var var_signer = sse_decode_opt_String(deserializer);
+    var var_tokenInfo =
+        sse_decode_opt_box_autoadd_base_token_info(deserializer);
+    var var_broadcast = sse_decode_bool(deserializer);
+    return TransactionMetadataInfo(
+        chainHash: var_chainHash,
+        hash: var_hash,
+        info: var_info,
+        icon: var_icon,
+        title: var_title,
+        signer: var_signer,
+        tokenInfo: var_tokenInfo,
+        broadcast: var_broadcast);
+  }
+
+  @protected
+  TransactionRequestEVM sse_decode_transaction_request_evm(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_nonce = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_from = sse_decode_opt_String(deserializer);
+    var var_to = sse_decode_opt_String(deserializer);
+    var var_value = sse_decode_opt_String(deserializer);
+    var var_gasLimit = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_data = sse_decode_opt_list_prim_u_8_strict(deserializer);
+    var var_maxFeePerGas = sse_decode_opt_U128(deserializer);
+    var var_maxPriorityFeePerGas = sse_decode_opt_U128(deserializer);
+    var var_gasPrice = sse_decode_opt_U128(deserializer);
+    var var_chainId = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_accessList = sse_decode_opt_list_access_list_item(deserializer);
+    var var_blobVersionedHashes = sse_decode_opt_list_String(deserializer);
+    var var_maxFeePerBlobGas = sse_decode_opt_U128(deserializer);
+    return TransactionRequestEVM(
+        nonce: var_nonce,
+        from: var_from,
+        to: var_to,
+        value: var_value,
+        gasLimit: var_gasLimit,
+        data: var_data,
+        maxFeePerGas: var_maxFeePerGas,
+        maxPriorityFeePerGas: var_maxPriorityFeePerGas,
+        gasPrice: var_gasPrice,
+        chainId: var_chainId,
+        accessList: var_accessList,
+        blobVersionedHashes: var_blobVersionedHashes,
+        maxFeePerBlobGas: var_maxFeePerBlobGas);
+  }
+
+  @protected
+  TransactionRequestInfo sse_decode_transaction_request_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_metadata = sse_decode_transaction_metadata_info(deserializer);
+    var var_scilla =
+        sse_decode_opt_box_autoadd_transaction_request_scilla(deserializer);
+    var var_evm =
+        sse_decode_opt_box_autoadd_transaction_request_evm(deserializer);
+    var var_btc =
+        sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+            deserializer);
+    var var_tron = sse_decode_opt_String(deserializer);
+    var var_solana = sse_decode_opt_list_prim_u_8_strict(deserializer);
+    return TransactionRequestInfo(
+        metadata: var_metadata,
+        scilla: var_scilla,
+        evm: var_evm,
+        btc: var_btc,
+        tron: var_tron,
+        solana: var_solana);
+  }
+
+  @protected
+  TransactionRequestScilla sse_decode_transaction_request_scilla(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chainId = sse_decode_u_16(deserializer);
+    var var_nonce = sse_decode_u_64(deserializer);
+    var var_gasPrice = sse_decode_U128(deserializer);
+    var var_gasLimit = sse_decode_u_64(deserializer);
+    var var_toAddr = sse_decode_String(deserializer);
+    var var_amount = sse_decode_U128(deserializer);
+    var var_code = sse_decode_String(deserializer);
+    var var_data = sse_decode_String(deserializer);
+    return TransactionRequestScilla(
+        chainId: var_chainId,
+        nonce: var_nonce,
+        gasPrice: var_gasPrice,
+        gasLimit: var_gasLimit,
+        toAddr: var_toAddr,
+        amount: var_amount,
+        code: var_code,
+        data: var_data);
+  }
+
+  @protected
+  TransactionStatusInfo sse_decode_transaction_status_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return TransactionStatusInfo.values[inner];
+  }
+
+  @protected
+  TxInInfo sse_decode_tx_in_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_previousOutput = sse_decode_out_point_info(deserializer);
+    var var_scriptSig = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_sequence = sse_decode_u_32(deserializer);
+    var var_witness = sse_decode_list_list_prim_u_8_strict(deserializer);
+    var var_address = sse_decode_opt_String(deserializer);
+    return TxInInfo(
+        previousOutput: var_previousOutput,
+        scriptSig: var_scriptSig,
+        sequence: var_sequence,
+        witness: var_witness,
+        address: var_address);
+  }
+
+  @protected
+  TxOutInfo sse_decode_tx_out_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_value = sse_decode_u_64(deserializer);
+    var var_scriptPubkey = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_address = sse_decode_opt_String(deserializer);
+    return TxOutInfo(
+        value: var_value, scriptPubkey: var_scriptPubkey, address: var_address);
+  }
+
+  @protected
+  int sse_decode_u_16(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint16();
+  }
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
+  }
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8();
+  }
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_txid = sse_decode_String(deserializer);
+    var var_vout = sse_decode_u_32(deserializer);
+    var var_value = sse_decode_u_64(deserializer);
+    var var_height = sse_decode_u_32(deserializer);
+    return UtxoInfo(
+        txid: var_txid, vout: var_vout, value: var_value, height: var_height);
+  }
+
+  @protected
+  WalletArgonParamsInfo sse_decode_wallet_argon_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_memory = sse_decode_u_32(deserializer);
+    var var_iterations = sse_decode_u_32(deserializer);
+    var var_threads = sse_decode_u_32(deserializer);
+    var var_secret = sse_decode_String(deserializer);
+    return WalletArgonParamsInfo(
+        memory: var_memory,
+        iterations: var_iterations,
+        threads: var_threads,
+        secret: var_secret);
+  }
+
+  @protected
+  WalletInfo sse_decode_wallet_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_walletType = sse_decode_String(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_authType = sse_decode_String(deserializer);
+    var var_walletAddress = sse_decode_String(deserializer);
+    var var_accounts =
+        sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(deserializer);
+    var var_selectedAccount = sse_decode_usize(deserializer);
+    var var_tokens = sse_decode_list_f_token_info(deserializer);
+    var var_settings = sse_decode_wallet_settings_info(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
+    var var_bip = sse_decode_u_32(deserializer);
+    return WalletInfo(
+        walletType: var_walletType,
+        walletName: var_walletName,
+        authType: var_authType,
+        walletAddress: var_walletAddress,
+        accounts: var_accounts,
+        selectedAccount: var_selectedAccount,
+        tokens: var_tokens,
+        settings: var_settings,
+        chainHash: var_chainHash,
+        slip44: var_slip44,
+        bip: var_bip);
+  }
+
+  @protected
+  WalletPolicy sse_decode_wallet_policy(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_descriptorTemplate = sse_decode_String(deserializer);
+    var var_keysInfo = sse_decode_list_String(deserializer);
+    var var_policyId = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_policyHmac = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_serialized = sse_decode_list_prim_u_8_strict(deserializer);
+    return WalletPolicy(
+        descriptorTemplate: var_descriptorTemplate,
+        keysInfo: var_keysInfo,
+        policyId: var_policyId,
+        policyHmac: var_policyHmac,
+        serialized: var_serialized);
+  }
+
+  @protected
+  WalletSettingsInfo sse_decode_wallet_settings_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_cipherOrders = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_argonParams = sse_decode_wallet_argon_params_info(deserializer);
+    var var_currencyConvert = sse_decode_String(deserializer);
+    var var_ipfsNode = sse_decode_opt_String(deserializer);
+    var var_ensEnabled = sse_decode_bool(deserializer);
+    var var_tokensListFetcher = sse_decode_bool(deserializer);
+    var var_nodeRankingEnabled = sse_decode_bool(deserializer);
+    var var_maxConnections = sse_decode_u_8(deserializer);
+    var var_requestTimeoutSecs = sse_decode_u_32(deserializer);
+    var var_ratesApiOptions = sse_decode_u_8(deserializer);
+    return WalletSettingsInfo(
+        cipherOrders: var_cipherOrders,
+        argonParams: var_argonParams,
+        currencyConvert: var_currencyConvert,
+        ipfsNode: var_ipfsNode,
+        ensEnabled: var_ensEnabled,
+        tokensListFetcher: var_tokensListFetcher,
+        nodeRankingEnabled: var_nodeRankingEnabled,
+        maxConnections: var_maxConnections,
+        requestTimeoutSecs: var_requestTimeoutSecs,
+        ratesApiOptions: var_ratesApiOptions);
+  }
+
+  @protected
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as LocalStorageImplImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as LocalStorageImplImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
+      Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_32_map_u_32_list_account_info_none(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_32_list_account_info_None(
+      Map<int, List<AccountInfo>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_32_list_account_info(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+      Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_8_address_chain_info(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_usize_String_None(
+      Map<BigInt, String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_usize_string(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void sse_encode_Map_usize_background_notification_state_None(
+      Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_usize_background_notification_state(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as LocalStorageImplImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_StreamSink_String_Sse(
+      RustStreamSink<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+        self.setupAndSerialize(
+            codec: SseCodec(
           decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletAddBip39WalletConstMeta,
-            argValues: [params, walletSettings, additionalFtokens],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletAddBip39WalletConstMeta => const TaskConstMeta(
-            debugName: "add_bip39_wallet",
-            argNames: ["params", "walletSettings", "additionalFtokens"],
-        );
-        
-
-@override Future<List<FTokenInfo>> crateApiTokenAddFtoken({required FTokenInfo meta , required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_f_token_info(meta, serializer);
-sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_f_token_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenAddFtokenConstMeta,
-            argValues: [meta, walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenAddFtokenConstMeta => const TaskConstMeta(
-            debugName: "add_ftoken",
-            argNames: ["meta", "walletIndex"],
-        );
-        
-
-@override Future<void> crateApiLedgerAddLedgerAccount({required BigInt walletIndex , required int ledgerIndex , required String name , String? keyOrAddr , required bool zilliqaLegacy , Map<int, AddressChainInfo>? btcChain })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_u_8(ledgerIndex, serializer);
-sse_encode_String(name, serializer);
-sse_encode_opt_String(keyOrAddr, serializer);
-sse_encode_bool(zilliqaLegacy, serializer);
-sse_encode_opt_Map_u_8_address_chain_info_None(btcChain, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerAddLedgerAccountConstMeta,
-            argValues: [walletIndex, ledgerIndex, name, keyOrAddr, zilliqaLegacy, btcChain],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerAddLedgerAccountConstMeta => const TaskConstMeta(
-            debugName: "add_ledger_account",
-            argNames: ["walletIndex", "ledgerIndex", "name", "keyOrAddr", "zilliqaLegacy", "btcChain"],
-        );
-        
-
-@override Future<String> crateApiLedgerAddLedgerWallet({required LedgerParamsInput params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_ledger_params_input(params, serializer);
-sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
-sse_encode_list_f_token_info(ftokens, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerAddLedgerWalletConstMeta,
-            argValues: [params, walletSettings, ftokens],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerAddLedgerWalletConstMeta => const TaskConstMeta(
-            debugName: "add_ledger_wallet",
-            argNames: ["params", "walletSettings", "ftokens"],
-        );
-        
-
-@override Future<void> crateApiBookAddNewBookAddress({required String name , required String addr , required BigInt net , required int slip44 })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(name, serializer);
-sse_encode_String(addr, serializer);
-sse_encode_usize(net, serializer);
-sse_encode_u_32(slip44, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBookAddNewBookAddressConstMeta,
-            argValues: [name, addr, net, slip44],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBookAddNewBookAddressConstMeta => const TaskConstMeta(
-            debugName: "add_new_book_address",
-            argNames: ["name", "addr", "net", "slip44"],
-        );
-        
-
-@override Future<void> crateApiWalletAddNextBip39Account({required AddNextBip39AccountParams params })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_add_next_bip_39_account_params(params, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletAddNextBip39AccountConstMeta,
-            argValues: [params],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletAddNextBip39AccountConstMeta => const TaskConstMeta(
-            debugName: "add_next_bip39_account",
-            argNames: ["params"],
-        );
-        
-
-@override Future<BigInt> crateApiProviderAddProvider({required NetworkConfigInfo providerConfig })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_u_64,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderAddProviderConstMeta,
-            argValues: [providerConfig],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderAddProviderConstMeta => const TaskConstMeta(
-            debugName: "add_provider",
-            argNames: ["providerConfig"],
-        );
-        
-
-@override Future<void> crateApiProviderAddProvidersList({required List<NetworkConfigInfo> providerConfig })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_network_config_info(providerConfig, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderAddProvidersListConstMeta,
-            argValues: [providerConfig],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderAddProvidersListConstMeta => const TaskConstMeta(
-            debugName: "add_providers_list",
-            argNames: ["providerConfig"],
-        );
-        
-
-@override Future<String> crateApiWalletAddSkWallet({required AddSKWalletParams params , required WalletSettingsInfo walletSettings , required List<FTokenInfo> ftokens })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_add_sk_wallet_params(params, serializer);
-sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
-sse_encode_list_f_token_info(ftokens, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletAddSkWalletConstMeta,
-            argValues: [params, walletSettings, ftokens],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletAddSkWalletConstMeta => const TaskConstMeta(
-            debugName: "add_sk_wallet",
-            argNames: ["params", "walletSettings", "ftokens"],
-        );
-        
-
-@override BigInt crateApiUtilsAddressToHash({required String addr })  { return handler.executeSync(SyncTask(
-            callFfi: () {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(addr, serializer);
-            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_usize,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiUtilsAddressToHashConstMeta,
-            argValues: [addr],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsAddressToHashConstMeta => const TaskConstMeta(
-            debugName: "address_to_hash",
-            argNames: ["addr"],
-        );
-        
-
-@override Future<List<FTokenInfo>> crateApiTokenAutoHintTokens({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_f_token_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenAutoHintTokensConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenAutoHintTokensConstMeta => const TaskConstMeta(
-            debugName: "auto_hint_tokens",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<bool> crateApiUtilsBip39ChecksumValid({required String words })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(words, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiUtilsBip39ChecksumValidConstMeta,
-            argValues: [words],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsBip39ChecksumValidConstMeta => const TaskConstMeta(
-            debugName: "bip39_checksum_valid",
-            argNames: ["words"],
-        );
-        
-
-@override Future<String> crateApiUtilsBitcoinAddressTypeFromAddress({required String addr })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(addr, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiUtilsBitcoinAddressTypeFromAddressConstMeta,
-            argValues: [addr],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsBitcoinAddressTypeFromAddressConstMeta => const TaskConstMeta(
-            debugName: "bitcoin_address_type_from_address",
-            argNames: ["addr"],
-        );
-        
-
-@override List<ExchangeProvider> crateApiExchangeBootstrapExchangeProviders({required List<NetworkConfigInfo> configs })  { return handler.executeSync(SyncTask(
-            callFfi: () {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_network_config_info(configs, serializer);
-            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_exchange_provider,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
-            argValues: [configs],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta => const TaskConstMeta(
-            debugName: "bootstrap_exchange_providers",
-            argNames: ["configs"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct({required TransactionBitcoin tx , required List<TxOutInfo> witnessUtxos })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_transaction_bitcoin(tx, serializer);
-sse_encode_list_tx_out_info(witnessUtxos, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta,
-            argValues: [tx, witnessUtxos],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildPsbtFromStructConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_build_psbt_from_struct",
-            argNames: ["tx", "witnessUtxos"],
-        );
-        
-
-@override Future<WalletPolicy> crateApiBtcLedgerBtcLedgerBuildWalletPolicy({required String xpub , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(xpub, serializer);
-sse_encode_list_prim_u_8_loose(masterFingerprint, serializer);
-sse_encode_u_32(bipPurpose, serializer);
-sse_encode_u_32(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_wallet_policy,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerBuildWalletPolicyConstMeta,
-            argValues: [xpub, masterFingerprint, bipPurpose, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerBuildWalletPolicyConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_build_wallet_policy",
-            argNames: ["xpub", "masterFingerprint", "bipPurpose", "accountIndex"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerComputeMerkleRoot({required List<Uint8List> leafHashes })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerComputeMerkleRootConstMeta,
-            argValues: [leafHashes],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerComputeMerkleRootConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_compute_merkle_root",
-            argNames: ["leafHashes"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerEncodePath({required String path })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(path, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerEncodePathConstMeta,
-            argValues: [path],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerEncodePathConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_encode_path",
-            argNames: ["path"],
-        );
-        
-
-@override Future<FinalizedBtcTx> crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs({required List<int> psbtBytes , required List<LedgerInputSignature> sigs , required List<InputMetaInfo> inputMeta })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
-sse_encode_list_ledger_input_signature(sigs, serializer);
-sse_encode_list_input_meta_info(inputMeta, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_finalized_btc_tx,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta,
-            argValues: [psbtBytes, sigs, inputMeta],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerFinalizePsbtWithSigsConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_finalize_psbt_with_sigs",
-            argNames: ["psbtBytes", "sigs", "inputMeta"],
-        );
-        
-
-@override Future<PlatformInt64> crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex({required List<Uint8List> leafHashes , required List<int> targetHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
-sse_encode_list_prim_u_8_loose(targetHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_i_64,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerGetMerkleLeafIndexConstMeta,
-            argValues: [leafHashes, targetHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetMerkleLeafIndexConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_get_merkle_leaf_index",
-            argNames: ["leafHashes", "targetHash"],
-        );
-        
-
-@override Future<MerkleProof> crateApiBtcLedgerBtcLedgerGetMerkleProof({required List<Uint8List> leafHashes , required int leafIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_list_prim_u_8_strict(leafHashes, serializer);
-sse_encode_u_32(leafIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_merkle_proof,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerGetMerkleProofConstMeta,
-            argValues: [leafHashes, leafIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetMerkleProofConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_get_merkle_proof",
-            argNames: ["leafHashes", "leafIndex"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerGetPreimage({required List<Uint8List> preimageHashes , required List<Uint8List> preimageData , required List<int> requestedHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_list_prim_u_8_strict(preimageHashes, serializer);
-sse_encode_list_list_prim_u_8_strict(preimageData, serializer);
-sse_encode_list_prim_u_8_loose(requestedHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerGetPreimageConstMeta,
-            argValues: [preimageHashes, preimageData, requestedHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerGetPreimageConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_get_preimage",
-            argNames: ["preimageHashes", "preimageData", "requestedHash"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerHashLeaf({required List<int> data })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(data, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerHashLeafConstMeta,
-            argValues: [data],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerHashLeafConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_hash_leaf",
-            argNames: ["data"],
-        );
-        
-
-@override Future<MerkelizedPsbt> crateApiBtcLedgerBtcLedgerMerkelisePsbt({required List<int> psbtBytes })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_merkelized_psbt,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerMerkelisePsbtConstMeta,
-            argValues: [psbtBytes],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerMerkelisePsbtConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_merkelise_psbt",
-            argNames: ["psbtBytes"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerPreparePsbt({required List<int> psbtBytes , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex , required String xpub })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(psbtBytes, serializer);
-sse_encode_list_prim_u_8_loose(masterFingerprint, serializer);
-sse_encode_u_32(bipPurpose, serializer);
-sse_encode_u_32(accountIndex, serializer);
-sse_encode_String(xpub, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerPreparePsbtConstMeta,
-            argValues: [psbtBytes, masterFingerprint, bipPurpose, accountIndex, xpub],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerPreparePsbtConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_prepare_psbt",
-            argNames: ["psbtBytes", "masterFingerprint", "bipPurpose", "accountIndex", "xpub"],
-        );
-        
-
-@override Future<Uint8List> crateApiBtcLedgerBtcLedgerSha256({required List<int> data })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(data, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiBtcLedgerBtcLedgerSha256ConstMeta,
-            argValues: [data],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBtcLedgerBtcLedgerSha256ConstMeta => const TaskConstMeta(
-            debugName: "btc_ledger_sha256",
-            argNames: ["data"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx({required BigInt walletIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta,
-            argValues: [walletIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildClaimScillaStakingRewardsTxConstMeta => const TaskConstMeta(
-            debugName: "build_claim_scilla_staking_rewards_tx",
-            argNames: ["walletIndex", "stake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxClaimRewardRequestConstMeta,
-            argValues: [walletIndex, accountIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxClaimRewardRequestConstMeta => const TaskConstMeta(
-            debugName: "build_tx_claim_reward_request",
-            argNames: ["walletIndex", "accountIndex", "stake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta,
-            argValues: [walletIndex, accountIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta => const TaskConstMeta(
-            debugName: "build_tx_claim_unstake_request",
-            argNames: ["walletIndex", "accountIndex", "stake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake , required String amount })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-sse_encode_String(amount, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxEvmStakeRequestConstMeta,
-            argValues: [walletIndex, accountIndex, stake, amount],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxEvmStakeRequestConstMeta => const TaskConstMeta(
-            debugName: "build_tx_evm_stake_request",
-            argNames: ["walletIndex", "accountIndex", "stake", "amount"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest({required BigInt walletIndex , required BigInt accountIndex , required FinalOutputInfo stake , required String amountToUnstake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-sse_encode_String(amountToUnstake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta,
-            argValues: [walletIndex, accountIndex, stake, amountToUnstake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta => const TaskConstMeta(
-            debugName: "build_tx_evm_unstake_request",
-            argNames: ["walletIndex", "accountIndex", "stake", "amountToUnstake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal({required BigInt walletIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta,
-            argValues: [walletIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta => const TaskConstMeta(
-            debugName: "build_tx_scilla_complete_withdrawal",
-            argNames: ["walletIndex", "stake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake({required BigInt walletIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxScillaInitUnstakeConstMeta,
-            argValues: [walletIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxScillaInitUnstakeConstMeta => const TaskConstMeta(
-            debugName: "build_tx_scilla_init_unstake",
-            argNames: ["walletIndex", "stake"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiStakeBuildTxScillaWithdrawStakeAvely({required BigInt walletIndex , required FinalOutputInfo stake })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_box_autoadd_final_output_info(stake, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta,
-            argValues: [walletIndex, stake],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeBuildTxScillaWithdrawStakeAvelyConstMeta => const TaskConstMeta(
-            debugName: "build_tx_scilla_withdraw_stake_avely",
-            argNames: ["walletIndex", "stake"],
-        );
-        
-
-@override Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo params })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_transaction_request_info(params, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_required_tx_params_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionCaclGasFeeConstMeta,
-            argValues: [walletIndex, accountIndex, params],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionCaclGasFeeConstMeta => const TaskConstMeta(
-            debugName: "cacl_gas_fee",
-            argNames: ["walletIndex", "accountIndex", "params"],
-        );
-        
-
-@override Future<void> crateApiWalletChangeAccountName({required BigInt walletIndex , required BigInt accountIndex , required String newName })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_String(newName, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletChangeAccountNameConstMeta,
-            argValues: [walletIndex, accountIndex, newName],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletChangeAccountNameConstMeta => const TaskConstMeta(
-            debugName: "change_account_name",
-            argNames: ["walletIndex", "accountIndex", "newName"],
-        );
-        
-
-@override Future<void> crateApiWalletChangeWalletName({required BigInt walletIndex , required String newName })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(newName, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletChangeWalletNameConstMeta,
-            argValues: [walletIndex, newName],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletChangeWalletNameConstMeta => const TaskConstMeta(
-            debugName: "change_wallet_name",
-            argNames: ["walletIndex", "newName"],
-        );
-        
-
-@override Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words({required List<String> words , required String lang })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(words, serializer);
-sse_encode_String(lang, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_usize_strict,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiMethodsCheckNotExistsBip39WordsConstMeta,
-            argValues: [words, lang],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiMethodsCheckNotExistsBip39WordsConstMeta => const TaskConstMeta(
-            debugName: "check_not_exists_bip39_words",
-            argNames: ["words", "lang"],
-        );
-        
-
-@override Future<List<HistoricalTransactionInfo>> crateApiTransactionCheckPendingTranasctions({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_historical_transaction_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionCheckPendingTranasctionsConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionCheckPendingTranasctionsConstMeta => const TaskConstMeta(
-            debugName: "check_pending_tranasctions",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<void> crateApiTransactionClearHistory({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionClearHistoryConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionClearHistoryConstMeta => const TaskConstMeta(
-            debugName: "clear_history",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<void> crateApiProviderCreateOrUpdateChain({required NetworkConfigInfo providerConfig })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderCreateOrUpdateChainConstMeta,
-            argValues: [providerConfig],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderCreateOrUpdateChainConstMeta => const TaskConstMeta(
-            debugName: "create_or_update_chain",
-            argNames: ["providerConfig"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiTransactionCreateTokenTransfer({required TokenTransferParamsInfo params })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_token_transfer_params_info(params, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionCreateTokenTransferConstMeta,
-            argValues: [params],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionCreateTokenTransferConstMeta => const TaskConstMeta(
-            debugName: "create_token_transfer",
-            argNames: ["params"],
-        );
-        
-
-@override Future<void> crateApiConnectionsCreateUpdateConnection({required BigInt walletIndex , required ConnectionInfo conn })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_box_autoadd_connection_info(conn, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiConnectionsCreateUpdateConnectionConstMeta,
-            argValues: [walletIndex, conn],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiConnectionsCreateUpdateConnectionConstMeta => const TaskConstMeta(
-            debugName: "create_update_connection",
-            argNames: ["walletIndex", "conn"],
-        );
-        
-
-@override Future<void> crateApiWalletDeleteAccount({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletDeleteAccountConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletDeleteAccountConstMeta => const TaskConstMeta(
-            debugName: "delete_account",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<void> crateApiWalletDeleteWallet({required BigInt walletIndex , String? password })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_opt_String(password, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletDeleteWalletConstMeta,
-            argValues: [walletIndex, password],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletDeleteWalletConstMeta => const TaskConstMeta(
-            debugName: "delete_wallet",
-            argNames: ["walletIndex", "password"],
-        );
-        
-
-@override Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp({required BigInt walletIndex , required BigInt accountIndex , required TransactionRequestInfo tx , required int slip44 })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_box_autoadd_transaction_request_info(tx, serializer);
-sse_encode_u_32(slip44, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_encoded_rlp_tx,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionEncodeTxRlpConstMeta,
-            argValues: [walletIndex, accountIndex, tx, slip44],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionEncodeTxRlpConstMeta => const TaskConstMeta(
-            debugName: "encode_tx_rlp",
-            argNames: ["walletIndex", "accountIndex", "tx", "slip44"],
-        );
-        
-
-@override Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_final_output_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeFetchEvmStakeConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeFetchEvmStakeConstMeta => const TaskConstMeta(
-            debugName: "fetch_evm_stake",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<List<FinalOutputInfo>> crateApiStakeFetchScillaStake({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_final_output_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiStakeFetchScillaStakeConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiStakeFetchScillaStakeConstMeta => const TaskConstMeta(
-            debugName: "fetch_scilla_stake",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<FTokenInfo> crateApiTokenFetchTokenMeta({required String addr , required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(addr, serializer);
-sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_f_token_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenFetchTokenMetaConstMeta,
-            argValues: [addr, walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenFetchTokenMetaConstMeta => const TaskConstMeta(
-            debugName: "fetch_token_meta",
-            argNames: ["addr", "walletIndex"],
-        );
-        
-
-@override String crateApiUtilsFromWei({required String value , required int decimals })  { return handler.executeSync(SyncTask(
-            callFfi: () {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(value, serializer);
-sse_encode_u_8(decimals, serializer);
-            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiUtilsFromWeiConstMeta,
-            argValues: [value, decimals],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsFromWeiConstMeta => const TaskConstMeta(
-            debugName: "from_wei",
-            argNames: ["value", "decimals"],
-        );
-        
-
-@override Future<String> crateApiMethodsGenBip39Words({required int count })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_u_8(count, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiMethodsGenBip39WordsConstMeta,
-            argValues: [count],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiMethodsGenBip39WordsConstMeta => const TaskConstMeta(
-            debugName: "gen_bip39_words",
-            argNames: ["count"],
-        );
-        
-
-@override Future<KeyPairInfo> crateApiMethodsGenKeypair()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_key_pair_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiMethodsGenKeypairConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiMethodsGenKeypairConstMeta => const TaskConstMeta(
-            debugName: "gen_keypair",
-            argNames: [],
-        );
-        
-
-@override Future<Uint8List> crateApiQrcodeGenPngQrcode({required String data , required QrConfigInfo config })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(data, serializer);
-sse_encode_box_autoadd_qr_config_info(config, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiQrcodeGenPngQrcodeConstMeta,
-            argValues: [data, config],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiQrcodeGenPngQrcodeConstMeta => const TaskConstMeta(
-            debugName: "gen_png_qrcode",
-            argNames: ["data", "config"],
-        );
-        
-
-@override Future<String> crateApiQrcodeGenSvgQrcode({required String data , required QrConfigInfo config })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(data, serializer);
-sse_encode_box_autoadd_qr_config_info(config, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiQrcodeGenSvgQrcodeConstMeta,
-            argValues: [data, config],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiQrcodeGenSvgQrcodeConstMeta => const TaskConstMeta(
-            debugName: "gen_svg_qrcode",
-            argNames: ["data", "config"],
-        );
-        
-
-@override Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_address_book_entry_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBookGetAddressBookListConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBookGetAddressBookListConstMeta => const TaskConstMeta(
-            debugName: "get_address_book_list",
-            argNames: [],
-        );
-        
-
-@override Future<List<String>> crateApiAuthGetBiometricType()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiAuthGetBiometricTypeConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiAuthGetBiometricTypeConstMeta => const TaskConstMeta(
-            debugName: "get_biometric_type",
-            argNames: [],
-        );
-        
-
-@override Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson({required String jsonStr })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(jsonStr, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_network_config_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderGetChainsProvidersFromJsonConstMeta,
-            argValues: [jsonStr],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderGetChainsProvidersFromJsonConstMeta => const TaskConstMeta(
-            debugName: "get_chains_providers_from_json",
-            argNames: ["jsonStr"],
-        );
-        
-
-@override Future<List<Category>> crateApiBookGetCombineSortAddresses({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_category,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBookGetCombineSortAddressesConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBookGetCombineSortAddressesConstMeta => const TaskConstMeta(
-            debugName: "get_combine_sort_addresses",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<List<ConnectionInfo>> crateApiConnectionsGetConnectionsList({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_connection_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiConnectionsGetConnectionsListConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiConnectionsGetConnectionsListConstMeta => const TaskConstMeta(
-            debugName: "get_connections_list",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<List<(String,String)>> crateApiUtilsGetCurrenciesTickets()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_record_string_string,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiUtilsGetCurrenciesTicketsConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsGetCurrenciesTicketsConstMeta => const TaskConstMeta(
-            debugName: "get_currencies_tickets",
-            argNames: [],
-        );
-        
-
-@override Future<BackgroundState> crateApiBackendGetData()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_background_state,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBackendGetDataConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBackendGetDataConstMeta => const TaskConstMeta(
-            debugName: "get_data",
-            argNames: [],
-        );
-        
-
-@override Future<List<HistoricalTransactionInfo>> crateApiTransactionGetHistory({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_historical_transaction_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionGetHistoryConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionGetHistoryConstMeta => const TaskConstMeta(
-            debugName: "get_history",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<(Uint8List,String)> crateApiCacheGetImageBytes({required String dir , required String url })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(dir, serializer);
-sse_encode_String(url, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_list_prim_u_8_strict_string,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiCacheGetImageBytesConstMeta,
-            argValues: [dir, url],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiCacheGetImageBytesConstMeta => const TaskConstMeta(
-            debugName: "get_image_bytes",
-            argNames: ["dir", "url"],
-        );
-        
-
-@override Future<String> crateApiCacheGetImageName({required String dir , required String url })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(dir, serializer);
-sse_encode_String(url, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiCacheGetImageNameConstMeta,
-            argValues: [dir, url],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiCacheGetImageNameConstMeta => const TaskConstMeta(
-            debugName: "get_image_name",
-            argNames: ["dir", "url"],
-        );
-        
-
-@override Future<(List<NetworkConfigInfo>,List<NetworkConfigInfo>)> crateApiProviderGetNetworks({required String mainnetJson , required String testnetJson })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(mainnetJson, serializer);
-sse_encode_String(testnetJson, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_list_network_config_info_list_network_config_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderGetNetworksConstMeta,
-            argValues: [mainnetJson, testnetJson],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderGetNetworksConstMeta => const TaskConstMeta(
-            debugName: "get_networks",
-            argNames: ["mainnetJson", "testnetJson"],
-        );
-        
-
-@override Future<NetworkConfigInfo> crateApiProviderGetProvider({required BigInt chainHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_u_64(chainHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_network_config_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderGetProviderConstMeta,
-            argValues: [chainHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderGetProviderConstMeta => const TaskConstMeta(
-            debugName: "get_provider",
-            argNames: ["chainHash"],
-        );
-        
-
-@override Future<List<NetworkConfigInfo>> crateApiProviderGetProviders()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 74, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_network_config_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderGetProvidersConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderGetProvidersConstMeta => const TaskConstMeta(
-            debugName: "get_providers",
-            argNames: [],
-        );
-        
-
-@override Future<List<WalletInfo>> crateApiWalletGetWallets()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_wallet_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletGetWalletsConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletGetWalletsConstMeta => const TaskConstMeta(
-            debugName: "get_wallets",
-            argNames: [],
-        );
-        
-
-@override Future<List<String>> crateApiWalletGetZilBech32Addresses({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletGetZilBech32AddressesConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletGetZilBech32AddressesConstMeta => const TaskConstMeta(
-            debugName: "get_zil_bech32_addresses",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<List<String>> crateApiWalletGetZilEthChecksumAddresses({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletGetZilEthChecksumAddressesConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletGetZilEthChecksumAddressesConstMeta => const TaskConstMeta(
-            debugName: "get_zil_eth_checksum_addresses",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<void> crateApiMethodsInitApp()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 78, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiMethodsInitAppConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiMethodsInitAppConstMeta => const TaskConstMeta(
-            debugName: "init_app",
-            argNames: [],
-        );
-        
-
-@override (String,String) crateApiUtilsIntlNumberFormating({required String value , required int decimals , required String localeStr , required String nativeSymbolStr , required String convertedSymbolStr , required double threshold , required bool compact , required double converted })  { return handler.executeSync(SyncTask(
-            callFfi: () {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(value, serializer);
-sse_encode_u_8(decimals, serializer);
-sse_encode_String(localeStr, serializer);
-sse_encode_String(nativeSymbolStr, serializer);
-sse_encode_String(convertedSymbolStr, serializer);
-sse_encode_f_64(threshold, serializer);
-sse_encode_bool(compact, serializer);
-sse_encode_f_64(converted, serializer);
-            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 79)!;
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_string_string,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiUtilsIntlNumberFormatingConstMeta,
-            argValues: [value, decimals, localeStr, nativeSymbolStr, convertedSymbolStr, threshold, compact, converted],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsIntlNumberFormatingConstMeta => const TaskConstMeta(
-            debugName: "intl_number_formating",
-            argNames: ["value", "decimals", "localeStr", "nativeSymbolStr", "convertedSymbolStr", "threshold", "compact", "converted"],
-        );
-        
-
-@override Future<bool> crateApiBackendIsServiceRunning()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiBackendIsServiceRunningConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBackendIsServiceRunningConstMeta => const TaskConstMeta(
-            debugName: "is_service_running",
-            argNames: [],
-        );
-        
-
-@override Future<bool> crateApiUtilsIsValidAddress({required String addr })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(addr, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: null,
-        )
-        ,
-            constMeta: kCrateApiUtilsIsValidAddressConstMeta,
-            argValues: [addr],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsIsValidAddressConstMeta => const TaskConstMeta(
-            debugName: "is_valid_address",
-            argNames: ["addr"],
-        );
-        
-
-@override Future<KeyPairInfo> crateApiMethodsKeypairFromSk({required String sk })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(sk, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_key_pair_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiMethodsKeypairFromSkConstMeta,
-            argValues: [sk],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiMethodsKeypairFromSkConstMeta => const TaskConstMeta(
-            debugName: "keypair_from_sk",
-            argNames: ["sk"],
-        );
-        
-
-@override Future<void> crateApiLedgerTransportLedgerBleClose({required String connectionId })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(connectionId, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerBleCloseConstMeta,
-            argValues: [connectionId],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerBleCloseConstMeta => const TaskConstMeta(
-            debugName: "ledger_ble_close",
-            argNames: ["connectionId"],
-        );
-        
-
-@override Future<Uint8List> crateApiLedgerTransportLedgerBleExchange({required String connectionId , required List<int> apdu })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(connectionId, serializer);
-sse_encode_list_prim_u_8_loose(apdu, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerBleExchangeConstMeta,
-            argValues: [connectionId, apdu],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerBleExchangeConstMeta => const TaskConstMeta(
-            debugName: "ledger_ble_exchange",
-            argNames: ["connectionId", "apdu"],
-        );
-        
-
-@override Future<String> crateApiLedgerTransportLedgerBleOpen({required String deviceId })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(deviceId, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerBleOpenConstMeta,
-            argValues: [deviceId],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerBleOpenConstMeta => const TaskConstMeta(
-            debugName: "ledger_ble_open",
-            argNames: ["deviceId"],
-        );
-        
-
-@override Future<List<RustLedgerBleDevice>> crateApiLedgerTransportLedgerBleScan()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_rust_ledger_ble_device,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerBleScanConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerBleScanConstMeta => const TaskConstMeta(
-            debugName: "ledger_ble_scan",
-            argNames: [],
-        );
-        
-
-@override Future<void> crateApiLedgerTransportLedgerHidClose({required String connectionId })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(connectionId, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerHidCloseConstMeta,
-            argValues: [connectionId],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerHidCloseConstMeta => const TaskConstMeta(
-            debugName: "ledger_hid_close",
-            argNames: ["connectionId"],
-        );
-        
-
-@override Future<Uint8List> crateApiLedgerTransportLedgerHidExchange({required String connectionId , required List<int> apdu })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(connectionId, serializer);
-sse_encode_list_prim_u_8_loose(apdu, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerHidExchangeConstMeta,
-            argValues: [connectionId, apdu],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerHidExchangeConstMeta => const TaskConstMeta(
-            debugName: "ledger_hid_exchange",
-            argNames: ["connectionId", "apdu"],
-        );
-        
-
-@override Future<List<RustLedgerHidDevice>> crateApiLedgerTransportLedgerHidList()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 89, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_rust_ledger_hid_device,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerHidListConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerHidListConstMeta => const TaskConstMeta(
-            debugName: "ledger_hid_list",
-            argNames: [],
-        );
-        
-
-@override Future<String> crateApiLedgerTransportLedgerHidOpen({required String deviceId })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(deviceId, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerTransportLedgerHidOpenConstMeta,
-            argValues: [deviceId],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerTransportLedgerHidOpenConstMeta => const TaskConstMeta(
-            debugName: "ledger_hid_open",
-            argNames: ["deviceId"],
-        );
-        
-
-@override Future<Uint32List> crateApiLedgerLedgerSplitPath({required String path })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(path, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 91, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_32_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerLedgerSplitPathConstMeta,
-            argValues: [path],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerLedgerSplitPathConstMeta => const TaskConstMeta(
-            debugName: "ledger_split_path",
-            argNames: ["path"],
-        );
-        
-
-@override Future<BackgroundState> crateApiBackendLoadService({required String path })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(path, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 92, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_background_state,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBackendLoadServiceConstMeta,
-            argValues: [path],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBackendLoadServiceConstMeta => const TaskConstMeta(
-            debugName: "load_service",
-            argNames: ["path"],
-        );
-        
-
-@override Future<Uint8List> crateApiWalletMakeKeystoreFile({required BigInt walletIndex , required String password })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(password, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 93, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletMakeKeystoreFileConstMeta,
-            argValues: [walletIndex, password],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletMakeKeystoreFileConstMeta => const TaskConstMeta(
-            debugName: "make_keystore_file",
-            argNames: ["walletIndex", "password"],
-        );
-        
-
-@override Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr({required String data })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(data, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 94, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_q_rcode_scan_result_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiQrcodeParseQrcodeStrConstMeta,
-            argValues: [data],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiQrcodeParseQrcodeStrConstMeta => const TaskConstMeta(
-            debugName: "parse_qrcode_str",
-            argNames: ["data"],
-        );
-        
-
-@override Future<Eip712Hashes> crateApiTransactionPrepareEip712Message({required String typedDataJson })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(typedDataJson, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 95, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_eip_712_hashes,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionPrepareEip712MessageConstMeta,
-            argValues: [typedDataJson],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionPrepareEip712MessageConstMeta => const TaskConstMeta(
-            debugName: "prepare_eip712_message",
-            argNames: ["typedDataJson"],
-        );
-        
-
-@override Future<Uint8List> crateApiTransactionPrepareMessage({required BigInt walletIndex , required BigInt accountIndex , required String message })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_String(message, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 96, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionPrepareMessageConstMeta,
-            argValues: [walletIndex, accountIndex, message],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionPrepareMessageConstMeta => const TaskConstMeta(
-            debugName: "prepare_message",
-            argNames: ["walletIndex", "accountIndex", "message"],
-        );
-        
-
-@override Future<String> crateApiProviderProviderReqProxy({required String payload , required BigInt chainHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(payload, serializer);
-sse_encode_u_64(chainHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 97, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderProviderReqProxyConstMeta,
-            argValues: [payload, chainHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderProviderReqProxyConstMeta => const TaskConstMeta(
-            debugName: "provider_req_proxy",
-            argNames: ["payload", "chainHash"],
-        );
-        
-
-@override Future<void> crateApiConnectionsRemoveConnections({required BigInt walletIndex , required String domain })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(domain, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 98, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiConnectionsRemoveConnectionsConstMeta,
-            argValues: [walletIndex, domain],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiConnectionsRemoveConnectionsConstMeta => const TaskConstMeta(
-            debugName: "remove_connections",
-            argNames: ["walletIndex", "domain"],
-        );
-        
-
-@override Future<void> crateApiBookRemoveFromAddressBook({required String addr })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(addr, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 99, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBookRemoveFromAddressBookConstMeta,
-            argValues: [addr],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBookRemoveFromAddressBookConstMeta => const TaskConstMeta(
-            debugName: "remove_from_address_book",
-            argNames: ["addr"],
-        );
-        
-
-@override Future<void> crateApiProviderRemoveProvider({required BigInt chainHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_u_64(chainHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 100, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderRemoveProviderConstMeta,
-            argValues: [chainHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderRemoveProviderConstMeta => const TaskConstMeta(
-            debugName: "remove_provider",
-            argNames: ["chainHash"],
-        );
-        
-
-@override Future<String> crateApiWalletRestoreFromKeystore({required List<int> keystoreBytes , required String password , required String biometricType })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(keystoreBytes, serializer);
-sse_encode_String(password, serializer);
-sse_encode_String(biometricType, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 101, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletRestoreFromKeystoreConstMeta,
-            argValues: [keystoreBytes, password, biometricType],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletRestoreFromKeystoreConstMeta => const TaskConstMeta(
-            debugName: "restore_from_keystore",
-            argNames: ["keystoreBytes", "password", "biometricType"],
-        );
-        
-
-@override Future<String> crateApiWalletRevealBip39Phrase({required BigInt walletIndex , required String password , String? passphrase })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(password, serializer);
-sse_encode_opt_String(passphrase, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 102, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletRevealBip39PhraseConstMeta,
-            argValues: [walletIndex, password, passphrase],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletRevealBip39PhraseConstMeta => const TaskConstMeta(
-            debugName: "reveal_bip39_phrase",
-            argNames: ["walletIndex", "password", "passphrase"],
-        );
-        
-
-@override Future<KeyPairInfo> crateApiWalletRevealKeypair({required BigInt walletIndex , required BigInt accountIndex , required String password , String? passphrase })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_String(password, serializer);
-sse_encode_opt_String(passphrase, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 103, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_key_pair_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletRevealKeypairConstMeta,
-            argValues: [walletIndex, accountIndex, password, passphrase],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletRevealKeypairConstMeta => const TaskConstMeta(
-            debugName: "reveal_keypair",
-            argNames: ["walletIndex", "accountIndex", "password", "passphrase"],
-        );
-        
-
-@override Future<void> crateApiTokenRmFtoken({required BigInt walletIndex , required String tokenAddress })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(tokenAddress, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 104, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenRmFtokenConstMeta,
-            argValues: [walletIndex, tokenAddress],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenRmFtokenConstMeta => const TaskConstMeta(
-            debugName: "rm_ftoken",
-            argNames: ["walletIndex", "tokenAddress"],
-        );
-        
-
-@override Future<Map<int, AddressChainInfo>> crateApiLedgerScanBtcAccountHistory({required BtcAccountXpubsInputInfo xpubs , required int ledgerIndex , required BigInt chainHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_btc_account_xpubs_input_info(xpubs, serializer);
-sse_encode_u_8(ledgerIndex, serializer);
-sse_encode_u_64(chainHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 105, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_Map_u_8_address_chain_info_None,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiLedgerScanBtcAccountHistoryConstMeta,
-            argValues: [xpubs, ledgerIndex, chainHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiLedgerScanBtcAccountHistoryConstMeta => const TaskConstMeta(
-            debugName: "scan_btc_account_history",
-            argNames: ["xpubs", "ledgerIndex", "chainHash"],
-        );
-        
-
-@override Future<void> crateApiWalletSelectAccount({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 106, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletSelectAccountConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletSelectAccountConstMeta => const TaskConstMeta(
-            debugName: "select_account",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<void> crateApiProviderSelectAccountsChain({required BigInt walletIndex , required BigInt chainHash , String? password })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_u_64(chainHash, serializer);
-sse_encode_opt_String(password, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 107, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiProviderSelectAccountsChainConstMeta,
-            argValues: [walletIndex, chainHash, password],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiProviderSelectAccountsChainConstMeta => const TaskConstMeta(
-            debugName: "select_accounts_chain",
-            argNames: ["walletIndex", "chainHash", "password"],
-        );
-        
-
-@override Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions({required int walletIndex , required int accountIndex , required TransactionRequestInfo tx , required List<int> sig , String? bip86Xpub })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_u_8(walletIndex, serializer);
-sse_encode_u_8(accountIndex, serializer);
-sse_encode_box_autoadd_transaction_request_info(tx, serializer);
-sse_encode_list_prim_u_8_loose(sig, serializer);
-sse_encode_opt_String(bip86Xpub, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 108, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_historical_transaction_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionSendSignedTransactionsConstMeta,
-            argValues: [walletIndex, accountIndex, tx, sig, bip86Xpub],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionSendSignedTransactionsConstMeta => const TaskConstMeta(
-            debugName: "send_signed_transactions",
-            argNames: ["walletIndex", "accountIndex", "tx", "sig", "bip86Xpub"],
-        );
-        
-
-@override Future<void> crateApiWalletSetBiometric({required BigInt walletIndex , String? password , required String newBiometricType })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_opt_String(password, serializer);
-sse_encode_String(newBiometricType, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 109, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletSetBiometricConstMeta,
-            argValues: [walletIndex, password, newBiometricType],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletSetBiometricConstMeta => const TaskConstMeta(
-            debugName: "set_biometric",
-            argNames: ["walletIndex", "password", "newBiometricType"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetBrowserSettings({required BrowserSettingsInfo browserSettings })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_browser_settings_info(browserSettings, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 110, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetBrowserSettingsConstMeta,
-            argValues: [browserSettings],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetBrowserSettingsConstMeta => const TaskConstMeta(
-            debugName: "set_browser_settings",
-            argNames: ["browserSettings"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetDefaultLocale({String? locale })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_opt_String(locale, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 111, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetDefaultLocaleConstMeta,
-            argValues: [locale],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetDefaultLocaleConstMeta => const TaskConstMeta(
-            debugName: "set_default_locale",
-            argNames: ["locale"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetGlobalNotifications({required bool globalEnabled })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(globalEnabled, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 112, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetGlobalNotificationsConstMeta,
-            argValues: [globalEnabled],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetGlobalNotificationsConstMeta => const TaskConstMeta(
-            debugName: "set_global_notifications",
-            argNames: ["globalEnabled"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetRateEngine({required BigInt walletIndex , required int engineCode })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_u_8(engineCode, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 113, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetRateEngineConstMeta,
-            argValues: [walletIndex, engineCode],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetRateEngineConstMeta => const TaskConstMeta(
-            debugName: "set_rate_engine",
-            argNames: ["walletIndex", "engineCode"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetRateFetcher({required BigInt walletIndex , required String currency })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_String(currency, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 114, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetRateFetcherConstMeta,
-            argValues: [walletIndex, currency],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetRateFetcherConstMeta => const TaskConstMeta(
-            debugName: "set_rate_fetcher",
-            argNames: ["walletIndex", "currency"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetTheme({required int appearancesCode , required bool compactNumbers })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_u_8(appearancesCode, serializer);
-sse_encode_bool(compactNumbers, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 115, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetThemeConstMeta,
-            argValues: [appearancesCode, compactNumbers],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetThemeConstMeta => const TaskConstMeta(
-            debugName: "set_theme",
-            argNames: ["appearancesCode", "compactNumbers"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetTokensListFetcher({required BigInt walletIndex , required bool enabled })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_bool(enabled, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 116, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetTokensListFetcherConstMeta,
-            argValues: [walletIndex, enabled],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetTokensListFetcherConstMeta => const TaskConstMeta(
-            debugName: "set_tokens_list_fetcher",
-            argNames: ["walletIndex", "enabled"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetWalletEns({required BigInt walletIndex , required bool ensEnabled })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_bool(ensEnabled, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 117, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetWalletEnsConstMeta,
-            argValues: [walletIndex, ensEnabled],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetWalletEnsConstMeta => const TaskConstMeta(
-            debugName: "set_wallet_ens",
-            argNames: ["walletIndex", "ensEnabled"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetWalletIpfsNode({required BigInt walletIndex , String? node })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_opt_String(node, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 118, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetWalletIpfsNodeConstMeta,
-            argValues: [walletIndex, node],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetWalletIpfsNodeConstMeta => const TaskConstMeta(
-            debugName: "set_wallet_ipfs_node",
-            argNames: ["walletIndex", "node"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetWalletNodeRanking({required BigInt walletIndex , required bool enabled })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_bool(enabled, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 119, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetWalletNodeRankingConstMeta,
-            argValues: [walletIndex, enabled],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetWalletNodeRankingConstMeta => const TaskConstMeta(
-            debugName: "set_wallet_node_ranking",
-            argNames: ["walletIndex", "enabled"],
-        );
-        
-
-@override Future<void> crateApiSettingsSetWalletNotifications({required BigInt walletIndex , required bool transactions , required bool price , required bool security , required bool balance })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_bool(transactions, serializer);
-sse_encode_bool(price, serializer);
-sse_encode_bool(security, serializer);
-sse_encode_bool(balance, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 120, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiSettingsSetWalletNotificationsConstMeta,
-            argValues: [walletIndex, transactions, price, security, balance],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiSettingsSetWalletNotificationsConstMeta => const TaskConstMeta(
-            debugName: "set_wallet_notifications",
-            argNames: ["walletIndex", "transactions", "price", "security", "balance"],
-        );
-        
-
-@override Future<(String,String)> crateApiTransactionSignMessage({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String message , String? title , String? icon })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_opt_String(password, serializer);
-sse_encode_opt_String(passphrase, serializer);
-sse_encode_String(message, serializer);
-sse_encode_opt_String(title, serializer);
-sse_encode_opt_String(icon, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 121, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_string_string,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionSignMessageConstMeta,
-            argValues: [walletIndex, accountIndex, password, passphrase, message, title, icon],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionSignMessageConstMeta => const TaskConstMeta(
-            debugName: "sign_message",
-            argNames: ["walletIndex", "accountIndex", "password", "passphrase", "message", "title", "icon"],
-        );
-        
-
-@override Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required TransactionRequestInfo tx })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_opt_String(password, serializer);
-sse_encode_opt_String(passphrase, serializer);
-sse_encode_box_autoadd_transaction_request_info(tx, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 122, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_historical_transaction_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionSignSendTransactionsConstMeta,
-            argValues: [walletIndex, accountIndex, password, passphrase, tx],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionSignSendTransactionsConstMeta => const TaskConstMeta(
-            debugName: "sign_send_transactions",
-            argNames: ["walletIndex", "accountIndex", "password", "passphrase", "tx"],
-        );
-        
-
-@override Future<(String,String)> crateApiTransactionSignTypedDataEip712({required BigInt walletIndex , required BigInt accountIndex , String? password , String? passphrase , required String typedDataJson , String? title , String? icon })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-sse_encode_opt_String(password, serializer);
-sse_encode_opt_String(passphrase, serializer);
-sse_encode_String(typedDataJson, serializer);
-sse_encode_opt_String(title, serializer);
-sse_encode_opt_String(icon, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 123, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_string_string,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionSignTypedDataEip712ConstMeta,
-            argValues: [walletIndex, accountIndex, password, passphrase, typedDataJson, title, icon],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionSignTypedDataEip712ConstMeta => const TaskConstMeta(
-            debugName: "sign_typed_data_eip712",
-            argNames: ["walletIndex", "accountIndex", "password", "passphrase", "typedDataJson", "title", "icon"],
-        );
-        
-
-@override Stream<BlockEvent> crateApiBackendStartBlockWorker({required BigInt walletIndex })  { 
-            final sink = RustStreamSink<BlockEvent>();
-            unawaited(handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_StreamSink_block_event_Sse(sink, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 124, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBackendStartBlockWorkerConstMeta,
-            argValues: [walletIndex, sink],
-            apiImpl: this,
-        )));
-            return sink.stream;
-             }
-
-
-        TaskConstMeta get kCrateApiBackendStartBlockWorkerConstMeta => const TaskConstMeta(
-            debugName: "start_block_worker",
-            argNames: ["walletIndex", "sink"],
-        );
-        
-
-@override Stream<String> crateApiTransactionStartHistoryWorker({required BigInt walletIndex })  { 
-            final sink = RustStreamSink<String>();
-            unawaited(handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_StreamSink_String_Sse(sink, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 125, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionStartHistoryWorkerConstMeta,
-            argValues: [walletIndex, sink],
-            apiImpl: this,
-        )));
-            return sink.stream;
-             }
-
-
-        TaskConstMeta get kCrateApiTransactionStartHistoryWorkerConstMeta => const TaskConstMeta(
-            debugName: "start_history_worker",
-            argNames: ["walletIndex", "sink"],
-        );
-        
-
-@override Future<void> crateApiBackendStopBlockWorker()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 126, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBackendStopBlockWorkerConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBackendStopBlockWorkerConstMeta => const TaskConstMeta(
-            debugName: "stop_block_worker",
-            argNames: [],
-        );
-        
-
-@override Future<void> crateApiTransactionStopHistoryWorker()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 127, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionStopHistoryWorkerConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionStopHistoryWorkerConstMeta => const TaskConstMeta(
-            debugName: "stop_history_worker",
-            argNames: [],
-        );
-        
-
-@override Future<void> crateApiBackendStopService()  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 128, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiBackendStopServiceConstMeta,
-            argValues: [],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiBackendStopServiceConstMeta => const TaskConstMeta(
-            debugName: "stop_service",
-            argNames: [],
-        );
-        
-
-@override Future<void> crateApiTokenSyncBalances({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 129, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenSyncBalancesConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenSyncBalancesConstMeta => const TaskConstMeta(
-            debugName: "sync_balances",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override (String,int) crateApiUtilsToWei({required String value , required int decimals })  { return handler.executeSync(SyncTask(
-            callFfi: () {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(value, serializer);
-sse_encode_u_8(decimals, serializer);
-            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 130)!;
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_string_u_8,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiUtilsToWeiConstMeta,
-            argValues: [value, decimals],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiUtilsToWeiConstMeta => const TaskConstMeta(
-            debugName: "to_wei",
-            argNames: ["value", "decimals"],
-        );
-        
-
-@override Future<bool> crateApiAuthTryUnlockWithPassword({required String password , required BigInt walletIndex , List<String>? identifiers })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(password, serializer);
-sse_encode_usize(walletIndex, serializer);
-sse_encode_opt_list_String(identifiers, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 131, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiAuthTryUnlockWithPasswordConstMeta,
-            argValues: [password, walletIndex, identifiers],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiAuthTryUnlockWithPasswordConstMeta => const TaskConstMeta(
-            debugName: "try_unlock_with_password",
-            argNames: ["password", "walletIndex", "identifiers"],
-        );
-        
-
-@override Future<bool> crateApiAuthTryUnlockWithSession({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 132, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_bool,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiAuthTryUnlockWithSessionConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiAuthTryUnlockWithSessionConstMeta => const TaskConstMeta(
-            debugName: "try_unlock_with_session",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<void> crateApiTokenUpdateRates({required BigInt walletIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 133, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTokenUpdateRatesConstMeta,
-            argValues: [walletIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTokenUpdateRatesConstMeta => const TaskConstMeta(
-            debugName: "update_rates",
-            argNames: ["walletIndex"],
-        );
-        
-
-@override Future<TransactionRequestInfo> crateApiTransactionUpdateTxWithParams({required TransactionRequestInfo tx , required RequiredTxParamsInfo params , required String balance , required BigInt chainHash })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_transaction_request_info(tx, serializer);
-sse_encode_box_autoadd_required_tx_params_info(params, serializer);
-sse_encode_String(balance, serializer);
-sse_encode_u_64(chainHash, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 134, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_transaction_request_info,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiTransactionUpdateTxWithParamsConstMeta,
-            argValues: [tx, params, balance, chainHash],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiTransactionUpdateTxWithParamsConstMeta => const TaskConstMeta(
-            debugName: "update_tx_with_params",
-            argNames: ["tx", "params", "balance", "chainHash"],
-        );
-        
-
-@override Future<(String,String)> crateApiWalletZilliqaGetBech32Base16Address({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 135, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_record_string_string,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletZilliqaGetBech32Base16AddressConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletZilliqaGetBech32Base16AddressConstMeta => const TaskConstMeta(
-            debugName: "zilliqa_get_bech32_base16_address",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<String> crateApiWalletZilliqaGetNFormat({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 136, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletZilliqaGetNFormatConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletZilliqaGetNFormatConstMeta => const TaskConstMeta(
-            debugName: "zilliqa_get_n_format",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-@override Future<String> crateApiWalletZilliqaLegacyBase16ToBech32({required String base16 })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(base16, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 137, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletZilliqaLegacyBase16ToBech32ConstMeta,
-            argValues: [base16],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletZilliqaLegacyBase16ToBech32ConstMeta => const TaskConstMeta(
-            debugName: "zilliqa_legacy_base16_to_bech32",
-            argNames: ["base16"],
-        );
-        
-
-@override Future<void> crateApiWalletZilliqaSwapChain({required BigInt walletIndex , required BigInt accountIndex })  { return handler.executeNormal(NormalTask(
-            callFfi: (port_) {
-              
-            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_usize(walletIndex, serializer);
-sse_encode_usize(accountIndex, serializer);
-            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 138, port: port_);
-            
-            },
-            codec: 
-        SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_String,
-        )
-        ,
-            constMeta: kCrateApiWalletZilliqaSwapChainConstMeta,
-            argValues: [walletIndex, accountIndex],
-            apiImpl: this,
-        )); }
-
-
-        TaskConstMeta get kCrateApiWalletZilliqaSwapChainConstMeta => const TaskConstMeta(
-            debugName: "zilliqa_swap_chain",
-            argNames: ["walletIndex", "accountIndex"],
-        );
-        
-
-RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_LocalStorageImpl => wire.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl;
-
-RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_LocalStorageImpl => wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl;
-
-
-
-                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return AnyhowException(raw as String); }
-
-@protected LocalStorageImpl dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>); }
-
-@protected LocalStorageImpl dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>); }
-
-@protected Map<int, Map<int, List<AccountInfo>>> dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_u_32_map_u_32_list_account_info_none(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_u_32_list_account_info(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, Map<int, AddressChainInfo>> dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_u_8_map_u_8_address_chain_info_none(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_u_8_address_chain_info(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_usize_string(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<BigInt, BackgroundNotificationState> dco_decode_Map_usize_background_notification_state_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return Map.fromEntries(dco_decode_list_record_usize_background_notification_state(raw).map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected LocalStorageImpl dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalDcoDecode(raw as List<dynamic>); }
-
-@protected RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-throw UnimplementedError(); }
-
-@protected RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-throw UnimplementedError(); }
-
-@protected String dco_decode_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as String; }
-
-@protected KeyValueStorage dco_decode_TraitDef_KeyValueStorage(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-throw UnimplementedError(); }
-
-@protected BigInt dco_decode_U128(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return BigInt.parse(raw); }
-
-@protected AccessListItem dco_decode_access_list_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return AccessListItem(address: dco_decode_String(arr[0]),
-storageKeys: dco_decode_list_String(arr[1]),); }
-
-@protected AccountInfo dco_decode_account_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return AccountInfo(addr: dco_decode_String(arr[0]),
-pubKey: dco_decode_opt_String(arr[1]),
-addrType: dco_decode_u_8(arr[2]),
-name: dco_decode_String(arr[3]),
-index: dco_decode_usize(arr[4]),); }
-
-@protected AddNextBip39AccountParams dco_decode_add_next_bip_39_account_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return AddNextBip39AccountParams(walletIndex: dco_decode_usize(arr[0]),
-accountIndex: dco_decode_usize(arr[1]),
-name: dco_decode_String(arr[2]),
-passphrase: dco_decode_String(arr[3]),
-password: dco_decode_opt_String(arr[4]),); }
-
-@protected AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 6) throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-                return AddSKWalletParams(sk: dco_decode_String(arr[0]),
-password: dco_decode_String(arr[1]),
-walletName: dco_decode_String(arr[2]),
-biometricType: dco_decode_String(arr[3]),
-chainHash: dco_decode_u_64(arr[4]),
-bipPurpose: dco_decode_u_32(arr[5]),); }
-
-@protected AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return AddressBookEntryInfo(name: dco_decode_String(arr[0]),
-addr: dco_decode_String(arr[1]),
-net: dco_decode_usize(arr[2]),
-slip44: dco_decode_u_32(arr[3]),); }
-
-@protected AddressChainInfo dco_decode_address_chain_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return AddressChainInfo(external_: dco_decode_list_btc_address_entry_info(arr[0]),
-internal: dco_decode_list_btc_address_entry_info(arr[1]),); }
-
-@protected BackgroundNotificationState dco_decode_background_notification_state(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return BackgroundNotificationState(transactions: dco_decode_bool(arr[0]),
-price: dco_decode_bool(arr[1]),
-security: dco_decode_bool(arr[2]),
-balance: dco_decode_bool(arr[3]),); }
-
-@protected BackgroundState dco_decode_background_state(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-                return BackgroundState(wallets: dco_decode_list_wallet_info(arr[0]),
-notificationsWalletStates: dco_decode_Map_usize_background_notification_state_None(arr[1]),
-notificationsGlobalEnabled: dco_decode_bool(arr[2]),
-locale: dco_decode_opt_String(arr[3]),
-appearances: dco_decode_u_8(arr[4]),
-abbreviatedNumber: dco_decode_bool(arr[5]),
-browserSettings: dco_decode_browser_settings_info(arr[6]),
-providers: dco_decode_list_network_config_info(arr[7]),); }
-
-@protected BaseTokenInfo dco_decode_base_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return BaseTokenInfo(value: dco_decode_String(arr[0]),
-symbol: dco_decode_String(arr[1]),
-decimals: dco_decode_u_8(arr[2]),); }
-
-@protected Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-                return Bip39AddWalletParams(password: dco_decode_String(arr[0]),
-mnemonicStr: dco_decode_String(arr[1]),
-mnemonicCheck: dco_decode_bool(arr[2]),
-accounts: dco_decode_list_record_usize_string(arr[3]),
-passphrase: dco_decode_String(arr[4]),
-walletName: dco_decode_String(arr[5]),
-biometricType: dco_decode_String(arr[6]),
-chainHash: dco_decode_u_64(arr[7]),); }
-
-@protected BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return BitcoinMetadataInfo(witnessUtxos: dco_decode_list_tx_out_info(arr[0]),
-inputMeta: dco_decode_list_input_meta_info(arr[1]),); }
-
-@protected BlockEvent dco_decode_block_event(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return BlockEvent(blockNumber: dco_decode_opt_box_autoadd_u_64(arr[0]),
-error: dco_decode_opt_String(arr[1]),); }
-
-@protected bool dco_decode_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as bool; }
-
-@protected AddNextBip39AccountParams dco_decode_box_autoadd_add_next_bip_39_account_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_add_next_bip_39_account_params(raw); }
-
-@protected AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_add_sk_wallet_params(raw); }
-
-@protected BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_base_token_info(raw); }
-
-@protected Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_bip_39_add_wallet_params(raw); }
-
-@protected bool dco_decode_box_autoadd_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as bool; }
-
-@protected BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_browser_settings_info(raw); }
-
-@protected BtcAccountXpubsInputInfo dco_decode_box_autoadd_btc_account_xpubs_input_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_btc_account_xpubs_input_info(raw); }
-
-@protected ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_colors_info(raw); }
-
-@protected ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_connection_info(raw); }
-
-@protected double dco_decode_box_autoadd_f_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as double; }
-
-@protected double dco_decode_box_autoadd_f_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as double; }
-
-@protected FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_f_token_info(raw); }
-
-@protected FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_final_output_info(raw); }
-
-@protected LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_ledger_params_input(raw); }
-
-@protected MetadataThorchain dco_decode_box_autoadd_metadata_thorchain(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_metadata_thorchain(raw); }
-
-@protected NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_network_config_info(raw); }
-
-@protected QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_qr_config_info(raw); }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo) dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as (TransactionBitcoin,BitcoinMetadataInfo); }
-
-@protected RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_required_tx_params_info(raw); }
-
-@protected TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_token_transfer_params_info(raw); }
-
-@protected TransactionBitcoin dco_decode_box_autoadd_transaction_bitcoin(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_transaction_bitcoin(raw); }
-
-@protected TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_transaction_request_evm(raw); }
-
-@protected TransactionRequestInfo dco_decode_box_autoadd_transaction_request_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_transaction_request_info(raw); }
-
-@protected TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_transaction_request_scilla(raw); }
-
-@protected BigInt dco_decode_box_autoadd_u_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_u_64(raw); }
-
-@protected WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dco_decode_wallet_settings_info(raw); }
-
-@protected BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 11) throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
-                return BrowserSettingsInfo(searchEngineIndex: dco_decode_u_8(arr[0]),
-cacheEnabled: dco_decode_bool(arr[1]),
-cookiesEnabled: dco_decode_bool(arr[2]),
-contentBlocking: dco_decode_u_8(arr[3]),
-doNotTrack: dco_decode_bool(arr[4]),
-incognitoMode: dco_decode_bool(arr[5]),
-textScalingFactor: dco_decode_f_32(arr[6]),
-allowGeolocation: dco_decode_bool(arr[7]),
-allowCamera: dco_decode_bool(arr[8]),
-allowMicrophone: dco_decode_bool(arr[9]),
-allowAutoPlay: dco_decode_bool(arr[10]),); }
-
-@protected BtcAccountXpubsInputInfo dco_decode_btc_account_xpubs_input_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return BtcAccountXpubsInputInfo(bip44Xpub: dco_decode_String(arr[0]),
-bip49Xpub: dco_decode_String(arr[1]),
-bip84Xpub: dco_decode_String(arr[2]),
-bip86Xpub: dco_decode_String(arr[3]),); }
-
-@protected BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return BtcAddressEntryInfo(address: dco_decode_String(arr[0]),
-path: dco_decode_String(arr[1]),
-history: dco_decode_list_String(arr[2]),
-utxos: dco_decode_list_utxo_info(arr[3]),); }
-
-@protected Category dco_decode_category(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return Category(name: dco_decode_String(arr[0]),
-entries: dco_decode_list_entry(arr[1]),); }
-
-@protected ColorsInfo dco_decode_colors_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return ColorsInfo(primary: dco_decode_opt_String(arr[0]),
-secondary: dco_decode_opt_String(arr[1]),
-background: dco_decode_opt_String(arr[2]),
-text: dco_decode_opt_String(arr[3]),); }
-
-@protected ConnectionInfo dco_decode_connection_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 11) throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
-                return ConnectionInfo(domain: dco_decode_String(arr[0]),
-accountIndexes: dco_decode_list_prim_usize_strict(arr[1]),
-favicon: dco_decode_opt_String(arr[2]),
-title: dco_decode_String(arr[3]),
-description: dco_decode_opt_String(arr[4]),
-colors: dco_decode_opt_box_autoadd_colors_info(arr[5]),
-lastConnected: dco_decode_u_64(arr[6]),
-canReadAccounts: dco_decode_bool(arr[7]),
-canRequestSignatures: dco_decode_bool(arr[8]),
-canSuggestTokens: dco_decode_bool(arr[9]),
-canSuggestTransactions: dco_decode_bool(arr[10]),); }
-
-@protected Eip712Hashes dco_decode_eip_712_hashes(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return Eip712Hashes(domainSeparator: dco_decode_list_prim_u_8_strict(arr[0]),
-hashStructMessage: dco_decode_list_prim_u_8_strict(arr[1]),); }
-
-@protected EncodedRLPTx dco_decode_encoded_rlp_tx(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return EncodedRLPTx(bytes: dco_decode_list_prim_u_8_strict(arr[0]),
-chunksBytes: dco_decode_list_list_prim_u_8_strict(arr[1]),); }
-
-@protected Entry dco_decode_entry(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return Entry(name: dco_decode_String(arr[0]),
-address: dco_decode_String(arr[1]),
-tag: dco_decode_opt_String(arr[2]),); }
-
-@protected ExchangeProvider dco_decode_exchange_provider(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-switch (raw[0]) {
-                case 0: return ExchangeProvider_Thorchain(dco_decode_box_autoadd_metadata_thorchain(raw[1]),);
-                default: throw Exception("unreachable");
-            } }
-
-@protected ExplorerInfo dco_decode_explorer_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return ExplorerInfo(name: dco_decode_String(arr[0]),
-url: dco_decode_String(arr[1]),
-icon: dco_decode_opt_String(arr[2]),
-standard: dco_decode_u_16(arr[3]),); }
-
-@protected double dco_decode_f_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as double; }
-
-@protected double dco_decode_f_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as double; }
-
-@protected FTokenInfo dco_decode_f_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 11) throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
-                return FTokenInfo(name: dco_decode_String(arr[0]),
-symbol: dco_decode_String(arr[1]),
-decimals: dco_decode_u_8(arr[2]),
-addr: dco_decode_String(arr[3]),
-addrType: dco_decode_u_8(arr[4]),
-logo: dco_decode_opt_String(arr[5]),
-balances: dco_decode_Map_usize_String_None(arr[6]),
-rate: dco_decode_f_64(arr[7]),
-default_: dco_decode_bool(arr[8]),
-native: dco_decode_bool(arr[9]),
-chainHash: dco_decode_u_64(arr[10]),); }
-
-@protected FinalOutputInfo dco_decode_final_output_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 14) throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
-                return FinalOutputInfo(name: dco_decode_String(arr[0]),
-address: dco_decode_String(arr[1]),
-token: dco_decode_opt_box_autoadd_f_token_info(arr[2]),
-delegAmt: dco_decode_String(arr[3]),
-rewards: dco_decode_String(arr[4]),
-claimableAmount: dco_decode_String(arr[5]),
-apr: dco_decode_opt_box_autoadd_f_64(arr[6]),
-commission: dco_decode_opt_box_autoadd_f_64(arr[7]),
-unbondingPeriodSeconds: dco_decode_opt_box_autoadd_u_64(arr[8]),
-lstPriceChangePercent: dco_decode_opt_box_autoadd_f_32(arr[9]),
-avgBlockTimeMs: dco_decode_opt_box_autoadd_u_64(arr[10]),
-tag: dco_decode_String(arr[11]),
-currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
-pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[13]),); }
-
-@protected FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return FinalizedBtcTx(rawTxHex: dco_decode_String(arr[0]),
-txHash: dco_decode_String(arr[1]),
-psbtBytes: dco_decode_list_prim_u_8_strict(arr[2]),); }
-
-@protected GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return GasFeeHistoryInfo(maxFee: dco_decode_U128(arr[0]),
-priorityFee: dco_decode_U128(arr[1]),
-baseFee: dco_decode_U128(arr[2]),); }
-
-@protected HistoricalTransactionInfo dco_decode_historical_transaction_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-                return HistoricalTransactionInfo(status: dco_decode_transaction_status_info(arr[0]),
-metadata: dco_decode_transaction_metadata_info(arr[1]),
-evm: dco_decode_opt_String(arr[2]),
-scilla: dco_decode_opt_String(arr[3]),
-btc: dco_decode_opt_box_autoadd_transaction_bitcoin(arr[4]),
-tron: dco_decode_opt_String(arr[5]),
-solana: dco_decode_opt_String(arr[6]),
-signedMessage: dco_decode_opt_String(arr[7]),
-timestamp: dco_decode_u_64(arr[8]),); }
-
-@protected int dco_decode_i_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected PlatformInt64 dco_decode_i_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dcoDecodeI64(raw); }
-
-@protected InputMetaInfo dco_decode_input_meta_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return InputMetaInfo(addressType: dco_decode_u_8(arr[0]),
-derivationPath: dco_decode_String(arr[1]),); }
-
-@protected KeyPairInfo dco_decode_key_pair_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return KeyPairInfo(sk: dco_decode_String(arr[0]),
-pk: dco_decode_String(arr[1]),); }
-
-@protected LedgerInputSignature dco_decode_ledger_input_signature(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return LedgerInputSignature(inputIndex: dco_decode_u_32(arr[0]),
-signature: dco_decode_list_prim_u_8_strict(arr[1]),
-pubkey: dco_decode_list_prim_u_8_strict(arr[2]),); }
-
-@protected LedgerParamsInput dco_decode_ledger_params_input(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-                return LedgerParamsInput(pubKeys: dco_decode_list_record_u_8_string(arr[0]),
-walletIndex: dco_decode_usize(arr[1]),
-walletName: dco_decode_String(arr[2]),
-ledgerId: dco_decode_String(arr[3]),
-accountNames: dco_decode_list_String(arr[4]),
-biometricType: dco_decode_String(arr[5]),
-chainHash: dco_decode_u_64(arr[6]),
-zilliqaLegacy: dco_decode_bool(arr[7]),
-btcChains: dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(arr[8]),); }
-
-@protected List<String> dco_decode_list_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_String).toList(); }
-
-@protected List<AccessListItem> dco_decode_list_access_list_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_access_list_item).toList(); }
-
-@protected List<AccountInfo> dco_decode_list_account_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_account_info).toList(); }
-
-@protected List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_address_book_entry_info).toList(); }
-
-@protected List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_btc_address_entry_info).toList(); }
-
-@protected List<Category> dco_decode_list_category(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_category).toList(); }
-
-@protected List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_connection_info).toList(); }
-
-@protected List<Entry> dco_decode_list_entry(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_entry).toList(); }
-
-@protected List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_exchange_provider).toList(); }
-
-@protected List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_explorer_info).toList(); }
-
-@protected List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_f_token_info).toList(); }
-
-@protected List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_final_output_info).toList(); }
-
-@protected List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_historical_transaction_info).toList(); }
-
-@protected List<InputMetaInfo> dco_decode_list_input_meta_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_input_meta_info).toList(); }
-
-@protected List<LedgerInputSignature> dco_decode_list_ledger_input_signature(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_ledger_input_signature).toList(); }
-
-@protected List<List<Uint8List>> dco_decode_list_list_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_list_list_prim_u_8_strict).toList(); }
-
-@protected List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_list_prim_u_8_strict).toList(); }
-
-@protected List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_network_config_info).toList(); }
-
-@protected List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_pending_withdrawal_info).toList(); }
-
-@protected Uint16List dco_decode_list_prim_u_16_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as Uint16List; }
-
-@protected Uint32List dco_decode_list_prim_u_32_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as Uint32List; }
-
-@protected Uint64List dco_decode_list_prim_u_64_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dcoDecodeUint64List(raw); }
-
-@protected List<int> dco_decode_list_prim_u_8_loose(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as List<int>; }
-
-@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as Uint8List; }
-
-@protected Uint64List dco_decode_list_prim_usize_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as Uint64List; }
-
-@protected List<(String,String)> dco_decode_list_record_string_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_string_string).toList(); }
-
-@protected List<(int,List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_u_32_list_account_info).toList(); }
-
-@protected List<(int,Map<int, List<AccountInfo>>)> dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_u_32_map_u_32_list_account_info_none).toList(); }
-
-@protected List<(int,AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_u_8_address_chain_info).toList(); }
-
-@protected List<(int,Map<int, AddressChainInfo>)> dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_u_8_map_u_8_address_chain_info_none).toList(); }
-
-@protected List<(int,String)> dco_decode_list_record_u_8_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList(); }
-
-@protected List<(BigInt,BackgroundNotificationState)> dco_decode_list_record_usize_background_notification_state(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_usize_background_notification_state).toList(); }
-
-@protected List<(BigInt,String)> dco_decode_list_record_usize_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_record_usize_string).toList(); }
-
-@protected List<RustLedgerBleDevice> dco_decode_list_rust_ledger_ble_device(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_rust_ledger_ble_device).toList(); }
-
-@protected List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_rust_ledger_hid_device).toList(); }
-
-@protected List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_tx_in_info).toList(); }
-
-@protected List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_tx_out_info).toList(); }
-
-@protected List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_utxo_info).toList(); }
-
-@protected List<WalletInfo> dco_decode_list_wallet_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return (raw as List<dynamic>).map(dco_decode_wallet_info).toList(); }
-
-@protected MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 16) throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
-                return MerkelizedPsbt(globalMapCommitment: dco_decode_list_prim_u_8_strict(arr[0]),
-globalMapKeysLeaves: dco_decode_list_list_prim_u_8_strict(arr[1]),
-globalMapValuesLeaves: dco_decode_list_list_prim_u_8_strict(arr[2]),
-inputMapCommitments: dco_decode_list_list_prim_u_8_strict(arr[3]),
-inputMapKeysLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[4]),
-inputMapValuesLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[5]),
-outputMapCommitments: dco_decode_list_list_prim_u_8_strict(arr[6]),
-outputMapKeysLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[7]),
-outputMapValuesLeaves: dco_decode_list_list_list_prim_u_8_strict(arr[8]),
-inputMapsRoot: dco_decode_list_prim_u_8_strict(arr[9]),
-outputMapsRoot: dco_decode_list_prim_u_8_strict(arr[10]),
-preimageHashes: dco_decode_list_list_prim_u_8_strict(arr[11]),
-preimageData: dco_decode_list_list_prim_u_8_strict(arr[12]),
-inputCount: dco_decode_u_32(arr[13]),
-outputCount: dco_decode_u_32(arr[14]),
-psbtBytes: dco_decode_list_prim_u_8_strict(arr[15]),); }
-
-@protected MerkleProof dco_decode_merkle_proof(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return MerkleProof(leafHash: dco_decode_list_prim_u_8_strict(arr[0]),
-proofHashes: dco_decode_list_list_prim_u_8_strict(arr[1]),); }
-
-@protected MetadataThorchain dco_decode_metadata_thorchain(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 1) throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-                return MetadataThorchain(dummy: dco_decode_u_8(arr[0]),); }
-
-@protected NetworkConfigInfo dco_decode_network_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 16) throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
-                return NetworkConfigInfo(name: dco_decode_String(arr[0]),
-logo: dco_decode_String(arr[1]),
-chain: dco_decode_String(arr[2]),
-shortName: dco_decode_String(arr[3]),
-rpc: dco_decode_list_String(arr[4]),
-features: dco_decode_list_prim_u_16_strict(arr[5]),
-chainId: dco_decode_u_64(arr[6]),
-chainIds: dco_decode_list_prim_u_64_strict(arr[7]),
-slip44: dco_decode_u_32(arr[8]),
-diffBlockTime: dco_decode_u_64(arr[9]),
-chainHash: dco_decode_u_64(arr[10]),
-ens: dco_decode_opt_String(arr[11]),
-explorers: dco_decode_list_explorer_info(arr[12]),
-fallbackEnabled: dco_decode_bool(arr[13]),
-testnet: dco_decode_opt_box_autoadd_bool(arr[14]),
-ftokens: dco_decode_list_f_token_info(arr[15]),); }
-
-@protected Map<int, AddressChainInfo>? dco_decode_opt_Map_u_8_address_chain_info_None(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_Map_u_8_address_chain_info_None(raw); }
-
-@protected String? dco_decode_opt_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_String(raw); }
-
-@protected BigInt? dco_decode_opt_U128(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_U128(raw); }
-
-@protected BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_base_token_info(raw); }
-
-@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_bool(raw); }
-
-@protected ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_colors_info(raw); }
-
-@protected double? dco_decode_opt_box_autoadd_f_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_f_32(raw); }
-
-@protected double? dco_decode_opt_box_autoadd_f_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_f_64(raw); }
-
-@protected FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_f_token_info(raw); }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo)? dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(raw); }
-
-@protected TransactionBitcoin? dco_decode_opt_box_autoadd_transaction_bitcoin(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_transaction_bitcoin(raw); }
-
-@protected TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_transaction_request_evm(raw); }
-
-@protected TransactionRequestScilla? dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_transaction_request_scilla(raw); }
-
-@protected BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_box_autoadd_u_64(raw); }
-
-@protected List<String>? dco_decode_opt_list_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_list_String(raw); }
-
-@protected List<AccessListItem>? dco_decode_opt_list_access_list_item(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_list_access_list_item(raw); }
-
-@protected Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw == null ? null : dco_decode_list_prim_u_8_strict(raw); }
-
-@protected OutPointInfo dco_decode_out_point_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-                return OutPointInfo(txid: dco_decode_String(arr[0]),
-vout: dco_decode_u_32(arr[1]),); }
-
-@protected PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return PendingWithdrawalInfo(amount: dco_decode_String(arr[0]),
-withdrawalBlock: dco_decode_u_64(arr[1]),
-claimable: dco_decode_bool(arr[2]),); }
-
-@protected QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return QRcodeScanResultInfo(recipient: dco_decode_String(arr[0]),
-provider: dco_decode_opt_String(arr[1]),
-tokenAddress: dco_decode_opt_String(arr[2]),
-amount: dco_decode_opt_String(arr[3]),); }
-
-@protected QrConfigInfo dco_decode_qr_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return QrConfigInfo(size: dco_decode_u_32(arr[0]),
-gapless: dco_decode_bool(arr[1]),
-color: dco_decode_u_32(arr[2]),
-eyeShape: dco_decode_u_8(arr[3]),
-dataModuleShape: dco_decode_u_8(arr[4]),); }
-
-@protected (List<NetworkConfigInfo>,List<NetworkConfigInfo>) dco_decode_record_list_network_config_info_list_network_config_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_list_network_config_info(arr[0]),dco_decode_list_network_config_info(arr[1]),); }
-
-@protected (Uint8List,String) dco_decode_record_list_prim_u_8_strict_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_list_prim_u_8_strict(arr[0]),dco_decode_String(arr[1]),); }
-
-@protected (String,String) dco_decode_record_string_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_String(arr[0]),dco_decode_String(arr[1]),); }
-
-@protected (String,int) dco_decode_record_string_u_8(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_String(arr[0]),dco_decode_u_8(arr[1]),); }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo) dco_decode_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_transaction_bitcoin(arr[0]),dco_decode_bitcoin_metadata_info(arr[1]),); }
-
-@protected (int,List<AccountInfo>) dco_decode_record_u_32_list_account_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_u_32(arr[0]),dco_decode_list_account_info(arr[1]),); }
-
-@protected (int,Map<int, List<AccountInfo>>) dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_u_32(arr[0]),dco_decode_Map_u_32_list_account_info_None(arr[1]),); }
-
-@protected (int,AddressChainInfo) dco_decode_record_u_8_address_chain_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_u_8(arr[0]),dco_decode_address_chain_info(arr[1]),); }
-
-@protected (int,Map<int, AddressChainInfo>) dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_u_8(arr[0]),dco_decode_Map_u_8_address_chain_info_None(arr[1]),); }
-
-@protected (int,String) dco_decode_record_u_8_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_u_8(arr[0]),dco_decode_String(arr[1]),); }
-
-@protected (BigInt,BackgroundNotificationState) dco_decode_record_usize_background_notification_state(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_usize(arr[0]),dco_decode_background_notification_state(arr[1]),); }
-
-@protected (BigInt,String) dco_decode_record_usize_string(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-            if (arr.length != 2) {
-                throw Exception('Expected 2 elements, got ${arr.length}');
-            }
-            return (dco_decode_usize(arr[0]),dco_decode_String(arr[1]),); }
-
-@protected RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 10) throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
-                return RequiredTxParamsInfo(gasPrice: dco_decode_U128(arr[0]),
-maxPriorityFee: dco_decode_U128(arr[1]),
-feeHistory: dco_decode_gas_fee_history_info(arr[2]),
-txEstimateGas: dco_decode_u_64(arr[3]),
-blobBaseFee: dco_decode_U128(arr[4]),
-nonce: dco_decode_u_64(arr[5]),
-slow: dco_decode_String(arr[6]),
-market: dco_decode_String(arr[7]),
-fast: dco_decode_String(arr[8]),
-current: dco_decode_String(arr[9]),); }
-
-@protected RustLedgerBleDevice dco_decode_rust_ledger_ble_device(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return RustLedgerBleDevice(deviceId: dco_decode_String(arr[0]),
-name: dco_decode_String(arr[1]),
-serviceUuid: dco_decode_String(arr[2]),
-modelId: dco_decode_String(arr[3]),
-productName: dco_decode_String(arr[4]),); }
-
-@protected RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return RustLedgerHidDevice(deviceId: dco_decode_String(arr[0]),
-vendorId: dco_decode_u_16(arr[1]),
-productId: dco_decode_u_16(arr[2]),
-productName: dco_decode_String(arr[3]),
-modelId: dco_decode_String(arr[4]),); }
-
-@protected TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 6) throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-                return TokenTransferParamsInfo(walletIndex: dco_decode_usize(arr[0]),
-accountIndex: dco_decode_usize(arr[1]),
-token: dco_decode_f_token_info(arr[2]),
-amount: dco_decode_String(arr[3]),
-recipient: dco_decode_String(arr[4]),
-icon: dco_decode_String(arr[5]),); }
-
-@protected TransactionBitcoin dco_decode_transaction_bitcoin(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return TransactionBitcoin(version: dco_decode_i_32(arr[0]),
-lockTime: dco_decode_u_32(arr[1]),
-input: dco_decode_list_tx_in_info(arr[2]),
-output: dco_decode_list_tx_out_info(arr[3]),
-fee: dco_decode_opt_box_autoadd_u_64(arr[4]),); }
-
-@protected TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-                return TransactionMetadataInfo(chainHash: dco_decode_u_64(arr[0]),
-hash: dco_decode_opt_String(arr[1]),
-info: dco_decode_opt_String(arr[2]),
-icon: dco_decode_opt_String(arr[3]),
-title: dco_decode_opt_String(arr[4]),
-signer: dco_decode_opt_String(arr[5]),
-tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[6]),
-broadcast: dco_decode_bool(arr[7]),); }
-
-@protected TransactionRequestEVM dco_decode_transaction_request_evm(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 13) throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
-                return TransactionRequestEVM(nonce: dco_decode_opt_box_autoadd_u_64(arr[0]),
-from: dco_decode_opt_String(arr[1]),
-to: dco_decode_opt_String(arr[2]),
-value: dco_decode_opt_String(arr[3]),
-gasLimit: dco_decode_opt_box_autoadd_u_64(arr[4]),
-data: dco_decode_opt_list_prim_u_8_strict(arr[5]),
-maxFeePerGas: dco_decode_opt_U128(arr[6]),
-maxPriorityFeePerGas: dco_decode_opt_U128(arr[7]),
-gasPrice: dco_decode_opt_U128(arr[8]),
-chainId: dco_decode_opt_box_autoadd_u_64(arr[9]),
-accessList: dco_decode_opt_list_access_list_item(arr[10]),
-blobVersionedHashes: dco_decode_opt_list_String(arr[11]),
-maxFeePerBlobGas: dco_decode_opt_U128(arr[12]),); }
-
-@protected TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 6) throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-                return TransactionRequestInfo(metadata: dco_decode_transaction_metadata_info(arr[0]),
-scilla: dco_decode_opt_box_autoadd_transaction_request_scilla(arr[1]),
-evm: dco_decode_opt_box_autoadd_transaction_request_evm(arr[2]),
-btc: dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(arr[3]),
-tron: dco_decode_opt_String(arr[4]),
-solana: dco_decode_opt_list_prim_u_8_strict(arr[5]),); }
-
-@protected TransactionRequestScilla dco_decode_transaction_request_scilla(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-                return TransactionRequestScilla(chainId: dco_decode_u_16(arr[0]),
-nonce: dco_decode_u_64(arr[1]),
-gasPrice: dco_decode_U128(arr[2]),
-gasLimit: dco_decode_u_64(arr[3]),
-toAddr: dco_decode_String(arr[4]),
-amount: dco_decode_U128(arr[5]),
-code: dco_decode_String(arr[6]),
-data: dco_decode_String(arr[7]),); }
-
-@protected TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return TransactionStatusInfo.values[raw as int]; }
-
-@protected TxInInfo dco_decode_tx_in_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return TxInInfo(previousOutput: dco_decode_out_point_info(arr[0]),
-scriptSig: dco_decode_list_prim_u_8_strict(arr[1]),
-sequence: dco_decode_u_32(arr[2]),
-witness: dco_decode_list_list_prim_u_8_strict(arr[3]),
-address: dco_decode_opt_String(arr[4]),); }
-
-@protected TxOutInfo dco_decode_tx_out_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-                return TxOutInfo(value: dco_decode_u_64(arr[0]),
-scriptPubkey: dco_decode_list_prim_u_8_strict(arr[1]),
-address: dco_decode_opt_String(arr[2]),); }
-
-@protected int dco_decode_u_16(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected int dco_decode_u_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected BigInt dco_decode_u_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dcoDecodeU64(raw); }
-
-@protected int dco_decode_u_8(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return raw as int; }
-
-@protected void dco_decode_unit(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return; }
-
-@protected BigInt dco_decode_usize(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-return dcoDecodeU64(raw); }
-
-@protected UtxoInfo dco_decode_utxo_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return UtxoInfo(txid: dco_decode_String(arr[0]),
-vout: dco_decode_u_32(arr[1]),
-value: dco_decode_u_64(arr[2]),
-height: dco_decode_u_32(arr[3]),); }
-
-@protected WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-                return WalletArgonParamsInfo(memory: dco_decode_u_32(arr[0]),
-iterations: dco_decode_u_32(arr[1]),
-threads: dco_decode_u_32(arr[2]),
-secret: dco_decode_String(arr[3]),); }
-
-@protected WalletInfo dco_decode_wallet_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 11) throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
-                return WalletInfo(walletType: dco_decode_String(arr[0]),
-walletName: dco_decode_String(arr[1]),
-authType: dco_decode_String(arr[2]),
-walletAddress: dco_decode_String(arr[3]),
-accounts: dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(arr[4]),
-selectedAccount: dco_decode_usize(arr[5]),
-tokens: dco_decode_list_f_token_info(arr[6]),
-settings: dco_decode_wallet_settings_info(arr[7]),
-chainHash: dco_decode_u_64(arr[8]),
-slip44: dco_decode_u_32(arr[9]),
-bip: dco_decode_u_32(arr[10]),); }
-
-@protected WalletPolicy dco_decode_wallet_policy(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-                return WalletPolicy(descriptorTemplate: dco_decode_String(arr[0]),
-keysInfo: dco_decode_list_String(arr[1]),
-policyId: dco_decode_list_prim_u_8_strict(arr[2]),
-policyHmac: dco_decode_list_prim_u_8_strict(arr[3]),
-serialized: dco_decode_list_prim_u_8_strict(arr[4]),); }
-
-@protected WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
-final arr = raw as List<dynamic>;
-                if (arr.length != 10) throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
-                return WalletSettingsInfo(cipherOrders: dco_decode_list_prim_u_8_strict(arr[0]),
-argonParams: dco_decode_wallet_argon_params_info(arr[1]),
-currencyConvert: dco_decode_String(arr[2]),
-ipfsNode: dco_decode_opt_String(arr[3]),
-ensEnabled: dco_decode_bool(arr[4]),
-tokensListFetcher: dco_decode_bool(arr[5]),
-nodeRankingEnabled: dco_decode_bool(arr[6]),
-maxConnections: dco_decode_u_8(arr[7]),
-requestTimeoutSecs: dco_decode_u_32(arr[8]),
-ratesApiOptions: dco_decode_u_8(arr[9]),); }
-
-@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_String(deserializer);
-        return AnyhowException(inner); }
-
-@protected LocalStorageImpl sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
-
-@protected LocalStorageImpl sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
-
-@protected Map<int, Map<int, List<AccountInfo>>> sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_u_32_map_u_32_list_account_info_none(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_u_32_list_account_info(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, Map<int, AddressChainInfo>> sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_u_8_map_u_8_address_chain_info_none(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_u_8_address_chain_info(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<BigInt, String> sse_decode_Map_usize_String_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_usize_string(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected Map<BigInt, BackgroundNotificationState> sse_decode_Map_usize_background_notification_state_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_record_usize_background_notification_state(deserializer);
-        return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2))); }
-
-@protected LocalStorageImpl sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return LocalStorageImplImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
-
-@protected RustStreamSink<String> sse_decode_StreamSink_String_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-throw UnimplementedError('Unreachable ()'); }
-
-@protected RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-throw UnimplementedError('Unreachable ()'); }
-
-@protected String sse_decode_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_list_prim_u_8_strict(deserializer);
-        return utf8.decoder.convert(inner); }
-
-@protected BigInt sse_decode_U128(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_String(deserializer);
-        return BigInt.parse(inner); }
-
-@protected AccessListItem sse_decode_access_list_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_address = sse_decode_String(deserializer);
-var var_storageKeys = sse_decode_list_String(deserializer);
-return AccessListItem(address: var_address, storageKeys: var_storageKeys); }
-
-@protected AccountInfo sse_decode_account_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_addr = sse_decode_String(deserializer);
-var var_pubKey = sse_decode_opt_String(deserializer);
-var var_addrType = sse_decode_u_8(deserializer);
-var var_name = sse_decode_String(deserializer);
-var var_index = sse_decode_usize(deserializer);
-return AccountInfo(addr: var_addr, pubKey: var_pubKey, addrType: var_addrType, name: var_name, index: var_index); }
-
-@protected AddNextBip39AccountParams sse_decode_add_next_bip_39_account_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_walletIndex = sse_decode_usize(deserializer);
-var var_accountIndex = sse_decode_usize(deserializer);
-var var_name = sse_decode_String(deserializer);
-var var_passphrase = sse_decode_String(deserializer);
-var var_password = sse_decode_opt_String(deserializer);
-return AddNextBip39AccountParams(walletIndex: var_walletIndex, accountIndex: var_accountIndex, name: var_name, passphrase: var_passphrase, password: var_password); }
-
-@protected AddSKWalletParams sse_decode_add_sk_wallet_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_sk = sse_decode_String(deserializer);
-var var_password = sse_decode_String(deserializer);
-var var_walletName = sse_decode_String(deserializer);
-var var_biometricType = sse_decode_String(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-var var_bipPurpose = sse_decode_u_32(deserializer);
-return AddSKWalletParams(sk: var_sk, password: var_password, walletName: var_walletName, biometricType: var_biometricType, chainHash: var_chainHash, bipPurpose: var_bipPurpose); }
-
-@protected AddressBookEntryInfo sse_decode_address_book_entry_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_addr = sse_decode_String(deserializer);
-var var_net = sse_decode_usize(deserializer);
-var var_slip44 = sse_decode_u_32(deserializer);
-return AddressBookEntryInfo(name: var_name, addr: var_addr, net: var_net, slip44: var_slip44); }
-
-@protected AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_external_ = sse_decode_list_btc_address_entry_info(deserializer);
-var var_internal = sse_decode_list_btc_address_entry_info(deserializer);
-return AddressChainInfo(external_: var_external_, internal: var_internal); }
-
-@protected BackgroundNotificationState sse_decode_background_notification_state(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_transactions = sse_decode_bool(deserializer);
-var var_price = sse_decode_bool(deserializer);
-var var_security = sse_decode_bool(deserializer);
-var var_balance = sse_decode_bool(deserializer);
-return BackgroundNotificationState(transactions: var_transactions, price: var_price, security: var_security, balance: var_balance); }
-
-@protected BackgroundState sse_decode_background_state(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_wallets = sse_decode_list_wallet_info(deserializer);
-var var_notificationsWalletStates = sse_decode_Map_usize_background_notification_state_None(deserializer);
-var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
-var var_locale = sse_decode_opt_String(deserializer);
-var var_appearances = sse_decode_u_8(deserializer);
-var var_abbreviatedNumber = sse_decode_bool(deserializer);
-var var_browserSettings = sse_decode_browser_settings_info(deserializer);
-var var_providers = sse_decode_list_network_config_info(deserializer);
-return BackgroundState(wallets: var_wallets, notificationsWalletStates: var_notificationsWalletStates, notificationsGlobalEnabled: var_notificationsGlobalEnabled, locale: var_locale, appearances: var_appearances, abbreviatedNumber: var_abbreviatedNumber, browserSettings: var_browserSettings, providers: var_providers); }
-
-@protected BaseTokenInfo sse_decode_base_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_value = sse_decode_String(deserializer);
-var var_symbol = sse_decode_String(deserializer);
-var var_decimals = sse_decode_u_8(deserializer);
-return BaseTokenInfo(value: var_value, symbol: var_symbol, decimals: var_decimals); }
-
-@protected Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_password = sse_decode_String(deserializer);
-var var_mnemonicStr = sse_decode_String(deserializer);
-var var_mnemonicCheck = sse_decode_bool(deserializer);
-var var_accounts = sse_decode_list_record_usize_string(deserializer);
-var var_passphrase = sse_decode_String(deserializer);
-var var_walletName = sse_decode_String(deserializer);
-var var_biometricType = sse_decode_String(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-return Bip39AddWalletParams(password: var_password, mnemonicStr: var_mnemonicStr, mnemonicCheck: var_mnemonicCheck, accounts: var_accounts, passphrase: var_passphrase, walletName: var_walletName, biometricType: var_biometricType, chainHash: var_chainHash); }
-
-@protected BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_witnessUtxos = sse_decode_list_tx_out_info(deserializer);
-var var_inputMeta = sse_decode_list_input_meta_info(deserializer);
-return BitcoinMetadataInfo(witnessUtxos: var_witnessUtxos, inputMeta: var_inputMeta); }
-
-@protected BlockEvent sse_decode_block_event(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_blockNumber = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_error = sse_decode_opt_String(deserializer);
-return BlockEvent(blockNumber: var_blockNumber, error: var_error); }
-
-@protected bool sse_decode_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint8() != 0; }
-
-@protected AddNextBip39AccountParams sse_decode_box_autoadd_add_next_bip_39_account_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_add_next_bip_39_account_params(deserializer)); }
-
-@protected AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_add_sk_wallet_params(deserializer)); }
-
-@protected BaseTokenInfo sse_decode_box_autoadd_base_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_base_token_info(deserializer)); }
-
-@protected Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_bip_39_add_wallet_params(deserializer)); }
-
-@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_bool(deserializer)); }
-
-@protected BrowserSettingsInfo sse_decode_box_autoadd_browser_settings_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_browser_settings_info(deserializer)); }
-
-@protected BtcAccountXpubsInputInfo sse_decode_box_autoadd_btc_account_xpubs_input_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_btc_account_xpubs_input_info(deserializer)); }
-
-@protected ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_colors_info(deserializer)); }
-
-@protected ConnectionInfo sse_decode_box_autoadd_connection_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_connection_info(deserializer)); }
-
-@protected double sse_decode_box_autoadd_f_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_f_32(deserializer)); }
-
-@protected double sse_decode_box_autoadd_f_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_f_64(deserializer)); }
-
-@protected FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_f_token_info(deserializer)); }
-
-@protected FinalOutputInfo sse_decode_box_autoadd_final_output_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_final_output_info(deserializer)); }
-
-@protected LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_ledger_params_input(deserializer)); }
-
-@protected MetadataThorchain sse_decode_box_autoadd_metadata_thorchain(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_metadata_thorchain(deserializer)); }
-
-@protected NetworkConfigInfo sse_decode_box_autoadd_network_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_network_config_info(deserializer)); }
-
-@protected QrConfigInfo sse_decode_box_autoadd_qr_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_qr_config_info(deserializer)); }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo) sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(deserializer)); }
-
-@protected RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_required_tx_params_info(deserializer)); }
-
-@protected TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_token_transfer_params_info(deserializer)); }
-
-@protected TransactionBitcoin sse_decode_box_autoadd_transaction_bitcoin(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_transaction_bitcoin(deserializer)); }
-
-@protected TransactionRequestEVM sse_decode_box_autoadd_transaction_request_evm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_transaction_request_evm(deserializer)); }
-
-@protected TransactionRequestInfo sse_decode_box_autoadd_transaction_request_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_transaction_request_info(deserializer)); }
-
-@protected TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_transaction_request_scilla(deserializer)); }
-
-@protected BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_u_64(deserializer)); }
-
-@protected WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return (sse_decode_wallet_settings_info(deserializer)); }
-
-@protected BrowserSettingsInfo sse_decode_browser_settings_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_searchEngineIndex = sse_decode_u_8(deserializer);
-var var_cacheEnabled = sse_decode_bool(deserializer);
-var var_cookiesEnabled = sse_decode_bool(deserializer);
-var var_contentBlocking = sse_decode_u_8(deserializer);
-var var_doNotTrack = sse_decode_bool(deserializer);
-var var_incognitoMode = sse_decode_bool(deserializer);
-var var_textScalingFactor = sse_decode_f_32(deserializer);
-var var_allowGeolocation = sse_decode_bool(deserializer);
-var var_allowCamera = sse_decode_bool(deserializer);
-var var_allowMicrophone = sse_decode_bool(deserializer);
-var var_allowAutoPlay = sse_decode_bool(deserializer);
-return BrowserSettingsInfo(searchEngineIndex: var_searchEngineIndex, cacheEnabled: var_cacheEnabled, cookiesEnabled: var_cookiesEnabled, contentBlocking: var_contentBlocking, doNotTrack: var_doNotTrack, incognitoMode: var_incognitoMode, textScalingFactor: var_textScalingFactor, allowGeolocation: var_allowGeolocation, allowCamera: var_allowCamera, allowMicrophone: var_allowMicrophone, allowAutoPlay: var_allowAutoPlay); }
-
-@protected BtcAccountXpubsInputInfo sse_decode_btc_account_xpubs_input_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_bip44Xpub = sse_decode_String(deserializer);
-var var_bip49Xpub = sse_decode_String(deserializer);
-var var_bip84Xpub = sse_decode_String(deserializer);
-var var_bip86Xpub = sse_decode_String(deserializer);
-return BtcAccountXpubsInputInfo(bip44Xpub: var_bip44Xpub, bip49Xpub: var_bip49Xpub, bip84Xpub: var_bip84Xpub, bip86Xpub: var_bip86Xpub); }
-
-@protected BtcAddressEntryInfo sse_decode_btc_address_entry_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_address = sse_decode_String(deserializer);
-var var_path = sse_decode_String(deserializer);
-var var_history = sse_decode_list_String(deserializer);
-var var_utxos = sse_decode_list_utxo_info(deserializer);
-return BtcAddressEntryInfo(address: var_address, path: var_path, history: var_history, utxos: var_utxos); }
-
-@protected Category sse_decode_category(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_entries = sse_decode_list_entry(deserializer);
-return Category(name: var_name, entries: var_entries); }
-
-@protected ColorsInfo sse_decode_colors_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_primary = sse_decode_opt_String(deserializer);
-var var_secondary = sse_decode_opt_String(deserializer);
-var var_background = sse_decode_opt_String(deserializer);
-var var_text = sse_decode_opt_String(deserializer);
-return ColorsInfo(primary: var_primary, secondary: var_secondary, background: var_background, text: var_text); }
-
-@protected ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_domain = sse_decode_String(deserializer);
-var var_accountIndexes = sse_decode_list_prim_usize_strict(deserializer);
-var var_favicon = sse_decode_opt_String(deserializer);
-var var_title = sse_decode_String(deserializer);
-var var_description = sse_decode_opt_String(deserializer);
-var var_colors = sse_decode_opt_box_autoadd_colors_info(deserializer);
-var var_lastConnected = sse_decode_u_64(deserializer);
-var var_canReadAccounts = sse_decode_bool(deserializer);
-var var_canRequestSignatures = sse_decode_bool(deserializer);
-var var_canSuggestTokens = sse_decode_bool(deserializer);
-var var_canSuggestTransactions = sse_decode_bool(deserializer);
-return ConnectionInfo(domain: var_domain, accountIndexes: var_accountIndexes, favicon: var_favicon, title: var_title, description: var_description, colors: var_colors, lastConnected: var_lastConnected, canReadAccounts: var_canReadAccounts, canRequestSignatures: var_canRequestSignatures, canSuggestTokens: var_canSuggestTokens, canSuggestTransactions: var_canSuggestTransactions); }
-
-@protected Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_domainSeparator = sse_decode_list_prim_u_8_strict(deserializer);
-var var_hashStructMessage = sse_decode_list_prim_u_8_strict(deserializer);
-return Eip712Hashes(domainSeparator: var_domainSeparator, hashStructMessage: var_hashStructMessage); }
-
-@protected EncodedRLPTx sse_decode_encoded_rlp_tx(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_bytes = sse_decode_list_prim_u_8_strict(deserializer);
-var var_chunksBytes = sse_decode_list_list_prim_u_8_strict(deserializer);
-return EncodedRLPTx(bytes: var_bytes, chunksBytes: var_chunksBytes); }
-
-@protected Entry sse_decode_entry(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_address = sse_decode_String(deserializer);
-var var_tag = sse_decode_opt_String(deserializer);
-return Entry(name: var_name, address: var_address, tag: var_tag); }
-
-@protected ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            var tag_ = sse_decode_i_32(deserializer);
-            switch (tag_) { case 0: var var_field0 = sse_decode_box_autoadd_metadata_thorchain(deserializer);
-return ExchangeProvider_Thorchain(var_field0); default: throw UnimplementedError(''); }
-             }
-
-@protected ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_url = sse_decode_String(deserializer);
-var var_icon = sse_decode_opt_String(deserializer);
-var var_standard = sse_decode_u_16(deserializer);
-return ExplorerInfo(name: var_name, url: var_url, icon: var_icon, standard: var_standard); }
-
-@protected double sse_decode_f_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getFloat32(); }
-
-@protected double sse_decode_f_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getFloat64(); }
-
-@protected FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_symbol = sse_decode_String(deserializer);
-var var_decimals = sse_decode_u_8(deserializer);
-var var_addr = sse_decode_String(deserializer);
-var var_addrType = sse_decode_u_8(deserializer);
-var var_logo = sse_decode_opt_String(deserializer);
-var var_balances = sse_decode_Map_usize_String_None(deserializer);
-var var_rate = sse_decode_f_64(deserializer);
-var var_default_ = sse_decode_bool(deserializer);
-var var_native = sse_decode_bool(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-return FTokenInfo(name: var_name, symbol: var_symbol, decimals: var_decimals, addr: var_addr, addrType: var_addrType, logo: var_logo, balances: var_balances, rate: var_rate, default_: var_default_, native: var_native, chainHash: var_chainHash); }
-
-@protected FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_address = sse_decode_String(deserializer);
-var var_token = sse_decode_opt_box_autoadd_f_token_info(deserializer);
-var var_delegAmt = sse_decode_String(deserializer);
-var var_rewards = sse_decode_String(deserializer);
-var var_claimableAmount = sse_decode_String(deserializer);
-var var_apr = sse_decode_opt_box_autoadd_f_64(deserializer);
-var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
-var var_unbondingPeriodSeconds = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_lstPriceChangePercent = sse_decode_opt_box_autoadd_f_32(deserializer);
-var var_avgBlockTimeMs = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_tag = sse_decode_String(deserializer);
-var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_pendingWithdrawals = sse_decode_list_pending_withdrawal_info(deserializer);
-return FinalOutputInfo(name: var_name, address: var_address, token: var_token, delegAmt: var_delegAmt, rewards: var_rewards, claimableAmount: var_claimableAmount, apr: var_apr, commission: var_commission, unbondingPeriodSeconds: var_unbondingPeriodSeconds, lstPriceChangePercent: var_lstPriceChangePercent, avgBlockTimeMs: var_avgBlockTimeMs, tag: var_tag, currentBlock: var_currentBlock, pendingWithdrawals: var_pendingWithdrawals); }
-
-@protected FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_rawTxHex = sse_decode_String(deserializer);
-var var_txHash = sse_decode_String(deserializer);
-var var_psbtBytes = sse_decode_list_prim_u_8_strict(deserializer);
-return FinalizedBtcTx(rawTxHex: var_rawTxHex, txHash: var_txHash, psbtBytes: var_psbtBytes); }
-
-@protected GasFeeHistoryInfo sse_decode_gas_fee_history_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_maxFee = sse_decode_U128(deserializer);
-var var_priorityFee = sse_decode_U128(deserializer);
-var var_baseFee = sse_decode_U128(deserializer);
-return GasFeeHistoryInfo(maxFee: var_maxFee, priorityFee: var_priorityFee, baseFee: var_baseFee); }
-
-@protected HistoricalTransactionInfo sse_decode_historical_transaction_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_status = sse_decode_transaction_status_info(deserializer);
-var var_metadata = sse_decode_transaction_metadata_info(deserializer);
-var var_evm = sse_decode_opt_String(deserializer);
-var var_scilla = sse_decode_opt_String(deserializer);
-var var_btc = sse_decode_opt_box_autoadd_transaction_bitcoin(deserializer);
-var var_tron = sse_decode_opt_String(deserializer);
-var var_solana = sse_decode_opt_String(deserializer);
-var var_signedMessage = sse_decode_opt_String(deserializer);
-var var_timestamp = sse_decode_u_64(deserializer);
-return HistoricalTransactionInfo(status: var_status, metadata: var_metadata, evm: var_evm, scilla: var_scilla, btc: var_btc, tron: var_tron, solana: var_solana, signedMessage: var_signedMessage, timestamp: var_timestamp); }
-
-@protected int sse_decode_i_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getInt32(); }
-
-@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getPlatformInt64(); }
-
-@protected InputMetaInfo sse_decode_input_meta_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_addressType = sse_decode_u_8(deserializer);
-var var_derivationPath = sse_decode_String(deserializer);
-return InputMetaInfo(addressType: var_addressType, derivationPath: var_derivationPath); }
-
-@protected KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_sk = sse_decode_String(deserializer);
-var var_pk = sse_decode_String(deserializer);
-return KeyPairInfo(sk: var_sk, pk: var_pk); }
-
-@protected LedgerInputSignature sse_decode_ledger_input_signature(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_inputIndex = sse_decode_u_32(deserializer);
-var var_signature = sse_decode_list_prim_u_8_strict(deserializer);
-var var_pubkey = sse_decode_list_prim_u_8_strict(deserializer);
-return LedgerInputSignature(inputIndex: var_inputIndex, signature: var_signature, pubkey: var_pubkey); }
-
-@protected LedgerParamsInput sse_decode_ledger_params_input(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_pubKeys = sse_decode_list_record_u_8_string(deserializer);
-var var_walletIndex = sse_decode_usize(deserializer);
-var var_walletName = sse_decode_String(deserializer);
-var var_ledgerId = sse_decode_String(deserializer);
-var var_accountNames = sse_decode_list_String(deserializer);
-var var_biometricType = sse_decode_String(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-var var_zilliqaLegacy = sse_decode_bool(deserializer);
-var var_btcChains = sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(deserializer);
-return LedgerParamsInput(pubKeys: var_pubKeys, walletIndex: var_walletIndex, walletName: var_walletName, ledgerId: var_ledgerId, accountNames: var_accountNames, biometricType: var_biometricType, chainHash: var_chainHash, zilliqaLegacy: var_zilliqaLegacy, btcChains: var_btcChains); }
-
-@protected List<String> sse_decode_list_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <String>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_String(deserializer)); }
-        return ans_;
-         }
-
-@protected List<AccessListItem> sse_decode_list_access_list_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <AccessListItem>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_access_list_item(deserializer)); }
-        return ans_;
-         }
-
-@protected List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <AccountInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_account_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <AddressBookEntryInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_address_book_entry_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <BtcAddressEntryInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_btc_address_entry_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<Category> sse_decode_list_category(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <Category>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_category(deserializer)); }
-        return ans_;
-         }
-
-@protected List<ConnectionInfo> sse_decode_list_connection_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <ConnectionInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_connection_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<Entry> sse_decode_list_entry(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <Entry>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_entry(deserializer)); }
-        return ans_;
-         }
-
-@protected List<ExchangeProvider> sse_decode_list_exchange_provider(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <ExchangeProvider>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_exchange_provider(deserializer)); }
-        return ans_;
-         }
-
-@protected List<ExplorerInfo> sse_decode_list_explorer_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <ExplorerInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_explorer_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <FTokenInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_f_token_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<FinalOutputInfo> sse_decode_list_final_output_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <FinalOutputInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_final_output_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <HistoricalTransactionInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_historical_transaction_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<InputMetaInfo> sse_decode_list_input_meta_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <InputMetaInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_input_meta_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<LedgerInputSignature> sse_decode_list_ledger_input_signature(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <LedgerInputSignature>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_ledger_input_signature(deserializer)); }
-        return ans_;
-         }
-
-@protected List<List<Uint8List>> sse_decode_list_list_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <List<Uint8List>>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_list_list_prim_u_8_strict(deserializer)); }
-        return ans_;
-         }
-
-@protected List<Uint8List> sse_decode_list_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <Uint8List>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_list_prim_u_8_strict(deserializer)); }
-        return ans_;
-         }
-
-@protected List<NetworkConfigInfo> sse_decode_list_network_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <NetworkConfigInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_network_config_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <PendingWithdrawalInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_pending_withdrawal_info(deserializer)); }
-        return ans_;
-         }
-
-@protected Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint16List(len_); }
-
-@protected Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint32List(len_); }
-
-@protected Uint64List sse_decode_list_prim_u_64_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint64List(len_); }
-
-@protected List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint8List(len_); }
-
-@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint8List(len_); }
-
-@protected Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var len_ = sse_decode_i_32(deserializer);
-                return deserializer.buffer.getUint64List(len_); }
-
-@protected List<(String,String)> sse_decode_list_record_string_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(String,String)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_string_string(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(int,List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(int,List<AccountInfo>)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_u_32_list_account_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(int,Map<int, List<AccountInfo>>)> sse_decode_list_record_u_32_map_u_32_list_account_info_none(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(int,Map<int, List<AccountInfo>>)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_u_32_map_u_32_list_account_info_none(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(int,AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(int,AddressChainInfo)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_u_8_address_chain_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(int,Map<int, AddressChainInfo>)> sse_decode_list_record_u_8_map_u_8_address_chain_info_none(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(int,Map<int, AddressChainInfo>)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_u_8_map_u_8_address_chain_info_none(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(int,String)> sse_decode_list_record_u_8_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(int,String)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_u_8_string(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(BigInt,BackgroundNotificationState)> sse_decode_list_record_usize_background_notification_state(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(BigInt,BackgroundNotificationState)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_usize_background_notification_state(deserializer)); }
-        return ans_;
-         }
-
-@protected List<(BigInt,String)> sse_decode_list_record_usize_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <(BigInt,String)>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_record_usize_string(deserializer)); }
-        return ans_;
-         }
-
-@protected List<RustLedgerBleDevice> sse_decode_list_rust_ledger_ble_device(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <RustLedgerBleDevice>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_rust_ledger_ble_device(deserializer)); }
-        return ans_;
-         }
-
-@protected List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <RustLedgerHidDevice>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_rust_ledger_hid_device(deserializer)); }
-        return ans_;
-         }
-
-@protected List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <TxInInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_tx_in_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<TxOutInfo> sse_decode_list_tx_out_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <TxOutInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_tx_out_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <UtxoInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_utxo_info(deserializer)); }
-        return ans_;
-         }
-
-@protected List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-        var len_ = sse_decode_i_32(deserializer);
-        var ans_ = <WalletInfo>[];
-        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_wallet_info(deserializer)); }
-        return ans_;
-         }
-
-@protected MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_globalMapCommitment = sse_decode_list_prim_u_8_strict(deserializer);
-var var_globalMapKeysLeaves = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_globalMapValuesLeaves = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_inputMapCommitments = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_inputMapKeysLeaves = sse_decode_list_list_list_prim_u_8_strict(deserializer);
-var var_inputMapValuesLeaves = sse_decode_list_list_list_prim_u_8_strict(deserializer);
-var var_outputMapCommitments = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_outputMapKeysLeaves = sse_decode_list_list_list_prim_u_8_strict(deserializer);
-var var_outputMapValuesLeaves = sse_decode_list_list_list_prim_u_8_strict(deserializer);
-var var_inputMapsRoot = sse_decode_list_prim_u_8_strict(deserializer);
-var var_outputMapsRoot = sse_decode_list_prim_u_8_strict(deserializer);
-var var_preimageHashes = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_preimageData = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_inputCount = sse_decode_u_32(deserializer);
-var var_outputCount = sse_decode_u_32(deserializer);
-var var_psbtBytes = sse_decode_list_prim_u_8_strict(deserializer);
-return MerkelizedPsbt(globalMapCommitment: var_globalMapCommitment, globalMapKeysLeaves: var_globalMapKeysLeaves, globalMapValuesLeaves: var_globalMapValuesLeaves, inputMapCommitments: var_inputMapCommitments, inputMapKeysLeaves: var_inputMapKeysLeaves, inputMapValuesLeaves: var_inputMapValuesLeaves, outputMapCommitments: var_outputMapCommitments, outputMapKeysLeaves: var_outputMapKeysLeaves, outputMapValuesLeaves: var_outputMapValuesLeaves, inputMapsRoot: var_inputMapsRoot, outputMapsRoot: var_outputMapsRoot, preimageHashes: var_preimageHashes, preimageData: var_preimageData, inputCount: var_inputCount, outputCount: var_outputCount, psbtBytes: var_psbtBytes); }
-
-@protected MerkleProof sse_decode_merkle_proof(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_leafHash = sse_decode_list_prim_u_8_strict(deserializer);
-var var_proofHashes = sse_decode_list_list_prim_u_8_strict(deserializer);
-return MerkleProof(leafHash: var_leafHash, proofHashes: var_proofHashes); }
-
-@protected MetadataThorchain sse_decode_metadata_thorchain(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_dummy = sse_decode_u_8(deserializer);
-return MetadataThorchain(dummy: var_dummy); }
-
-@protected NetworkConfigInfo sse_decode_network_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_name = sse_decode_String(deserializer);
-var var_logo = sse_decode_String(deserializer);
-var var_chain = sse_decode_String(deserializer);
-var var_shortName = sse_decode_String(deserializer);
-var var_rpc = sse_decode_list_String(deserializer);
-var var_features = sse_decode_list_prim_u_16_strict(deserializer);
-var var_chainId = sse_decode_u_64(deserializer);
-var var_chainIds = sse_decode_list_prim_u_64_strict(deserializer);
-var var_slip44 = sse_decode_u_32(deserializer);
-var var_diffBlockTime = sse_decode_u_64(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-var var_ens = sse_decode_opt_String(deserializer);
-var var_explorers = sse_decode_list_explorer_info(deserializer);
-var var_fallbackEnabled = sse_decode_bool(deserializer);
-var var_testnet = sse_decode_opt_box_autoadd_bool(deserializer);
-var var_ftokens = sse_decode_list_f_token_info(deserializer);
-return NetworkConfigInfo(name: var_name, logo: var_logo, chain: var_chain, shortName: var_shortName, rpc: var_rpc, features: var_features, chainId: var_chainId, chainIds: var_chainIds, slip44: var_slip44, diffBlockTime: var_diffBlockTime, chainHash: var_chainHash, ens: var_ens, explorers: var_explorers, fallbackEnabled: var_fallbackEnabled, testnet: var_testnet, ftokens: var_ftokens); }
-
-@protected Map<int, AddressChainInfo>? sse_decode_opt_Map_u_8_address_chain_info_None(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_Map_u_8_address_chain_info_None(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected String? sse_decode_opt_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_String(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected BigInt? sse_decode_opt_U128(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_U128(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected BaseTokenInfo? sse_decode_opt_box_autoadd_base_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_base_token_info(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_bool(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected ColorsInfo? sse_decode_opt_box_autoadd_colors_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_colors_info(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_f_32(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_f_64(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_f_token_info(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo)? sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected TransactionBitcoin? sse_decode_opt_box_autoadd_transaction_bitcoin(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_transaction_bitcoin(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_transaction_request_evm(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected TransactionRequestScilla? sse_decode_opt_box_autoadd_transaction_request_scilla(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_transaction_request_scilla(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_box_autoadd_u_64(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_list_String(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected List<AccessListItem>? sse_decode_opt_list_access_list_item(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_list_access_list_item(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-            if (sse_decode_bool(deserializer)) {
-                return (sse_decode_list_prim_u_8_strict(deserializer));
-            } else {
-                return null;
-            }
-             }
-
-@protected OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_txid = sse_decode_String(deserializer);
-var var_vout = sse_decode_u_32(deserializer);
-return OutPointInfo(txid: var_txid, vout: var_vout); }
-
-@protected PendingWithdrawalInfo sse_decode_pending_withdrawal_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_amount = sse_decode_String(deserializer);
-var var_withdrawalBlock = sse_decode_u_64(deserializer);
-var var_claimable = sse_decode_bool(deserializer);
-return PendingWithdrawalInfo(amount: var_amount, withdrawalBlock: var_withdrawalBlock, claimable: var_claimable); }
-
-@protected QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_recipient = sse_decode_String(deserializer);
-var var_provider = sse_decode_opt_String(deserializer);
-var var_tokenAddress = sse_decode_opt_String(deserializer);
-var var_amount = sse_decode_opt_String(deserializer);
-return QRcodeScanResultInfo(recipient: var_recipient, provider: var_provider, tokenAddress: var_tokenAddress, amount: var_amount); }
-
-@protected QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_size = sse_decode_u_32(deserializer);
-var var_gapless = sse_decode_bool(deserializer);
-var var_color = sse_decode_u_32(deserializer);
-var var_eyeShape = sse_decode_u_8(deserializer);
-var var_dataModuleShape = sse_decode_u_8(deserializer);
-return QrConfigInfo(size: var_size, gapless: var_gapless, color: var_color, eyeShape: var_eyeShape, dataModuleShape: var_dataModuleShape); }
-
-@protected (List<NetworkConfigInfo>,List<NetworkConfigInfo>) sse_decode_record_list_network_config_info_list_network_config_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_list_network_config_info(deserializer);
-var var_field1 = sse_decode_list_network_config_info(deserializer);
-return (var_field0, var_field1); }
-
-@protected (Uint8List,String) sse_decode_record_list_prim_u_8_strict_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_list_prim_u_8_strict(deserializer);
-var var_field1 = sse_decode_String(deserializer);
-return (var_field0, var_field1); }
-
-@protected (String,String) sse_decode_record_string_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_String(deserializer);
-var var_field1 = sse_decode_String(deserializer);
-return (var_field0, var_field1); }
-
-@protected (String,int) sse_decode_record_string_u_8(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_String(deserializer);
-var var_field1 = sse_decode_u_8(deserializer);
-return (var_field0, var_field1); }
-
-@protected (TransactionBitcoin,BitcoinMetadataInfo) sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_transaction_bitcoin(deserializer);
-var var_field1 = sse_decode_bitcoin_metadata_info(deserializer);
-return (var_field0, var_field1); }
-
-@protected (int,List<AccountInfo>) sse_decode_record_u_32_list_account_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_u_32(deserializer);
-var var_field1 = sse_decode_list_account_info(deserializer);
-return (var_field0, var_field1); }
-
-@protected (int,Map<int, List<AccountInfo>>) sse_decode_record_u_32_map_u_32_list_account_info_none(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_u_32(deserializer);
-var var_field1 = sse_decode_Map_u_32_list_account_info_None(deserializer);
-return (var_field0, var_field1); }
-
-@protected (int,AddressChainInfo) sse_decode_record_u_8_address_chain_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_u_8(deserializer);
-var var_field1 = sse_decode_address_chain_info(deserializer);
-return (var_field0, var_field1); }
-
-@protected (int,Map<int, AddressChainInfo>) sse_decode_record_u_8_map_u_8_address_chain_info_none(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_u_8(deserializer);
-var var_field1 = sse_decode_Map_u_8_address_chain_info_None(deserializer);
-return (var_field0, var_field1); }
-
-@protected (int,String) sse_decode_record_u_8_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_u_8(deserializer);
-var var_field1 = sse_decode_String(deserializer);
-return (var_field0, var_field1); }
-
-@protected (BigInt,BackgroundNotificationState) sse_decode_record_usize_background_notification_state(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_usize(deserializer);
-var var_field1 = sse_decode_background_notification_state(deserializer);
-return (var_field0, var_field1); }
-
-@protected (BigInt,String) sse_decode_record_usize_string(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_field0 = sse_decode_usize(deserializer);
-var var_field1 = sse_decode_String(deserializer);
-return (var_field0, var_field1); }
-
-@protected RequiredTxParamsInfo sse_decode_required_tx_params_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_gasPrice = sse_decode_U128(deserializer);
-var var_maxPriorityFee = sse_decode_U128(deserializer);
-var var_feeHistory = sse_decode_gas_fee_history_info(deserializer);
-var var_txEstimateGas = sse_decode_u_64(deserializer);
-var var_blobBaseFee = sse_decode_U128(deserializer);
-var var_nonce = sse_decode_u_64(deserializer);
-var var_slow = sse_decode_String(deserializer);
-var var_market = sse_decode_String(deserializer);
-var var_fast = sse_decode_String(deserializer);
-var var_current = sse_decode_String(deserializer);
-return RequiredTxParamsInfo(gasPrice: var_gasPrice, maxPriorityFee: var_maxPriorityFee, feeHistory: var_feeHistory, txEstimateGas: var_txEstimateGas, blobBaseFee: var_blobBaseFee, nonce: var_nonce, slow: var_slow, market: var_market, fast: var_fast, current: var_current); }
-
-@protected RustLedgerBleDevice sse_decode_rust_ledger_ble_device(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_deviceId = sse_decode_String(deserializer);
-var var_name = sse_decode_String(deserializer);
-var var_serviceUuid = sse_decode_String(deserializer);
-var var_modelId = sse_decode_String(deserializer);
-var var_productName = sse_decode_String(deserializer);
-return RustLedgerBleDevice(deviceId: var_deviceId, name: var_name, serviceUuid: var_serviceUuid, modelId: var_modelId, productName: var_productName); }
-
-@protected RustLedgerHidDevice sse_decode_rust_ledger_hid_device(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_deviceId = sse_decode_String(deserializer);
-var var_vendorId = sse_decode_u_16(deserializer);
-var var_productId = sse_decode_u_16(deserializer);
-var var_productName = sse_decode_String(deserializer);
-var var_modelId = sse_decode_String(deserializer);
-return RustLedgerHidDevice(deviceId: var_deviceId, vendorId: var_vendorId, productId: var_productId, productName: var_productName, modelId: var_modelId); }
-
-@protected TokenTransferParamsInfo sse_decode_token_transfer_params_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_walletIndex = sse_decode_usize(deserializer);
-var var_accountIndex = sse_decode_usize(deserializer);
-var var_token = sse_decode_f_token_info(deserializer);
-var var_amount = sse_decode_String(deserializer);
-var var_recipient = sse_decode_String(deserializer);
-var var_icon = sse_decode_String(deserializer);
-return TokenTransferParamsInfo(walletIndex: var_walletIndex, accountIndex: var_accountIndex, token: var_token, amount: var_amount, recipient: var_recipient, icon: var_icon); }
-
-@protected TransactionBitcoin sse_decode_transaction_bitcoin(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_version = sse_decode_i_32(deserializer);
-var var_lockTime = sse_decode_u_32(deserializer);
-var var_input = sse_decode_list_tx_in_info(deserializer);
-var var_output = sse_decode_list_tx_out_info(deserializer);
-var var_fee = sse_decode_opt_box_autoadd_u_64(deserializer);
-return TransactionBitcoin(version: var_version, lockTime: var_lockTime, input: var_input, output: var_output, fee: var_fee); }
-
-@protected TransactionMetadataInfo sse_decode_transaction_metadata_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_chainHash = sse_decode_u_64(deserializer);
-var var_hash = sse_decode_opt_String(deserializer);
-var var_info = sse_decode_opt_String(deserializer);
-var var_icon = sse_decode_opt_String(deserializer);
-var var_title = sse_decode_opt_String(deserializer);
-var var_signer = sse_decode_opt_String(deserializer);
-var var_tokenInfo = sse_decode_opt_box_autoadd_base_token_info(deserializer);
-var var_broadcast = sse_decode_bool(deserializer);
-return TransactionMetadataInfo(chainHash: var_chainHash, hash: var_hash, info: var_info, icon: var_icon, title: var_title, signer: var_signer, tokenInfo: var_tokenInfo, broadcast: var_broadcast); }
-
-@protected TransactionRequestEVM sse_decode_transaction_request_evm(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_nonce = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_from = sse_decode_opt_String(deserializer);
-var var_to = sse_decode_opt_String(deserializer);
-var var_value = sse_decode_opt_String(deserializer);
-var var_gasLimit = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_data = sse_decode_opt_list_prim_u_8_strict(deserializer);
-var var_maxFeePerGas = sse_decode_opt_U128(deserializer);
-var var_maxPriorityFeePerGas = sse_decode_opt_U128(deserializer);
-var var_gasPrice = sse_decode_opt_U128(deserializer);
-var var_chainId = sse_decode_opt_box_autoadd_u_64(deserializer);
-var var_accessList = sse_decode_opt_list_access_list_item(deserializer);
-var var_blobVersionedHashes = sse_decode_opt_list_String(deserializer);
-var var_maxFeePerBlobGas = sse_decode_opt_U128(deserializer);
-return TransactionRequestEVM(nonce: var_nonce, from: var_from, to: var_to, value: var_value, gasLimit: var_gasLimit, data: var_data, maxFeePerGas: var_maxFeePerGas, maxPriorityFeePerGas: var_maxPriorityFeePerGas, gasPrice: var_gasPrice, chainId: var_chainId, accessList: var_accessList, blobVersionedHashes: var_blobVersionedHashes, maxFeePerBlobGas: var_maxFeePerBlobGas); }
-
-@protected TransactionRequestInfo sse_decode_transaction_request_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_metadata = sse_decode_transaction_metadata_info(deserializer);
-var var_scilla = sse_decode_opt_box_autoadd_transaction_request_scilla(deserializer);
-var var_evm = sse_decode_opt_box_autoadd_transaction_request_evm(deserializer);
-var var_btc = sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(deserializer);
-var var_tron = sse_decode_opt_String(deserializer);
-var var_solana = sse_decode_opt_list_prim_u_8_strict(deserializer);
-return TransactionRequestInfo(metadata: var_metadata, scilla: var_scilla, evm: var_evm, btc: var_btc, tron: var_tron, solana: var_solana); }
-
-@protected TransactionRequestScilla sse_decode_transaction_request_scilla(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_chainId = sse_decode_u_16(deserializer);
-var var_nonce = sse_decode_u_64(deserializer);
-var var_gasPrice = sse_decode_U128(deserializer);
-var var_gasLimit = sse_decode_u_64(deserializer);
-var var_toAddr = sse_decode_String(deserializer);
-var var_amount = sse_decode_U128(deserializer);
-var var_code = sse_decode_String(deserializer);
-var var_data = sse_decode_String(deserializer);
-return TransactionRequestScilla(chainId: var_chainId, nonce: var_nonce, gasPrice: var_gasPrice, gasLimit: var_gasLimit, toAddr: var_toAddr, amount: var_amount, code: var_code, data: var_data); }
-
-@protected TransactionStatusInfo sse_decode_transaction_status_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var inner = sse_decode_i_32(deserializer);
-        return TransactionStatusInfo.values[inner]; }
-
-@protected TxInInfo sse_decode_tx_in_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_previousOutput = sse_decode_out_point_info(deserializer);
-var var_scriptSig = sse_decode_list_prim_u_8_strict(deserializer);
-var var_sequence = sse_decode_u_32(deserializer);
-var var_witness = sse_decode_list_list_prim_u_8_strict(deserializer);
-var var_address = sse_decode_opt_String(deserializer);
-return TxInInfo(previousOutput: var_previousOutput, scriptSig: var_scriptSig, sequence: var_sequence, witness: var_witness, address: var_address); }
-
-@protected TxOutInfo sse_decode_tx_out_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_value = sse_decode_u_64(deserializer);
-var var_scriptPubkey = sse_decode_list_prim_u_8_strict(deserializer);
-var var_address = sse_decode_opt_String(deserializer);
-return TxOutInfo(value: var_value, scriptPubkey: var_scriptPubkey, address: var_address); }
-
-@protected int sse_decode_u_16(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint16(); }
-
-@protected int sse_decode_u_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint32(); }
-
-@protected BigInt sse_decode_u_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getBigUint64(); }
-
-@protected int sse_decode_u_8(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getUint8(); }
-
-@protected void sse_decode_unit(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
- }
-
-@protected BigInt sse_decode_usize(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-return deserializer.buffer.getBigUint64(); }
-
-@protected UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_txid = sse_decode_String(deserializer);
-var var_vout = sse_decode_u_32(deserializer);
-var var_value = sse_decode_u_64(deserializer);
-var var_height = sse_decode_u_32(deserializer);
-return UtxoInfo(txid: var_txid, vout: var_vout, value: var_value, height: var_height); }
-
-@protected WalletArgonParamsInfo sse_decode_wallet_argon_params_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_memory = sse_decode_u_32(deserializer);
-var var_iterations = sse_decode_u_32(deserializer);
-var var_threads = sse_decode_u_32(deserializer);
-var var_secret = sse_decode_String(deserializer);
-return WalletArgonParamsInfo(memory: var_memory, iterations: var_iterations, threads: var_threads, secret: var_secret); }
-
-@protected WalletInfo sse_decode_wallet_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_walletType = sse_decode_String(deserializer);
-var var_walletName = sse_decode_String(deserializer);
-var var_authType = sse_decode_String(deserializer);
-var var_walletAddress = sse_decode_String(deserializer);
-var var_accounts = sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(deserializer);
-var var_selectedAccount = sse_decode_usize(deserializer);
-var var_tokens = sse_decode_list_f_token_info(deserializer);
-var var_settings = sse_decode_wallet_settings_info(deserializer);
-var var_chainHash = sse_decode_u_64(deserializer);
-var var_slip44 = sse_decode_u_32(deserializer);
-var var_bip = sse_decode_u_32(deserializer);
-return WalletInfo(walletType: var_walletType, walletName: var_walletName, authType: var_authType, walletAddress: var_walletAddress, accounts: var_accounts, selectedAccount: var_selectedAccount, tokens: var_tokens, settings: var_settings, chainHash: var_chainHash, slip44: var_slip44, bip: var_bip); }
-
-@protected WalletPolicy sse_decode_wallet_policy(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_descriptorTemplate = sse_decode_String(deserializer);
-var var_keysInfo = sse_decode_list_String(deserializer);
-var var_policyId = sse_decode_list_prim_u_8_strict(deserializer);
-var var_policyHmac = sse_decode_list_prim_u_8_strict(deserializer);
-var var_serialized = sse_decode_list_prim_u_8_strict(deserializer);
-return WalletPolicy(descriptorTemplate: var_descriptorTemplate, keysInfo: var_keysInfo, policyId: var_policyId, policyHmac: var_policyHmac, serialized: var_serialized); }
-
-@protected WalletSettingsInfo sse_decode_wallet_settings_info(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-var var_cipherOrders = sse_decode_list_prim_u_8_strict(deserializer);
-var var_argonParams = sse_decode_wallet_argon_params_info(deserializer);
-var var_currencyConvert = sse_decode_String(deserializer);
-var var_ipfsNode = sse_decode_opt_String(deserializer);
-var var_ensEnabled = sse_decode_bool(deserializer);
-var var_tokensListFetcher = sse_decode_bool(deserializer);
-var var_nodeRankingEnabled = sse_decode_bool(deserializer);
-var var_maxConnections = sse_decode_u_8(deserializer);
-var var_requestTimeoutSecs = sse_decode_u_32(deserializer);
-var var_ratesApiOptions = sse_decode_u_8(deserializer);
-return WalletSettingsInfo(cipherOrders: var_cipherOrders, argonParams: var_argonParams, currencyConvert: var_currencyConvert, ipfsNode: var_ipfsNode, ensEnabled: var_ensEnabled, tokensListFetcher: var_tokensListFetcher, nodeRankingEnabled: var_nodeRankingEnabled, maxConnections: var_maxConnections, requestTimeoutSecs: var_requestTimeoutSecs, ratesApiOptions: var_ratesApiOptions); }
-
-@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.message, serializer); }
-
-@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize((self as LocalStorageImplImpl).frbInternalSseEncode(move: true), serializer); }
-
-@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize((self as LocalStorageImplImpl).frbInternalSseEncode(move: false), serializer); }
-
-@protected void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_u_32_map_u_32_list_account_info_none(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_Map_u_32_list_account_info_None(Map<int, List<AccountInfo>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_u_32_list_account_info(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_u_8_map_u_8_address_chain_info_none(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_Map_u_8_address_chain_info_None(Map<int, AddressChainInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_u_8_address_chain_info(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_Map_usize_String_None(Map<BigInt, String> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_usize_string(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_Map_usize_background_notification_state_None(Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_usize_background_notification_state(self.entries.map((e) => (e.key, e.value)).toList(), serializer); }
-
-@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize((self as LocalStorageImplImpl).frbInternalSseEncode(move: null), serializer); }
-
-@protected void sse_encode_StreamSink_String_Sse(RustStreamSink<String> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.setupAndSerialize(codec: SseCodec(
-            decodeSuccessData: sse_decode_String,
-            decodeErrorData: sse_decode_AnyhowException,
-        )), serializer); }
-
-@protected void sse_encode_StreamSink_block_event_Sse(RustStreamSink<BlockEvent> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.setupAndSerialize(codec: SseCodec(
-            decodeSuccessData: sse_decode_block_event,
-            decodeErrorData: sse_decode_AnyhowException,
-        )), serializer); }
-
-@protected void sse_encode_String(String self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer); }
-
-@protected void sse_encode_U128(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.toString(), serializer); }
-
-@protected void sse_encode_access_list_item(AccessListItem self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.address, serializer);
-sse_encode_list_String(self.storageKeys, serializer);
- }
-
-@protected void sse_encode_account_info(AccountInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.addr, serializer);
-sse_encode_opt_String(self.pubKey, serializer);
-sse_encode_u_8(self.addrType, serializer);
-sse_encode_String(self.name, serializer);
-sse_encode_usize(self.index, serializer);
- }
-
-@protected void sse_encode_add_next_bip_39_account_params(AddNextBip39AccountParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize(self.walletIndex, serializer);
-sse_encode_usize(self.accountIndex, serializer);
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.passphrase, serializer);
-sse_encode_opt_String(self.password, serializer);
- }
-
-@protected void sse_encode_add_sk_wallet_params(AddSKWalletParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.sk, serializer);
-sse_encode_String(self.password, serializer);
-sse_encode_String(self.walletName, serializer);
-sse_encode_String(self.biometricType, serializer);
-sse_encode_u_64(self.chainHash, serializer);
-sse_encode_u_32(self.bipPurpose, serializer);
- }
-
-@protected void sse_encode_address_book_entry_info(AddressBookEntryInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.addr, serializer);
-sse_encode_usize(self.net, serializer);
-sse_encode_u_32(self.slip44, serializer);
- }
-
-@protected void sse_encode_address_chain_info(AddressChainInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_btc_address_entry_info(self.external_, serializer);
-sse_encode_list_btc_address_entry_info(self.internal, serializer);
- }
-
-@protected void sse_encode_background_notification_state(BackgroundNotificationState self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_bool(self.transactions, serializer);
-sse_encode_bool(self.price, serializer);
-sse_encode_bool(self.security, serializer);
-sse_encode_bool(self.balance, serializer);
- }
-
-@protected void sse_encode_background_state(BackgroundState self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_wallet_info(self.wallets, serializer);
-sse_encode_Map_usize_background_notification_state_None(self.notificationsWalletStates, serializer);
-sse_encode_bool(self.notificationsGlobalEnabled, serializer);
-sse_encode_opt_String(self.locale, serializer);
-sse_encode_u_8(self.appearances, serializer);
-sse_encode_bool(self.abbreviatedNumber, serializer);
-sse_encode_browser_settings_info(self.browserSettings, serializer);
-sse_encode_list_network_config_info(self.providers, serializer);
- }
-
-@protected void sse_encode_base_token_info(BaseTokenInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.value, serializer);
-sse_encode_String(self.symbol, serializer);
-sse_encode_u_8(self.decimals, serializer);
- }
-
-@protected void sse_encode_bip_39_add_wallet_params(Bip39AddWalletParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.password, serializer);
-sse_encode_String(self.mnemonicStr, serializer);
-sse_encode_bool(self.mnemonicCheck, serializer);
-sse_encode_list_record_usize_string(self.accounts, serializer);
-sse_encode_String(self.passphrase, serializer);
-sse_encode_String(self.walletName, serializer);
-sse_encode_String(self.biometricType, serializer);
-sse_encode_u_64(self.chainHash, serializer);
- }
-
-@protected void sse_encode_bitcoin_metadata_info(BitcoinMetadataInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_tx_out_info(self.witnessUtxos, serializer);
-sse_encode_list_input_meta_info(self.inputMeta, serializer);
- }
-
-@protected void sse_encode_block_event(BlockEvent self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_opt_box_autoadd_u_64(self.blockNumber, serializer);
-sse_encode_opt_String(self.error, serializer);
- }
-
-@protected void sse_encode_bool(bool self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint8(self ? 1 : 0); }
-
-@protected void sse_encode_box_autoadd_add_next_bip_39_account_params(AddNextBip39AccountParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_add_next_bip_39_account_params(self, serializer); }
-
-@protected void sse_encode_box_autoadd_add_sk_wallet_params(AddSKWalletParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_add_sk_wallet_params(self, serializer); }
-
-@protected void sse_encode_box_autoadd_base_token_info(BaseTokenInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_base_token_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_bip_39_add_wallet_params(Bip39AddWalletParams self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_bip_39_add_wallet_params(self, serializer); }
-
-@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_bool(self, serializer); }
-
-@protected void sse_encode_box_autoadd_browser_settings_info(BrowserSettingsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_browser_settings_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_btc_account_xpubs_input_info(BtcAccountXpubsInputInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_btc_account_xpubs_input_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_colors_info(ColorsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_colors_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_connection_info(ConnectionInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_connection_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_f_32(self, serializer); }
-
-@protected void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_f_64(self, serializer); }
-
-@protected void sse_encode_box_autoadd_f_token_info(FTokenInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_f_token_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_final_output_info(FinalOutputInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_final_output_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_ledger_params_input(LedgerParamsInput self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_ledger_params_input(self, serializer); }
-
-@protected void sse_encode_box_autoadd_metadata_thorchain(MetadataThorchain self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_metadata_thorchain(self, serializer); }
-
-@protected void sse_encode_box_autoadd_network_config_info(NetworkConfigInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_network_config_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_qr_config_info(QrConfigInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_qr_config_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_record_transaction_bitcoin_bitcoin_metadata_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_required_tx_params_info(RequiredTxParamsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_required_tx_params_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_token_transfer_params_info(TokenTransferParamsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_token_transfer_params_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_transaction_bitcoin(TransactionBitcoin self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_bitcoin(self, serializer); }
-
-@protected void sse_encode_box_autoadd_transaction_request_evm(TransactionRequestEVM self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_request_evm(self, serializer); }
-
-@protected void sse_encode_box_autoadd_transaction_request_info(TransactionRequestInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_request_info(self, serializer); }
-
-@protected void sse_encode_box_autoadd_transaction_request_scilla(TransactionRequestScilla self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_request_scilla(self, serializer); }
-
-@protected void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_64(self, serializer); }
-
-@protected void sse_encode_box_autoadd_wallet_settings_info(WalletSettingsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_wallet_settings_info(self, serializer); }
-
-@protected void sse_encode_browser_settings_info(BrowserSettingsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.searchEngineIndex, serializer);
-sse_encode_bool(self.cacheEnabled, serializer);
-sse_encode_bool(self.cookiesEnabled, serializer);
-sse_encode_u_8(self.contentBlocking, serializer);
-sse_encode_bool(self.doNotTrack, serializer);
-sse_encode_bool(self.incognitoMode, serializer);
-sse_encode_f_32(self.textScalingFactor, serializer);
-sse_encode_bool(self.allowGeolocation, serializer);
-sse_encode_bool(self.allowCamera, serializer);
-sse_encode_bool(self.allowMicrophone, serializer);
-sse_encode_bool(self.allowAutoPlay, serializer);
- }
-
-@protected void sse_encode_btc_account_xpubs_input_info(BtcAccountXpubsInputInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.bip44Xpub, serializer);
-sse_encode_String(self.bip49Xpub, serializer);
-sse_encode_String(self.bip84Xpub, serializer);
-sse_encode_String(self.bip86Xpub, serializer);
- }
-
-@protected void sse_encode_btc_address_entry_info(BtcAddressEntryInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.address, serializer);
-sse_encode_String(self.path, serializer);
-sse_encode_list_String(self.history, serializer);
-sse_encode_list_utxo_info(self.utxos, serializer);
- }
-
-@protected void sse_encode_category(Category self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_list_entry(self.entries, serializer);
- }
-
-@protected void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_opt_String(self.primary, serializer);
-sse_encode_opt_String(self.secondary, serializer);
-sse_encode_opt_String(self.background, serializer);
-sse_encode_opt_String(self.text, serializer);
- }
-
-@protected void sse_encode_connection_info(ConnectionInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.domain, serializer);
-sse_encode_list_prim_usize_strict(self.accountIndexes, serializer);
-sse_encode_opt_String(self.favicon, serializer);
-sse_encode_String(self.title, serializer);
-sse_encode_opt_String(self.description, serializer);
-sse_encode_opt_box_autoadd_colors_info(self.colors, serializer);
-sse_encode_u_64(self.lastConnected, serializer);
-sse_encode_bool(self.canReadAccounts, serializer);
-sse_encode_bool(self.canRequestSignatures, serializer);
-sse_encode_bool(self.canSuggestTokens, serializer);
-sse_encode_bool(self.canSuggestTransactions, serializer);
- }
-
-@protected void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.domainSeparator, serializer);
-sse_encode_list_prim_u_8_strict(self.hashStructMessage, serializer);
- }
-
-@protected void sse_encode_encoded_rlp_tx(EncodedRLPTx self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.bytes, serializer);
-sse_encode_list_list_prim_u_8_strict(self.chunksBytes, serializer);
- }
-
-@protected void sse_encode_entry(Entry self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.address, serializer);
-sse_encode_opt_String(self.tag, serializer);
- }
-
-@protected void sse_encode_exchange_provider(ExchangeProvider self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-switch (self) { case ExchangeProvider_Thorchain(field0: final field0): sse_encode_i_32(0, serializer); sse_encode_box_autoadd_metadata_thorchain(field0, serializer);
-  } }
-
-@protected void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.url, serializer);
-sse_encode_opt_String(self.icon, serializer);
-sse_encode_u_16(self.standard, serializer);
- }
-
-@protected void sse_encode_f_32(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putFloat32(self); }
-
-@protected void sse_encode_f_64(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putFloat64(self); }
-
-@protected void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.symbol, serializer);
-sse_encode_u_8(self.decimals, serializer);
-sse_encode_String(self.addr, serializer);
-sse_encode_u_8(self.addrType, serializer);
-sse_encode_opt_String(self.logo, serializer);
-sse_encode_Map_usize_String_None(self.balances, serializer);
-sse_encode_f_64(self.rate, serializer);
-sse_encode_bool(self.default_, serializer);
-sse_encode_bool(self.native, serializer);
-sse_encode_u_64(self.chainHash, serializer);
- }
-
-@protected void sse_encode_final_output_info(FinalOutputInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.address, serializer);
-sse_encode_opt_box_autoadd_f_token_info(self.token, serializer);
-sse_encode_String(self.delegAmt, serializer);
-sse_encode_String(self.rewards, serializer);
-sse_encode_String(self.claimableAmount, serializer);
-sse_encode_opt_box_autoadd_f_64(self.apr, serializer);
-sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
-sse_encode_opt_box_autoadd_u_64(self.unbondingPeriodSeconds, serializer);
-sse_encode_opt_box_autoadd_f_32(self.lstPriceChangePercent, serializer);
-sse_encode_opt_box_autoadd_u_64(self.avgBlockTimeMs, serializer);
-sse_encode_String(self.tag, serializer);
-sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
-sse_encode_list_pending_withdrawal_info(self.pendingWithdrawals, serializer);
- }
-
-@protected void sse_encode_finalized_btc_tx(FinalizedBtcTx self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.rawTxHex, serializer);
-sse_encode_String(self.txHash, serializer);
-sse_encode_list_prim_u_8_strict(self.psbtBytes, serializer);
- }
-
-@protected void sse_encode_gas_fee_history_info(GasFeeHistoryInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_U128(self.maxFee, serializer);
-sse_encode_U128(self.priorityFee, serializer);
-sse_encode_U128(self.baseFee, serializer);
- }
-
-@protected void sse_encode_historical_transaction_info(HistoricalTransactionInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_status_info(self.status, serializer);
-sse_encode_transaction_metadata_info(self.metadata, serializer);
-sse_encode_opt_String(self.evm, serializer);
-sse_encode_opt_String(self.scilla, serializer);
-sse_encode_opt_box_autoadd_transaction_bitcoin(self.btc, serializer);
-sse_encode_opt_String(self.tron, serializer);
-sse_encode_opt_String(self.solana, serializer);
-sse_encode_opt_String(self.signedMessage, serializer);
-sse_encode_u_64(self.timestamp, serializer);
- }
-
-@protected void sse_encode_i_32(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putInt32(self); }
-
-@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putPlatformInt64(self); }
-
-@protected void sse_encode_input_meta_info(InputMetaInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.addressType, serializer);
-sse_encode_String(self.derivationPath, serializer);
- }
-
-@protected void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.sk, serializer);
-sse_encode_String(self.pk, serializer);
- }
-
-@protected void sse_encode_ledger_input_signature(LedgerInputSignature self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_32(self.inputIndex, serializer);
-sse_encode_list_prim_u_8_strict(self.signature, serializer);
-sse_encode_list_prim_u_8_strict(self.pubkey, serializer);
- }
-
-@protected void sse_encode_ledger_params_input(LedgerParamsInput self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_record_u_8_string(self.pubKeys, serializer);
-sse_encode_usize(self.walletIndex, serializer);
-sse_encode_String(self.walletName, serializer);
-sse_encode_String(self.ledgerId, serializer);
-sse_encode_list_String(self.accountNames, serializer);
-sse_encode_String(self.biometricType, serializer);
-sse_encode_u_64(self.chainHash, serializer);
-sse_encode_bool(self.zilliqaLegacy, serializer);
-sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(self.btcChains, serializer);
- }
-
-@protected void sse_encode_list_String(List<String> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_String(item, serializer); } }
-
-@protected void sse_encode_list_access_list_item(List<AccessListItem> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_access_list_item(item, serializer); } }
-
-@protected void sse_encode_list_account_info(List<AccountInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_account_info(item, serializer); } }
-
-@protected void sse_encode_list_address_book_entry_info(List<AddressBookEntryInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_address_book_entry_info(item, serializer); } }
-
-@protected void sse_encode_list_btc_address_entry_info(List<BtcAddressEntryInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_btc_address_entry_info(item, serializer); } }
-
-@protected void sse_encode_list_category(List<Category> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_category(item, serializer); } }
-
-@protected void sse_encode_list_connection_info(List<ConnectionInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_connection_info(item, serializer); } }
-
-@protected void sse_encode_list_entry(List<Entry> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_entry(item, serializer); } }
-
-@protected void sse_encode_list_exchange_provider(List<ExchangeProvider> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_exchange_provider(item, serializer); } }
-
-@protected void sse_encode_list_explorer_info(List<ExplorerInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_explorer_info(item, serializer); } }
-
-@protected void sse_encode_list_f_token_info(List<FTokenInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_f_token_info(item, serializer); } }
-
-@protected void sse_encode_list_final_output_info(List<FinalOutputInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_final_output_info(item, serializer); } }
-
-@protected void sse_encode_list_historical_transaction_info(List<HistoricalTransactionInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_historical_transaction_info(item, serializer); } }
-
-@protected void sse_encode_list_input_meta_info(List<InputMetaInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_input_meta_info(item, serializer); } }
-
-@protected void sse_encode_list_ledger_input_signature(List<LedgerInputSignature> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_ledger_input_signature(item, serializer); } }
-
-@protected void sse_encode_list_list_list_prim_u_8_strict(List<List<Uint8List>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_list_list_prim_u_8_strict(item, serializer); } }
-
-@protected void sse_encode_list_list_prim_u_8_strict(List<Uint8List> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_list_prim_u_8_strict(item, serializer); } }
-
-@protected void sse_encode_list_network_config_info(List<NetworkConfigInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_network_config_info(item, serializer); } }
-
-@protected void sse_encode_list_pending_withdrawal_info(List<PendingWithdrawalInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_pending_withdrawal_info(item, serializer); } }
-
-@protected void sse_encode_list_prim_u_16_strict(Uint16List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint16List(self); }
-
-@protected void sse_encode_list_prim_u_32_strict(Uint32List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint32List(self); }
-
-@protected void sse_encode_list_prim_u_64_strict(Uint64List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint64List(self); }
-
-@protected void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint8List(self is Uint8List ? self : Uint8List.fromList(self)); }
-
-@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint8List(self); }
-
-@protected void sse_encode_list_prim_usize_strict(Uint64List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-                    serializer.buffer.putUint64List(self); }
-
-@protected void sse_encode_list_record_string_string(List<(String,String)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_string_string(item, serializer); } }
-
-@protected void sse_encode_list_record_u_32_list_account_info(List<(int,List<AccountInfo>)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_u_32_list_account_info(item, serializer); } }
-
-@protected void sse_encode_list_record_u_32_map_u_32_list_account_info_none(List<(int,Map<int, List<AccountInfo>>)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_u_32_map_u_32_list_account_info_none(item, serializer); } }
-
-@protected void sse_encode_list_record_u_8_address_chain_info(List<(int,AddressChainInfo)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_u_8_address_chain_info(item, serializer); } }
-
-@protected void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(List<(int,Map<int, AddressChainInfo>)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_u_8_map_u_8_address_chain_info_none(item, serializer); } }
-
-@protected void sse_encode_list_record_u_8_string(List<(int,String)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_u_8_string(item, serializer); } }
-
-@protected void sse_encode_list_record_usize_background_notification_state(List<(BigInt,BackgroundNotificationState)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_usize_background_notification_state(item, serializer); } }
-
-@protected void sse_encode_list_record_usize_string(List<(BigInt,String)> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_record_usize_string(item, serializer); } }
-
-@protected void sse_encode_list_rust_ledger_ble_device(List<RustLedgerBleDevice> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_rust_ledger_ble_device(item, serializer); } }
-
-@protected void sse_encode_list_rust_ledger_hid_device(List<RustLedgerHidDevice> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_rust_ledger_hid_device(item, serializer); } }
-
-@protected void sse_encode_list_tx_in_info(List<TxInInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_tx_in_info(item, serializer); } }
-
-@protected void sse_encode_list_tx_out_info(List<TxOutInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_tx_out_info(item, serializer); } }
-
-@protected void sse_encode_list_utxo_info(List<UtxoInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_utxo_info(item, serializer); } }
-
-@protected void sse_encode_list_wallet_info(List<WalletInfo> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.length, serializer);
-        for (final item in self) { sse_encode_wallet_info(item, serializer); } }
-
-@protected void sse_encode_merkelized_psbt(MerkelizedPsbt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.globalMapCommitment, serializer);
-sse_encode_list_list_prim_u_8_strict(self.globalMapKeysLeaves, serializer);
-sse_encode_list_list_prim_u_8_strict(self.globalMapValuesLeaves, serializer);
-sse_encode_list_list_prim_u_8_strict(self.inputMapCommitments, serializer);
-sse_encode_list_list_list_prim_u_8_strict(self.inputMapKeysLeaves, serializer);
-sse_encode_list_list_list_prim_u_8_strict(self.inputMapValuesLeaves, serializer);
-sse_encode_list_list_prim_u_8_strict(self.outputMapCommitments, serializer);
-sse_encode_list_list_list_prim_u_8_strict(self.outputMapKeysLeaves, serializer);
-sse_encode_list_list_list_prim_u_8_strict(self.outputMapValuesLeaves, serializer);
-sse_encode_list_prim_u_8_strict(self.inputMapsRoot, serializer);
-sse_encode_list_prim_u_8_strict(self.outputMapsRoot, serializer);
-sse_encode_list_list_prim_u_8_strict(self.preimageHashes, serializer);
-sse_encode_list_list_prim_u_8_strict(self.preimageData, serializer);
-sse_encode_u_32(self.inputCount, serializer);
-sse_encode_u_32(self.outputCount, serializer);
-sse_encode_list_prim_u_8_strict(self.psbtBytes, serializer);
- }
-
-@protected void sse_encode_merkle_proof(MerkleProof self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.leafHash, serializer);
-sse_encode_list_list_prim_u_8_strict(self.proofHashes, serializer);
- }
-
-@protected void sse_encode_metadata_thorchain(MetadataThorchain self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.dummy, serializer);
- }
-
-@protected void sse_encode_network_config_info(NetworkConfigInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.logo, serializer);
-sse_encode_String(self.chain, serializer);
-sse_encode_String(self.shortName, serializer);
-sse_encode_list_String(self.rpc, serializer);
-sse_encode_list_prim_u_16_strict(self.features, serializer);
-sse_encode_u_64(self.chainId, serializer);
-sse_encode_list_prim_u_64_strict(self.chainIds, serializer);
-sse_encode_u_32(self.slip44, serializer);
-sse_encode_u_64(self.diffBlockTime, serializer);
-sse_encode_u_64(self.chainHash, serializer);
-sse_encode_opt_String(self.ens, serializer);
-sse_encode_list_explorer_info(self.explorers, serializer);
-sse_encode_bool(self.fallbackEnabled, serializer);
-sse_encode_opt_box_autoadd_bool(self.testnet, serializer);
-sse_encode_list_f_token_info(self.ftokens, serializer);
- }
-
-@protected void sse_encode_opt_Map_u_8_address_chain_info_None(Map<int, AddressChainInfo>? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_Map_u_8_address_chain_info_None(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_String(String? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_String(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_U128(BigInt? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_U128(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_base_token_info(BaseTokenInfo? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_base_token_info(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_bool(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_colors_info(ColorsInfo? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_colors_info(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_f_32(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_f_64(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_f_token_info(FTokenInfo? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_f_token_info(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo)? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_transaction_bitcoin(TransactionBitcoin? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_transaction_bitcoin(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_transaction_request_evm(TransactionRequestEVM? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_transaction_request_evm(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_transaction_request_scilla(TransactionRequestScilla? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_transaction_request_scilla(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_box_autoadd_u_64(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_list_String(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_list_access_list_item(List<AccessListItem>? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_list_access_list_item(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_opt_list_prim_u_8_strict(Uint8List? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-
-                sse_encode_bool(self != null, serializer);
-                if (self != null) {
-                    sse_encode_list_prim_u_8_strict(self, serializer);
-                }
-                 }
-
-@protected void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.txid, serializer);
-sse_encode_u_32(self.vout, serializer);
- }
-
-@protected void sse_encode_pending_withdrawal_info(PendingWithdrawalInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.amount, serializer);
-sse_encode_u_64(self.withdrawalBlock, serializer);
-sse_encode_bool(self.claimable, serializer);
- }
-
-@protected void sse_encode_q_rcode_scan_result_info(QRcodeScanResultInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.recipient, serializer);
-sse_encode_opt_String(self.provider, serializer);
-sse_encode_opt_String(self.tokenAddress, serializer);
-sse_encode_opt_String(self.amount, serializer);
- }
-
-@protected void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_32(self.size, serializer);
-sse_encode_bool(self.gapless, serializer);
-sse_encode_u_32(self.color, serializer);
-sse_encode_u_8(self.eyeShape, serializer);
-sse_encode_u_8(self.dataModuleShape, serializer);
- }
-
-@protected void sse_encode_record_list_network_config_info_list_network_config_info((List<NetworkConfigInfo>,List<NetworkConfigInfo>) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_network_config_info(self.$1, serializer);
-sse_encode_list_network_config_info(self.$2, serializer);
- }
-
-@protected void sse_encode_record_list_prim_u_8_strict_string((Uint8List,String) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.$1, serializer);
-sse_encode_String(self.$2, serializer);
- }
-
-@protected void sse_encode_record_string_string((String,String) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.$1, serializer);
-sse_encode_String(self.$2, serializer);
- }
-
-@protected void sse_encode_record_string_u_8((String,int) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.$1, serializer);
-sse_encode_u_8(self.$2, serializer);
- }
-
-@protected void sse_encode_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_bitcoin(self.$1, serializer);
-sse_encode_bitcoin_metadata_info(self.$2, serializer);
- }
-
-@protected void sse_encode_record_u_32_list_account_info((int,List<AccountInfo>) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_32(self.$1, serializer);
-sse_encode_list_account_info(self.$2, serializer);
- }
-
-@protected void sse_encode_record_u_32_map_u_32_list_account_info_none((int,Map<int, List<AccountInfo>>) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_32(self.$1, serializer);
-sse_encode_Map_u_32_list_account_info_None(self.$2, serializer);
- }
-
-@protected void sse_encode_record_u_8_address_chain_info((int,AddressChainInfo) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.$1, serializer);
-sse_encode_address_chain_info(self.$2, serializer);
- }
-
-@protected void sse_encode_record_u_8_map_u_8_address_chain_info_none((int,Map<int, AddressChainInfo>) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.$1, serializer);
-sse_encode_Map_u_8_address_chain_info_None(self.$2, serializer);
- }
-
-@protected void sse_encode_record_u_8_string((int,String) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_8(self.$1, serializer);
-sse_encode_String(self.$2, serializer);
- }
-
-@protected void sse_encode_record_usize_background_notification_state((BigInt,BackgroundNotificationState) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize(self.$1, serializer);
-sse_encode_background_notification_state(self.$2, serializer);
- }
-
-@protected void sse_encode_record_usize_string((BigInt,String) self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize(self.$1, serializer);
-sse_encode_String(self.$2, serializer);
- }
-
-@protected void sse_encode_required_tx_params_info(RequiredTxParamsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_U128(self.gasPrice, serializer);
-sse_encode_U128(self.maxPriorityFee, serializer);
-sse_encode_gas_fee_history_info(self.feeHistory, serializer);
-sse_encode_u_64(self.txEstimateGas, serializer);
-sse_encode_U128(self.blobBaseFee, serializer);
-sse_encode_u_64(self.nonce, serializer);
-sse_encode_String(self.slow, serializer);
-sse_encode_String(self.market, serializer);
-sse_encode_String(self.fast, serializer);
-sse_encode_String(self.current, serializer);
- }
-
-@protected void sse_encode_rust_ledger_ble_device(RustLedgerBleDevice self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.deviceId, serializer);
-sse_encode_String(self.name, serializer);
-sse_encode_String(self.serviceUuid, serializer);
-sse_encode_String(self.modelId, serializer);
-sse_encode_String(self.productName, serializer);
- }
-
-@protected void sse_encode_rust_ledger_hid_device(RustLedgerHidDevice self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.deviceId, serializer);
-sse_encode_u_16(self.vendorId, serializer);
-sse_encode_u_16(self.productId, serializer);
-sse_encode_String(self.productName, serializer);
-sse_encode_String(self.modelId, serializer);
- }
-
-@protected void sse_encode_token_transfer_params_info(TokenTransferParamsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_usize(self.walletIndex, serializer);
-sse_encode_usize(self.accountIndex, serializer);
-sse_encode_f_token_info(self.token, serializer);
-sse_encode_String(self.amount, serializer);
-sse_encode_String(self.recipient, serializer);
-sse_encode_String(self.icon, serializer);
- }
-
-@protected void sse_encode_transaction_bitcoin(TransactionBitcoin self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.version, serializer);
-sse_encode_u_32(self.lockTime, serializer);
-sse_encode_list_tx_in_info(self.input, serializer);
-sse_encode_list_tx_out_info(self.output, serializer);
-sse_encode_opt_box_autoadd_u_64(self.fee, serializer);
- }
-
-@protected void sse_encode_transaction_metadata_info(TransactionMetadataInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_64(self.chainHash, serializer);
-sse_encode_opt_String(self.hash, serializer);
-sse_encode_opt_String(self.info, serializer);
-sse_encode_opt_String(self.icon, serializer);
-sse_encode_opt_String(self.title, serializer);
-sse_encode_opt_String(self.signer, serializer);
-sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
-sse_encode_bool(self.broadcast, serializer);
- }
-
-@protected void sse_encode_transaction_request_evm(TransactionRequestEVM self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_opt_box_autoadd_u_64(self.nonce, serializer);
-sse_encode_opt_String(self.from, serializer);
-sse_encode_opt_String(self.to, serializer);
-sse_encode_opt_String(self.value, serializer);
-sse_encode_opt_box_autoadd_u_64(self.gasLimit, serializer);
-sse_encode_opt_list_prim_u_8_strict(self.data, serializer);
-sse_encode_opt_U128(self.maxFeePerGas, serializer);
-sse_encode_opt_U128(self.maxPriorityFeePerGas, serializer);
-sse_encode_opt_U128(self.gasPrice, serializer);
-sse_encode_opt_box_autoadd_u_64(self.chainId, serializer);
-sse_encode_opt_list_access_list_item(self.accessList, serializer);
-sse_encode_opt_list_String(self.blobVersionedHashes, serializer);
-sse_encode_opt_U128(self.maxFeePerBlobGas, serializer);
- }
-
-@protected void sse_encode_transaction_request_info(TransactionRequestInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_transaction_metadata_info(self.metadata, serializer);
-sse_encode_opt_box_autoadd_transaction_request_scilla(self.scilla, serializer);
-sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
-sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(self.btc, serializer);
-sse_encode_opt_String(self.tron, serializer);
-sse_encode_opt_list_prim_u_8_strict(self.solana, serializer);
- }
-
-@protected void sse_encode_transaction_request_scilla(TransactionRequestScilla self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_16(self.chainId, serializer);
-sse_encode_u_64(self.nonce, serializer);
-sse_encode_U128(self.gasPrice, serializer);
-sse_encode_u_64(self.gasLimit, serializer);
-sse_encode_String(self.toAddr, serializer);
-sse_encode_U128(self.amount, serializer);
-sse_encode_String(self.code, serializer);
-sse_encode_String(self.data, serializer);
- }
-
-@protected void sse_encode_transaction_status_info(TransactionStatusInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_i_32(self.index, serializer); }
-
-@protected void sse_encode_tx_in_info(TxInInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_out_point_info(self.previousOutput, serializer);
-sse_encode_list_prim_u_8_strict(self.scriptSig, serializer);
-sse_encode_u_32(self.sequence, serializer);
-sse_encode_list_list_prim_u_8_strict(self.witness, serializer);
-sse_encode_opt_String(self.address, serializer);
- }
-
-@protected void sse_encode_tx_out_info(TxOutInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_64(self.value, serializer);
-sse_encode_list_prim_u_8_strict(self.scriptPubkey, serializer);
-sse_encode_opt_String(self.address, serializer);
- }
-
-@protected void sse_encode_u_16(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint16(self); }
-
-@protected void sse_encode_u_32(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint32(self); }
-
-@protected void sse_encode_u_64(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putBigUint64(self); }
-
-@protected void sse_encode_u_8(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putUint8(self); }
-
-@protected void sse_encode_unit(void self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
- }
-
-@protected void sse_encode_usize(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-serializer.buffer.putBigUint64(self); }
-
-@protected void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.txid, serializer);
-sse_encode_u_32(self.vout, serializer);
-sse_encode_u_64(self.value, serializer);
-sse_encode_u_32(self.height, serializer);
- }
-
-@protected void sse_encode_wallet_argon_params_info(WalletArgonParamsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_u_32(self.memory, serializer);
-sse_encode_u_32(self.iterations, serializer);
-sse_encode_u_32(self.threads, serializer);
-sse_encode_String(self.secret, serializer);
- }
-
-@protected void sse_encode_wallet_info(WalletInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.walletType, serializer);
-sse_encode_String(self.walletName, serializer);
-sse_encode_String(self.authType, serializer);
-sse_encode_String(self.walletAddress, serializer);
-sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(self.accounts, serializer);
-sse_encode_usize(self.selectedAccount, serializer);
-sse_encode_list_f_token_info(self.tokens, serializer);
-sse_encode_wallet_settings_info(self.settings, serializer);
-sse_encode_u_64(self.chainHash, serializer);
-sse_encode_u_32(self.slip44, serializer);
-sse_encode_u_32(self.bip, serializer);
- }
-
-@protected void sse_encode_wallet_policy(WalletPolicy self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_String(self.descriptorTemplate, serializer);
-sse_encode_list_String(self.keysInfo, serializer);
-sse_encode_list_prim_u_8_strict(self.policyId, serializer);
-sse_encode_list_prim_u_8_strict(self.policyHmac, serializer);
-sse_encode_list_prim_u_8_strict(self.serialized, serializer);
- }
-
-@protected void sse_encode_wallet_settings_info(WalletSettingsInfo self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
-sse_encode_list_prim_u_8_strict(self.cipherOrders, serializer);
-sse_encode_wallet_argon_params_info(self.argonParams, serializer);
-sse_encode_String(self.currencyConvert, serializer);
-sse_encode_opt_String(self.ipfsNode, serializer);
-sse_encode_bool(self.ensEnabled, serializer);
-sse_encode_bool(self.tokensListFetcher, serializer);
-sse_encode_bool(self.nodeRankingEnabled, serializer);
-sse_encode_u_8(self.maxConnections, serializer);
-sse_encode_u_32(self.requestTimeoutSecs, serializer);
-sse_encode_u_8(self.ratesApiOptions, serializer);
- }
-                }
-                
-
-            @sealed class LocalStorageImplImpl extends RustOpaque implements LocalStorageImpl {
-                // Not to be used by end users
-                LocalStorageImplImpl.frbInternalDcoDecode(List<dynamic> wire):
-                    super.frbInternalDcoDecode(wire, _kStaticData);
-
-                // Not to be used by end users
-                LocalStorageImplImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative):
-                    super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-                static final _kStaticData = RustArcStaticData(
-                    rustArcIncrementStrongCount: RustLib.instance.api.rust_arc_increment_strong_count_LocalStorageImpl,
-                    rustArcDecrementStrongCount: RustLib.instance.api.rust_arc_decrement_strong_count_LocalStorageImpl,
-                    rustArcDecrementStrongCountPtr: RustLib.instance.api.rust_arc_decrement_strong_count_LocalStorageImplPtr,
-                );
-
-                 Future<String?>  get_({required String key })=>RustLib.instance.api.crateApiLocalStorageLocalStorageImplGet(that: this, key: key);
-
-
- Future<void>  rm({required String key })=>RustLib.instance.api.crateApiLocalStorageLocalStorageImplRm(that: this, key: key);
-
-
- Future<void>  set_({required String key , required String value })=>RustLib.instance.api.crateApiLocalStorageLocalStorageImplSet(that: this, key: key, value: value);
-
-
-            }
+          decodeErrorData: sse_decode_AnyhowException,
+        )),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_StreamSink_block_event_Sse(
+      RustStreamSink<BlockEvent> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+        self.setupAndSerialize(
+            codec: SseCodec(
+          decodeSuccessData: sse_decode_block_event,
+          decodeErrorData: sse_decode_AnyhowException,
+        )),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_U128(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.toString(), serializer);
+  }
+
+  @protected
+  void sse_encode_access_list_item(
+      AccessListItem self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.address, serializer);
+    sse_encode_list_String(self.storageKeys, serializer);
+  }
+
+  @protected
+  void sse_encode_account_info(AccountInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.addr, serializer);
+    sse_encode_opt_String(self.pubKey, serializer);
+    sse_encode_u_8(self.addrType, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_usize(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_add_next_bip_39_account_params(
+      AddNextBip39AccountParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.walletIndex, serializer);
+    sse_encode_usize(self.accountIndex, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.passphrase, serializer);
+    sse_encode_opt_String(self.password, serializer);
+  }
+
+  @protected
+  void sse_encode_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sk, serializer);
+    sse_encode_String(self.password, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_32(self.bipPurpose, serializer);
+  }
+
+  @protected
+  void sse_encode_address_book_entry_info(
+      AddressBookEntryInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.addr, serializer);
+    sse_encode_usize(self.net, serializer);
+    sse_encode_u_32(self.slip44, serializer);
+  }
+
+  @protected
+  void sse_encode_address_chain_info(
+      AddressChainInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_btc_address_entry_info(self.external_, serializer);
+    sse_encode_list_btc_address_entry_info(self.internal, serializer);
+  }
+
+  @protected
+  void sse_encode_background_notification_state(
+      BackgroundNotificationState self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.transactions, serializer);
+    sse_encode_bool(self.price, serializer);
+    sse_encode_bool(self.security, serializer);
+    sse_encode_bool(self.balance, serializer);
+  }
+
+  @protected
+  void sse_encode_background_state(
+      BackgroundState self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_wallet_info(self.wallets, serializer);
+    sse_encode_Map_usize_background_notification_state_None(
+        self.notificationsWalletStates, serializer);
+    sse_encode_bool(self.notificationsGlobalEnabled, serializer);
+    sse_encode_opt_String(self.locale, serializer);
+    sse_encode_u_8(self.appearances, serializer);
+    sse_encode_bool(self.abbreviatedNumber, serializer);
+    sse_encode_browser_settings_info(self.browserSettings, serializer);
+    sse_encode_list_network_config_info(self.providers, serializer);
+  }
+
+  @protected
+  void sse_encode_base_token_info(
+      BaseTokenInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.value, serializer);
+    sse_encode_String(self.symbol, serializer);
+    sse_encode_u_8(self.decimals, serializer);
+  }
+
+  @protected
+  void sse_encode_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.password, serializer);
+    sse_encode_String(self.mnemonicStr, serializer);
+    sse_encode_bool(self.mnemonicCheck, serializer);
+    sse_encode_list_record_usize_string(self.accounts, serializer);
+    sse_encode_String(self.passphrase, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+  }
+
+  @protected
+  void sse_encode_bitcoin_metadata_info(
+      BitcoinMetadataInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_tx_out_info(self.witnessUtxos, serializer);
+    sse_encode_list_input_meta_info(self.inputMeta, serializer);
+  }
+
+  @protected
+  void sse_encode_block_event(BlockEvent self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_u_64(self.blockNumber, serializer);
+    sse_encode_opt_String(self.error, serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_add_next_bip_39_account_params(
+      AddNextBip39AccountParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_add_next_bip_39_account_params(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_add_sk_wallet_params(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_base_token_info(
+      BaseTokenInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_base_token_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bip_39_add_wallet_params(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_browser_settings_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_btc_account_xpubs_input_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_colors_info(
+      ColorsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_colors_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_connection_info(
+      ConnectionInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_connection_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_32(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_f_token_info(
+      FTokenInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_token_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_final_output_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_ledger_params_input(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_metadata_thorchain(
+      MetadataThorchain self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_metadata_thorchain(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_network_config_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_qr_config_info(
+      QrConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_qr_config_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      (TransactionBitcoin, BitcoinMetadataInfo) self,
+      SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_record_transaction_bitcoin_bitcoin_metadata_info(
+        self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_required_tx_params_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_token_transfer_params_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_bitcoin(
+      TransactionBitcoin self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_bitcoin(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_evm(
+      TransactionRequestEVM self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_evm(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_info(
+      TransactionRequestInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_scilla(
+      TransactionRequestScilla self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_scilla(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_wallet_settings_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.searchEngineIndex, serializer);
+    sse_encode_bool(self.cacheEnabled, serializer);
+    sse_encode_bool(self.cookiesEnabled, serializer);
+    sse_encode_u_8(self.contentBlocking, serializer);
+    sse_encode_bool(self.doNotTrack, serializer);
+    sse_encode_bool(self.incognitoMode, serializer);
+    sse_encode_f_32(self.textScalingFactor, serializer);
+    sse_encode_bool(self.allowGeolocation, serializer);
+    sse_encode_bool(self.allowCamera, serializer);
+    sse_encode_bool(self.allowMicrophone, serializer);
+    sse_encode_bool(self.allowAutoPlay, serializer);
+  }
+
+  @protected
+  void sse_encode_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.bip44Xpub, serializer);
+    sse_encode_String(self.bip49Xpub, serializer);
+    sse_encode_String(self.bip84Xpub, serializer);
+    sse_encode_String(self.bip86Xpub, serializer);
+  }
+
+  @protected
+  void sse_encode_btc_address_entry_info(
+      BtcAddressEntryInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.address, serializer);
+    sse_encode_String(self.path, serializer);
+    sse_encode_list_String(self.history, serializer);
+    sse_encode_list_utxo_info(self.utxos, serializer);
+  }
+
+  @protected
+  void sse_encode_category(Category self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_list_entry(self.entries, serializer);
+  }
+
+  @protected
+  void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.primary, serializer);
+    sse_encode_opt_String(self.secondary, serializer);
+    sse_encode_opt_String(self.background, serializer);
+    sse_encode_opt_String(self.text, serializer);
+  }
+
+  @protected
+  void sse_encode_connection_info(
+      ConnectionInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.domain, serializer);
+    sse_encode_list_prim_usize_strict(self.accountIndexes, serializer);
+    sse_encode_opt_String(self.favicon, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_opt_String(self.description, serializer);
+    sse_encode_opt_box_autoadd_colors_info(self.colors, serializer);
+    sse_encode_u_64(self.lastConnected, serializer);
+    sse_encode_bool(self.canReadAccounts, serializer);
+    sse_encode_bool(self.canRequestSignatures, serializer);
+    sse_encode_bool(self.canSuggestTokens, serializer);
+    sse_encode_bool(self.canSuggestTransactions, serializer);
+  }
+
+  @protected
+  void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.domainSeparator, serializer);
+    sse_encode_list_prim_u_8_strict(self.hashStructMessage, serializer);
+  }
+
+  @protected
+  void sse_encode_encoded_rlp_tx(EncodedRLPTx self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.bytes, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.chunksBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_entry(Entry self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.address, serializer);
+    sse_encode_opt_String(self.tag, serializer);
+  }
+
+  @protected
+  void sse_encode_exchange_provider(
+      ExchangeProvider self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case ExchangeProvider_Thorchain(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_metadata_thorchain(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.url, serializer);
+    sse_encode_opt_String(self.icon, serializer);
+    sse_encode_u_16(self.standard, serializer);
+  }
+
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat32(self);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
+  void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.symbol, serializer);
+    sse_encode_u_8(self.decimals, serializer);
+    sse_encode_String(self.addr, serializer);
+    sse_encode_u_8(self.addrType, serializer);
+    sse_encode_opt_String(self.logo, serializer);
+    sse_encode_Map_usize_String_None(self.balances, serializer);
+    sse_encode_f_64(self.rate, serializer);
+    sse_encode_bool(self.default_, serializer);
+    sse_encode_bool(self.native, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+  }
+
+  @protected
+  void sse_encode_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.address, serializer);
+    sse_encode_opt_box_autoadd_f_token_info(self.token, serializer);
+    sse_encode_String(self.delegAmt, serializer);
+    sse_encode_String(self.rewards, serializer);
+    sse_encode_String(self.claimableAmount, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.apr, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.unbondingPeriodSeconds, serializer);
+    sse_encode_opt_box_autoadd_f_32(self.lstPriceChangePercent, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.avgBlockTimeMs, serializer);
+    sse_encode_String(self.tag, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
+    sse_encode_list_pending_withdrawal_info(
+        self.pendingWithdrawals, serializer);
+  }
+
+  @protected
+  void sse_encode_finalized_btc_tx(
+      FinalizedBtcTx self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.rawTxHex, serializer);
+    sse_encode_String(self.txHash, serializer);
+    sse_encode_list_prim_u_8_strict(self.psbtBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_gas_fee_history_info(
+      GasFeeHistoryInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_U128(self.maxFee, serializer);
+    sse_encode_U128(self.priorityFee, serializer);
+    sse_encode_U128(self.baseFee, serializer);
+  }
+
+  @protected
+  void sse_encode_historical_transaction_info(
+      HistoricalTransactionInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_status_info(self.status, serializer);
+    sse_encode_transaction_metadata_info(self.metadata, serializer);
+    sse_encode_opt_String(self.evm, serializer);
+    sse_encode_opt_String(self.scilla, serializer);
+    sse_encode_opt_box_autoadd_transaction_bitcoin(self.btc, serializer);
+    sse_encode_opt_String(self.tron, serializer);
+    sse_encode_opt_String(self.solana, serializer);
+    sse_encode_opt_String(self.signedMessage, serializer);
+    sse_encode_u_64(self.timestamp, serializer);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putPlatformInt64(self);
+  }
+
+  @protected
+  void sse_encode_input_meta_info(
+      InputMetaInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.addressType, serializer);
+    sse_encode_String(self.derivationPath, serializer);
+  }
+
+  @protected
+  void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sk, serializer);
+    sse_encode_String(self.pk, serializer);
+  }
+
+  @protected
+  void sse_encode_ledger_input_signature(
+      LedgerInputSignature self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.inputIndex, serializer);
+    sse_encode_list_prim_u_8_strict(self.signature, serializer);
+    sse_encode_list_prim_u_8_strict(self.pubkey, serializer);
+  }
+
+  @protected
+  void sse_encode_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_u_8_string(self.pubKeys, serializer);
+    sse_encode_usize(self.walletIndex, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.ledgerId, serializer);
+    sse_encode_list_String(self.accountNames, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_bool(self.zilliqaLegacy, serializer);
+    sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+        self.btcChains, serializer);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_access_list_item(
+      List<AccessListItem> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_access_list_item(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_account_info(
+      List<AccountInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_account_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_address_book_entry_info(
+      List<AddressBookEntryInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_address_book_entry_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_btc_address_entry_info(
+      List<BtcAddressEntryInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_btc_address_entry_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_category(List<Category> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_category(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_connection_info(
+      List<ConnectionInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_connection_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_entry(List<Entry> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_entry(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_exchange_provider(
+      List<ExchangeProvider> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_exchange_provider(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_explorer_info(
+      List<ExplorerInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_explorer_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_f_token_info(
+      List<FTokenInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_f_token_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_final_output_info(
+      List<FinalOutputInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_final_output_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_historical_transaction_info(
+      List<HistoricalTransactionInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_historical_transaction_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_input_meta_info(
+      List<InputMetaInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_input_meta_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_ledger_input_signature(
+      List<LedgerInputSignature> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_ledger_input_signature(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_list_list_prim_u_8_strict(
+      List<List<Uint8List>> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_list_prim_u_8_strict(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_list_prim_u_8_strict(
+      List<Uint8List> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_prim_u_8_strict(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_network_config_info(
+      List<NetworkConfigInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_network_config_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_pending_withdrawal_info(
+      List<PendingWithdrawalInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_pending_withdrawal_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_u_16_strict(
+      Uint16List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint16List(self);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_32_strict(
+      Uint32List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint32List(self);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_64_strict(
+      Uint64List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint64List(self);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(
+      List<int> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer
+        .putUint8List(self is Uint8List ? self : Uint8List.fromList(self));
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+      Uint8List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_prim_usize_strict(
+      Uint64List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint64List(self);
+  }
+
+  @protected
+  void sse_encode_list_record_string_string(
+      List<(String, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_32_list_account_info(
+      List<(int, List<AccountInfo>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_32_list_account_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_32_map_u_32_list_account_info_none(
+      List<(int, Map<int, List<AccountInfo>>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_32_map_u_32_list_account_info_none(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_8_address_chain_info(
+      List<(int, AddressChainInfo)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_address_chain_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+      List<(int, Map<int, AddressChainInfo>)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_map_u_8_address_chain_info_none(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_8_string(
+      List<(int, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_usize_background_notification_state(
+      List<(BigInt, BackgroundNotificationState)> self,
+      SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_usize_background_notification_state(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_usize_string(
+      List<(BigInt, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_usize_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_rust_ledger_ble_device(
+      List<RustLedgerBleDevice> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_rust_ledger_ble_device(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_rust_ledger_hid_device(
+      List<RustLedgerHidDevice> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_rust_ledger_hid_device(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_tx_in_info(
+      List<TxInInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tx_in_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_tx_out_info(
+      List<TxOutInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tx_out_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_utxo_info(
+      List<UtxoInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_utxo_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_wallet_info(
+      List<WalletInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_wallet_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_merkelized_psbt(
+      MerkelizedPsbt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.globalMapCommitment, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.globalMapKeysLeaves, serializer);
+    sse_encode_list_list_prim_u_8_strict(
+        self.globalMapValuesLeaves, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.inputMapCommitments, serializer);
+    sse_encode_list_list_list_prim_u_8_strict(
+        self.inputMapKeysLeaves, serializer);
+    sse_encode_list_list_list_prim_u_8_strict(
+        self.inputMapValuesLeaves, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.outputMapCommitments, serializer);
+    sse_encode_list_list_list_prim_u_8_strict(
+        self.outputMapKeysLeaves, serializer);
+    sse_encode_list_list_list_prim_u_8_strict(
+        self.outputMapValuesLeaves, serializer);
+    sse_encode_list_prim_u_8_strict(self.inputMapsRoot, serializer);
+    sse_encode_list_prim_u_8_strict(self.outputMapsRoot, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.preimageHashes, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.preimageData, serializer);
+    sse_encode_u_32(self.inputCount, serializer);
+    sse_encode_u_32(self.outputCount, serializer);
+    sse_encode_list_prim_u_8_strict(self.psbtBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_merkle_proof(MerkleProof self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.leafHash, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.proofHashes, serializer);
+  }
+
+  @protected
+  void sse_encode_metadata_thorchain(
+      MetadataThorchain self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.dummy, serializer);
+  }
+
+  @protected
+  void sse_encode_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.logo, serializer);
+    sse_encode_String(self.chain, serializer);
+    sse_encode_String(self.shortName, serializer);
+    sse_encode_list_String(self.rpc, serializer);
+    sse_encode_list_prim_u_16_strict(self.features, serializer);
+    sse_encode_u_64(self.chainId, serializer);
+    sse_encode_list_prim_u_64_strict(self.chainIds, serializer);
+    sse_encode_u_32(self.slip44, serializer);
+    sse_encode_u_64(self.diffBlockTime, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_opt_String(self.ens, serializer);
+    sse_encode_list_explorer_info(self.explorers, serializer);
+    sse_encode_bool(self.fallbackEnabled, serializer);
+    sse_encode_opt_box_autoadd_bool(self.testnet, serializer);
+    sse_encode_list_f_token_info(self.ftokens, serializer);
+  }
+
+  @protected
+  void sse_encode_opt_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo>? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_Map_u_8_address_chain_info_None(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_U128(BigInt? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_U128(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_base_token_info(
+      BaseTokenInfo? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_base_token_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_bool(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_colors_info(
+      ColorsInfo? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_colors_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_32(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_token_info(
+      FTokenInfo? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_token_info(self, serializer);
+    }
+  }
+
+  @protected
+  void
+      sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          (TransactionBitcoin, BitcoinMetadataInfo)? self,
+          SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_bitcoin(
+      TransactionBitcoin? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_bitcoin(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_evm(
+      TransactionRequestEVM? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_request_evm(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_scilla(
+      TransactionRequestScilla? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_request_scilla(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_String(
+      List<String>? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_access_list_item(
+      List<AccessListItem>? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_access_list_item(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+      Uint8List? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_prim_u_8_strict(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.txid, serializer);
+    sse_encode_u_32(self.vout, serializer);
+  }
+
+  @protected
+  void sse_encode_pending_withdrawal_info(
+      PendingWithdrawalInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.amount, serializer);
+    sse_encode_u_64(self.withdrawalBlock, serializer);
+    sse_encode_bool(self.claimable, serializer);
+  }
+
+  @protected
+  void sse_encode_q_rcode_scan_result_info(
+      QRcodeScanResultInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.recipient, serializer);
+    sse_encode_opt_String(self.provider, serializer);
+    sse_encode_opt_String(self.tokenAddress, serializer);
+    sse_encode_opt_String(self.amount, serializer);
+  }
+
+  @protected
+  void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.size, serializer);
+    sse_encode_bool(self.gapless, serializer);
+    sse_encode_u_32(self.color, serializer);
+    sse_encode_u_8(self.eyeShape, serializer);
+    sse_encode_u_8(self.dataModuleShape, serializer);
+  }
+
+  @protected
+  void sse_encode_record_list_network_config_info_list_network_config_info(
+      (List<NetworkConfigInfo>, List<NetworkConfigInfo>) self,
+      SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_network_config_info(self.$1, serializer);
+    sse_encode_list_network_config_info(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_list_prim_u_8_strict_string(
+      (Uint8List, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_string(
+      (String, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_u_8(
+      (String, int) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_u_8(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_transaction_bitcoin_bitcoin_metadata_info(
+      (TransactionBitcoin, BitcoinMetadataInfo) self,
+      SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_bitcoin(self.$1, serializer);
+    sse_encode_bitcoin_metadata_info(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_32_list_account_info(
+      (int, List<AccountInfo>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.$1, serializer);
+    sse_encode_list_account_info(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_32_map_u_32_list_account_info_none(
+      (int, Map<int, List<AccountInfo>>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.$1, serializer);
+    sse_encode_Map_u_32_list_account_info_None(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_8_address_chain_info(
+      (int, AddressChainInfo) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_address_chain_info(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_8_map_u_8_address_chain_info_none(
+      (int, Map<int, AddressChainInfo>) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_Map_u_8_address_chain_info_None(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_8_string(
+      (int, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_usize_background_notification_state(
+      (BigInt, BackgroundNotificationState) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
+    sse_encode_background_notification_state(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_usize_string(
+      (BigInt, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_U128(self.gasPrice, serializer);
+    sse_encode_U128(self.maxPriorityFee, serializer);
+    sse_encode_gas_fee_history_info(self.feeHistory, serializer);
+    sse_encode_u_64(self.txEstimateGas, serializer);
+    sse_encode_U128(self.blobBaseFee, serializer);
+    sse_encode_u_64(self.nonce, serializer);
+    sse_encode_String(self.slow, serializer);
+    sse_encode_String(self.market, serializer);
+    sse_encode_String(self.fast, serializer);
+    sse_encode_String(self.current, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_ledger_ble_device(
+      RustLedgerBleDevice self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.deviceId, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.serviceUuid, serializer);
+    sse_encode_String(self.modelId, serializer);
+    sse_encode_String(self.productName, serializer);
+  }
+
+  @protected
+  void sse_encode_rust_ledger_hid_device(
+      RustLedgerHidDevice self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.deviceId, serializer);
+    sse_encode_u_16(self.vendorId, serializer);
+    sse_encode_u_16(self.productId, serializer);
+    sse_encode_String(self.productName, serializer);
+    sse_encode_String(self.modelId, serializer);
+  }
+
+  @protected
+  void sse_encode_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.walletIndex, serializer);
+    sse_encode_usize(self.accountIndex, serializer);
+    sse_encode_f_token_info(self.token, serializer);
+    sse_encode_String(self.amount, serializer);
+    sse_encode_String(self.recipient, serializer);
+    sse_encode_String(self.icon, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_bitcoin(
+      TransactionBitcoin self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.version, serializer);
+    sse_encode_u_32(self.lockTime, serializer);
+    sse_encode_list_tx_in_info(self.input, serializer);
+    sse_encode_list_tx_out_info(self.output, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.fee, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_metadata_info(
+      TransactionMetadataInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_opt_String(self.hash, serializer);
+    sse_encode_opt_String(self.info, serializer);
+    sse_encode_opt_String(self.icon, serializer);
+    sse_encode_opt_String(self.title, serializer);
+    sse_encode_opt_String(self.signer, serializer);
+    sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
+    sse_encode_bool(self.broadcast, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_request_evm(
+      TransactionRequestEVM self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_u_64(self.nonce, serializer);
+    sse_encode_opt_String(self.from, serializer);
+    sse_encode_opt_String(self.to, serializer);
+    sse_encode_opt_String(self.value, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.gasLimit, serializer);
+    sse_encode_opt_list_prim_u_8_strict(self.data, serializer);
+    sse_encode_opt_U128(self.maxFeePerGas, serializer);
+    sse_encode_opt_U128(self.maxPriorityFeePerGas, serializer);
+    sse_encode_opt_U128(self.gasPrice, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.chainId, serializer);
+    sse_encode_opt_list_access_list_item(self.accessList, serializer);
+    sse_encode_opt_list_String(self.blobVersionedHashes, serializer);
+    sse_encode_opt_U128(self.maxFeePerBlobGas, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_request_info(
+      TransactionRequestInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_metadata_info(self.metadata, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_scilla(
+        self.scilla, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
+    sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+        self.btc, serializer);
+    sse_encode_opt_String(self.tron, serializer);
+    sse_encode_opt_list_prim_u_8_strict(self.solana, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_request_scilla(
+      TransactionRequestScilla self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_16(self.chainId, serializer);
+    sse_encode_u_64(self.nonce, serializer);
+    sse_encode_U128(self.gasPrice, serializer);
+    sse_encode_u_64(self.gasLimit, serializer);
+    sse_encode_String(self.toAddr, serializer);
+    sse_encode_U128(self.amount, serializer);
+    sse_encode_String(self.code, serializer);
+    sse_encode_String(self.data, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_status_info(
+      TransactionStatusInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_tx_in_info(TxInInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_out_point_info(self.previousOutput, serializer);
+    sse_encode_list_prim_u_8_strict(self.scriptSig, serializer);
+    sse_encode_u_32(self.sequence, serializer);
+    sse_encode_list_list_prim_u_8_strict(self.witness, serializer);
+    sse_encode_opt_String(self.address, serializer);
+  }
+
+  @protected
+  void sse_encode_tx_out_info(TxOutInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.value, serializer);
+    sse_encode_list_prim_u_8_strict(self.scriptPubkey, serializer);
+    sse_encode_opt_String(self.address, serializer);
+  }
+
+  @protected
+  void sse_encode_u_16(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint16(self);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
+  }
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
+  void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.txid, serializer);
+    sse_encode_u_32(self.vout, serializer);
+    sse_encode_u_64(self.value, serializer);
+    sse_encode_u_32(self.height, serializer);
+  }
+
+  @protected
+  void sse_encode_wallet_argon_params_info(
+      WalletArgonParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.memory, serializer);
+    sse_encode_u_32(self.iterations, serializer);
+    sse_encode_u_32(self.threads, serializer);
+    sse_encode_String(self.secret, serializer);
+  }
+
+  @protected
+  void sse_encode_wallet_info(WalletInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.walletType, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.authType, serializer);
+    sse_encode_String(self.walletAddress, serializer);
+    sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
+        self.accounts, serializer);
+    sse_encode_usize(self.selectedAccount, serializer);
+    sse_encode_list_f_token_info(self.tokens, serializer);
+    sse_encode_wallet_settings_info(self.settings, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_32(self.slip44, serializer);
+    sse_encode_u_32(self.bip, serializer);
+  }
+
+  @protected
+  void sse_encode_wallet_policy(WalletPolicy self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.descriptorTemplate, serializer);
+    sse_encode_list_String(self.keysInfo, serializer);
+    sse_encode_list_prim_u_8_strict(self.policyId, serializer);
+    sse_encode_list_prim_u_8_strict(self.policyHmac, serializer);
+    sse_encode_list_prim_u_8_strict(self.serialized, serializer);
+  }
+
+  @protected
+  void sse_encode_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.cipherOrders, serializer);
+    sse_encode_wallet_argon_params_info(self.argonParams, serializer);
+    sse_encode_String(self.currencyConvert, serializer);
+    sse_encode_opt_String(self.ipfsNode, serializer);
+    sse_encode_bool(self.ensEnabled, serializer);
+    sse_encode_bool(self.tokensListFetcher, serializer);
+    sse_encode_bool(self.nodeRankingEnabled, serializer);
+    sse_encode_u_8(self.maxConnections, serializer);
+    sse_encode_u_32(self.requestTimeoutSecs, serializer);
+    sse_encode_u_8(self.ratesApiOptions, serializer);
+  }
+}
+
+@sealed
+class LocalStorageImplImpl extends RustOpaque implements LocalStorageImpl {
+  // Not to be used by end users
+  LocalStorageImplImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  LocalStorageImplImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_LocalStorageImpl,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_LocalStorageImpl,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance.api.rust_arc_decrement_strong_count_LocalStorageImplPtr,
+  );
+
+  Future<String?> get_({required String key}) => RustLib.instance.api
+      .crateApiLocalStorageLocalStorageImplGet(that: this, key: key);
+
+  Future<void> rm({required String key}) => RustLib.instance.api
+      .crateApiLocalStorageLocalStorageImplRm(that: this, key: key);
+
+  Future<void> set_({required String key, required String value}) =>
+      RustLib.instance.api.crateApiLocalStorageLocalStorageImplSet(
+          that: this, key: key, value: value);
+}

@@ -6,31 +6,20 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class MetadataThorchain {
+  final int dummy;
 
-            
+  const MetadataThorchain({
+    required this.dummy,
+  });
 
-            
+  @override
+  int get hashCode => dummy.hashCode;
 
-            class MetadataThorchain  {
-                final int dummy;
-
-                const MetadataThorchain({required this.dummy ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => dummy.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is MetadataThorchain &&
-                runtimeType == other.runtimeType
-                && dummy == other.dummy;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetadataThorchain &&
+          runtimeType == other.runtimeType &&
+          dummy == other.dummy;
+}

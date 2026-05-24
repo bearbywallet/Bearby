@@ -6,34 +6,30 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class AddressBookEntryInfo {
+  final String name;
+  final String addr;
+  final BigInt net;
+  final int slip44;
 
-            
+  const AddressBookEntryInfo({
+    required this.name,
+    required this.addr,
+    required this.net,
+    required this.slip44,
+  });
 
-            
+  @override
+  int get hashCode =>
+      name.hashCode ^ addr.hashCode ^ net.hashCode ^ slip44.hashCode;
 
-            class AddressBookEntryInfo  {
-                final String name;
-final String addr;
-final BigInt net;
-final int slip44;
-
-                const AddressBookEntryInfo({required this.name ,required this.addr ,required this.net ,required this.slip44 ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => name.hashCode^addr.hashCode^net.hashCode^slip44.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is AddressBookEntryInfo &&
-                runtimeType == other.runtimeType
-                && name == other.name&& addr == other.addr&& net == other.net&& slip44 == other.slip44;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddressBookEntryInfo &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          addr == other.addr &&
+          net == other.net &&
+          slip44 == other.slip44;
+}

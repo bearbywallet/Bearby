@@ -7,38 +7,65 @@ import '../frb_generated.dart';
 import '../models/transactions/btc.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `add_preimage`, `build_merkle_map`, `build_merkle_tree`, `build_v2_global_map`, `build_v2_input_maps`, `build_v2_output_maps`, `compute_proof`, `descriptor_template_for_bip`, `encode_varint`, `hash_node`, `highest_power_of_2_less_than`
 
-            // These functions are ignored because they are not marked as `pub`: `add_preimage`, `build_merkle_map`, `build_merkle_tree`, `build_v2_global_map`, `build_v2_input_maps`, `build_v2_output_maps`, `compute_proof`, `descriptor_template_for_bip`, `encode_varint`, `hash_node`, `highest_power_of_2_less_than`
-
-
-            /// Leaf hash: SHA256(0x00 || data)
-Future<Uint8List>  btcLedgerHashLeaf({required List<int> data }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerHashLeaf(data: data);
+/// Leaf hash: SHA256(0x00 || data)
+Future<Uint8List> btcLedgerHashLeaf({required List<int> data}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerHashLeaf(data: data);
 
 /// SHA256 hash
-Future<Uint8List>  btcLedgerSha256({required List<int> data }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerSha256(data: data);
+Future<Uint8List> btcLedgerSha256({required List<int> data}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerSha256(data: data);
 
 /// Compute merkle root from leaf hashes.
-Future<Uint8List>  btcLedgerComputeMerkleRoot({required List<Uint8List> leafHashes }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerComputeMerkleRoot(leafHashes: leafHashes);
+Future<Uint8List> btcLedgerComputeMerkleRoot(
+        {required List<Uint8List> leafHashes}) =>
+    RustLib.instance.api
+        .crateApiBtcLedgerBtcLedgerComputeMerkleRoot(leafHashes: leafHashes);
 
 /// Compute merkle proof for a leaf at the given index.
-Future<MerkleProof>  btcLedgerGetMerkleProof({required List<Uint8List> leafHashes , required int leafIndex }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetMerkleProof(leafHashes: leafHashes, leafIndex: leafIndex);
+Future<MerkleProof> btcLedgerGetMerkleProof(
+        {required List<Uint8List> leafHashes, required int leafIndex}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetMerkleProof(
+        leafHashes: leafHashes, leafIndex: leafIndex);
 
 /// Find the index of a leaf by its hash. Returns -1 if not found.
-Future<PlatformInt64>  btcLedgerGetMerkleLeafIndex({required List<Uint8List> leafHashes , required List<int> targetHash }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex(leafHashes: leafHashes, targetHash: targetHash);
+Future<PlatformInt64> btcLedgerGetMerkleLeafIndex(
+        {required List<Uint8List> leafHashes, required List<int> targetHash}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetMerkleLeafIndex(
+        leafHashes: leafHashes, targetHash: targetHash);
 
 /// Look up preimage data by its SHA-256 hash.
-Future<Uint8List>  btcLedgerGetPreimage({required List<Uint8List> preimageHashes , required List<Uint8List> preimageData , required List<int> requestedHash }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetPreimage(preimageHashes: preimageHashes, preimageData: preimageData, requestedHash: requestedHash);
+Future<Uint8List> btcLedgerGetPreimage(
+        {required List<Uint8List> preimageHashes,
+        required List<Uint8List> preimageData,
+        required List<int> requestedHash}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerGetPreimage(
+        preimageHashes: preimageHashes,
+        preimageData: preimageData,
+        requestedHash: requestedHash);
 
 /// Decompose a PSBT into merkle structures for Ledger signing.
 /// Converts PSBTv0 to PSBTv2 key-value maps as required by the Ledger Bitcoin app v2.
-Future<MerkelizedPsbt>  btcLedgerMerkelisePsbt({required List<int> psbtBytes }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerMerkelisePsbt(psbtBytes: psbtBytes);
+Future<MerkelizedPsbt> btcLedgerMerkelisePsbt({required List<int> psbtBytes}) =>
+    RustLib.instance.api
+        .crateApiBtcLedgerBtcLedgerMerkelisePsbt(psbtBytes: psbtBytes);
 
 /// Build a wallet policy for the Ledger BTC app.
 /// `xpub`: the extended public key string
 /// `master_fingerprint`: 4-byte master key fingerprint
 /// `bip_purpose`: BIP purpose number (44, 49, 84, 86)
 /// `account_index`: the account index in the derivation path
-Future<WalletPolicy>  btcLedgerBuildWalletPolicy({required String xpub , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildWalletPolicy(xpub: xpub, masterFingerprint: masterFingerprint, bipPurpose: bipPurpose, accountIndex: accountIndex);
+Future<WalletPolicy> btcLedgerBuildWalletPolicy(
+        {required String xpub,
+        required List<int> masterFingerprint,
+        required int bipPurpose,
+        required int accountIndex}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildWalletPolicy(
+        xpub: xpub,
+        masterFingerprint: masterFingerprint,
+        bipPurpose: bipPurpose,
+        accountIndex: accountIndex);
 
 /// Finalize a PSBT with signatures collected from Ledger device.
 /// `psbt_bytes`: original PSBT bytes
@@ -46,180 +73,262 @@ Future<WalletPolicy>  btcLedgerBuildWalletPolicy({required String xpub , require
 /// `input_meta`: per-input (address_type, derivation_path), aligned with
 ///   `psbt.unsigned_tx.input[]`. Each input is finalized using its own type,
 ///   so a single PSBT may mix P2PKH/P2SH-P2WPKH/P2WPKH/P2TR inputs.
-Future<FinalizedBtcTx>  btcLedgerFinalizePsbtWithSigs({required List<int> psbtBytes , required List<LedgerInputSignature> sigs , required List<InputMetaInfo> inputMeta }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(psbtBytes: psbtBytes, sigs: sigs, inputMeta: inputMeta);
+Future<FinalizedBtcTx> btcLedgerFinalizePsbtWithSigs(
+        {required List<int> psbtBytes,
+        required List<LedgerInputSignature> sigs,
+        required List<InputMetaInfo> inputMeta}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerFinalizePsbtWithSigs(
+        psbtBytes: psbtBytes, sigs: sigs, inputMeta: inputMeta);
 
-Future<Uint8List>  btcLedgerBuildPsbtFromStruct({required TransactionBitcoin tx , required List<TxOutInfo> witnessUtxos }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(tx: tx, witnessUtxos: witnessUtxos);
+Future<Uint8List> btcLedgerBuildPsbtFromStruct(
+        {required TransactionBitcoin tx,
+        required List<TxOutInfo> witnessUtxos}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
+        tx: tx, witnessUtxos: witnessUtxos);
 
 /// Populate BIP32 derivation info into a PSBT for Ledger signing.
 /// Derives child keys from the account xpub and matches them against
 /// input/output script_pubkeys to set tap_key_origins / bip32_derivation.
-Future<Uint8List>  btcLedgerPreparePsbt({required List<int> psbtBytes , required List<int> masterFingerprint , required int bipPurpose , required int accountIndex , required String xpub }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerPreparePsbt(psbtBytes: psbtBytes, masterFingerprint: masterFingerprint, bipPurpose: bipPurpose, accountIndex: accountIndex, xpub: xpub);
+Future<Uint8List> btcLedgerPreparePsbt(
+        {required List<int> psbtBytes,
+        required List<int> masterFingerprint,
+        required int bipPurpose,
+        required int accountIndex,
+        required String xpub}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerPreparePsbt(
+        psbtBytes: psbtBytes,
+        masterFingerprint: masterFingerprint,
+        bipPurpose: bipPurpose,
+        accountIndex: accountIndex,
+        xpub: xpub);
 
 /// Encode a BIP32 derivation path to bytes for APDU.
 /// Path format: number_of_elements(1) || element1(4) || element2(4) || ...
 /// Hardened elements have bit 31 set.
-Future<Uint8List>  btcLedgerEncodePath({required String path }) => RustLib.instance.api.crateApiBtcLedgerBtcLedgerEncodePath(path: path);
+Future<Uint8List> btcLedgerEncodePath({required String path}) =>
+    RustLib.instance.api.crateApiBtcLedgerBtcLedgerEncodePath(path: path);
 
-            /// Finalized transaction result
-class FinalizedBtcTx  {
-                final String rawTxHex;
-final String txHash;
-final Uint8List psbtBytes;
+/// Finalized transaction result
+class FinalizedBtcTx {
+  final String rawTxHex;
+  final String txHash;
+  final Uint8List psbtBytes;
 
-                const FinalizedBtcTx({required this.rawTxHex ,required this.txHash ,required this.psbtBytes ,});
+  const FinalizedBtcTx({
+    required this.rawTxHex,
+    required this.txHash,
+    required this.psbtBytes,
+  });
 
-                
-                
+  @override
+  int get hashCode => rawTxHex.hashCode ^ txHash.hashCode ^ psbtBytes.hashCode;
 
-                
-        @override
-        int get hashCode => rawTxHex.hashCode^txHash.hashCode^psbtBytes.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is FinalizedBtcTx &&
-                runtimeType == other.runtimeType
-                && rawTxHex == other.rawTxHex&& txHash == other.txHash&& psbtBytes == other.psbtBytes;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FinalizedBtcTx &&
+          runtimeType == other.runtimeType &&
+          rawTxHex == other.rawTxHex &&
+          txHash == other.txHash &&
+          psbtBytes == other.psbtBytes;
+}
 
 /// Input signature from Ledger
-class LedgerInputSignature  {
-                final int inputIndex;
-final Uint8List signature;
-final Uint8List pubkey;
+class LedgerInputSignature {
+  final int inputIndex;
+  final Uint8List signature;
+  final Uint8List pubkey;
 
-                const LedgerInputSignature({required this.inputIndex ,required this.signature ,required this.pubkey ,});
+  const LedgerInputSignature({
+    required this.inputIndex,
+    required this.signature,
+    required this.pubkey,
+  });
 
-                
-                
+  @override
+  int get hashCode =>
+      inputIndex.hashCode ^ signature.hashCode ^ pubkey.hashCode;
 
-                
-        @override
-        int get hashCode => inputIndex.hashCode^signature.hashCode^pubkey.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is LedgerInputSignature &&
-                runtimeType == other.runtimeType
-                && inputIndex == other.inputIndex&& signature == other.signature&& pubkey == other.pubkey;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LedgerInputSignature &&
+          runtimeType == other.runtimeType &&
+          inputIndex == other.inputIndex &&
+          signature == other.signature &&
+          pubkey == other.pubkey;
+}
 
 /// Represents a merkelized PSBT ready for Ledger signing.
-class MerkelizedPsbt  {
-                /// Global map commitment: varint(n) || keys_root || values_root
-final Uint8List globalMapCommitment;
-/// Leaf hashes for global keys merkle tree
-final List<Uint8List> globalMapKeysLeaves;
-/// Leaf hashes for global values merkle tree
-final List<Uint8List> globalMapValuesLeaves;
-/// Per-input map commitments
-final List<Uint8List> inputMapCommitments;
-/// Per-input keys leaf hashes (flattened: input_index -> leaves)
-final List<List<Uint8List>> inputMapKeysLeaves;
-/// Per-input values leaf hashes
-final List<List<Uint8List>> inputMapValuesLeaves;
-/// Per-output map commitments
-final List<Uint8List> outputMapCommitments;
-/// Per-output keys leaf hashes
-final List<List<Uint8List>> outputMapKeysLeaves;
-/// Per-output values leaf hashes
-final List<List<Uint8List>> outputMapValuesLeaves;
-/// Merkle root of input map commitment leaf hashes
-final Uint8List inputMapsRoot;
-/// Merkle root of output map commitment leaf hashes
-final Uint8List outputMapsRoot;
-/// All preimage data stored by SHA-256 hash
-final List<Uint8List> preimageHashes;
-final List<Uint8List> preimageData;
-/// Counts
-final int inputCount;
-final int outputCount;
-/// Original PSBT bytes
-final Uint8List psbtBytes;
+class MerkelizedPsbt {
+  /// Global map commitment: varint(n) || keys_root || values_root
+  final Uint8List globalMapCommitment;
 
-                const MerkelizedPsbt({required this.globalMapCommitment ,required this.globalMapKeysLeaves ,required this.globalMapValuesLeaves ,required this.inputMapCommitments ,required this.inputMapKeysLeaves ,required this.inputMapValuesLeaves ,required this.outputMapCommitments ,required this.outputMapKeysLeaves ,required this.outputMapValuesLeaves ,required this.inputMapsRoot ,required this.outputMapsRoot ,required this.preimageHashes ,required this.preimageData ,required this.inputCount ,required this.outputCount ,required this.psbtBytes ,});
+  /// Leaf hashes for global keys merkle tree
+  final List<Uint8List> globalMapKeysLeaves;
 
-                
-                
+  /// Leaf hashes for global values merkle tree
+  final List<Uint8List> globalMapValuesLeaves;
 
-                
-        @override
-        int get hashCode => globalMapCommitment.hashCode^globalMapKeysLeaves.hashCode^globalMapValuesLeaves.hashCode^inputMapCommitments.hashCode^inputMapKeysLeaves.hashCode^inputMapValuesLeaves.hashCode^outputMapCommitments.hashCode^outputMapKeysLeaves.hashCode^outputMapValuesLeaves.hashCode^inputMapsRoot.hashCode^outputMapsRoot.hashCode^preimageHashes.hashCode^preimageData.hashCode^inputCount.hashCode^outputCount.hashCode^psbtBytes.hashCode;
-        
+  /// Per-input map commitments
+  final List<Uint8List> inputMapCommitments;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is MerkelizedPsbt &&
-                runtimeType == other.runtimeType
-                && globalMapCommitment == other.globalMapCommitment&& globalMapKeysLeaves == other.globalMapKeysLeaves&& globalMapValuesLeaves == other.globalMapValuesLeaves&& inputMapCommitments == other.inputMapCommitments&& inputMapKeysLeaves == other.inputMapKeysLeaves&& inputMapValuesLeaves == other.inputMapValuesLeaves&& outputMapCommitments == other.outputMapCommitments&& outputMapKeysLeaves == other.outputMapKeysLeaves&& outputMapValuesLeaves == other.outputMapValuesLeaves&& inputMapsRoot == other.inputMapsRoot&& outputMapsRoot == other.outputMapsRoot&& preimageHashes == other.preimageHashes&& preimageData == other.preimageData&& inputCount == other.inputCount&& outputCount == other.outputCount&& psbtBytes == other.psbtBytes;
-        
-            }
+  /// Per-input keys leaf hashes (flattened: input_index -> leaves)
+  final List<List<Uint8List>> inputMapKeysLeaves;
+
+  /// Per-input values leaf hashes
+  final List<List<Uint8List>> inputMapValuesLeaves;
+
+  /// Per-output map commitments
+  final List<Uint8List> outputMapCommitments;
+
+  /// Per-output keys leaf hashes
+  final List<List<Uint8List>> outputMapKeysLeaves;
+
+  /// Per-output values leaf hashes
+  final List<List<Uint8List>> outputMapValuesLeaves;
+
+  /// Merkle root of input map commitment leaf hashes
+  final Uint8List inputMapsRoot;
+
+  /// Merkle root of output map commitment leaf hashes
+  final Uint8List outputMapsRoot;
+
+  /// All preimage data stored by SHA-256 hash
+  final List<Uint8List> preimageHashes;
+  final List<Uint8List> preimageData;
+
+  /// Counts
+  final int inputCount;
+  final int outputCount;
+
+  /// Original PSBT bytes
+  final Uint8List psbtBytes;
+
+  const MerkelizedPsbt({
+    required this.globalMapCommitment,
+    required this.globalMapKeysLeaves,
+    required this.globalMapValuesLeaves,
+    required this.inputMapCommitments,
+    required this.inputMapKeysLeaves,
+    required this.inputMapValuesLeaves,
+    required this.outputMapCommitments,
+    required this.outputMapKeysLeaves,
+    required this.outputMapValuesLeaves,
+    required this.inputMapsRoot,
+    required this.outputMapsRoot,
+    required this.preimageHashes,
+    required this.preimageData,
+    required this.inputCount,
+    required this.outputCount,
+    required this.psbtBytes,
+  });
+
+  @override
+  int get hashCode =>
+      globalMapCommitment.hashCode ^
+      globalMapKeysLeaves.hashCode ^
+      globalMapValuesLeaves.hashCode ^
+      inputMapCommitments.hashCode ^
+      inputMapKeysLeaves.hashCode ^
+      inputMapValuesLeaves.hashCode ^
+      outputMapCommitments.hashCode ^
+      outputMapKeysLeaves.hashCode ^
+      outputMapValuesLeaves.hashCode ^
+      inputMapsRoot.hashCode ^
+      outputMapsRoot.hashCode ^
+      preimageHashes.hashCode ^
+      preimageData.hashCode ^
+      inputCount.hashCode ^
+      outputCount.hashCode ^
+      psbtBytes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MerkelizedPsbt &&
+          runtimeType == other.runtimeType &&
+          globalMapCommitment == other.globalMapCommitment &&
+          globalMapKeysLeaves == other.globalMapKeysLeaves &&
+          globalMapValuesLeaves == other.globalMapValuesLeaves &&
+          inputMapCommitments == other.inputMapCommitments &&
+          inputMapKeysLeaves == other.inputMapKeysLeaves &&
+          inputMapValuesLeaves == other.inputMapValuesLeaves &&
+          outputMapCommitments == other.outputMapCommitments &&
+          outputMapKeysLeaves == other.outputMapKeysLeaves &&
+          outputMapValuesLeaves == other.outputMapValuesLeaves &&
+          inputMapsRoot == other.inputMapsRoot &&
+          outputMapsRoot == other.outputMapsRoot &&
+          preimageHashes == other.preimageHashes &&
+          preimageData == other.preimageData &&
+          inputCount == other.inputCount &&
+          outputCount == other.outputCount &&
+          psbtBytes == other.psbtBytes;
+}
 
 /// Merkle proof result
-class MerkleProof  {
-                final Uint8List leafHash;
-final List<Uint8List> proofHashes;
+class MerkleProof {
+  final Uint8List leafHash;
+  final List<Uint8List> proofHashes;
 
-                const MerkleProof({required this.leafHash ,required this.proofHashes ,});
+  const MerkleProof({
+    required this.leafHash,
+    required this.proofHashes,
+  });
 
-                
-                
+  @override
+  int get hashCode => leafHash.hashCode ^ proofHashes.hashCode;
 
-                
-        @override
-        int get hashCode => leafHash.hashCode^proofHashes.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is MerkleProof &&
-                runtimeType == other.runtimeType
-                && leafHash == other.leafHash&& proofHashes == other.proofHashes;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MerkleProof &&
+          runtimeType == other.runtimeType &&
+          leafHash == other.leafHash &&
+          proofHashes == other.proofHashes;
+}
 
 /// Wallet policy for Ledger BTC app
-class WalletPolicy  {
-                /// Descriptor template string, e.g. "wpkh(@0)"
-final String descriptorTemplate;
-/// Keys info strings, e.g. ["[fingerprint/84'/0'/0']xpub..."]
-final List<String> keysInfo;
-/// Wallet policy ID = SHA256(serialized policy)
-final Uint8List policyId;
-/// HMAC for registered wallets (empty for default single-key wallets)
-final Uint8List policyHmac;
-/// Serialized policy bytes (for preimage store)
-final Uint8List serialized;
+class WalletPolicy {
+  /// Descriptor template string, e.g. "wpkh(@0)"
+  final String descriptorTemplate;
 
-                const WalletPolicy({required this.descriptorTemplate ,required this.keysInfo ,required this.policyId ,required this.policyHmac ,required this.serialized ,});
+  /// Keys info strings, e.g. ["[fingerprint/84'/0'/0']xpub..."]
+  final List<String> keysInfo;
 
-                
-                
+  /// Wallet policy ID = SHA256(serialized policy)
+  final Uint8List policyId;
 
-                
-        @override
-        int get hashCode => descriptorTemplate.hashCode^keysInfo.hashCode^policyId.hashCode^policyHmac.hashCode^serialized.hashCode;
-        
+  /// HMAC for registered wallets (empty for default single-key wallets)
+  final Uint8List policyHmac;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is WalletPolicy &&
-                runtimeType == other.runtimeType
-                && descriptorTemplate == other.descriptorTemplate&& keysInfo == other.keysInfo&& policyId == other.policyId&& policyHmac == other.policyHmac&& serialized == other.serialized;
-        
-            }
-            
+  /// Serialized policy bytes (for preimage store)
+  final Uint8List serialized;
+
+  const WalletPolicy({
+    required this.descriptorTemplate,
+    required this.keysInfo,
+    required this.policyId,
+    required this.policyHmac,
+    required this.serialized,
+  });
+
+  @override
+  int get hashCode =>
+      descriptorTemplate.hashCode ^
+      keysInfo.hashCode ^
+      policyId.hashCode ^
+      policyHmac.hashCode ^
+      serialized.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WalletPolicy &&
+          runtimeType == other.runtimeType &&
+          descriptorTemplate == other.descriptorTemplate &&
+          keysInfo == other.keysInfo &&
+          policyId == other.policyId &&
+          policyHmac == other.policyHmac &&
+          serialized == other.serialized;
+}

@@ -7,23 +7,30 @@ import '../frb_generated.dart';
 import '../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-
-            // These functions are ignored because they are not marked as `pub`: `fetch_solana_tokens`, `fetch_tron_tokens`, `fetch_zilliqa_tokens`
+// These functions are ignored because they are not marked as `pub`: `fetch_solana_tokens`, `fetch_tron_tokens`, `fetch_zilliqa_tokens`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `PortfolioBalance`, `PortfolioResponse`, `PortfolioToken`, `Portfolio`, `ProtectionInfo`, `SolanaTokenEntry`, `SolanaTokenListResponse`, `TokenAmount`, `TokenMetadata`, `TronAccountResponse`, `TronAccountToken`, `ZilliqaEvmTokenResponse`, `ZilliqaScillaApiResponse`, `ZilliqaScillaTokenResponse`, `ZilstreamResponse`, `ZilstreamToken`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
+Future<void> syncBalances({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiTokenSyncBalances(walletIndex: walletIndex);
 
-            Future<void>  syncBalances({required BigInt walletIndex }) => RustLib.instance.api.crateApiTokenSyncBalances(walletIndex: walletIndex);
+Future<void> updateRates({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
 
-Future<void>  updateRates({required BigInt walletIndex }) => RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
+Future<FTokenInfo> fetchTokenMeta(
+        {required String addr, required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
 
-Future<FTokenInfo>  fetchTokenMeta({required String addr , required BigInt walletIndex }) => RustLib.instance.api.crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
+Future<List<FTokenInfo>> autoHintTokens({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiTokenAutoHintTokens(walletIndex: walletIndex);
 
-Future<List<FTokenInfo>>  autoHintTokens({required BigInt walletIndex }) => RustLib.instance.api.crateApiTokenAutoHintTokens(walletIndex: walletIndex);
+Future<List<FTokenInfo>> addFtoken(
+        {required FTokenInfo meta, required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTokenAddFtoken(meta: meta, walletIndex: walletIndex);
 
-Future<List<FTokenInfo>>  addFtoken({required FTokenInfo meta , required BigInt walletIndex }) => RustLib.instance.api.crateApiTokenAddFtoken(meta: meta, walletIndex: walletIndex);
-
-Future<void>  rmFtoken({required BigInt walletIndex , required String tokenAddress }) => RustLib.instance.api.crateApiTokenRmFtoken(walletIndex: walletIndex, tokenAddress: tokenAddress);
-
-            
-            
+Future<void> rmFtoken(
+        {required BigInt walletIndex, required String tokenAddress}) =>
+    RustLib.instance.api.crateApiTokenRmFtoken(
+        walletIndex: walletIndex, tokenAddress: tokenAddress);

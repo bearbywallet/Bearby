@@ -6,32 +6,23 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class AccessListItem {
+  final String address;
+  final List<String> storageKeys;
 
-            
+  const AccessListItem({
+    required this.address,
+    required this.storageKeys,
+  });
 
-            
+  @override
+  int get hashCode => address.hashCode ^ storageKeys.hashCode;
 
-            class AccessListItem  {
-                final String address;
-final List<String> storageKeys;
-
-                const AccessListItem({required this.address ,required this.storageKeys ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => address.hashCode^storageKeys.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is AccessListItem &&
-                runtimeType == other.runtimeType
-                && address == other.address&& storageKeys == other.storageKeys;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AccessListItem &&
+          runtimeType == other.runtimeType &&
+          address == other.address &&
+          storageKeys == other.storageKeys;
+}

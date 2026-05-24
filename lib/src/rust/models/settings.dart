@@ -6,99 +6,147 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class BrowserSettingsInfo {
+  final int searchEngineIndex;
+  final bool cacheEnabled;
+  final bool cookiesEnabled;
+  final int contentBlocking;
+  final bool doNotTrack;
+  final bool incognitoMode;
+  final double textScalingFactor;
+  final bool allowGeolocation;
+  final bool allowCamera;
+  final bool allowMicrophone;
+  final bool allowAutoPlay;
 
-            
+  const BrowserSettingsInfo({
+    required this.searchEngineIndex,
+    required this.cacheEnabled,
+    required this.cookiesEnabled,
+    required this.contentBlocking,
+    required this.doNotTrack,
+    required this.incognitoMode,
+    required this.textScalingFactor,
+    required this.allowGeolocation,
+    required this.allowCamera,
+    required this.allowMicrophone,
+    required this.allowAutoPlay,
+  });
 
-            
+  @override
+  int get hashCode =>
+      searchEngineIndex.hashCode ^
+      cacheEnabled.hashCode ^
+      cookiesEnabled.hashCode ^
+      contentBlocking.hashCode ^
+      doNotTrack.hashCode ^
+      incognitoMode.hashCode ^
+      textScalingFactor.hashCode ^
+      allowGeolocation.hashCode ^
+      allowCamera.hashCode ^
+      allowMicrophone.hashCode ^
+      allowAutoPlay.hashCode;
 
-            class BrowserSettingsInfo  {
-                final int searchEngineIndex;
-final bool cacheEnabled;
-final bool cookiesEnabled;
-final int contentBlocking;
-final bool doNotTrack;
-final bool incognitoMode;
-final double textScalingFactor;
-final bool allowGeolocation;
-final bool allowCamera;
-final bool allowMicrophone;
-final bool allowAutoPlay;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BrowserSettingsInfo &&
+          runtimeType == other.runtimeType &&
+          searchEngineIndex == other.searchEngineIndex &&
+          cacheEnabled == other.cacheEnabled &&
+          cookiesEnabled == other.cookiesEnabled &&
+          contentBlocking == other.contentBlocking &&
+          doNotTrack == other.doNotTrack &&
+          incognitoMode == other.incognitoMode &&
+          textScalingFactor == other.textScalingFactor &&
+          allowGeolocation == other.allowGeolocation &&
+          allowCamera == other.allowCamera &&
+          allowMicrophone == other.allowMicrophone &&
+          allowAutoPlay == other.allowAutoPlay;
+}
 
-                const BrowserSettingsInfo({required this.searchEngineIndex ,required this.cacheEnabled ,required this.cookiesEnabled ,required this.contentBlocking ,required this.doNotTrack ,required this.incognitoMode ,required this.textScalingFactor ,required this.allowGeolocation ,required this.allowCamera ,required this.allowMicrophone ,required this.allowAutoPlay ,});
+class WalletArgonParamsInfo {
+  final int memory;
+  final int iterations;
+  final int threads;
+  final String secret;
 
-                
-                
+  const WalletArgonParamsInfo({
+    required this.memory,
+    required this.iterations,
+    required this.threads,
+    required this.secret,
+  });
 
-                
-        @override
-        int get hashCode => searchEngineIndex.hashCode^cacheEnabled.hashCode^cookiesEnabled.hashCode^contentBlocking.hashCode^doNotTrack.hashCode^incognitoMode.hashCode^textScalingFactor.hashCode^allowGeolocation.hashCode^allowCamera.hashCode^allowMicrophone.hashCode^allowAutoPlay.hashCode;
-        
+  @override
+  int get hashCode =>
+      memory.hashCode ^
+      iterations.hashCode ^
+      threads.hashCode ^
+      secret.hashCode;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is BrowserSettingsInfo &&
-                runtimeType == other.runtimeType
-                && searchEngineIndex == other.searchEngineIndex&& cacheEnabled == other.cacheEnabled&& cookiesEnabled == other.cookiesEnabled&& contentBlocking == other.contentBlocking&& doNotTrack == other.doNotTrack&& incognitoMode == other.incognitoMode&& textScalingFactor == other.textScalingFactor&& allowGeolocation == other.allowGeolocation&& allowCamera == other.allowCamera&& allowMicrophone == other.allowMicrophone&& allowAutoPlay == other.allowAutoPlay;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WalletArgonParamsInfo &&
+          runtimeType == other.runtimeType &&
+          memory == other.memory &&
+          iterations == other.iterations &&
+          threads == other.threads &&
+          secret == other.secret;
+}
 
-class WalletArgonParamsInfo  {
-                final int memory;
-final int iterations;
-final int threads;
-final String secret;
+class WalletSettingsInfo {
+  final Uint8List cipherOrders;
+  final WalletArgonParamsInfo argonParams;
+  final String currencyConvert;
+  final String? ipfsNode;
+  final bool ensEnabled;
+  final bool tokensListFetcher;
+  final bool nodeRankingEnabled;
+  final int maxConnections;
+  final int requestTimeoutSecs;
+  final int ratesApiOptions;
 
-                const WalletArgonParamsInfo({required this.memory ,required this.iterations ,required this.threads ,required this.secret ,});
+  const WalletSettingsInfo({
+    required this.cipherOrders,
+    required this.argonParams,
+    required this.currencyConvert,
+    this.ipfsNode,
+    required this.ensEnabled,
+    required this.tokensListFetcher,
+    required this.nodeRankingEnabled,
+    required this.maxConnections,
+    required this.requestTimeoutSecs,
+    required this.ratesApiOptions,
+  });
 
-                
-                
+  @override
+  int get hashCode =>
+      cipherOrders.hashCode ^
+      argonParams.hashCode ^
+      currencyConvert.hashCode ^
+      ipfsNode.hashCode ^
+      ensEnabled.hashCode ^
+      tokensListFetcher.hashCode ^
+      nodeRankingEnabled.hashCode ^
+      maxConnections.hashCode ^
+      requestTimeoutSecs.hashCode ^
+      ratesApiOptions.hashCode;
 
-                
-        @override
-        int get hashCode => memory.hashCode^iterations.hashCode^threads.hashCode^secret.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is WalletArgonParamsInfo &&
-                runtimeType == other.runtimeType
-                && memory == other.memory&& iterations == other.iterations&& threads == other.threads&& secret == other.secret;
-        
-            }
-
-class WalletSettingsInfo  {
-                final Uint8List cipherOrders;
-final WalletArgonParamsInfo argonParams;
-final String currencyConvert;
-final String? ipfsNode;
-final bool ensEnabled;
-final bool tokensListFetcher;
-final bool nodeRankingEnabled;
-final int maxConnections;
-final int requestTimeoutSecs;
-final int ratesApiOptions;
-
-                const WalletSettingsInfo({required this.cipherOrders ,required this.argonParams ,required this.currencyConvert ,this.ipfsNode ,required this.ensEnabled ,required this.tokensListFetcher ,required this.nodeRankingEnabled ,required this.maxConnections ,required this.requestTimeoutSecs ,required this.ratesApiOptions ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => cipherOrders.hashCode^argonParams.hashCode^currencyConvert.hashCode^ipfsNode.hashCode^ensEnabled.hashCode^tokensListFetcher.hashCode^nodeRankingEnabled.hashCode^maxConnections.hashCode^requestTimeoutSecs.hashCode^ratesApiOptions.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is WalletSettingsInfo &&
-                runtimeType == other.runtimeType
-                && cipherOrders == other.cipherOrders&& argonParams == other.argonParams&& currencyConvert == other.currencyConvert&& ipfsNode == other.ipfsNode&& ensEnabled == other.ensEnabled&& tokensListFetcher == other.tokensListFetcher&& nodeRankingEnabled == other.nodeRankingEnabled&& maxConnections == other.maxConnections&& requestTimeoutSecs == other.requestTimeoutSecs&& ratesApiOptions == other.ratesApiOptions;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WalletSettingsInfo &&
+          runtimeType == other.runtimeType &&
+          cipherOrders == other.cipherOrders &&
+          argonParams == other.argonParams &&
+          currencyConvert == other.currencyConvert &&
+          ipfsNode == other.ipfsNode &&
+          ensEnabled == other.ensEnabled &&
+          tokensListFetcher == other.tokensListFetcher &&
+          nodeRankingEnabled == other.nodeRankingEnabled &&
+          maxConnections == other.maxConnections &&
+          requestTimeoutSecs == other.requestTimeoutSecs &&
+          ratesApiOptions == other.ratesApiOptions;
+}

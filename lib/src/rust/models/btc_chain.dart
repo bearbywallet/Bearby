@@ -6,110 +6,110 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class AddressChainInfo {
+  final List<BtcAddressEntryInfo> external_;
+  final List<BtcAddressEntryInfo> internal;
 
-            
+  const AddressChainInfo({
+    required this.external_,
+    required this.internal,
+  });
 
-            
+  @override
+  int get hashCode => external_.hashCode ^ internal.hashCode;
 
-            class AddressChainInfo  {
-                final List<BtcAddressEntryInfo> external_;
-final List<BtcAddressEntryInfo> internal;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddressChainInfo &&
+          runtimeType == other.runtimeType &&
+          external_ == other.external_ &&
+          internal == other.internal;
+}
 
-                const AddressChainInfo({required this.external_ ,required this.internal ,});
+class BtcAccountXpubsInputInfo {
+  final String bip44Xpub;
+  final String bip49Xpub;
+  final String bip84Xpub;
+  final String bip86Xpub;
 
-                
-                
+  const BtcAccountXpubsInputInfo({
+    required this.bip44Xpub,
+    required this.bip49Xpub,
+    required this.bip84Xpub,
+    required this.bip86Xpub,
+  });
 
-                
-        @override
-        int get hashCode => external_.hashCode^internal.hashCode;
-        
+  @override
+  int get hashCode =>
+      bip44Xpub.hashCode ^
+      bip49Xpub.hashCode ^
+      bip84Xpub.hashCode ^
+      bip86Xpub.hashCode;
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is AddressChainInfo &&
-                runtimeType == other.runtimeType
-                && external_ == other.external_&& internal == other.internal;
-        
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BtcAccountXpubsInputInfo &&
+          runtimeType == other.runtimeType &&
+          bip44Xpub == other.bip44Xpub &&
+          bip49Xpub == other.bip49Xpub &&
+          bip84Xpub == other.bip84Xpub &&
+          bip86Xpub == other.bip86Xpub;
+}
 
-class BtcAccountXpubsInputInfo  {
-                final String bip44Xpub;
-final String bip49Xpub;
-final String bip84Xpub;
-final String bip86Xpub;
+class BtcAddressEntryInfo {
+  final String address;
+  final String path;
+  final List<String> history;
+  final List<UtxoInfo> utxos;
 
-                const BtcAccountXpubsInputInfo({required this.bip44Xpub ,required this.bip49Xpub ,required this.bip84Xpub ,required this.bip86Xpub ,});
+  const BtcAddressEntryInfo({
+    required this.address,
+    required this.path,
+    required this.history,
+    required this.utxos,
+  });
 
-                
-                
+  @override
+  int get hashCode =>
+      address.hashCode ^ path.hashCode ^ history.hashCode ^ utxos.hashCode;
 
-                
-        @override
-        int get hashCode => bip44Xpub.hashCode^bip49Xpub.hashCode^bip84Xpub.hashCode^bip86Xpub.hashCode;
-        
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BtcAddressEntryInfo &&
+          runtimeType == other.runtimeType &&
+          address == other.address &&
+          path == other.path &&
+          history == other.history &&
+          utxos == other.utxos;
+}
 
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is BtcAccountXpubsInputInfo &&
-                runtimeType == other.runtimeType
-                && bip44Xpub == other.bip44Xpub&& bip49Xpub == other.bip49Xpub&& bip84Xpub == other.bip84Xpub&& bip86Xpub == other.bip86Xpub;
-        
-            }
+class UtxoInfo {
+  final String txid;
+  final int vout;
+  final BigInt value;
+  final int height;
 
-class BtcAddressEntryInfo  {
-                final String address;
-final String path;
-final List<String> history;
-final List<UtxoInfo> utxos;
+  const UtxoInfo({
+    required this.txid,
+    required this.vout,
+    required this.value,
+    required this.height,
+  });
 
-                const BtcAddressEntryInfo({required this.address ,required this.path ,required this.history ,required this.utxos ,});
+  @override
+  int get hashCode =>
+      txid.hashCode ^ vout.hashCode ^ value.hashCode ^ height.hashCode;
 
-                
-                
-
-                
-        @override
-        int get hashCode => address.hashCode^path.hashCode^history.hashCode^utxos.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is BtcAddressEntryInfo &&
-                runtimeType == other.runtimeType
-                && address == other.address&& path == other.path&& history == other.history&& utxos == other.utxos;
-        
-            }
-
-class UtxoInfo  {
-                final String txid;
-final int vout;
-final BigInt value;
-final int height;
-
-                const UtxoInfo({required this.txid ,required this.vout ,required this.value ,required this.height ,});
-
-                
-                
-
-                
-        @override
-        int get hashCode => txid.hashCode^vout.hashCode^value.hashCode^height.hashCode;
-        
-
-                
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is UtxoInfo &&
-                runtimeType == other.runtimeType
-                && txid == other.txid&& vout == other.vout&& value == other.value&& height == other.height;
-        
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UtxoInfo &&
+          runtimeType == other.runtimeType &&
+          txid == other.txid &&
+          vout == other.vout &&
+          value == other.value &&
+          height == other.height;
+}

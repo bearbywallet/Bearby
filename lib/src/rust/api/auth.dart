@@ -6,14 +6,16 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<bool> tryUnlockWithSession({required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiAuthTryUnlockWithSession(walletIndex: walletIndex);
 
-            
+Future<bool> tryUnlockWithPassword(
+        {required String password,
+        required BigInt walletIndex,
+        List<String>? identifiers}) =>
+    RustLib.instance.api.crateApiAuthTryUnlockWithPassword(
+        password: password, walletIndex: walletIndex, identifiers: identifiers);
 
-            Future<bool>  tryUnlockWithSession({required BigInt walletIndex }) => RustLib.instance.api.crateApiAuthTryUnlockWithSession(walletIndex: walletIndex);
-
-Future<bool>  tryUnlockWithPassword({required String password , required BigInt walletIndex , List<String>? identifiers }) => RustLib.instance.api.crateApiAuthTryUnlockWithPassword(password: password, walletIndex: walletIndex, identifiers: identifiers);
-
-Future<List<String>>  getBiometricType() => RustLib.instance.api.crateApiAuthGetBiometricType();
-
-            
-            
+Future<List<String>> getBiometricType() =>
+    RustLib.instance.api.crateApiAuthGetBiometricType();

@@ -52,1120 +52,1952 @@ import 'models/transactions/transaction_metadata.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 
+abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
+  RustLibApiImplPlatform({
+    required super.handler,
+    required super.wire,
+    required super.generalizedFrbRustBinding,
+    required super.portManager,
+  });
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_LocalStorageImplPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr;
 
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-                abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
-                  RustLibApiImplPlatform({
-                    required super.handler,
-                    required super.wire,
-                    required super.generalizedFrbRustBinding,
-                    required super.portManager,
-                  });
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
 
-                  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_LocalStorageImplPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr;
+  @protected
+  LocalStorageImpl
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
 
+  @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(dynamic raw);
 
+  @protected
+  Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(
+      dynamic raw);
 
-                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw);
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw);
 
-@protected LocalStorageImpl dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw);
+  @protected
+  Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(
+      dynamic raw);
 
-@protected LocalStorageImpl dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw);
+  @protected
+  Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw);
 
-@protected Map<int, Map<int, List<AccountInfo>>> dco_decode_Map_u_32_Map_u_32_list_account_info_None_None(dynamic raw);
+  @protected
+  Map<BigInt, BackgroundNotificationState>
+      dco_decode_Map_usize_background_notification_state_None(dynamic raw);
 
-@protected Map<int, List<AccountInfo>> dco_decode_Map_u_32_list_account_info_None(dynamic raw);
+  @protected
+  LocalStorageImpl
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          dynamic raw);
 
-@protected Map<int, Map<int, AddressChainInfo>> dco_decode_Map_u_8_Map_u_8_address_chain_info_None_None(dynamic raw);
+  @protected
+  RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw);
 
-@protected Map<int, AddressChainInfo> dco_decode_Map_u_8_address_chain_info_None(dynamic raw);
+  @protected
+  RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(dynamic raw);
 
-@protected Map<BigInt, String> dco_decode_Map_usize_String_None(dynamic raw);
+  @protected
+  String dco_decode_String(dynamic raw);
 
-@protected Map<BigInt, BackgroundNotificationState> dco_decode_Map_usize_background_notification_state_None(dynamic raw);
+  @protected
+  KeyValueStorage dco_decode_TraitDef_KeyValueStorage(dynamic raw);
 
-@protected LocalStorageImpl dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(dynamic raw);
+  @protected
+  BigInt dco_decode_U128(dynamic raw);
 
-@protected RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw);
+  @protected
+  AccessListItem dco_decode_access_list_item(dynamic raw);
 
-@protected RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(dynamic raw);
+  @protected
+  AccountInfo dco_decode_account_info(dynamic raw);
 
-@protected String dco_decode_String(dynamic raw);
+  @protected
+  AddNextBip39AccountParams dco_decode_add_next_bip_39_account_params(
+      dynamic raw);
 
-@protected KeyValueStorage dco_decode_TraitDef_KeyValueStorage(dynamic raw);
+  @protected
+  AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw);
 
-@protected BigInt dco_decode_U128(dynamic raw);
+  @protected
+  AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw);
 
-@protected AccessListItem dco_decode_access_list_item(dynamic raw);
+  @protected
+  AddressChainInfo dco_decode_address_chain_info(dynamic raw);
 
-@protected AccountInfo dco_decode_account_info(dynamic raw);
+  @protected
+  BackgroundNotificationState dco_decode_background_notification_state(
+      dynamic raw);
 
-@protected AddNextBip39AccountParams dco_decode_add_next_bip_39_account_params(dynamic raw);
+  @protected
+  BackgroundState dco_decode_background_state(dynamic raw);
 
-@protected AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw);
+  @protected
+  BaseTokenInfo dco_decode_base_token_info(dynamic raw);
 
-@protected AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw);
+  @protected
+  Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw);
 
-@protected AddressChainInfo dco_decode_address_chain_info(dynamic raw);
+  @protected
+  BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw);
 
-@protected BackgroundNotificationState dco_decode_background_notification_state(dynamic raw);
+  @protected
+  BlockEvent dco_decode_block_event(dynamic raw);
 
-@protected BackgroundState dco_decode_background_state(dynamic raw);
+  @protected
+  bool dco_decode_bool(dynamic raw);
 
-@protected BaseTokenInfo dco_decode_base_token_info(dynamic raw);
+  @protected
+  AddNextBip39AccountParams
+      dco_decode_box_autoadd_add_next_bip_39_account_params(dynamic raw);
 
-@protected Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw);
+  @protected
+  AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw);
 
-@protected BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw);
+  @protected
+  BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw);
 
-@protected BlockEvent dco_decode_block_event(dynamic raw);
+  @protected
+  Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(
+      dynamic raw);
 
-@protected bool dco_decode_bool(dynamic raw);
+  @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw);
 
-@protected AddNextBip39AccountParams dco_decode_box_autoadd_add_next_bip_39_account_params(dynamic raw);
+  @protected
+  BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(dynamic raw);
 
-@protected AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw);
+  @protected
+  BtcAccountXpubsInputInfo dco_decode_box_autoadd_btc_account_xpubs_input_info(
+      dynamic raw);
 
-@protected BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw);
+  @protected
+  ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
 
-@protected Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(dynamic raw);
+  @protected
+  ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
 
-@protected bool dco_decode_box_autoadd_bool(dynamic raw);
+  @protected
+  double dco_decode_box_autoadd_f_32(dynamic raw);
 
-@protected BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(dynamic raw);
+  @protected
+  double dco_decode_box_autoadd_f_64(dynamic raw);
 
-@protected BtcAccountXpubsInputInfo dco_decode_box_autoadd_btc_account_xpubs_input_info(dynamic raw);
+  @protected
+  FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw);
 
-@protected ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
+  @protected
+  FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw);
 
-@protected ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
+  @protected
+  LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
 
-@protected double dco_decode_box_autoadd_f_32(dynamic raw);
+  @protected
+  MetadataThorchain dco_decode_box_autoadd_metadata_thorchain(dynamic raw);
 
-@protected double dco_decode_box_autoadd_f_64(dynamic raw);
+  @protected
+  NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
 
-@protected FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw);
+  @protected
+  QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
-@protected FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw);
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          dynamic raw);
 
-@protected LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
+  @protected
+  RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
+      dynamic raw);
 
-@protected MetadataThorchain dco_decode_box_autoadd_metadata_thorchain(dynamic raw);
+  @protected
+  TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
+      dynamic raw);
 
-@protected NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
+  @protected
+  TransactionBitcoin dco_decode_box_autoadd_transaction_bitcoin(dynamic raw);
 
-@protected QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
+  @protected
+  TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(
+      dynamic raw);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo) dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw);
+  @protected
+  TransactionRequestInfo dco_decode_box_autoadd_transaction_request_info(
+      dynamic raw);
 
-@protected RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(dynamic raw);
+  @protected
+  TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(
+      dynamic raw);
 
-@protected TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(dynamic raw);
+  @protected
+  BigInt dco_decode_box_autoadd_u_64(dynamic raw);
 
-@protected TransactionBitcoin dco_decode_box_autoadd_transaction_bitcoin(dynamic raw);
+  @protected
+  WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
 
-@protected TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(dynamic raw);
+  @protected
+  BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
 
-@protected TransactionRequestInfo dco_decode_box_autoadd_transaction_request_info(dynamic raw);
+  @protected
+  BtcAccountXpubsInputInfo dco_decode_btc_account_xpubs_input_info(dynamic raw);
 
-@protected TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(dynamic raw);
+  @protected
+  BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
 
-@protected BigInt dco_decode_box_autoadd_u_64(dynamic raw);
+  @protected
+  Category dco_decode_category(dynamic raw);
 
-@protected WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
+  @protected
+  ColorsInfo dco_decode_colors_info(dynamic raw);
 
-@protected BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
+  @protected
+  ConnectionInfo dco_decode_connection_info(dynamic raw);
 
-@protected BtcAccountXpubsInputInfo dco_decode_btc_account_xpubs_input_info(dynamic raw);
+  @protected
+  Eip712Hashes dco_decode_eip_712_hashes(dynamic raw);
 
-@protected BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
+  @protected
+  EncodedRLPTx dco_decode_encoded_rlp_tx(dynamic raw);
 
-@protected Category dco_decode_category(dynamic raw);
+  @protected
+  Entry dco_decode_entry(dynamic raw);
 
-@protected ColorsInfo dco_decode_colors_info(dynamic raw);
+  @protected
+  ExchangeProvider dco_decode_exchange_provider(dynamic raw);
 
-@protected ConnectionInfo dco_decode_connection_info(dynamic raw);
+  @protected
+  ExplorerInfo dco_decode_explorer_info(dynamic raw);
 
-@protected Eip712Hashes dco_decode_eip_712_hashes(dynamic raw);
+  @protected
+  double dco_decode_f_32(dynamic raw);
 
-@protected EncodedRLPTx dco_decode_encoded_rlp_tx(dynamic raw);
+  @protected
+  double dco_decode_f_64(dynamic raw);
 
-@protected Entry dco_decode_entry(dynamic raw);
+  @protected
+  FTokenInfo dco_decode_f_token_info(dynamic raw);
 
-@protected ExchangeProvider dco_decode_exchange_provider(dynamic raw);
+  @protected
+  FinalOutputInfo dco_decode_final_output_info(dynamic raw);
 
-@protected ExplorerInfo dco_decode_explorer_info(dynamic raw);
+  @protected
+  FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw);
 
-@protected double dco_decode_f_32(dynamic raw);
+  @protected
+  GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
 
-@protected double dco_decode_f_64(dynamic raw);
+  @protected
+  HistoricalTransactionInfo dco_decode_historical_transaction_info(dynamic raw);
 
-@protected FTokenInfo dco_decode_f_token_info(dynamic raw);
+  @protected
+  int dco_decode_i_32(dynamic raw);
 
-@protected FinalOutputInfo dco_decode_final_output_info(dynamic raw);
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw);
 
-@protected FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw);
+  @protected
+  InputMetaInfo dco_decode_input_meta_info(dynamic raw);
 
-@protected GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
+  @protected
+  KeyPairInfo dco_decode_key_pair_info(dynamic raw);
 
-@protected HistoricalTransactionInfo dco_decode_historical_transaction_info(dynamic raw);
+  @protected
+  LedgerInputSignature dco_decode_ledger_input_signature(dynamic raw);
 
-@protected int dco_decode_i_32(dynamic raw);
+  @protected
+  LedgerParamsInput dco_decode_ledger_params_input(dynamic raw);
 
-@protected PlatformInt64 dco_decode_i_64(dynamic raw);
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
 
-@protected InputMetaInfo dco_decode_input_meta_info(dynamic raw);
+  @protected
+  List<AccessListItem> dco_decode_list_access_list_item(dynamic raw);
 
-@protected KeyPairInfo dco_decode_key_pair_info(dynamic raw);
+  @protected
+  List<AccountInfo> dco_decode_list_account_info(dynamic raw);
 
-@protected LedgerInputSignature dco_decode_ledger_input_signature(dynamic raw);
+  @protected
+  List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(
+      dynamic raw);
 
-@protected LedgerParamsInput dco_decode_ledger_params_input(dynamic raw);
+  @protected
+  List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(dynamic raw);
 
-@protected List<String> dco_decode_list_String(dynamic raw);
+  @protected
+  List<Category> dco_decode_list_category(dynamic raw);
 
-@protected List<AccessListItem> dco_decode_list_access_list_item(dynamic raw);
+  @protected
+  List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw);
 
-@protected List<AccountInfo> dco_decode_list_account_info(dynamic raw);
+  @protected
+  List<Entry> dco_decode_list_entry(dynamic raw);
 
-@protected List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(dynamic raw);
+  @protected
+  List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw);
 
-@protected List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(dynamic raw);
+  @protected
+  List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
 
-@protected List<Category> dco_decode_list_category(dynamic raw);
+  @protected
+  List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
 
-@protected List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw);
+  @protected
+  List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw);
 
-@protected List<Entry> dco_decode_list_entry(dynamic raw);
+  @protected
+  List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
+      dynamic raw);
 
-@protected List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw);
+  @protected
+  List<InputMetaInfo> dco_decode_list_input_meta_info(dynamic raw);
 
-@protected List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
+  @protected
+  List<LedgerInputSignature> dco_decode_list_ledger_input_signature(
+      dynamic raw);
 
-@protected List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
+  @protected
+  List<List<Uint8List>> dco_decode_list_list_list_prim_u_8_strict(dynamic raw);
 
-@protected List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw);
+  @protected
+  List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw);
 
-@protected List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(dynamic raw);
+  @protected
+  List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
 
-@protected List<InputMetaInfo> dco_decode_list_input_meta_info(dynamic raw);
+  @protected
+  List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(
+      dynamic raw);
 
-@protected List<LedgerInputSignature> dco_decode_list_ledger_input_signature(dynamic raw);
+  @protected
+  Uint16List dco_decode_list_prim_u_16_strict(dynamic raw);
 
-@protected List<List<Uint8List>> dco_decode_list_list_list_prim_u_8_strict(dynamic raw);
+  @protected
+  Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
 
-@protected List<Uint8List> dco_decode_list_list_prim_u_8_strict(dynamic raw);
+  @protected
+  Uint64List dco_decode_list_prim_u_64_strict(dynamic raw);
 
-@protected List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
-@protected List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(dynamic raw);
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
-@protected Uint16List dco_decode_list_prim_u_16_strict(dynamic raw);
+  @protected
+  Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
 
-@protected Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
-@protected Uint64List dco_decode_list_prim_u_64_strict(dynamic raw);
+  @protected
+  List<(int, List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(
+      dynamic raw);
 
-@protected List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+  @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw);
 
-@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+  @protected
+  List<(int, AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(
+      dynamic raw);
 
-@protected Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
 
-@protected List<(String,String)> dco_decode_list_record_string_string(dynamic raw);
+  @protected
+  List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw);
 
-@protected List<(int,List<AccountInfo>)> dco_decode_list_record_u_32_list_account_info(dynamic raw);
+  @protected
+  List<(BigInt, BackgroundNotificationState)>
+      dco_decode_list_record_usize_background_notification_state(dynamic raw);
 
-@protected List<(int,Map<int, List<AccountInfo>>)> dco_decode_list_record_u_32_map_u_32_list_account_info_none(dynamic raw);
+  @protected
+  List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw);
 
-@protected List<(int,AddressChainInfo)> dco_decode_list_record_u_8_address_chain_info(dynamic raw);
+  @protected
+  List<RustLedgerBleDevice> dco_decode_list_rust_ledger_ble_device(dynamic raw);
 
-@protected List<(int,Map<int, AddressChainInfo>)> dco_decode_list_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
+  @protected
+  List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
 
-@protected List<(int,String)> dco_decode_list_record_u_8_string(dynamic raw);
+  @protected
+  List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw);
 
-@protected List<(BigInt,BackgroundNotificationState)> dco_decode_list_record_usize_background_notification_state(dynamic raw);
+  @protected
+  List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw);
 
-@protected List<(BigInt,String)> dco_decode_list_record_usize_string(dynamic raw);
+  @protected
+  List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw);
 
-@protected List<RustLedgerBleDevice> dco_decode_list_rust_ledger_ble_device(dynamic raw);
+  @protected
+  List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
-@protected List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
+  @protected
+  MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
 
-@protected List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw);
+  @protected
+  MerkleProof dco_decode_merkle_proof(dynamic raw);
 
-@protected List<TxOutInfo> dco_decode_list_tx_out_info(dynamic raw);
+  @protected
+  MetadataThorchain dco_decode_metadata_thorchain(dynamic raw);
 
-@protected List<UtxoInfo> dco_decode_list_utxo_info(dynamic raw);
+  @protected
+  NetworkConfigInfo dco_decode_network_config_info(dynamic raw);
 
-@protected List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+  @protected
+  Map<int, AddressChainInfo>? dco_decode_opt_Map_u_8_address_chain_info_None(
+      dynamic raw);
 
-@protected MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
+  @protected
+  String? dco_decode_opt_String(dynamic raw);
 
-@protected MerkleProof dco_decode_merkle_proof(dynamic raw);
+  @protected
+  BigInt? dco_decode_opt_U128(dynamic raw);
 
-@protected MetadataThorchain dco_decode_metadata_thorchain(dynamic raw);
+  @protected
+  BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw);
 
-@protected NetworkConfigInfo dco_decode_network_config_info(dynamic raw);
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
-@protected Map<int, AddressChainInfo>? dco_decode_opt_Map_u_8_address_chain_info_None(dynamic raw);
+  @protected
+  ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw);
 
-@protected String? dco_decode_opt_String(dynamic raw);
+  @protected
+  double? dco_decode_opt_box_autoadd_f_32(dynamic raw);
 
-@protected BigInt? dco_decode_opt_U128(dynamic raw);
+  @protected
+  double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
 
-@protected BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw);
+  @protected
+  FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
 
-@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+  @protected
+  (
+    TransactionBitcoin,
+    BitcoinMetadataInfo
+  )? dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      dynamic raw);
 
-@protected ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw);
+  @protected
+  TransactionBitcoin? dco_decode_opt_box_autoadd_transaction_bitcoin(
+      dynamic raw);
 
-@protected double? dco_decode_opt_box_autoadd_f_32(dynamic raw);
+  @protected
+  TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
+      dynamic raw);
 
-@protected double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
+  @protected
+  TransactionRequestScilla?
+      dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
 
-@protected FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
+  @protected
+  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo)? dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw);
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw);
 
-@protected TransactionBitcoin? dco_decode_opt_box_autoadd_transaction_bitcoin(dynamic raw);
+  @protected
+  List<AccessListItem>? dco_decode_opt_list_access_list_item(dynamic raw);
 
-@protected TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(dynamic raw);
+  @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
 
-@protected TransactionRequestScilla? dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
+  @protected
+  OutPointInfo dco_decode_out_point_info(dynamic raw);
 
-@protected BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
+  @protected
+  PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
-@protected List<String>? dco_decode_opt_list_String(dynamic raw);
+  @protected
+  QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
 
-@protected List<AccessListItem>? dco_decode_opt_list_access_list_item(dynamic raw);
+  @protected
+  QrConfigInfo dco_decode_qr_config_info(dynamic raw);
 
-@protected Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+  @protected
+  (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
+      dco_decode_record_list_network_config_info_list_network_config_info(
+          dynamic raw);
 
-@protected OutPointInfo dco_decode_out_point_info(dynamic raw);
+  @protected
+  (Uint8List, String) dco_decode_record_list_prim_u_8_strict_string(
+      dynamic raw);
 
-@protected PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw);
 
-@protected QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
+  @protected
+  (String, int) dco_decode_record_string_u_8(dynamic raw);
 
-@protected QrConfigInfo dco_decode_qr_config_info(dynamic raw);
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      dco_decode_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw);
 
-@protected (List<NetworkConfigInfo>,List<NetworkConfigInfo>) dco_decode_record_list_network_config_info_list_network_config_info(dynamic raw);
+  @protected
+  (int, List<AccountInfo>) dco_decode_record_u_32_list_account_info(
+      dynamic raw);
 
-@protected (Uint8List,String) dco_decode_record_list_prim_u_8_strict_string(dynamic raw);
+  @protected
+  (int, Map<int, List<AccountInfo>>)
+      dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw);
 
-@protected (String,String) dco_decode_record_string_string(dynamic raw);
+  @protected
+  (int, AddressChainInfo) dco_decode_record_u_8_address_chain_info(dynamic raw);
 
-@protected (String,int) dco_decode_record_string_u_8(dynamic raw);
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo) dco_decode_record_transaction_bitcoin_bitcoin_metadata_info(dynamic raw);
+  @protected
+  (int, String) dco_decode_record_u_8_string(dynamic raw);
 
-@protected (int,List<AccountInfo>) dco_decode_record_u_32_list_account_info(dynamic raw);
+  @protected
+  (BigInt, BackgroundNotificationState)
+      dco_decode_record_usize_background_notification_state(dynamic raw);
 
-@protected (int,Map<int, List<AccountInfo>>) dco_decode_record_u_32_map_u_32_list_account_info_none(dynamic raw);
+  @protected
+  (BigInt, String) dco_decode_record_usize_string(dynamic raw);
 
-@protected (int,AddressChainInfo) dco_decode_record_u_8_address_chain_info(dynamic raw);
+  @protected
+  RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw);
 
-@protected (int,Map<int, AddressChainInfo>) dco_decode_record_u_8_map_u_8_address_chain_info_none(dynamic raw);
+  @protected
+  RustLedgerBleDevice dco_decode_rust_ledger_ble_device(dynamic raw);
 
-@protected (int,String) dco_decode_record_u_8_string(dynamic raw);
+  @protected
+  RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
 
-@protected (BigInt,BackgroundNotificationState) dco_decode_record_usize_background_notification_state(dynamic raw);
+  @protected
+  TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
 
-@protected (BigInt,String) dco_decode_record_usize_string(dynamic raw);
+  @protected
+  TransactionBitcoin dco_decode_transaction_bitcoin(dynamic raw);
 
-@protected RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw);
+  @protected
+  TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw);
 
-@protected RustLedgerBleDevice dco_decode_rust_ledger_ble_device(dynamic raw);
+  @protected
+  TransactionRequestEVM dco_decode_transaction_request_evm(dynamic raw);
 
-@protected RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
+  @protected
+  TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw);
 
-@protected TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
+  @protected
+  TransactionRequestScilla dco_decode_transaction_request_scilla(dynamic raw);
 
-@protected TransactionBitcoin dco_decode_transaction_bitcoin(dynamic raw);
+  @protected
+  TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw);
 
-@protected TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw);
+  @protected
+  TxInInfo dco_decode_tx_in_info(dynamic raw);
 
-@protected TransactionRequestEVM dco_decode_transaction_request_evm(dynamic raw);
+  @protected
+  TxOutInfo dco_decode_tx_out_info(dynamic raw);
 
-@protected TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw);
+  @protected
+  int dco_decode_u_16(dynamic raw);
 
-@protected TransactionRequestScilla dco_decode_transaction_request_scilla(dynamic raw);
+  @protected
+  int dco_decode_u_32(dynamic raw);
 
-@protected TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw);
+  @protected
+  BigInt dco_decode_u_64(dynamic raw);
 
-@protected TxInInfo dco_decode_tx_in_info(dynamic raw);
+  @protected
+  int dco_decode_u_8(dynamic raw);
 
-@protected TxOutInfo dco_decode_tx_out_info(dynamic raw);
+  @protected
+  void dco_decode_unit(dynamic raw);
 
-@protected int dco_decode_u_16(dynamic raw);
+  @protected
+  BigInt dco_decode_usize(dynamic raw);
 
-@protected int dco_decode_u_32(dynamic raw);
+  @protected
+  UtxoInfo dco_decode_utxo_info(dynamic raw);
 
-@protected BigInt dco_decode_u_64(dynamic raw);
+  @protected
+  WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw);
 
-@protected int dco_decode_u_8(dynamic raw);
+  @protected
+  WalletInfo dco_decode_wallet_info(dynamic raw);
 
-@protected void dco_decode_unit(dynamic raw);
+  @protected
+  WalletPolicy dco_decode_wallet_policy(dynamic raw);
 
-@protected BigInt dco_decode_usize(dynamic raw);
+  @protected
+  WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
 
-@protected UtxoInfo dco_decode_utxo_info(dynamic raw);
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
-@protected WalletArgonParamsInfo dco_decode_wallet_argon_params_info(dynamic raw);
+  @protected
+  LocalStorageImpl
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer);
 
-@protected WalletInfo dco_decode_wallet_info(dynamic raw);
+  @protected
+  LocalStorageImpl
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer);
 
-@protected WalletPolicy dco_decode_wallet_policy(dynamic raw);
+  @protected
+  Map<int, Map<int, List<AccountInfo>>>
+      sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(
+          SseDeserializer deserializer);
 
-@protected WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
+  @protected
+  Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(
+      SseDeserializer deserializer);
 
-@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+  @protected
+  Map<int, Map<int, AddressChainInfo>>
+      sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(
+          SseDeserializer deserializer);
 
-@protected LocalStorageImpl sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer);
+  @protected
+  Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(
+      SseDeserializer deserializer);
 
-@protected LocalStorageImpl sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer);
+  @protected
+  Map<BigInt, String> sse_decode_Map_usize_String_None(
+      SseDeserializer deserializer);
 
-@protected Map<int, Map<int, List<AccountInfo>>> sse_decode_Map_u_32_Map_u_32_list_account_info_None_None(SseDeserializer deserializer);
+  @protected
+  Map<BigInt, BackgroundNotificationState>
+      sse_decode_Map_usize_background_notification_state_None(
+          SseDeserializer deserializer);
 
-@protected Map<int, List<AccountInfo>> sse_decode_Map_u_32_list_account_info_None(SseDeserializer deserializer);
+  @protected
+  LocalStorageImpl
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          SseDeserializer deserializer);
 
-@protected Map<int, Map<int, AddressChainInfo>> sse_decode_Map_u_8_Map_u_8_address_chain_info_None_None(SseDeserializer deserializer);
+  @protected
+  RustStreamSink<String> sse_decode_StreamSink_String_Sse(
+      SseDeserializer deserializer);
 
-@protected Map<int, AddressChainInfo> sse_decode_Map_u_8_address_chain_info_None(SseDeserializer deserializer);
+  @protected
+  RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(
+      SseDeserializer deserializer);
 
-@protected Map<BigInt, String> sse_decode_Map_usize_String_None(SseDeserializer deserializer);
+  @protected
+  String sse_decode_String(SseDeserializer deserializer);
 
-@protected Map<BigInt, BackgroundNotificationState> sse_decode_Map_usize_background_notification_state_None(SseDeserializer deserializer);
+  @protected
+  BigInt sse_decode_U128(SseDeserializer deserializer);
 
-@protected LocalStorageImpl sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(SseDeserializer deserializer);
+  @protected
+  AccessListItem sse_decode_access_list_item(SseDeserializer deserializer);
 
-@protected RustStreamSink<String> sse_decode_StreamSink_String_Sse(SseDeserializer deserializer);
+  @protected
+  AccountInfo sse_decode_account_info(SseDeserializer deserializer);
 
-@protected RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(SseDeserializer deserializer);
+  @protected
+  AddNextBip39AccountParams sse_decode_add_next_bip_39_account_params(
+      SseDeserializer deserializer);
 
-@protected String sse_decode_String(SseDeserializer deserializer);
+  @protected
+  AddSKWalletParams sse_decode_add_sk_wallet_params(
+      SseDeserializer deserializer);
 
-@protected BigInt sse_decode_U128(SseDeserializer deserializer);
+  @protected
+  AddressBookEntryInfo sse_decode_address_book_entry_info(
+      SseDeserializer deserializer);
 
-@protected AccessListItem sse_decode_access_list_item(SseDeserializer deserializer);
+  @protected
+  AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer);
 
-@protected AccountInfo sse_decode_account_info(SseDeserializer deserializer);
+  @protected
+  BackgroundNotificationState sse_decode_background_notification_state(
+      SseDeserializer deserializer);
 
-@protected AddNextBip39AccountParams sse_decode_add_next_bip_39_account_params(SseDeserializer deserializer);
+  @protected
+  BackgroundState sse_decode_background_state(SseDeserializer deserializer);
 
-@protected AddSKWalletParams sse_decode_add_sk_wallet_params(SseDeserializer deserializer);
+  @protected
+  BaseTokenInfo sse_decode_base_token_info(SseDeserializer deserializer);
 
-@protected AddressBookEntryInfo sse_decode_address_book_entry_info(SseDeserializer deserializer);
+  @protected
+  Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(
+      SseDeserializer deserializer);
 
-@protected AddressChainInfo sse_decode_address_chain_info(SseDeserializer deserializer);
+  @protected
+  BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(
+      SseDeserializer deserializer);
 
-@protected BackgroundNotificationState sse_decode_background_notification_state(SseDeserializer deserializer);
+  @protected
+  BlockEvent sse_decode_block_event(SseDeserializer deserializer);
 
-@protected BackgroundState sse_decode_background_state(SseDeserializer deserializer);
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
 
-@protected BaseTokenInfo sse_decode_base_token_info(SseDeserializer deserializer);
+  @protected
+  AddNextBip39AccountParams
+      sse_decode_box_autoadd_add_next_bip_39_account_params(
+          SseDeserializer deserializer);
 
-@protected Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(SseDeserializer deserializer);
+  @protected
+  AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(
+      SseDeserializer deserializer);
 
-@protected BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(SseDeserializer deserializer);
+  @protected
+  BaseTokenInfo sse_decode_box_autoadd_base_token_info(
+      SseDeserializer deserializer);
 
-@protected BlockEvent sse_decode_block_event(SseDeserializer deserializer);
+  @protected
+  Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(
+      SseDeserializer deserializer);
 
-@protected bool sse_decode_bool(SseDeserializer deserializer);
+  @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
-@protected AddNextBip39AccountParams sse_decode_box_autoadd_add_next_bip_39_account_params(SseDeserializer deserializer);
+  @protected
+  BrowserSettingsInfo sse_decode_box_autoadd_browser_settings_info(
+      SseDeserializer deserializer);
 
-@protected AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(SseDeserializer deserializer);
+  @protected
+  BtcAccountXpubsInputInfo sse_decode_box_autoadd_btc_account_xpubs_input_info(
+      SseDeserializer deserializer);
 
-@protected BaseTokenInfo sse_decode_box_autoadd_base_token_info(SseDeserializer deserializer);
+  @protected
+  ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
 
-@protected Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(SseDeserializer deserializer);
+  @protected
+  ConnectionInfo sse_decode_box_autoadd_connection_info(
+      SseDeserializer deserializer);
 
-@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+  @protected
+  double sse_decode_box_autoadd_f_32(SseDeserializer deserializer);
 
-@protected BrowserSettingsInfo sse_decode_box_autoadd_browser_settings_info(SseDeserializer deserializer);
+  @protected
+  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
 
-@protected BtcAccountXpubsInputInfo sse_decode_box_autoadd_btc_account_xpubs_input_info(SseDeserializer deserializer);
+  @protected
+  FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer);
 
-@protected ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
+  @protected
+  FinalOutputInfo sse_decode_box_autoadd_final_output_info(
+      SseDeserializer deserializer);
 
-@protected ConnectionInfo sse_decode_box_autoadd_connection_info(SseDeserializer deserializer);
+  @protected
+  LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
+      SseDeserializer deserializer);
 
-@protected double sse_decode_box_autoadd_f_32(SseDeserializer deserializer);
+  @protected
+  MetadataThorchain sse_decode_box_autoadd_metadata_thorchain(
+      SseDeserializer deserializer);
 
-@protected double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
+  @protected
+  NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
+      SseDeserializer deserializer);
 
-@protected FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer);
+  @protected
+  QrConfigInfo sse_decode_box_autoadd_qr_config_info(
+      SseDeserializer deserializer);
 
-@protected FinalOutputInfo sse_decode_box_autoadd_final_output_info(SseDeserializer deserializer);
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          SseDeserializer deserializer);
 
-@protected LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(SseDeserializer deserializer);
+  @protected
+  RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
+      SseDeserializer deserializer);
 
-@protected MetadataThorchain sse_decode_box_autoadd_metadata_thorchain(SseDeserializer deserializer);
+  @protected
+  TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
+      SseDeserializer deserializer);
 
-@protected NetworkConfigInfo sse_decode_box_autoadd_network_config_info(SseDeserializer deserializer);
+  @protected
+  TransactionBitcoin sse_decode_box_autoadd_transaction_bitcoin(
+      SseDeserializer deserializer);
 
-@protected QrConfigInfo sse_decode_box_autoadd_qr_config_info(SseDeserializer deserializer);
+  @protected
+  TransactionRequestEVM sse_decode_box_autoadd_transaction_request_evm(
+      SseDeserializer deserializer);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo) sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer);
+  @protected
+  TransactionRequestInfo sse_decode_box_autoadd_transaction_request_info(
+      SseDeserializer deserializer);
 
-@protected RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(SseDeserializer deserializer);
+  @protected
+  TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(
+      SseDeserializer deserializer);
 
-@protected TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(SseDeserializer deserializer);
+  @protected
+  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
 
-@protected TransactionBitcoin sse_decode_box_autoadd_transaction_bitcoin(SseDeserializer deserializer);
+  @protected
+  WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer);
 
-@protected TransactionRequestEVM sse_decode_box_autoadd_transaction_request_evm(SseDeserializer deserializer);
+  @protected
+  BrowserSettingsInfo sse_decode_browser_settings_info(
+      SseDeserializer deserializer);
 
-@protected TransactionRequestInfo sse_decode_box_autoadd_transaction_request_info(SseDeserializer deserializer);
+  @protected
+  BtcAccountXpubsInputInfo sse_decode_btc_account_xpubs_input_info(
+      SseDeserializer deserializer);
 
-@protected TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(SseDeserializer deserializer);
+  @protected
+  BtcAddressEntryInfo sse_decode_btc_address_entry_info(
+      SseDeserializer deserializer);
 
-@protected BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
+  @protected
+  Category sse_decode_category(SseDeserializer deserializer);
 
-@protected WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(SseDeserializer deserializer);
+  @protected
+  ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
 
-@protected BrowserSettingsInfo sse_decode_browser_settings_info(SseDeserializer deserializer);
+  @protected
+  ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer);
 
-@protected BtcAccountXpubsInputInfo sse_decode_btc_account_xpubs_input_info(SseDeserializer deserializer);
+  @protected
+  Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer);
 
-@protected BtcAddressEntryInfo sse_decode_btc_address_entry_info(SseDeserializer deserializer);
+  @protected
+  EncodedRLPTx sse_decode_encoded_rlp_tx(SseDeserializer deserializer);
 
-@protected Category sse_decode_category(SseDeserializer deserializer);
+  @protected
+  Entry sse_decode_entry(SseDeserializer deserializer);
 
-@protected ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
+  @protected
+  ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer);
 
-@protected ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer);
+  @protected
+  ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
 
-@protected Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer);
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer);
 
-@protected EncodedRLPTx sse_decode_encoded_rlp_tx(SseDeserializer deserializer);
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
 
-@protected Entry sse_decode_entry(SseDeserializer deserializer);
+  @protected
+  FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
-@protected ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer);
+  @protected
+  FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer);
 
-@protected ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
+  @protected
+  FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer);
 
-@protected double sse_decode_f_32(SseDeserializer deserializer);
+  @protected
+  GasFeeHistoryInfo sse_decode_gas_fee_history_info(
+      SseDeserializer deserializer);
 
-@protected double sse_decode_f_64(SseDeserializer deserializer);
+  @protected
+  HistoricalTransactionInfo sse_decode_historical_transaction_info(
+      SseDeserializer deserializer);
 
-@protected FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
 
-@protected FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer);
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
-@protected FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer);
+  @protected
+  InputMetaInfo sse_decode_input_meta_info(SseDeserializer deserializer);
 
-@protected GasFeeHistoryInfo sse_decode_gas_fee_history_info(SseDeserializer deserializer);
+  @protected
+  KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
 
-@protected HistoricalTransactionInfo sse_decode_historical_transaction_info(SseDeserializer deserializer);
+  @protected
+  LedgerInputSignature sse_decode_ledger_input_signature(
+      SseDeserializer deserializer);
 
-@protected int sse_decode_i_32(SseDeserializer deserializer);
+  @protected
+  LedgerParamsInput sse_decode_ledger_params_input(
+      SseDeserializer deserializer);
 
-@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
 
-@protected InputMetaInfo sse_decode_input_meta_info(SseDeserializer deserializer);
+  @protected
+  List<AccessListItem> sse_decode_list_access_list_item(
+      SseDeserializer deserializer);
 
-@protected KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
+  @protected
+  List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer);
 
-@protected LedgerInputSignature sse_decode_ledger_input_signature(SseDeserializer deserializer);
+  @protected
+  List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
+      SseDeserializer deserializer);
 
-@protected LedgerParamsInput sse_decode_ledger_params_input(SseDeserializer deserializer);
+  @protected
+  List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(
+      SseDeserializer deserializer);
 
-@protected List<String> sse_decode_list_String(SseDeserializer deserializer);
+  @protected
+  List<Category> sse_decode_list_category(SseDeserializer deserializer);
 
-@protected List<AccessListItem> sse_decode_list_access_list_item(SseDeserializer deserializer);
+  @protected
+  List<ConnectionInfo> sse_decode_list_connection_info(
+      SseDeserializer deserializer);
 
-@protected List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer);
+  @protected
+  List<Entry> sse_decode_list_entry(SseDeserializer deserializer);
 
-@protected List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(SseDeserializer deserializer);
+  @protected
+  List<ExchangeProvider> sse_decode_list_exchange_provider(
+      SseDeserializer deserializer);
 
-@protected List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(SseDeserializer deserializer);
+  @protected
+  List<ExplorerInfo> sse_decode_list_explorer_info(
+      SseDeserializer deserializer);
 
-@protected List<Category> sse_decode_list_category(SseDeserializer deserializer);
+  @protected
+  List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
 
-@protected List<ConnectionInfo> sse_decode_list_connection_info(SseDeserializer deserializer);
+  @protected
+  List<FinalOutputInfo> sse_decode_list_final_output_info(
+      SseDeserializer deserializer);
 
-@protected List<Entry> sse_decode_list_entry(SseDeserializer deserializer);
+  @protected
+  List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
+      SseDeserializer deserializer);
 
-@protected List<ExchangeProvider> sse_decode_list_exchange_provider(SseDeserializer deserializer);
+  @protected
+  List<InputMetaInfo> sse_decode_list_input_meta_info(
+      SseDeserializer deserializer);
 
-@protected List<ExplorerInfo> sse_decode_list_explorer_info(SseDeserializer deserializer);
+  @protected
+  List<LedgerInputSignature> sse_decode_list_ledger_input_signature(
+      SseDeserializer deserializer);
 
-@protected List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
+  @protected
+  List<List<Uint8List>> sse_decode_list_list_list_prim_u_8_strict(
+      SseDeserializer deserializer);
 
-@protected List<FinalOutputInfo> sse_decode_list_final_output_info(SseDeserializer deserializer);
+  @protected
+  List<Uint8List> sse_decode_list_list_prim_u_8_strict(
+      SseDeserializer deserializer);
 
-@protected List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(SseDeserializer deserializer);
+  @protected
+  List<NetworkConfigInfo> sse_decode_list_network_config_info(
+      SseDeserializer deserializer);
 
-@protected List<InputMetaInfo> sse_decode_list_input_meta_info(SseDeserializer deserializer);
+  @protected
+  List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(
+      SseDeserializer deserializer);
 
-@protected List<LedgerInputSignature> sse_decode_list_ledger_input_signature(SseDeserializer deserializer);
+  @protected
+  Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer);
 
-@protected List<List<Uint8List>> sse_decode_list_list_list_prim_u_8_strict(SseDeserializer deserializer);
+  @protected
+  Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
 
-@protected List<Uint8List> sse_decode_list_list_prim_u_8_strict(SseDeserializer deserializer);
+  @protected
+  Uint64List sse_decode_list_prim_u_64_strict(SseDeserializer deserializer);
 
-@protected List<NetworkConfigInfo> sse_decode_list_network_config_info(SseDeserializer deserializer);
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
-@protected List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(SseDeserializer deserializer);
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
-@protected Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer);
+  @protected
+  Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
 
-@protected Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+      SseDeserializer deserializer);
 
-@protected Uint64List sse_decode_list_prim_u_64_strict(SseDeserializer deserializer);
+  @protected
+  List<(int, List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(
+      SseDeserializer deserializer);
 
-@protected List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+  @protected
+  List<(int, Map<int, List<AccountInfo>>)>
+      sse_decode_list_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer);
 
-@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+  @protected
+  List<(int, AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(
+      SseDeserializer deserializer);
 
-@protected Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
+  @protected
+  List<(int, Map<int, AddressChainInfo>)>
+      sse_decode_list_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer);
 
-@protected List<(String,String)> sse_decode_list_record_string_string(SseDeserializer deserializer);
+  @protected
+  List<(int, String)> sse_decode_list_record_u_8_string(
+      SseDeserializer deserializer);
 
-@protected List<(int,List<AccountInfo>)> sse_decode_list_record_u_32_list_account_info(SseDeserializer deserializer);
+  @protected
+  List<(BigInt, BackgroundNotificationState)>
+      sse_decode_list_record_usize_background_notification_state(
+          SseDeserializer deserializer);
 
-@protected List<(int,Map<int, List<AccountInfo>>)> sse_decode_list_record_u_32_map_u_32_list_account_info_none(SseDeserializer deserializer);
+  @protected
+  List<(BigInt, String)> sse_decode_list_record_usize_string(
+      SseDeserializer deserializer);
 
-@protected List<(int,AddressChainInfo)> sse_decode_list_record_u_8_address_chain_info(SseDeserializer deserializer);
+  @protected
+  List<RustLedgerBleDevice> sse_decode_list_rust_ledger_ble_device(
+      SseDeserializer deserializer);
 
-@protected List<(int,Map<int, AddressChainInfo>)> sse_decode_list_record_u_8_map_u_8_address_chain_info_none(SseDeserializer deserializer);
+  @protected
+  List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(
+      SseDeserializer deserializer);
 
-@protected List<(int,String)> sse_decode_list_record_u_8_string(SseDeserializer deserializer);
+  @protected
+  List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer);
 
-@protected List<(BigInt,BackgroundNotificationState)> sse_decode_list_record_usize_background_notification_state(SseDeserializer deserializer);
+  @protected
+  List<TxOutInfo> sse_decode_list_tx_out_info(SseDeserializer deserializer);
 
-@protected List<(BigInt,String)> sse_decode_list_record_usize_string(SseDeserializer deserializer);
+  @protected
+  List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer);
 
-@protected List<RustLedgerBleDevice> sse_decode_list_rust_ledger_ble_device(SseDeserializer deserializer);
+  @protected
+  List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
 
-@protected List<RustLedgerHidDevice> sse_decode_list_rust_ledger_hid_device(SseDeserializer deserializer);
+  @protected
+  MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
 
-@protected List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer);
+  @protected
+  MerkleProof sse_decode_merkle_proof(SseDeserializer deserializer);
 
-@protected List<TxOutInfo> sse_decode_list_tx_out_info(SseDeserializer deserializer);
+  @protected
+  MetadataThorchain sse_decode_metadata_thorchain(SseDeserializer deserializer);
 
-@protected List<UtxoInfo> sse_decode_list_utxo_info(SseDeserializer deserializer);
+  @protected
+  NetworkConfigInfo sse_decode_network_config_info(
+      SseDeserializer deserializer);
 
-@protected List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+  @protected
+  Map<int, AddressChainInfo>? sse_decode_opt_Map_u_8_address_chain_info_None(
+      SseDeserializer deserializer);
 
-@protected MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
 
-@protected MerkleProof sse_decode_merkle_proof(SseDeserializer deserializer);
+  @protected
+  BigInt? sse_decode_opt_U128(SseDeserializer deserializer);
 
-@protected MetadataThorchain sse_decode_metadata_thorchain(SseDeserializer deserializer);
+  @protected
+  BaseTokenInfo? sse_decode_opt_box_autoadd_base_token_info(
+      SseDeserializer deserializer);
 
-@protected NetworkConfigInfo sse_decode_network_config_info(SseDeserializer deserializer);
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
-@protected Map<int, AddressChainInfo>? sse_decode_opt_Map_u_8_address_chain_info_None(SseDeserializer deserializer);
+  @protected
+  ColorsInfo? sse_decode_opt_box_autoadd_colors_info(
+      SseDeserializer deserializer);
 
-@protected String? sse_decode_opt_String(SseDeserializer deserializer);
+  @protected
+  double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer);
 
-@protected BigInt? sse_decode_opt_U128(SseDeserializer deserializer);
+  @protected
+  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
 
-@protected BaseTokenInfo? sse_decode_opt_box_autoadd_base_token_info(SseDeserializer deserializer);
+  @protected
+  FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
+      SseDeserializer deserializer);
 
-@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+  @protected
+  (
+    TransactionBitcoin,
+    BitcoinMetadataInfo
+  )? sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      SseDeserializer deserializer);
 
-@protected ColorsInfo? sse_decode_opt_box_autoadd_colors_info(SseDeserializer deserializer);
+  @protected
+  TransactionBitcoin? sse_decode_opt_box_autoadd_transaction_bitcoin(
+      SseDeserializer deserializer);
 
-@protected double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer);
+  @protected
+  TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
+      SseDeserializer deserializer);
 
-@protected double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
+  @protected
+  TransactionRequestScilla?
+      sse_decode_opt_box_autoadd_transaction_request_scilla(
+          SseDeserializer deserializer);
 
-@protected FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(SseDeserializer deserializer);
+  @protected
+  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo)? sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer);
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
-@protected TransactionBitcoin? sse_decode_opt_box_autoadd_transaction_bitcoin(SseDeserializer deserializer);
+  @protected
+  List<AccessListItem>? sse_decode_opt_list_access_list_item(
+      SseDeserializer deserializer);
 
-@protected TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(SseDeserializer deserializer);
+  @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
 
-@protected TransactionRequestScilla? sse_decode_opt_box_autoadd_transaction_request_scilla(SseDeserializer deserializer);
+  @protected
+  OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer);
 
-@protected BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
+  @protected
+  PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
+      SseDeserializer deserializer);
 
-@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
+  @protected
+  QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
+      SseDeserializer deserializer);
 
-@protected List<AccessListItem>? sse_decode_opt_list_access_list_item(SseDeserializer deserializer);
+  @protected
+  QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer);
 
-@protected Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+  @protected
+  (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
+      sse_decode_record_list_network_config_info_list_network_config_info(
+          SseDeserializer deserializer);
 
-@protected OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer);
+  @protected
+  (Uint8List, String) sse_decode_record_list_prim_u_8_strict_string(
+      SseDeserializer deserializer);
 
-@protected PendingWithdrawalInfo sse_decode_pending_withdrawal_info(SseDeserializer deserializer);
+  @protected
+  (String, String) sse_decode_record_string_string(
+      SseDeserializer deserializer);
 
-@protected QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(SseDeserializer deserializer);
+  @protected
+  (String, int) sse_decode_record_string_u_8(SseDeserializer deserializer);
 
-@protected QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer);
+  @protected
+  (TransactionBitcoin, BitcoinMetadataInfo)
+      sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(
+          SseDeserializer deserializer);
 
-@protected (List<NetworkConfigInfo>,List<NetworkConfigInfo>) sse_decode_record_list_network_config_info_list_network_config_info(SseDeserializer deserializer);
+  @protected
+  (int, List<AccountInfo>) sse_decode_record_u_32_list_account_info(
+      SseDeserializer deserializer);
 
-@protected (Uint8List,String) sse_decode_record_list_prim_u_8_strict_string(SseDeserializer deserializer);
+  @protected
+  (int, Map<int, List<AccountInfo>>)
+      sse_decode_record_u_32_map_u_32_list_account_info_none(
+          SseDeserializer deserializer);
 
-@protected (String,String) sse_decode_record_string_string(SseDeserializer deserializer);
+  @protected
+  (int, AddressChainInfo) sse_decode_record_u_8_address_chain_info(
+      SseDeserializer deserializer);
 
-@protected (String,int) sse_decode_record_string_u_8(SseDeserializer deserializer);
+  @protected
+  (int, Map<int, AddressChainInfo>)
+      sse_decode_record_u_8_map_u_8_address_chain_info_none(
+          SseDeserializer deserializer);
 
-@protected (TransactionBitcoin,BitcoinMetadataInfo) sse_decode_record_transaction_bitcoin_bitcoin_metadata_info(SseDeserializer deserializer);
+  @protected
+  (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer);
 
-@protected (int,List<AccountInfo>) sse_decode_record_u_32_list_account_info(SseDeserializer deserializer);
+  @protected
+  (BigInt, BackgroundNotificationState)
+      sse_decode_record_usize_background_notification_state(
+          SseDeserializer deserializer);
 
-@protected (int,Map<int, List<AccountInfo>>) sse_decode_record_u_32_map_u_32_list_account_info_none(SseDeserializer deserializer);
+  @protected
+  (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
 
-@protected (int,AddressChainInfo) sse_decode_record_u_8_address_chain_info(SseDeserializer deserializer);
+  @protected
+  RequiredTxParamsInfo sse_decode_required_tx_params_info(
+      SseDeserializer deserializer);
 
-@protected (int,Map<int, AddressChainInfo>) sse_decode_record_u_8_map_u_8_address_chain_info_none(SseDeserializer deserializer);
+  @protected
+  RustLedgerBleDevice sse_decode_rust_ledger_ble_device(
+      SseDeserializer deserializer);
 
-@protected (int,String) sse_decode_record_u_8_string(SseDeserializer deserializer);
+  @protected
+  RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
+      SseDeserializer deserializer);
 
-@protected (BigInt,BackgroundNotificationState) sse_decode_record_usize_background_notification_state(SseDeserializer deserializer);
+  @protected
+  TokenTransferParamsInfo sse_decode_token_transfer_params_info(
+      SseDeserializer deserializer);
 
-@protected (BigInt,String) sse_decode_record_usize_string(SseDeserializer deserializer);
+  @protected
+  TransactionBitcoin sse_decode_transaction_bitcoin(
+      SseDeserializer deserializer);
 
-@protected RequiredTxParamsInfo sse_decode_required_tx_params_info(SseDeserializer deserializer);
+  @protected
+  TransactionMetadataInfo sse_decode_transaction_metadata_info(
+      SseDeserializer deserializer);
 
-@protected RustLedgerBleDevice sse_decode_rust_ledger_ble_device(SseDeserializer deserializer);
+  @protected
+  TransactionRequestEVM sse_decode_transaction_request_evm(
+      SseDeserializer deserializer);
 
-@protected RustLedgerHidDevice sse_decode_rust_ledger_hid_device(SseDeserializer deserializer);
+  @protected
+  TransactionRequestInfo sse_decode_transaction_request_info(
+      SseDeserializer deserializer);
 
-@protected TokenTransferParamsInfo sse_decode_token_transfer_params_info(SseDeserializer deserializer);
+  @protected
+  TransactionRequestScilla sse_decode_transaction_request_scilla(
+      SseDeserializer deserializer);
 
-@protected TransactionBitcoin sse_decode_transaction_bitcoin(SseDeserializer deserializer);
+  @protected
+  TransactionStatusInfo sse_decode_transaction_status_info(
+      SseDeserializer deserializer);
 
-@protected TransactionMetadataInfo sse_decode_transaction_metadata_info(SseDeserializer deserializer);
+  @protected
+  TxInInfo sse_decode_tx_in_info(SseDeserializer deserializer);
 
-@protected TransactionRequestEVM sse_decode_transaction_request_evm(SseDeserializer deserializer);
+  @protected
+  TxOutInfo sse_decode_tx_out_info(SseDeserializer deserializer);
 
-@protected TransactionRequestInfo sse_decode_transaction_request_info(SseDeserializer deserializer);
+  @protected
+  int sse_decode_u_16(SseDeserializer deserializer);
 
-@protected TransactionRequestScilla sse_decode_transaction_request_scilla(SseDeserializer deserializer);
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer);
 
-@protected TransactionStatusInfo sse_decode_transaction_status_info(SseDeserializer deserializer);
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer);
 
-@protected TxInInfo sse_decode_tx_in_info(SseDeserializer deserializer);
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer);
 
-@protected TxOutInfo sse_decode_tx_out_info(SseDeserializer deserializer);
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer);
 
-@protected int sse_decode_u_16(SseDeserializer deserializer);
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer);
 
-@protected int sse_decode_u_32(SseDeserializer deserializer);
+  @protected
+  UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer);
 
-@protected BigInt sse_decode_u_64(SseDeserializer deserializer);
+  @protected
+  WalletArgonParamsInfo sse_decode_wallet_argon_params_info(
+      SseDeserializer deserializer);
 
-@protected int sse_decode_u_8(SseDeserializer deserializer);
+  @protected
+  WalletInfo sse_decode_wallet_info(SseDeserializer deserializer);
 
-@protected void sse_decode_unit(SseDeserializer deserializer);
+  @protected
+  WalletPolicy sse_decode_wallet_policy(SseDeserializer deserializer);
 
-@protected BigInt sse_decode_usize(SseDeserializer deserializer);
+  @protected
+  WalletSettingsInfo sse_decode_wallet_settings_info(
+      SseDeserializer deserializer);
 
-@protected UtxoInfo sse_decode_utxo_info(SseDeserializer deserializer);
+  @protected
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer);
 
-@protected WalletArgonParamsInfo sse_decode_wallet_argon_params_info(SseDeserializer deserializer);
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
 
-@protected WalletInfo sse_decode_wallet_info(SseDeserializer deserializer);
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
 
-@protected WalletPolicy sse_decode_wallet_policy(SseDeserializer deserializer);
+  @protected
+  void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(
+      Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer);
 
-@protected WalletSettingsInfo sse_decode_wallet_settings_info(SseDeserializer deserializer);
+  @protected
+  void sse_encode_Map_u_32_list_account_info_None(
+      Map<int, List<AccountInfo>> self, SseSerializer serializer);
 
-@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer);
+  @protected
+  void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(
+      Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer);
 
-@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer);
+  @protected
+  void sse_encode_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer);
+  @protected
+  void sse_encode_Map_usize_String_None(
+      Map<BigInt, String> self, SseSerializer serializer);
 
-@protected void sse_encode_Map_u_32_Map_u_32_list_account_info_None_None(Map<int, Map<int, List<AccountInfo>>> self, SseSerializer serializer);
+  @protected
+  void sse_encode_Map_usize_background_notification_state_None(
+      Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer);
 
-@protected void sse_encode_Map_u_32_list_account_info_None(Map<int, List<AccountInfo>> self, SseSerializer serializer);
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+          LocalStorageImpl self, SseSerializer serializer);
 
-@protected void sse_encode_Map_u_8_Map_u_8_address_chain_info_None_None(Map<int, Map<int, AddressChainInfo>> self, SseSerializer serializer);
+  @protected
+  void sse_encode_StreamSink_String_Sse(
+      RustStreamSink<String> self, SseSerializer serializer);
 
-@protected void sse_encode_Map_u_8_address_chain_info_None(Map<int, AddressChainInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_StreamSink_block_event_Sse(
+      RustStreamSink<BlockEvent> self, SseSerializer serializer);
 
-@protected void sse_encode_Map_usize_String_None(Map<BigInt, String> self, SseSerializer serializer);
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer);
 
-@protected void sse_encode_Map_usize_background_notification_state_None(Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer);
+  @protected
+  void sse_encode_U128(BigInt self, SseSerializer serializer);
 
-@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(LocalStorageImpl self, SseSerializer serializer);
+  @protected
+  void sse_encode_access_list_item(
+      AccessListItem self, SseSerializer serializer);
 
-@protected void sse_encode_StreamSink_String_Sse(RustStreamSink<String> self, SseSerializer serializer);
+  @protected
+  void sse_encode_account_info(AccountInfo self, SseSerializer serializer);
 
-@protected void sse_encode_StreamSink_block_event_Sse(RustStreamSink<BlockEvent> self, SseSerializer serializer);
+  @protected
+  void sse_encode_add_next_bip_39_account_params(
+      AddNextBip39AccountParams self, SseSerializer serializer);
 
-@protected void sse_encode_String(String self, SseSerializer serializer);
+  @protected
+  void sse_encode_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer);
 
-@protected void sse_encode_U128(BigInt self, SseSerializer serializer);
+  @protected
+  void sse_encode_address_book_entry_info(
+      AddressBookEntryInfo self, SseSerializer serializer);
 
-@protected void sse_encode_access_list_item(AccessListItem self, SseSerializer serializer);
+  @protected
+  void sse_encode_address_chain_info(
+      AddressChainInfo self, SseSerializer serializer);
 
-@protected void sse_encode_account_info(AccountInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_background_notification_state(
+      BackgroundNotificationState self, SseSerializer serializer);
 
-@protected void sse_encode_add_next_bip_39_account_params(AddNextBip39AccountParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_background_state(
+      BackgroundState self, SseSerializer serializer);
 
-@protected void sse_encode_add_sk_wallet_params(AddSKWalletParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_base_token_info(BaseTokenInfo self, SseSerializer serializer);
 
-@protected void sse_encode_address_book_entry_info(AddressBookEntryInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer);
 
-@protected void sse_encode_address_chain_info(AddressChainInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_bitcoin_metadata_info(
+      BitcoinMetadataInfo self, SseSerializer serializer);
 
-@protected void sse_encode_background_notification_state(BackgroundNotificationState self, SseSerializer serializer);
+  @protected
+  void sse_encode_block_event(BlockEvent self, SseSerializer serializer);
 
-@protected void sse_encode_background_state(BackgroundState self, SseSerializer serializer);
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
 
-@protected void sse_encode_base_token_info(BaseTokenInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_add_next_bip_39_account_params(
+      AddNextBip39AccountParams self, SseSerializer serializer);
 
-@protected void sse_encode_bip_39_add_wallet_params(Bip39AddWalletParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer);
 
-@protected void sse_encode_bitcoin_metadata_info(BitcoinMetadataInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_base_token_info(
+      BaseTokenInfo self, SseSerializer serializer);
 
-@protected void sse_encode_block_event(BlockEvent self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer);
 
-@protected void sse_encode_bool(bool self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_add_next_bip_39_account_params(AddNextBip39AccountParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_add_sk_wallet_params(AddSKWalletParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_base_token_info(BaseTokenInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_colors_info(
+      ColorsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_bip_39_add_wallet_params(Bip39AddWalletParams self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_connection_info(
+      ConnectionInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_browser_settings_info(BrowserSettingsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_btc_account_xpubs_input_info(BtcAccountXpubsInputInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_f_token_info(
+      FTokenInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_colors_info(ColorsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_connection_info(ConnectionInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_metadata_thorchain(
+      MetadataThorchain self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_f_token_info(FTokenInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_qr_config_info(
+      QrConfigInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_final_output_info(FinalOutputInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+      (TransactionBitcoin, BitcoinMetadataInfo) self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_ledger_params_input(LedgerParamsInput self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_metadata_thorchain(MetadataThorchain self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_network_config_info(NetworkConfigInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_transaction_bitcoin(
+      TransactionBitcoin self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_qr_config_info(QrConfigInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_transaction_request_evm(
+      TransactionRequestEVM self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo) self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_transaction_request_info(
+      TransactionRequestInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_required_tx_params_info(RequiredTxParamsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_transaction_request_scilla(
+      TransactionRequestScilla self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_token_transfer_params_info(TokenTransferParamsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_transaction_bitcoin(TransactionBitcoin self, SseSerializer serializer);
+  @protected
+  void sse_encode_box_autoadd_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_transaction_request_evm(TransactionRequestEVM self, SseSerializer serializer);
+  @protected
+  void sse_encode_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_transaction_request_info(TransactionRequestInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_btc_account_xpubs_input_info(
+      BtcAccountXpubsInputInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_transaction_request_scilla(TransactionRequestScilla self, SseSerializer serializer);
+  @protected
+  void sse_encode_btc_address_entry_info(
+      BtcAddressEntryInfo self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
+  @protected
+  void sse_encode_category(Category self, SseSerializer serializer);
 
-@protected void sse_encode_box_autoadd_wallet_settings_info(WalletSettingsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_browser_settings_info(BrowserSettingsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_connection_info(
+      ConnectionInfo self, SseSerializer serializer);
 
-@protected void sse_encode_btc_account_xpubs_input_info(BtcAccountXpubsInputInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer);
 
-@protected void sse_encode_btc_address_entry_info(BtcAddressEntryInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_encoded_rlp_tx(EncodedRLPTx self, SseSerializer serializer);
 
-@protected void sse_encode_category(Category self, SseSerializer serializer);
+  @protected
+  void sse_encode_entry(Entry self, SseSerializer serializer);
 
-@protected void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_exchange_provider(
+      ExchangeProvider self, SseSerializer serializer);
 
-@protected void sse_encode_connection_info(ConnectionInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
 
-@protected void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer);
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer);
 
-@protected void sse_encode_encoded_rlp_tx(EncodedRLPTx self, SseSerializer serializer);
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
 
-@protected void sse_encode_entry(Entry self, SseSerializer serializer);
+  @protected
+  void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
-@protected void sse_encode_exchange_provider(ExchangeProvider self, SseSerializer serializer);
+  @protected
+  void sse_encode_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer);
 
-@protected void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_finalized_btc_tx(
+      FinalizedBtcTx self, SseSerializer serializer);
 
-@protected void sse_encode_f_32(double self, SseSerializer serializer);
+  @protected
+  void sse_encode_gas_fee_history_info(
+      GasFeeHistoryInfo self, SseSerializer serializer);
 
-@protected void sse_encode_f_64(double self, SseSerializer serializer);
+  @protected
+  void sse_encode_historical_transaction_info(
+      HistoricalTransactionInfo self, SseSerializer serializer);
 
-@protected void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
 
-@protected void sse_encode_final_output_info(FinalOutputInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
-@protected void sse_encode_finalized_btc_tx(FinalizedBtcTx self, SseSerializer serializer);
+  @protected
+  void sse_encode_input_meta_info(InputMetaInfo self, SseSerializer serializer);
 
-@protected void sse_encode_gas_fee_history_info(GasFeeHistoryInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
 
-@protected void sse_encode_historical_transaction_info(HistoricalTransactionInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_ledger_input_signature(
+      LedgerInputSignature self, SseSerializer serializer);
 
-@protected void sse_encode_i_32(int self, SseSerializer serializer);
+  @protected
+  void sse_encode_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer);
 
-@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
-@protected void sse_encode_input_meta_info(InputMetaInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_access_list_item(
+      List<AccessListItem> self, SseSerializer serializer);
 
-@protected void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_account_info(
+      List<AccountInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_ledger_input_signature(LedgerInputSignature self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_address_book_entry_info(
+      List<AddressBookEntryInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_ledger_params_input(LedgerParamsInput self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_btc_address_entry_info(
+      List<BtcAddressEntryInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_String(List<String> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_category(List<Category> self, SseSerializer serializer);
 
-@protected void sse_encode_list_access_list_item(List<AccessListItem> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_connection_info(
+      List<ConnectionInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_account_info(List<AccountInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_entry(List<Entry> self, SseSerializer serializer);
 
-@protected void sse_encode_list_address_book_entry_info(List<AddressBookEntryInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_exchange_provider(
+      List<ExchangeProvider> self, SseSerializer serializer);
 
-@protected void sse_encode_list_btc_address_entry_info(List<BtcAddressEntryInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_explorer_info(
+      List<ExplorerInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_category(List<Category> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_f_token_info(
+      List<FTokenInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_connection_info(List<ConnectionInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_final_output_info(
+      List<FinalOutputInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_entry(List<Entry> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_historical_transaction_info(
+      List<HistoricalTransactionInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_exchange_provider(List<ExchangeProvider> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_input_meta_info(
+      List<InputMetaInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_explorer_info(List<ExplorerInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_ledger_input_signature(
+      List<LedgerInputSignature> self, SseSerializer serializer);
 
-@protected void sse_encode_list_f_token_info(List<FTokenInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_list_list_prim_u_8_strict(
+      List<List<Uint8List>> self, SseSerializer serializer);
 
-@protected void sse_encode_list_final_output_info(List<FinalOutputInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_list_prim_u_8_strict(
+      List<Uint8List> self, SseSerializer serializer);
 
-@protected void sse_encode_list_historical_transaction_info(List<HistoricalTransactionInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_network_config_info(
+      List<NetworkConfigInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_input_meta_info(List<InputMetaInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_pending_withdrawal_info(
+      List<PendingWithdrawalInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_ledger_input_signature(List<LedgerInputSignature> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_u_16_strict(
+      Uint16List self, SseSerializer serializer);
 
-@protected void sse_encode_list_list_list_prim_u_8_strict(List<List<Uint8List>> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_u_32_strict(
+      Uint32List self, SseSerializer serializer);
 
-@protected void sse_encode_list_list_prim_u_8_strict(List<Uint8List> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_u_64_strict(
+      Uint64List self, SseSerializer serializer);
 
-@protected void sse_encode_list_network_config_info(List<NetworkConfigInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
-@protected void sse_encode_list_pending_withdrawal_info(List<PendingWithdrawalInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+      Uint8List self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_u_16_strict(Uint16List self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_prim_usize_strict(
+      Uint64List self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_u_32_strict(Uint32List self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_string_string(
+      List<(String, String)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_u_64_strict(Uint64List self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_u_32_list_account_info(
+      List<(int, List<AccountInfo>)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_u_32_map_u_32_list_account_info_none(
+      List<(int, Map<int, List<AccountInfo>>)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_u_8_address_chain_info(
+      List<(int, AddressChainInfo)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_prim_usize_strict(Uint64List self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(
+      List<(int, Map<int, AddressChainInfo>)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_string_string(List<(String,String)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_u_8_string(
+      List<(int, String)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_u_32_list_account_info(List<(int,List<AccountInfo>)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_usize_background_notification_state(
+      List<(BigInt, BackgroundNotificationState)> self,
+      SseSerializer serializer);
 
-@protected void sse_encode_list_record_u_32_map_u_32_list_account_info_none(List<(int,Map<int, List<AccountInfo>>)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_record_usize_string(
+      List<(BigInt, String)> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_u_8_address_chain_info(List<(int,AddressChainInfo)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_rust_ledger_ble_device(
+      List<RustLedgerBleDevice> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_u_8_map_u_8_address_chain_info_none(List<(int,Map<int, AddressChainInfo>)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_rust_ledger_hid_device(
+      List<RustLedgerHidDevice> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_u_8_string(List<(int,String)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_tx_in_info(
+      List<TxInInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_usize_background_notification_state(List<(BigInt,BackgroundNotificationState)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_tx_out_info(
+      List<TxOutInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_record_usize_string(List<(BigInt,String)> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_utxo_info(List<UtxoInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_rust_ledger_ble_device(List<RustLedgerBleDevice> self, SseSerializer serializer);
+  @protected
+  void sse_encode_list_wallet_info(
+      List<WalletInfo> self, SseSerializer serializer);
 
-@protected void sse_encode_list_rust_ledger_hid_device(List<RustLedgerHidDevice> self, SseSerializer serializer);
+  @protected
+  void sse_encode_merkelized_psbt(
+      MerkelizedPsbt self, SseSerializer serializer);
 
-@protected void sse_encode_list_tx_in_info(List<TxInInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_merkle_proof(MerkleProof self, SseSerializer serializer);
 
-@protected void sse_encode_list_tx_out_info(List<TxOutInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_metadata_thorchain(
+      MetadataThorchain self, SseSerializer serializer);
 
-@protected void sse_encode_list_utxo_info(List<UtxoInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer);
 
-@protected void sse_encode_list_wallet_info(List<WalletInfo> self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_Map_u_8_address_chain_info_None(
+      Map<int, AddressChainInfo>? self, SseSerializer serializer);
 
-@protected void sse_encode_merkelized_psbt(MerkelizedPsbt self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
 
-@protected void sse_encode_merkle_proof(MerkleProof self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_U128(BigInt? self, SseSerializer serializer);
 
-@protected void sse_encode_metadata_thorchain(MetadataThorchain self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_base_token_info(
+      BaseTokenInfo? self, SseSerializer serializer);
 
-@protected void sse_encode_network_config_info(NetworkConfigInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_Map_u_8_address_chain_info_None(Map<int, AddressChainInfo>? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_colors_info(
+      ColorsInfo? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_String(String? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_U128(BigInt? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_base_token_info(BaseTokenInfo? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_f_token_info(
+      FTokenInfo? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+  @protected
+  void
+      sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
+          (TransactionBitcoin, BitcoinMetadataInfo)? self,
+          SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_colors_info(ColorsInfo? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_bitcoin(
+      TransactionBitcoin? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_evm(
+      TransactionRequestEVM? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_scilla(
+      TransactionRequestScilla? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_f_token_info(FTokenInfo? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo)? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_transaction_bitcoin(TransactionBitcoin? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_list_access_list_item(
+      List<AccessListItem>? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_transaction_request_evm(TransactionRequestEVM? self, SseSerializer serializer);
+  @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+      Uint8List? self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_transaction_request_scilla(TransactionRequestScilla? self, SseSerializer serializer);
+  @protected
+  void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer);
 
-@protected void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
+  @protected
+  void sse_encode_pending_withdrawal_info(
+      PendingWithdrawalInfo self, SseSerializer serializer);
 
-@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+  @protected
+  void sse_encode_q_rcode_scan_result_info(
+      QRcodeScanResultInfo self, SseSerializer serializer);
 
-@protected void sse_encode_opt_list_access_list_item(List<AccessListItem>? self, SseSerializer serializer);
+  @protected
+  void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer);
 
-@protected void sse_encode_opt_list_prim_u_8_strict(Uint8List? self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_list_network_config_info_list_network_config_info(
+      (List<NetworkConfigInfo>, List<NetworkConfigInfo>) self,
+      SseSerializer serializer);
 
-@protected void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_list_prim_u_8_strict_string(
+      (Uint8List, String) self, SseSerializer serializer);
 
-@protected void sse_encode_pending_withdrawal_info(PendingWithdrawalInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_string_string(
+      (String, String) self, SseSerializer serializer);
 
-@protected void sse_encode_q_rcode_scan_result_info(QRcodeScanResultInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_string_u_8(
+      (String, int) self, SseSerializer serializer);
 
-@protected void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_transaction_bitcoin_bitcoin_metadata_info(
+      (TransactionBitcoin, BitcoinMetadataInfo) self, SseSerializer serializer);
 
-@protected void sse_encode_record_list_network_config_info_list_network_config_info((List<NetworkConfigInfo>,List<NetworkConfigInfo>) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_u_32_list_account_info(
+      (int, List<AccountInfo>) self, SseSerializer serializer);
 
-@protected void sse_encode_record_list_prim_u_8_strict_string((Uint8List,String) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_u_32_map_u_32_list_account_info_none(
+      (int, Map<int, List<AccountInfo>>) self, SseSerializer serializer);
 
-@protected void sse_encode_record_string_string((String,String) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_u_8_address_chain_info(
+      (int, AddressChainInfo) self, SseSerializer serializer);
 
-@protected void sse_encode_record_string_u_8((String,int) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_u_8_map_u_8_address_chain_info_none(
+      (int, Map<int, AddressChainInfo>) self, SseSerializer serializer);
 
-@protected void sse_encode_record_transaction_bitcoin_bitcoin_metadata_info((TransactionBitcoin,BitcoinMetadataInfo) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_u_8_string(
+      (int, String) self, SseSerializer serializer);
 
-@protected void sse_encode_record_u_32_list_account_info((int,List<AccountInfo>) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_usize_background_notification_state(
+      (BigInt, BackgroundNotificationState) self, SseSerializer serializer);
 
-@protected void sse_encode_record_u_32_map_u_32_list_account_info_none((int,Map<int, List<AccountInfo>>) self, SseSerializer serializer);
+  @protected
+  void sse_encode_record_usize_string(
+      (BigInt, String) self, SseSerializer serializer);
 
-@protected void sse_encode_record_u_8_address_chain_info((int,AddressChainInfo) self, SseSerializer serializer);
+  @protected
+  void sse_encode_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_record_u_8_map_u_8_address_chain_info_none((int,Map<int, AddressChainInfo>) self, SseSerializer serializer);
+  @protected
+  void sse_encode_rust_ledger_ble_device(
+      RustLedgerBleDevice self, SseSerializer serializer);
 
-@protected void sse_encode_record_u_8_string((int,String) self, SseSerializer serializer);
+  @protected
+  void sse_encode_rust_ledger_hid_device(
+      RustLedgerHidDevice self, SseSerializer serializer);
 
-@protected void sse_encode_record_usize_background_notification_state((BigInt,BackgroundNotificationState) self, SseSerializer serializer);
+  @protected
+  void sse_encode_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_record_usize_string((BigInt,String) self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_bitcoin(
+      TransactionBitcoin self, SseSerializer serializer);
 
-@protected void sse_encode_required_tx_params_info(RequiredTxParamsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_metadata_info(
+      TransactionMetadataInfo self, SseSerializer serializer);
 
-@protected void sse_encode_rust_ledger_ble_device(RustLedgerBleDevice self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_request_evm(
+      TransactionRequestEVM self, SseSerializer serializer);
 
-@protected void sse_encode_rust_ledger_hid_device(RustLedgerHidDevice self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_request_info(
+      TransactionRequestInfo self, SseSerializer serializer);
 
-@protected void sse_encode_token_transfer_params_info(TokenTransferParamsInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_request_scilla(
+      TransactionRequestScilla self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_bitcoin(TransactionBitcoin self, SseSerializer serializer);
+  @protected
+  void sse_encode_transaction_status_info(
+      TransactionStatusInfo self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_metadata_info(TransactionMetadataInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_tx_in_info(TxInInfo self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_request_evm(TransactionRequestEVM self, SseSerializer serializer);
+  @protected
+  void sse_encode_tx_out_info(TxOutInfo self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_request_info(TransactionRequestInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_u_16(int self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_request_scilla(TransactionRequestScilla self, SseSerializer serializer);
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer);
 
-@protected void sse_encode_transaction_status_info(TransactionStatusInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
-@protected void sse_encode_tx_in_info(TxInInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer);
 
-@protected void sse_encode_tx_out_info(TxOutInfo self, SseSerializer serializer);
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer);
 
-@protected void sse_encode_u_16(int self, SseSerializer serializer);
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer);
 
-@protected void sse_encode_u_32(int self, SseSerializer serializer);
+  @protected
+  void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer);
 
-@protected void sse_encode_u_64(BigInt self, SseSerializer serializer);
+  @protected
+  void sse_encode_wallet_argon_params_info(
+      WalletArgonParamsInfo self, SseSerializer serializer);
 
-@protected void sse_encode_u_8(int self, SseSerializer serializer);
+  @protected
+  void sse_encode_wallet_info(WalletInfo self, SseSerializer serializer);
 
-@protected void sse_encode_unit(void self, SseSerializer serializer);
+  @protected
+  void sse_encode_wallet_policy(WalletPolicy self, SseSerializer serializer);
 
-@protected void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-@protected void sse_encode_utxo_info(UtxoInfo self, SseSerializer serializer);
-
-@protected void sse_encode_wallet_argon_params_info(WalletArgonParamsInfo self, SseSerializer serializer);
-
-@protected void sse_encode_wallet_info(WalletInfo self, SseSerializer serializer);
-
-@protected void sse_encode_wallet_policy(WalletPolicy self, SseSerializer serializer);
-
-@protected void sse_encode_wallet_settings_info(WalletSettingsInfo self, SseSerializer serializer);
-                }
-                
-
+  @protected
+  void sse_encode_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer);
+}
 
 // Section: wire_class
 
+class RustLibWire implements BaseWire {
+  factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
+      RustLibWire(lib.ffiDynamicLibrary);
 
-        class RustLibWire implements BaseWire {
+  /// Holds the symbol lookup function.
+  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+      _lookup;
 
-            factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
-              RustLibWire(lib.ffiDynamicLibrary);
-        
-            /// Holds the symbol lookup function.
-            final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-                _lookup;
-  
-            /// The symbols are looked up in [dynamicLibrary].
-            RustLibWire(ffi.DynamicLibrary dynamicLibrary)
-                : _lookup = dynamicLibrary.lookup;
+  /// The symbols are looked up in [dynamicLibrary].
+  RustLibWire(ffi.DynamicLibrary dynamicLibrary)
+      : _lookup = dynamicLibrary.lookup;
 
-            
-            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
-              ffi.Pointer<ffi.Void> ptr,
-            ) {
-              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
-                ptr,
-              );
-            }
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+      ptr,
+    );
+  }
 
-            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_bearby_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
-            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-            
-            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
-              ffi.Pointer<ffi.Void> ptr,
-            ) {
-              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
-                ptr,
-              );
-            }
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_bearby_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
-            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_bearby_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
-            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-            
-        }
-        
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_bearby_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImpl =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLocalStorageImplPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+}
