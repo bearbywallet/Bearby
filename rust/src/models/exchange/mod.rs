@@ -9,6 +9,7 @@ pub enum ExchangeProvider {
     Thorchain(u64),
     Uniswap(u64),
     ZIlSwap(u64),
+    SunSwap(u64),
 }
 
 impl ExchangeProvider {
@@ -25,6 +26,10 @@ impl ExchangeProvider {
             Self::ZIlSwap(_) => {
                 const SLIP44: &[u32] = &[ZILLIQA];
                 addr_type == 0 && SLIP44.contains(&slip44)
+            }
+            Self::SunSwap(_) => {
+                const SLIP44: &[u32] = &[TRON];
+                addr_type == 4 && SLIP44.contains(&slip44)
             }
         }
     }

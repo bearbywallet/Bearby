@@ -4,6 +4,10 @@ use zilpay::serde::Deserialize;
 const THORCHAIN_BASE_URLS: &[&str] = &[
     "https://thornode.thorchain.network",
     "https://gateway.liquify.com/chain/thorchain_api",
+    "https://thornode.ninerealms.com",
+    "https://thornode.thorswap.net",
+    "https://thornode-v2.ninerealms.com",
+    "https://thornode.liquify.com",
 ];
 
 #[frb(ignore)]

@@ -11,9 +11,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
-Future<void> fetchExchangeAssets() =>
-    RustLib.instance.api.crateApiExchangeFetchExchangeAssets();
-
 Future<void> fetchExchangeQuote(
         {required ExchangeAsset asset,
         required String fromAsset,
