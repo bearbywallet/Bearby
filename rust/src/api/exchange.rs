@@ -64,10 +64,6 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     Ok(all_ftokens)
 }
 
-pub async fn fetch_exchange_assets() -> Result<(), String> {
-    Ok(())
-}
-
 pub async fn fetch_exchange_quote(
     asset: ExchangeAsset,
     from_asset: String,

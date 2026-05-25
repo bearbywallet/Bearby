@@ -92,6 +92,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult Function(ExchangeProvider_Uniswap value)? uniswap,
+    TResult Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -100,6 +101,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
+      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
+        return zIlSwap(_that);
       case _:
         return orElse();
     }
@@ -122,6 +125,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult map<TResult extends Object?>({
     required TResult Function(ExchangeProvider_Thorchain value) thorchain,
     required TResult Function(ExchangeProvider_Uniswap value) uniswap,
+    required TResult Function(ExchangeProvider_ZIlSwap value) zIlSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -129,6 +133,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap():
         return uniswap(_that);
+      case ExchangeProvider_ZIlSwap():
+        return zIlSwap(_that);
     }
   }
 
@@ -148,6 +154,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult? Function(ExchangeProvider_Uniswap value)? uniswap,
+    TResult? Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -155,6 +162,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
+      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
+        return zIlSwap(_that);
       case _:
         return null;
     }
@@ -176,6 +185,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(BigInt field0)? thorchain,
     TResult Function(BigInt field0)? uniswap,
+    TResult Function(BigInt field0)? zIlSwap,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -184,6 +194,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
+      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
+        return zIlSwap(_that.field0);
       case _:
         return orElse();
     }
@@ -206,6 +218,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult when<TResult extends Object?>({
     required TResult Function(BigInt field0) thorchain,
     required TResult Function(BigInt field0) uniswap,
+    required TResult Function(BigInt field0) zIlSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -213,6 +226,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap():
         return uniswap(_that.field0);
+      case ExchangeProvider_ZIlSwap():
+        return zIlSwap(_that.field0);
     }
   }
 
@@ -232,6 +247,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(BigInt field0)? thorchain,
     TResult? Function(BigInt field0)? uniswap,
+    TResult? Function(BigInt field0)? zIlSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -239,6 +255,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
+      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
+        return zIlSwap(_that.field0);
       case _:
         return null;
     }
@@ -376,6 +394,75 @@ class _$ExchangeProvider_UniswapCopyWithImpl<$Res>
     Object? field0 = null,
   }) {
     return _then(ExchangeProvider_Uniswap(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as BigInt,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ExchangeProvider_ZIlSwap extends ExchangeProvider {
+  const ExchangeProvider_ZIlSwap(this.field0) : super._();
+
+  @override
+  final BigInt field0;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ExchangeProvider_ZIlSwapCopyWith<ExchangeProvider_ZIlSwap> get copyWith =>
+      _$ExchangeProvider_ZIlSwapCopyWithImpl<ExchangeProvider_ZIlSwap>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ExchangeProvider_ZIlSwap &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @override
+  String toString() {
+    return 'ExchangeProvider.zIlSwap(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ExchangeProvider_ZIlSwapCopyWith<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProvider_ZIlSwapCopyWith(ExchangeProvider_ZIlSwap value,
+          $Res Function(ExchangeProvider_ZIlSwap) _then) =
+      _$ExchangeProvider_ZIlSwapCopyWithImpl;
+  @override
+  @useResult
+  $Res call({BigInt field0});
+}
+
+/// @nodoc
+class _$ExchangeProvider_ZIlSwapCopyWithImpl<$Res>
+    implements $ExchangeProvider_ZIlSwapCopyWith<$Res> {
+  _$ExchangeProvider_ZIlSwapCopyWithImpl(this._self, this._then);
+
+  final ExchangeProvider_ZIlSwap _self;
+  final $Res Function(ExchangeProvider_ZIlSwap) _then;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(ExchangeProvider_ZIlSwap(
       null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable

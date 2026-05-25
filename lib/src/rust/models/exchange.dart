@@ -43,4 +43,7 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   const factory ExchangeProvider.uniswap(
     BigInt field0,
   ) = ExchangeProvider_Uniswap;
+  const factory ExchangeProvider.zIlSwap(
+    BigInt field0,
+  ) = ExchangeProvider_ZIlSwap;
 }
