@@ -13,22 +13,22 @@ part of 'exchange.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$ExchangeTxParams {
-  ThorchainTxParams get field0;
+mixin _$ExchangeProvider {
+  BigInt get field0;
 
-  /// Create a copy of ExchangeTxParams
+  /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ExchangeTxParamsCopyWith<ExchangeTxParams> get copyWith =>
-      _$ExchangeTxParamsCopyWithImpl<ExchangeTxParams>(
-          this as ExchangeTxParams, _$identity);
+  $ExchangeProviderCopyWith<ExchangeProvider> get copyWith =>
+      _$ExchangeProviderCopyWithImpl<ExchangeProvider>(
+          this as ExchangeProvider, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is ExchangeTxParams &&
+            other is ExchangeProvider &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -37,28 +37,28 @@ mixin _$ExchangeTxParams {
 
   @override
   String toString() {
-    return 'ExchangeTxParams(field0: $field0)';
+    return 'ExchangeProvider(field0: $field0)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ExchangeTxParamsCopyWith<$Res> {
-  factory $ExchangeTxParamsCopyWith(
-          ExchangeTxParams value, $Res Function(ExchangeTxParams) _then) =
-      _$ExchangeTxParamsCopyWithImpl;
+abstract mixin class $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProviderCopyWith(
+          ExchangeProvider value, $Res Function(ExchangeProvider) _then) =
+      _$ExchangeProviderCopyWithImpl;
   @useResult
-  $Res call({ThorchainTxParams field0});
+  $Res call({BigInt field0});
 }
 
 /// @nodoc
-class _$ExchangeTxParamsCopyWithImpl<$Res>
-    implements $ExchangeTxParamsCopyWith<$Res> {
-  _$ExchangeTxParamsCopyWithImpl(this._self, this._then);
+class _$ExchangeProviderCopyWithImpl<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  _$ExchangeProviderCopyWithImpl(this._self, this._then);
 
-  final ExchangeTxParams _self;
-  final $Res Function(ExchangeTxParams) _then;
+  final ExchangeProvider _self;
+  final $Res Function(ExchangeProvider) _then;
 
-  /// Create a copy of ExchangeTxParams
+  /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -69,13 +69,13 @@ class _$ExchangeTxParamsCopyWithImpl<$Res>
       field0: null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
-              as ThorchainTxParams,
+              as BigInt,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [ExchangeTxParams].
-extension ExchangeTxParamsPatterns on ExchangeTxParams {
+/// Adds pattern-matching-related methods to [ExchangeProvider].
+extension ExchangeProviderPatterns on ExchangeProvider {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -90,13 +90,16 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ExchangeTxParams_Thorchain value)? thorchain,
+    TResult Function(ExchangeProvider_Thorchain value)? thorchain,
+    TResult Function(ExchangeProvider_Uniswap value)? uniswap,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain() when thorchain != null:
+      case ExchangeProvider_Thorchain() when thorchain != null:
         return thorchain(_that);
+      case ExchangeProvider_Uniswap() when uniswap != null:
+        return uniswap(_that);
       case _:
         return orElse();
     }
@@ -117,12 +120,15 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ExchangeTxParams_Thorchain value) thorchain,
+    required TResult Function(ExchangeProvider_Thorchain value) thorchain,
+    required TResult Function(ExchangeProvider_Uniswap value) uniswap,
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain():
+      case ExchangeProvider_Thorchain():
         return thorchain(_that);
+      case ExchangeProvider_Uniswap():
+        return uniswap(_that);
     }
   }
 
@@ -140,12 +146,15 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ExchangeTxParams_Thorchain value)? thorchain,
+    TResult? Function(ExchangeProvider_Thorchain value)? thorchain,
+    TResult? Function(ExchangeProvider_Uniswap value)? uniswap,
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain() when thorchain != null:
+      case ExchangeProvider_Thorchain() when thorchain != null:
         return thorchain(_that);
+      case ExchangeProvider_Uniswap() when uniswap != null:
+        return uniswap(_that);
       case _:
         return null;
     }
@@ -165,13 +174,16 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(ThorchainTxParams field0)? thorchain,
+    TResult Function(BigInt field0)? thorchain,
+    TResult Function(BigInt field0)? uniswap,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain() when thorchain != null:
+      case ExchangeProvider_Thorchain() when thorchain != null:
         return thorchain(_that.field0);
+      case ExchangeProvider_Uniswap() when uniswap != null:
+        return uniswap(_that.field0);
       case _:
         return orElse();
     }
@@ -192,12 +204,15 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(ThorchainTxParams field0) thorchain,
+    required TResult Function(BigInt field0) thorchain,
+    required TResult Function(BigInt field0) uniswap,
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain():
+      case ExchangeProvider_Thorchain():
         return thorchain(_that.field0);
+      case ExchangeProvider_Uniswap():
+        return uniswap(_that.field0);
     }
   }
 
@@ -215,12 +230,15 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(ThorchainTxParams field0)? thorchain,
+    TResult? Function(BigInt field0)? thorchain,
+    TResult? Function(BigInt field0)? uniswap,
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeTxParams_Thorchain() when thorchain != null:
+      case ExchangeProvider_Thorchain() when thorchain != null:
         return thorchain(_that.field0);
+      case ExchangeProvider_Uniswap() when uniswap != null:
+        return uniswap(_that.field0);
       case _:
         return null;
     }
@@ -229,27 +247,27 @@ extension ExchangeTxParamsPatterns on ExchangeTxParams {
 
 /// @nodoc
 
-class ExchangeTxParams_Thorchain extends ExchangeTxParams {
-  const ExchangeTxParams_Thorchain(this.field0) : super._();
+class ExchangeProvider_Thorchain extends ExchangeProvider {
+  const ExchangeProvider_Thorchain(this.field0) : super._();
 
   @override
-  final ThorchainTxParams field0;
+  final BigInt field0;
 
-  /// Create a copy of ExchangeTxParams
+  /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ExchangeTxParams_ThorchainCopyWith<ExchangeTxParams_Thorchain>
+  $ExchangeProvider_ThorchainCopyWith<ExchangeProvider_Thorchain>
       get copyWith =>
-          _$ExchangeTxParams_ThorchainCopyWithImpl<ExchangeTxParams_Thorchain>(
+          _$ExchangeProvider_ThorchainCopyWithImpl<ExchangeProvider_Thorchain>(
               this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is ExchangeTxParams_Thorchain &&
+            other is ExchangeProvider_Thorchain &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -258,41 +276,110 @@ class ExchangeTxParams_Thorchain extends ExchangeTxParams {
 
   @override
   String toString() {
-    return 'ExchangeTxParams.thorchain(field0: $field0)';
+    return 'ExchangeProvider.thorchain(field0: $field0)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ExchangeTxParams_ThorchainCopyWith<$Res>
-    implements $ExchangeTxParamsCopyWith<$Res> {
-  factory $ExchangeTxParams_ThorchainCopyWith(ExchangeTxParams_Thorchain value,
-          $Res Function(ExchangeTxParams_Thorchain) _then) =
-      _$ExchangeTxParams_ThorchainCopyWithImpl;
+abstract mixin class $ExchangeProvider_ThorchainCopyWith<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProvider_ThorchainCopyWith(ExchangeProvider_Thorchain value,
+          $Res Function(ExchangeProvider_Thorchain) _then) =
+      _$ExchangeProvider_ThorchainCopyWithImpl;
   @override
   @useResult
-  $Res call({ThorchainTxParams field0});
+  $Res call({BigInt field0});
 }
 
 /// @nodoc
-class _$ExchangeTxParams_ThorchainCopyWithImpl<$Res>
-    implements $ExchangeTxParams_ThorchainCopyWith<$Res> {
-  _$ExchangeTxParams_ThorchainCopyWithImpl(this._self, this._then);
+class _$ExchangeProvider_ThorchainCopyWithImpl<$Res>
+    implements $ExchangeProvider_ThorchainCopyWith<$Res> {
+  _$ExchangeProvider_ThorchainCopyWithImpl(this._self, this._then);
 
-  final ExchangeTxParams_Thorchain _self;
-  final $Res Function(ExchangeTxParams_Thorchain) _then;
+  final ExchangeProvider_Thorchain _self;
+  final $Res Function(ExchangeProvider_Thorchain) _then;
 
-  /// Create a copy of ExchangeTxParams
+  /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(ExchangeTxParams_Thorchain(
+    return _then(ExchangeProvider_Thorchain(
       null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
-              as ThorchainTxParams,
+              as BigInt,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ExchangeProvider_Uniswap extends ExchangeProvider {
+  const ExchangeProvider_Uniswap(this.field0) : super._();
+
+  @override
+  final BigInt field0;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ExchangeProvider_UniswapCopyWith<ExchangeProvider_Uniswap> get copyWith =>
+      _$ExchangeProvider_UniswapCopyWithImpl<ExchangeProvider_Uniswap>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ExchangeProvider_Uniswap &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @override
+  String toString() {
+    return 'ExchangeProvider.uniswap(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ExchangeProvider_UniswapCopyWith<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProvider_UniswapCopyWith(ExchangeProvider_Uniswap value,
+          $Res Function(ExchangeProvider_Uniswap) _then) =
+      _$ExchangeProvider_UniswapCopyWithImpl;
+  @override
+  @useResult
+  $Res call({BigInt field0});
+}
+
+/// @nodoc
+class _$ExchangeProvider_UniswapCopyWithImpl<$Res>
+    implements $ExchangeProvider_UniswapCopyWith<$Res> {
+  _$ExchangeProvider_UniswapCopyWithImpl(this._self, this._then);
+
+  final ExchangeProvider_Uniswap _self;
+  final $Res Function(ExchangeProvider_Uniswap) _then;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(ExchangeProvider_Uniswap(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as BigInt,
     ));
   }
 }

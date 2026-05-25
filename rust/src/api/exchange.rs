@@ -1,87 +1,79 @@
-use zilpay::background::bg_wallet::WalletManagement;
+use std::collections::HashSet;
+
+use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::rpc::network_config::ChainConfig;
+use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
-use crate::models::{
-    exchange::{
-        build_exchange_chain_groups, thorchain, ExchangeChainGroup, ExchangeProviderId,
-        ExchangeProviderMetadata, ExchangeQuoteResult,
-    },
-    ftoken::FTokenInfo,
-    provider::NetworkConfigInfo,
-};
+use crate::models::exchange::{ExchangeAsset, ExchangeProvider};
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 
-pub async fn bootstrap_exchange_providers(
-    configs: Vec<NetworkConfigInfo>,
-    wallet_index: usize,
-) -> Result<(Vec<ExchangeProviderId>, Vec<FTokenInfo>), String> {
-    if configs.is_empty() {
-        return Ok((Vec::with_capacity(0), Vec::with_capacity(0)));
-    }
-
-    let wallet_tokens: Vec<FTokenInfo> = {
+pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
+    let condidate = HashSet::from([
+        ExchangeProvider::Thorchain(0),
+        ExchangeProvider::Uniswap(0),
+        ExchangeProvider::ZIlSwap(0),
+    ]);
+    let all_ftokens: Vec<ExchangeAsset> = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        let wallet = service
+        let mut seen = HashSet::new();
+        let all_chain: Vec<ChainConfig> = service
             .core
-            .get_wallet_by_index(wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
-        wallet
-            .get_ftokens()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?
+            .get_providers()
             .into_iter()
-            .map(|t| t.into())
-            .collect()
-    };
+            .map(|n| n.config)
+            .collect();
+        let all_ftokens: Vec<ExchangeAsset> = service
+            .core
+            .wallets
+            .iter()
+            .map(|w| w.get_ftokens().map_err(|e| e.to_string()))
+            .collect::<Result<Vec<Vec<FToken>>, String>>()?
+            .into_iter()
+            .flatten()
+            .filter_map(|t: FToken| {
+                if !seen.insert(t.addr.to_hash()) {
+                    return None;
+                }
 
-    let candidates = [ExchangeProviderId::Thorchain];
-    let mut result = Vec::with_capacity(candidates.len());
+                let slip44 = all_chain.iter().find(|c| c.hash() == t.chain_hash)?.slip_44;
+                let providers: HashSet<ExchangeProvider> = condidate
+                    .iter()
+                    .filter(|p| p.is_support(t.addr.prefix_type(), slip44))
+                    .cloned()
+                    .collect();
 
-    for candidate in candidates {
-        if configs.iter().any(|c| candidate.is_supported(c)) {
-            result.push(candidate);
-        }
+                if providers.is_empty() {
+                    return None;
+                }
+                Some(ExchangeAsset {
+                    token: t.into(),
+                    providers,
+                    halted: true,
+                })
+            })
+            .collect();
+
+        all_ftokens
     }
+    .into_iter()
+    .collect();
 
-    Ok((result, wallet_tokens))
+    Ok(all_ftokens)
 }
 
-pub async fn fetch_exchange_assets(
-    provider: ExchangeProviderId,
-    configs: Vec<NetworkConfigInfo>,
-    wallet_tokens: Vec<FTokenInfo>,
-) -> Result<Vec<ExchangeChainGroup>, String> {
-    match provider {
-        ExchangeProviderId::Thorchain => {
-            let meta = thorchain::fetch_thorchain_metadata().await?;
-            let metadata = ExchangeProviderMetadata::Thorchain(meta);
-            Ok(build_exchange_chain_groups(
-                &configs,
-                &metadata,
-                &wallet_tokens,
-            ))
-        }
-    }
+pub async fn fetch_exchange_assets() -> Result<(), String> {
+    Ok(())
 }
 
 pub async fn fetch_exchange_quote(
-    provider: ExchangeProviderId,
+    asset: ExchangeAsset,
     from_asset: String,
     to_asset: String,
     amount: String,
     destination: String,
-) -> Result<ExchangeQuoteResult, String> {
-    match provider {
-        ExchangeProviderId::Thorchain => {
-            let quote = thorchain::fetch_thorchain_swap_quote(
-                &from_asset,
-                &to_asset,
-                &amount,
-                &destination,
-            )
-            .await?;
-            Ok(quote.into_quote_result())
-        }
-    }
+) -> Result<(), String> {
+    Ok(())
 }

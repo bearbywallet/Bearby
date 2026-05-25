@@ -6,30 +6,22 @@
 import '../frb_generated.dart';
 import '../models/exchange.dart';
 import '../models/ftoken.dart';
-import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<(List<ExchangeProviderId>, List<FTokenInfo>)> bootstrapExchangeProviders(
-        {required List<NetworkConfigInfo> configs,
-        required BigInt walletIndex}) =>
-    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(
-        configs: configs, walletIndex: walletIndex);
+Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
+    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
-Future<List<ExchangeChainGroup>> fetchExchangeAssets(
-        {required ExchangeProviderId provider,
-        required List<NetworkConfigInfo> configs,
-        required List<FTokenInfo> walletTokens}) =>
-    RustLib.instance.api.crateApiExchangeFetchExchangeAssets(
-        provider: provider, configs: configs, walletTokens: walletTokens);
+Future<void> fetchExchangeAssets() =>
+    RustLib.instance.api.crateApiExchangeFetchExchangeAssets();
 
-Future<ExchangeQuoteResult> fetchExchangeQuote(
-        {required ExchangeProviderId provider,
+Future<void> fetchExchangeQuote(
+        {required ExchangeAsset asset,
         required String fromAsset,
         required String toAsset,
         required String amount,
         required String destination}) =>
     RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
-        provider: provider,
+        asset: asset,
         fromAsset: fromAsset,
         toAsset: toAsset,
         amount: amount,

@@ -11,23 +11,17 @@ part 'exchange.freezed.dart';
 
 class ExchangeAsset {
   final FTokenInfo token;
-  final String providerAssetId;
-  final ExchangeProviderId provider;
+  final Set<ExchangeProvider> providers;
   final bool halted;
 
   const ExchangeAsset({
     required this.token,
-    required this.providerAssetId,
-    required this.provider,
+    required this.providers,
     required this.halted,
   });
 
   @override
-  int get hashCode =>
-      token.hashCode ^
-      providerAssetId.hashCode ^
-      provider.hashCode ^
-      halted.hashCode;
+  int get hashCode => token.hashCode ^ providers.hashCode ^ halted.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -35,190 +29,18 @@ class ExchangeAsset {
       other is ExchangeAsset &&
           runtimeType == other.runtimeType &&
           token == other.token &&
-          providerAssetId == other.providerAssetId &&
-          provider == other.provider &&
+          providers == other.providers &&
           halted == other.halted;
 }
 
-class ExchangeChainGroup {
-  final BigInt chainHash;
-  final List<ExchangeAsset> assets;
-
-  const ExchangeChainGroup({
-    required this.chainHash,
-    required this.assets,
-  });
-
-  @override
-  int get hashCode => chainHash.hashCode ^ assets.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExchangeChainGroup &&
-          runtimeType == other.runtimeType &&
-          chainHash == other.chainHash &&
-          assets == other.assets;
-}
-
-class ExchangeFees {
-  final String total;
-  final String outbound;
-  final String liquidity;
-  final String affiliate;
-  final PlatformInt64 slippageBps;
-  final PlatformInt64 totalBps;
-
-  const ExchangeFees({
-    required this.total,
-    required this.outbound,
-    required this.liquidity,
-    required this.affiliate,
-    required this.slippageBps,
-    required this.totalBps,
-  });
-
-  @override
-  int get hashCode =>
-      total.hashCode ^
-      outbound.hashCode ^
-      liquidity.hashCode ^
-      affiliate.hashCode ^
-      slippageBps.hashCode ^
-      totalBps.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExchangeFees &&
-          runtimeType == other.runtimeType &&
-          total == other.total &&
-          outbound == other.outbound &&
-          liquidity == other.liquidity &&
-          affiliate == other.affiliate &&
-          slippageBps == other.slippageBps &&
-          totalBps == other.totalBps;
-}
-
-enum ExchangeProviderId {
-  thorchain,
-  ;
-}
-
-class ExchangeQuoteResult {
-  final String expectedAmountOut;
-  final String minAmountIn;
-  final ExchangeFees fees;
-  final ExchangeTiming timing;
-  final String warning;
-  final String notes;
-  final ExchangeTxParams txParams;
-
-  const ExchangeQuoteResult({
-    required this.expectedAmountOut,
-    required this.minAmountIn,
-    required this.fees,
-    required this.timing,
-    required this.warning,
-    required this.notes,
-    required this.txParams,
-  });
-
-  @override
-  int get hashCode =>
-      expectedAmountOut.hashCode ^
-      minAmountIn.hashCode ^
-      fees.hashCode ^
-      timing.hashCode ^
-      warning.hashCode ^
-      notes.hashCode ^
-      txParams.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExchangeQuoteResult &&
-          runtimeType == other.runtimeType &&
-          expectedAmountOut == other.expectedAmountOut &&
-          minAmountIn == other.minAmountIn &&
-          fees == other.fees &&
-          timing == other.timing &&
-          warning == other.warning &&
-          notes == other.notes &&
-          txParams == other.txParams;
-}
-
-class ExchangeTiming {
-  final PlatformInt64 inboundSeconds;
-  final PlatformInt64 outboundSeconds;
-  final PlatformInt64 totalSeconds;
-
-  const ExchangeTiming({
-    required this.inboundSeconds,
-    required this.outboundSeconds,
-    required this.totalSeconds,
-  });
-
-  @override
-  int get hashCode =>
-      inboundSeconds.hashCode ^
-      outboundSeconds.hashCode ^
-      totalSeconds.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExchangeTiming &&
-          runtimeType == other.runtimeType &&
-          inboundSeconds == other.inboundSeconds &&
-          outboundSeconds == other.outboundSeconds &&
-          totalSeconds == other.totalSeconds;
-}
-
 @freezed
-sealed class ExchangeTxParams with _$ExchangeTxParams {
-  const ExchangeTxParams._();
+sealed class ExchangeProvider with _$ExchangeProvider {
+  const ExchangeProvider._();
 
-  const factory ExchangeTxParams.thorchain(
-    ThorchainTxParams field0,
-  ) = ExchangeTxParams_Thorchain;
-}
-
-class ThorchainTxParams {
-  final String inboundAddress;
-  final String router;
-  final String memo;
-  final PlatformInt64 expiry;
-  final String recommendedGasRate;
-  final String gasRateUnits;
-
-  const ThorchainTxParams({
-    required this.inboundAddress,
-    required this.router,
-    required this.memo,
-    required this.expiry,
-    required this.recommendedGasRate,
-    required this.gasRateUnits,
-  });
-
-  @override
-  int get hashCode =>
-      inboundAddress.hashCode ^
-      router.hashCode ^
-      memo.hashCode ^
-      expiry.hashCode ^
-      recommendedGasRate.hashCode ^
-      gasRateUnits.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ThorchainTxParams &&
-          runtimeType == other.runtimeType &&
-          inboundAddress == other.inboundAddress &&
-          router == other.router &&
-          memo == other.memo &&
-          expiry == other.expiry &&
-          recommendedGasRate == other.recommendedGasRate &&
-          gasRateUnits == other.gasRateUnits;
+  const factory ExchangeProvider.thorchain(
+    BigInt field0,
+  ) = ExchangeProvider_Thorchain;
+  const factory ExchangeProvider.uniswap(
+    BigInt field0,
+  ) = ExchangeProvider_Uniswap;
 }

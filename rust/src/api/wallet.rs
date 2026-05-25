@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use zilpay::secrecy::zeroize::Zeroize;
-use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
 use zilpay::errors::background::BackgroundError;
@@ -9,6 +7,8 @@ use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
 use zilpay::proto::address::Address;
 use zilpay::rpc::network_config::ChainConfig;
+use zilpay::secrecy::zeroize::Zeroize;
+use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;

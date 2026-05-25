@@ -1,6 +1,6 @@
 use crate::{service::background::BACKGROUND_SERVICE, utils::errors::ServiceError};
-use zilpay::secrecy::{zeroize::Zeroize, SecretString};
 pub use zilpay::background::bg_wallet::WalletManagement;
+use zilpay::secrecy::{zeroize::Zeroize, SecretString};
 use zilpay::session;
 
 pub async fn try_unlock_with_session(wallet_index: usize) -> Result<bool, String> {
