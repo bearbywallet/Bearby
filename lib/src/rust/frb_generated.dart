@@ -186,10 +186,7 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
       {required String addr});
 
-  Future<(List<ExchangeProviderId>, List<FTokenInfo>)>
-      crateApiExchangeBootstrapExchangeProviders(
-          {required List<NetworkConfigInfo> configs,
-          required BigInt walletIndex});
+  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders();
 
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
       {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos});
@@ -317,13 +314,10 @@ abstract class RustLibApi extends BaseApi {
   Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
       {required BigInt walletIndex, required BigInt accountIndex});
 
-  Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
-      {required ExchangeProviderId provider,
-      required List<NetworkConfigInfo> configs,
-      required List<FTokenInfo> walletTokens});
+  Future<void> crateApiExchangeFetchExchangeAssets();
 
-  Future<ExchangeQuoteResult> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeProviderId provider,
+  Future<void> crateApiExchangeFetchExchangeQuote(
+      {required ExchangeAsset asset,
       required String fromAsset,
       required String toAsset,
       required String amount,
@@ -1116,25 +1110,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<(List<ExchangeProviderId>, List<FTokenInfo>)>
-      crateApiExchangeBootstrapExchangeProviders(
-          {required List<NetworkConfigInfo> configs,
-          required BigInt walletIndex}) {
+  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_list_network_config_info(configs, serializer);
-        sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 21, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_record_list_exchange_provider_id_list_f_token_info,
+        decodeSuccessData: sse_decode_list_exchange_asset,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
-      argValues: [configs, walletIndex],
+      argValues: [],
       apiImpl: this,
     ));
   }
@@ -1142,7 +1130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta =>
       const TaskConstMeta(
         debugName: "bootstrap_exchange_providers",
-        argNames: ["configs", "walletIndex"],
+        argNames: [],
       );
 
   @override
@@ -2077,25 +2065,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<ExchangeChainGroup>> crateApiExchangeFetchExchangeAssets(
-      {required ExchangeProviderId provider,
-      required List<NetworkConfigInfo> configs,
-      required List<FTokenInfo> walletTokens}) {
+  Future<void> crateApiExchangeFetchExchangeAssets() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_exchange_provider_id(provider, serializer);
-        sse_encode_list_network_config_info(configs, serializer);
-        sse_encode_list_f_token_info(walletTokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 55, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_exchange_chain_group,
+        decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeAssetsConstMeta,
-      argValues: [provider, configs, walletTokens],
+      argValues: [],
       apiImpl: this,
     ));
   }
@@ -2103,12 +2085,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeFetchExchangeAssetsConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_exchange_assets",
-        argNames: ["provider", "configs", "walletTokens"],
+        argNames: [],
       );
 
   @override
-  Future<ExchangeQuoteResult> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeProviderId provider,
+  Future<void> crateApiExchangeFetchExchangeQuote(
+      {required ExchangeAsset asset,
       required String fromAsset,
       required String toAsset,
       required String amount,
@@ -2116,7 +2098,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_exchange_provider_id(provider, serializer);
+        sse_encode_box_autoadd_exchange_asset(asset, serializer);
         sse_encode_String(fromAsset, serializer);
         sse_encode_String(toAsset, serializer);
         sse_encode_String(amount, serializer);
@@ -2125,11 +2107,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 56, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_exchange_quote_result,
+        decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeQuoteConstMeta,
-      argValues: [provider, fromAsset, toAsset, amount, destination],
+      argValues: [asset, fromAsset, toAsset, amount, destination],
       apiImpl: this,
     ));
   }
@@ -2137,7 +2119,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeFetchExchangeQuoteConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_exchange_quote",
-        argNames: ["provider", "fromAsset", "toAsset", "amount", "destination"],
+        argNames: ["asset", "fromAsset", "toAsset", "amount", "destination"],
       );
 
   @override
@@ -4552,6 +4534,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Set<ExchangeProvider> dco_decode_Set_exchange_provider_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Set.from(dco_decode_list_exchange_provider(raw));
+  }
+
+  @protected
   RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
@@ -4821,6 +4809,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeAsset dco_decode_box_autoadd_exchange_asset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_exchange_asset(raw);
+  }
+
+  @protected
   double dco_decode_box_autoadd_f_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as double;
@@ -4875,12 +4869,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_required_tx_params_info(raw);
-  }
-
-  @protected
-  ThorchainTxParams dco_decode_box_autoadd_thorchain_tx_params(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_thorchain_tx_params(raw);
   }
 
   @protected
@@ -5067,87 +5055,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeAsset dco_decode_exchange_asset(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ExchangeAsset(
-      token: dco_decode_f_token_info(arr[0]),
-      providerAssetId: dco_decode_String(arr[1]),
-      provider: dco_decode_exchange_provider_id(arr[2]),
-      halted: dco_decode_bool(arr[3]),
-    );
-  }
-
-  @protected
-  ExchangeChainGroup dco_decode_exchange_chain_group(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ExchangeChainGroup(
-      chainHash: dco_decode_u_64(arr[0]),
-      assets: dco_decode_list_exchange_asset(arr[1]),
-    );
-  }
-
-  @protected
-  ExchangeFees dco_decode_exchange_fees(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-    return ExchangeFees(
-      total: dco_decode_String(arr[0]),
-      outbound: dco_decode_String(arr[1]),
-      liquidity: dco_decode_String(arr[2]),
-      affiliate: dco_decode_String(arr[3]),
-      slippageBps: dco_decode_i_64(arr[4]),
-      totalBps: dco_decode_i_64(arr[5]),
-    );
-  }
-
-  @protected
-  ExchangeProviderId dco_decode_exchange_provider_id(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ExchangeProviderId.values[raw as int];
-  }
-
-  @protected
-  ExchangeQuoteResult dco_decode_exchange_quote_result(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return ExchangeQuoteResult(
-      expectedAmountOut: dco_decode_String(arr[0]),
-      minAmountIn: dco_decode_String(arr[1]),
-      fees: dco_decode_exchange_fees(arr[2]),
-      timing: dco_decode_exchange_timing(arr[3]),
-      warning: dco_decode_String(arr[4]),
-      notes: dco_decode_String(arr[5]),
-      txParams: dco_decode_exchange_tx_params(arr[6]),
-    );
-  }
-
-  @protected
-  ExchangeTiming dco_decode_exchange_timing(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
     if (arr.length != 3)
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return ExchangeTiming(
-      inboundSeconds: dco_decode_i_64(arr[0]),
-      outboundSeconds: dco_decode_i_64(arr[1]),
-      totalSeconds: dco_decode_i_64(arr[2]),
+    return ExchangeAsset(
+      token: dco_decode_f_token_info(arr[0]),
+      providers: dco_decode_Set_exchange_provider_None(arr[1]),
+      halted: dco_decode_bool(arr[2]),
     );
   }
 
   @protected
-  ExchangeTxParams dco_decode_exchange_tx_params(dynamic raw) {
+  ExchangeProvider dco_decode_exchange_provider(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ExchangeTxParams_Thorchain(
-          dco_decode_box_autoadd_thorchain_tx_params(raw[1]),
+        return ExchangeProvider_Thorchain(
+          dco_decode_u_64(raw[1]),
+        );
+      case 1:
+        return ExchangeProvider_Uniswap(
+          dco_decode_u_64(raw[1]),
         );
       default:
         throw Exception("unreachable");
@@ -5401,15 +5328,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ExchangeChainGroup> dco_decode_list_exchange_chain_group(dynamic raw) {
+  List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_exchange_chain_group).toList();
-  }
-
-  @protected
-  List<ExchangeProviderId> dco_decode_list_exchange_provider_id(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_exchange_provider_id).toList();
+    return (raw as List<dynamic>).map(dco_decode_exchange_provider).toList();
   }
 
   @protected
@@ -5860,22 +5781,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  (
-    List<ExchangeProviderId>,
-    List<FTokenInfo>
-  ) dco_decode_record_list_exchange_provider_id_list_f_token_info(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_list_exchange_provider_id(arr[0]),
-      dco_decode_list_f_token_info(arr[1]),
-    );
-  }
-
-  @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
       dco_decode_record_list_network_config_info_list_network_config_info(
           dynamic raw) {
@@ -6087,22 +5992,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       productId: dco_decode_u_16(arr[2]),
       productName: dco_decode_String(arr[3]),
       modelId: dco_decode_String(arr[4]),
-    );
-  }
-
-  @protected
-  ThorchainTxParams dco_decode_thorchain_tx_params(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-    return ThorchainTxParams(
-      inboundAddress: dco_decode_String(arr[0]),
-      router: dco_decode_String(arr[1]),
-      memo: dco_decode_String(arr[2]),
-      expiry: dco_decode_i_64(arr[3]),
-      recommendedGasRate: dco_decode_String(arr[4]),
-      gasRateUnits: dco_decode_String(arr[5]),
     );
   }
 
@@ -6458,6 +6347,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Set<ExchangeProvider> sse_decode_Set_exchange_provider_None(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_exchange_provider(deserializer);
+    return Set.from(inner);
+  }
+
+  @protected
   RustStreamSink<String> sse_decode_StreamSink_String_Sse(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6723,6 +6620,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeAsset sse_decode_box_autoadd_exchange_asset(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_exchange_asset(deserializer));
+  }
+
+  @protected
   double sse_decode_box_autoadd_f_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_f_32(deserializer));
@@ -6782,13 +6686,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_required_tx_params_info(deserializer));
-  }
-
-  @protected
-  ThorchainTxParams sse_decode_box_autoadd_thorchain_tx_params(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_thorchain_tx_params(deserializer));
   }
 
   @protected
@@ -6979,94 +6876,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeAsset sse_decode_exchange_asset(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_token = sse_decode_f_token_info(deserializer);
-    var var_providerAssetId = sse_decode_String(deserializer);
-    var var_provider = sse_decode_exchange_provider_id(deserializer);
+    var var_providers = sse_decode_Set_exchange_provider_None(deserializer);
     var var_halted = sse_decode_bool(deserializer);
     return ExchangeAsset(
-        token: var_token,
-        providerAssetId: var_providerAssetId,
-        provider: var_provider,
-        halted: var_halted);
+        token: var_token, providers: var_providers, halted: var_halted);
   }
 
   @protected
-  ExchangeChainGroup sse_decode_exchange_chain_group(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_chainHash = sse_decode_u_64(deserializer);
-    var var_assets = sse_decode_list_exchange_asset(deserializer);
-    return ExchangeChainGroup(chainHash: var_chainHash, assets: var_assets);
-  }
-
-  @protected
-  ExchangeFees sse_decode_exchange_fees(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_total = sse_decode_String(deserializer);
-    var var_outbound = sse_decode_String(deserializer);
-    var var_liquidity = sse_decode_String(deserializer);
-    var var_affiliate = sse_decode_String(deserializer);
-    var var_slippageBps = sse_decode_i_64(deserializer);
-    var var_totalBps = sse_decode_i_64(deserializer);
-    return ExchangeFees(
-        total: var_total,
-        outbound: var_outbound,
-        liquidity: var_liquidity,
-        affiliate: var_affiliate,
-        slippageBps: var_slippageBps,
-        totalBps: var_totalBps);
-  }
-
-  @protected
-  ExchangeProviderId sse_decode_exchange_provider_id(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ExchangeProviderId.values[inner];
-  }
-
-  @protected
-  ExchangeQuoteResult sse_decode_exchange_quote_result(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_expectedAmountOut = sse_decode_String(deserializer);
-    var var_minAmountIn = sse_decode_String(deserializer);
-    var var_fees = sse_decode_exchange_fees(deserializer);
-    var var_timing = sse_decode_exchange_timing(deserializer);
-    var var_warning = sse_decode_String(deserializer);
-    var var_notes = sse_decode_String(deserializer);
-    var var_txParams = sse_decode_exchange_tx_params(deserializer);
-    return ExchangeQuoteResult(
-        expectedAmountOut: var_expectedAmountOut,
-        minAmountIn: var_minAmountIn,
-        fees: var_fees,
-        timing: var_timing,
-        warning: var_warning,
-        notes: var_notes,
-        txParams: var_txParams);
-  }
-
-  @protected
-  ExchangeTiming sse_decode_exchange_timing(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_inboundSeconds = sse_decode_i_64(deserializer);
-    var var_outboundSeconds = sse_decode_i_64(deserializer);
-    var var_totalSeconds = sse_decode_i_64(deserializer);
-    return ExchangeTiming(
-        inboundSeconds: var_inboundSeconds,
-        outboundSeconds: var_outboundSeconds,
-        totalSeconds: var_totalSeconds);
-  }
-
-  @protected
-  ExchangeTxParams sse_decode_exchange_tx_params(SseDeserializer deserializer) {
+  ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        var var_field0 =
-            sse_decode_box_autoadd_thorchain_tx_params(deserializer);
-        return ExchangeTxParams_Thorchain(var_field0);
+        var var_field0 = sse_decode_u_64(deserializer);
+        return ExchangeProvider_Thorchain(var_field0);
+      case 1:
+        var var_field0 = sse_decode_u_64(deserializer);
+        return ExchangeProvider_Uniswap(var_field0);
       default:
         throw UnimplementedError('');
     }
@@ -7388,27 +7215,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ExchangeChainGroup> sse_decode_list_exchange_chain_group(
+  List<ExchangeProvider> sse_decode_list_exchange_provider(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ExchangeChainGroup>[];
+    var ans_ = <ExchangeProvider>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_exchange_chain_group(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<ExchangeProviderId> sse_decode_list_exchange_provider_id(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ExchangeProviderId>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_exchange_provider_id(deserializer));
+      ans_.add(sse_decode_exchange_provider(deserializer));
     }
     return ans_;
   }
@@ -8115,16 +7929,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  (List<ExchangeProviderId>, List<FTokenInfo>)
-      sse_decode_record_list_exchange_provider_id_list_f_token_info(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_list_exchange_provider_id(deserializer);
-    var var_field1 = sse_decode_list_f_token_info(deserializer);
-    return (var_field0, var_field1);
-  }
-
-  @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
       sse_decode_record_list_network_config_info_list_network_config_info(
           SseDeserializer deserializer) {
@@ -8294,25 +8098,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         productId: var_productId,
         productName: var_productName,
         modelId: var_modelId);
-  }
-
-  @protected
-  ThorchainTxParams sse_decode_thorchain_tx_params(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_inboundAddress = sse_decode_String(deserializer);
-    var var_router = sse_decode_String(deserializer);
-    var var_memo = sse_decode_String(deserializer);
-    var var_expiry = sse_decode_i_64(deserializer);
-    var var_recommendedGasRate = sse_decode_String(deserializer);
-    var var_gasRateUnits = sse_decode_String(deserializer);
-    return ThorchainTxParams(
-        inboundAddress: var_inboundAddress,
-        router: var_router,
-        memo: var_memo,
-        expiry: var_expiry,
-        recommendedGasRate: var_recommendedGasRate,
-        gasRateUnits: var_gasRateUnits);
   }
 
   @protected
@@ -8707,6 +8492,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_Set_exchange_provider_None(
+      Set<ExchangeProvider> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_exchange_provider(self.toList(), serializer);
+  }
+
+  @protected
   void sse_encode_StreamSink_String_Sse(
       RustStreamSink<String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8935,6 +8727,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_exchange_asset(
+      ExchangeAsset self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_exchange_asset(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_f_32(self, serializer);
@@ -8995,13 +8794,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       RequiredTxParamsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_required_tx_params_info(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_thorchain_tx_params(
-      ThorchainTxParams self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_thorchain_tx_params(self, serializer);
   }
 
   @protected
@@ -9148,67 +8940,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_exchange_asset(ExchangeAsset self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_f_token_info(self.token, serializer);
-    sse_encode_String(self.providerAssetId, serializer);
-    sse_encode_exchange_provider_id(self.provider, serializer);
+    sse_encode_Set_exchange_provider_None(self.providers, serializer);
     sse_encode_bool(self.halted, serializer);
   }
 
   @protected
-  void sse_encode_exchange_chain_group(
-      ExchangeChainGroup self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_64(self.chainHash, serializer);
-    sse_encode_list_exchange_asset(self.assets, serializer);
-  }
-
-  @protected
-  void sse_encode_exchange_fees(ExchangeFees self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.total, serializer);
-    sse_encode_String(self.outbound, serializer);
-    sse_encode_String(self.liquidity, serializer);
-    sse_encode_String(self.affiliate, serializer);
-    sse_encode_i_64(self.slippageBps, serializer);
-    sse_encode_i_64(self.totalBps, serializer);
-  }
-
-  @protected
-  void sse_encode_exchange_provider_id(
-      ExchangeProviderId self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_exchange_quote_result(
-      ExchangeQuoteResult self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.expectedAmountOut, serializer);
-    sse_encode_String(self.minAmountIn, serializer);
-    sse_encode_exchange_fees(self.fees, serializer);
-    sse_encode_exchange_timing(self.timing, serializer);
-    sse_encode_String(self.warning, serializer);
-    sse_encode_String(self.notes, serializer);
-    sse_encode_exchange_tx_params(self.txParams, serializer);
-  }
-
-  @protected
-  void sse_encode_exchange_timing(
-      ExchangeTiming self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self.inboundSeconds, serializer);
-    sse_encode_i_64(self.outboundSeconds, serializer);
-    sse_encode_i_64(self.totalSeconds, serializer);
-  }
-
-  @protected
-  void sse_encode_exchange_tx_params(
-      ExchangeTxParams self, SseSerializer serializer) {
+  void sse_encode_exchange_provider(
+      ExchangeProvider self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case ExchangeTxParams_Thorchain(field0: final field0):
+      case ExchangeProvider_Thorchain(field0: final field0):
         sse_encode_i_32(0, serializer);
-        sse_encode_box_autoadd_thorchain_tx_params(field0, serializer);
+        sse_encode_u_64(field0, serializer);
+      case ExchangeProvider_Uniswap(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_u_64(field0, serializer);
     }
   }
 
@@ -9443,22 +9189,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_exchange_chain_group(
-      List<ExchangeChainGroup> self, SseSerializer serializer) {
+  void sse_encode_list_exchange_provider(
+      List<ExchangeProvider> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
-      sse_encode_exchange_chain_group(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_exchange_provider_id(
-      List<ExchangeProviderId> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_exchange_provider_id(item, serializer);
+      sse_encode_exchange_provider(item, serializer);
     }
   }
 
@@ -10029,15 +9765,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_record_list_exchange_provider_id_list_f_token_info(
-      (List<ExchangeProviderId>, List<FTokenInfo>) self,
-      SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_exchange_provider_id(self.$1, serializer);
-    sse_encode_list_f_token_info(self.$2, serializer);
-  }
-
-  @protected
   void sse_encode_record_list_network_config_info_list_network_config_info(
       (List<NetworkConfigInfo>, List<NetworkConfigInfo>) self,
       SseSerializer serializer) {
@@ -10171,18 +9898,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_16(self.productId, serializer);
     sse_encode_String(self.productName, serializer);
     sse_encode_String(self.modelId, serializer);
-  }
-
-  @protected
-  void sse_encode_thorchain_tx_params(
-      ThorchainTxParams self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.inboundAddress, serializer);
-    sse_encode_String(self.router, serializer);
-    sse_encode_String(self.memo, serializer);
-    sse_encode_i_64(self.expiry, serializer);
-    sse_encode_String(self.recommendedGasRate, serializer);
-    sse_encode_String(self.gasRateUnits, serializer);
   }
 
   @protected
