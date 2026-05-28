@@ -41,9 +41,50 @@ sealed class ExchangeProvider with _$ExchangeProvider {
     BigInt field0,
   ) = ExchangeProvider_Thorchain;
   const factory ExchangeProvider.uniswap(
-    BigInt field0,
+    UniswapMeta field0,
   ) = ExchangeProvider_Uniswap;
   const factory ExchangeProvider.zIlSwap(
     BigInt field0,
   ) = ExchangeProvider_ZIlSwap;
+  const factory ExchangeProvider.sunSwap(
+    BigInt field0,
+  ) = ExchangeProvider_SunSwap;
+}
+
+/// FFI-safe Uniswap deployment metadata. Addresses are hex `0x...` strings so the
+/// whole struct crosses the flutter_rust_bridge boundary; they are parsed into alloy
+/// `Address` once, internally, via [`UniswapMeta::resolve`].
+class UniswapMeta {
+  final BigInt chainId;
+  final String universalRouter;
+  final String quoterV2;
+  final String permit2;
+  final String weth;
+
+  const UniswapMeta({
+    required this.chainId,
+    required this.universalRouter,
+    required this.quoterV2,
+    required this.permit2,
+    required this.weth,
+  });
+
+  @override
+  int get hashCode =>
+      chainId.hashCode ^
+      universalRouter.hashCode ^
+      quoterV2.hashCode ^
+      permit2.hashCode ^
+      weth.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UniswapMeta &&
+          runtimeType == other.runtimeType &&
+          chainId == other.chainId &&
+          universalRouter == other.universalRouter &&
+          quoterV2 == other.quoterV2 &&
+          permit2 == other.permit2 &&
+          weth == other.weth;
 }
