@@ -6,20 +6,98 @@
 import '../frb_generated.dart';
 import '../models/exchange.dart';
 import '../models/ftoken.dart';
+import '../models/transactions/access_list.dart';
+import '../models/transactions/base_token.dart';
+import '../models/transactions/btc.dart';
+import '../models/transactions/evm.dart';
+import '../models/transactions/request.dart';
+import '../models/transactions/scilla.dart';
+import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
-Future<void> fetchExchangeQuote(
-        {required ExchangeAsset asset,
+/// Quote a swap against the chosen provider. For Uniswap this probes the V3 fee tiers
+/// on-chain and, for ERC20 inputs, also returns the Permit2 typed-data JSON the UI must
+/// sign before calling [`build_exchange_tx`].
+Future<ExchangeQuoteInfo> fetchExchangeQuote(
+        {required ExchangeProvider provider,
+        required ExchangeAsset asset,
         required String fromAsset,
         required String toAsset,
         required String amount,
         required String destination}) =>
     RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
+        provider: provider,
         asset: asset,
         fromAsset: fromAsset,
         toAsset: toAsset,
         amount: amount,
         destination: destination);
+
+/// Build the unsigned swap transaction for the chosen provider. The UI signs and
+/// broadcasts it via the existing `sign_send_transactions` FFI. `token_in` is the WETH
+/// address for native ETH inputs; `permit_nonce`/`permit_signature` come from the quote
+/// step and the user's EIP-712 signature (ERC20 inputs only).
+Future<TransactionRequestInfo> buildExchangeTx(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required ExchangeProvider provider,
+        required String tokenIn,
+        required String tokenOut,
+        required String amountIn,
+        required String amountOut,
+        required int feeTier,
+        required int slippageBps,
+        required BigInt deadline,
+        required bool isNativeIn,
+        BigInt? permitNonce,
+        String? permitSignature}) =>
+    RustLib.instance.api.crateApiExchangeBuildExchangeTx(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        provider: provider,
+        tokenIn: tokenIn,
+        tokenOut: tokenOut,
+        amountIn: amountIn,
+        amountOut: amountOut,
+        feeTier: feeTier,
+        slippageBps: slippageBps,
+        deadline: deadline,
+        isNativeIn: isNativeIn,
+        permitNonce: permitNonce,
+        permitSignature: permitSignature);
+
+/// Read-only quote result. `amount_out` is common to every provider; the remaining
+/// fields are provider-specific extras (`Option`, grown as more providers land).
+class ExchangeQuoteInfo {
+  final String amountOut;
+  final int? feeTier;
+  final String? permitTypedDataJson;
+  final BigInt? permitNonce;
+
+  const ExchangeQuoteInfo({
+    required this.amountOut,
+    this.feeTier,
+    this.permitTypedDataJson,
+    this.permitNonce,
+  });
+
+  @override
+  int get hashCode =>
+      amountOut.hashCode ^
+      feeTier.hashCode ^
+      permitTypedDataJson.hashCode ^
+      permitNonce.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExchangeQuoteInfo &&
+          runtimeType == other.runtimeType &&
+          amountOut == other.amountOut &&
+          feeTier == other.feeTier &&
+          permitTypedDataJson == other.permitTypedDataJson &&
+          permitNonce == other.permitNonce;
+}
