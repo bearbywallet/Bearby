@@ -46,7 +46,7 @@ const ADDRESS_THIS: Address = Address::with_last_byte(2);
 
 /// Platform fee taken from the swap *output* by PAY_PORTION, in basis points.
 pub const FEE_BIPS: u32 = 50;
-const FEE_RECIPIENT: Address = address!("0x74d35b31ed6b31818331bc28fe343669126f152f");
+const FEE_RECIPIENT: Address = address!("0x74d35b31eD6b31818331Bc28fe343669126f152F");
 
 /// V3 fee tiers probed by the quoter; the tier with the best output wins.
 pub const V3_FEE_TIERS: &[u32] = &[100, 500, 3000, 10000];
@@ -138,6 +138,30 @@ impl UniswapMeta {
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
                 "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
             ),
+            // Ethereum Sepolia (testnet)
+            11155111 => (
+                "0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b",
+                "0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3",
+                "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+            ),
+            // Optimism Sepolia (testnet)
+            11155420 => (
+                "0xD5bBa708b39537d33F2812E5Ea032622456F1A95",
+                "0xC5290058841028F1614F3A6F0F5816cAd0df5E27",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            // Base Sepolia (testnet)
+            84532 => (
+                "0x492E6456D9528771018DeB9E87ef7750EF184104",
+                "0xC5290058841028F1614F3A6F0F5816cAd0df5E27",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            // Arbitrum Sepolia (testnet)
+            421614 => (
+                "0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2",
+                "0x2779a0CC1c3e0E44D2542EC3e79e3864Ae93Ef0B",
+                "0x980B62Da83eFf3D4576C647993b0c1D7faf17c73",
+            ),
             _ => return None,
         };
 
@@ -225,7 +249,10 @@ pub enum SwapInput {
     /// Native input: `WRAP_ETH` funds the router; no approval / no permit.
     NativeEth,
     /// ERC20 input: `PERMIT2_PERMIT` with an EIP-712 signature; the user pays.
-    Erc20 { permit: PermitSingle, signature: Vec<u8> },
+    Erc20 {
+        permit: PermitSingle,
+        signature: Vec<u8>,
+    },
 }
 
 #[frb(ignore)]
@@ -273,7 +300,13 @@ pub fn build_execute_calldata(plan: SwapPlan, deadline: U256) -> Vec<u8> {
     let path = v3_path(&token_in, fee_tier, &token_out);
     commands.push(CMD_V3_SWAP_EXACT_IN);
     inputs.push(
-        (ADDRESS_THIS, amount_in, U256::ZERO, Bytes::from(path), payer_is_user)
+        (
+            ADDRESS_THIS,
+            amount_in,
+            U256::ZERO,
+            Bytes::from(path),
+            payer_is_user,
+        )
             .abi_encode_params()
             .into(),
     );
