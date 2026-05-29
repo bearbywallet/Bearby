@@ -6,20 +6,10 @@ use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::uniswap::{build_uniswap_tx_info, uniswap_quote_info};
-use crate::models::exchange::{ExchangeAsset, ExchangeProvider, UniswapMeta};
+use crate::models::exchange::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, UniswapMeta};
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-
-/// Read-only quote result. `amount_out` is common to every provider; the remaining
-/// fields are provider-specific extras (`Option`, grown as more providers land).
-#[derive(Debug)]
-pub struct ExchangeQuoteInfo {
-    pub amount_out: String,
-    pub fee_tier: Option<u32>,
-    pub permit_typed_data_json: Option<String>,
-    pub permit_nonce: Option<u64>,
-}
 
 pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
     let condidate = HashSet::from([ExchangeProvider::Thorchain(0), ExchangeProvider::ZIlSwap(0)]);
@@ -82,24 +72,32 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     Ok(all_ftokens)
 }
 
-/// Quote a swap against the chosen provider. For Uniswap this probes the V3 fee tiers
-/// on-chain and, for ERC20 inputs, also returns the Permit2 typed-data JSON the UI must
-/// sign before calling [`build_exchange_tx`].
 pub async fn fetch_exchange_quote(
-    provider: ExchangeProvider,
     asset: ExchangeAsset,
     from_asset: String,
     to_asset: String,
     amount: String,
     destination: String,
-) -> Result<ExchangeQuoteInfo, String> {
-    match provider {
-        ExchangeProvider::Uniswap(meta) => {
-            uniswap_quote_info(&meta, &asset, &from_asset, &to_asset, &amount, &destination).await
+) -> Result<Vec<ExchangeQuoteInfo>, String> {
+    let mut quotes = Vec::with_capacity(asset.providers.len());
+    for provider in &asset.providers {
+        let result = match provider {
+            ExchangeProvider::Uniswap(meta) => {
+                uniswap_quote_info(meta, &asset, &from_asset, &to_asset, &amount, &destination)
+                    .await
+            }
+            ExchangeProvider::Thorchain(_) => continue,
+            ExchangeProvider::ZIlSwap(_) => continue,
+            ExchangeProvider::SunSwap(_) => continue,
+        };
+        if let Ok(quote) = result {
+            quotes.push(quote);
         }
-        ExchangeProvider::Thorchain(_) => todo!(),
-        ExchangeProvider::ZIlSwap(_) => todo!(),
-        ExchangeProvider::SunSwap(_) => todo!(),
+    }
+    if quotes.is_empty() {
+        Err("No provider returned a quote".into())
+    } else {
+        Ok(quotes)
     }
 }
 

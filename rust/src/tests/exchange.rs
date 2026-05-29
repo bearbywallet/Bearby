@@ -176,12 +176,11 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_fetch_exchange_quote() {
         setup_eth_wallet().await;
-        let (asset, provider) = uniswap_asset().await;
+        let (asset, _) = uniswap_asset().await;
 
-        let quote = fetch_exchange_quote(
-            provider,
+        let quotes = fetch_exchange_quote(
             asset,
-            String::new(), // native input -> from_asset ignored (WETH used)
+            String::new(),
             USDC_MAINNET.to_string(),
             ONE_ETH.to_string(),
             "0x0000000000000000000000000000000000000001".to_string(),
@@ -189,6 +188,9 @@ mod exchange_tests {
         .await
         .expect("live uniswap quote");
 
+        assert!(!quotes.is_empty(), "expected at least one quote");
+
+        let quote = &quotes[0];
         let out: U256 = quote.amount_out.parse().unwrap();
         assert!(out > U256::ZERO, "quote should return non-zero output");
         assert!(

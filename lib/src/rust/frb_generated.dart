@@ -329,9 +329,8 @@ abstract class RustLibApi extends BaseApi {
   Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
       {required BigInt walletIndex, required BigInt accountIndex});
 
-  Future<ExchangeQuoteInfo> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeProvider provider,
-      required ExchangeAsset asset,
+  Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
+      {required ExchangeAsset asset,
       required String fromAsset,
       required String toAsset,
       required String amount,
@@ -2157,9 +2156,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<ExchangeQuoteInfo> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeProvider provider,
-      required ExchangeAsset asset,
+  Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
+      {required ExchangeAsset asset,
       required String fromAsset,
       required String toAsset,
       required String amount,
@@ -2167,7 +2165,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_exchange_provider(provider, serializer);
         sse_encode_box_autoadd_exchange_asset(asset, serializer);
         sse_encode_String(fromAsset, serializer);
         sse_encode_String(toAsset, serializer);
@@ -2177,11 +2174,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 56, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_exchange_quote_info,
+        decodeSuccessData: sse_decode_list_exchange_quote_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeQuoteConstMeta,
-      argValues: [provider, asset, fromAsset, toAsset, amount, destination],
+      argValues: [asset, fromAsset, toAsset, amount, destination],
       apiImpl: this,
     ));
   }
@@ -2189,14 +2186,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeFetchExchangeQuoteConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_exchange_quote",
-        argNames: [
-          "provider",
-          "asset",
-          "fromAsset",
-          "toAsset",
-          "amount",
-          "destination"
-        ],
+        argNames: ["asset", "fromAsset", "toAsset", "amount", "destination"],
       );
 
   @override
@@ -5188,13 +5178,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ExchangeQuoteInfo(
-      amountOut: dco_decode_String(arr[0]),
-      feeTier: dco_decode_opt_box_autoadd_u_32(arr[1]),
-      permitTypedDataJson: dco_decode_opt_String(arr[2]),
-      permitNonce: dco_decode_opt_box_autoadd_u_64(arr[3]),
+      provider: dco_decode_exchange_provider(arr[0]),
+      amountOut: dco_decode_String(arr[1]),
+      feeTier: dco_decode_opt_box_autoadd_u_32(arr[2]),
+      permitTypedDataJson: dco_decode_opt_String(arr[3]),
+      permitNonce: dco_decode_opt_box_autoadd_u_64(arr[4]),
     );
   }
 
@@ -5448,6 +5439,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_exchange_provider).toList();
+  }
+
+  @protected
+  List<ExchangeQuoteInfo> dco_decode_list_exchange_quote_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_exchange_quote_info).toList();
   }
 
   @protected
@@ -7067,11 +7064,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeQuoteInfo sse_decode_exchange_quote_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_provider = sse_decode_exchange_provider(deserializer);
     var var_amountOut = sse_decode_String(deserializer);
     var var_feeTier = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
     var var_permitNonce = sse_decode_opt_box_autoadd_u_64(deserializer);
     return ExchangeQuoteInfo(
+        provider: var_provider,
         amountOut: var_amountOut,
         feeTier: var_feeTier,
         permitTypedDataJson: var_permitTypedDataJson,
@@ -7402,6 +7401,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ExchangeProvider>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_exchange_provider(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ExchangeQuoteInfo> sse_decode_list_exchange_quote_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ExchangeQuoteInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_exchange_quote_info(deserializer));
     }
     return ans_;
   }
@@ -9194,6 +9206,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_exchange_quote_info(
       ExchangeQuoteInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_exchange_provider(self.provider, serializer);
     sse_encode_String(self.amountOut, serializer);
     sse_encode_opt_box_autoadd_u_32(self.feeTier, serializer);
     sse_encode_opt_String(self.permitTypedDataJson, serializer);
@@ -9437,6 +9450,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_exchange_provider(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_exchange_quote_info(
+      List<ExchangeQuoteInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_exchange_quote_info(item, serializer);
     }
   }
 

@@ -26,8 +26,7 @@ use zilpay::rpc::{
 use zilpay::serde_json::{json, Value};
 use zilpay::wallet::wallet_storage::StorageOperations;
 
-use super::{ExchangeAsset, UniswapMeta};
-use crate::api::exchange::ExchangeQuoteInfo;
+use super::{ExchangeAsset, ExchangeQuoteInfo, ExchangeProvider, UniswapMeta};
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
@@ -591,6 +590,7 @@ pub async fn uniswap_quote_info(
     };
 
     Ok(ExchangeQuoteInfo {
+        provider: ExchangeProvider::Uniswap(meta.clone()),
         amount_out: quote.amount_out.to_string(),
         fee_tier: Some(quote.fee_tier),
         permit_typed_data_json,
