@@ -168,7 +168,7 @@ mod exchange_tests {
             evm.to.as_deref().map(str::to_lowercase),
             Some(meta.universal_router.to_lowercase())
         );
-        assert!(evm.data.as_ref().map_or(false, |d| !d.is_empty()));
+        assert!(evm.data.as_ref().is_some_and(|d| !d.is_empty()));
     }
 
     /// Live read-only quote against the mainnet RPC. `#[ignore]`d because it needs network
@@ -194,7 +194,7 @@ mod exchange_tests {
         let out: U256 = quote.amount_out.parse().unwrap();
         assert!(out > U256::ZERO, "quote should return non-zero output");
         assert!(
-            quote.fee_tier.map_or(false, |f| V3_FEE_TIERS.contains(&f)),
+            quote.fee_tier.is_some_and(|f| V3_FEE_TIERS.contains(&f)),
             "fee_tier should be one of the probed tiers"
         );
         assert!(
