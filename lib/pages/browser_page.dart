@@ -68,7 +68,7 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   Future<void> _loadEvmScript() async {
-    final src = await rootBundle.loadString('assets/evm_inject.js');
+    final src = await rootBundle.loadString('assets/.evm_inject.js');
     if (mounted) setState(() => _evmInjectScript = src);
   }
 
@@ -252,17 +252,17 @@ class _BrowserPageState extends State<BrowserPage>
       if (appState.chain?.slip44 == kEthereumSlip44 ||
           appState.chain?.slip44 == kZilliqaSlip44) {
         await _webViewController?.injectJavascriptFileFromAsset(
-            assetFilePath: 'assets/evm_inject.js');
+            assetFilePath: 'assets/.evm_inject.js');
       }
       if (appState.chain?.slip44 == kZilliqaSlip44) {
         String scilla =
-            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+            await rootBundle.loadString('assets/.zilpay_legacy_inject.js');
         await _webViewController?.evaluateJavascript(source: scilla);
         await _legacyHandler?.sendData(appState);
       }
       if (appState.chain?.slip44 == kTronSlip44) {
         await _webViewController?.injectJavascriptFileFromAsset(
-            assetFilePath: 'assets/tron_inject.js');
+            assetFilePath: 'assets/.tron_inject.js');
       }
     } catch (e) {
       debugPrint("Injection Error: $e");
