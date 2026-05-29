@@ -54,3 +54,12 @@ pub struct ExchangeAsset {
     pub providers: HashSet<ExchangeProvider>,
     pub halted: bool,
 }
+
+#[derive(Debug)]
+pub struct ExchangeQuoteInfo {
+    pub provider: ExchangeProvider,
+    pub amount_out: String,
+    pub fee_tier: Option<u32>,
+    pub permit_typed_data_json: Option<String>,
+    pub permit_nonce: Option<u64>,
+}

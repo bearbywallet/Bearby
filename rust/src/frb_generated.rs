@@ -2190,8 +2190,6 @@ fn wire__crate__api__exchange__fetch_exchange_quote_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_provider =
-                <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
             let api_asset = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
             let api_from_asset = <String>::sse_decode(&mut deserializer);
             let api_to_asset = <String>::sse_decode(&mut deserializer);
@@ -2202,7 +2200,6 @@ fn wire__crate__api__exchange__fetch_exchange_quote_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::exchange::fetch_exchange_quote(
-                            api_provider,
                             api_asset,
                             api_from_asset,
                             api_to_asset,
@@ -6016,14 +6013,17 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
     }
 }
 
-impl SseDecode for crate::api::exchange::ExchangeQuoteInfo {
+impl SseDecode for crate::models::exchange::ExchangeQuoteInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_provider =
+            <crate::models::exchange::ExchangeProvider>::sse_decode(deserializer);
         let mut var_amountOut = <String>::sse_decode(deserializer);
         let mut var_feeTier = <Option<u32>>::sse_decode(deserializer);
         let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
         let mut var_permitNonce = <Option<u64>>::sse_decode(deserializer);
-        return crate::api::exchange::ExchangeQuoteInfo {
+        return crate::models::exchange::ExchangeQuoteInfo {
+            provider: var_provider,
             amount_out: var_amountOut,
             fee_tier: var_feeTier,
             permit_typed_data_json: var_permitTypedDataJson,
@@ -6397,6 +6397,20 @@ impl SseDecode for Vec<crate::models::exchange::ExchangeProvider> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::models::exchange::ExchangeProvider>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::exchange::ExchangeQuoteInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::exchange::ExchangeQuoteInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -8816,9 +8830,10 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeProvider
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::exchange::ExchangeQuoteInfo {
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeQuoteInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
+            self.provider.into_into_dart().into_dart(),
             self.amount_out.into_into_dart().into_dart(),
             self.fee_tier.into_into_dart().into_dart(),
             self.permit_typed_data_json.into_into_dart().into_dart(),
@@ -8828,13 +8843,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::exchange::ExchangeQuoteInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::exchange::ExchangeQuoteInfo
+    for crate::models::exchange::ExchangeQuoteInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::exchange::ExchangeQuoteInfo>
-    for crate::api::exchange::ExchangeQuoteInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeQuoteInfo>
+    for crate::models::exchange::ExchangeQuoteInfo
 {
-    fn into_into_dart(self) -> crate::api::exchange::ExchangeQuoteInfo {
+    fn into_into_dart(self) -> crate::models::exchange::ExchangeQuoteInfo {
         self
     }
 }
@@ -10152,9 +10167,10 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
     }
 }
 
-impl SseEncode for crate::api::exchange::ExchangeQuoteInfo {
+impl SseEncode for crate::models::exchange::ExchangeQuoteInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
         <String>::sse_encode(self.amount_out, serializer);
         <Option<u32>>::sse_encode(self.fee_tier, serializer);
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
@@ -10422,6 +10438,16 @@ impl SseEncode for Vec<crate::models::exchange::ExchangeProvider> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::exchange::ExchangeProvider>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::exchange::ExchangeQuoteInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::exchange::ExchangeQuoteInfo>::sse_encode(item, serializer);
         }
     }
 }

@@ -372,6 +372,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw);
 
   @protected
+  List<ExchangeQuoteInfo> dco_decode_list_exchange_quote_info(dynamic raw);
+
+  @protected
   List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
 
   @protected
@@ -1006,6 +1009,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ExchangeProvider> sse_decode_list_exchange_provider(
+      SseDeserializer deserializer);
+
+  @protected
+  List<ExchangeQuoteInfo> sse_decode_list_exchange_quote_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1691,6 +1698,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_exchange_provider(
       List<ExchangeProvider> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_exchange_quote_info(
+      List<ExchangeQuoteInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_explorer_info(

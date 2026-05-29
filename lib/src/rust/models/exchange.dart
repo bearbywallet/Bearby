@@ -51,6 +51,41 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   ) = ExchangeProvider_SunSwap;
 }
 
+class ExchangeQuoteInfo {
+  final ExchangeProvider provider;
+  final String amountOut;
+  final int? feeTier;
+  final String? permitTypedDataJson;
+  final BigInt? permitNonce;
+
+  const ExchangeQuoteInfo({
+    required this.provider,
+    required this.amountOut,
+    this.feeTier,
+    this.permitTypedDataJson,
+    this.permitNonce,
+  });
+
+  @override
+  int get hashCode =>
+      provider.hashCode ^
+      amountOut.hashCode ^
+      feeTier.hashCode ^
+      permitTypedDataJson.hashCode ^
+      permitNonce.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExchangeQuoteInfo &&
+          runtimeType == other.runtimeType &&
+          provider == other.provider &&
+          amountOut == other.amountOut &&
+          feeTier == other.feeTier &&
+          permitTypedDataJson == other.permitTypedDataJson &&
+          permitNonce == other.permitNonce;
+}
+
 /// FFI-safe Uniswap deployment metadata. Addresses are hex `0x...` strings so the
 /// whole struct crosses the flutter_rust_bridge boundary; they are parsed into alloy
 /// `Address` once, internally, via [`UniswapMeta::resolve`].
