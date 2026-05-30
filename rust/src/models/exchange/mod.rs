@@ -10,7 +10,7 @@ use std::collections::HashSet;
 /// FFI-safe Uniswap deployment metadata. Addresses are hex `0x...` strings so the
 /// whole struct crosses the flutter_rust_bridge boundary; they are parsed into alloy
 /// `Address` once, internally, via [`UniswapMeta::resolve`].
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UniswapMeta {
     pub chain_id: u64,
     pub universal_router: String,

@@ -12,7 +12,11 @@ use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 
 pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
-    let condidate = HashSet::from([ExchangeProvider::Thorchain(0), ExchangeProvider::ZIlSwap(0)]);
+    let condidate = HashSet::from([
+        ExchangeProvider::Thorchain(0),
+        ExchangeProvider::ZIlSwap(0),
+        ExchangeProvider::Uniswap(Default::default()),
+    ]);
     let all_ftokens: Vec<ExchangeAsset> = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -43,22 +47,12 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
                 let slip44 = chain.slip_44;
                 let chain_id = chain.chain_id();
                 let addr_type = t.addr.prefix_type();
-
-                let mut providers: HashSet<ExchangeProvider> = condidate
+                let providers: HashSet<ExchangeProvider> = condidate
                     .iter()
                     .filter(|p| p.is_support(addr_type, slip44, chain_id))
                     .cloned()
                     .collect();
 
-                if addr_type == 1 {
-                    if let Some(meta) = UniswapMeta::for_chain(chain_id) {
-                        providers.insert(ExchangeProvider::Uniswap(meta));
-                    }
-                }
-
-                if providers.is_empty() {
-                    return None;
-                }
                 Some(ExchangeAsset {
                     token: t.into(),
                     providers,
