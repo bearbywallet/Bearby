@@ -1,8 +1,7 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::rpc::network_config::ChainConfig;
-use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::uniswap::{build_uniswap_tx_info, uniswap_quote_info};
@@ -20,48 +19,59 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     let all_ftokens: Vec<ExchangeAsset> = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        let mut seen = HashSet::new();
         let all_chain: Vec<ChainConfig> = service
             .core
             .get_providers()
             .into_iter()
             .map(|n| n.config)
             .collect();
-        let all_ftokens: Vec<ExchangeAsset> = service
-            .core
-            .wallets
-            .iter()
-            .map(|w| w.get_ftokens().map_err(|e| e.to_string()))
-            .collect::<Result<Vec<Vec<FToken>>, String>>()?
-            .into_iter()
-            .flatten()
-            .filter_map(|t: FToken| {
-                // Dedup by (chain, addr): native tokens use an all-zero address, so
-                // `to_hash()` alone collides across every chain (and between ETH/ZIL),
-                // which would drop every native asset but the first one.
-                if !seen.insert((t.chain_hash, t.addr.to_hash())) {
-                    return None;
+
+        let mut assets: HashMap<(u64, usize), ExchangeAsset> = HashMap::new();
+
+        for wallet in service.core.wallets.iter() {
+            let ftokens = wallet.get_ftokens().map_err(|e| e.to_string())?;
+            for t in ftokens {
+                let key = (t.chain_hash, t.addr.to_hash());
+
+                if let Some(existing) = assets.get_mut(&key) {
+                    for (&account_idx, balance) in &t.balances {
+                        existing
+                            .token
+                            .balances
+                            .entry(account_idx)
+                            .or_insert(balance.to_string());
+                    }
+                    continue;
                 }
 
-                let chain = all_chain.iter().find(|c| c.hash() == t.chain_hash)?;
-                let slip44 = chain.slip_44;
-                let chain_id = chain.chain_id();
-                let addr_type = t.addr.prefix_type();
+                let chain = match all_chain.iter().find(|c| c.hash() == t.chain_hash) {
+                    Some(c) => c,
+                    None => continue,
+                };
                 let providers: HashSet<ExchangeProvider> = condidate
                     .iter()
-                    .filter(|p| p.is_support(addr_type, slip44, chain_id))
+                    .filter(|p| p.is_support(t.addr.prefix_type(), chain.slip_44, chain.chain_id()))
                     .cloned()
+                    .map(|p| match p {
+                        ExchangeProvider::Uniswap(_) => ExchangeProvider::Uniswap(
+                            UniswapMeta::for_chain(chain.chain_id()).unwrap_or_default(),
+                        ),
+                        p => p,
+                    })
                     .collect();
 
-                Some(ExchangeAsset {
-                    token: t.into(),
-                    providers,
-                    halted: true,
-                })
-            })
-            .collect();
+                assets.insert(
+                    key,
+                    ExchangeAsset {
+                        token: t.into(),
+                        providers,
+                        halted: true,
+                    },
+                );
+            }
+        }
 
-        all_ftokens
+        assets.into_values().collect::<Vec<ExchangeAsset>>()
     }
     .into_iter()
     .collect();
