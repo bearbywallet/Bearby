@@ -257,6 +257,34 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangePageTabBuySell => '구매/판매';
 
   @override
+  String get exchangeSettingsPriceProtection => '가격 보호';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => '하위 스왑 수';
+
+  @override
+  String get exchangeSettingsTimeBetween => '하위 스왑 간격';
+
+  @override
+  String get exchangeSettingsReset => '초기화';
+
+  @override
+  String get exchangeSettingsSave => '저장';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count개 블록',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => '비밀 키 공개';
 
   @override

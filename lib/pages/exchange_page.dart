@@ -17,6 +17,7 @@ import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
+import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
@@ -205,12 +206,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     _scheduleQuote();
   }
 
-  void _setMax(ExchangeAsset from) {
+  void _setPercent(ExchangeAsset from, int percent) {
     final balance =
         BigInt.tryParse(from.token.balances[_appState.accountBalanceKey] ?? '') ??
             BigInt.zero;
+    final portion = balance * BigInt.from(percent) ~/ BigInt.from(100);
     setState(() {
-      _amount = fromWei(value: balance.toString(), decimals: from.token.decimals);
+      _amount = fromWei(value: portion.toString(), decimals: from.token.decimals);
       _hasDecimalPoint = _amount.contains('.');
     });
     _scheduleQuote();
@@ -462,25 +464,19 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       );
     }
 
-    // Render the structure instantly; swap in skeletons until the assets land.
-    final Widget cards;
-    if (from != null && to != null) {
-      cards = Column(
-        children: [
-          _buildPayCard(theme, l10n, from),
-          _buildDirectionButton(theme, from),
-          _buildGetCard(theme, l10n, to),
-        ],
-      );
-    } else {
-      cards = Column(
-        children: [
-          _buildSkeletonCard(theme),
-          _buildDirectionButton(theme, null),
-          _buildSkeletonCard(theme),
-        ],
-      );
+    // Bootstrap is fast — don't flash any loading state. Render nothing until the
+    // assets land, then show the real cards.
+    if (from == null || to == null) {
+      return const SizedBox.shrink();
     }
+
+    final Widget cards = Column(
+      children: [
+        _buildPayCard(theme, l10n, from),
+        _buildDirectionButton(theme, from),
+        _buildGetCard(theme, l10n, to),
+      ],
+    );
 
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(
@@ -519,34 +515,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildSkeletonCard(AppTheme theme) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SkeletonBox(width: 70, height: 12),
-          SizedBox(height: 14),
-          Row(
-            children: [
-              SkeletonBox(width: 130, height: 30),
-              Spacer(),
-              SkeletonBox(width: 100, height: 40, borderRadius: 20),
-            ],
-          ),
-          SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTabs(AppTheme theme, AppLocalizations l10n) {
     Widget tab(String label, _OrderType type, bool enabled) {
       final selected = _orderType == type;
@@ -557,7 +525,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           padding: const EdgeInsets.only(right: 18),
           child: Text(
             label,
-            style: theme.titleLarge.copyWith(
+            style: theme.titleSmall.copyWith(
               color: selected
                   ? theme.textPrimary
                   : theme.textSecondary.withValues(alpha: enabled ? 1.0 : 0.5),
@@ -571,11 +539,26 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           tab(l10n.exchangePageTabSwap, _OrderType.swap, true),
           tab(l10n.exchangePageTabLimit, _OrderType.limit, false),
           tab(l10n.exchangePageTabBuySell, _OrderType.buySell, false),
+          const Spacer(),
+          GestureDetector(
+            onTap: () => showSwapSettingsModal(context: context),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: SvgPicture.asset(
+                "assets/icons/gear.svg",
+                width: 22,
+                height: 22,
+                colorFilter:
+                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -654,29 +637,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
-                fromWei(value: balance.toString(), decimals: token.decimals),
-                style: theme.bodyText2
-                    .copyWith(color: theme.textPrimary.withValues(alpha: 0.7)),
-              ),
+              _percentChip(theme, '25%', () => _setPercent(from, 25)),
               const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => _setMax(from),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: theme.textPrimary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'Max',
-                    style: theme.labelSmall.copyWith(
-                      color: theme.textPrimary.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-              ),
+              _percentChip(theme, '50%', () => _setPercent(from, 50)),
+              const SizedBox(width: 8),
+              _percentChip(theme, '100%', () => _setPercent(from, 100)),
             ],
           ),
         ],
@@ -684,9 +649,31 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
+  Widget _percentChip(AppTheme theme, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: theme.textPrimary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          label,
+          style: theme.labelSmall.copyWith(
+            color: theme.textPrimary.withValues(alpha: 0.7),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDirectionButton(AppTheme theme, ExchangeAsset? from) {
     // Flip is only valid when the current "pay" token can legally become an output
-    // (ERC20-out only — native-out unwrap is unsupported by the backend).
+    // (ERC20-out only). Native-out unwrap (e.g. WBTC -> BNB) is supported by Uniswap's
+    // Universal Router via UNWRAP_WETH but not yet wired in the Rust backend
+    // (build_execute_calldata); once that lands, this guard can drop the native check.
     final canFlip = from != null && !from.token.native && _toAsset != null;
 
     return Padding(

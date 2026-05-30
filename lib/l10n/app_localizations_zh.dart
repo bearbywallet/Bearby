@@ -257,6 +257,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangePageTabBuySell => '买卖';
 
   @override
+  String get exchangeSettingsPriceProtection => '价格保护';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => '子交换数量';
+
+  @override
+  String get exchangeSettingsTimeBetween => '子交换间隔';
+
+  @override
+  String get exchangeSettingsReset => '重置';
+
+  @override
+  String get exchangeSettingsSave => '保存';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个区块',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => '显示私钥';
 
   @override

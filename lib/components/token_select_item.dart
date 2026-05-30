@@ -1,5 +1,6 @@
 import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/amount.dart';
@@ -13,18 +14,27 @@ class TokenSelectItem extends StatelessWidget {
   final VoidCallback onTap;
   final double iconSize;
 
+  /// Optional small chain icon overlaid on the bottom-right of the token avatar.
+  final Widget? networkBadge;
+
+  /// Optional SVG asset paths for exchange providers, rendered next to the symbol.
+  final List<String> providerIcons;
+
   const TokenSelectItem({
     super.key,
     required this.ftoken,
     required this.balance,
     required this.onTap,
     this.iconSize = 40.0,
+    this.networkBadge,
+    this.providerIcons = const [],
   });
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
+    final badge = networkBadge;
     final (amount, converted) = formatingAmount(
       amount: balance,
       symbol: ftoken.symbol,
@@ -40,33 +50,41 @@ class TokenSelectItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Row(
           children: [
-            Container(
+            SizedBox(
               width: iconSize,
               height: iconSize,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(iconSize / 2),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(iconSize / 2),
-                child: AsyncImage(
-                  url: processTokenLogo(
-                    token: ftoken,
-                    shortName: appState.chain?.shortName ?? "",
-                    theme: theme.value,
-                  ),
-                  width: iconSize,
-                  height: iconSize,
-                  fit: BoxFit.contain,
-                  errorWidget: Jazzicon(
-                    seed: ftoken.addr,
-                    diameter: iconSize,
-                  ),
-                  loadingWidget: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(iconSize / 2),
+                    child: AsyncImage(
+                      url: processTokenLogo(
+                        token: ftoken,
+                        shortName: appState.chain?.shortName ?? "",
+                        theme: theme.value,
+                      ),
+                      width: iconSize,
+                      height: iconSize,
+                      fit: BoxFit.contain,
+                      errorWidget: Jazzicon(
+                        seed: ftoken.addr,
+                        diameter: iconSize,
+                      ),
+                      loadingWidget: const Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  if (badge != null)
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: badge,
+                    ),
+                ],
               ),
             ),
             const SizedBox(width: 12),
@@ -74,12 +92,24 @@ class TokenSelectItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    ftoken.symbol,
-                    style: theme.bodyText1.copyWith(
-                      color: theme.textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          ftoken.symbol,
+                          style: theme.bodyText1.copyWith(
+                            color: theme.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      for (final icon in providerIcons) ...[
+                        const SizedBox(width: 6),
+                        SvgPicture.asset(icon, width: 16, height: 16),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(

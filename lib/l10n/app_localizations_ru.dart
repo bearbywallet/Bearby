@@ -257,6 +257,37 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangePageTabBuySell => 'Купить/Продать';
 
   @override
+  String get exchangeSettingsPriceProtection => 'Защита цены';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => 'Количество под-обменов';
+
+  @override
+  String get exchangeSettingsTimeBetween => 'Время между под-обменами';
+
+  @override
+  String get exchangeSettingsReset => 'Сбросить';
+
+  @override
+  String get exchangeSettingsSave => 'Сохранить';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count блока',
+      many: '$count блоков',
+      few: '$count блока',
+      one: '1 блок',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

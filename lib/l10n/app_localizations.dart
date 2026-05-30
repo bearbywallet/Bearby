@@ -593,6 +593,48 @@ abstract class AppLocalizations {
   /// **'Buy/Sell'**
   String get exchangePageTabBuySell;
 
+  /// No description provided for @exchangeSettingsPriceProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Protection'**
+  String get exchangeSettingsPriceProtection;
+
+  /// No description provided for @exchangeSettingsTwap.
+  ///
+  /// In en, this message translates to:
+  /// **'TWAP'**
+  String get exchangeSettingsTwap;
+
+  /// No description provided for @exchangeSettingsSubSwaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of sub-swaps'**
+  String get exchangeSettingsSubSwaps;
+
+  /// No description provided for @exchangeSettingsTimeBetween.
+  ///
+  /// In en, this message translates to:
+  /// **'Time between sub-swaps'**
+  String get exchangeSettingsTimeBetween;
+
+  /// No description provided for @exchangeSettingsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get exchangeSettingsReset;
+
+  /// No description provided for @exchangeSettingsSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get exchangeSettingsSave;
+
+  /// No description provided for @exchangeSettingsBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 block} other{{count} blocks}}'**
+  String exchangeSettingsBlocks(int count);
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:
