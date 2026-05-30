@@ -33,8 +33,9 @@ Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
 
 /// Build the unsigned swap transaction for the chosen provider. The UI signs and
 /// broadcasts it via the existing `sign_send_transactions` FFI. `token_in` is the WETH
-/// address for native ETH inputs; `permit_nonce`/`permit_signature` come from the quote
-/// step and the user's EIP-712 signature (ERC20 inputs only).
+/// address for native ETH inputs. For ERC20 inputs the Permit2 EIP-712 signature is
+/// produced internally from `permit_nonce` and the supplied `password`/`passphrase`, so
+/// the UI never signs the permit itself.
 Future<TransactionRequestInfo> buildExchangeTx(
         {required BigInt walletIndex,
         required BigInt accountIndex,
@@ -48,7 +49,8 @@ Future<TransactionRequestInfo> buildExchangeTx(
         required BigInt deadline,
         required bool isNativeIn,
         BigInt? permitNonce,
-        String? permitSignature}) =>
+        String? password,
+        String? passphrase}) =>
     RustLib.instance.api.crateApiExchangeBuildExchangeTx(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -62,4 +64,5 @@ Future<TransactionRequestInfo> buildExchangeTx(
         deadline: deadline,
         isNativeIn: isNativeIn,
         permitNonce: permitNonce,
-        permitSignature: permitSignature);
+        password: password,
+        passphrase: passphrase);

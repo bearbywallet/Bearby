@@ -1318,7 +1318,8 @@ fn wire__crate__api__exchange__build_exchange_tx_impl(
             let api_deadline = <u64>::sse_decode(&mut deserializer);
             let api_is_native_in = <bool>::sse_decode(&mut deserializer);
             let api_permit_nonce = <Option<u64>>::sse_decode(&mut deserializer);
-            let api_permit_signature = <Option<String>>::sse_decode(&mut deserializer);
+            let api_password = <Option<String>>::sse_decode(&mut deserializer);
+            let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1336,7 +1337,8 @@ fn wire__crate__api__exchange__build_exchange_tx_impl(
                             api_deadline,
                             api_is_native_in,
                             api_permit_nonce,
-                            api_permit_signature,
+                            api_password,
+                            api_passphrase,
                         )
                         .await?;
                         Ok(output_ok)

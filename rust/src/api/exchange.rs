@@ -106,8 +106,9 @@ pub async fn fetch_exchange_quote(
 
 /// Build the unsigned swap transaction for the chosen provider. The UI signs and
 /// broadcasts it via the existing `sign_send_transactions` FFI. `token_in` is the WETH
-/// address for native ETH inputs; `permit_nonce`/`permit_signature` come from the quote
-/// step and the user's EIP-712 signature (ERC20 inputs only).
+/// address for native ETH inputs. For ERC20 inputs the Permit2 EIP-712 signature is
+/// produced internally from `permit_nonce` and the supplied `password`/`passphrase`, so
+/// the UI never signs the permit itself.
 #[allow(clippy::too_many_arguments)]
 pub async fn build_exchange_tx(
     wallet_index: usize,
@@ -122,7 +123,8 @@ pub async fn build_exchange_tx(
     deadline: u64,
     is_native_in: bool,
     permit_nonce: Option<u64>,
-    permit_signature: Option<String>,
+    password: Option<String>,
+    passphrase: Option<String>,
 ) -> Result<TransactionRequestInfo, String> {
     match provider {
         ExchangeProvider::Uniswap(meta) => {
@@ -139,7 +141,8 @@ pub async fn build_exchange_tx(
                 deadline,
                 is_native_in,
                 permit_nonce,
-                permit_signature,
+                password,
+                passphrase,
             )
             .await
         }

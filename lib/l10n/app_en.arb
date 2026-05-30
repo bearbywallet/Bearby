@@ -285,6 +285,16 @@
   },
   "homePageReceiveButton": "Receive",
   "homePageSendButton": "Send",
+  "homePageExchangeButton": "Exchange",
+  "exchangePageTitle": "Exchange",
+  "exchangePagePay": "You pay",
+  "exchangePageGet": "You get",
+  "exchangePageConfirm": "Confirm",
+  "exchangePageComingSoon": "Soon",
+  "exchangePageNoAssets": "No swappable assets on this network",
+  "exchangePageTabSwap": "Swap",
+  "exchangePageTabLimit": "Limit",
+  "exchangePageTabBuySell": "Buy/Sell",
   "revealSecretKeyTitle": "Reveal Secret Key",
   "@revealSecretKeyTitle": {
     "description": "Title for the RevealSecretKey page"
