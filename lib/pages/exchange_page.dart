@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
@@ -21,7 +22,6 @@ import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
-import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
@@ -202,18 +202,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         _amount = "0";
         _hasDecimalPoint = false;
       }
-    });
-    _scheduleQuote();
-  }
-
-  void _setPercent(ExchangeAsset from, int percent) {
-    final balance =
-        BigInt.tryParse(from.token.balances[_appState.accountBalanceKey] ?? '') ??
-            BigInt.zero;
-    final portion = balance * BigInt.from(percent) ~/ BigInt.from(100);
-    setState(() {
-      _amount = fromWei(value: portion.toString(), decimals: from.token.decimals);
-      _hasDecimalPoint = _amount.contains('.');
     });
     _scheduleQuote();
   }
@@ -472,7 +460,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
     final Widget cards = Column(
       children: [
-        _buildPayCard(theme, l10n, from),
+        _buildPayCard(from),
         _buildDirectionButton(theme, from),
         _buildGetCard(theme, l10n, to),
       ],
@@ -564,107 +552,27 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildPayCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset from) {
+  Widget _buildPayCard(ExchangeAsset from) {
     final token = from.token;
     final balance =
         BigInt.tryParse(token.balances[_appState.accountBalanceKey] ?? '') ??
             BigInt.zero;
-    final amountWei = toDecimalsWei(_amount, token.decimals);
-    final exceeded = amountWei > balance;
-    final (_, converted) = formatingAmount(
-      amount: amountWei,
-      symbol: token.symbol,
-      decimals: token.decimals,
-      rate: token.rate,
-      appState: _appState,
-    );
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _amount,
-                      style: theme.displayLarge.copyWith(
-                        color: exceeded ? theme.danger : theme.textPrimary,
-                        fontSize:
-                            AdaptiveSize.getAdaptiveFontSize(context, 26),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (converted.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          converted,
-                          style: theme.bodyText2
-                              .copyWith(color: theme.textSecondary),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              _buildTokenSelector(
-                theme,
-                token,
-                () => showExchangeTokenSelectModal(
-                  context: context,
-                  assets: _assets,
-                  onSelected: _selectFrom,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _percentChip(theme, '25%', () => _setPercent(from, 25)),
-              const SizedBox(width: 8),
-              _percentChip(theme, '50%', () => _setPercent(from, 50)),
-              const SizedBox(width: 8),
-              _percentChip(theme, '100%', () => _setPercent(from, 100)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _percentChip(AppTheme theme, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: theme.textPrimary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          label,
-          style: theme.labelSmall.copyWith(
-            color: theme.textPrimary.withValues(alpha: 0.7),
-          ),
-        ),
+    return TokenAmountCard(
+      amount: _amount,
+      token: token,
+      balance: balance,
+      onAmountChanged: (v) {
+        setState(() {
+          _amount = v;
+          _hasDecimalPoint = v.contains('.');
+        });
+        _scheduleQuote();
+      },
+      onTokenTap: () => showExchangeTokenSelectModal(
+        context: context,
+        assets: _assets,
+        onSelected: _selectFrom,
       ),
     );
   }
