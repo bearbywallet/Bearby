@@ -227,6 +227,36 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homePageSendButton => '보내기';
 
   @override
+  String get homePageExchangeButton => '교환';
+
+  @override
+  String get exchangePageTitle => '교환';
+
+  @override
+  String get exchangePagePay => '보낼 금액';
+
+  @override
+  String get exchangePageGet => '받을 금액';
+
+  @override
+  String get exchangePageConfirm => '확인';
+
+  @override
+  String get exchangePageComingSoon => '곧';
+
+  @override
+  String get exchangePageNoAssets => '이 네트워크에서 교환 가능한 자산이 없습니다';
+
+  @override
+  String get exchangePageTabSwap => '스왑';
+
+  @override
+  String get exchangePageTabLimit => '지정가';
+
+  @override
+  String get exchangePageTabBuySell => '구매/판매';
+
+  @override
   String get revealSecretKeyTitle => '비밀 키 공개';
 
   @override

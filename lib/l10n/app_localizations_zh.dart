@@ -227,6 +227,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePageSendButton => '发送';
 
   @override
+  String get homePageExchangeButton => '兑换';
+
+  @override
+  String get exchangePageTitle => '兑换';
+
+  @override
+  String get exchangePagePay => '支付';
+
+  @override
+  String get exchangePageGet => '获得';
+
+  @override
+  String get exchangePageConfirm => '确认';
+
+  @override
+  String get exchangePageComingSoon => '即将';
+
+  @override
+  String get exchangePageNoAssets => '此网络上没有可兑换的资产';
+
+  @override
+  String get exchangePageTabSwap => '兑换';
+
+  @override
+  String get exchangePageTabLimit => '限价';
+
+  @override
+  String get exchangePageTabBuySell => '买卖';
+
+  @override
   String get revealSecretKeyTitle => '显示私钥';
 
   @override

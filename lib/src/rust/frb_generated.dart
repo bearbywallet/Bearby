@@ -250,7 +250,8 @@ abstract class RustLibApi extends BaseApi {
       required BigInt deadline,
       required bool isNativeIn,
       BigInt? permitNonce,
-      String? permitSignature});
+      String? password,
+      String? passphrase});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
       {required BigInt walletIndex,
@@ -1530,7 +1531,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required BigInt deadline,
       required bool isNativeIn,
       BigInt? permitNonce,
-      String? permitSignature}) {
+      String? password,
+      String? passphrase}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1546,7 +1548,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_64(deadline, serializer);
         sse_encode_bool(isNativeIn, serializer);
         sse_encode_opt_box_autoadd_u_64(permitNonce, serializer);
-        sse_encode_opt_String(permitSignature, serializer);
+        sse_encode_opt_String(password, serializer);
+        sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 35, port: port_);
       },
@@ -1568,7 +1571,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         deadline,
         isNativeIn,
         permitNonce,
-        permitSignature
+        password,
+        passphrase
       ],
       apiImpl: this,
     ));
@@ -1590,7 +1594,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "deadline",
           "isNativeIn",
           "permitNonce",
-          "permitSignature"
+          "password",
+          "passphrase"
         ],
       );
 

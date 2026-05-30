@@ -227,6 +227,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homePageSendButton => '送信';
 
   @override
+  String get homePageExchangeButton => '交換';
+
+  @override
+  String get exchangePageTitle => '交換';
+
+  @override
+  String get exchangePagePay => '支払う';
+
+  @override
+  String get exchangePageGet => '受け取る';
+
+  @override
+  String get exchangePageConfirm => '確認';
+
+  @override
+  String get exchangePageComingSoon => '近日';
+
+  @override
+  String get exchangePageNoAssets => 'このネットワークに交換可能な資産がありません';
+
+  @override
+  String get exchangePageTabSwap => 'スワップ';
+
+  @override
+  String get exchangePageTabLimit => '指値';
+
+  @override
+  String get exchangePageTabBuySell => '売買';
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override

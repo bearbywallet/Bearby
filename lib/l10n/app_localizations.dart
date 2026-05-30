@@ -533,6 +533,66 @@ abstract class AppLocalizations {
   /// **'Send'**
   String get homePageSendButton;
 
+  /// No description provided for @homePageExchangeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange'**
+  String get homePageExchangeButton;
+
+  /// No description provided for @exchangePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange'**
+  String get exchangePageTitle;
+
+  /// No description provided for @exchangePagePay.
+  ///
+  /// In en, this message translates to:
+  /// **'You pay'**
+  String get exchangePagePay;
+
+  /// No description provided for @exchangePageGet.
+  ///
+  /// In en, this message translates to:
+  /// **'You get'**
+  String get exchangePageGet;
+
+  /// No description provided for @exchangePageConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get exchangePageConfirm;
+
+  /// No description provided for @exchangePageComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon'**
+  String get exchangePageComingSoon;
+
+  /// No description provided for @exchangePageNoAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'No swappable assets on this network'**
+  String get exchangePageNoAssets;
+
+  /// No description provided for @exchangePageTabSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get exchangePageTabSwap;
+
+  /// No description provided for @exchangePageTabLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get exchangePageTabLimit;
+
+  /// No description provided for @exchangePageTabBuySell.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy/Sell'**
+  String get exchangePageTabBuySell;
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:

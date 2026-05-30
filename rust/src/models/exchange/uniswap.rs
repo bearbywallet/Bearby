@@ -599,8 +599,9 @@ pub async fn uniswap_quote_info(
 }
 
 /// Tx-build orchestration for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::build_exchange_tx`: resolve the deployment, look up the signer
-/// account, build the unsigned Universal Router tx and lift it into the FFI type.
+/// `crate::api::exchange::build_exchange_tx`: resolve the deployment, (for ERC20 inputs)
+/// sign the Permit2 typed data internally, look up the signer account, build the unsigned
+/// Universal Router tx and lift it into the FFI type.
 #[frb(ignore)]
 #[allow(clippy::too_many_arguments)]
 pub async fn build_uniswap_tx_info(
@@ -616,9 +617,32 @@ pub async fn build_uniswap_tx_info(
     deadline: u64,
     is_native_in: bool,
     permit_nonce: Option<u64>,
-    permit_signature: Option<String>,
+    password: Option<String>,
+    passphrase: Option<String>,
 ) -> Result<TransactionRequestInfo, String> {
     let addrs = meta.resolve()?;
+
+    // ERC20 inputs need a Permit2 EIP-712 signature. Rebuild the exact typed data signed at
+    // quote time from the nonce and sign it here, reusing the shared EIP-712 signer so the
+    // permit logic lives in one place. Native inputs use WRAP_ETH and need no permit.
+    let permit_signature: Option<String> = if is_native_in {
+        None
+    } else {
+        let nonce =
+            permit_nonce.ok_or_else(|| "missing permit nonce for ERC20 input".to_string())?;
+        let typed_data_json = permit2_typed_data_json(&addrs, &token_in, nonce);
+        let (_pubkey, signature) = crate::api::transaction::sign_typed_data_eip712(
+            wallet_index,
+            account_index,
+            password,
+            passphrase,
+            typed_data_json,
+            None,
+            None,
+        )
+        .await?;
+        Some(signature)
+    };
 
     with_service(|core| {
         let wallet = core

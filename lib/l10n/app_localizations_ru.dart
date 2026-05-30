@@ -227,6 +227,36 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homePageSendButton => 'Отправить';
 
   @override
+  String get homePageExchangeButton => 'Обмен';
+
+  @override
+  String get exchangePageTitle => 'Обмен';
+
+  @override
+  String get exchangePagePay => 'Вы платите';
+
+  @override
+  String get exchangePageGet => 'Вы получаете';
+
+  @override
+  String get exchangePageConfirm => 'Подтвердить';
+
+  @override
+  String get exchangePageComingSoon => 'Скоро';
+
+  @override
+  String get exchangePageNoAssets => 'В этой сети нет активов для обмена';
+
+  @override
+  String get exchangePageTabSwap => 'Обмен';
+
+  @override
+  String get exchangePageTabLimit => 'Лимит';
+
+  @override
+  String get exchangePageTabBuySell => 'Купить/Продать';
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

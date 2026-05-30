@@ -8,6 +8,7 @@ import 'pages/initial_page.dart';
 import 'pages/home_page.dart';
 import 'pages/history_page.dart';
 import 'pages/browser_page.dart';
+import 'pages/exchange_page.dart';
 import 'pages/about.dart';
 import 'pages/add_account.dart';
 import 'pages/add_ledger_account.dart';
@@ -46,6 +47,7 @@ abstract class AppRoutes {
   static const home               = '/';
   static const history            = '/history';
   static const browser            = '/browser';
+  static const exchange           = '/exchange';
   static const login              = '/login';
   static const initial            = '/initial';
   static const settings           = '/settings';
@@ -166,6 +168,14 @@ GoRouter createRouter(AppState appState) {
               GoRoute(
                 path: AppRoutes.history,
                 builder: (_, __) => const HistoryPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.exchange,
+                builder: (_, __) => const ExchangePage(),
               ),
             ],
           ),
