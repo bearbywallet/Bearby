@@ -216,10 +216,14 @@ class TokenAmountCard extends StatelessWidget {
             ),
           ),
         if (isExceeded) const SizedBox(width: 4),
-        Text(
-          fromWei(value: balance.toString(), decimals: token.decimals),
-          style: theme.bodyText2.copyWith(
-            color: theme.textPrimary.withValues(alpha: 0.7),
+        Flexible(
+          child: Text(
+            fromWei(value: balance.toString(), decimals: token.decimals),
+            style: theme.bodyText2.copyWith(
+              color: theme.textPrimary.withValues(alpha: 0.7),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 12),

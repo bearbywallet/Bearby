@@ -97,6 +97,9 @@ pub async fn fetch_exchange_quote(
             ExchangeProvider::ZIlSwap(_) => continue,
             ExchangeProvider::SunSwap(_) => continue,
         };
+        if let Err(e) = &result {
+            dbg!("fetch_exchange_quote: provider failed", e);
+        }
         if let Ok(quote) = result {
             quotes.push(quote);
         }
