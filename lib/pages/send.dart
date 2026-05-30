@@ -13,6 +13,7 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/utils.dart';
@@ -86,6 +87,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   void _updateValue(String value) {
     setState(() {
       _amount = value;
+      _hasDecimalPoint = value.contains('.');
     });
   }
 
@@ -187,18 +189,37 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
                             child: Column(
                               children: [
                                 const SizedBox(height: 16),
-                                TokenAmountCard(
-                                  amount: _amount,
-                                  tokenIndex: _tokenIndex,
-                                  onMaxTap: _updateValue,
-                                  onTokenSelected: (int value) {
-                                    setState(() {
-                                      _tokenIndex = value;
-                                      _amount = '0';
-                                    });
-                                    _focusNode.requestFocus();
-                                  },
-                                ),
+                                Builder(builder: (context) {
+                                  final wallet = appState.wallet;
+                                  if (wallet == null ||
+                                      wallet.tokens.isEmpty ||
+                                      _tokenIndex < 0 ||
+                                      _tokenIndex >= wallet.tokens.length) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final token = wallet.tokens[_tokenIndex];
+                                  final balance = BigInt.tryParse(token
+                                              .balances[
+                                                  appState.accountBalanceKey] ??
+                                          '') ??
+                                      BigInt.zero;
+                                  return TokenAmountCard(
+                                    amount: _amount,
+                                    token: token,
+                                    balance: balance,
+                                    onAmountChanged: _updateValue,
+                                    onTokenTap: () => showTokenSelectModal(
+                                      context: context,
+                                      onTokenSelected: (int value) {
+                                        setState(() {
+                                          _tokenIndex = value;
+                                          _amount = '0';
+                                        });
+                                        _focusNode.requestFocus();
+                                      },
+                                    ),
+                                  );
+                                }),
                                 SvgPicture.asset(
                                   "assets/icons/down_arrow.svg",
                                   width: 20,
