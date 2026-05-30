@@ -119,6 +119,12 @@ impl UniswapMeta {
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
                 "0x4200000000000000000000000000000000000006",
             ),
+            // BNB Smart Chain (wrapped native = WBNB)
+            56 => (
+                "0x1906c1d672b88cd1b9ac7593301ca990f94eae07",
+                "0x78D78E420Da98ad378D7799bE8f4AF69033EB077",
+                "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            ),
             // Polygon PoS (wrapped native = WMATIC)
             137 => (
                 "0x1095692A6237d83C6a72F3F5eFEdb9A670C49223",
