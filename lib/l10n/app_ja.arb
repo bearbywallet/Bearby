@@ -81,6 +81,20 @@
   "exchangePageTabSwap": "スワップ",
   "exchangePageTabLimit": "指値",
   "exchangePageTabBuySell": "売買",
+  "exchangeSettingsPriceProtection": "価格保護",
+  "exchangeSettingsTwap": "TWAP",
+  "exchangeSettingsSubSwaps": "サブスワップ数",
+  "exchangeSettingsTimeBetween": "サブスワップ間隔",
+  "exchangeSettingsReset": "リセット",
+  "exchangeSettingsSave": "保存",
+  "exchangeSettingsBlocks": "{count, plural, other{{count}ブロック}}",
+  "@exchangeSettingsBlocks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",

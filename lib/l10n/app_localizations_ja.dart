@@ -257,6 +257,34 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangePageTabBuySell => '売買';
 
   @override
+  String get exchangeSettingsPriceProtection => '価格保護';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => 'サブスワップ数';
+
+  @override
+  String get exchangeSettingsTimeBetween => 'サブスワップ間隔';
+
+  @override
+  String get exchangeSettingsReset => 'リセット';
+
+  @override
+  String get exchangeSettingsSave => '保存';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countブロック',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override

@@ -81,6 +81,20 @@
   "exchangePageTabSwap": "Обмен",
   "exchangePageTabLimit": "Лимит",
   "exchangePageTabBuySell": "Купить/Продать",
+  "exchangeSettingsPriceProtection": "Защита цены",
+  "exchangeSettingsTwap": "TWAP",
+  "exchangeSettingsSubSwaps": "Количество под-обменов",
+  "exchangeSettingsTimeBetween": "Время между под-обменами",
+  "exchangeSettingsReset": "Сбросить",
+  "exchangeSettingsSave": "Сохранить",
+  "exchangeSettingsBlocks": "{count, plural, =1{1 блок} few{{count} блока} many{{count} блоков} other{{count} блока}}",
+  "@exchangeSettingsBlocks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",
   "revealSecretKeyInvalidPassword": "неверный пароль, ошибка:",
