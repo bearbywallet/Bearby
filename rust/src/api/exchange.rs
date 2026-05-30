@@ -32,7 +32,10 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
             .into_iter()
             .flatten()
             .filter_map(|t: FToken| {
-                if !seen.insert(t.addr.to_hash()) {
+                // Dedup by (chain, addr): native tokens use an all-zero address, so
+                // `to_hash()` alone collides across every chain (and between ETH/ZIL),
+                // which would drop every native asset but the first one.
+                if !seen.insert((t.chain_hash, t.addr.to_hash())) {
                     return None;
                 }
 
