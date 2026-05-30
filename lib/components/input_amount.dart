@@ -227,6 +227,8 @@ class TokenAmountCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
+        _percentChip(theme, '0%', () => _setPercent(0)),
+        const SizedBox(width: 8),
         _percentChip(theme, '25%', () => _setPercent(25)),
         const SizedBox(width: 8),
         _percentChip(theme, '50%', () => _setPercent(50)),
