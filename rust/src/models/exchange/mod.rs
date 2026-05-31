@@ -7,17 +7,7 @@ use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
 use super::ftoken::FTokenInfo;
 use std::collections::HashSet;
 
-/// FFI-safe Uniswap deployment metadata. Addresses are hex `0x...` strings so the
-/// whole struct crosses the flutter_rust_bridge boundary; they are parsed into alloy
-/// `Address` once, internally, via [`UniswapMeta::resolve`].
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct UniswapMeta {
-    pub chain_id: u64,
-    pub universal_router: String,
-    pub quoter_v2: String,
-    pub permit2: String,
-    pub weth: String,
-}
+pub use uniswap::UniswapMeta;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Hash, Clone)]
 pub enum ExchangeProvider {
@@ -35,7 +25,7 @@ impl ExchangeProvider {
                 const SLIP44: &[u32] = &[BITCOIN, ETHEREUM, TRON, SOLANA];
                 SLIP44.contains(&slip44)
             }
-            Self::Uniswap(_) => addr_type == 1 && UniswapMeta::for_chain(chain_id).is_some(),
+            Self::Uniswap(_) => addr_type == 1 && uniswap::is_supported_chain(chain_id),
             Self::ZIlSwap(_) => {
                 const SLIP44: &[u32] = &[ZILLIQA];
                 addr_type == 0 && SLIP44.contains(&slip44)
@@ -59,7 +49,7 @@ pub struct ExchangeAsset {
 pub struct ExchangeQuoteInfo {
     pub provider: ExchangeProvider,
     pub amount_out: String,
-    pub fee_tier: Option<u32>,
+    /// Standard EIP-712 typed-data JSON to sign (Permit2). `None` for native input or
+    /// when the API returns no permit (`permitData: null`).
     pub permit_typed_data_json: Option<String>,
-    pub permit_nonce: Option<u64>,
 }

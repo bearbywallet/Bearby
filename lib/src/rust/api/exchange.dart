@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import '../models/exchange.dart';
+import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
