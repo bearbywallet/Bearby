@@ -5997,7 +5997,7 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
             }
             1 => {
                 let mut var_field0 =
-                    <crate::models::exchange::UniswapMeta>::sse_decode(deserializer);
+                    <crate::models::exchange::uniswap::UniswapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::Uniswap(var_field0);
             }
             2 => {
@@ -6021,15 +6021,11 @@ impl SseDecode for crate::models::exchange::ExchangeQuoteInfo {
         let mut var_provider =
             <crate::models::exchange::ExchangeProvider>::sse_decode(deserializer);
         let mut var_amountOut = <String>::sse_decode(deserializer);
-        let mut var_feeTier = <Option<u32>>::sse_decode(deserializer);
         let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
-        let mut var_permitNonce = <Option<u64>>::sse_decode(deserializer);
         return crate::models::exchange::ExchangeQuoteInfo {
             provider: var_provider,
             amount_out: var_amountOut,
-            fee_tier: var_feeTier,
             permit_typed_data_json: var_permitTypedDataJson,
-            permit_nonce: var_permitNonce,
         };
     }
 }
@@ -7083,17 +7079,6 @@ impl SseDecode for Option<crate::models::transactions::scilla::TransactionReques
     }
 }
 
-impl SseDecode for Option<u32> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<u32>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for Option<u64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7638,20 +7623,12 @@ impl SseDecode for u8 {
     }
 }
 
-impl SseDecode for crate::models::exchange::UniswapMeta {
+impl SseDecode for crate::models::exchange::uniswap::UniswapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_chainId = <u64>::sse_decode(deserializer);
-        let mut var_universalRouter = <String>::sse_decode(deserializer);
-        let mut var_quoterV2 = <String>::sse_decode(deserializer);
-        let mut var_permit2 = <String>::sse_decode(deserializer);
-        let mut var_weth = <String>::sse_decode(deserializer);
-        return crate::models::exchange::UniswapMeta {
+        return crate::models::exchange::uniswap::UniswapMeta {
             chain_id: var_chainId,
-            universal_router: var_universalRouter,
-            quoter_v2: var_quoterV2,
-            permit2: var_permit2,
-            weth: var_weth,
         };
     }
 }
@@ -8837,9 +8814,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeQuoteInf
         [
             self.provider.into_into_dart().into_dart(),
             self.amount_out.into_into_dart().into_dart(),
-            self.fee_tier.into_into_dart().into_dart(),
             self.permit_typed_data_json.into_into_dart().into_dart(),
-            self.permit_nonce.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -9607,26 +9582,19 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::TxOutIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::exchange::UniswapMeta {
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::uniswap::UniswapMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.chain_id.into_into_dart().into_dart(),
-            self.universal_router.into_into_dart().into_dart(),
-            self.quoter_v2.into_into_dart().into_dart(),
-            self.permit2.into_into_dart().into_dart(),
-            self.weth.into_into_dart().into_dart(),
-        ]
-        .into_dart()
+        [self.chain_id.into_into_dart().into_dart()].into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::exchange::UniswapMeta
+    for crate::models::exchange::uniswap::UniswapMeta
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::UniswapMeta>
-    for crate::models::exchange::UniswapMeta
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::uniswap::UniswapMeta>
+    for crate::models::exchange::uniswap::UniswapMeta
 {
-    fn into_into_dart(self) -> crate::models::exchange::UniswapMeta {
+    fn into_into_dart(self) -> crate::models::exchange::uniswap::UniswapMeta {
         self
     }
 }
@@ -10152,7 +10120,7 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
             }
             crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
                 <i32>::sse_encode(1, serializer);
-                <crate::models::exchange::UniswapMeta>::sse_encode(field0, serializer);
+                <crate::models::exchange::uniswap::UniswapMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
                 <i32>::sse_encode(2, serializer);
@@ -10174,9 +10142,7 @@ impl SseEncode for crate::models::exchange::ExchangeQuoteInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
         <String>::sse_encode(self.amount_out, serializer);
-        <Option<u32>>::sse_encode(self.fee_tier, serializer);
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
-        <Option<u64>>::sse_encode(self.permit_nonce, serializer);
     }
 }
 
@@ -10968,16 +10934,6 @@ impl SseEncode for Option<crate::models::transactions::scilla::TransactionReques
     }
 }
 
-impl SseEncode for Option<u32> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <u32>::sse_encode(value, serializer);
-        }
-    }
-}
-
 impl SseEncode for Option<u64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -11388,14 +11344,10 @@ impl SseEncode for u8 {
     }
 }
 
-impl SseEncode for crate::models::exchange::UniswapMeta {
+impl SseEncode for crate::models::exchange::uniswap::UniswapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u64>::sse_encode(self.chain_id, serializer);
-        <String>::sse_encode(self.universal_router, serializer);
-        <String>::sse_encode(self.quoter_v2, serializer);
-        <String>::sse_encode(self.permit2, serializer);
-        <String>::sse_encode(self.weth, serializer);
     }
 }
 

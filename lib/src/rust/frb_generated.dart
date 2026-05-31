@@ -33,6 +33,7 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
+import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -4984,12 +4985,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int dco_decode_box_autoadd_u_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as int;
-  }
-
-  @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_u_64(raw);
@@ -5183,14 +5178,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return ExchangeQuoteInfo(
       provider: dco_decode_exchange_provider(arr[0]),
       amountOut: dco_decode_String(arr[1]),
-      feeTier: dco_decode_opt_box_autoadd_u_32(arr[2]),
-      permitTypedDataJson: dco_decode_opt_String(arr[3]),
-      permitNonce: dco_decode_opt_box_autoadd_u_64(arr[4]),
+      permitTypedDataJson: dco_decode_opt_String(arr[2]),
     );
   }
 
@@ -5822,12 +5815,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
-  }
-
-  @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
@@ -6290,14 +6277,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   UniswapMeta dco_decode_uniswap_meta(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
     return UniswapMeta(
       chainId: dco_decode_u_64(arr[0]),
-      universalRouter: dco_decode_String(arr[1]),
-      quoterV2: dco_decode_String(arr[2]),
-      permit2: dco_decode_String(arr[3]),
-      weth: dco_decode_String(arr[4]),
     );
   }
 
@@ -6871,12 +6854,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_u_32(deserializer));
-  }
-
-  @protected
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_64(deserializer));
@@ -7071,15 +7048,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_provider = sse_decode_exchange_provider(deserializer);
     var var_amountOut = sse_decode_String(deserializer);
-    var var_feeTier = sse_decode_opt_box_autoadd_u_32(deserializer);
     var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
-    var var_permitNonce = sse_decode_opt_box_autoadd_u_64(deserializer);
     return ExchangeQuoteInfo(
         provider: var_provider,
         amountOut: var_amountOut,
-        feeTier: var_feeTier,
-        permitTypedDataJson: var_permitTypedDataJson,
-        permitNonce: var_permitNonce);
+        permitTypedDataJson: var_permitTypedDataJson);
   }
 
   @protected
@@ -8028,17 +8001,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_u_32(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -8508,16 +8470,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   UniswapMeta sse_decode_uniswap_meta(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_chainId = sse_decode_u_64(deserializer);
-    var var_universalRouter = sse_decode_String(deserializer);
-    var var_quoterV2 = sse_decode_String(deserializer);
-    var var_permit2 = sse_decode_String(deserializer);
-    var var_weth = sse_decode_String(deserializer);
-    return UniswapMeta(
-        chainId: var_chainId,
-        universalRouter: var_universalRouter,
-        quoterV2: var_quoterV2,
-        permit2: var_permit2,
-        weth: var_weth);
+    return UniswapMeta(chainId: var_chainId);
   }
 
   @protected
@@ -9062,12 +9015,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_32(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self, serializer);
@@ -9213,9 +9160,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_exchange_provider(self.provider, serializer);
     sse_encode_String(self.amountOut, serializer);
-    sse_encode_opt_box_autoadd_u_32(self.feeTier, serializer);
     sse_encode_opt_String(self.permitTypedDataJson, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.permitNonce, serializer);
   }
 
   @protected
@@ -9956,16 +9901,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_u_32(self, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -10317,10 +10252,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_uniswap_meta(UniswapMeta self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self.chainId, serializer);
-    sse_encode_String(self.universalRouter, serializer);
-    sse_encode_String(self.quoterV2, serializer);
-    sse_encode_String(self.permit2, serializer);
-    sse_encode_String(self.weth, serializer);
   }
 
   @protected

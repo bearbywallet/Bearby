@@ -51,7 +51,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   bool _loadingAssets = true;
   String? _assetsError;
+  // "You pay" — our tokens on the active network (source = active wallet chain).
   List<ExchangeAsset> _assets = const [];
+  // "You get" — every Uniswap-supported token across all chains (bridge targets).
+  List<ExchangeAsset> _getAssets = const [];
   ExchangeAsset? _fromAsset;
   ExchangeAsset? _toAsset;
 
@@ -86,25 +89,28 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     try {
       final all = await bootstrapExchangeProviders();
       final chainHash = _appState.wallet?.chainHash;
-      final assets = all
-          .where((a) =>
-              a.token.chainHash == chainHash &&
-              a.token.addrType == 1 &&
-              a.providers
-                  .any((p) => p.whenOrNull(uniswap: (_) => true) ?? false))
+      // Pay side: our tokens on the active network. Get side: every chain (bridge targets).
+      final pay = all
+          .where((a) => a.token.chainHash == chainHash && _isUniswapEvm(a))
           .toList();
+      final get = all.where(_isUniswapEvm).toList();
 
       ExchangeAsset? from;
       ExchangeAsset? to;
-      if (assets.isNotEmpty) {
-        from = assets.firstWhere((a) => a.token.native, orElse: () => assets.first);
-        final outs = assets.where((a) => !a.token.native && a != from).toList();
-        to = outs.isNotEmpty ? outs.first : null;
+      if (pay.isNotEmpty) {
+        from = pay.firstWhere((a) => a.token.native, orElse: () => pay.first);
+      }
+      for (final a in get) {
+        if (a != from) {
+          to = a;
+          break;
+        }
       }
 
       if (!mounted) return;
       setState(() {
-        _assets = assets;
+        _assets = pay;
+        _getAssets = get;
         _fromAsset = from;
         _toAsset = to;
         _loadingAssets = false;
@@ -118,10 +124,36 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
-  /// Output assets: ERC20s on the active chain (native-out unwrap is unsupported),
-  /// excluding whatever is selected on the "pay" side.
+  /// "You get" assets: every Uniswap token across all chains (bridge targets), excluding
+  /// whatever is selected on the "pay" side.
   List<ExchangeAsset> get _outAssets =>
-      _assets.where((a) => !a.token.native && a != _fromAsset).toList();
+      _getAssets.where((a) => a != _fromAsset).toList();
+
+  /// An EVM token that at least one Uniswap provider supports.
+  static bool _isUniswapEvm(ExchangeAsset a) =>
+      a.token.addrType == 1 &&
+      a.providers.any((p) => p.whenOrNull(uniswap: (_) => true) ?? false);
+
+  /// The Uniswap source/target chain id carried by an asset's provider, if any.
+  static BigInt? _uniChainId(ExchangeAsset a) {
+    for (final p in a.providers) {
+      final id = p.whenOrNull(uniswap: (m) => m.chainId);
+      if (id != null) return id;
+    }
+    return null;
+  }
+
+  /// `tokenOut` for the Trading API. A different destination chain is prefixed
+  /// `"<chainId>:addr"` so the API returns a BRIDGE route; same-chain stays a bare address.
+  /// Native tokens already carry the zero address in the catalog, so no substitution.
+  String _outTokenParam(ExchangeAsset from, ExchangeAsset to) {
+    final addr = to.token.addr;
+    final fromId = _uniChainId(from);
+    final toId = _uniChainId(to);
+    return (fromId != null && toId != null && fromId != toId)
+        ? '$toId:$addr'
+        : addr;
+  }
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
@@ -146,7 +178,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       final quotes = await fetchExchangeQuote(
         asset: from,
         fromAsset: from.token.addr,
-        toAsset: to.token.addr,
+        toAsset: _outTokenParam(from, to),
         amount: amountWei.toString(),
         destination: account.addr,
       );
@@ -260,12 +292,14 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
     final fromToken = from.token;
     final isNativeIn = fromToken.native;
-    final weth = quote.provider.whenOrNull(uniswap: (meta) => meta.weth);
-    if (weth == null) {
+    final isUniswap = quote.provider.whenOrNull(uniswap: (_) => true) ?? false;
+    if (!isUniswap) {
       _showError('Unsupported provider');
       return;
     }
-    final tokenIn = isNativeIn ? weth : fromToken.addr;
+    // Native tokens already carry the zero address; Rust also overrides `tokenIn`
+    // internally when `isNativeIn`.
+    final tokenIn = fromToken.addr;
     final isLedger = wallet.walletType.contains(WalletType.ledger.name);
 
     _btnController.start();
@@ -296,14 +330,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         accountIndex: wallet.selectedAccount,
         provider: quote.provider,
         tokenIn: tokenIn,
-        tokenOut: to.token.addr,
+        tokenOut: _outTokenParam(from, to),
         amountIn: amountInWei.toString(),
         amountOut: quote.amountOut,
-        feeTier: quote.feeTier ?? 3000,
+        feeTier: 0, // unused by the Trading API arm; kept for FFI stability
         slippageBps: _slippageBps,
         deadline: deadline,
         isNativeIn: isNativeIn,
-        permitNonce: quote.permitNonce,
         password: permitPassword,
       );
 
