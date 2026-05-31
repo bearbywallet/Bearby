@@ -168,9 +168,19 @@ mod exchange_tests {
             "native input needs no permit"
         );
 
-        let tx = finalize_exchange_swap(0, 0, prepared.quote_blob, None, 0)
-            .await
-            .expect("finalize native swap tx");
+        let tx = finalize_exchange_swap(
+            0,
+            0,
+            prepared.quote_blob,
+            None,
+            0,
+            "Swap".to_string(),
+            "1 ETH → 1000 USDC · Uniswap".to_string(),
+            "assets/icons/uniswap.svg".to_string(),
+            None,
+        )
+        .await
+        .expect("finalize native swap tx");
 
         let evm = tx.evm.expect("evm tx present");
         assert_eq!(evm.chain_id, Some(1));

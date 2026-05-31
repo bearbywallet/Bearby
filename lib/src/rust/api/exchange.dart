@@ -50,6 +50,7 @@ Stream<String> executeExchangeSwap(
         required String amountIn,
         required int slippageBps,
         required bool isNativeIn,
+        required ExchangeTxDisplay display,
         String? password,
         String? passphrase}) =>
     RustLib.instance.api.crateApiExchangeExecuteExchangeSwap(
@@ -61,6 +62,7 @@ Stream<String> executeExchangeSwap(
         amountIn: amountIn,
         slippageBps: slippageBps,
         isNativeIn: isNativeIn,
+        display: display,
         password: password,
         passphrase: passphrase);
 
@@ -75,7 +77,9 @@ Future<TransactionRequestInfo?> checkExchangeApproval(
         required String tokenIn,
         required String amountIn,
         required bool isNativeIn,
-        required BigInt nonce}) =>
+        required BigInt nonce,
+        required String approveTitle,
+        required String providerIcon}) =>
     RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -83,7 +87,9 @@ Future<TransactionRequestInfo?> checkExchangeApproval(
         tokenIn: tokenIn,
         amountIn: amountIn,
         isNativeIn: isNativeIn,
-        nonce: nonce);
+        nonce: nonce,
+        approveTitle: approveTitle,
+        providerIcon: providerIcon);
 
 Future<PreparedSwapInfo> prepareExchangeSwap(
         {required BigInt walletIndex,
@@ -112,13 +118,21 @@ Future<TransactionRequestInfo> finalizeExchangeSwap(
         required BigInt accountIndex,
         required String quoteBlob,
         String? permitSignature,
-        required BigInt nonce}) =>
+        required BigInt nonce,
+        required String swapTitle,
+        required String swapInfo,
+        required String providerIcon,
+        BaseTokenInfo? outToken}) =>
     RustLib.instance.api.crateApiExchangeFinalizeExchangeSwap(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         quoteBlob: quoteBlob,
         permitSignature: permitSignature,
-        nonce: nonce);
+        nonce: nonce,
+        swapTitle: swapTitle,
+        swapInfo: swapInfo,
+        providerIcon: providerIcon,
+        outToken: outToken);
 
 /// Base pending nonce for the active account on its chain. The Ledger modal pins it once and passes
 /// `N` (approve) / `N+1` (swap) explicitly, since `eth_getTransactionCount(latest)` won't reflect a
