@@ -32,11 +32,31 @@ Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
         amount: amount,
         destination: destination);
 
-/// Build the unsigned swap transaction for the chosen provider. The UI signs and
-/// broadcasts it via the existing `sign_send_transactions` FFI. `token_in` is the WETH
-/// address for native ETH inputs. For ERC20 inputs the Permit2 EIP-712 signature is
-/// produced internally from `permit_nonce` and the supplied `password`/`passphrase`, so
-/// the UI never signs the permit itself.
+/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the
+/// swap, and if so return the unsigned approval tx for the UI to sign+broadcast first. Native
+/// inputs never need approval (`Ok(None)`); the UI must call this before `build_exchange_tx`
+/// for ERC-20 inputs. Provider-agnostic: each arm forwards to its own approval check.
+Future<TransactionRequestInfo?> checkExchangeApproval(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required ExchangeProvider provider,
+        required String tokenIn,
+        required String amountIn,
+        required bool isNativeIn}) =>
+    RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        provider: provider,
+        tokenIn: tokenIn,
+        amountIn: amountIn,
+        isNativeIn: isNativeIn);
+
+/// Build the unsigned swap (or cross-chain bridge) transaction for the chosen provider.
+/// The UI signs and broadcasts it via the existing `sign_send_transactions` FFI. For
+/// native inputs `token_in` is ignored (the provider uses its own native sentinel); for
+/// ERC20 inputs requiring Permit2 the EIP-712 signature is produced internally from the
+/// freshly fetched quote and the supplied `password`/`passphrase`, so the UI never signs
+/// the permit itself.
 Future<TransactionRequestInfo> buildExchangeTx(
         {required BigInt walletIndex,
         required BigInt accountIndex,

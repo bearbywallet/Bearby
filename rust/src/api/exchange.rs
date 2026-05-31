@@ -3,7 +3,9 @@ use std::collections::{HashMap, HashSet};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
-use crate::models::exchange::uniswap::{build_uniswap_tx_info, uniswap_quote_info};
+use crate::models::exchange::uniswap::{
+    build_uniswap_tx_info, uniswap_check_approval, uniswap_quote_info,
+};
 use crate::models::exchange::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, UniswapMeta};
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
@@ -174,6 +176,31 @@ pub async fn fetch_exchange_quote(
     } else {
         dbg!("fetch_exchange_quote: SUCCESS", quotes.len());
         Ok(quotes)
+    }
+}
+
+/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the
+/// swap, and if so return the unsigned approval tx for the UI to sign+broadcast first. Native
+/// inputs never need approval (`Ok(None)`); the UI must call this before `build_exchange_tx`
+/// for ERC-20 inputs. Provider-agnostic: each arm forwards to its own approval check.
+pub async fn check_exchange_approval(
+    wallet_index: usize,
+    account_index: usize,
+    provider: ExchangeProvider,
+    token_in: String,
+    amount_in: String,
+    is_native_in: bool,
+) -> Result<Option<TransactionRequestInfo>, String> {
+    if is_native_in {
+        return Ok(None);
+    }
+    match provider {
+        ExchangeProvider::Uniswap(meta) => {
+            uniswap_check_approval(wallet_index, account_index, &meta, &token_in, &amount_in).await
+        }
+        ExchangeProvider::Thorchain(_)
+        | ExchangeProvider::ZIlSwap(_)
+        | ExchangeProvider::SunSwap(_) => Ok(None),
     }
 }
 
