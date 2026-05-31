@@ -325,27 +325,57 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     // internally when `isNativeIn`.
     final tokenIn = fromToken.addr;
     final isLedger = wallet.walletType.contains(WalletType.ledger.name);
+    if (!isNativeIn && isLedger) {
+      _showError('ERC20 swaps are not supported on Ledger yet');
+      return;
+    }
 
     _btnController.start();
 
-    String? permitPassword;
-    if (!isNativeIn) {
-      if (isLedger) {
-        _btnController.reset();
-        _showError('ERC20 swaps are not supported on Ledger yet');
-        return;
+    try {
+      final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
+
+      // ERC-20 inputs need a one-time on-chain approve before the swap can pull tokens.
+      // Native inputs never do. When an approval is required we broadcast it first; the
+      // user re-taps Swap once it confirms.
+      if (!isNativeIn) {
+        final approval = await checkExchangeApproval(
+          walletIndex: appState.selectedWalletIndex,
+          accountIndex: wallet.selectedAccount,
+          provider: quote.provider,
+          tokenIn: tokenIn,
+          amountIn: amountInWei.toString(),
+          isNativeIn: isNativeIn,
+        );
+        if (approval != null) {
+          if (!mounted) {
+            _btnController.stop();
+            return;
+          }
+          _btnController.stop();
+          showConfirmTransactionModal(
+            context: context,
+            tx: approval,
+            to: tokenIn,
+            amount: '0',
+            token: fromToken,
+            onConfirm: (_) => context.go(AppRoutes.history),
+            onDismiss: () => _btnController.reset(),
+          );
+          return;
+        }
       }
-      if (wallet.authType == 'none') {
+
+      // Permit2 signing password for ERC-20 inputs (native needs none).
+      String? permitPassword;
+      if (!isNativeIn && wallet.authType == 'none') {
         permitPassword = await _promptPassword();
         if (permitPassword == null) {
           _btnController.reset();
           return;
         }
       }
-    }
 
-    try {
-      final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
       final deadline = BigInt.from(
           DateTime.now().millisecondsSinceEpoch ~/ 1000 + _deadlineSeconds);
 

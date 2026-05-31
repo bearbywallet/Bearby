@@ -521,6 +521,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  TransactionRequestInfo? dco_decode_opt_box_autoadd_transaction_request_info(
+      dynamic raw);
+
+  @protected
   TransactionRequestScilla?
       dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
 
@@ -1171,6 +1175,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
+      SseDeserializer deserializer);
+
+  @protected
+  TransactionRequestInfo? sse_decode_opt_box_autoadd_transaction_request_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1861,6 +1869,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_evm(
       TransactionRequestEVM? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_info(
+      TransactionRequestInfo? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_scilla(

@@ -269,28 +269,25 @@ fn parse_hex_u256(s: &str) -> Result<U256, String> {
     U256::from_str_radix(t, 16).map_err(|e| e.to_string())
 }
 
-/// Validate the `/swap` response and lift it into the FFI tx. `chain_hash` is the source
-/// chain that signs and broadcasts; `broadcast: true` matches the existing swap flow.
+/// Lift a Trading-API tx object (`{to, data, value, chainId, gasLimit}` — the shape shared by
+/// `/swap` and `/check_approval`) into the FFI tx. `swapper`/`chain_hash` set the signer and
+/// the broadcasting network; `broadcast: true` matches the existing swap flow.
 #[frb(ignore)]
-fn swap_response_to_tx(
-    resp: &Value,
+fn json_obj_to_eth_tx(
+    obj: &Value,
     swapper: Address,
     chain_hash: u64,
 ) -> Result<TransactionRequestInfo, String> {
-    let swap = resp.get("swap").ok_or("swap field missing")?;
-    let to = swap
-        .get("to")
-        .and_then(Value::as_str)
-        .ok_or("swap.to missing")?;
-    let data = swap
+    let to = obj.get("to").and_then(Value::as_str).ok_or("tx.to missing")?;
+    let data = obj
         .get("data")
         .and_then(Value::as_str)
-        .ok_or("swap.data missing")?;
+        .ok_or("tx.data missing")?;
     if data.is_empty() || data == "0x" {
-        return Err("swap.data empty — quote expired, refetch".to_string());
+        return Err("tx.data empty — quote expired, refetch".to_string());
     }
 
-    let value = parse_hex_u256(swap.get("value").and_then(Value::as_str).unwrap_or("0x0"))?;
+    let value = parse_hex_u256(obj.get("value").and_then(Value::as_str).unwrap_or("0x0"))?;
     let input = hex::decode(data.strip_prefix("0x").unwrap_or(data)).map_err(|e| e.to_string())?;
 
     let mut tx = ETHTransactionRequest {
@@ -300,10 +297,10 @@ fn swap_response_to_tx(
         from: Some(swapper),
         value: Some(value),
         input: input.into(),
-        gas: swap.get("gasLimit").and_then(as_u64),
+        gas: obj.get("gasLimit").and_then(as_u64),
         ..Default::default()
     };
-    tx.chain_id = swap.get("chainId").and_then(as_u64);
+    tx.chain_id = obj.get("chainId").and_then(as_u64);
 
     Ok(TransactionRequest::Ethereum((
         tx,
@@ -314,6 +311,47 @@ fn swap_response_to_tx(
         },
     ))
     .into())
+}
+
+/// Validate the `/swap` response and lift its `swap` object into the FFI tx.
+#[frb(ignore)]
+fn swap_response_to_tx(
+    resp: &Value,
+    swapper: Address,
+    chain_hash: u64,
+) -> Result<TransactionRequestInfo, String> {
+    let swap = resp.get("swap").ok_or("swap field missing")?;
+    json_obj_to_eth_tx(swap, swapper, chain_hash)
+}
+
+/// Resolve the signer address and the source chain_hash (the chain that broadcasts) under one
+/// short read guard. Shared by the build and approval paths — `chain_id` is the source chain.
+#[frb(ignore)]
+async fn resolve_signer(
+    wallet_index: usize,
+    account_index: usize,
+    chain_id: u64,
+) -> Result<(Address, u64), String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let chain_hash = service
+        .core
+        .get_providers()
+        .into_iter()
+        .find(|p| p.config.chain_id() == chain_id)
+        .map(|p| p.config.hash())
+        .ok_or_else(|| "source chain provider not found".to_string())?;
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let account = data
+        .get_account(account_index)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    Ok((account.addr.to_alloy_addr(), chain_hash))
 }
 
 /// Quote orchestration for the `ExchangeProvider::Uniswap` arm of
@@ -405,30 +443,8 @@ pub async fn build_uniswap_tx_info(
         is_native_in,
     );
 
-    // Swapper address + the source chain that signs/broadcasts, read under one short guard
-    // (no await inside).
-    let (swapper, chain_hash) = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        let chain_hash = service
-            .core
-            .get_providers()
-            .into_iter()
-            .find(|p| p.config.chain_id() == in_chain)
-            .map(|p| p.config.hash())
-            .ok_or_else(|| "source chain provider not found".to_string())?;
-        let wallet = service
-            .core
-            .get_wallet_by_index(wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
-        let data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        (account.addr.to_alloy_addr(), chain_hash)
-    };
+    // Swapper address + the source chain that signs/broadcasts.
+    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, in_chain).await?;
 
     dbg!("build_uniswap_tx_info: swapper", &swapper.to_string(), chain_hash);
 
@@ -481,6 +497,38 @@ pub async fn build_uniswap_tx_info(
     dbg!("build_uniswap_tx_info: /swap response received");
 
     swap_response_to_tx(&swap_resp, swapper, chain_hash)
+}
+
+/// Approval pre-step for the `ExchangeProvider::Uniswap` arm of
+/// `crate::api::exchange::check_exchange_approval`. ERC-20 inputs need a one-time on-chain
+/// `approve` (to Permit2 for swaps, to the bridge spender for bridges) before the swap can
+/// pull tokens. Returns `Ok(None)` when the existing allowance already covers `amount` (the
+/// API replies `approval: null`); otherwise the unsigned approve tx for the UI to broadcast.
+#[frb(ignore)]
+pub async fn uniswap_check_approval(
+    wallet_index: usize,
+    account_index: usize,
+    meta: &UniswapMeta,
+    token: &str,
+    amount: &str,
+) -> Result<Option<TransactionRequestInfo>, String> {
+    let chain_id = meta.chain_id;
+    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, chain_id).await?;
+
+    let body = json!({
+        "walletAddress": swapper.to_string(),
+        "token": token,
+        "amount": amount,
+        "chainId": chain_id,
+    });
+    let resp = trading_api_post(&Client::new(), "/check_approval", &body).await?;
+
+    match resp.get("approval") {
+        Some(approval) if !approval.is_null() => {
+            json_obj_to_eth_tx(approval, swapper, chain_hash).map(Some)
+        }
+        _ => Ok(None),
+    }
 }
 
 #[cfg(test)]
