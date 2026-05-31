@@ -5,7 +5,8 @@ mod exchange_tests {
 
     use crate::api::backend::load_service;
     use crate::api::exchange::{
-        bootstrap_exchange_providers, build_exchange_tx, fetch_exchange_quote,
+        bootstrap_exchange_providers, fetch_exchange_quote, finalize_exchange_swap,
+        prepare_exchange_swap,
     };
     use crate::api::provider::get_chains_providers_from_json;
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
@@ -150,24 +151,26 @@ mod exchange_tests {
 
         // is_native_in = true, so `token_in` is overridden to the API native sentinel
         // internally — pass the zero address as a placeholder.
-        let tx = build_exchange_tx(
+        let prepared = prepare_exchange_swap(
             0,
             0,
             provider,
             "0x0000000000000000000000000000000000000000".to_string(),
             USDC_MAINNET.to_string(),
             ONE_ETH.to_string(),
-            String::new(), // amount_out unused by the API arm
-            0,             // fee_tier unused
-            50,            // slippage_bps = 0.5%
-            0,             // deadline unused
+            50, // slippage_bps = 0.5%
             true,
-            None,
-            None,
-            None,
         )
         .await
-        .expect("build native swap tx");
+        .expect("prepare native swap");
+        assert!(
+            prepared.permit_typed_data_json.is_none(),
+            "native input needs no permit"
+        );
+
+        let tx = finalize_exchange_swap(0, 0, prepared.quote_blob, None, 0)
+            .await
+            .expect("finalize native swap tx");
 
         let evm = tx.evm.expect("evm tx present");
         assert_eq!(evm.chain_id, Some(1));

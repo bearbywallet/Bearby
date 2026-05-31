@@ -9,9 +9,6 @@ use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 use crate::utils::helpers::{parse_address, with_service};
-use zilpay::secrecy::zeroize::Zeroize;
-use zilpay::secrecy::SecretString;
-use zilpay::tokio::sync::mpsc;
 use zilpay::background::bg_bitcoin::BitcoinManagement;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;
@@ -19,8 +16,10 @@ use zilpay::background::bg_tx::update_tx_from_params;
 pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
-use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
+use zilpay::background::Background;
 use zilpay::bitcoin::bip32::Xpub;
+use zilpay::cipher::argon2::Argon2Seed;
+use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
@@ -33,11 +32,93 @@ pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 use zilpay::proto::utils::safe_chunk_transaction;
 pub use zilpay::proto::U256;
+use zilpay::secrecy::zeroize::Zeroize;
+use zilpay::secrecy::SecretString;
 use zilpay::token::ft::FToken;
+use zilpay::tokio::sync::mpsc;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
-use zilpay::wallet::wallet_types::WalletTypes;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
+use zilpay::wallet::wallet_types::WalletTypes;
+
+/// One Argon2 unlock. With a password it derives the seed via password-unlock (zeroizing the
+/// password after); otherwise it reuses the active session. Shared by every signing entry point
+/// so a single flow never re-derives the seed more than once.
+pub(crate) async fn unlock_seed(
+    core: &Arc<Background>,
+    wallet_index: usize,
+    password: Option<String>,
+) -> Result<Argon2Seed, ServiceError> {
+    let password = password.map(|p| SecretString::new(p.into()));
+    let seed = if let Some(mut pass) = password {
+        let key = core
+            .unlock_wallet_with_password(&pass, None, wallet_index)
+            .await;
+        pass.zeroize();
+        key
+    } else {
+        core.unlock_wallet_with_session(wallet_index).await
+    }
+    .map_err(ServiceError::BackgroundError)?;
+
+    Ok(seed)
+}
+
+/// Sign one transaction with an already-derived `seed` (no re-unlock) and either broadcast it or
+/// persist it to history, per `metadata.broadcast`. Carries the Zilliqa/Ethereum chain_id
+/// injection so callers don't repeat it. Used by both the single-tx FFI and the swap orchestrator.
+pub(crate) async fn sign_and_broadcast_one(
+    core: &Arc<Background>,
+    wallet_index: usize,
+    account_index: usize,
+    seed: &Argon2Seed,
+    passphrase: &SecretString,
+    mut tx: TransactionRequest,
+) -> Result<HistoricalTransactionInfo, ServiceError> {
+    let wallet = core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let chain = core
+        .get_provider(wallet_data.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+
+    match &mut tx {
+        TransactionRequest::Zilliqa((zil_tx, _)) => {
+            zil_tx.chain_id = chain.config.chain_ids[1] as u16;
+        }
+        TransactionRequest::Ethereum((eth_tx, _)) => {
+            eth_tx.chain_id = Some(chain.config.chain_id());
+        }
+        _ => {}
+    }
+
+    let signed_tx = wallet
+        .sign_transaction(tx, account_index, seed, passphrase)
+        .await
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    if signed_tx.get_metadata().broadcast {
+        core.broadcast_signed_transactions(wallet_index, vec![signed_tx])
+            .await
+            .map_err(ServiceError::BackgroundError)?
+            .into_iter()
+            .next()
+            .map(|v| v.into())
+            .ok_or(ServiceError::TransactionErrors(
+                zilpay::errors::tx::TransactionErrors::InvalidTransaction,
+            ))
+    } else {
+        let history = HistoricalTransaction::from_transaction_receipt(signed_tx)
+            .map_err(ServiceError::TransactionErrors)?;
+        wallet
+            .add_history(std::slice::from_ref(&history))
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        Ok(history.into())
+    }
+}
 
 pub async fn send_signed_transactions(
     wallet_index: u8,
@@ -92,7 +173,10 @@ pub async fn send_signed_transactions(
                 eprintln!("[btc] BIP86 Ledger BTC tx but bip86_xpub not provided — address rotation skipped");
             }
             (WalletTypes::Ledger(_), Some(xpub)) => {
-                if let Err(e) = core.rotate_btc_account(wallet_index, account_index, &xpub).await {
+                if let Err(e) = core
+                    .rotate_btc_account(wallet_index, account_index, &xpub)
+                    .await
+                {
                     eprintln!("[btc] rotate failed after broadcast: {e}");
                 }
             }
@@ -113,75 +197,30 @@ pub async fn sign_send_transactions(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
-    let password = password.map(|p| SecretString::new(p.into()));
+
+    let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
+
+    let req_tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+    let tx = sign_and_broadcast_one(
+        &core,
+        wallet_index,
+        account_index,
+        &seed_bytes,
+        &secret_passphrase,
+        req_tx,
+    )
+    .await?;
+
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
-
-    let seed_bytes = if let Some(mut pass) = password {
-        let key = core
-            .unlock_wallet_with_password(&pass, None, wallet_index)
-            .await;
-
-        pass.zeroize();
-
-        key
-    } else {
-        core.unlock_wallet_with_session(wallet_index).await
-    }
-    .map_err(ServiceError::BackgroundError)?;
-
-    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
-
     let wallet_data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let sender_account = wallet_data
         .get_account(account_index)
         .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
-
-    let signed_tx = {
-        let chain = core
-            .get_provider(wallet_data.chain_hash)
-            .map_err(ServiceError::BackgroundError)?;
-        let mut tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
-
-        match &mut tx {
-            TransactionRequest::Zilliqa((zil_tx, _)) => {
-                zil_tx.chain_id = chain.config.chain_ids[1] as u16;
-            }
-            TransactionRequest::Ethereum((eth_tx, _)) => {
-                eth_tx.chain_id = Some(chain.config.chain_id());
-            }
-            _ => {}
-        }
-
-        wallet
-            .sign_transaction(tx, account_index, &seed_bytes, &secret_passphrase)
-            .await
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?
-    };
-
-    let is_broadcast = signed_tx.get_metadata().broadcast;
-
-    let tx = if is_broadcast {
-        core.broadcast_signed_transactions(wallet_index, vec![signed_tx])
-            .await
-            .map_err(ServiceError::BackgroundError)?
-            .into_iter()
-            .next()
-            .map(|v| v.into())
-            .ok_or(ServiceError::TransactionErrors(
-                zilpay::errors::tx::TransactionErrors::InvalidTransaction,
-            ))?
-    } else {
-        let history = HistoricalTransaction::from_transaction_receipt(signed_tx)
-            .map_err(ServiceError::TransactionErrors)?;
-        wallet
-            .add_history(std::slice::from_ref(&history))
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        history.into()
-    };
 
     if matches!(sender_account.addr, Address::Secp256k1Bitcoin(_))
         && wallet_data.bip == DerivationPath::BIP86_PURPOSE
@@ -197,14 +236,14 @@ pub async fn sign_send_transactions(
         let seed_secret = mnemonic
             .to_seed(&secret_passphrase)
             .map_err(|e| ServiceError::ParseError("bip39_seed".into(), format!("{:?}", e)))?;
-        let bip86_xpub = BtcAccountXpubsInput::from_seed(
-            &seed_secret,
-            account_index as u32,
-            network,
-        )
-        .map_err(ServiceError::from)?
-        .bip86_xpub;
-        if let Err(e) = core.rotate_btc_account(wallet_index, account_index, &bip86_xpub).await {
+        let bip86_xpub =
+            BtcAccountXpubsInput::from_seed(&seed_secret, account_index as u32, network)
+                .map_err(ServiceError::from)?
+                .bip86_xpub;
+        if let Err(e) = core
+            .rotate_btc_account(wallet_index, account_index, &bip86_xpub)
+            .await
+        {
             eprintln!("[btc] rotate failed after broadcast: {e}");
         }
     }
@@ -322,34 +361,21 @@ pub async fn sign_message(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
-    let password = password.map(|p| SecretString::new(p.into()));
 
-    let signed: (PubKey, Signature) = {
-        let seed_bytes = if let Some(mut pass) = password {
-            let key = core
-                .unlock_wallet_with_password(&pass, None, wallet_index)
-                .await;
-            pass.zeroize();
-            key
-        } else {
-            core.unlock_wallet_with_session(wallet_index).await
-        }
+    let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
+    let signed: (PubKey, Signature) = core
+        .sign_message(
+            wallet_index,
+            account_index,
+            &seed_bytes,
+            &secret_passphrase,
+            &message,
+            title,
+            icon,
+        )
         .map_err(ServiceError::BackgroundError)?;
-        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
-        let signed = core
-            .sign_message(
-                wallet_index,
-                account_index,
-                &seed_bytes,
-                &secret_passphrase,
-                &message,
-                title,
-                icon,
-            )
-            .map_err(ServiceError::BackgroundError)?;
 
-        Ok::<(PubKey, Signature), ServiceError>(signed)
-    }?;
     let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
@@ -368,34 +394,22 @@ pub async fn sign_typed_data_eip712(
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
-    let password = password.map(|p| SecretString::new(p.into()));
-    let signed: (PubKey, Signature) = {
-        let seed_bytes = if let Some(mut pass) = password {
-            let key = core
-                .unlock_wallet_with_password(&pass, None, wallet_index)
-                .await;
-            pass.zeroize();
-            key
-        } else {
-            core.unlock_wallet_with_session(wallet_index).await
-        }
-        .map_err(ServiceError::BackgroundError)?;
-        let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
-        let signed = core
-            .sign_typed_data_eip712(
-                wallet_index,
-                account_index,
-                &seed_bytes,
-                &secret_passphrase,
-                &typed_data_json,
-                title,
-                icon,
-            )
-            .await
-            .map_err(ServiceError::BackgroundError)?;
 
-        Ok::<(PubKey, Signature), ServiceError>(signed)
-    }?;
+    let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
+    let signed: (PubKey, Signature) = core
+        .sign_typed_data_eip712(
+            wallet_index,
+            account_index,
+            &seed_bytes,
+            &secret_passphrase,
+            &typed_data_json,
+            title,
+            icon,
+        )
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+
     let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
@@ -683,7 +697,10 @@ mod tests_ledger {
                 );
 
         let chunks_bytes = safe_chunk_transaction(&rlp, &derivation_bytes, tx_type).unwrap();
-        let chunks: Vec<String> = chunks_bytes.iter().map(zilpay::alloy::hex::encode).collect();
+        let chunks: Vec<String> = chunks_bytes
+            .iter()
+            .map(zilpay::alloy::hex::encode)
+            .collect();
 
         let should_be = vec![ "058000002c8000003c800000000000000000000000f9059181a784ce60755f83055c4e9445312ea0eff7e09c83cbe249fa1d7598c4c8cd4e865af3107a4000b905645c9c18e2000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000006b175474e89094c44da98b954eedeac495271d0f00000000000000000000000000000000000000000000000000",
   "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -726,7 +743,10 @@ mod tests_ledger {
         assert_eq!(zilpay::alloy::hex::encode(&rlp), "02f905920181a7808501a8e81b2083055c4e9445312ea0eff7e09c83cbe249fa1d7598c4c8cd4e865af3107a4000b905645c9c18e2000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000006b175474e89094c44da98b954eedeac495271d0f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000005af3107a400000000000000000000000000000000000000000000000000006575041f270c7d5000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c7000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0");
 
         let chunks_bytes = safe_chunk_transaction(&rlp, &derivation_bytes, tx_type).unwrap();
-        let chunks: Vec<String> = chunks_bytes.iter().map(zilpay::alloy::hex::encode).collect();
+        let chunks: Vec<String> = chunks_bytes
+            .iter()
+            .map(zilpay::alloy::hex::encode)
+            .collect();
         let should_be = vec![ "058000002c8000003c80000000000000000000000002f905920181a7808501a8e81b2083055c4e9445312ea0eff7e09c83cbe249fa1d7598c4c8cd4e865af3107a4000b905645c9c18e2000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000f5f5b97624542d72a9e06f04804bf81baa15e2b4000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000006b175474e89094c44da98b954eedeac495271d0f000000000000000000000000000000000000000000",
   "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
   "000000000000000000000001000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000",

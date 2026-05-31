@@ -1,12 +1,25 @@
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 
+use zilpay::alloy::primitives::Address as AlloyAddress;
 use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::background::bg_tx::{update_tx_from_params, TransactionsManagement};
+use zilpay::background::bg_wallet::WalletManagement;
+use zilpay::background::Background;
+use zilpay::network::evm::RequiredTxParams;
+use zilpay::proto::address::Address;
+use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
+use zilpay::proto::U256;
+use zilpay::secrecy::SecretString;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
+use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
+use crate::frb_generated::StreamSink;
 use crate::models::exchange::uniswap::{
-    build_uniswap_tx_info, uniswap_check_approval, uniswap_quote_info,
+    finalize_uniswap_swap, prepare_uniswap_swap, uniswap_check_approval, uniswap_quote_info,
 };
 use crate::models::exchange::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, UniswapMeta};
+use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
@@ -22,7 +35,10 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let all_providers = service.core.get_providers();
 
-    dbg!("bootstrap_exchange_providers: chain providers count", all_providers.len());
+    dbg!(
+        "bootstrap_exchange_providers: chain providers count",
+        all_providers.len()
+    );
 
     // Pre-size on the exact catalog token count (the slice iterators report exact hints).
     let total_tokens: usize = all_providers.iter().map(|p| p.config.ftokens.len()).sum();
@@ -58,12 +74,19 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         let chain = provider.config;
         let slip_44 = chain.slip_44;
         let chain_id = chain.chain_id();
-        dbg!("bootstrap_exchange_providers: chain", &chain.short_name, chain_id, slip_44, chain.ftokens.len());
+        dbg!(
+            "bootstrap_exchange_providers: chain",
+            &chain.short_name,
+            chain_id,
+            slip_44,
+            chain.ftokens.len()
+        );
         for token in chain.ftokens {
             let key = (token.chain_hash, token.addr.to_hash());
             let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
             if !providers.is_empty() {
-                dbg!("bootstrap_exchange_providers: token + providers",
+                dbg!(
+                    "bootstrap_exchange_providers: token + providers",
                     &token.symbol,
                     &token.name,
                     chain_id,
@@ -96,11 +119,16 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
                 }
                 None => {
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
-                        dbg!("bootstrap_exchange_providers: custom token, chain meta not found", &token.symbol, token.chain_hash);
+                        dbg!(
+                            "bootstrap_exchange_providers: custom token, chain meta not found",
+                            &token.symbol,
+                            token.chain_hash
+                        );
                         continue;
                     };
                     let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
-                    dbg!("bootstrap_exchange_providers: custom wallet token",
+                    dbg!(
+                        "bootstrap_exchange_providers: custom wallet token",
                         &token.symbol,
                         chain_id,
                         &providers,
@@ -130,7 +158,8 @@ pub async fn fetch_exchange_quote(
     amount: String,
     destination: String,
 ) -> Result<Vec<ExchangeQuoteInfo>, String> {
-    dbg!("fetch_exchange_quote: START",
+    dbg!(
+        "fetch_exchange_quote: START",
         &asset.token.symbol,
         &asset.token.chain_hash,
         &asset.token.native,
@@ -166,7 +195,11 @@ pub async fn fetch_exchange_quote(
             dbg!("fetch_exchange_quote: provider FAILED", provider, e);
         }
         if let Ok(quote) = result {
-            dbg!("fetch_exchange_quote: provider OK", provider, &quote.amount_out);
+            dbg!(
+                "fetch_exchange_quote: provider OK",
+                provider,
+                &quote.amount_out
+            );
             quotes.push(quote);
         }
     }
@@ -179,10 +212,207 @@ pub async fn fetch_exchange_quote(
     }
 }
 
-/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the
-/// swap, and if so return the unsigned approval tx for the UI to sign+broadcast first. Native
-/// inputs never need approval (`Ok(None)`); the UI must call this before `build_exchange_tx`
-/// for ERC-20 inputs. Provider-agnostic: each arm forwards to its own approval check.
+/// Resolve `(proto signer for fee/nonce estimation, alloy swapper for the Trading API, source
+/// chain_hash)` from the active wallet/account. Synchronous and lock-free — it operates on an
+/// already-cloned `core`, so it never re-acquires the service lock. The swap source chain is always
+/// the wallet's active chain (the "pay" token lives there), which is also the chain that broadcasts.
+fn resolve_swap_signer(
+    core: &Arc<Background>,
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<(Address, AlloyAddress, u64), ServiceError> {
+    let wallet = core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let account = data
+        .get_account(account_index)
+        .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+
+    Ok((
+        account.addr.clone(),
+        account.addr.to_alloy_addr(),
+        data.chain_hash,
+    ))
+}
+
+/// Estimate fee history + the pending nonce once for `signer`, pre-set to the FAST tier. Reused to
+/// fill fees on every tx in a swap (approve + swap) without re-simulating each — the sample tx is
+/// only there to satisfy the batch RPC; its `estimateGas` result is ignored.
+async fn estimate_fast_params(
+    core: &Arc<Background>,
+    chain_hash: u64,
+    signer: &Address,
+) -> Result<RequiredTxParams, ServiceError> {
+    let chain = core
+        .get_provider(chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let sample = TransactionRequest::Ethereum((
+        ETHTransactionRequest::default(),
+        TransactionMetadata {
+            chain_hash,
+            ..Default::default()
+        },
+    ));
+    let mut params = chain
+        .estimate_params_batch(&sample, signer, 4, None)
+        .await
+        .map_err(ServiceError::NetworkErrors)?;
+    params.current = params.fast;
+
+    Ok(params)
+}
+
+/// Apply pre-estimated FAST fees + an explicit `nonce` to an EVM tx, **preserving the Trading-API
+/// `gasLimit`** (never re-simulating the swap, which reverts before the approve is mined). Nonces
+/// are caller-sequenced (`N`, `N+1`) so an approve + swap batch never collides on the same nonce.
+fn apply_fast_fees(
+    tx: &mut TransactionRequest,
+    base: &RequiredTxParams,
+    nonce: u64,
+) -> Result<(), ServiceError> {
+    let api_gas = match tx {
+        TransactionRequest::Ethereum((eth, _)) => eth.gas,
+        _ => None,
+    };
+    let mut params = base.clone();
+    params.nonce = nonce;
+    if let Some(g) = api_gas {
+        params.tx_estimate_gas = U256::from(g);
+    }
+    update_tx_from_params(tx, params, U256::ZERO).map_err(ServiceError::TransactionErrors)?;
+
+    Ok(())
+}
+
+/// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
+/// sign the Permit2 EIP-712, build the swap via `/swap`, and broadcast approve (`N`) + swap (`N+1`)
+/// back-to-back (EVM nonce ordering guarantees the approve executes first). Returns the broadcast
+/// histories. Progress streams as `approving`/`approved`/`permit`/`swapping`/`done`. Ledger wallets
+/// use the step-by-step `check_exchange_approval` → `prepare_exchange_swap` → `finalize_exchange_swap`
+/// path instead (a device cannot sign a batch).
+#[allow(clippy::too_many_arguments)]
+pub async fn execute_exchange_swap(
+    wallet_index: usize,
+    account_index: usize,
+    provider: ExchangeProvider,
+    token_in: String,
+    token_out: String,
+    amount_in: String,
+    slippage_bps: u32,
+    is_native_in: bool,
+    password: Option<String>,
+    passphrase: Option<String>,
+    sink: StreamSink<String>,
+) -> Result<Vec<HistoricalTransactionInfo>, String> {
+    let ExchangeProvider::Uniswap(meta) = provider else {
+        return Err("unsupported exchange provider".to_string());
+    };
+
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let seed = unlock_seed(&core, wallet_index, password).await?;
+    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
+    let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+
+    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+    let mut nonce = base.nonce;
+    let mut results: Vec<HistoricalTransactionInfo> = Vec::with_capacity(2);
+
+    // One-time ERC-20 approval (to Permit2 / the bridge spender). Native inputs never need it.
+    if !is_native_in {
+        if let Some(approval) =
+            uniswap_check_approval(&meta, swapper, chain_hash, &token_in, &amount_in).await?
+        {
+            let _ = sink.add("approving".to_string());
+            let mut approve_tx: TransactionRequest = approval
+                .try_into()
+                .map_err(ServiceError::TransactionErrors)?;
+            apply_fast_fees(&mut approve_tx, &base, nonce)?;
+            let hist = sign_and_broadcast_one(
+                &core,
+                wallet_index,
+                account_index,
+                &seed,
+                &secret_passphrase,
+                approve_tx,
+            )
+            .await?;
+            results.push(hist);
+            nonce += 1;
+            let _ = sink.add("approved".to_string());
+        }
+    }
+
+    // Re-quote (freshness) after the approve is broadcast, sign the Permit2 permit with the same
+    // seed, then ask `/swap` for the router/bridge calldata.
+    let prepared = prepare_uniswap_swap(
+        &meta,
+        swapper,
+        &token_in,
+        &token_out,
+        &amount_in,
+        slippage_bps,
+        is_native_in,
+    )
+    .await?;
+    let permit_signature: Option<String> = match prepared.permit_typed_data_json {
+        Some(typed_data) => {
+            let _ = sink.add("permit".to_string());
+            let (_pubkey, sig) = core
+                .sign_typed_data_eip712(
+                    wallet_index,
+                    account_index,
+                    &seed,
+                    &secret_passphrase,
+                    &typed_data,
+                    None,
+                    None,
+                )
+                .await
+                .map_err(ServiceError::BackgroundError)?;
+            Some(sig.to_hex_prefixed())
+        }
+        None => None,
+    };
+
+    let mut swap_tx: TransactionRequest = finalize_uniswap_swap(
+        &prepared.quote_blob,
+        swapper,
+        chain_hash,
+        permit_signature.as_deref(),
+    )
+    .await?
+    .try_into()
+    .map_err(ServiceError::TransactionErrors)?;
+    apply_fast_fees(&mut swap_tx, &base, nonce)?;
+
+    let _ = sink.add("swapping".to_string());
+    let swap_hist = sign_and_broadcast_one(
+        &core,
+        wallet_index,
+        account_index,
+        &seed,
+        &secret_passphrase,
+        swap_tx,
+    )
+    .await?;
+    results.push(swap_hist);
+    let _ = sink.add("done".to_string());
+
+    Ok(results)
+}
+
+/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the swap,
+/// and if so return the unsigned approval tx — with FAST fees + the given `nonce` already applied —
+/// for a **Ledger** device to sign and broadcast first. Native inputs never need approval
+/// (`Ok(None)`). Software wallets don't call this; `execute_exchange_swap` handles approval inline.
 pub async fn check_exchange_approval(
     wallet_index: usize,
     account_index: usize,
@@ -190,65 +420,188 @@ pub async fn check_exchange_approval(
     token_in: String,
     amount_in: String,
     is_native_in: bool,
+    nonce: u64,
 ) -> Result<Option<TransactionRequestInfo>, String> {
     if is_native_in {
         return Ok(None);
     }
-    match provider {
-        ExchangeProvider::Uniswap(meta) => {
-            uniswap_check_approval(wallet_index, account_index, &meta, &token_in, &amount_in).await
+    let ExchangeProvider::Uniswap(meta) = provider else {
+        return Ok(None);
+    };
+
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let approval =
+        uniswap_check_approval(&meta, swapper, chain_hash, &token_in, &amount_in).await?;
+
+    match approval {
+        Some(info) => {
+            let mut tx: TransactionRequest =
+                info.try_into().map_err(ServiceError::TransactionErrors)?;
+            let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+            apply_fast_fees(&mut tx, &base, nonce)?;
+            Ok(Some(tx.into()))
         }
-        ExchangeProvider::Thorchain(_)
-        | ExchangeProvider::ZIlSwap(_)
-        | ExchangeProvider::SunSwap(_) => Ok(None),
+        None => Ok(None),
     }
 }
 
-/// Build the unsigned swap (or cross-chain bridge) transaction for the chosen provider.
-/// The UI signs and broadcasts it via the existing `sign_send_transactions` FFI. For
-/// native inputs `token_in` is ignored (the provider uses its own native sentinel); for
-/// ERC20 inputs requiring Permit2 the EIP-712 signature is produced internally from the
-/// freshly fetched quote and the supplied `password`/`passphrase`, so the UI never signs
-/// the permit itself.
+/// **Ledger step.** Re-quote and surface the Permit2 typed data to sign on-device, plus the opaque
+/// quote blob to feed back into [`finalize_exchange_swap`]. Native inputs / routings without a
+/// Permit2 authorization return `permit_typed_data_json: None`.
+pub struct PreparedSwapInfo {
+    pub permit_typed_data_json: Option<String>,
+    pub quote_blob: String,
+}
+
 #[allow(clippy::too_many_arguments)]
-pub async fn build_exchange_tx(
+pub async fn prepare_exchange_swap(
     wallet_index: usize,
     account_index: usize,
     provider: ExchangeProvider,
     token_in: String,
     token_out: String,
     amount_in: String,
-    amount_out: String,
-    fee_tier: u32,
     slippage_bps: u32,
-    deadline: u64,
     is_native_in: bool,
-    permit_nonce: Option<u64>,
-    password: Option<String>,
-    passphrase: Option<String>,
-) -> Result<TransactionRequestInfo, String> {
-    // The Trading API derives routing, fees and the Permit2 nonce itself, so these legacy
-    // on-chain params are accepted for FFI stability but unused by the Uniswap arm.
-    let _ = (&amount_out, &fee_tier, &deadline, &permit_nonce);
+) -> Result<PreparedSwapInfo, String> {
+    let ExchangeProvider::Uniswap(meta) = provider else {
+        return Err("unsupported exchange provider".to_string());
+    };
 
-    match provider {
-        ExchangeProvider::Uniswap(meta) => {
-            build_uniswap_tx_info(
-                wallet_index,
-                account_index,
-                &meta,
-                token_in,
-                token_out,
-                amount_in,
-                slippage_bps,
-                is_native_in,
-                password,
-                passphrase,
-            )
-            .await
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (_signer, swapper, _chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let prepared = prepare_uniswap_swap(
+        &meta,
+        swapper,
+        &token_in,
+        &token_out,
+        &amount_in,
+        slippage_bps,
+        is_native_in,
+    )
+    .await?;
+
+    Ok(PreparedSwapInfo {
+        permit_typed_data_json: prepared.permit_typed_data_json,
+        quote_blob: prepared.quote_blob,
+    })
+}
+
+/// **Ledger final step.** Attach the device-signed permit signature, call `/swap`, and return the
+/// swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
+/// the UI to broadcast via `send_signed_transactions`.
+pub async fn finalize_exchange_swap(
+    wallet_index: usize,
+    account_index: usize,
+    quote_blob: String,
+    permit_signature: Option<String>,
+    nonce: u64,
+) -> Result<TransactionRequestInfo, String> {
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let mut swap_tx: TransactionRequest = finalize_uniswap_swap(
+        &quote_blob,
+        swapper,
+        chain_hash,
+        permit_signature.as_deref(),
+    )
+    .await?
+    .try_into()
+    .map_err(ServiceError::TransactionErrors)?;
+    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+    apply_fast_fees(&mut swap_tx, &base, nonce)?;
+
+    Ok(swap_tx.into())
+}
+
+/// Base pending nonce for the active account on its chain. The Ledger modal pins it once and passes
+/// `N` (approve) / `N+1` (swap) explicitly, since `eth_getTransactionCount(latest)` won't reflect a
+/// just-broadcast approve between device prompts.
+pub async fn estimate_swap_base_nonce(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<u64, String> {
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, _swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+
+    Ok(base.nonce)
+}
+
+#[cfg(test)]
+mod swap_gas_tests {
+    use super::*;
+    use zilpay::network::evm::GasFeeHistory;
+
+    // base_fee = 0 keeps `update_tx_from_params` on the legacy branch, so the test needs no RPC.
+    fn base_params() -> RequiredTxParams {
+        RequiredTxParams {
+            gas_price: U256::from(1_000_000_000u64),
+            max_priority_fee: U256::ZERO,
+            fee_history: GasFeeHistory::default(),
+            tx_estimate_gas: U256::ZERO,
+            blob_base_fee: U256::ZERO,
+            nonce: 0,
+            slow: U256::from(1_000_000_000u64),
+            market: U256::from(1_500_000_000u64),
+            fast: U256::from(2_000_000_000u64),
+            current: U256::from(2_000_000_000u64),
         }
-        ExchangeProvider::Thorchain(_) => todo!(),
-        ExchangeProvider::ZIlSwap(_) => todo!(),
-        ExchangeProvider::SunSwap(_) => todo!(),
+    }
+
+    fn eth_tx(gas: u64) -> TransactionRequest {
+        TransactionRequest::Ethereum((
+            ETHTransactionRequest {
+                gas: Some(gas),
+                ..Default::default()
+            },
+            TransactionMetadata::default(),
+        ))
+    }
+
+    /// The two legs of a swap share one estimate but must get sequential nonces (`N`, `N+1`), and
+    /// the Trading-API `gasLimit` must survive — never replaced by a zero re-estimate.
+    #[test]
+    fn apply_fast_fees_sequences_nonce_and_preserves_api_gas_limit() {
+        let base = base_params();
+
+        let mut approve = eth_tx(60_000);
+        apply_fast_fees(&mut approve, &base, 5).unwrap();
+
+        let mut swap = eth_tx(321_542);
+        apply_fast_fees(&mut swap, &base, 6).unwrap();
+
+        let TransactionRequest::Ethereum((approve_eth, _)) = approve else {
+            panic!("expected ethereum tx");
+        };
+        let TransactionRequest::Ethereum((swap_eth, _)) = swap else {
+            panic!("expected ethereum tx");
+        };
+
+        assert_eq!(approve_eth.nonce, Some(5));
+        assert_eq!(approve_eth.gas, Some(60_000));
+        assert_eq!(swap_eth.nonce, Some(6));
+        assert_eq!(swap_eth.gas, Some(321_542));
     }
 }
