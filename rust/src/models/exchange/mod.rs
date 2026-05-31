@@ -5,6 +5,7 @@ use flutter_rust_bridge::frb;
 use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
 
 use super::ftoken::FTokenInfo;
+use super::transactions::base_token::BaseTokenInfo;
 use std::collections::HashSet;
 
 pub use uniswap::UniswapMeta;
@@ -43,6 +44,24 @@ pub struct ExchangeAsset {
     pub token: FTokenInfo,
     pub providers: HashSet<ExchangeProvider>,
     pub halted: bool,
+}
+
+/// Display metadata composed on the Dart side and threaded into every tx built for a swap.
+/// Passed as a single struct to keep the FFI surface small.
+#[derive(Debug, Clone)]
+pub struct ExchangeTxDisplay {
+    /// Flutter local asset path, e.g. `"assets/icons/uniswap.svg"`.
+    pub provider_icon: String,
+    /// History title for the swap tx: `"Swap"`.
+    pub swap_title: String,
+    /// History detail line: `"1.5 BNB → 120 CAKE · Uniswap"`.
+    pub swap_info: String,
+    /// History title for the approve tx: `"Approve WORM"`.
+    pub approve_title: String,
+    /// History title for the software permit entry: `"Permit2 · Uniswap"`.
+    pub permit_title: String,
+    /// Destination token with the expected `amountOut` as `value` (wei string).
+    pub out_token: Option<BaseTokenInfo>,
 }
 
 #[derive(Debug)]

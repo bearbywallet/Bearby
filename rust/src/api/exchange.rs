@@ -18,7 +18,10 @@ use crate::frb_generated::StreamSink;
 use crate::models::exchange::uniswap::{
     finalize_uniswap_swap, prepare_uniswap_swap, uniswap_check_approval, uniswap_quote_info,
 };
-use crate::models::exchange::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, UniswapMeta};
+use crate::models::exchange::{
+    ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, UniswapMeta,
+};
+use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
@@ -303,6 +306,7 @@ pub async fn execute_exchange_swap(
     amount_in: String,
     slippage_bps: u32,
     is_native_in: bool,
+    display: ExchangeTxDisplay,
     password: Option<String>,
     passphrase: Option<String>,
     sink: StreamSink<String>,
@@ -327,8 +331,16 @@ pub async fn execute_exchange_swap(
 
     // One-time ERC-20 approval (to Permit2 / the bridge spender). Native inputs never need it.
     if !is_native_in {
-        if let Some(approval) =
-            uniswap_check_approval(&meta, swapper, chain_hash, &token_in, &amount_in).await?
+        if let Some(approval) = uniswap_check_approval(
+            &meta,
+            swapper,
+            chain_hash,
+            &token_in,
+            &amount_in,
+            display.approve_title.clone(),
+            display.provider_icon.clone(),
+        )
+        .await?
         {
             let _ = sink.add("approving".to_string());
             let mut approve_tx: TransactionRequest = approval
@@ -372,8 +384,8 @@ pub async fn execute_exchange_swap(
                     &seed,
                     &secret_passphrase,
                     &typed_data,
-                    None,
-                    None,
+                    Some(display.permit_title.clone()),
+                    Some(display.provider_icon.clone()),
                 )
                 .await
                 .map_err(ServiceError::BackgroundError)?;
@@ -387,6 +399,10 @@ pub async fn execute_exchange_swap(
         swapper,
         chain_hash,
         permit_signature.as_deref(),
+        display.swap_title,
+        display.swap_info,
+        display.provider_icon,
+        display.out_token,
     )
     .await?
     .try_into()
@@ -421,6 +437,8 @@ pub async fn check_exchange_approval(
     amount_in: String,
     is_native_in: bool,
     nonce: u64,
+    approve_title: String,
+    provider_icon: String,
 ) -> Result<Option<TransactionRequestInfo>, String> {
     if is_native_in {
         return Ok(None);
@@ -436,8 +454,16 @@ pub async fn check_exchange_approval(
     };
 
     let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let approval =
-        uniswap_check_approval(&meta, swapper, chain_hash, &token_in, &amount_in).await?;
+    let approval = uniswap_check_approval(
+        &meta,
+        swapper,
+        chain_hash,
+        &token_in,
+        &amount_in,
+        approve_title,
+        provider_icon,
+    )
+    .await?;
 
     match approval {
         Some(info) => {
@@ -501,12 +527,17 @@ pub async fn prepare_exchange_swap(
 /// **Ledger final step.** Attach the device-signed permit signature, call `/swap`, and return the
 /// swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
 /// the UI to broadcast via `send_signed_transactions`.
+#[allow(clippy::too_many_arguments)]
 pub async fn finalize_exchange_swap(
     wallet_index: usize,
     account_index: usize,
     quote_blob: String,
     permit_signature: Option<String>,
     nonce: u64,
+    swap_title: String,
+    swap_info: String,
+    provider_icon: String,
+    out_token: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
@@ -520,6 +551,10 @@ pub async fn finalize_exchange_swap(
         swapper,
         chain_hash,
         permit_signature.as_deref(),
+        swap_title,
+        swap_info,
+        provider_icon,
+        out_token,
     )
     .await?
     .try_into()

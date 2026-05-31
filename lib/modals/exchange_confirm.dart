@@ -23,6 +23,7 @@ import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -132,6 +133,9 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   /// Pre-formatted "you get" amount (symbol included from [formatingAmount]).
   late final String _getText;
 
+  /// Display metadata composed once; threaded into every tx Rust builds.
+  late final ExchangeTxDisplay _display;
+
   /// Live status of each planned step; mutated only inside [setState].
   final Map<_Step, _StepState> _stepStates = <_Step, _StepState>{};
 
@@ -166,6 +170,21 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
     _payText = _format(appState, widget.fromToken, widget.amountInWei);
     _getText = _format(appState, widget.toToken, widget.amountOut);
+
+    final providerIcon = exchangeProviderIconAsset(widget.provider);
+    final providerName = exchangeProviderName(widget.provider);
+    _display = ExchangeTxDisplay(
+      providerIcon: providerIcon,
+      swapTitle: 'Swap',
+      swapInfo: '$_payText \u2192 $_getText \u00b7 $providerName',
+      approveTitle: 'Approve ${widget.fromToken.symbol}',
+      permitTitle: 'Permit2 \u00b7 $providerName',
+      outToken: BaseTokenInfo(
+        value: widget.amountOut,
+        symbol: widget.toToken.symbol,
+        decimals: widget.toToken.decimals,
+      ),
+    );
 
     if (_isLedger) {
       appState.ledgerViewController.scanAndAutoConnect().then((_) {
@@ -280,6 +299,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       amountIn: widget.amountInWei,
       slippageBps: widget.slippageBps,
       isNativeIn: widget.isNativeIn,
+      display: _display,
       password: wallet.authType == 'none' ? _passwordController.text : null,
     );
 
@@ -293,7 +313,12 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
           });
         }
       },
-      onDone: () => _completeAndExit(appState),
+      onDone: () {
+        // onError already set _error and _loading=false; onDone always fires
+        // after onError on a closing stream — guard against accidental pop+nav.
+        if (_error != null) return;
+        _completeAndExit(appState);
+      },
     );
   }
 
@@ -338,6 +363,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
           amountIn: widget.amountInWei,
           isNativeIn: widget.isNativeIn,
           nonce: baseNonce,
+          approveTitle: _display.approveTitle,
+          providerIcon: _display.providerIcon,
         );
         if (approval != null) {
           final sig = await ledger.signTransaction(
@@ -388,6 +415,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         quoteBlob: prep.quoteBlob,
         permitSignature: permitSignature,
         nonce: swapNonce,
+        swapTitle: _display.swapTitle,
+        swapInfo: _display.swapInfo,
+        providerIcon: _display.providerIcon,
+        outToken: _display.outToken,
       );
       final swapSig = await ledger.signTransaction(
         transaction: swapTx,

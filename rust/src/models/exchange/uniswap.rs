@@ -20,6 +20,7 @@ use zilpay::reqwest::Client;
 use zilpay::serde_json::{json, Map, Value};
 
 use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
+use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 
 const TRADING_API_BASE: &str = "https://trade-api.gateway.uniswap.org/v1";
@@ -268,11 +269,16 @@ fn parse_hex_u256(s: &str) -> Result<U256, String> {
 /// Lift a Trading-API tx object (`{to, data, value, chainId, gasLimit}` — the shape shared by
 /// `/swap` and `/check_approval`) into the FFI tx. `swapper`/`chain_hash` set the signer and
 /// the broadcasting network; `broadcast: true` matches the existing swap flow.
+/// Optional display fields (`title`, `info`, `icon`, `token_info`) populate the history entry.
 #[frb(ignore)]
 fn json_obj_to_eth_tx(
     obj: &Value,
     swapper: Address,
     chain_hash: u64,
+    title: Option<String>,
+    info: Option<String>,
+    icon: Option<String>,
+    token_info: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
     let to = obj
         .get("to")
@@ -306,6 +312,16 @@ fn json_obj_to_eth_tx(
         TransactionMetadata {
             chain_hash,
             broadcast: true,
+            title,
+            info,
+            icon,
+            token_info: token_info.map(|t| {
+                (
+                    U256::from_str(&t.value).unwrap_or_default(),
+                    t.decimals,
+                    t.symbol,
+                )
+            }),
             ..Default::default()
         },
     ))
@@ -318,9 +334,13 @@ fn swap_response_to_tx(
     resp: &Value,
     swapper: Address,
     chain_hash: u64,
+    title: String,
+    info: String,
+    icon: String,
+    token_info: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
     let swap = resp.get("swap").ok_or("swap field missing")?;
-    json_obj_to_eth_tx(swap, swapper, chain_hash)
+    json_obj_to_eth_tx(swap, swapper, chain_hash, Some(title), Some(info), Some(icon), token_info)
 }
 
 /// Quote orchestration for the `ExchangeProvider::Uniswap` arm of
@@ -471,12 +491,18 @@ pub async fn prepare_uniswap_swap(
 
 /// Second half of a Uniswap swap: attach the (seed- or device-produced) Permit2 signature to the
 /// quote, call `/swap`, and lift the router/bridge calldata into the unsigned FFI tx. Lock-free.
+/// `swap_title`, `swap_info`, `provider_icon`, and `out_token` are threaded into the tx metadata
+/// so the history entry shows the provider icon and a human-readable description.
 #[frb(ignore)]
 pub async fn finalize_uniswap_swap(
     quote_blob: &str,
     swapper: Address,
     chain_hash: u64,
     permit_signature: Option<&str>,
+    swap_title: String,
+    swap_info: String,
+    provider_icon: String,
+    out_token: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
     let quote: Value = zilpay::serde_json::from_str(quote_blob).map_err(|e| e.to_string())?;
     let swap_req = build_swap_body(&quote, permit_signature)?;
@@ -484,7 +510,7 @@ pub async fn finalize_uniswap_swap(
 
     dbg!("finalize_uniswap_swap: /swap response received");
 
-    swap_response_to_tx(&swap_resp, swapper, chain_hash)
+    swap_response_to_tx(&swap_resp, swapper, chain_hash, swap_title, swap_info, provider_icon, out_token)
 }
 
 /// Approval pre-step for the `ExchangeProvider::Uniswap` arm of
@@ -499,6 +525,8 @@ pub async fn uniswap_check_approval(
     chain_hash: u64,
     token: &str,
     amount: &str,
+    approve_title: String,
+    provider_icon: String,
 ) -> Result<Option<TransactionRequestInfo>, String> {
     let body = json!({
         "walletAddress": swapper.to_string(),
@@ -510,7 +538,16 @@ pub async fn uniswap_check_approval(
 
     match resp.get("approval") {
         Some(approval) if !approval.is_null() => {
-            json_obj_to_eth_tx(approval, swapper, chain_hash).map(Some)
+            json_obj_to_eth_tx(
+                approval,
+                swapper,
+                chain_hash,
+                Some(approve_title),
+                None,
+                Some(provider_icon),
+                None,
+            )
+            .map(Some)
         }
         _ => Ok(None),
     }
@@ -597,7 +634,16 @@ mod uniswap_tests {
             "chainId": 1,
             "gasLimit": 341542
         }});
-        let tx = swap_response_to_tx(&resp, Address::ZERO, 42).unwrap();
+        let tx = swap_response_to_tx(
+            &resp,
+            Address::ZERO,
+            42,
+            "Swap".to_string(),
+            "1 ETH → 1000 USDC · Uniswap".to_string(),
+            "assets/icons/uniswap.svg".to_string(),
+            None,
+        )
+        .unwrap();
         let evm = tx.evm.unwrap();
         assert_eq!(evm.chain_id, Some(1));
         assert_eq!(evm.gas_limit, Some(341542));

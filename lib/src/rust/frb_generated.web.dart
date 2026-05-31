@@ -203,6 +203,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ExchangeProvider dco_decode_box_autoadd_exchange_provider(dynamic raw);
 
   @protected
+  ExchangeTxDisplay dco_decode_box_autoadd_exchange_tx_display(dynamic raw);
+
+  @protected
   double dco_decode_box_autoadd_f_32(dynamic raw);
 
   @protected
@@ -295,6 +298,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw);
+
+  @protected
+  ExchangeTxDisplay dco_decode_exchange_tx_display(dynamic raw);
 
   @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
@@ -825,6 +831,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  ExchangeTxDisplay sse_decode_box_autoadd_exchange_tx_display(
+      SseDeserializer deserializer);
+
+  @protected
   double sse_decode_box_autoadd_f_32(SseDeserializer deserializer);
 
   @protected
@@ -926,6 +936,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExchangeQuoteInfo sse_decode_exchange_quote_info(
+      SseDeserializer deserializer);
+
+  @protected
+  ExchangeTxDisplay sse_decode_exchange_tx_display(
       SseDeserializer deserializer);
 
   @protected
@@ -1508,6 +1522,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ExchangeProvider self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_exchange_tx_display(
+      ExchangeTxDisplay self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer);
 
   @protected
@@ -1613,6 +1631,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_exchange_quote_info(
       ExchangeQuoteInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_exchange_tx_display(
+      ExchangeTxDisplay self, SseSerializer serializer);
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);

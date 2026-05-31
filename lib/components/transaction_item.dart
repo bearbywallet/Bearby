@@ -46,7 +46,29 @@ class _HistoryItemState extends State<HistoryItem>
   Widget _buildIcon(AppState appState) {
     final theme = appState.currentTheme;
     final token = _findMatchingToken(appState);
+    final icon = widget.transaction.icon;
 
+    // Local asset SVG (e.g. "assets/icons/uniswap.svg") — render directly.
+    if (icon != null && icon.startsWith('assets/') && icon.endsWith('.svg')) {
+      return Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+                color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
+        child: ClipOval(
+          child: SvgPicture.asset(
+            icon,
+            width: 32,
+            height: 32,
+            fit: BoxFit.contain,
+          ),
+        ),
+      );
+    }
+
+    // Remote URL or token logo fallback — existing path.
     return Container(
       width: 32,
       height: 32,
@@ -56,11 +78,11 @@ class _HistoryItemState extends State<HistoryItem>
               color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
       child: ClipOval(
         child: AsyncImage(
-          url: widget.transaction.icon ??
+          url: icon ??
               (token != null
                   ? processTokenLogo(
                       token: token,
-                      shortName: appState.chain?.shortName ?? "",
+                      shortName: appState.chain?.shortName ?? '',
                       theme: theme.value,
                     )
                   : null),
@@ -84,8 +106,8 @@ class _HistoryItemState extends State<HistoryItem>
               ),
             ),
           ),
-          loadingWidget:
-              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          loadingWidget: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
     );

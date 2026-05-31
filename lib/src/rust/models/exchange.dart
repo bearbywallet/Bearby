@@ -8,6 +8,7 @@ import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+import 'transactions/base_token.dart';
 part 'exchange.freezed.dart';
 
 class ExchangeAsset {
@@ -78,4 +79,56 @@ class ExchangeQuoteInfo {
           provider == other.provider &&
           amountOut == other.amountOut &&
           permitTypedDataJson == other.permitTypedDataJson;
+}
+
+/// Display metadata composed on the Dart side and threaded into every tx built for a swap.
+/// Passed as a single struct to keep the FFI surface small.
+class ExchangeTxDisplay {
+  /// Flutter local asset path, e.g. `"assets/icons/uniswap.svg"`.
+  final String providerIcon;
+
+  /// History title for the swap tx: `"Swap"`.
+  final String swapTitle;
+
+  /// History detail line: `"1.5 BNB → 120 CAKE · Uniswap"`.
+  final String swapInfo;
+
+  /// History title for the approve tx: `"Approve WORM"`.
+  final String approveTitle;
+
+  /// History title for the software permit entry: `"Permit2 · Uniswap"`.
+  final String permitTitle;
+
+  /// Destination token with the expected `amountOut` as `value` (wei string).
+  final BaseTokenInfo? outToken;
+
+  const ExchangeTxDisplay({
+    required this.providerIcon,
+    required this.swapTitle,
+    required this.swapInfo,
+    required this.approveTitle,
+    required this.permitTitle,
+    this.outToken,
+  });
+
+  @override
+  int get hashCode =>
+      providerIcon.hashCode ^
+      swapTitle.hashCode ^
+      swapInfo.hashCode ^
+      approveTitle.hashCode ^
+      permitTitle.hashCode ^
+      outToken.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExchangeTxDisplay &&
+          runtimeType == other.runtimeType &&
+          providerIcon == other.providerIcon &&
+          swapTitle == other.swapTitle &&
+          swapInfo == other.swapInfo &&
+          approveTitle == other.approveTitle &&
+          permitTitle == other.permitTitle &&
+          outToken == other.outToken;
 }

@@ -1740,6 +1740,8 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
             let api_amount_in = <String>::sse_decode(&mut deserializer);
             let api_is_native_in = <bool>::sse_decode(&mut deserializer);
             let api_nonce = <u64>::sse_decode(&mut deserializer);
+            let api_approve_title = <String>::sse_decode(&mut deserializer);
+            let api_provider_icon = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1752,6 +1754,8 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
                             api_amount_in,
                             api_is_native_in,
                             api_nonce,
+                            api_approve_title,
+                            api_provider_icon,
                         )
                         .await?;
                         Ok(output_ok)
@@ -2189,6 +2193,8 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
             let api_amount_in = <String>::sse_decode(&mut deserializer);
             let api_slippage_bps = <u32>::sse_decode(&mut deserializer);
             let api_is_native_in = <bool>::sse_decode(&mut deserializer);
+            let api_display =
+                <crate::models::exchange::ExchangeTxDisplay>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             let api_sink =
@@ -2208,6 +2214,7 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
                             api_amount_in,
                             api_slippage_bps,
                             api_is_native_in,
+                            api_display,
                             api_password,
                             api_passphrase,
                             api_sink,
@@ -2413,6 +2420,13 @@ fn wire__crate__api__exchange__finalize_exchange_swap_impl(
             let api_quote_blob = <String>::sse_decode(&mut deserializer);
             let api_permit_signature = <Option<String>>::sse_decode(&mut deserializer);
             let api_nonce = <u64>::sse_decode(&mut deserializer);
+            let api_swap_title = <String>::sse_decode(&mut deserializer);
+            let api_swap_info = <String>::sse_decode(&mut deserializer);
+            let api_provider_icon = <String>::sse_decode(&mut deserializer);
+            let api_out_token =
+                <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
+                    &mut deserializer,
+                );
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -2423,6 +2437,10 @@ fn wire__crate__api__exchange__finalize_exchange_swap_impl(
                             api_quote_blob,
                             api_permit_signature,
                             api_nonce,
+                            api_swap_title,
+                            api_swap_info,
+                            api_provider_icon,
+                            api_out_token,
                         )
                         .await?;
                         Ok(output_ok)
@@ -6221,6 +6239,29 @@ impl SseDecode for crate::models::exchange::ExchangeQuoteInfo {
     }
 }
 
+impl SseDecode for crate::models::exchange::ExchangeTxDisplay {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_providerIcon = <String>::sse_decode(deserializer);
+        let mut var_swapTitle = <String>::sse_decode(deserializer);
+        let mut var_swapInfo = <String>::sse_decode(deserializer);
+        let mut var_approveTitle = <String>::sse_decode(deserializer);
+        let mut var_permitTitle = <String>::sse_decode(deserializer);
+        let mut var_outToken =
+            <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
+                deserializer,
+            );
+        return crate::models::exchange::ExchangeTxDisplay {
+            provider_icon: var_providerIcon,
+            swap_title: var_swapTitle,
+            swap_info: var_swapInfo,
+            approve_title: var_approveTitle,
+            permit_title: var_permitTitle,
+            out_token: var_outToken,
+        };
+    }
+}
+
 impl SseDecode for crate::models::provider::ExplorerInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9078,6 +9119,31 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeQuoteInf
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeTxDisplay {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.provider_icon.into_into_dart().into_dart(),
+            self.swap_title.into_into_dart().into_dart(),
+            self.swap_info.into_into_dart().into_dart(),
+            self.approve_title.into_into_dart().into_dart(),
+            self.permit_title.into_into_dart().into_dart(),
+            self.out_token.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::ExchangeTxDisplay
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeTxDisplay>
+    for crate::models::exchange::ExchangeTxDisplay
+{
+    fn into_into_dart(self) -> crate::models::exchange::ExchangeTxDisplay {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::provider::ExplorerInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -10411,6 +10477,21 @@ impl SseEncode for crate::models::exchange::ExchangeQuoteInfo {
         <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
         <String>::sse_encode(self.amount_out, serializer);
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::ExchangeTxDisplay {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.provider_icon, serializer);
+        <String>::sse_encode(self.swap_title, serializer);
+        <String>::sse_encode(self.swap_info, serializer);
+        <String>::sse_encode(self.approve_title, serializer);
+        <String>::sse_encode(self.permit_title, serializer);
+        <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_encode(
+            self.out_token,
+            serializer,
+        );
     }
 }
 
