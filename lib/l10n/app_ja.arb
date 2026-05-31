@@ -71,6 +71,30 @@
   "homePageErrorTitle": "信号なし",
   "homePageReceiveButton": "受信",
   "homePageSendButton": "送信",
+  "homePageExchangeButton": "交換",
+  "exchangePageTitle": "交換",
+  "exchangePagePay": "支払う",
+  "exchangePageGet": "受け取る",
+  "exchangePageConfirm": "確認",
+  "exchangePageComingSoon": "近日",
+  "exchangePageNoAssets": "このネットワークに交換可能な資産がありません",
+  "exchangePageTabSwap": "スワップ",
+  "exchangePageTabLimit": "指値",
+  "exchangePageTabBuySell": "売買",
+  "exchangeSettingsPriceProtection": "価格保護",
+  "exchangeSettingsTwap": "TWAP",
+  "exchangeSettingsSubSwaps": "サブスワップ数",
+  "exchangeSettingsTimeBetween": "サブスワップ間隔",
+  "exchangeSettingsReset": "リセット",
+  "exchangeSettingsSave": "保存",
+  "exchangeSettingsBlocks": "{count, plural, other{{count}ブロック}}",
+  "@exchangeSettingsBlocks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",

@@ -227,6 +227,64 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homePageSendButton => '送信';
 
   @override
+  String get homePageExchangeButton => '交換';
+
+  @override
+  String get exchangePageTitle => '交換';
+
+  @override
+  String get exchangePagePay => '支払う';
+
+  @override
+  String get exchangePageGet => '受け取る';
+
+  @override
+  String get exchangePageConfirm => '確認';
+
+  @override
+  String get exchangePageComingSoon => '近日';
+
+  @override
+  String get exchangePageNoAssets => 'このネットワークに交換可能な資産がありません';
+
+  @override
+  String get exchangePageTabSwap => 'スワップ';
+
+  @override
+  String get exchangePageTabLimit => '指値';
+
+  @override
+  String get exchangePageTabBuySell => '売買';
+
+  @override
+  String get exchangeSettingsPriceProtection => '価格保護';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => 'サブスワップ数';
+
+  @override
+  String get exchangeSettingsTimeBetween => 'サブスワップ間隔';
+
+  @override
+  String get exchangeSettingsReset => 'リセット';
+
+  @override
+  String get exchangeSettingsSave => '保存';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countブロック',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override

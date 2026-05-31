@@ -285,6 +285,30 @@
   },
   "homePageReceiveButton": "Receive",
   "homePageSendButton": "Send",
+  "homePageExchangeButton": "Exchange",
+  "exchangePageTitle": "Exchange",
+  "exchangePagePay": "You pay",
+  "exchangePageGet": "You get",
+  "exchangePageConfirm": "Confirm",
+  "exchangePageComingSoon": "Soon",
+  "exchangePageNoAssets": "No swappable assets on this network",
+  "exchangePageTabSwap": "Swap",
+  "exchangePageTabLimit": "Limit",
+  "exchangePageTabBuySell": "Buy/Sell",
+  "exchangeSettingsPriceProtection": "Price Protection",
+  "exchangeSettingsTwap": "TWAP",
+  "exchangeSettingsSubSwaps": "Number of sub-swaps",
+  "exchangeSettingsTimeBetween": "Time between sub-swaps",
+  "exchangeSettingsReset": "Reset",
+  "exchangeSettingsSave": "Save",
+  "exchangeSettingsBlocks": "{count, plural, =1{1 block} other{{count} blocks}}",
+  "@exchangeSettingsBlocks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "revealSecretKeyTitle": "Reveal Secret Key",
   "@revealSecretKeyTitle": {
     "description": "Title for the RevealSecretKey page"

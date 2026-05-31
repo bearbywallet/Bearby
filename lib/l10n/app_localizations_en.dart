@@ -227,6 +227,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageSendButton => 'Send';
 
   @override
+  String get homePageExchangeButton => 'Exchange';
+
+  @override
+  String get exchangePageTitle => 'Exchange';
+
+  @override
+  String get exchangePagePay => 'You pay';
+
+  @override
+  String get exchangePageGet => 'You get';
+
+  @override
+  String get exchangePageConfirm => 'Confirm';
+
+  @override
+  String get exchangePageComingSoon => 'Soon';
+
+  @override
+  String get exchangePageNoAssets => 'No swappable assets on this network';
+
+  @override
+  String get exchangePageTabSwap => 'Swap';
+
+  @override
+  String get exchangePageTabLimit => 'Limit';
+
+  @override
+  String get exchangePageTabBuySell => 'Buy/Sell';
+
+  @override
+  String get exchangeSettingsPriceProtection => 'Price Protection';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => 'Number of sub-swaps';
+
+  @override
+  String get exchangeSettingsTimeBetween => 'Time between sub-swaps';
+
+  @override
+  String get exchangeSettingsReset => 'Reset';
+
+  @override
+  String get exchangeSettingsSave => 'Save';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count blocks',
+      one: '1 block',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => 'Reveal Secret Key';
 
   @override

@@ -6,53 +6,40 @@ import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
-import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
-class TokenAmountCard extends StatefulWidget {
+/// Shared token amount card: amount display, token selector and a balance row with
+/// 25% / 50% / 100% chips. Presentational only — the caller supplies the [token] and
+/// [balance] and reacts to [onAmountChanged] (chips) and [onTokenTap] (selector).
+class TokenAmountCard extends StatelessWidget {
   final String amount;
-  final int tokenIndex;
-  final bool showMax;
-  final Function(String) onMaxTap;
-  final Function(int) onTokenSelected;
+  final FTokenInfo token;
+  final BigInt balance;
+  final void Function(String amount) onAmountChanged;
+  final VoidCallback onTokenTap;
 
   const TokenAmountCard({
     super.key,
     this.amount = "0",
-    this.tokenIndex = 0,
-    this.showMax = true,
-    required this.onMaxTap,
-    required this.onTokenSelected,
+    required this.token,
+    required this.balance,
+    required this.onAmountChanged,
+    required this.onTokenTap,
   });
 
-  @override
-  State<TokenAmountCard> createState() => _TokenAmountCardState();
-}
-
-class _TokenAmountCardState extends State<TokenAmountCard> {
-  Key _imageKey = UniqueKey();
+  void _setPercent(int percent) {
+    final portion = balance * BigInt.from(percent) ~/ BigInt.from(100);
+    onAmountChanged(fromWei(value: portion.toString(), decimals: token.decimals));
+  }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
-    final wallet = appState.wallet;
-
-    if (wallet == null ||
-        wallet.tokens.isEmpty ||
-        widget.tokenIndex < 0 ||
-        widget.tokenIndex >= wallet.tokens.length) {
-      return Container();
-    }
-
-    final token = wallet.tokens[widget.tokenIndex];
-    final bigAmount = toDecimalsWei(widget.amount.toString(), token.decimals);
-    final bigBalance =
-        BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '-') ??
-            BigInt.zero;
+    final bigAmount = toDecimalsWei(amount, token.decimals);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -66,9 +53,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       ),
       child: Column(
         children: [
-          _buildAmountRow(context, theme, token, bigAmount, appState),
+          _buildAmountRow(context, theme, bigAmount, appState),
           const SizedBox(height: 8),
-          _buildBalanceRow(theme, bigBalance, token),
+          _buildBalanceRow(theme),
         ],
       ),
     );
@@ -77,7 +64,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
   Widget _buildAmountRow(
     BuildContext context,
     AppTheme theme,
-    FTokenInfo token,
     BigInt bigAmount,
     AppState appState,
   ) {
@@ -85,9 +71,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: _buildAmountInfo(context, theme, token, bigAmount, appState),
+          child: _buildAmountInfo(context, theme, bigAmount, appState),
         ),
-        _buildTokenSelector(context, appState, token),
+        _buildTokenSelector(appState, theme),
       ],
     );
   }
@@ -95,7 +81,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
   Widget _buildAmountInfo(
     BuildContext context,
     AppTheme theme,
-    FTokenInfo token,
     BigInt bigAmount,
     AppState appState,
   ) {
@@ -107,7 +92,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       appState: appState,
     );
 
-    final fontSize = _calculateAdaptiveFontSize(context, widget.amount);
+    final fontSize = _calculateAdaptiveFontSize(context, amount);
     final showConverted = appState.wallet?.settings.currencyConvert != null &&
         converted.isNotEmpty;
 
@@ -116,7 +101,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          widget.amount,
+          amount,
           style: theme.displayLarge.copyWith(
             color: theme.textPrimary,
             fontSize: fontSize,
@@ -140,25 +125,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
   }
 
-  Widget _buildTokenSelector(
-    BuildContext context,
-    AppState appState,
-    FTokenInfo token,
-  ) {
-    final theme = appState.currentTheme;
-
+  Widget _buildTokenSelector(AppState appState, AppTheme theme) {
     return GestureDetector(
-      onTap: () {
-        showTokenSelectModal(
-          context: context,
-          onTokenSelected: (int index) {
-            widget.onTokenSelected(index);
-            setState(() {
-              _imageKey = UniqueKey();
-            });
-          },
-        );
-      },
+      onTap: onTokenTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -171,7 +140,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTokenIcon(appState, token),
+            _buildTokenIcon(appState, theme),
             const SizedBox(width: 8),
             Text(
               token.symbol,
@@ -179,53 +148,59 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                 color: theme.textPrimary,
               ),
             ),
+            const SizedBox(width: 4),
+            SvgPicture.asset(
+              "assets/icons/tiny_down_arrow.svg",
+              width: 12,
+              height: 12,
+              colorFilter:
+                  ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTokenIcon(AppState appState, FTokenInfo token) {
-    final theme = appState.currentTheme;
-
+  Widget _buildTokenIcon(AppState appState, AppTheme theme) {
     return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: theme.textPrimary.withValues(alpha: 0.2),
-            width: 1.5,
-          ),
-          shape: BoxShape.circle,
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: theme.textPrimary.withValues(alpha: 0.2),
+          width: 1.5,
         ),
-        child: ClipOval(
-          child: AsyncImage(
-            key: _imageKey,
-            url: processTokenLogo(
-              token: token,
-              shortName: appState.chain?.shortName ?? "",
-              theme: theme.value,
-            ),
-            width: 24,
-            height: 24,
-            fit: BoxFit.cover,
-            errorWidget: Jazzicon(
-              seed: token.addr,
-              diameter: 24,
-            ),
-            loadingWidget: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: AsyncImage(
+          key: ValueKey(token.addr),
+          url: processTokenLogo(
+            token: token,
+            shortName: appState.chain?.shortName ?? "",
+            theme: theme.value,
+          ),
+          width: 24,
+          height: 24,
+          fit: BoxFit.cover,
+          errorWidget: Jazzicon(
+            seed: token.addr,
+            diameter: 24,
+          ),
+          loadingWidget: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
-  Widget _buildBalanceRow(AppTheme theme, BigInt balance, FTokenInfo token) {
-    final currentAmount = toDecimalsWei(widget.amount, token.decimals);
+  Widget _buildBalanceRow(AppTheme theme) {
+    final currentAmount = toDecimalsWei(amount, token.decimals);
     final bool isExceeded = currentAmount > balance;
-    final bool isMax = currentAmount == balance;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -241,41 +216,45 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             ),
           ),
         if (isExceeded) const SizedBox(width: 4),
-        Text(
-          fromWei(value: balance.toString(), decimals: token.decimals),
-          style: theme.bodyText2.copyWith(
+        Flexible(
+          child: Text(
+            fromWei(value: balance.toString(), decimals: token.decimals),
+            style: theme.bodyText2.copyWith(
+              color: theme.textPrimary.withValues(alpha: 0.7),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: 12),
+        _percentChip(theme, '0%', () => _setPercent(0)),
+        const SizedBox(width: 8),
+        _percentChip(theme, '25%', () => _setPercent(25)),
+        const SizedBox(width: 8),
+        _percentChip(theme, '50%', () => _setPercent(50)),
+        const SizedBox(width: 8),
+        _percentChip(theme, '100%', () => _setPercent(100)),
+      ],
+    );
+  }
+
+  Widget _percentChip(AppTheme theme, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: theme.textPrimary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          label,
+          style: theme.labelSmall.copyWith(
             color: theme.textPrimary.withValues(alpha: 0.7),
           ),
         ),
-        if (widget.showMax)
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: GestureDetector(
-              onTap: () => widget.onMaxTap(
-                  fromWei(value: balance.toString(), decimals: token.decimals)),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: isMax
-                      ? theme.warning.withValues(alpha: 0.2)
-                      : theme.textPrimary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'Max',
-                  style: theme.labelSmall.copyWith(
-                    color: isMax
-                        ? theme.warning
-                        : theme.textPrimary.withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 

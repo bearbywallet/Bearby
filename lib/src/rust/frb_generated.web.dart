@@ -34,6 +34,7 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
+import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -249,9 +250,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(
       dynamic raw);
-
-  @protected
-  int dco_decode_box_autoadd_u_32(dynamic raw);
 
   @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw);
@@ -525,11 +523,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
-  TransactionRequestScilla?
-      dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
+  TransactionRequestInfo? dco_decode_opt_box_autoadd_transaction_request_info(
+      dynamic raw);
 
   @protected
-  int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+  TransactionRequestScilla?
+      dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
 
   @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
@@ -877,9 +876,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
-
-  @protected
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
 
   @protected
@@ -1184,12 +1180,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  TransactionRequestInfo? sse_decode_opt_box_autoadd_transaction_request_info(
+      SseDeserializer deserializer);
+
+  @protected
   TransactionRequestScilla?
       sse_decode_opt_box_autoadd_transaction_request_scilla(
           SseDeserializer deserializer);
-
-  @protected
-  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
@@ -1559,9 +1556,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       TransactionRequestScilla self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
-
-  @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
 
   @protected
@@ -1879,11 +1873,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       TransactionRequestEVM? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_transaction_request_scilla(
-      TransactionRequestScilla? self, SseSerializer serializer);
+  void sse_encode_opt_box_autoadd_transaction_request_info(
+      TransactionRequestInfo? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+  void sse_encode_opt_box_autoadd_transaction_request_scilla(
+      TransactionRequestScilla? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);

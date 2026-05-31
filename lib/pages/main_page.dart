@@ -77,6 +77,7 @@ class MainPageState extends State<MainPage> {
           items: [
             CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),
             CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
+            CustomBottomNavigationBarItem(iconPath: 'assets/icons/swap.svg'),
             CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
           ],
           currentIndex: widget.shell.currentIndex,

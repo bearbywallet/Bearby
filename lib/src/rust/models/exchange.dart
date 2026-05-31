@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
@@ -54,25 +55,20 @@ sealed class ExchangeProvider with _$ExchangeProvider {
 class ExchangeQuoteInfo {
   final ExchangeProvider provider;
   final String amountOut;
-  final int? feeTier;
+
+  /// Standard EIP-712 typed-data JSON to sign (Permit2). `None` for native input or
+  /// when the API returns no permit (`permitData: null`).
   final String? permitTypedDataJson;
-  final BigInt? permitNonce;
 
   const ExchangeQuoteInfo({
     required this.provider,
     required this.amountOut,
-    this.feeTier,
     this.permitTypedDataJson,
-    this.permitNonce,
   });
 
   @override
   int get hashCode =>
-      provider.hashCode ^
-      amountOut.hashCode ^
-      feeTier.hashCode ^
-      permitTypedDataJson.hashCode ^
-      permitNonce.hashCode;
+      provider.hashCode ^ amountOut.hashCode ^ permitTypedDataJson.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -81,45 +77,5 @@ class ExchangeQuoteInfo {
           runtimeType == other.runtimeType &&
           provider == other.provider &&
           amountOut == other.amountOut &&
-          feeTier == other.feeTier &&
-          permitTypedDataJson == other.permitTypedDataJson &&
-          permitNonce == other.permitNonce;
-}
-
-/// FFI-safe Uniswap deployment metadata. Addresses are hex `0x...` strings so the
-/// whole struct crosses the flutter_rust_bridge boundary; they are parsed into alloy
-/// `Address` once, internally, via [`UniswapMeta::resolve`].
-class UniswapMeta {
-  final BigInt chainId;
-  final String universalRouter;
-  final String quoterV2;
-  final String permit2;
-  final String weth;
-
-  const UniswapMeta({
-    required this.chainId,
-    required this.universalRouter,
-    required this.quoterV2,
-    required this.permit2,
-    required this.weth,
-  });
-
-  @override
-  int get hashCode =>
-      chainId.hashCode ^
-      universalRouter.hashCode ^
-      quoterV2.hashCode ^
-      permit2.hashCode ^
-      weth.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UniswapMeta &&
-          runtimeType == other.runtimeType &&
-          chainId == other.chainId &&
-          universalRouter == other.universalRouter &&
-          quoterV2 == other.quoterV2 &&
-          permit2 == other.permit2 &&
-          weth == other.weth;
+          permitTypedDataJson == other.permitTypedDataJson;
 }

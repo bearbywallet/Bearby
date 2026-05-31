@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import '../models/exchange.dart';
+import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
@@ -31,10 +32,31 @@ Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
         amount: amount,
         destination: destination);
 
-/// Build the unsigned swap transaction for the chosen provider. The UI signs and
-/// broadcasts it via the existing `sign_send_transactions` FFI. `token_in` is the WETH
-/// address for native ETH inputs; `permit_nonce`/`permit_signature` come from the quote
-/// step and the user's EIP-712 signature (ERC20 inputs only).
+/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the
+/// swap, and if so return the unsigned approval tx for the UI to sign+broadcast first. Native
+/// inputs never need approval (`Ok(None)`); the UI must call this before `build_exchange_tx`
+/// for ERC-20 inputs. Provider-agnostic: each arm forwards to its own approval check.
+Future<TransactionRequestInfo?> checkExchangeApproval(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required ExchangeProvider provider,
+        required String tokenIn,
+        required String amountIn,
+        required bool isNativeIn}) =>
+    RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        provider: provider,
+        tokenIn: tokenIn,
+        amountIn: amountIn,
+        isNativeIn: isNativeIn);
+
+/// Build the unsigned swap (or cross-chain bridge) transaction for the chosen provider.
+/// The UI signs and broadcasts it via the existing `sign_send_transactions` FFI. For
+/// native inputs `token_in` is ignored (the provider uses its own native sentinel); for
+/// ERC20 inputs requiring Permit2 the EIP-712 signature is produced internally from the
+/// freshly fetched quote and the supplied `password`/`passphrase`, so the UI never signs
+/// the permit itself.
 Future<TransactionRequestInfo> buildExchangeTx(
         {required BigInt walletIndex,
         required BigInt accountIndex,
@@ -48,7 +70,8 @@ Future<TransactionRequestInfo> buildExchangeTx(
         required BigInt deadline,
         required bool isNativeIn,
         BigInt? permitNonce,
-        String? permitSignature}) =>
+        String? password,
+        String? passphrase}) =>
     RustLib.instance.api.crateApiExchangeBuildExchangeTx(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -62,4 +85,5 @@ Future<TransactionRequestInfo> buildExchangeTx(
         deadline: deadline,
         isNativeIn: isNativeIn,
         permitNonce: permitNonce,
-        permitSignature: permitSignature);
+        password: password,
+        passphrase: passphrase);

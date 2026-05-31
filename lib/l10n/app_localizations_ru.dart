@@ -227,6 +227,67 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homePageSendButton => 'Отправить';
 
   @override
+  String get homePageExchangeButton => 'Обмен';
+
+  @override
+  String get exchangePageTitle => 'Обмен';
+
+  @override
+  String get exchangePagePay => 'Вы платите';
+
+  @override
+  String get exchangePageGet => 'Вы получаете';
+
+  @override
+  String get exchangePageConfirm => 'Подтвердить';
+
+  @override
+  String get exchangePageComingSoon => 'Скоро';
+
+  @override
+  String get exchangePageNoAssets => 'В этой сети нет активов для обмена';
+
+  @override
+  String get exchangePageTabSwap => 'Обмен';
+
+  @override
+  String get exchangePageTabLimit => 'Лимит';
+
+  @override
+  String get exchangePageTabBuySell => 'Купить/Продать';
+
+  @override
+  String get exchangeSettingsPriceProtection => 'Защита цены';
+
+  @override
+  String get exchangeSettingsTwap => 'TWAP';
+
+  @override
+  String get exchangeSettingsSubSwaps => 'Количество под-обменов';
+
+  @override
+  String get exchangeSettingsTimeBetween => 'Время между под-обменами';
+
+  @override
+  String get exchangeSettingsReset => 'Сбросить';
+
+  @override
+  String get exchangeSettingsSave => 'Сохранить';
+
+  @override
+  String exchangeSettingsBlocks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count блока',
+      many: '$count блоков',
+      few: '$count блока',
+      one: '1 блок',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

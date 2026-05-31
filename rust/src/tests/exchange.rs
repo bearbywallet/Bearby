@@ -11,8 +11,7 @@ mod exchange_tests {
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
 
     use crate::api::backend::is_service_running;
-    use crate::models::exchange::uniswap::V3_FEE_TIERS;
-    use crate::models::exchange::{ExchangeAsset, ExchangeProvider, UniswapMeta};
+    use crate::models::exchange::{ExchangeAsset, ExchangeProvider};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
     use crate::service::background::BACKGROUND_SERVICE;
     use tempfile::tempdir;
@@ -103,18 +102,22 @@ mod exchange_tests {
     /// asset and its `ExchangeProvider::Uniswap` variant.
     async fn uniswap_asset() -> (ExchangeAsset, ExchangeProvider) {
         let assets = bootstrap_exchange_providers().await.unwrap();
+        // The catalog now spans every chain, so pin to native ETH on Ethereum mainnet
+        // (chain 1): the empty `from_asset` resolves to the API native sentinel and the
+        // tests quote against USDC on chain 1.
         let asset = assets
             .into_iter()
             .find(|a| {
-                a.providers
-                    .iter()
-                    .any(|p| matches!(p, ExchangeProvider::Uniswap(_)))
+                a.token.native
+                    && a.providers
+                        .iter()
+                        .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
             })
-            .expect("expected a Uniswap-supported asset");
+            .expect("expected native ETH (chain 1) with a Uniswap provider");
         let provider = asset
             .providers
             .iter()
-            .find(|p| matches!(p, ExchangeProvider::Uniswap(_)))
+            .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
             .cloned()
             .unwrap();
         (asset, provider)
@@ -136,25 +139,30 @@ mod exchange_tests {
         );
     }
 
+    /// Live build against the Trading API: native ETH -> USDC on mainnet (no permit, two
+    /// API calls). `#[ignore]`d because it needs network access; run explicitly with:
+    /// `cargo test -p rust_lib_zilpay exchange -- --ignored`.
+    #[ignore]
     #[zilpay::tokio::test]
     async fn test_build_exchange_tx_native() {
         setup_eth_wallet().await;
         let (_, provider) = uniswap_asset().await;
-        let meta = UniswapMeta::for_chain(1).unwrap();
 
-        // Native ETH -> USDC. Offline & deterministic (no RPC), so assert strictly.
+        // is_native_in = true, so `token_in` is overridden to the API native sentinel
+        // internally — pass the zero address as a placeholder.
         let tx = build_exchange_tx(
             0,
             0,
             provider,
-            meta.weth.clone(),
+            "0x0000000000000000000000000000000000000000".to_string(),
             USDC_MAINNET.to_string(),
             ONE_ETH.to_string(),
-            "1000000000".to_string(), // 1000 USDC placeholder expected-out
-            500,
-            50,
-            9_999_999_999,
+            String::new(), // amount_out unused by the API arm
+            0,             // fee_tier unused
+            50,            // slippage_bps = 0.5%
+            0,             // deadline unused
             true,
+            None,
             None,
             None,
         )
@@ -164,10 +172,7 @@ mod exchange_tests {
         let evm = tx.evm.expect("evm tx present");
         assert_eq!(evm.chain_id, Some(1));
         assert_eq!(evm.value.as_deref(), Some(ONE_ETH));
-        assert_eq!(
-            evm.to.as_deref().map(str::to_lowercase),
-            Some(meta.universal_router.to_lowercase())
-        );
+        assert!(evm.to.as_deref().is_some_and(|t| t.len() == 42));
         assert!(evm.data.as_ref().is_some_and(|d| !d.is_empty()));
     }
 
@@ -194,14 +199,10 @@ mod exchange_tests {
         let out: U256 = quote.amount_out.parse().unwrap();
         assert!(out > U256::ZERO, "quote should return non-zero output");
         assert!(
-            quote.fee_tier.is_some_and(|f| V3_FEE_TIERS.contains(&f)),
-            "fee_tier should be one of the probed tiers"
-        );
-        assert!(
             quote.permit_typed_data_json.is_none(),
             "native input needs no permit"
         );
 
-        dbg!(out, quote.fee_tier);
+        dbg!(out);
     }
 }
