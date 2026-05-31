@@ -549,6 +549,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
   @protected
+  PreparedSwapInfo dco_decode_prepared_swap_info(dynamic raw);
+
+  @protected
   QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
 
   @protected
@@ -1207,6 +1210,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
       SseDeserializer deserializer);
+
+  @protected
+  PreparedSwapInfo sse_decode_prepared_swap_info(SseDeserializer deserializer);
 
   @protected
   QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
@@ -1900,6 +1906,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_pending_withdrawal_info(
       PendingWithdrawalInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_prepared_swap_info(
+      PreparedSwapInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_q_rcode_scan_result_info(

@@ -9,3 +9,11 @@ String exchangeProviderIconAsset(ExchangeProvider provider) => provider.map(
       zIlSwap: (_) => 'assets/icons/zilswap.svg',
       sunSwap: (_) => 'assets/icons/sunswap.svg',
     );
+
+/// Human label for each [ExchangeProvider]; pairs with [exchangeProviderIconAsset].
+String exchangeProviderName(ExchangeProvider provider) => provider.map(
+      thorchain: (_) => 'THORChain',
+      uniswap: (_) => 'Uniswap',
+      zIlSwap: (_) => 'ZilSwap',
+      sunSwap: (_) => 'SunSwap',
+    );

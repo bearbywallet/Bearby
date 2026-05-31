@@ -14,18 +14,13 @@ use std::str::FromStr;
 use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{Address, U256};
-use zilpay::background::bg_provider::ProvidersManagement;
-use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
 use zilpay::reqwest::Client;
 use zilpay::serde_json::{json, Map, Value};
-use zilpay::wallet::wallet_storage::StorageOperations;
 
 use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
 use crate::models::transactions::request::TransactionRequestInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
 
 const TRADING_API_BASE: &str = "https://trade-api.gateway.uniswap.org/v1";
 // Temporary shared test key — to be replaced by our hosted backend so the key is never
@@ -42,9 +37,8 @@ const NATIVE_SENTINEL: &str = "0x0000000000000000000000000000000000000000";
 /// IDs verified against the gateway's `tokenOutChainId` enum.
 const SUPPORTED_CHAINS: &[u64] = &[
     // mainnets
-    1, 10, 56, 130, 137, 143, 196, 324, 480, 1868, 4217, 4326, 8453,
-    42161, 42220, 43114, 59144, 81457, 7777777,
-    // testnets
+    1, 10, 56, 130, 137, 143, 196, 324, 480, 1868, 4217, 4326, 8453, 42161, 42220, 43114, 59144,
+    81457, 7777777, // testnets
     1301,     // Unichain Sepolia
     11155111, // Sepolia
     84532,    // Base Sepolia
@@ -183,7 +177,9 @@ fn permit_to_typed_data(permit: &Value) -> Result<String, String> {
 
     let mut referenced: HashSet<&str> = HashSet::with_capacity(types.len());
     for fields in types.values() {
-        let Some(arr) = fields.as_array() else { continue };
+        let Some(arr) = fields.as_array() else {
+            continue;
+        };
         for f in arr {
             if let Some(t) = f.get("type").and_then(Value::as_str) {
                 referenced.insert(t.trim_end_matches("[]"));
@@ -278,7 +274,10 @@ fn json_obj_to_eth_tx(
     swapper: Address,
     chain_hash: u64,
 ) -> Result<TransactionRequestInfo, String> {
-    let to = obj.get("to").and_then(Value::as_str).ok_or("tx.to missing")?;
+    let to = obj
+        .get("to")
+        .and_then(Value::as_str)
+        .ok_or("tx.to missing")?;
     let data = obj
         .get("data")
         .and_then(Value::as_str)
@@ -324,36 +323,6 @@ fn swap_response_to_tx(
     json_obj_to_eth_tx(swap, swapper, chain_hash)
 }
 
-/// Resolve the signer address and the source chain_hash (the chain that broadcasts) under one
-/// short read guard. Shared by the build and approval paths — `chain_id` is the source chain.
-#[frb(ignore)]
-async fn resolve_signer(
-    wallet_index: usize,
-    account_index: usize,
-    chain_id: u64,
-) -> Result<(Address, u64), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let chain_hash = service
-        .core
-        .get_providers()
-        .into_iter()
-        .find(|p| p.config.chain_id() == chain_id)
-        .map(|p| p.config.hash())
-        .ok_or_else(|| "source chain provider not found".to_string())?;
-    let wallet = service
-        .core
-        .get_wallet_by_index(wallet_index)
-        .map_err(ServiceError::BackgroundError)?;
-    let data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let account = data
-        .get_account(account_index)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    Ok((account.addr.to_alloy_addr(), chain_hash))
-}
-
 /// Quote orchestration for the `ExchangeProvider::Uniswap` arm of
 /// `crate::api::exchange::fetch_exchange_quote`: hit `/quote` and surface the output amount
 /// plus the Permit2 typed data to sign (for ERC-20 inputs on routings that use Permit2).
@@ -370,7 +339,8 @@ pub async fn uniswap_quote_info(
     let (out_chain, tout) = parse_out(to_asset, in_chain);
     let tin = input_token(asset.token.native, from_asset);
 
-    dbg!("uniswap_quote_info: params",
+    dbg!(
+        "uniswap_quote_info: params",
         in_chain,
         out_chain,
         &*tin,
@@ -386,7 +356,13 @@ pub async fn uniswap_quote_info(
     let body = quote_body(destination, &tin, &tout, in_chain, out_chain, amount, 50);
     let resp = trading_api_post(&client, "/quote", &body).await?;
 
-    dbg!("uniswap_quote_info: got response", &resp.get("routing"), &resp.get("quote").and_then(|q| q.get("output").and_then(|o| o.get("amount"))));
+    dbg!(
+        "uniswap_quote_info: got response",
+        &resp.get("routing"),
+        &resp
+            .get("quote")
+            .and_then(|q| q.get("output").and_then(|o| o.get("amount")))
+    );
 
     let amount_out = output_amount(&resp)?;
     let permit_typed_data_json = match permit_value(&resp) {
@@ -400,7 +376,11 @@ pub async fn uniswap_quote_info(
         }
     };
 
-    dbg!("uniswap_quote_info: SUCCESS", &amount_out, permit_typed_data_json.is_some());
+    dbg!(
+        "uniswap_quote_info: SUCCESS",
+        &amount_out,
+        permit_typed_data_json.is_some()
+    );
 
     Ok(ExchangeQuoteInfo {
         provider: ExchangeProvider::Uniswap(meta.clone()),
@@ -409,44 +389,46 @@ pub async fn uniswap_quote_info(
     })
 }
 
-/// Tx-build orchestration for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::build_exchange_tx`. Re-quotes for freshness (quotes expire in
-/// ~30-60s), signs the Permit2 EIP-712 internally when present, calls `/swap`, then returns
-/// the unsigned tx for the UI to sign+broadcast.
+/// Result of the quote half of a swap: the Permit2 typed data to sign (when the routing uses
+/// Permit2) plus the raw `/quote` response carried opaquely to [`finalize_uniswap_swap`].
 #[frb(ignore)]
-#[allow(clippy::too_many_arguments)]
-pub async fn build_uniswap_tx_info(
-    wallet_index: usize,
-    account_index: usize,
+pub struct PreparedUniswapSwap {
+    /// Standard EIP-712 typed-data JSON to sign, or `None` for native input / routings without
+    /// a Permit2 authorization.
+    pub permit_typed_data_json: Option<String>,
+    /// Serialized `/quote` response, fed back verbatim into `finalize_uniswap_swap`.
+    pub quote_blob: String,
+}
+
+/// First half of a Uniswap swap: hit `/quote` (routing + optional Permit2 `permitData`) and
+/// surface the permit typed data to sign plus the opaque quote blob. Lock-free — the caller
+/// passes the already-resolved `swapper`, so this never touches `BACKGROUND_SERVICE` (safe to
+/// call while a service read guard is held, e.g. from the software orchestrator).
+#[frb(ignore)]
+pub async fn prepare_uniswap_swap(
     meta: &UniswapMeta,
-    token_in: String,
-    token_out: String,
-    amount_in: String,
+    swapper: Address,
+    token_in: &str,
+    token_out: &str,
+    amount_in: &str,
     slippage_bps: u32,
     is_native_in: bool,
-    password: Option<String>,
-    passphrase: Option<String>,
-) -> Result<TransactionRequestInfo, String> {
+) -> Result<PreparedUniswapSwap, String> {
     let in_chain = meta.chain_id;
-    let (out_chain, tout) = parse_out(&token_out, in_chain);
-    let tin = input_token(is_native_in, &token_in);
+    let (out_chain, tout) = parse_out(token_out, in_chain);
+    let tin = input_token(is_native_in, token_in);
 
-    dbg!("build_uniswap_tx_info: START",
-        wallet_index,
-        account_index,
+    dbg!(
+        "prepare_uniswap_swap: START",
         in_chain,
         out_chain,
         &*tin,
         &*tout,
-        &amount_in,
+        amount_in,
         slippage_bps,
         is_native_in,
+        &swapper.to_string(),
     );
-
-    // Swapper address + the source chain that signs/broadcasts.
-    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, in_chain).await?;
-
-    dbg!("build_uniswap_tx_info: swapper", &swapper.to_string(), chain_hash);
 
     let client = Client::new();
     let quote = trading_api_post(
@@ -458,43 +440,49 @@ pub async fn build_uniswap_tx_info(
             &tout,
             in_chain,
             out_chain,
-            &amount_in,
+            amount_in,
             slippage_bps,
         ),
     )
     .await?;
 
-    dbg!("build_uniswap_tx_info: quote response", &quote.get("routing"), quote.get("permitData").is_some());
+    dbg!(
+        "prepare_uniswap_swap: quote response",
+        &quote.get("routing"),
+        quote.get("permitData").is_some()
+    );
 
-    // Sign the Permit2 typed data internally when the routing requires it. The signed JSON
-    // is the transformed standard form; the /swap body re-attaches the original permitData.
-    let signature: Option<String> = match permit_value(&quote) {
+    let permit_typed_data_json = match permit_value(&quote) {
         Some(pd) => {
-            dbg!("build_uniswap_tx_info: signing Permit2 typed data");
-            let typed_data_json = permit_to_typed_data(pd)?;
-            let (_pubkey, sig) = crate::api::transaction::sign_typed_data_eip712(
-                wallet_index,
-                account_index,
-                password,
-                passphrase,
-                typed_data_json,
-                None,
-                None,
-            )
-            .await?;
-            dbg!("build_uniswap_tx_info: Permit2 signed OK");
-            Some(sig)
+            dbg!("prepare_uniswap_swap: permitData present, converting to typed data");
+            Some(permit_to_typed_data(pd)?)
         }
         None => {
-            dbg!("build_uniswap_tx_info: no permitData, skipping Permit2 sign");
+            dbg!("prepare_uniswap_swap: no permitData (native input or routing without Permit2)");
             None
         }
     };
 
-    let swap_req = build_swap_body(&quote, signature.as_deref())?;
-    let swap_resp = trading_api_post(&client, "/swap", &swap_req).await?;
+    Ok(PreparedUniswapSwap {
+        permit_typed_data_json,
+        quote_blob: quote.to_string(),
+    })
+}
 
-    dbg!("build_uniswap_tx_info: /swap response received");
+/// Second half of a Uniswap swap: attach the (seed- or device-produced) Permit2 signature to the
+/// quote, call `/swap`, and lift the router/bridge calldata into the unsigned FFI tx. Lock-free.
+#[frb(ignore)]
+pub async fn finalize_uniswap_swap(
+    quote_blob: &str,
+    swapper: Address,
+    chain_hash: u64,
+    permit_signature: Option<&str>,
+) -> Result<TransactionRequestInfo, String> {
+    let quote: Value = zilpay::serde_json::from_str(quote_blob).map_err(|e| e.to_string())?;
+    let swap_req = build_swap_body(&quote, permit_signature)?;
+    let swap_resp = trading_api_post(&Client::new(), "/swap", &swap_req).await?;
+
+    dbg!("finalize_uniswap_swap: /swap response received");
 
     swap_response_to_tx(&swap_resp, swapper, chain_hash)
 }
@@ -506,20 +494,17 @@ pub async fn build_uniswap_tx_info(
 /// API replies `approval: null`); otherwise the unsigned approve tx for the UI to broadcast.
 #[frb(ignore)]
 pub async fn uniswap_check_approval(
-    wallet_index: usize,
-    account_index: usize,
     meta: &UniswapMeta,
+    swapper: Address,
+    chain_hash: u64,
     token: &str,
     amount: &str,
 ) -> Result<Option<TransactionRequestInfo>, String> {
-    let chain_id = meta.chain_id;
-    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, chain_id).await?;
-
     let body = json!({
         "walletAddress": swapper.to_string(),
         "token": token,
         "amount": amount,
-        "chainId": chain_id,
+        "chainId": meta.chain_id,
     });
     let resp = trading_api_post(&Client::new(), "/check_approval", &body).await?;
 
@@ -575,7 +560,8 @@ mod uniswap_tests {
             },
             "values": { "spender": "0x66a9", "sigDeadline": "1", "details": {} }
         });
-        let out: Value = zilpay::serde_json::from_str(&permit_to_typed_data(&permit).unwrap()).unwrap();
+        let out: Value =
+            zilpay::serde_json::from_str(&permit_to_typed_data(&permit).unwrap()).unwrap();
         assert_eq!(out["primaryType"], "PermitSingle");
         assert!(out["message"].is_object());
         // EIP712Domain injected with only the present domain keys, in canonical order.

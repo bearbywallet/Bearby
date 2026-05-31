@@ -11,15 +11,13 @@ import 'package:bearby/components/jazzicon.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
 import 'package:bearby/components/skeleton_box.dart';
-import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
+import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/swap_settings.dart';
-import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
@@ -40,7 +38,6 @@ class ExchangePage extends StatefulWidget {
 
 class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   static const int _slippageBps = 50; // 0.5%
-  static const int _deadlineSeconds = 1200; // 20 minutes
   static const Duration _quoteDebounce = Duration(milliseconds: 400);
 
   late final AppState _appState;
@@ -285,19 +282,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   bool get _canSwap {
     final from = _fromAsset;
-    if (from == null || _toAsset == null || _selectedQuote == null) return false;
+    if (from == null || _toAsset == null || _selectedQuote == null)
+      return false;
     if (_amount.endsWith('.')) return false;
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) return false;
-    final balance =
-        BigInt.tryParse(from.token.balances[_appState.accountBalanceKey] ?? '') ??
-            BigInt.zero;
+    final balance = BigInt.tryParse(
+            from.token.balances[_appState.accountBalanceKey] ?? '') ??
+        BigInt.zero;
     return amountWei <= balance;
   }
 
   // --- confirm ------------------------------------------------------------
 
-  Future<void> _handleSwap() async {
+  void _handleSwap() {
     if (!_canSwap) return;
 
     final appState = _appState;
@@ -314,145 +312,35 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       return;
     }
 
-    final fromToken = from.token;
-    final isNativeIn = fromToken.native;
     final isUniswap = quote.provider.whenOrNull(uniswap: (_) => true) ?? false;
     if (!isUniswap) {
       _showError('Unsupported provider');
       return;
     }
+
+    final fromToken = from.token;
     // Native tokens already carry the zero address; Rust also overrides `tokenIn`
-    // internally when `isNativeIn`.
+    // internally when `isNativeIn`. A `"<chainId>:addr"` output marks a bridge route.
     final tokenIn = fromToken.addr;
-    final isLedger = wallet.walletType.contains(WalletType.ledger.name);
-    if (!isNativeIn && isLedger) {
-      _showError('ERC20 swaps are not supported on Ledger yet');
-      return;
-    }
+    final tokenOut = _outTokenParam(from, to);
+    final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
 
-    _btnController.start();
-
-    try {
-      final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
-
-      // ERC-20 inputs need a one-time on-chain approve before the swap can pull tokens.
-      // Native inputs never do. When an approval is required we broadcast it first; the
-      // user re-taps Swap once it confirms.
-      if (!isNativeIn) {
-        final approval = await checkExchangeApproval(
-          walletIndex: appState.selectedWalletIndex,
-          accountIndex: wallet.selectedAccount,
-          provider: quote.provider,
-          tokenIn: tokenIn,
-          amountIn: amountInWei.toString(),
-          isNativeIn: isNativeIn,
-        );
-        if (approval != null) {
-          if (!mounted) {
-            _btnController.stop();
-            return;
-          }
-          _btnController.stop();
-          showConfirmTransactionModal(
-            context: context,
-            tx: approval,
-            to: tokenIn,
-            amount: '0',
-            token: fromToken,
-            onConfirm: (_) => context.go(AppRoutes.history),
-            onDismiss: () => _btnController.reset(),
-          );
-          return;
-        }
-      }
-
-      // Permit2 signing password for ERC-20 inputs (native needs none).
-      String? permitPassword;
-      if (!isNativeIn && wallet.authType == 'none') {
-        permitPassword = await _promptPassword();
-        if (permitPassword == null) {
-          _btnController.reset();
-          return;
-        }
-      }
-
-      final deadline = BigInt.from(
-          DateTime.now().millisecondsSinceEpoch ~/ 1000 + _deadlineSeconds);
-
-      final tx = await buildExchangeTx(
-        walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
-        provider: quote.provider,
-        tokenIn: tokenIn,
-        tokenOut: _outTokenParam(from, to),
-        amountIn: amountInWei.toString(),
-        amountOut: quote.amountOut,
-        feeTier: 0, // unused by the Trading API arm; kept for FFI stability
-        slippageBps: _slippageBps,
-        deadline: deadline,
-        isNativeIn: isNativeIn,
-        password: permitPassword,
-      );
-
-      if (!mounted) {
-        _btnController.stop();
-        return;
-      }
-      _btnController.stop();
-      showConfirmTransactionModal(
-        context: context,
-        tx: tx,
-        to: account.addr,
-        amount: _amount,
-        token: fromToken,
-        onConfirm: (_) => context.go(AppRoutes.history),
-        onDismiss: () => _btnController.reset(),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      _btnController.error();
-      _showError(e.toString());
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) _btnController.reset();
-      });
-    }
-  }
-
-  Future<String?> _promptPassword() async {
-    final controller = TextEditingController();
-    final theme = _appState.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
-
-    final result = await showDialog<String>(
+    // The confirm modal owns the whole approve → permit → swap sequence (batched for software
+    // wallets, step-by-step on Ledger), so the page just hands it the swap intent.
+    showExchangeConfirmModal(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: theme.cardBackground,
-        title: Text(
-          l10n.exchangePageConfirm,
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        content: SmartInput(
-          controller: controller,
-          hint: 'Password',
-          obscureText: true,
-          autofocus: true,
-          borderColor: theme.textPrimary,
-          focusedBorderColor: theme.primaryPurple,
-          onSubmitted: (value) => Navigator.pop(ctx, value),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, controller.text),
-            child: Text(
-              l10n.exchangePageConfirm,
-              style: theme.button.copyWith(color: theme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
+      provider: quote.provider,
+      fromToken: fromToken,
+      toToken: to.token,
+      amountInWei: amountInWei.toString(),
+      tokenIn: tokenIn,
+      tokenOut: tokenOut,
+      amountOut: quote.amountOut,
+      isNativeIn: fromToken.native,
+      slippageBps: _slippageBps,
+      onDone: () => context.go(AppRoutes.history),
+      onDismiss: () => _btnController.reset(),
     );
-    controller.dispose();
-    return (result != null && result.isNotEmpty) ? result : null;
   }
 
   void _showError(String message) {
@@ -526,7 +414,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final to = _toAsset;
 
     // Only show a message once bootstrap finished with nothing to swap.
-    if (!_loadingAssets && (_assetsError != null || from == null || to == null)) {
+    if (!_loadingAssets &&
+        (_assetsError != null || from == null || to == null)) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(padding),
@@ -716,7 +605,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to) {
+  Widget _buildGetCard(
+      AppTheme theme, AppLocalizations l10n, ExchangeAsset to) {
     final token = to.token;
     final quote = _selectedQuote;
     final (outAmount, _) = quote == null
@@ -762,8 +652,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                       ? SkeletonBox(
                           key: const ValueKey('get-skeleton'),
                           width: 150,
-                          height:
-                              AdaptiveSize.getAdaptiveFontSize(context, 28),
+                          height: AdaptiveSize.getAdaptiveFontSize(context, 28),
                         )
                       : Text(
                           outAmount,
