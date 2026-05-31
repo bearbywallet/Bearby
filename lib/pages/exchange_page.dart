@@ -24,6 +24,7 @@ import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -89,19 +90,42 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     try {
       final all = await bootstrapExchangeProviders();
       final chainHash = _appState.wallet?.chainHash;
-      // Pay side: our tokens on the active network. Get side: every chain (bridge targets).
+
+      // Resolve the active (source) chain — getChain throws, so scan providers.
+      NetworkConfigInfo? active;
+      for (final p in _appState.state.providers) {
+        if (p.chainHash == chainHash) {
+          active = p;
+          break;
+        }
+      }
+      final sourceTestnet = active?.testnet ?? false;
+
+      // Destinations must share the source environment (mainnet↔mainnet / testnet↔testnet).
+      final sameEnvChains = <BigInt>{
+        for (final p in _appState.state.providers)
+          if ((p.testnet ?? false) == sourceTestnet) p.chainHash,
+      };
+
+      // Pay = our tokens on the active network. Get = same-environment Uniswap tokens.
       final pay = all
           .where((a) => a.token.chainHash == chainHash && _isUniswapEvm(a))
           .toList();
-      final get = all.where(_isUniswapEvm).toList();
+      final get = all
+          .where((a) =>
+              _isUniswapEvm(a) && sameEnvChains.contains(a.token.chainHash))
+          .toList();
 
       ExchangeAsset? from;
       ExchangeAsset? to;
       if (pay.isNotEmpty) {
         from = pay.firstWhere((a) => a.token.native, orElse: () => pay.first);
       }
+      // Prefer a same-chain token (a plain swap, always routable); fall back to first same-env.
       for (final a in get) {
-        if (a != from) {
+        if (a == from) continue;
+        to ??= a;
+        if (a.token.chainHash == chainHash) {
           to = a;
           break;
         }

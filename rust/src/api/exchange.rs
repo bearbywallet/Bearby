@@ -20,6 +20,8 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let all_providers = service.core.get_providers();
 
+    dbg!("bootstrap_exchange_providers: chain providers count", all_providers.len());
+
     // Pre-size on the exact catalog token count (the slice iterators report exact hints).
     let total_tokens: usize = all_providers.iter().map(|p| p.config.ftokens.len()).sum();
 
@@ -54,9 +56,19 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         let chain = provider.config;
         let slip_44 = chain.slip_44;
         let chain_id = chain.chain_id();
+        dbg!("bootstrap_exchange_providers: chain", &chain.short_name, chain_id, slip_44, chain.ftokens.len());
         for token in chain.ftokens {
             let key = (token.chain_hash, token.addr.to_hash());
             let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
+            if !providers.is_empty() {
+                dbg!("bootstrap_exchange_providers: token + providers",
+                    &token.symbol,
+                    &token.name,
+                    chain_id,
+                    token.addr.prefix_type(),
+                    &providers,
+                );
+            }
             assets.entry(key).or_insert_with(|| ExchangeAsset {
                 token: token.into(),
                 providers,
@@ -82,9 +94,15 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
                 }
                 None => {
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
+                        dbg!("bootstrap_exchange_providers: custom token, chain meta not found", &token.symbol, token.chain_hash);
                         continue;
                     };
                     let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
+                    dbg!("bootstrap_exchange_providers: custom wallet token",
+                        &token.symbol,
+                        chain_id,
+                        &providers,
+                    );
                     assets.insert(
                         key,
                         ExchangeAsset {
@@ -98,7 +116,9 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         }
     }
 
-    Ok(assets.into_values().collect())
+    let result: Vec<ExchangeAsset> = assets.into_values().collect();
+    dbg!("bootstrap_exchange_providers: DONE", result.len());
+    Ok(result)
 }
 
 pub async fn fetch_exchange_quote(
@@ -108,27 +128,51 @@ pub async fn fetch_exchange_quote(
     amount: String,
     destination: String,
 ) -> Result<Vec<ExchangeQuoteInfo>, String> {
+    dbg!("fetch_exchange_quote: START",
+        &asset.token.symbol,
+        &asset.token.chain_hash,
+        &asset.token.native,
+        &from_asset,
+        &to_asset,
+        &amount,
+        &destination,
+        &asset.providers,
+    );
+
     let mut quotes = Vec::with_capacity(asset.providers.len());
     for provider in &asset.providers {
+        dbg!("fetch_exchange_quote: trying provider", provider);
         let result = match provider {
             ExchangeProvider::Uniswap(meta) => {
                 uniswap_quote_info(meta, &asset, &from_asset, &to_asset, &amount, &destination)
                     .await
             }
-            ExchangeProvider::Thorchain(_) => continue,
-            ExchangeProvider::ZIlSwap(_) => continue,
-            ExchangeProvider::SunSwap(_) => continue,
+            ExchangeProvider::Thorchain(_) => {
+                dbg!("fetch_exchange_quote: Thorchain not yet implemented, skipping");
+                continue;
+            }
+            ExchangeProvider::ZIlSwap(_) => {
+                dbg!("fetch_exchange_quote: ZIlSwap not yet implemented, skipping");
+                continue;
+            }
+            ExchangeProvider::SunSwap(_) => {
+                dbg!("fetch_exchange_quote: SunSwap not yet implemented, skipping");
+                continue;
+            }
         };
         if let Err(e) = &result {
-            dbg!("fetch_exchange_quote: provider failed", e);
+            dbg!("fetch_exchange_quote: provider FAILED", provider, e);
         }
         if let Ok(quote) = result {
+            dbg!("fetch_exchange_quote: provider OK", provider, &quote.amount_out);
             quotes.push(quote);
         }
     }
     if quotes.is_empty() {
+        dbg!("fetch_exchange_quote: NO provider returned a quote");
         Err("No provider returned a quote".into())
     } else {
+        dbg!("fetch_exchange_quote: SUCCESS", quotes.len());
         Ok(quotes)
     }
 }

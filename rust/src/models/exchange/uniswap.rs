@@ -37,13 +37,17 @@ const ROUTER_VERSION: &str = "2.0";
 /// returns `permitData: null` (no Permit2 signing) and carries the amount as `swap.value`.
 const NATIVE_SENTINEL: &str = "0x0000000000000000000000000000000000000000";
 
-/// Chains the Trading API can swap on (Universal Router deployments) plus the testnets the
-/// app exercises. The API is the source of truth and rejects anything else; this only
-/// gates whether the UI offers a Uniswap provider for an asset.
+/// Chains the Trading API can route on. Source of truth is the API itself (it 400s on
+/// anything else); this only gates whether the UI offers a Uniswap provider for an asset.
+/// IDs verified against the gateway's `tokenOutChainId` enum.
 const SUPPORTED_CHAINS: &[u64] = &[
-    1, 10, 56, 130, 137, 480, 1868, 8453, 42161, 42220, 43114, 57073, 81457, 7777777,
-    // testnets:
-    11155111, 11155420, 84532, 421614,
+    // mainnets
+    1, 10, 56, 130, 137, 143, 196, 324, 480, 1868, 4217, 4326, 8453,
+    42161, 42220, 43114, 59144, 81457, 7777777,
+    // testnets
+    1301,     // Unichain Sepolia
+    11155111, // Sepolia
+    84532,    // Base Sepolia
 ];
 
 #[frb(ignore)]
@@ -69,18 +73,26 @@ impl UniswapMeta {
 /// Single POST against the Trading API — the one place request headers/error handling live.
 #[frb(ignore)]
 async fn trading_api_post(client: &Client, path: &str, body: &Value) -> Result<Value, String> {
+    let url = format!("{TRADING_API_BASE}{path}");
+    dbg!("trading_api_post: REQUEST", &url, body);
+
     let resp = client
-        .post(format!("{TRADING_API_BASE}{path}"))
+        .post(&url)
         .header("Content-Type", "application/json")
         .header("x-api-key", TRADING_API_KEY)
         .header("x-universal-router-version", ROUTER_VERSION)
         .json(body)
         .send()
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| {
+            dbg!("trading_api_post: HTTP error", &e.to_string());
+            e.to_string()
+        })?;
 
     let status = resp.status();
     let text = resp.text().await.map_err(|e| e.to_string())?;
+    dbg!("trading_api_post: RESPONSE", status.as_u16(), &text);
+
     if !status.is_success() {
         return Err(format!("trading-api {path} {status}: {text}"));
     }
@@ -320,15 +332,37 @@ pub async fn uniswap_quote_info(
     let (out_chain, tout) = parse_out(to_asset, in_chain);
     let tin = input_token(asset.token.native, from_asset);
 
+    dbg!("uniswap_quote_info: params",
+        in_chain,
+        out_chain,
+        &*tin,
+        &*tout,
+        amount,
+        destination,
+        asset.token.native,
+        from_asset,
+        to_asset,
+    );
+
     let client = Client::new();
     let body = quote_body(destination, &tin, &tout, in_chain, out_chain, amount, 50);
     let resp = trading_api_post(&client, "/quote", &body).await?;
 
+    dbg!("uniswap_quote_info: got response", &resp.get("routing"), &resp.get("quote").and_then(|q| q.get("output").and_then(|o| o.get("amount"))));
+
     let amount_out = output_amount(&resp)?;
     let permit_typed_data_json = match permit_value(&resp) {
-        Some(pd) => Some(permit_to_typed_data(pd)?),
-        None => None,
+        Some(pd) => {
+            dbg!("uniswap_quote_info: permitData present, converting to typed data");
+            Some(permit_to_typed_data(pd)?)
+        }
+        None => {
+            dbg!("uniswap_quote_info: no permitData (native input or routing without Permit2)");
+            None
+        }
     };
+
+    dbg!("uniswap_quote_info: SUCCESS", &amount_out, permit_typed_data_json.is_some());
 
     Ok(ExchangeQuoteInfo {
         provider: ExchangeProvider::Uniswap(meta.clone()),
@@ -359,6 +393,18 @@ pub async fn build_uniswap_tx_info(
     let (out_chain, tout) = parse_out(&token_out, in_chain);
     let tin = input_token(is_native_in, &token_in);
 
+    dbg!("build_uniswap_tx_info: START",
+        wallet_index,
+        account_index,
+        in_chain,
+        out_chain,
+        &*tin,
+        &*tout,
+        &amount_in,
+        slippage_bps,
+        is_native_in,
+    );
+
     // Swapper address + the source chain that signs/broadcasts, read under one short guard
     // (no await inside).
     let (swapper, chain_hash) = {
@@ -384,6 +430,8 @@ pub async fn build_uniswap_tx_info(
         (account.addr.to_alloy_addr(), chain_hash)
     };
 
+    dbg!("build_uniswap_tx_info: swapper", &swapper.to_string(), chain_hash);
+
     let client = Client::new();
     let quote = trading_api_post(
         &client,
@@ -400,10 +448,13 @@ pub async fn build_uniswap_tx_info(
     )
     .await?;
 
+    dbg!("build_uniswap_tx_info: quote response", &quote.get("routing"), quote.get("permitData").is_some());
+
     // Sign the Permit2 typed data internally when the routing requires it. The signed JSON
     // is the transformed standard form; the /swap body re-attaches the original permitData.
     let signature: Option<String> = match permit_value(&quote) {
         Some(pd) => {
+            dbg!("build_uniswap_tx_info: signing Permit2 typed data");
             let typed_data_json = permit_to_typed_data(pd)?;
             let (_pubkey, sig) = crate::api::transaction::sign_typed_data_eip712(
                 wallet_index,
@@ -415,13 +466,19 @@ pub async fn build_uniswap_tx_info(
                 None,
             )
             .await?;
+            dbg!("build_uniswap_tx_info: Permit2 signed OK");
             Some(sig)
         }
-        None => None,
+        None => {
+            dbg!("build_uniswap_tx_info: no permitData, skipping Permit2 sign");
+            None
+        }
     };
 
     let swap_req = build_swap_body(&quote, signature.as_deref())?;
     let swap_resp = trading_api_post(&client, "/swap", &swap_req).await?;
+
+    dbg!("build_uniswap_tx_info: /swap response received");
 
     swap_response_to_tx(&swap_resp, swapper, chain_hash)
 }
