@@ -153,6 +153,12 @@ impl UniswapMeta {
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
                 "0x4200000000000000000000000000000000000006",
             ),
+            // BNB Chain (wrapped native = WBNB)
+            56 => (
+                "0x1906c1d672b88cd1b9ac7593301ca990f94eae07",
+                "0x78D78E420Da98ad378D7799bE8f4AF69033EB077",
+                "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            ),
             137 => (
                 "0x1095692A6237d83C6a72F3F5eFEdb9A670C49223",
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
@@ -221,7 +227,7 @@ struct SwapPlan {
 }
 
 /// Chains the Universal Router is deployed on.
-const SUPPORTED_CHAINS: &[u64] = &[1, 10, 137, 8453, 42161];
+const SUPPORTED_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161];
 
 #[frb(ignore)]
 pub fn is_supported_chain(chain_id: u64) -> bool {
@@ -989,8 +995,27 @@ mod uniswap_tests {
     #[test]
     fn meta_for_chain_known_and_unknown() {
         assert!(UniswapMeta::for_chain(1).is_some());
+        assert!(UniswapMeta::for_chain(56).is_some());
         assert!(UniswapMeta::for_chain(8453).is_some());
         assert!(UniswapMeta::for_chain(999).is_none());
+    }
+
+    #[test]
+    fn meta_resolve_bsc() {
+        let addrs = UniswapMeta::for_chain(56).unwrap().resolve().unwrap();
+        assert_eq!(addrs.chain_id, 56);
+        assert_eq!(
+            addrs.universal_router,
+            Address::from_str("0x1906c1d672b88cd1b9ac7593301ca990f94eae07").unwrap()
+        );
+        assert_eq!(
+            addrs.quoter_v2,
+            Address::from_str("0x78D78E420Da98ad378D7799bE8f4AF69033EB077").unwrap()
+        );
+        assert_eq!(
+            addrs.weth,
+            Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap()
+        );
     }
 
     #[test]
@@ -1050,6 +1075,7 @@ mod uniswap_tests {
     #[test]
     fn is_supported_chain_returns_true_for_deployed() {
         assert!(is_supported_chain(1));
+        assert!(is_supported_chain(56));
         assert!(is_supported_chain(42161));
         assert!(!is_supported_chain(999));
     }
