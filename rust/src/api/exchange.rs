@@ -268,18 +268,72 @@ async fn estimate_fast_params(
     Ok(params)
 }
 
-/// Apply pre-estimated FAST fees + an explicit `nonce` to an EVM tx, **preserving the Trading-API
-/// `gasLimit`** (never re-simulating the swap, which reverts before the approve is mined). Nonces
-/// are caller-sequenced (`N`, `N+1`) so an approve + swap batch never collides on the same nonce.
+/// Swap gas-limit buffers as `(numerator, denominator)`: `1.15×` on a live node estimate, `1.4×`
+/// on the Trading-API fallback. See [`apply_swap_gas_limit`].
+const SWAP_ESTIMATE_BUFFER: (u64, u64) = (115, 100);
+const SWAP_API_FALLBACK_BUFFER: (u64, u64) = (140, 100);
+
+/// `gas × num / den`, saturating so it can never panic on overflow.
+fn buffer_gas(gas: u64, (num, den): (u64, u64)) -> u64 {
+    gas.saturating_mul(num) / den
+}
+
+/// The EVM gas limit currently on `tx` (if it's an Ethereum tx).
+fn eth_gas(tx: &TransactionRequest) -> Option<u64> {
+    match tx {
+        TransactionRequest::Ethereum((eth, _)) => eth.gas,
+        _ => None,
+    }
+}
+
+/// Overwrite the EVM gas limit on `tx` in place (no-op for non-Ethereum txs).
+fn set_eth_gas(tx: &mut TransactionRequest, gas: u64) {
+    if let TransactionRequest::Ethereum((eth, _)) = tx {
+        eth.gas = Some(gas);
+    }
+}
+
+/// Set the swap tx's gas limit from a **live `eth_estimateGas`** against the node (×1.15) when the
+/// tx can be simulated, else the Trading-API estimate already on the tx (×1.4). The fallback
+/// covers a swap bundled behind an unmined approve — the allowance isn't on-chain yet, so the
+/// simulation reverts (`Err`) — as well as transient RPC failures. The Trading-API number is the
+/// bare `gasUseEstimate` with no margin, so it must never be broadcast verbatim. No-op for
+/// non-EVM / gas-less txs.
+async fn apply_swap_gas_limit(
+    core: &Arc<Background>,
+    chain_hash: u64,
+    swap_tx: &mut TransactionRequest,
+) {
+    let Some(api_gas) = eth_gas(swap_tx) else {
+        return;
+    };
+
+    let live = match core.get_provider(chain_hash) {
+        Ok(chain) => chain
+            .estimate_gas(swap_tx)
+            .await
+            .ok()
+            .and_then(|gas| u64::try_from(gas).ok()),
+        Err(_) => None,
+    };
+
+    let limit = match live {
+        Some(est) => buffer_gas(est, SWAP_ESTIMATE_BUFFER),
+        None => buffer_gas(api_gas, SWAP_API_FALLBACK_BUFFER),
+    };
+    set_eth_gas(swap_tx, limit);
+}
+
+/// Apply pre-estimated FAST fees + an explicit `nonce` to an EVM tx, **preserving the gas limit
+/// already on the tx** (the swap leg sets it via [`apply_swap_gas_limit`]; the approve leg keeps
+/// its `/check_approval` gas) — never re-simulating here, which would revert before the approve is
+/// mined. Nonces are caller-sequenced (`N`, `N+1`) so an approve + swap batch never collides.
 fn apply_fast_fees(
     tx: &mut TransactionRequest,
     base: &RequiredTxParams,
     nonce: u64,
 ) -> Result<(), ServiceError> {
-    let api_gas = match tx {
-        TransactionRequest::Ethereum((eth, _)) => eth.gas,
-        _ => None,
-    };
+    let api_gas = eth_gas(tx);
     let mut params = base.clone();
     params.nonce = nonce;
     if let Some(g) = api_gas {
@@ -407,6 +461,7 @@ pub async fn execute_exchange_swap(
     .await?
     .try_into()
     .map_err(ServiceError::TransactionErrors)?;
+    apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
 
     let _ = sink.add("swapping".to_string());
@@ -559,6 +614,7 @@ pub async fn finalize_exchange_swap(
     .await?
     .try_into()
     .map_err(ServiceError::TransactionErrors)?;
+    apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
     let base = estimate_fast_params(&core, chain_hash, &signer).await?;
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
 
@@ -638,5 +694,15 @@ mod swap_gas_tests {
         assert_eq!(approve_eth.gas, Some(60_000));
         assert_eq!(swap_eth.nonce, Some(6));
         assert_eq!(swap_eth.gas, Some(321_542));
+    }
+
+    /// The two swap gas-limit buffers, plus the saturating guard against overflow panics.
+    #[test]
+    fn buffer_gas_applies_ratio_and_saturates() {
+        // live estimate ×1.15, Trading-API fallback ×1.4 (integer division truncates).
+        assert_eq!(buffer_gas(182_000, SWAP_ESTIMATE_BUFFER), 209_300);
+        assert_eq!(buffer_gas(179_917, SWAP_API_FALLBACK_BUFFER), 251_883);
+        // saturating_mul keeps it panic-free at the u64 ceiling.
+        assert_eq!(buffer_gas(u64::MAX, (115, 100)), u64::MAX / 100);
     }
 }
