@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/exchange_provider_icon.dart';
+import 'package:bearby/components/gas_eip1559.dart';
 import 'package:bearby/components/glass_message.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -17,13 +18,16 @@ import 'package:bearby/ledger/ledger_connector.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/eip712.dart';
+import 'package:bearby/mixins/gas_eip1559.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/gas.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -142,6 +146,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   /// Indented sub-line shown under the currently active step.
   String? _hint;
 
+  /// Live gas params for the swap, fetched against a preview tx (native-in only).
+  RequiredTxParamsInfo? _gasParams;
+  TransactionRequestInfo? _gasPreviewTx;
+  Timer? _gasTimer;
+
   bool _loading = false;
   bool _obscurePassword = true;
   String? _error;
@@ -191,10 +200,17 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         if (mounted) setState(() {});
       });
     }
+
+    // Preview the swap's network fee up front. Only native-in swaps can be estimated without a
+    // signed permit / on-chain allowance, so the rest fall back to the tier label.
+    if (widget.isNativeIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _initGasPreview());
+    }
   }
 
   @override
   void dispose() {
+    _gasTimer?.cancel();
     _swapSub?.cancel();
     _passwordController.dispose();
     if (_isLedger && context.mounted) {
@@ -274,14 +290,80 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   }
 
   // -------------------------------------------------------------------------
+  // Gas preview (native-in only) — same pipeline as the transfer modal: build a
+  // throwaway unsigned swap tx once, then poll [caclGasFee] on it. Never broadcasts.
+  // -------------------------------------------------------------------------
+
+  Future<void> _initGasPreview() async {
+    final appState = context.read<AppState>();
+    final wallet = appState.wallet;
+    if (wallet == null) return;
+    try {
+      final nonce = await estimateSwapBaseNonce(
+        walletIndex: appState.selectedWalletIndex,
+        accountIndex: wallet.selectedAccount,
+      );
+      final prep = await prepareExchangeSwap(
+        walletIndex: appState.selectedWalletIndex,
+        accountIndex: wallet.selectedAccount,
+        provider: widget.provider,
+        tokenIn: widget.tokenIn,
+        tokenOut: widget.tokenOut,
+        amountIn: widget.amountInWei,
+        slippageBps: widget.slippageBps,
+        isNativeIn: true,
+      );
+      final tx = await finalizeExchangeSwap(
+        walletIndex: appState.selectedWalletIndex,
+        accountIndex: wallet.selectedAccount,
+        quoteBlob: prep.quoteBlob,
+        permitSignature: null,
+        nonce: nonce,
+        swapTitle: _display.swapTitle,
+        swapInfo: _display.swapInfo,
+        providerIcon: _display.providerIcon,
+        outToken: _display.outToken,
+      );
+      if (!mounted) return;
+      _gasPreviewTx = tx;
+      await _refreshGas();
+      _gasTimer =
+          Timer.periodic(const Duration(seconds: 12), (_) => _refreshGas());
+    } catch (e) {
+      // Non-blocking: the modal still shows the Aggressive tier label.
+      debugPrint('swap gas preview failed: $e');
+    }
+  }
+
+  Future<void> _refreshGas() async {
+    final tx = _gasPreviewTx;
+    if (tx == null || !mounted) return;
+    final appState = context.read<AppState>();
+    final wallet = appState.wallet;
+    if (wallet == null) return;
+    try {
+      final gas = await caclGasFee(
+        params: tx,
+        walletIndex: appState.selectedWalletIndex,
+        accountIndex: wallet.selectedAccount,
+      );
+      if (mounted) setState(() => _gasParams = gas);
+    } catch (e) {
+      debugPrint('swap gas refresh failed: $e');
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Software wallet confirm
   // -------------------------------------------------------------------------
 
-  void _confirmSoftware(AppState appState) {
+  /// Returns a future that completes only when the swap stream is done or errors, so the awaiting
+  /// [SwipeButton] keeps its loading state for the entire approve → permit → swap sequence.
+  Future<void> _confirmSoftware(AppState appState) {
     final wallet = appState.wallet;
     if (wallet == null) {
       setState(() => _error = 'No active account');
-      return;
+      return Future.value();
     }
 
     setState(() {
@@ -290,6 +372,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _resetSteps();
     });
 
+    final completer = Completer<void>();
     final stream = executeExchangeSwap(
       walletIndex: appState.selectedWalletIndex,
       accountIndex: wallet.selectedAccount,
@@ -312,14 +395,18 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
             _error = e.toString();
           });
         }
+        if (!completer.isCompleted) completer.complete();
       },
       onDone: () {
         // onError already set _error and _loading=false; onDone always fires
         // after onError on a closing stream — guard against accidental pop+nav.
+        if (!completer.isCompleted) completer.complete();
         if (_error != null) return;
         _completeAndExit(appState);
       },
     );
+
+    return completer.future;
   }
 
   // -------------------------------------------------------------------------
@@ -605,30 +692,72 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-  Widget _buildMeta(AppState appState, AppTheme theme) {
-    final addr = appState.account?.addr;
-    final slippageText =
-        '${(widget.slippageBps / 100).toStringAsFixed(2)}%  ·  Aggressive';
-
-    return Wrap(
-      spacing: 6,
-      runSpacing: 4,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        if (addr != null && addr.isNotEmpty) ...[
+  Widget _metaRow(AppTheme theme, String label, Widget value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
           Text(
-            'To',
-            style: theme.caption.copyWith(color: theme.textSecondary),
+            label,
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
           ),
-          CopyContent(address: addr),
-          Text(
-            '·',
-            style: theme.caption.copyWith(color: theme.textSecondary),
+          const Spacer(),
+          Flexible(
+            child: Align(alignment: Alignment.centerRight, child: value),
           ),
         ],
-        Text(
-          slippageText,
-          style: theme.caption.copyWith(color: theme.textSecondary),
+      ),
+    );
+  }
+
+  Widget _buildMeta(AppState appState, AppTheme theme) {
+    final addr = appState.account?.addr;
+    final slippage = '${(widget.slippageBps / 100).toStringAsFixed(2)}%';
+    const tier = GasFeeOption.aggressive;
+
+    // Native-in: real Aggressive fee from the preview tx (`fast` is the total fee in wei).
+    String? feeText;
+    final gas = _gasParams;
+    if (gas != null && widget.isNativeIn) {
+      final (normalized, _) = formatingAmount(
+        amount: BigInt.tryParse(gas.fast) ?? BigInt.zero,
+        symbol: widget.fromToken.symbol,
+        decimals: widget.fromToken.decimals,
+        rate: widget.fromToken.rate,
+        appState: appState,
+      );
+      feeText = '≈ $normalized';
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (addr != null && addr.isNotEmpty)
+          _metaRow(theme, 'Recipient', CopyContent(address: addr)),
+        _metaRow(
+          theme,
+          'Slippage',
+          Text(
+            slippage,
+            style: theme.bodyText1.copyWith(color: theme.textPrimary),
+          ),
+        ),
+        if (feeText != null)
+          _metaRow(
+            theme,
+            'Network fee',
+            Text(
+              feeText,
+              style: theme.bodyText1.copyWith(color: theme.textPrimary),
+            ),
+          ),
+        _metaRow(
+          theme,
+          'Gas tier',
+          Text(
+            '${tier.icon} ${tier.title(context)}',
+            style: theme.bodyText1.copyWith(color: theme.textPrimary),
+          ),
         ),
       ],
     );
@@ -729,7 +858,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                           if (_isLedger) {
                             await _confirmLedger(appState);
                           } else {
-                            _confirmSoftware(appState);
+                            await _confirmSoftware(appState);
                           }
                         },
                       ),
