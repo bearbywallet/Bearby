@@ -17,7 +17,7 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `estimate_fast_params`, `resolve_swap_signer`
+// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
 
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
@@ -36,7 +36,7 @@ Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
         destination: destination);
 
 /// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
-/// sign the Permit2 EIP-712, build the swap via `/swap`, and broadcast approve (`N`) + swap (`N+1`)
+/// sign the Permit2 EIP-712, build the Universal Router swap calldata, and broadcast approve (`N`) + swap (`N+1`)
 /// back-to-back (EVM nonce ordering guarantees the approve executes first). Returns the broadcast
 /// histories. Progress streams as `approving`/`approved`/`permit`/`swapping`/`done`. Ledger wallets
 /// use the step-by-step `check_exchange_approval` → `prepare_exchange_swap` → `finalize_exchange_swap`
@@ -110,8 +110,8 @@ Future<PreparedSwapInfo> prepareExchangeSwap(
         slippageBps: slippageBps,
         isNativeIn: isNativeIn);
 
-/// **Ledger final step.** Attach the device-signed permit signature, call `/swap`, and return the
-/// swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
+/// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
+/// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
 /// the UI to broadcast via `send_signed_transactions`.
 Future<TransactionRequestInfo> finalizeExchangeSwap(
         {required BigInt walletIndex,

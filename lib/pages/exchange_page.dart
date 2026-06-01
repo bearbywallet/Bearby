@@ -22,7 +22,6 @@ import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -51,7 +50,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   String? _assetsError;
   // "You pay" — our tokens on the active network (source = active wallet chain).
   List<ExchangeAsset> _assets = const [];
-  // "You get" — every Uniswap-supported token across all chains (bridge targets).
+  // "You get" — every Uniswap-supported token on the active chain (same-chain swaps only).
   List<ExchangeAsset> _getAssets = const [];
   ExchangeAsset? _fromAsset;
   ExchangeAsset? _toAsset;
@@ -88,44 +87,24 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       final all = await bootstrapExchangeProviders();
       final chainHash = _appState.wallet?.chainHash;
 
-      // Resolve the active (source) chain — getChain throws, so scan providers.
-      NetworkConfigInfo? active;
-      for (final p in _appState.state.providers) {
-        if (p.chainHash == chainHash) {
-          active = p;
-          break;
-        }
-      }
-      final sourceTestnet = active?.testnet ?? false;
-
-      // Destinations must share the source environment (mainnet↔mainnet / testnet↔testnet).
-      final sameEnvChains = <BigInt>{
-        for (final p in _appState.state.providers)
-          if ((p.testnet ?? false) == sourceTestnet) p.chainHash,
-      };
-
-      // Pay = our tokens on the active network. Get = same-environment Uniswap tokens.
+      // Uniswap routes a single hop on ONE chain, so both the "pay" and "get" sides live
+      // on the wallet's active chain. (Cross-chain bridging will arrive later as a
+      // separate provider, e.g. Thorchain.)
       final pay = all
           .where((a) => a.token.chainHash == chainHash && _isUniswapEvm(a))
           .toList();
-      final get = all
-          .where((a) =>
-              _isUniswapEvm(a) && sameEnvChains.contains(a.token.chainHash))
-          .toList();
+      final get = pay;
 
       ExchangeAsset? from;
       ExchangeAsset? to;
       if (pay.isNotEmpty) {
         from = pay.firstWhere((a) => a.token.native, orElse: () => pay.first);
       }
-      // Prefer a same-chain token (a plain swap, always routable); fall back to first same-env.
+      // Default the "get" side to the first token that isn't the "pay" token.
       for (final a in get) {
         if (a == from) continue;
-        to ??= a;
-        if (a.token.chainHash == chainHash) {
-          to = a;
-          break;
-        }
+        to = a;
+        break;
       }
 
       if (!mounted) return;
@@ -145,8 +124,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
-  /// "You get" assets: every Uniswap token across all chains (bridge targets), excluding
-  /// whatever is selected on the "pay" side.
+  /// "You get" assets: every Uniswap token on the active chain, excluding whatever is
+  /// selected on the "pay" side.
   List<ExchangeAsset> get _outAssets =>
       _getAssets.where((a) => a != _fromAsset).toList();
 
@@ -155,26 +134,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       a.token.addrType == 1 &&
       a.providers.any((p) => p.whenOrNull(uniswap: (_) => true) ?? false);
 
-  /// The Uniswap source/target chain id carried by an asset's provider, if any.
-  static BigInt? _uniChainId(ExchangeAsset a) {
-    for (final p in a.providers) {
-      final id = p.whenOrNull(uniswap: (m) => m.chainId);
-      if (id != null) return id;
-    }
-    return null;
-  }
-
-  /// `tokenOut` for the Trading API. A different destination chain is prefixed
-  /// `"<chainId>:addr"` so the API returns a BRIDGE route; same-chain stays a bare address.
-  /// Native tokens already carry the zero address in the catalog, so no substitution.
-  String _outTokenParam(ExchangeAsset from, ExchangeAsset to) {
-    final addr = to.token.addr;
-    final fromId = _uniChainId(from);
-    final toId = _uniChainId(to);
-    return (fromId != null && toId != null && fromId != toId)
-        ? '$toId:$addr'
-        : addr;
-  }
+  /// `tokenOut` for the swap. Same-chain only, so it's just the token address; native
+  /// tokens already carry the zero address in the catalog (the Rust layer substitutes
+  /// WETH internally for native input/output).
+  String _outTokenParam(ExchangeAsset to) => to.token.addr;
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
@@ -199,7 +162,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       final quotes = await fetchExchangeQuote(
         asset: from,
         fromAsset: from.token.addr,
-        toAsset: _outTokenParam(from, to),
+        toAsset: _outTokenParam(to),
         amount: amountWei.toString(),
         destination: account.addr,
       );
@@ -319,10 +282,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
 
     final fromToken = from.token;
-    // Native tokens already carry the zero address; Rust also overrides `tokenIn`
-    // internally when `isNativeIn`. A `"<chainId>:addr"` output marks a bridge route.
+    // Native tokens already carry the zero address; the Rust layer substitutes WETH
+    // internally for native input (`isNativeIn`) and native output. Same-chain only.
     final tokenIn = fromToken.addr;
-    final tokenOut = _outTokenParam(from, to);
+    final tokenOut = _outTokenParam(to);
     final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
 
     // The confirm modal owns the whole approve → permit → swap sequence (batched for software
@@ -554,11 +517,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   }
 
   Widget _buildDirectionButton(AppTheme theme, ExchangeAsset? from) {
-    // Flip is only valid when the current "pay" token can legally become an output
-    // (ERC20-out only). Native-out unwrap (e.g. WBTC -> BNB) is supported by Uniswap's
-    // Universal Router via UNWRAP_WETH but not yet wired in the Rust backend
-    // (build_execute_calldata); once that lands, this guard can drop the native check.
-    final canFlip = from != null && !from.token.native && _toAsset != null;
+    // Same-chain swaps are always reversible: the Rust backend handles native input
+    // (WRAP_ETH) and native output (UNWRAP_WETH), so either token can be the input.
+    final canFlip = from != null && _toAsset != null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

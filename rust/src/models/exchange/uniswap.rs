@@ -1,321 +1,756 @@
-//! Internal Uniswap layer backed by the Uniswap **Trading API**
-//! (`https://trade-api.gateway.uniswap.org/v1`). Nothing here crosses the
-//! flutter_rust_bridge boundary: every item is `#[frb(ignore)]`. The API gives full
-//! v2/v3/v4 routing on every Uniswap-supported chain plus cross-chain `BRIDGE` routing.
+//! Internal Uniswap layer that quotes on-chain via **QuoterV2** (`eth_call`) and builds
+//! swaps by encoding Universal Router `execute(commands, inputs, deadline)` calldata
+//! directly with `alloy`. Nothing here crosses the flutter_rust_bridge boundary: every
+//! item is `#[frb(ignore)]` and freely uses alloy types.
 //!
-//! Flow: `/quote` (routing + optional Permit2 `permitData`) → sign the permit EIP-712
-//! internally → `/swap` (unsigned router/bridge calldata) → lift into the FFI tx, which
-//! the UI signs and broadcasts via the existing `sign_send_transactions`.
+//! Flow: on-chain fee-tier probing → permit signing (ERC-20 input) → build unsigned
+//! Universal Router tx → the UI signs and broadcasts via `sign_send_transactions`.
 
 use std::borrow::Cow;
-use std::collections::HashSet;
 use std::str::FromStr;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
-use zilpay::alloy::primitives::{Address, U256};
+use zilpay::alloy::primitives::{
+    address, aliases::{U160, U24, U48}, Address, Bytes, U256,
+};
+use zilpay::alloy::sol_types::{SolCall, SolValue};
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
-use zilpay::reqwest::Client;
-use zilpay::serde_json::{json, Map, Value};
+use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::rpc::{
+    common::JsonRPC, methods::EvmMethods, network_config::ChainConfig, provider::RpcProvider,
+    zil_interfaces::ResultRes,
+};
+use zilpay::serde;
+use zilpay::serde_json::{self, json, Value};
 
 use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
 use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
+use crate::utils::errors::ServiceError;
+use crate::utils::helpers::with_service;
 
-const TRADING_API_BASE: &str = "https://trade-api.gateway.uniswap.org/v1";
-// Temporary shared test key — to be replaced by our hosted backend so the key is never
-// shipped in the binary (the backend injects it and can also enable the platform fee).
-const TRADING_API_KEY: &str = "UnUgzBC9Jsu3ulMJGnIn_enFSPKRj-VReeNCf9HlV-U";
-const ROUTER_VERSION: &str = "2.0";
+// Universal Router command bytes (Commands.sol).
+const CMD_V3_SWAP_EXACT_IN: u8 = 0x00;
+const CMD_SWEEP: u8 = 0x04;
+const CMD_PAY_PORTION: u8 = 0x06;
+const CMD_PERMIT2_PERMIT: u8 = 0x0a;
+const CMD_WRAP_ETH: u8 = 0x0b;
+const CMD_UNWRAP_WETH: u8 = 0x0c;
 
-/// Native-input sentinel: the API recommends the zero address for native ETH input — it
-/// returns `permitData: null` (no Permit2 signing) and carries the amount as `swap.value`.
+// Router recipient sentinel: address(2) routes funds to the router itself so that the
+// subsequent PAY_PORTION / SWEEP commands can split the swap output.
+const ADDRESS_THIS: Address = Address::with_last_byte(2);
+
+const FEE_BIPS: u32 = 50;
+const FEE_RECIPIENT: Address = address!("0x74d35b31ed6b31818331bc28fe343669126f152f");
+
+const V3_FEE_TIERS: &[u32] = &[100, 500, 3000, 10000];
+
+const PERMIT_AMOUNT: U160 = U160::MAX;
+const PERMIT_EXPIRATION: U48 = U48::MAX;
+const PERMIT_SIG_DEADLINE: u64 = 281_474_976_710_655;
+
+const DEFAULT_APPROVE_GAS: u64 = 60_000;
+const DEFAULT_SWAP_GAS: u64 = 400_000;
+
 const NATIVE_SENTINEL: &str = "0x0000000000000000000000000000000000000000";
 
-/// Chains the Trading API can route on. Source of truth is the API itself (it 400s on
-/// anything else); this only gates whether the UI offers a Uniswap provider for an asset.
-/// IDs verified against the gateway's `tokenOutChainId` enum.
-const SUPPORTED_CHAINS: &[u64] = &[
-    // mainnets
-    1, 10, 56, 130, 137, 143, 196, 324, 480, 1868, 4217, 4326, 8453, 42161, 42220, 43114, 59144,
-    81457, 7777777, // testnets
-    1301,     // Unichain Sepolia
-    11155111, // Sepolia
-    84532,    // Base Sepolia
-];
+mod sol_types {
+    use zilpay::alloy::sol;
 
-#[frb(ignore)]
-pub fn is_supported_chain(chain_id: u64) -> bool {
-    SUPPORTED_CHAINS.contains(&chain_id)
+    sol! {
+        struct QuoteExactInputSingleParams {
+            address tokenIn;
+            address tokenOut;
+            uint256 amountIn;
+            uint24 fee;
+            uint160 sqrtPriceLimitX96;
+        }
+
+        function quoteExactInputSingle(QuoteExactInputSingleParams params)
+            external
+            returns (uint256 amountOut, uint160 sqrtPriceX96After, uint32 ticks, uint256 gasEstimate);
+
+        struct PermitDetails {
+            address token;
+            uint160 amount;
+            uint48 expiration;
+            uint48 nonce;
+        }
+
+        struct PermitSingle {
+            PermitDetails details;
+            address spender;
+            uint256 sigDeadline;
+        }
+
+        function execute(bytes commands, bytes[] inputs, uint256 deadline) external payable;
+    }
+
+    sol! {
+        // The real on-chain name is `allowance` — the function selector is derived from the
+        // signature `allowance(address,address,address)`, NOT the interface name, so this must
+        // stay named `allowance` (renaming it changes the selector and the call reverts).
+        interface IPermit2 {
+            function allowance(address owner, address token, address spender)
+                external view returns (uint160 amount, uint48 expiration, uint48 nonce);
+        }
+    }
+
+    sol! {
+        interface IERC20 {
+            function allowance(address owner, address spender) external view returns (uint256);
+            function approve(address spender, uint256 amount) external returns (bool);
+        }
+    }
 }
 
-/// FFI-safe Uniswap marker. Only the source chain id is needed — the Trading API resolves
-/// routers, pools and routing itself. Carried inside [`ExchangeProvider::Uniswap`].
+use sol_types::{
+    executeCall, quoteExactInputSingleCall, PermitDetails, PermitSingle, QuoteExactInputSingleParams,
+};
+use sol_types::{IERC20, IPermit2};
+
+/// `Copy` bundle of parsed deployment addresses.
+#[frb(ignore)]
+#[derive(Clone, Copy)]
+pub struct UniswapAddrs {
+    pub chain_id: u64,
+    pub universal_router: Address,
+    pub quoter_v2: Address,
+    pub permit2: Address,
+    pub weth: Address,
+}
+
+/// FFI-safe Uniswap marker. Only the source chain id is needed — deployment addresses
+/// are resolved internally from a const table via [`UniswapMeta::resolve`].
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UniswapMeta {
     pub chain_id: u64,
 }
 
 impl UniswapMeta {
-    /// `Some` iff the Trading API supports `chain_id`. Gates `ExchangeProvider::is_support`.
+    /// `Some` iff `chain_id` has Universal Router + QuoterV2 deployments.
     #[frb(ignore)]
     pub fn for_chain(chain_id: u64) -> Option<Self> {
         is_supported_chain(chain_id).then_some(Self { chain_id })
     }
-}
 
-/// Single POST against the Trading API — the one place request headers/error handling live.
-#[frb(ignore)]
-async fn trading_api_post(client: &Client, path: &str, body: &Value) -> Result<Value, String> {
-    let url = format!("{TRADING_API_BASE}{path}");
-    dbg!("trading_api_post: REQUEST", &url, body);
+    /// Parse the deployment table into a `Copy` alloy bundle.
+    #[frb(ignore)]
+    pub fn resolve(&self) -> Result<UniswapAddrs, String> {
+        const PERMIT2: &str = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
+        let (universal_router, quoter_v2, weth) = match self.chain_id {
+            1 => (
+                "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            ),
+            10 => (
+                "0x851116D9223fabED8E56C0E6b8Ad0c31d98b3507",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            137 => (
+                "0x1095692A6237d83C6a72F3F5eFEdb9A670C49223",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+            ),
+            8453 => (
+                "0x6fF5693b99212Da76ad316178A184AB56D299b43",
+                "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            42161 => (
+                "0xA51afAFe0263b40EdaEf0Df8781eA9aa03E381a3",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+            ),
+            _ => return Err("unsupported chain".to_string()),
+        };
 
-    let resp = client
-        .post(&url)
-        .header("Content-Type", "application/json")
-        .header("x-api-key", TRADING_API_KEY)
-        .header("x-universal-router-version", ROUTER_VERSION)
-        .json(body)
-        .send()
-        .await
-        .map_err(|e| {
-            dbg!("trading_api_post: HTTP error", &e.to_string());
-            e.to_string()
-        })?;
-
-    let status = resp.status();
-    let text = resp.text().await.map_err(|e| e.to_string())?;
-    dbg!("trading_api_post: RESPONSE", status.as_u16(), &text);
-
-    if !status.is_success() {
-        return Err(format!("trading-api {path} {status}: {text}"));
+        let parse = |s: &str| Address::from_str(s).map_err(|e| e.to_string());
+        Ok(UniswapAddrs {
+            chain_id: self.chain_id,
+            universal_router: parse(universal_router)?,
+            quoter_v2: parse(quoter_v2)?,
+            permit2: parse(PERMIT2)?,
+            weth: parse(weth)?,
+        })
     }
-    zilpay::serde_json::from_str(&text).map_err(|e| e.to_string())
 }
 
-/// Parse the output side of a quote: `"<chainId>:0xaddr"` carries a bridge target chain,
-/// plain `"0xaddr"` stays on the source chain. Borrowed → no extra allocation.
+/// Serialized inside `quote_blob` — opaque to the UI, carries everything
+/// `finalize_uniswap_swap` needs to build the unsigned tx.
 #[frb(ignore)]
-fn parse_out<'a>(to_asset: &'a str, source_chain: u64) -> (u64, Cow<'a, str>) {
-    match to_asset.split_once(':') {
-        Some((chain, addr)) if !chain.is_empty() && chain.bytes().all(|b| b.is_ascii_digit()) => {
-            (chain.parse().unwrap_or(source_chain), Cow::Borrowed(addr))
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(crate = "zilpay::serde")]
+struct QuoteBlob {
+    chain_id: u64,
+    token_in: String,
+    token_out: String,
+    amount_in: String,
+    amount_out: String,
+    fee_tier: u32,
+    permit_nonce: Option<u64>,
+    is_native_in: bool,
+    is_native_out: bool,
+    slippage_bps: u32,
+}
+
+/// Native or Permit2 authorization for the swap.
+enum SwapInput {
+    NativeEth,
+    Erc20 {
+        permit: PermitSingle,
+        signature: Vec<u8>,
+    },
+}
+
+struct SwapPlan {
+    token_in: Address,
+    token_out: Address,
+    amount_in: U256,
+    amount_out_min: U256,
+    fee_tier: u32,
+    recipient: Address,
+    input: SwapInput,
+    native_out: bool,
+}
+
+/// Chains the Universal Router is deployed on.
+const SUPPORTED_CHAINS: &[u64] = &[1, 10, 137, 8453, 42161];
+
+#[frb(ignore)]
+pub fn is_supported_chain(chain_id: u64) -> bool {
+    SUPPORTED_CHAINS.contains(&chain_id)
+}
+
+/// Resolve `to_asset`: detect cross-chain prefix and native-out sentinel.
+/// Returns `(resolved_token, is_native_out)`, or `Err` when `to_asset` targets a
+/// different chain (cross-chain not supported by Uniswap).
+fn resolve_out<'a>(to_asset: &'a str, source_chain: u64) -> Result<(Cow<'a, str>, bool), String> {
+    if let Some((chain_part, addr)) = to_asset.split_once(':') {
+        if !chain_part.is_empty() && chain_part.bytes().all(|b| b.is_ascii_digit()) {
+            let chain: u64 = chain_part.parse().map_err(|_| "invalid chain id".to_string())?;
+            if chain != source_chain {
+                return Err("cross-chain Uniswap not supported".to_string());
+            }
+            let is_native = addr == NATIVE_SENTINEL || addr.is_empty();
+            return Ok((Cow::Owned(addr.to_string()), is_native));
         }
-        _ => (source_chain, Cow::Borrowed(to_asset)),
     }
+    let is_native = to_asset == NATIVE_SENTINEL || to_asset.is_empty();
+    Ok((Cow::Borrowed(to_asset), is_native))
 }
 
-/// The input token as the API wants it: zero sentinel for native, else the ERC-20 address.
-#[frb(ignore)]
-fn input_token(is_native_in: bool, token: &str) -> Cow<'_, str> {
+/// Resolve the input token: substitute WETH for native input.
+fn resolve_in<'a>(is_native_in: bool, weth: &'a str, from_asset: &'a str) -> Cow<'a, str> {
     if is_native_in {
-        Cow::Borrowed(NATIVE_SENTINEL)
+        Cow::Borrowed(weth)
     } else {
-        Cow::Borrowed(token)
+        Cow::Borrowed(from_asset)
     }
 }
 
-/// `/quote` body. `protocols` (no `routingPreference`) keeps routing on-chain: `CLASSIC`
-/// same-chain, `BRIDGE` cross-chain — both return broadcastable calldata. Gasless UniswapX
-/// (DUTCH/PRIORITY) is intentionally excluded since it has no on-chain tx to broadcast.
-//
-// Platform fee: the documented `portionBips`/`portionRecipient` are silently ignored by the
-// shared test key, so no fee is taken here. The hosted backend will apply it server-side.
-#[frb(ignore)]
-fn quote_body(
-    swapper: &str,
+fn v3_path(tin: &Address, fee: u32, tout: &Address) -> Vec<u8> {
+    let mut p = Vec::with_capacity(20 + 3 + 20);
+    p.extend_from_slice(tin.as_slice());
+    p.extend_from_slice(&fee.to_be_bytes()[1..]);
+    p.extend_from_slice(tout.as_slice());
+    p
+}
+
+fn encode_quote(tin: Address, tout: Address, amt: U256, fee: u32) -> Vec<u8> {
+    quoteExactInputSingleCall {
+        params: QuoteExactInputSingleParams {
+            tokenIn: tin,
+            tokenOut: tout,
+            amountIn: amt,
+            fee: U24::from(fee),
+            sqrtPriceLimitX96: U160::ZERO,
+        },
+    }
+    .abi_encode()
+}
+
+fn decode_quote(data: &[u8]) -> Option<U256> {
+    quoteExactInputSingleCall::abi_decode_returns(data)
+        .ok()
+        .map(|r| r.amountOut)
+}
+
+fn decode_allowance_nonce(data: &[u8]) -> Option<u64> {
+    IPermit2::allowanceCall::abi_decode_returns(data)
+        .ok()
+        .map(|r| r.nonce.to::<u64>())
+}
+
+fn decode_erc20_allowance(data: &[u8]) -> Option<U256> {
+    IERC20::allowanceCall::abi_decode_returns(data).ok()
+}
+
+/// Encode the Universal Router `execute(commands, inputs, deadline)` calldata for a
+/// single-hop V3 swap that takes our platform fee from the output:
+/// `[WRAP_ETH|PERMIT2_PERMIT] → V3_SWAP_EXACT_IN → PAY_PORTION → [SWEEP|UNWRAP_WETH]`.
+fn build_execute_calldata(plan: SwapPlan, deadline: U256) -> Vec<u8> {
+    let SwapPlan {
+        token_in,
+        token_out,
+        amount_in,
+        amount_out_min,
+        fee_tier,
+        recipient,
+        input,
+        native_out,
+    } = plan;
+
+    let mut commands = Vec::with_capacity(4);
+    let mut inputs: Vec<Bytes> = Vec::with_capacity(4);
+
+    let payer_is_user = match input {
+        SwapInput::NativeEth => {
+            commands.push(CMD_WRAP_ETH);
+            inputs.push((ADDRESS_THIS, amount_in).abi_encode_params().into());
+            false
+        }
+        SwapInput::Erc20 { permit, signature } => {
+            commands.push(CMD_PERMIT2_PERMIT);
+            inputs.push((permit, Bytes::from(signature)).abi_encode_params().into());
+            true
+        }
+    };
+
+    let path = v3_path(&token_in, fee_tier, &token_out);
+    commands.push(CMD_V3_SWAP_EXACT_IN);
+    inputs.push(
+        (ADDRESS_THIS, amount_in, U256::ZERO, Bytes::from(path), payer_is_user)
+            .abi_encode_params()
+            .into(),
+    );
+
+    commands.push(CMD_PAY_PORTION);
+    inputs.push(
+        (token_out, FEE_RECIPIENT, U256::from(FEE_BIPS))
+            .abi_encode_params()
+            .into(),
+    );
+
+    if native_out {
+        commands.push(CMD_UNWRAP_WETH);
+        inputs.push((recipient, amount_out_min).abi_encode_params().into());
+    } else {
+        commands.push(CMD_SWEEP);
+        inputs.push((token_out, recipient, amount_out_min).abi_encode_params().into());
+    }
+
+    executeCall {
+        commands: Bytes::from(commands),
+        inputs,
+        deadline,
+    }
+    .abi_encode()
+}
+
+/// Standard EIP-712 typed-data JSON for a Permit2 `PermitSingle`.
+fn permit2_typed_data_json(addrs: &UniswapAddrs, token_hex: &str, nonce: u64) -> String {
+    json!({
+        "types": {
+            "EIP712Domain": [
+                { "name": "name", "type": "string" },
+                { "name": "chainId", "type": "uint256" },
+                { "name": "verifyingContract", "type": "address" }
+            ],
+            "PermitSingle": [
+                { "name": "details", "type": "PermitDetails" },
+                { "name": "spender", "type": "address" },
+                { "name": "sigDeadline", "type": "uint256" }
+            ],
+            "PermitDetails": [
+                { "name": "token", "type": "address" },
+                { "name": "amount", "type": "uint160" },
+                { "name": "expiration", "type": "uint48" },
+                { "name": "nonce", "type": "uint48" }
+            ]
+        },
+        "primaryType": "PermitSingle",
+        "domain": {
+            "name": "Permit2",
+            "chainId": addrs.chain_id,
+            "verifyingContract": addrs.permit2.to_string()
+        },
+        "message": {
+            "details": {
+                "token": token_hex,
+                "amount": PERMIT_AMOUNT.to_string(),
+                "expiration": PERMIT_EXPIRATION.to_string(),
+                "nonce": nonce.to_string()
+            },
+            "spender": addrs.universal_router.to_string(),
+            "sigDeadline": PERMIT_SIG_DEADLINE.to_string()
+        }
+    })
+    .to_string()
+}
+
+/// Read-only quote: probe every fee tier (and the Permit2 nonce for ERC-20 inputs) in a
+/// single batched `eth_call`, then keep the tier with the largest output.
+async fn uniswap_quote(
+    config: &ChainConfig,
+    addrs: &UniswapAddrs,
     token_in: &str,
     token_out: &str,
-    in_chain: u64,
-    out_chain: u64,
-    amount: &str,
-    slippage_bps: u32,
-) -> Value {
-    json!({
-        "swapper": swapper,
-        "tokenIn": token_in,
-        "tokenOut": token_out,
-        "tokenInChainId": in_chain,
-        "tokenOutChainId": out_chain,
-        "amount": amount,
-        "type": "EXACT_INPUT",
-        "slippageTolerance": f64::from(slippage_bps) / 100.0,
-        "protocols": ["V2", "V3", "V4"],
-    })
-}
+    amount_in: &str,
+    owner: &str,
+    is_native_in: bool,
+) -> Result<(U256, u32, Option<u64>), String> {
+    let tin = Address::from_str(token_in).map_err(|e| e.to_string())?;
+    let tout = Address::from_str(token_out).map_err(|e| e.to_string())?;
+    let amt = U256::from_str(amount_in).map_err(|e| e.to_string())?;
 
-/// `quote.output.amount` (present for CLASSIC and BRIDGE routings alike).
-#[frb(ignore)]
-fn output_amount(resp: &Value) -> Result<String, String> {
-    resp.get("quote")
-        .and_then(|q| q.get("output"))
-        .and_then(|o| o.get("amount"))
-        .and_then(Value::as_str)
-        .map(str::to_owned)
-        .ok_or_else(|| "quote.output.amount missing".to_string())
-}
+    let mut calls: Vec<Value> = Vec::with_capacity(V3_FEE_TIERS.len() + 1);
+    for &fee in V3_FEE_TIERS {
+        let data = encode_quote(tin, tout, amt, fee);
+        calls.push(RpcProvider::<ChainConfig>::build_payload(
+            json!([{ "to": addrs.quoter_v2.to_string(), "data": hex::encode_prefixed(&data) }, "latest"]),
+            EvmMethods::Call,
+        ));
+    }
+    if !is_native_in {
+        let owner_addr = Address::from_str(owner).map_err(|e| e.to_string())?;
+        let data = IPermit2::allowanceCall {
+            owner: owner_addr,
+            token: tin,
+            spender: addrs.universal_router,
+        }
+        .abi_encode();
+        calls.push(RpcProvider::<ChainConfig>::build_payload(
+            json!([{ "to": addrs.permit2.to_string(), "data": hex::encode_prefixed(&data) }, "latest"]),
+            EvmMethods::Call,
+        ));
+    }
 
-/// Borrow the non-null `permitData` from a quote response, if any.
-#[frb(ignore)]
-fn permit_value(resp: &Value) -> Option<&Value> {
-    resp.get("permitData").filter(|v| !v.is_null())
-}
+    let provider: RpcProvider<ChainConfig> = RpcProvider::new(config);
+    let res = provider
+        .req::<Vec<ResultRes<Value>>>(Value::Array(calls))
+        .await
+        .map_err(|e| e.to_string())?;
 
-/// Convert the API `permitData` (`{domain, types, values}`) into the standard EIP-712
-/// typed-data JSON our signer consumes (`{types(+EIP712Domain), primaryType, domain,
-/// message}`). `primaryType` is inferred as the root struct (the one no field references),
-/// so this stays generic over the permit shape.
-#[frb(ignore)]
-fn permit_to_typed_data(permit: &Value) -> Result<String, String> {
-    let obj = permit.as_object().ok_or("permitData is not an object")?;
-    let domain = obj.get("domain").ok_or("permitData.domain missing")?;
-    let types = obj
-        .get("types")
-        .and_then(Value::as_object)
-        .ok_or("permitData.types missing")?;
-    let message = obj.get("values").ok_or("permitData.values missing")?;
-
-    let mut referenced: HashSet<&str> = HashSet::with_capacity(types.len());
-    for fields in types.values() {
-        let Some(arr) = fields.as_array() else {
+    let mut best: Option<(U256, u32)> = None;
+    for (i, &fee) in V3_FEE_TIERS.iter().enumerate() {
+        let Some(r) = res.get(i) else { continue };
+        if r.error.is_some() {
             continue;
-        };
-        for f in arr {
-            if let Some(t) = f.get("type").and_then(Value::as_str) {
-                referenced.insert(t.trim_end_matches("[]"));
+        }
+        let out = r
+            .result
+            .as_ref()
+            .and_then(|v| v.as_str())
+            .and_then(|s| hex::decode(s).ok())
+            .and_then(|b| decode_quote(&b));
+        if let Some(out) = out {
+            if out > U256::ZERO && best.map_or(true, |(b, _)| out > b) {
+                best = Some((out, fee));
             }
         }
     }
-    let primary = types
-        .keys()
-        .map(String::as_str)
-        .find(|k| *k != "EIP712Domain" && !referenced.contains(k))
-        .ok_or("cannot infer primaryType")?;
+    let (amount_out, fee_tier) = best.ok_or_else(|| "no liquidity for pair".to_string())?;
 
-    // Match the EIP-712 shape the signer already accepts: inject EIP712Domain in canonical
-    // field order from whichever domain keys are present.
-    let mut types_out = types.clone();
-    if !types_out.contains_key("EIP712Domain") {
-        if let Some(dom) = domain.as_object() {
-            let mut entries: Vec<Value> = Vec::with_capacity(dom.len());
-            for (key, ty) in [
-                ("name", "string"),
-                ("version", "string"),
-                ("chainId", "uint256"),
-                ("verifyingContract", "address"),
-                ("salt", "bytes32"),
-            ] {
-                if dom.contains_key(key) {
-                    entries.push(json!({ "name": key, "type": ty }));
-                }
-            }
-            types_out.insert("EIP712Domain".to_string(), Value::Array(entries));
-        }
-    }
+    let nonce = if is_native_in {
+        None
+    } else {
+        res.get(V3_FEE_TIERS.len())
+            .filter(|r| r.error.is_none())
+            .and_then(|r| r.result.as_ref())
+            .and_then(|v| v.as_str())
+            .and_then(|s| hex::decode(s).ok())
+            .and_then(|b| decode_allowance_nonce(&b))
+    };
 
-    Ok(json!({
-        "types": Value::Object(types_out),
-        "primaryType": primary,
-        "domain": domain,
-        "message": message,
-    })
-    .to_string())
+    Ok((amount_out, fee_tier, nonce))
 }
 
-/// Build the `/swap` body: spread the quote response, stripping `permitData`/
-/// `permitTransaction`, and (for routings that carry a Permit2 authorization) re-attach the
-/// **original** `permitData` together with its `signature` — both present or both absent.
-#[frb(ignore)]
-fn build_swap_body(quote_resp: &Value, signature: Option<&str>) -> Result<Value, String> {
-    let mut obj: Map<String, Value> = quote_resp
-        .as_object()
-        .ok_or("quote response is not an object")?
-        .clone();
-    let permit = obj.remove("permitData");
-    obj.remove("permitTransaction");
-    obj.remove("requestId");
-
-    if let (Some(sig), Some(pd)) = (signature, permit) {
-        if !pd.is_null() {
-            obj.insert("signature".to_string(), Value::String(sig.to_owned()));
-            obj.insert("permitData".to_string(), pd);
-        }
-    }
-    Ok(Value::Object(obj))
-}
-
-/// Decimal-or-hex u64 (`gasLimit` is a JSON number; tolerate a hex string too).
-#[frb(ignore)]
-fn as_u64(v: &Value) -> Option<u64> {
-    v.as_u64()
-        .or_else(|| v.as_str().and_then(|s| s.parse().ok()))
-        .or_else(|| {
-            v.as_str()
-                .and_then(|s| u64::from_str_radix(s.strip_prefix("0x")?, 16).ok())
-        })
-}
-
-/// `swap.value` arrives as a `0x` hex string; everything else is a decimal amount string.
-#[frb(ignore)]
-fn parse_hex_u256(s: &str) -> Result<U256, String> {
-    let t = s.strip_prefix("0x").unwrap_or(s);
-    if t.is_empty() {
-        return Ok(U256::ZERO);
-    }
-    U256::from_str_radix(t, 16).map_err(|e| e.to_string())
-}
-
-/// Lift a Trading-API tx object (`{to, data, value, chainId, gasLimit}` — the shape shared by
-/// `/swap` and `/check_approval`) into the FFI tx. `swapper`/`chain_hash` set the signer and
-/// the broadcasting network; `broadcast: true` matches the existing swap flow.
-/// Optional display fields (`title`, `info`, `icon`, `token_info`) populate the history entry.
-#[frb(ignore)]
-fn json_obj_to_eth_tx(
-    obj: &Value,
-    swapper: Address,
+/// Build the unsigned Universal Router swap transaction.
+fn build_uniswap_tx(
+    addrs: &UniswapAddrs,
     chain_hash: u64,
-    title: Option<String>,
-    info: Option<String>,
-    icon: Option<String>,
-    token_info: Option<BaseTokenInfo>,
-) -> Result<TransactionRequestInfo, String> {
-    let to = obj
-        .get("to")
-        .and_then(Value::as_str)
-        .ok_or("tx.to missing")?;
-    let data = obj
-        .get("data")
-        .and_then(Value::as_str)
-        .ok_or("tx.data missing")?;
-    if data.is_empty() || data == "0x" {
-        return Err("tx.data empty — quote expired, refetch".to_string());
-    }
+    from: Address,
+    token_in: &str,
+    token_out: &str,
+    amount_in: &str,
+    amount_out: &str,
+    fee_tier: u32,
+    slippage_bps: u32,
+    deadline: u64,
+    is_native_in: bool,
+    is_native_out: bool,
+    permit_nonce: Option<u64>,
+    permit_signature: Option<&str>,
+) -> Result<TransactionRequest, String> {
+    let tin = Address::from_str(token_in).map_err(|e| e.to_string())?;
+    let tout = Address::from_str(token_out).map_err(|e| e.to_string())?;
+    let amount_in_u256 = U256::from_str(amount_in).map_err(|e| e.to_string())?;
+    let amount_out_u256 = U256::from_str(amount_out).map_err(|e| e.to_string())?;
 
-    let value = parse_hex_u256(obj.get("value").and_then(Value::as_str).unwrap_or("0x0"))?;
-    let input = hex::decode(data.strip_prefix("0x").unwrap_or(data)).map_err(|e| e.to_string())?;
+    let bps = U256::from(10_000u32);
+    let slip = U256::from(10_000u32.saturating_sub(slippage_bps));
+    let fee = U256::from(10_000u32.saturating_sub(FEE_BIPS));
+    let by_slip = amount_out_u256.saturating_mul(slip) / bps;
+    let amount_out_min = by_slip.saturating_mul(fee) / bps;
 
+    let input = if is_native_in {
+        SwapInput::NativeEth
+    } else {
+        let nonce =
+            permit_nonce.ok_or_else(|| "missing permit nonce for ERC-20 input".to_string())?;
+        let sig_hex = permit_signature
+            .ok_or_else(|| "missing permit signature for ERC-20 input".to_string())?;
+        let signature = hex::decode(sig_hex.strip_prefix("0x").unwrap_or(sig_hex))
+            .map_err(|e| e.to_string())?;
+        let permit = PermitSingle {
+            details: PermitDetails {
+                token: tin,
+                amount: PERMIT_AMOUNT,
+                expiration: PERMIT_EXPIRATION,
+                nonce: U48::from(nonce),
+            },
+            spender: addrs.universal_router,
+            sigDeadline: U256::from(PERMIT_SIG_DEADLINE),
+        };
+        SwapInput::Erc20 { permit, signature }
+    };
+
+    let plan = SwapPlan {
+        token_in: tin,
+        token_out: tout,
+        amount_in: amount_in_u256,
+        amount_out_min,
+        fee_tier,
+        recipient: from,
+        input,
+        native_out: is_native_out,
+    };
+    let data = build_execute_calldata(plan, U256::from(deadline));
+
+    let value = if is_native_in {
+        amount_in_u256
+    } else {
+        U256::ZERO
+    };
     let mut tx = ETHTransactionRequest {
-        to: Some(AlloyTxKind::Call(
-            Address::from_str(to).map_err(|e| e.to_string())?,
-        )),
-        from: Some(swapper),
+        to: Some(AlloyTxKind::Call(addrs.universal_router)),
+        from: Some(from),
         value: Some(value),
-        input: input.into(),
-        gas: obj.get("gasLimit").and_then(as_u64),
+        input: data.into(),
+        gas: Some(DEFAULT_SWAP_GAS),
         ..Default::default()
     };
-    tx.chain_id = obj.get("chainId").and_then(as_u64);
+    tx.chain_id = Some(addrs.chain_id);
 
     Ok(TransactionRequest::Ethereum((
         tx,
         TransactionMetadata {
             chain_hash,
             broadcast: true,
-            title,
-            info,
-            icon,
-            token_info: token_info.map(|t| {
+            ..Default::default()
+        },
+    )))
+}
+
+/// Quote orchestration for the `ExchangeProvider::Uniswap` arm: resolve the deployment,
+/// pull the chain config, run the on-chain quote and (for ERC-20 inputs) attach the
+/// Permit2 JSON to sign. The displayed output has the platform fee subtracted.
+#[frb(ignore)]
+pub async fn uniswap_quote_info(
+    meta: &UniswapMeta,
+    asset: &ExchangeAsset,
+    from_asset: &str,
+    to_asset: &str,
+    amount: &str,
+    destination: &str,
+) -> Result<ExchangeQuoteInfo, String> {
+    let addrs = meta.resolve()?;
+    let is_native_in = asset.token.native;
+
+    let (tout, is_native_out) = resolve_out(to_asset, meta.chain_id)?;
+    let token_out = if is_native_out {
+        addrs.weth.to_string()
+    } else {
+        tout.into_owned()
+    };
+
+    let token_in = resolve_in(is_native_in, &addrs.weth.to_string(), from_asset).into_owned();
+
+    let config = with_service(|core| {
+        Ok(core
+            .get_provider(asset.token.chain_hash)
+            .map_err(ServiceError::BackgroundError)?
+            .config
+            .clone())
+    })
+    .await
+    .map_err(|e: ServiceError| e.to_string())?;
+
+    let (gross_out, _fee_tier, nonce) = uniswap_quote(
+        &config,
+        &addrs,
+        &token_in,
+        &token_out,
+        amount,
+        destination,
+        is_native_in,
+    )
+    .await?;
+
+    let fee_bps = U256::from(10_000u32.saturating_sub(FEE_BIPS));
+    let net_out = gross_out.saturating_mul(fee_bps) / U256::from(10_000u32);
+
+    let permit_typed_data_json = if is_native_in {
+        None
+    } else {
+        nonce.map(|nonce| permit2_typed_data_json(&addrs, &token_in, nonce))
+    };
+
+    Ok(ExchangeQuoteInfo {
+        provider: ExchangeProvider::Uniswap(meta.clone()),
+        amount_out: net_out.to_string(),
+        permit_typed_data_json,
+    })
+}
+
+#[frb(ignore)]
+pub struct PreparedUniswapSwap {
+    pub permit_typed_data_json: Option<String>,
+    pub quote_blob: String,
+}
+
+/// First half of a Uniswap swap: re-quote for freshness, build the opaque blob, and
+/// surface the permit typed data to sign (for ERC-20 inputs).
+#[frb(ignore)]
+pub async fn prepare_uniswap_swap(
+    meta: &UniswapMeta,
+    swapper: Address,
+    chain_hash: u64,
+    token_in: &str,
+    token_out: &str,
+    amount_in: &str,
+    slippage_bps: u32,
+    is_native_in: bool,
+) -> Result<PreparedUniswapSwap, String> {
+    let addrs = meta.resolve()?;
+    let (tout, is_native_out) = resolve_out(token_out, meta.chain_id)?;
+    let resolved_out = if is_native_out {
+        addrs.weth.to_string()
+    } else {
+        tout.into_owned()
+    };
+    let resolved_in = resolve_in(is_native_in, &addrs.weth.to_string(), token_in).into_owned();
+
+    let config = with_service(|core| {
+        Ok(core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?
+            .config
+            .clone())
+    })
+    .await
+    .map_err(|e: ServiceError| e.to_string())?;
+
+    let (amount_out, fee_tier, nonce) = uniswap_quote(
+        &config,
+        &addrs,
+        &resolved_in,
+        &resolved_out,
+        amount_in,
+        &swapper.to_string(),
+        is_native_in,
+    )
+    .await?;
+
+    let permit_typed_data_json = if is_native_in {
+        None
+    } else {
+        nonce.map(|nonce| permit2_typed_data_json(&addrs, &resolved_in, nonce))
+    };
+
+    let blob = QuoteBlob {
+        chain_id: meta.chain_id,
+        token_in: resolved_in,
+        token_out: resolved_out,
+        amount_in: amount_in.to_string(),
+        amount_out: amount_out.to_string(),
+        fee_tier,
+        permit_nonce: nonce,
+        is_native_in,
+        is_native_out,
+        slippage_bps,
+    };
+
+    Ok(PreparedUniswapSwap {
+        permit_typed_data_json,
+        quote_blob: serde_json::to_string(&blob).map_err(|e| e.to_string())?,
+    })
+}
+
+/// Second half of a Uniswap swap: attach the permit signature, build the unsigned
+/// Universal Router tx, and lift it into the FFI tx with display metadata.
+#[frb(ignore)]
+pub async fn finalize_uniswap_swap(
+    quote_blob: &str,
+    swapper: Address,
+    chain_hash: u64,
+    permit_signature: Option<&str>,
+    swap_title: String,
+    swap_info: String,
+    provider_icon: String,
+    out_token: Option<BaseTokenInfo>,
+) -> Result<TransactionRequestInfo, String> {
+    let blob: QuoteBlob =
+        serde_json::from_str(quote_blob).map_err(|e| format!("invalid quote_blob: {e}"))?;
+
+    let meta = UniswapMeta::for_chain(blob.chain_id)
+        .ok_or_else(|| "unsupported chain in quote_blob".to_string())?;
+    let addrs = meta.resolve()?;
+
+    let deadline = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|e| e.to_string())?
+        .as_secs()
+        .saturating_add(20 * 60);
+
+    let tx = build_uniswap_tx(
+        &addrs,
+        chain_hash,
+        swapper,
+        &blob.token_in,
+        &blob.token_out,
+        &blob.amount_in,
+        &blob.amount_out,
+        blob.fee_tier,
+        blob.slippage_bps,
+        deadline,
+        blob.is_native_in,
+        blob.is_native_out,
+        blob.permit_nonce,
+        permit_signature,
+    )?;
+
+    let evm_tx = match tx {
+        TransactionRequest::Ethereum((eth, _)) => eth,
+        _ => return Err("expected Ethereum tx".to_string()),
+    };
+
+    Ok(TransactionRequest::Ethereum((
+        evm_tx,
+        TransactionMetadata {
+            chain_hash,
+            broadcast: true,
+            title: Some(swap_title),
+            info: Some(swap_info),
+            icon: Some(provider_icon),
+            token_info: out_token.map(|t| {
                 (
                     U256::from_str(&t.value).unwrap_or_default(),
                     t.decimals,
@@ -328,196 +763,8 @@ fn json_obj_to_eth_tx(
     .into())
 }
 
-/// Validate the `/swap` response and lift its `swap` object into the FFI tx.
-#[frb(ignore)]
-fn swap_response_to_tx(
-    resp: &Value,
-    swapper: Address,
-    chain_hash: u64,
-    title: String,
-    info: String,
-    icon: String,
-    token_info: Option<BaseTokenInfo>,
-) -> Result<TransactionRequestInfo, String> {
-    let swap = resp.get("swap").ok_or("swap field missing")?;
-    json_obj_to_eth_tx(swap, swapper, chain_hash, Some(title), Some(info), Some(icon), token_info)
-}
-
-/// Quote orchestration for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::fetch_exchange_quote`: hit `/quote` and surface the output amount
-/// plus the Permit2 typed data to sign (for ERC-20 inputs on routings that use Permit2).
-#[frb(ignore)]
-pub async fn uniswap_quote_info(
-    meta: &UniswapMeta,
-    asset: &ExchangeAsset,
-    from_asset: &str,
-    to_asset: &str,
-    amount: &str,
-    destination: &str,
-) -> Result<ExchangeQuoteInfo, String> {
-    let in_chain = meta.chain_id;
-    let (out_chain, tout) = parse_out(to_asset, in_chain);
-    let tin = input_token(asset.token.native, from_asset);
-
-    dbg!(
-        "uniswap_quote_info: params",
-        in_chain,
-        out_chain,
-        &*tin,
-        &*tout,
-        amount,
-        destination,
-        asset.token.native,
-        from_asset,
-        to_asset,
-    );
-
-    let client = Client::new();
-    let body = quote_body(destination, &tin, &tout, in_chain, out_chain, amount, 50);
-    let resp = trading_api_post(&client, "/quote", &body).await?;
-
-    dbg!(
-        "uniswap_quote_info: got response",
-        &resp.get("routing"),
-        &resp
-            .get("quote")
-            .and_then(|q| q.get("output").and_then(|o| o.get("amount")))
-    );
-
-    let amount_out = output_amount(&resp)?;
-    let permit_typed_data_json = match permit_value(&resp) {
-        Some(pd) => {
-            dbg!("uniswap_quote_info: permitData present, converting to typed data");
-            Some(permit_to_typed_data(pd)?)
-        }
-        None => {
-            dbg!("uniswap_quote_info: no permitData (native input or routing without Permit2)");
-            None
-        }
-    };
-
-    dbg!(
-        "uniswap_quote_info: SUCCESS",
-        &amount_out,
-        permit_typed_data_json.is_some()
-    );
-
-    Ok(ExchangeQuoteInfo {
-        provider: ExchangeProvider::Uniswap(meta.clone()),
-        amount_out,
-        permit_typed_data_json,
-    })
-}
-
-/// Result of the quote half of a swap: the Permit2 typed data to sign (when the routing uses
-/// Permit2) plus the raw `/quote` response carried opaquely to [`finalize_uniswap_swap`].
-#[frb(ignore)]
-pub struct PreparedUniswapSwap {
-    /// Standard EIP-712 typed-data JSON to sign, or `None` for native input / routings without
-    /// a Permit2 authorization.
-    pub permit_typed_data_json: Option<String>,
-    /// Serialized `/quote` response, fed back verbatim into `finalize_uniswap_swap`.
-    pub quote_blob: String,
-}
-
-/// First half of a Uniswap swap: hit `/quote` (routing + optional Permit2 `permitData`) and
-/// surface the permit typed data to sign plus the opaque quote blob. Lock-free — the caller
-/// passes the already-resolved `swapper`, so this never touches `BACKGROUND_SERVICE` (safe to
-/// call while a service read guard is held, e.g. from the software orchestrator).
-#[frb(ignore)]
-pub async fn prepare_uniswap_swap(
-    meta: &UniswapMeta,
-    swapper: Address,
-    token_in: &str,
-    token_out: &str,
-    amount_in: &str,
-    slippage_bps: u32,
-    is_native_in: bool,
-) -> Result<PreparedUniswapSwap, String> {
-    let in_chain = meta.chain_id;
-    let (out_chain, tout) = parse_out(token_out, in_chain);
-    let tin = input_token(is_native_in, token_in);
-
-    dbg!(
-        "prepare_uniswap_swap: START",
-        in_chain,
-        out_chain,
-        &*tin,
-        &*tout,
-        amount_in,
-        slippage_bps,
-        is_native_in,
-        &swapper.to_string(),
-    );
-
-    let client = Client::new();
-    let quote = trading_api_post(
-        &client,
-        "/quote",
-        &quote_body(
-            &swapper.to_string(),
-            &tin,
-            &tout,
-            in_chain,
-            out_chain,
-            amount_in,
-            slippage_bps,
-        ),
-    )
-    .await?;
-
-    dbg!(
-        "prepare_uniswap_swap: quote response",
-        &quote.get("routing"),
-        quote.get("permitData").is_some()
-    );
-
-    let permit_typed_data_json = match permit_value(&quote) {
-        Some(pd) => {
-            dbg!("prepare_uniswap_swap: permitData present, converting to typed data");
-            Some(permit_to_typed_data(pd)?)
-        }
-        None => {
-            dbg!("prepare_uniswap_swap: no permitData (native input or routing without Permit2)");
-            None
-        }
-    };
-
-    Ok(PreparedUniswapSwap {
-        permit_typed_data_json,
-        quote_blob: quote.to_string(),
-    })
-}
-
-/// Second half of a Uniswap swap: attach the (seed- or device-produced) Permit2 signature to the
-/// quote, call `/swap`, and lift the router/bridge calldata into the unsigned FFI tx. Lock-free.
-/// `swap_title`, `swap_info`, `provider_icon`, and `out_token` are threaded into the tx metadata
-/// so the history entry shows the provider icon and a human-readable description.
-#[frb(ignore)]
-pub async fn finalize_uniswap_swap(
-    quote_blob: &str,
-    swapper: Address,
-    chain_hash: u64,
-    permit_signature: Option<&str>,
-    swap_title: String,
-    swap_info: String,
-    provider_icon: String,
-    out_token: Option<BaseTokenInfo>,
-) -> Result<TransactionRequestInfo, String> {
-    let quote: Value = zilpay::serde_json::from_str(quote_blob).map_err(|e| e.to_string())?;
-    let swap_req = build_swap_body(&quote, permit_signature)?;
-    let swap_resp = trading_api_post(&Client::new(), "/swap", &swap_req).await?;
-
-    dbg!("finalize_uniswap_swap: /swap response received");
-
-    swap_response_to_tx(&swap_resp, swapper, chain_hash, swap_title, swap_info, provider_icon, out_token)
-}
-
-/// Approval pre-step for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::check_exchange_approval`. ERC-20 inputs need a one-time on-chain
-/// `approve` (to Permit2 for swaps, to the bridge spender for bridges) before the swap can
-/// pull tokens. Returns `Ok(None)` when the existing allowance already covers `amount` (the
-/// API replies `approval: null`); otherwise the unsigned approve tx for the UI to broadcast.
+/// Check whether the user's ERC-20 token has enough allowance for Permit2 to pull.
+/// Returns `Some(approve_tx)` if the current allowance is below `amount`, else `None`.
 #[frb(ignore)]
 pub async fn uniswap_check_approval(
     meta: &UniswapMeta,
@@ -528,126 +775,304 @@ pub async fn uniswap_check_approval(
     approve_title: String,
     provider_icon: String,
 ) -> Result<Option<TransactionRequestInfo>, String> {
-    let body = json!({
-        "walletAddress": swapper.to_string(),
-        "token": token,
-        "amount": amount,
-        "chainId": meta.chain_id,
-    });
-    let resp = trading_api_post(&Client::new(), "/check_approval", &body).await?;
+    let addrs = meta.resolve()?;
 
-    match resp.get("approval") {
-        Some(approval) if !approval.is_null() => {
-            json_obj_to_eth_tx(
-                approval,
-                swapper,
-                chain_hash,
-                Some(approve_title),
-                None,
-                Some(provider_icon),
-                None,
-            )
-            .map(Some)
-        }
-        _ => Ok(None),
+    let config = with_service(|core| {
+        Ok(core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?
+            .config
+            .clone())
+    })
+    .await
+    .map_err(|e: ServiceError| e.to_string())?;
+
+    let token_addr = Address::from_str(token).map_err(|e| e.to_string())?;
+    let call = IERC20::allowanceCall {
+        owner: swapper,
+        spender: addrs.permit2,
     }
+    .abi_encode();
+
+    let payload = RpcProvider::<ChainConfig>::build_payload(
+        json!([{ "to": token, "data": hex::encode_prefixed(&call) }, "latest"]),
+        EvmMethods::Call,
+    );
+
+    let provider: RpcProvider<ChainConfig> = RpcProvider::new(&config);
+    let res = provider
+        .req::<ResultRes<Value>>(payload)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let current = res
+        .result
+        .as_ref()
+        .and_then(|v| v.as_str())
+        .and_then(|s| hex::decode(s).ok())
+        .and_then(|b| decode_erc20_allowance(&b))
+        .unwrap_or(U256::ZERO);
+
+    let needed = U256::from_str(amount).map_err(|e| e.to_string())?;
+    if current >= needed {
+        return Ok(None);
+    }
+
+    let data = IERC20::approveCall {
+        spender: addrs.permit2,
+        amount: U256::MAX,
+    }
+    .abi_encode();
+
+    let mut tx = ETHTransactionRequest {
+        to: Some(AlloyTxKind::Call(token_addr)),
+        from: Some(swapper),
+        value: Some(U256::ZERO),
+        input: data.into(),
+        gas: Some(DEFAULT_APPROVE_GAS),
+        ..Default::default()
+    };
+    tx.chain_id = Some(addrs.chain_id);
+
+    Ok(Some(
+        TransactionRequest::Ethereum((
+            tx,
+            TransactionMetadata {
+                chain_hash,
+                broadcast: true,
+                title: Some(approve_title),
+                icon: Some(provider_icon),
+                ..Default::default()
+            },
+        ))
+        .into(),
+    ))
 }
 
 #[cfg(test)]
 mod uniswap_tests {
     use super::*;
 
+    fn addr(b: u8) -> Address {
+        Address::from([b; 20])
+    }
+
     #[test]
-    fn parse_out_same_chain_plain_addr() {
-        let (chain, addr) = parse_out("0xabc", 8453);
-        assert_eq!(chain, 8453);
+    fn resolve_out_same_chain_plain_addr() {
+        let (addr, native) = resolve_out("0xabc", 8453).unwrap();
         assert_eq!(addr.as_ref(), "0xabc");
+        assert!(!native);
     }
 
     #[test]
-    fn parse_out_cross_chain_prefix() {
-        let (chain, addr) = parse_out("42161:0xdef", 8453);
-        assert_eq!(chain, 42161);
-        assert_eq!(addr.as_ref(), "0xdef");
+    fn resolve_out_cross_chain_rejected() {
+        let err = resolve_out("42161:0xdef", 8453).unwrap_err();
+        assert!(err.contains("cross-chain"));
     }
 
     #[test]
-    fn input_token_native_uses_sentinel() {
-        assert_eq!(input_token(true, "0xWETH").as_ref(), NATIVE_SENTINEL);
-        assert_eq!(input_token(false, "0xUSDC").as_ref(), "0xUSDC");
+    fn resolve_out_native_sentinel() {
+        let (addr, native) = resolve_out(NATIVE_SENTINEL, 8453).unwrap();
+        assert_eq!(addr.as_ref(), NATIVE_SENTINEL);
+        assert!(native);
     }
 
     #[test]
-    fn permit_to_typed_data_infers_primary_and_message() {
-        // Permit2 PermitSingle shape as returned by the Trading API.
-        let permit = json!({
-            "domain": { "name": "Permit2", "chainId": 1, "verifyingContract": "0x000000000022D473030F116dDEE9F6B43aC78BA3" },
-            "types": {
-                "PermitSingle": [
-                    { "name": "details", "type": "PermitDetails" },
-                    { "name": "spender", "type": "address" },
-                    { "name": "sigDeadline", "type": "uint256" }
-                ],
-                "PermitDetails": [
-                    { "name": "token", "type": "address" },
-                    { "name": "amount", "type": "uint160" },
-                    { "name": "expiration", "type": "uint48" },
-                    { "name": "nonce", "type": "uint48" }
-                ]
+    fn resolve_out_same_chain_prefixed() {
+        let (addr, native) = resolve_out("8453:0xabc", 8453).unwrap();
+        assert_eq!(addr.as_ref(), "0xabc");
+        assert!(!native);
+    }
+
+    #[test]
+    fn resolve_out_same_chain_prefixed_native() {
+        let input = format!("8453:{NATIVE_SENTINEL}");
+        let (addr, native) = resolve_out(&input, 8453).unwrap();
+        assert_eq!(addr.as_ref(), NATIVE_SENTINEL);
+        assert!(native);
+    }
+
+    #[test]
+    fn resolve_in_native_uses_weth() {
+        assert_eq!(
+            resolve_in(true, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "0xabc").as_ref(),
+            "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+        );
+        assert_eq!(resolve_in(false, "0xWETH", "0xUSDC").as_ref(), "0xUSDC");
+    }
+
+    #[test]
+    fn v3_path_layout() {
+        let tin = addr(0x11);
+        let tout = addr(0x22);
+        let path = v3_path(&tin, 3000, &tout);
+
+        assert_eq!(path.len(), 43);
+        assert_eq!(&path[..20], tin.as_slice());
+        assert_eq!(&path[20..23], &[0x00, 0x0b, 0xb8]);
+        assert_eq!(&path[23..], tout.as_slice());
+    }
+
+    #[test]
+    fn execute_calldata_native_eth() {
+        let plan = SwapPlan {
+            token_in: addr(0xaa),
+            token_out: addr(0xbb),
+            amount_in: U256::from(1_000u64),
+            amount_out_min: U256::from(900u64),
+            fee_tier: 500,
+            recipient: addr(0xcc),
+            input: SwapInput::NativeEth,
+            native_out: false,
+        };
+        let data = build_execute_calldata(plan, U256::from(123u64));
+
+        assert_eq!(&data[..4], executeCall::SELECTOR.as_slice());
+        let decoded = executeCall::abi_decode(&data).unwrap();
+        assert_eq!(decoded.commands.as_ref(), &[0x0b, 0x00, 0x06, 0x04]);
+        assert_eq!(decoded.inputs.len(), 4);
+        assert_eq!(decoded.deadline, U256::from(123u64));
+    }
+
+    #[test]
+    fn execute_calldata_erc20_permit() {
+        let permit = PermitSingle {
+            details: PermitDetails {
+                token: addr(0xbb),
+                amount: U160::from(5u64),
+                expiration: U48::from(6u64),
+                nonce: U48::from(7u64),
             },
-            "values": { "spender": "0x66a9", "sigDeadline": "1", "details": {} }
-        });
-        let out: Value =
-            zilpay::serde_json::from_str(&permit_to_typed_data(&permit).unwrap()).unwrap();
-        assert_eq!(out["primaryType"], "PermitSingle");
-        assert!(out["message"].is_object());
-        // EIP712Domain injected with only the present domain keys, in canonical order.
-        let dom = out["types"]["EIP712Domain"].as_array().unwrap();
-        let names: Vec<&str> = dom.iter().map(|e| e["name"].as_str().unwrap()).collect();
-        assert_eq!(names, ["name", "chainId", "verifyingContract"]);
+            spender: addr(0xee),
+            sigDeadline: U256::from(8u64),
+        };
+        let plan = SwapPlan {
+            token_in: addr(0xaa),
+            token_out: addr(0xbb),
+            amount_in: U256::from(1_000u64),
+            amount_out_min: U256::from(900u64),
+            fee_tier: 3000,
+            recipient: addr(0xcc),
+            input: SwapInput::Erc20 {
+                permit,
+                signature: vec![1, 2, 3, 4],
+            },
+            native_out: false,
+        };
+        let data = build_execute_calldata(plan, U256::from(456u64));
+
+        assert_eq!(&data[..4], executeCall::SELECTOR.as_slice());
+        let decoded = executeCall::abi_decode(&data).unwrap();
+        assert_eq!(decoded.commands.as_ref(), &[0x0a, 0x00, 0x06, 0x04]);
+        assert_eq!(decoded.inputs.len(), 4);
     }
 
     #[test]
-    fn build_swap_body_strips_and_reattaches_permit() {
-        let quote = json!({
-            "requestId": "x", "routing": "CLASSIC",
-            "permitData": { "domain": {} }, "permitTransaction": null,
-            "quote": { "output": { "amount": "1" } }
-        });
-        // No signature → permit dropped, no signature field.
-        let no_sig = build_swap_body(&quote, None).unwrap();
-        assert!(no_sig.get("permitData").is_none());
-        assert!(no_sig.get("signature").is_none());
-        assert!(no_sig.get("requestId").is_none());
-        // With signature → both re-attached.
-        let with_sig = build_swap_body(&quote, Some("0xsig")).unwrap();
-        assert_eq!(with_sig["signature"], "0xsig");
-        assert!(with_sig.get("permitData").is_some());
+    fn execute_calldata_native_out_unwraps() {
+        let plan = SwapPlan {
+            token_in: addr(0xaa),
+            token_out: addr(0xbb),
+            amount_in: U256::from(1_000u64),
+            amount_out_min: U256::from(900u64),
+            fee_tier: 500,
+            recipient: addr(0xcc),
+            input: SwapInput::NativeEth,
+            native_out: true,
+        };
+        let data = build_execute_calldata(plan, U256::from(789u64));
+
+        let decoded = executeCall::abi_decode(&data).unwrap();
+        assert_eq!(decoded.commands.as_ref(), &[0x0b, 0x00, 0x06, 0x0c]);
+        assert_eq!(decoded.inputs.len(), 4);
     }
 
     #[test]
-    fn swap_response_to_tx_parses_fields() {
-        let resp = json!({ "swap": {
-            "to": "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af",
-            "data": "0x1234",
-            "value": "0x0de0b6b3a7640000",
-            "chainId": 1,
-            "gasLimit": 341542
-        }});
-        let tx = swap_response_to_tx(
-            &resp,
-            Address::ZERO,
-            42,
-            "Swap".to_string(),
-            "1 ETH → 1000 USDC · Uniswap".to_string(),
-            "assets/icons/uniswap.svg".to_string(),
-            None,
-        )
-        .unwrap();
-        let evm = tx.evm.unwrap();
-        assert_eq!(evm.chain_id, Some(1));
-        assert_eq!(evm.gas_limit, Some(341542));
-        assert_eq!(evm.value.as_deref(), Some("1000000000000000000"));
-        assert!(evm.data.is_some_and(|d| !d.is_empty()));
+    fn meta_for_chain_known_and_unknown() {
+        assert!(UniswapMeta::for_chain(1).is_some());
+        assert!(UniswapMeta::for_chain(8453).is_some());
+        assert!(UniswapMeta::for_chain(999).is_none());
+    }
+
+    #[test]
+    fn meta_resolve_parses_addresses() {
+        let meta = UniswapMeta::for_chain(1).unwrap();
+        let addrs = meta.resolve().unwrap();
+        assert_eq!(addrs.chain_id, 1);
+        assert_eq!(
+            addrs.universal_router,
+            Address::from_str("0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af").unwrap()
+        );
+        assert_eq!(
+            addrs.permit2,
+            Address::from_str("0x000000000022D473030F116dDEE9F6B43aC78BA3").unwrap()
+        );
+    }
+
+    #[test]
+    fn meta_resolve_unsupported_chain() {
+        let meta = UniswapMeta { chain_id: 999 };
+        assert!(meta.resolve().is_err());
+    }
+
+    #[test]
+    fn permit2_typed_data_json_has_correct_shape() {
+        let meta = UniswapMeta::for_chain(1).unwrap();
+        let addrs = meta.resolve().unwrap();
+        let json_str = permit2_typed_data_json(&addrs, "0xabc", 42);
+        let v: Value = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(v["primaryType"], "PermitSingle");
+        assert_eq!(v["domain"]["chainId"], 1);
+        assert_eq!(v["message"]["details"]["nonce"], "42");
+        assert_eq!(v["message"]["spender"], addrs.universal_router.to_string());
+    }
+
+    #[test]
+    fn quote_blob_round_trips() {
+        let blob = QuoteBlob {
+            chain_id: 8453,
+            token_in: "0xtin".to_string(),
+            token_out: "0xtout".to_string(),
+            amount_in: "100".to_string(),
+            amount_out: "200".to_string(),
+            fee_tier: 3000,
+            permit_nonce: Some(7),
+            is_native_in: false,
+            is_native_out: true,
+            slippage_bps: 50,
+        };
+        let json_str = serde_json::to_string(&blob).unwrap();
+        let parsed: QuoteBlob = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(parsed.chain_id, 8453);
+        assert_eq!(parsed.permit_nonce, Some(7));
+        assert!(parsed.is_native_out);
+    }
+
+    #[test]
+    fn is_supported_chain_returns_true_for_deployed() {
+        assert!(is_supported_chain(1));
+        assert!(is_supported_chain(42161));
+        assert!(!is_supported_chain(999));
+    }
+
+    #[test]
+    fn decode_quote_handles_zero_and_success() {
+        let empty = Vec::new();
+        assert!(decode_quote(&empty).is_none());
+    }
+
+    #[test]
+    fn decode_allowance_nonce_handles_zero_and_success() {
+        let empty = Vec::new();
+        assert!(decode_allowance_nonce(&empty).is_none());
+    }
+
+    /// Guards the regression where renaming the `sol!` function (e.g. to `permit2Allowance`)
+    /// silently changed the 4-byte selector — the selector is derived from the on-chain
+    /// signature `allowance(address,address,address)`, never the interface/function name.
+    #[test]
+    fn permit2_allowance_selector_matches_real_signature() {
+        use zilpay::alloy::primitives::keccak256;
+        let expected = &keccak256("allowance(address,address,address)")[..4];
+        assert_eq!(IPermit2::allowanceCall::SELECTOR.as_slice(), expected);
     }
 }

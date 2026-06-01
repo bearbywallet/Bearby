@@ -6,8 +6,8 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-/// FFI-safe Uniswap marker. Only the source chain id is needed — the Trading API resolves
-/// routers, pools and routing itself. Carried inside [`ExchangeProvider::Uniswap`].
+/// FFI-safe Uniswap marker. Only the source chain id is needed — deployment addresses
+/// are resolved internally from a const table via [`UniswapMeta::resolve`].
 class UniswapMeta {
   final BigInt chainId;
 

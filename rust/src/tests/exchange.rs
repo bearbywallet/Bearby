@@ -104,7 +104,7 @@ mod exchange_tests {
     async fn uniswap_asset() -> (ExchangeAsset, ExchangeProvider) {
         let assets = bootstrap_exchange_providers().await.unwrap();
         // The catalog now spans every chain, so pin to native ETH on Ethereum mainnet
-        // (chain 1): the empty `from_asset` resolves to the API native sentinel and the
+        // (chain 1): the empty `from_asset` resolves to WETH internally and the
         // tests quote against USDC on chain 1.
         let asset = assets
             .into_iter()
@@ -140,8 +140,8 @@ mod exchange_tests {
         );
     }
 
-    /// Live build against the Trading API: native ETH -> USDC on mainnet (no permit, two
-    /// API calls). `#[ignore]`d because it needs network access; run explicitly with:
+    /// Live build via on-chain quoting: native ETH -> USDC on mainnet (no permit, one
+    /// batched `eth_call`). `#[ignore]`d because it needs network access; run explicitly with:
     /// `cargo test -p rust_lib_zilpay exchange -- --ignored`.
     #[ignore]
     #[zilpay::tokio::test]
@@ -149,7 +149,7 @@ mod exchange_tests {
         setup_eth_wallet().await;
         let (_, provider) = uniswap_asset().await;
 
-        // is_native_in = true, so `token_in` is overridden to the API native sentinel
+        // is_native_in = true, so `token_in` is overridden to WETH
         // internally — pass the zero address as a placeholder.
         let prepared = prepare_exchange_swap(
             0,
@@ -191,6 +191,7 @@ mod exchange_tests {
 
     /// Live read-only quote against the mainnet RPC. `#[ignore]`d because it needs network
     /// access; run explicitly with: `cargo test -p rust_lib_zilpay exchange -- --ignored`.
+    #[ignore]
     #[zilpay::tokio::test]
     async fn test_fetch_exchange_quote() {
         setup_eth_wallet().await;
