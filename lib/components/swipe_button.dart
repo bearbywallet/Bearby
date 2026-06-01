@@ -72,9 +72,12 @@ class _SwipeButtonState extends State<SwipeButton>
       if (widget.onSwipeComplete != null) {
         await widget.onSwipeComplete!();
       }
+      if (!mounted) return;
       await _controller.reverse();
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
+    if (!mounted) return;
     setState(() {
       _isDragging = false;
       _dragExtent = 0.0;
