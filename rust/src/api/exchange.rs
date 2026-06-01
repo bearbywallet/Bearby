@@ -215,7 +215,7 @@ pub async fn fetch_exchange_quote(
     }
 }
 
-/// Resolve `(proto signer for fee/nonce estimation, alloy swapper for the Trading API, source
+/// Resolve `(proto signer for fee/nonce estimation, alloy swapper for the Universal Router, source
 /// chain_hash)` from the active wallet/account. Synchronous and lock-free — it operates on an
 /// already-cloned `core`, so it never re-acquires the service lock. The swap source chain is always
 /// the wallet's active chain (the "pay" token lives there), which is also the chain that broadcasts.
@@ -269,7 +269,7 @@ async fn estimate_fast_params(
 }
 
 /// Swap gas-limit buffers as `(numerator, denominator)`: `1.15×` on a live node estimate, `1.4×`
-/// on the Trading-API fallback. See [`apply_swap_gas_limit`].
+/// on the built-in default-gas fallback. See [`apply_swap_gas_limit`].
 const SWAP_ESTIMATE_BUFFER: (u64, u64) = (115, 100);
 const SWAP_API_FALLBACK_BUFFER: (u64, u64) = (140, 100);
 
@@ -294,10 +294,10 @@ fn set_eth_gas(tx: &mut TransactionRequest, gas: u64) {
 }
 
 /// Set the swap tx's gas limit from a **live `eth_estimateGas`** against the node (×1.15) when the
-/// tx can be simulated, else the Trading-API estimate already on the tx (×1.4). The fallback
+/// tx can be simulated, else the conservative default gas already on the tx (×1.4). The fallback
 /// covers a swap bundled behind an unmined approve — the allowance isn't on-chain yet, so the
-/// simulation reverts (`Err`) — as well as transient RPC failures. The Trading-API number is the
-/// bare `gasUseEstimate` with no margin, so it must never be broadcast verbatim. No-op for
+/// simulation reverts (`Err`) — as well as transient RPC failures. The default (`DEFAULT_SWAP_GAS`)
+/// is a fixed, generous limit, so the ×1.4 fallback gives it extra head-room. No-op for
 /// non-EVM / gas-less txs.
 async fn apply_swap_gas_limit(
     core: &Arc<Background>,
@@ -326,7 +326,7 @@ async fn apply_swap_gas_limit(
 
 /// Apply pre-estimated FAST fees + an explicit `nonce` to an EVM tx, **preserving the gas limit
 /// already on the tx** (the swap leg sets it via [`apply_swap_gas_limit`]; the approve leg keeps
-/// its `/check_approval` gas) — never re-simulating here, which would revert before the approve is
+/// its `DEFAULT_APPROVE_GAS`) — never re-simulating here, which would revert before the approve is
 /// mined. Nonces are caller-sequenced (`N`, `N+1`) so an approve + swap batch never collides.
 fn apply_fast_fees(
     tx: &mut TransactionRequest,
@@ -345,7 +345,7 @@ fn apply_fast_fees(
 }
 
 /// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
-/// sign the Permit2 EIP-712, build the swap via `/swap`, and broadcast approve (`N`) + swap (`N+1`)
+/// sign the Permit2 EIP-712, build the Universal Router swap calldata, and broadcast approve (`N`) + swap (`N+1`)
 /// back-to-back (EVM nonce ordering guarantees the approve executes first). Returns the broadcast
 /// histories. Progress streams as `approving`/`approved`/`permit`/`swapping`/`done`. Ledger wallets
 /// use the step-by-step `check_exchange_approval` → `prepare_exchange_swap` → `finalize_exchange_swap`
@@ -383,7 +383,7 @@ pub async fn execute_exchange_swap(
     let mut nonce = base.nonce;
     let mut results: Vec<HistoricalTransactionInfo> = Vec::with_capacity(2);
 
-    // One-time ERC-20 approval (to Permit2 / the bridge spender). Native inputs never need it.
+    // One-time ERC-20 approval (to the Permit2 contract). Native inputs never need it.
     if !is_native_in {
         if let Some(approval) = uniswap_check_approval(
             &meta,
@@ -416,11 +416,10 @@ pub async fn execute_exchange_swap(
         }
     }
 
-    // Re-quote (freshness) after the approve is broadcast, sign the Permit2 permit with the same
-    // seed, then ask `/swap` for the router/bridge calldata.
     let prepared = prepare_uniswap_swap(
         &meta,
         swapper,
+        chain_hash,
         &token_in,
         &token_out,
         &amount_in,
@@ -561,10 +560,11 @@ pub async fn prepare_exchange_swap(
         Arc::clone(&service.core)
     };
 
-    let (_signer, swapper, _chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let (_signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
     let prepared = prepare_uniswap_swap(
         &meta,
         swapper,
+        chain_hash,
         &token_in,
         &token_out,
         &amount_in,
@@ -579,8 +579,8 @@ pub async fn prepare_exchange_swap(
     })
 }
 
-/// **Ledger final step.** Attach the device-signed permit signature, call `/swap`, and return the
-/// swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
+/// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
+/// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
 /// the UI to broadcast via `send_signed_transactions`.
 #[allow(clippy::too_many_arguments)]
 pub async fn finalize_exchange_swap(
@@ -672,7 +672,7 @@ mod swap_gas_tests {
     }
 
     /// The two legs of a swap share one estimate but must get sequential nonces (`N`, `N+1`), and
-    /// the Trading-API `gasLimit` must survive — never replaced by a zero re-estimate.
+    /// the gas limit already on the tx must survive — never replaced by a zero re-estimate.
     #[test]
     fn apply_fast_fees_sequences_nonce_and_preserves_api_gas_limit() {
         let base = base_params();
@@ -699,7 +699,7 @@ mod swap_gas_tests {
     /// The two swap gas-limit buffers, plus the saturating guard against overflow panics.
     #[test]
     fn buffer_gas_applies_ratio_and_saturates() {
-        // live estimate ×1.15, Trading-API fallback ×1.4 (integer division truncates).
+        // live estimate ×1.15, default-gas fallback ×1.4 (integer division truncates).
         assert_eq!(buffer_gas(182_000, SWAP_ESTIMATE_BUFFER), 209_300);
         assert_eq!(buffer_gas(179_917, SWAP_API_FALLBACK_BUFFER), 251_883);
         // saturating_mul keeps it panic-free at the u64 ceiling.
