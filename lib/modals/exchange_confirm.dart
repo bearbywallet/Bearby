@@ -808,8 +808,20 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (addr != null && addr.isNotEmpty)
-          _metaRow(theme, l10n.exchangeConfirmRecipient,
-              CopyContent(address: addr)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Text(
+                  l10n.exchangeConfirmRecipient,
+                  style:
+                      theme.bodyText2.copyWith(color: theme.textSecondary),
+                ),
+                const Spacer(),
+                CopyContent(address: addr),
+              ],
+            ),
+          ),
         _metaRow(
           theme,
           l10n.exchangeConfirmSlippage,
