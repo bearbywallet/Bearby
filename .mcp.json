@@ -1,3 +1,18 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "rust-mcp": {
+      "type": "local",
+      "command": ["rust-mcp-server"],
+      "enabled": true
+    },
+    "dart-mcp-server": {
+      "type": "local",
+      "command": [
+        "dart",
+        "mcp-server"
+      ],
+      "enabled": true,
+      "environment": {}
+    }
+  }
 }
