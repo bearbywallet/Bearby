@@ -275,8 +275,12 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       return;
     }
 
-    final isUniswap = quote.provider.whenOrNull(uniswap: (_) => true) ?? false;
-    if (!isUniswap) {
+    final isSupported = quote.provider.whenOrNull(
+          uniswap: (_) => true,
+          pancakeSwap: (_) => true,
+        ) ??
+        false;
+    if (!isSupported) {
       _showError('Unsupported provider');
       return;
     }

@@ -6210,10 +6210,15 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
                 return crate::models::exchange::ExchangeProvider::Uniswap(var_field0);
             }
             2 => {
+                let mut var_field0 =
+                    <crate::models::exchange::pancakeswap::PancakeMeta>::sse_decode(deserializer);
+                return crate::models::exchange::ExchangeProvider::PancakeSwap(var_field0);
+            }
+            3 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::ZIlSwap(var_field0);
             }
-            3 => {
+            4 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
             }
@@ -7380,6 +7385,16 @@ impl SseDecode for crate::models::transactions::btc::OutPointInfo {
         return crate::models::transactions::btc::OutPointInfo {
             txid: var_txid,
             vout: var_vout,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::pancakeswap::PancakeMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_chainId = <u64>::sse_decode(deserializer);
+        return crate::models::exchange::pancakeswap::PancakeMeta {
+            chain_id: var_chainId,
         };
     }
 }
@@ -9073,11 +9088,14 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider
             crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
                 [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
                 [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+                [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -9506,6 +9524,23 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::OutPoin
     for crate::models::transactions::btc::OutPointInfo
 {
     fn into_into_dart(self) -> crate::models::transactions::btc::OutPointInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::pancakeswap::PancakeMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [self.chain_id.into_into_dart().into_dart()].into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::pancakeswap::PancakeMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::pancakeswap::PancakeMeta>
+    for crate::models::exchange::pancakeswap::PancakeMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::pancakeswap::PancakeMeta {
         self
     }
 }
@@ -10456,12 +10491,16 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
                 <i32>::sse_encode(1, serializer);
                 <crate::models::exchange::uniswap::UniswapMeta>::sse_encode(field0, serializer);
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 <i32>::sse_encode(2, serializer);
+                <crate::models::exchange::pancakeswap::PancakeMeta>::sse_encode(field0, serializer);
+            }
+            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+                <i32>::sse_encode(3, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
-                <i32>::sse_encode(3, serializer);
+                <i32>::sse_encode(4, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             _ => {
@@ -11342,6 +11381,13 @@ impl SseEncode for crate::models::transactions::btc::OutPointInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.txid, serializer);
         <u32>::sse_encode(self.vout, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::pancakeswap::PancakeMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.chain_id, serializer);
     }
 }
 

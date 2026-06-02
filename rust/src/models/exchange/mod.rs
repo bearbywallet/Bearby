@@ -1,4 +1,6 @@
+pub mod pancakeswap;
 pub mod thorchain;
+pub mod univ_router;
 pub mod uniswap;
 
 use flutter_rust_bridge::frb;
@@ -8,12 +10,15 @@ use super::ftoken::FTokenInfo;
 use super::transactions::base_token::BaseTokenInfo;
 use std::collections::HashSet;
 
+pub use pancakeswap::PancakeMeta;
+pub use univ_router::RouterConfig;
 pub use uniswap::UniswapMeta;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Hash, Clone)]
 pub enum ExchangeProvider {
     Thorchain(u64),
     Uniswap(UniswapMeta),
+    PancakeSwap(PancakeMeta),
     ZIlSwap(u64),
     SunSwap(u64),
 }
@@ -27,6 +32,7 @@ impl ExchangeProvider {
                 SLIP44.contains(&slip44)
             }
             Self::Uniswap(_) => addr_type == 1 && uniswap::is_supported_chain(chain_id),
+            Self::PancakeSwap(_) => addr_type == 1 && pancakeswap::is_supported_chain(chain_id),
             Self::ZIlSwap(_) => {
                 const SLIP44: &[u32] = &[ZILLIQA];
                 addr_type == 0 && SLIP44.contains(&slip44)
@@ -35,6 +41,19 @@ impl ExchangeProvider {
                 const SLIP44: &[u32] = &[TRON];
                 addr_type == 4 && SLIP44.contains(&slip44)
             }
+        }
+    }
+
+    /// Resolve the shared Universal-Router engine config for the EVM-DEX variants
+    /// (Uniswap, PancakeSwap). `None` for non-Universal-Router providers. This is the single
+    /// place that maps a provider to its [`RouterConfig`], collapsing the per-function match
+    /// arms in `api/exchange.rs`.
+    #[frb(ignore)]
+    pub fn router_config(&self) -> Option<Result<RouterConfig, String>> {
+        match self {
+            Self::Uniswap(m) => Some(m.resolve()),
+            Self::PancakeSwap(m) => Some(m.resolve()),
+            _ => None,
         }
     }
 }
