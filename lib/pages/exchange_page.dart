@@ -158,7 +158,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   static bool _isSwappableEvm(ExchangeAsset a) =>
       a.token.addrType == 1 &&
       a.providers.any((p) =>
-          p.whenOrNull(uniswap: (_) => true, pancakeSwap: (_) => true) ?? false);
+          p.whenOrNull(uniswap: (_) => true, pancakeSwap: (_) => true) ??
+          false);
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();

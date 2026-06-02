@@ -760,7 +760,7 @@ fn wire__crate__api__exchange__bootstrap_exchange_providers_impl(
     rust_vec_len_: i32,
     data_len_: i32,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "bootstrap_exchange_providers",
             port: Some(port_),
@@ -777,15 +777,11 @@ fn wire__crate__api__exchange__bootstrap_exchange_providers_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::exchange::bootstrap_exchange_providers().await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::exchange::bootstrap_exchange_providers()?;
+                    Ok(output_ok)
+                })())
             }
         },
     )

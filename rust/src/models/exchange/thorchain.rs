@@ -363,30 +363,62 @@ async fn chain_ctx(chain_hash: u64) -> Result<(u32, u64), String> {
     .map_err(|e: ServiceError| e.to_string())
 }
 
+/// THORChain tradeable pool asset ids (lower-cased). These are the `Available` pools from
+/// `GET /thorchain/pools` — stable enough to hardcode. Used as a gate: a token only gets the
+/// Thorchain provider if its resolved asset id matches a pool below.
 #[frb(ignore)]
-#[derive(Debug, Deserialize)]
-#[serde(crate = "zilpay::serde")]
-pub struct PoolRaw {
-    #[serde(default)]
-    pub asset: String,
-    #[serde(default)]
-    pub status: String,
-}
+pub const THORCHAIN_POOLS: &[&str] = &[
+    "eth.link-0x514910771af9ca656af840dff83e8264ecf986ca",
+    "bsc.btcb-0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
+    "sol.sol",
+    "bsc.busd-0xe9e7cea3dedca5984780bafc599bd69add087d56",
+    "eth.dai-0x6b175474e89094c44da98b954eedeac495271d0f",
+    "bsc.twt-0x4b0f1812e5df2a09796481ff14017e6005508003",
+    "avax.sol-0xfe6b19286885a4f7f55adad09c3cd1f906d2478f",
+    "base.vvv-0xacfe6019ed1a7dc6f7b508c02d1b04ec88cc21bf",
+    "ltc.ltc",
+    "gaia.atom",
+    "bsc.eth-0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+    "eth.eth",
+    "bsc.usdt-0x55d398326f99059ff775485246999027b3197955",
+    "avax.usdt-0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7",
+    "eth.thor-0xa5f2211b9b8170f694421f2046281775e8468044",
+    "avax.usdc-0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e",
+    "eth.gusd-0x056fd409e1d7a124bd7017459dfea2f387b6d5cd",
+    "eth.aave-0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+    "eth.fox-0xc770eefad204b5180df6a14ee197d99d808ee52d",
+    "base.eth",
+    "doge.doge",
+    "eth.lusd-0x5f98805a4e8be255a32880fdec7f6728c6568ba0",
+    "eth.usdc-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "thor.ruji",
+    "tron.usdt-tr7nhqjekqxgtci8q8zy4pl8otszgjlj6t",
+    "avax.avax",
+    "xrp.xrp",
+    "bsc.usdc-0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+    "base.usdc-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+    "eth.vthor-0x815c23eca83261b6ec689b60cc4a58b54bc24d8d",
+    "eth.usdp-0x8e870d67f660d95d5be530380d0ec0bd388289e1",
+    "tron.trx",
+    "eth.wbtc-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "eth.xrune-0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c",
+    "bch.bch",
+    "btc.btc",
+    "eth.tgt-0x108a850856db3f85d0269a2693d896b394c80325",
+    "eth.usdt-0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "eth.yfi-0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
+    "thor.tcy",
+    "bsc.bnb",
+];
 
-/// The set of THORChain-tradeable asset ids (lower-cased for case-insensitive matching), e.g.
-/// `bsc.bnb`, `eth.usdc-0xa0b8…`, `btc.btc`. Only `Available` pools are swappable (`Staged` pools
-/// exist but reject swaps). THORChain supports *only* these assets, never an arbitrary token on a
-/// supported chain — this is what gates whether a token gets the THORChain provider at all.
+/// Build a `HashSet<String>` from [`THORCHAIN_POOLS`] for O(1) membership checks.
 #[frb(ignore)]
-pub async fn thorchain_supported_assets() -> Result<std::collections::HashSet<String>, String> {
-    let pools = thorchain_get::<Vec<PoolRaw>>("/thorchain/pools", &[]).await?;
-    let mut set = std::collections::HashSet::with_capacity(pools.len());
-    for pool in pools {
-        if pool.status == "Available" {
-            set.insert(pool.asset.to_lowercase());
-        }
+pub fn thorchain_pool_set() -> std::collections::HashSet<String> {
+    let mut set = std::collections::HashSet::with_capacity(THORCHAIN_POOLS.len());
+    for pool in THORCHAIN_POOLS {
+        set.insert(pool.to_string());
     }
-    Ok(set)
+    set
 }
 
 /// Resolve the per-chain THORChain router address from `inbound_addresses`. Used by the Ledger
@@ -524,6 +556,16 @@ pub async fn thorchain_prepare_swap(
     })
 }
 
+/// Deposit-specific parameters for [`build_deposit_tx`].
+struct DepositParams {
+    vault: Address,
+    asset: Address,
+    amount: U256,
+    memo: String,
+    expiry: i64,
+    is_native: bool,
+}
+
 /// Build the EVM `router.depositWithExpiry(vault, asset, amount, memo, expiry)` deposit tx.
 /// Native input → `asset = 0x0`, `value = amount`; ERC-20 → `asset = token`, `value = 0`
 /// (the router pulls the token, so a prior `approve(router)` is required — see
@@ -533,23 +575,22 @@ fn build_deposit_tx(
     chain_id: u64,
     chain_hash: u64,
     from: Address,
-    vault: Address,
-    asset: Address,
-    amount: U256,
-    memo: String,
-    expiry: i64,
-    is_native: bool,
+    deposit: DepositParams,
 ) -> TransactionRequest {
     let data = depositWithExpiryCall {
-        vault,
-        asset,
-        amount,
-        memo,
-        expiry: U256::from(expiry.max(0) as u64),
+        vault: deposit.vault,
+        asset: deposit.asset,
+        amount: deposit.amount,
+        memo: deposit.memo,
+        expiry: U256::from(deposit.expiry.max(0) as u64),
     }
     .abi_encode();
 
-    let value = if is_native { amount } else { U256::ZERO };
+    let value = if deposit.is_native {
+        deposit.amount
+    } else {
+        U256::ZERO
+    };
     let mut tx = ETHTransactionRequest {
         to: Some(AlloyTxKind::Call(router)),
         from: Some(from),
@@ -636,8 +677,18 @@ pub async fn thorchain_finalize_swap(
             let amount = U256::from_str(&blob.amount).map_err(|e| e.to_string())?;
 
             let tx = build_deposit_tx(
-                router, chain_id, chain_hash, swapper, vault, asset, amount, blob.memo, blob.expiry,
-                is_native,
+                router,
+                chain_id,
+                chain_hash,
+                swapper,
+                DepositParams {
+                    vault,
+                    asset,
+                    amount,
+                    memo: blob.memo,
+                    expiry: blob.expiry,
+                    is_native,
+                },
             );
             with_display(tx, chain_hash, swap_title, swap_info, provider_icon, out_token)
         }
@@ -837,12 +888,14 @@ mod tests {
             1,
             7,
             from,
-            vault,
-            Address::ZERO,
-            amount,
-            memo.clone(),
-            123,
-            true,
+            DepositParams {
+                vault,
+                asset: Address::ZERO,
+                amount,
+                memo: memo.clone(),
+                expiry: 123,
+                is_native: true,
+            },
         );
         let TransactionRequest::Ethereum((eth, meta)) = tx else {
             panic!("expected ethereum tx");
@@ -867,12 +920,14 @@ mod tests {
             56,
             1,
             Address::from([0x11; 20]),
-            Address::from([0xcd; 20]),
-            token,
-            U256::from(5_000u64),
-            "=:ETH.ETH:0xabc".to_string(),
-            0,
-            false,
+            DepositParams {
+                vault: Address::from([0xcd; 20]),
+                asset: token,
+                amount: U256::from(5_000u64),
+                memo: "=:ETH.ETH:0xabc".to_string(),
+                expiry: 0,
+                is_native: false,
+            },
         );
         let TransactionRequest::Ethereum((eth, _)) = tx else {
             panic!("expected ethereum tx");
