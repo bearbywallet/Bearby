@@ -101,8 +101,8 @@ mod exchange_tests {
 
     /// Pick the bootstrapped native-ETH (chain 1) asset with a Uniswap provider, the USDC (chain 1)
     /// destination asset, and the `ExchangeProvider::Uniswap` variant.
-    async fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
-        let assets = bootstrap_exchange_providers().await.unwrap();
+    fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
+        let assets = bootstrap_exchange_providers().unwrap();
         let asset = assets
             .iter()
             .find(|a| {
@@ -131,7 +131,7 @@ mod exchange_tests {
     async fn test_bootstrap_exchange_providers() {
         setup_eth_wallet().await;
 
-        let assets = bootstrap_exchange_providers().await.unwrap();
+        let assets = bootstrap_exchange_providers().unwrap();
 
         assert!(
             assets.iter().any(|a| {
@@ -150,7 +150,7 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_build_exchange_tx_native() {
         setup_eth_wallet().await;
-        let (eth, usdc, provider) = uniswap_asset().await;
+        let (eth, usdc, provider) = uniswap_asset();
 
         let prepared = prepare_exchange_swap(
             0,
@@ -197,7 +197,7 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_fetch_exchange_quote() {
         setup_eth_wallet().await;
-        let (asset, usdc, _) = uniswap_asset().await;
+        let (asset, usdc, _) = uniswap_asset();
 
         let quotes = fetch_exchange_quote(
             asset,

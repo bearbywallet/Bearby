@@ -21,6 +21,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `execute_thorchain_swap`, `resolve_swap_signer`, `set_eth_gas`
 
+/// Synchronous bootstrap of all exchange providers across every registered chain. THORChain pool
+/// membership is hardcoded (see [`THORCHAIN_POOLS`]) — no REST call. Halted status is always
+/// `false`: the THORChain `/thorchain/inbound_addresses` live check is dropped for speed; the
+/// swap quote itself will fail if a chain is actually paused.
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
