@@ -6,6 +6,7 @@
 import '../frb_generated.dart';
 import '../models/exchange.dart';
 import '../models/exchange/pancakeswap.dart';
+import '../models/exchange/thorchain.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/access_list.dart';
@@ -18,23 +19,22 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
+// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `execute_thorchain_swap`, `resolve_swap_signer`, `set_eth_gas`
 
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
+/// Quote `asset → to` across every provider on `asset`. Same-chain DEX providers (Uniswap,
+/// PancakeSwap) require `to` on the same chain; THORChain bridges to a different chain — its quote
+/// output is a different asset, so the UI renders THORChain as its own bridge route rather than
+/// rate-comparing it. `destination` is the recipient address on `to`'s chain (THORChain only).
 Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
         {required ExchangeAsset asset,
-        required String fromAsset,
-        required String toAsset,
+        required ExchangeAsset to,
         required String amount,
         required String destination}) =>
     RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
-        asset: asset,
-        fromAsset: fromAsset,
-        toAsset: toAsset,
-        amount: amount,
-        destination: destination);
+        asset: asset, to: to, amount: amount, destination: destination);
 
 /// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
 /// sign the Permit2 EIP-712, build the Universal Router swap calldata, and broadcast approve (`N`) + swap (`N+1`)
@@ -46,11 +46,11 @@ Stream<String> executeExchangeSwap(
         {required BigInt walletIndex,
         required BigInt accountIndex,
         required ExchangeProvider provider,
-        required String tokenIn,
-        required String tokenOut,
+        required ExchangeAsset from,
+        required ExchangeAsset to,
         required String amountIn,
         required int slippageBps,
-        required bool isNativeIn,
+        required String destination,
         required ExchangeTxDisplay display,
         String? password,
         String? passphrase}) =>
@@ -58,11 +58,11 @@ Stream<String> executeExchangeSwap(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         provider: provider,
-        tokenIn: tokenIn,
-        tokenOut: tokenOut,
+        from: from,
+        to: to,
         amountIn: amountIn,
         slippageBps: slippageBps,
-        isNativeIn: isNativeIn,
+        destination: destination,
         display: display,
         password: password,
         passphrase: passphrase);
@@ -96,20 +96,20 @@ Future<PreparedSwapInfo> prepareExchangeSwap(
         {required BigInt walletIndex,
         required BigInt accountIndex,
         required ExchangeProvider provider,
-        required String tokenIn,
-        required String tokenOut,
+        required ExchangeAsset from,
+        required ExchangeAsset to,
         required String amountIn,
         required int slippageBps,
-        required bool isNativeIn}) =>
+        required String destination}) =>
     RustLib.instance.api.crateApiExchangePrepareExchangeSwap(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         provider: provider,
-        tokenIn: tokenIn,
-        tokenOut: tokenOut,
+        from: from,
+        to: to,
         amountIn: amountIn,
         slippageBps: slippageBps,
-        isNativeIn: isNativeIn);
+        destination: destination);
 
 /// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
 /// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
@@ -117,6 +117,7 @@ Future<PreparedSwapInfo> prepareExchangeSwap(
 Future<TransactionRequestInfo> finalizeExchangeSwap(
         {required BigInt walletIndex,
         required BigInt accountIndex,
+        required ExchangeProvider provider,
         required String quoteBlob,
         String? permitSignature,
         required BigInt nonce,
@@ -127,6 +128,7 @@ Future<TransactionRequestInfo> finalizeExchangeSwap(
     RustLib.instance.api.crateApiExchangeFinalizeExchangeSwap(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
+        provider: provider,
         quoteBlob: quoteBlob,
         permitSignature: permitSignature,
         nonce: nonce,

@@ -34,6 +34,7 @@ import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
+import 'models/exchange/thorchain.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -331,11 +332,11 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
+      required ExchangeAsset from,
+      required ExchangeAsset to,
       required String amountIn,
       required int slippageBps,
-      required bool isNativeIn,
+      required String destination,
       required ExchangeTxDisplay display,
       String? password,
       String? passphrase});
@@ -345,8 +346,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
       {required ExchangeAsset asset,
-      required String fromAsset,
-      required String toAsset,
+      required ExchangeAsset to,
       required String amount,
       required String destination});
 
@@ -359,6 +359,7 @@ abstract class RustLibApi extends BaseApi {
   Future<TransactionRequestInfo> crateApiExchangeFinalizeExchangeSwap(
       {required BigInt walletIndex,
       required BigInt accountIndex,
+      required ExchangeProvider provider,
       required String quoteBlob,
       String? permitSignature,
       required BigInt nonce,
@@ -479,11 +480,11 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
+      required ExchangeAsset from,
+      required ExchangeAsset to,
       required String amountIn,
       required int slippageBps,
-      required bool isNativeIn});
+      required String destination});
 
   Future<Uint8List> crateApiTransactionPrepareMessage(
       {required BigInt walletIndex,
@@ -2180,11 +2181,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
+      required ExchangeAsset from,
+      required ExchangeAsset to,
       required String amountIn,
       required int slippageBps,
-      required bool isNativeIn,
+      required String destination,
       required ExchangeTxDisplay display,
       String? password,
       String? passphrase}) {
@@ -2195,11 +2196,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_exchange_provider(provider, serializer);
-        sse_encode_String(tokenIn, serializer);
-        sse_encode_String(tokenOut, serializer);
+        sse_encode_box_autoadd_exchange_asset(from, serializer);
+        sse_encode_box_autoadd_exchange_asset(to, serializer);
         sse_encode_String(amountIn, serializer);
         sse_encode_u_32(slippageBps, serializer);
-        sse_encode_bool(isNativeIn, serializer);
+        sse_encode_String(destination, serializer);
         sse_encode_box_autoadd_exchange_tx_display(display, serializer);
         sse_encode_opt_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
@@ -2216,11 +2217,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         walletIndex,
         accountIndex,
         provider,
-        tokenIn,
-        tokenOut,
+        from,
+        to,
         amountIn,
         slippageBps,
-        isNativeIn,
+        destination,
         display,
         password,
         passphrase,
@@ -2238,11 +2239,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "walletIndex",
           "accountIndex",
           "provider",
-          "tokenIn",
-          "tokenOut",
+          "from",
+          "to",
           "amountIn",
           "slippageBps",
-          "isNativeIn",
+          "destination",
           "display",
           "password",
           "passphrase",
@@ -2279,16 +2280,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
       {required ExchangeAsset asset,
-      required String fromAsset,
-      required String toAsset,
+      required ExchangeAsset to,
       required String amount,
       required String destination}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_exchange_asset(asset, serializer);
-        sse_encode_String(fromAsset, serializer);
-        sse_encode_String(toAsset, serializer);
+        sse_encode_box_autoadd_exchange_asset(to, serializer);
         sse_encode_String(amount, serializer);
         sse_encode_String(destination, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -2299,7 +2298,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiExchangeFetchExchangeQuoteConstMeta,
-      argValues: [asset, fromAsset, toAsset, amount, destination],
+      argValues: [asset, to, amount, destination],
       apiImpl: this,
     ));
   }
@@ -2307,7 +2306,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiExchangeFetchExchangeQuoteConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_exchange_quote",
-        argNames: ["asset", "fromAsset", "toAsset", "amount", "destination"],
+        argNames: ["asset", "to", "amount", "destination"],
       );
 
   @override
@@ -2368,6 +2367,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<TransactionRequestInfo> crateApiExchangeFinalizeExchangeSwap(
       {required BigInt walletIndex,
       required BigInt accountIndex,
+      required ExchangeProvider provider,
       required String quoteBlob,
       String? permitSignature,
       required BigInt nonce,
@@ -2380,6 +2380,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
+        sse_encode_box_autoadd_exchange_provider(provider, serializer);
         sse_encode_String(quoteBlob, serializer);
         sse_encode_opt_String(permitSignature, serializer);
         sse_encode_u_64(nonce, serializer);
@@ -2398,6 +2399,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       argValues: [
         walletIndex,
         accountIndex,
+        provider,
         quoteBlob,
         permitSignature,
         nonce,
@@ -2416,6 +2418,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [
           "walletIndex",
           "accountIndex",
+          "provider",
           "quoteBlob",
           "permitSignature",
           "nonce",
@@ -3448,22 +3451,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
+      required ExchangeAsset from,
+      required ExchangeAsset to,
       required String amountIn,
       required int slippageBps,
-      required bool isNativeIn}) {
+      required String destination}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_exchange_provider(provider, serializer);
-        sse_encode_String(tokenIn, serializer);
-        sse_encode_String(tokenOut, serializer);
+        sse_encode_box_autoadd_exchange_asset(from, serializer);
+        sse_encode_box_autoadd_exchange_asset(to, serializer);
         sse_encode_String(amountIn, serializer);
         sse_encode_u_32(slippageBps, serializer);
-        sse_encode_bool(isNativeIn, serializer);
+        sse_encode_String(destination, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 101, port: port_);
       },
@@ -3476,11 +3479,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         walletIndex,
         accountIndex,
         provider,
-        tokenIn,
-        tokenOut,
+        from,
+        to,
         amountIn,
         slippageBps,
-        isNativeIn
+        destination
       ],
       apiImpl: this,
     ));
@@ -3493,11 +3496,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "walletIndex",
           "accountIndex",
           "provider",
-          "tokenIn",
-          "tokenOut",
+          "from",
+          "to",
           "amountIn",
           "slippageBps",
-          "isNativeIn"
+          "destination"
         ],
       );
 
@@ -5198,6 +5201,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ThorchainMeta dco_decode_box_autoadd_thorchain_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_thorchain_meta(raw);
+  }
+
+  @protected
   TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -5402,7 +5411,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     switch (raw[0]) {
       case 0:
         return ExchangeProvider_Thorchain(
-          dco_decode_u_64(raw[1]),
+          dco_decode_box_autoadd_thorchain_meta(raw[1]),
         );
       case 1:
         return ExchangeProvider_Uniswap(
@@ -6408,6 +6417,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ThorchainMeta dco_decode_thorchain_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ThorchainMeta(
+      chain: dco_decode_String(arr[0]),
+      asset: dco_decode_String(arr[1]),
+      chainId: dco_decode_u_64(arr[2]),
+    );
+  }
+
+  @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -7133,6 +7155,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ThorchainMeta sse_decode_box_autoadd_thorchain_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_thorchain_meta(deserializer));
+  }
+
+  @protected
   TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7340,7 +7369,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        var var_field0 = sse_decode_u_64(deserializer);
+        var var_field0 = sse_decode_box_autoadd_thorchain_meta(deserializer);
         return ExchangeProvider_Thorchain(var_field0);
       case 1:
         var var_field0 = sse_decode_box_autoadd_uniswap_meta(deserializer);
@@ -8636,6 +8665,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ThorchainMeta sse_decode_thorchain_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chain = sse_decode_String(deserializer);
+    var var_asset = sse_decode_String(deserializer);
+    var var_chainId = sse_decode_u_64(deserializer);
+    return ThorchainMeta(
+        chain: var_chain, asset: var_asset, chainId: var_chainId);
+  }
+
+  @protected
   TokenTransferParamsInfo sse_decode_token_transfer_params_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9360,6 +9399,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_thorchain_meta(
+      ThorchainMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_thorchain_meta(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_token_transfer_params_info(
       TokenTransferParamsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9521,7 +9567,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     switch (self) {
       case ExchangeProvider_Thorchain(field0: final field0):
         sse_encode_i_32(0, serializer);
-        sse_encode_u_64(field0, serializer);
+        sse_encode_box_autoadd_thorchain_meta(field0, serializer);
       case ExchangeProvider_Uniswap(field0: final field0):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_uniswap_meta(field0, serializer);
@@ -10534,6 +10580,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_16(self.productId, serializer);
     sse_encode_String(self.productName, serializer);
     sse_encode_String(self.modelId, serializer);
+  }
+
+  @protected
+  void sse_encode_thorchain_meta(ThorchainMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.chain, serializer);
+    sse_encode_String(self.asset, serializer);
+    sse_encode_u_64(self.chainId, serializer);
   }
 
   @protected

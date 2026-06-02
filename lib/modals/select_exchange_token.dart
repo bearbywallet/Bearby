@@ -177,7 +177,7 @@ class _ExchangeTokenSelectContentState
                   balance: balance,
                   networkBadge: _buildNetworkBadge(appState, theme, asset.token),
                   providerIcons:
-                      asset.providers.map(exchangeProviderIconAsset).toList(),
+                      asset.providers.map((p) => p.iconAsset).toList(),
                   onTap: () {
                     widget.onSelected(asset);
                     Navigator.pop(context);

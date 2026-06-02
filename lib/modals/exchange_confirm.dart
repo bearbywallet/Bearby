@@ -46,12 +46,10 @@ enum _StepState { pending, active, done, skipped }
 void showExchangeConfirmModal({
   required BuildContext context,
   required List<ExchangeQuoteInfo> quotes,
-  required FTokenInfo fromToken,
-  required FTokenInfo toToken,
+  required ExchangeAsset from,
+  required ExchangeAsset to,
   required String amountInWei,
-  required String tokenIn,
-  required String tokenOut,
-  required bool isNativeIn,
+  required String destination,
   required int slippageBps,
   required VoidCallback onDone,
   VoidCallback? onDismiss,
@@ -66,12 +64,10 @@ void showExchangeConfirmModal({
     barrierColor: Colors.black54,
     builder: (context) => _ExchangeConfirmContent(
       quotes: quotes,
-      fromToken: fromToken,
-      toToken: toToken,
+      from: from,
+      to: to,
       amountInWei: amountInWei,
-      tokenIn: tokenIn,
-      tokenOut: tokenOut,
-      isNativeIn: isNativeIn,
+      destination: destination,
       slippageBps: slippageBps,
       onDone: onDone,
     ),
@@ -84,23 +80,22 @@ void showExchangeConfirmModal({
 
 class _ExchangeConfirmContent extends StatefulWidget {
   final List<ExchangeQuoteInfo> quotes;
-  final FTokenInfo fromToken;
-  final FTokenInfo toToken;
+  final ExchangeAsset from;
+  final ExchangeAsset to;
   final String amountInWei;
-  final String tokenIn;
-  final String tokenOut;
-  final bool isNativeIn;
+
+  /// Recipient on the destination chain. Same address as the wallet for same-chain swaps; the
+  /// chosen recipient for a THORChain cross-chain bridge.
+  final String destination;
   final int slippageBps;
   final VoidCallback onDone;
 
   const _ExchangeConfirmContent({
     required this.quotes,
-    required this.fromToken,
-    required this.toToken,
+    required this.from,
+    required this.to,
     required this.amountInWei,
-    required this.tokenIn,
-    required this.tokenOut,
-    required this.isNativeIn,
+    required this.destination,
     required this.slippageBps,
     required this.onDone,
   });
@@ -148,6 +143,14 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   ExchangeQuoteInfo get _selected => widget.quotes[_selectedIndex];
   bool get _isWrapUnwrap => _selected.isWrapUnwrap;
 
+  // Derived from the two assets — no stored duplication.
+  FTokenInfo get _fromToken => widget.from.token;
+  FTokenInfo get _toToken => widget.to.token;
+  bool get _isNativeIn => widget.from.token.native;
+
+  /// THORChain bridge route: native send + memo / router deposit, never Permit2.
+  bool get _isThorchain => _selected.provider.isThorchain;
+
   // -------------------------------------------------------------------------
   // Lifecycle
   // -------------------------------------------------------------------------
@@ -180,19 +183,22 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
     final appState = context.read<AppState>();
 
-    // Native input and pure wrap/unwrap are single-tx: no ERC-20 approve / Permit2 needed.
-    _plan = (widget.isNativeIn || _isWrapUnwrap)
+    // Native input and pure wrap/unwrap are single-tx. THORChain never uses Permit2, so an ERC-20
+    // bridge is approve → swap; an ERC-20 DEX swap is approve → permit → swap.
+    _plan = (_isNativeIn || _isWrapUnwrap)
         ? const <_Step>[_Step.swap]
-        : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
+        : _isThorchain
+            ? const <_Step>[_Step.approve, _Step.swap]
+            : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
     for (final s in _plan) {
       _stepStates[s] = _StepState.pending;
     }
 
-    _payText = _format(appState, widget.fromToken, widget.amountInWei);
+    _payText = _format(appState, _fromToken, widget.amountInWei);
 
     // Preview each route's network fee up front. Only native-in swaps can be estimated without a
     // signed permit / on-chain allowance, so ERC-20-input routes show no gas.
-    if (widget.isNativeIn) {
+    if (_isNativeIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _estimateAllRouteGas());
     }
   }
@@ -209,11 +215,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
   /// Localized "Wrap"/"Unwrap" verb for a native↔wrapped op (direction from [_ExchangeConfirmContent.isNativeIn]).
   String _wrapVerb(AppLocalizations l10n) =>
-      widget.isNativeIn ? l10n.exchangeConfirmWrap : l10n.exchangeConfirmUnwrap;
+      _isNativeIn ? l10n.exchangeConfirmWrap : l10n.exchangeConfirmUnwrap;
 
   /// "You get" text for a given route (recomputed per selection).
   String _getTextFor(AppState appState, ExchangeQuoteInfo quote) =>
-      _format(appState, widget.toToken, quote.amountOut);
+      _format(appState, _toToken, quote.amountOut);
 
   /// Build the tx display metadata for [quote]. Wrap/unwrap is provider-less (a direct WETH
   /// deposit/withdraw): a neutral icon/title and no "\u00b7 Provider" suffix; a normal swap carries the
@@ -223,23 +229,23 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     AppLocalizations l10n,
     ExchangeQuoteInfo quote,
   ) {
-    final providerName = exchangeProviderName(quote.provider);
+    final providerName = quote.provider.displayName;
     final getText = _getTextFor(appState, quote);
     final wrapTitle = _wrapVerb(l10n);
     return ExchangeTxDisplay(
       providerIcon: quote.isWrapUnwrap
           ? 'assets/icons/swap.svg'
-          : exchangeProviderIconAsset(quote.provider),
+          : quote.provider.iconAsset,
       swapTitle: quote.isWrapUnwrap ? wrapTitle : l10n.exchangePageTabSwap,
       swapInfo: quote.isWrapUnwrap
           ? '$_payText \u2192 $getText'
           : '$_payText \u2192 $getText \u00b7 $providerName',
-      approveTitle: l10n.exchangeHistoryApprove(widget.fromToken.symbol),
+      approveTitle: l10n.exchangeHistoryApprove(_fromToken.symbol),
       permitTitle: l10n.exchangeHistoryPermit(providerName),
       outToken: BaseTokenInfo(
         value: quote.amountOut,
-        symbol: widget.toToken.symbol,
-        decimals: widget.toToken.decimals,
+        symbol: _toToken.symbol,
+        decimals: _toToken.decimals,
       ),
     );
   }
@@ -323,7 +329,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   void _estimateAllRouteGas() {
     final appState = context.read<AppState>();
     final wallet = appState.wallet;
-    if (wallet == null || !widget.isNativeIn) return;
+    if (wallet == null || !_isNativeIn) return;
     // Independent futures so each row fills in as it resolves; failures are swallowed per-route.
     for (var i = 0; i < widget.quotes.length; i++) {
       unawaited(_estimateRouteGas(appState, wallet.selectedAccount, i));
@@ -347,16 +353,17 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         walletIndex: appState.selectedWalletIndex,
         accountIndex: accountIndex,
         provider: quote.provider,
-        tokenIn: widget.tokenIn,
-        tokenOut: widget.tokenOut,
+        from: widget.from,
+        to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
-        isNativeIn: true,
+        destination: widget.destination,
       );
       final disp = _displayFor(appState, l10n, quote);
       final tx = await finalizeExchangeSwap(
         walletIndex: appState.selectedWalletIndex,
         accountIndex: accountIndex,
+        provider: quote.provider,
         quoteBlob: prep.quoteBlob,
         permitSignature: null,
         nonce: nonce,
@@ -405,11 +412,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       walletIndex: appState.selectedWalletIndex,
       accountIndex: wallet.selectedAccount,
       provider: _selected.provider,
-      tokenIn: widget.tokenIn,
-      tokenOut: widget.tokenOut,
+      from: widget.from,
+      to: widget.to,
       amountIn: widget.amountInWei,
       slippageBps: widget.slippageBps,
-      isNativeIn: widget.isNativeIn,
+      destination: widget.destination,
       display: _displayFor(appState, l10n, _selected),
       password: wallet.authType == 'none' ? _passwordController.text : null,
     );
@@ -470,15 +477,15 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       );
       var swapNonce = baseNonce;
 
-      if (!widget.isNativeIn) {
+      if (!_isNativeIn) {
         _onStage('approving', hint: l10n.exchangeConfirmHintApprove);
         final approval = await checkExchangeApproval(
           walletIndex: walletIndexBig,
           accountIndex: accountIndexBig,
           provider: _selected.provider,
-          tokenIn: widget.tokenIn,
+          tokenIn: _fromToken.addr,
           amountIn: widget.amountInWei,
-          isNativeIn: widget.isNativeIn,
+          isNativeIn: _isNativeIn,
           nonce: baseNonce,
           approveTitle: disp.approveTitle,
           providerIcon: disp.providerIcon,
@@ -507,11 +514,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         walletIndex: walletIndexBig,
         accountIndex: accountIndexBig,
         provider: _selected.provider,
-        tokenIn: widget.tokenIn,
-        tokenOut: widget.tokenOut,
+        from: widget.from,
+        to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
-        isNativeIn: widget.isNativeIn,
+        destination: widget.destination,
       );
 
       String? permitSignature;
@@ -529,6 +536,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       final swapTx = await finalizeExchangeSwap(
         walletIndex: walletIndexBig,
         accountIndex: accountIndexBig,
+        provider: _selected.provider,
         quoteBlob: prep.quoteBlob,
         permitSignature: permitSignature,
         nonce: swapNonce,
@@ -664,9 +672,9 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     if (wei == null) return null;
     final (text, _) = formatingAmount(
       amount: wei,
-      symbol: widget.fromToken.symbol,
-      decimals: widget.fromToken.decimals,
-      rate: widget.fromToken.rate,
+      symbol: _fromToken.symbol,
+      decimals: _fromToken.decimals,
+      rate: _fromToken.rate,
       appState: appState,
     );
     return text;
@@ -692,7 +700,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final selected = index == _selectedIndex;
     final isBest = index == 0 && widget.quotes.length > 1;
     final selectable = widget.quotes.length > 1;
-    final out = _format(appState, widget.toToken, quote.amountOut);
+    final out = _format(appState, _toToken, quote.amountOut);
     final gasText = _routeGasText(appState, index);
     final gasLabel = gasText != null
         ? l10n.exchangeConfirmAfterGas(gasText)
@@ -724,7 +732,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
               )
             else
               SvgPicture.asset(
-                exchangeProviderIconAsset(quote.provider),
+                quote.provider.iconAsset,
                 width: 28,
                 height: 28,
               ),
@@ -800,14 +808,14 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-  Widget _buildMeta(AppState appState, AppTheme theme, AppLocalizations l10n) {
-    final addr = appState.account?.addr;
+  Widget _buildMeta(AppTheme theme, AppLocalizations l10n) {
+    final recipient = widget.destination;
     final slippage = '${(widget.slippageBps / 100).toStringAsFixed(2)}%';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (addr != null && addr.isNotEmpty)
+        if (recipient.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
@@ -818,7 +826,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                       theme.bodyText2.copyWith(color: theme.textSecondary),
                 ),
                 const Spacer(),
-                CopyContent(address: addr),
+                CopyContent(address: recipient),
               ],
             ),
           ),
@@ -900,7 +908,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                       const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
-                        child: _buildMeta(appState, theme, l10n),
+                        child: _buildMeta(theme, l10n),
                       ),
                       if (needsPassword) ...[
                         const SizedBox(height: 12),
