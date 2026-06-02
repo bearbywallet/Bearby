@@ -6236,10 +6236,12 @@ impl SseDecode for crate::models::exchange::ExchangeQuoteInfo {
             <crate::models::exchange::ExchangeProvider>::sse_decode(deserializer);
         let mut var_amountOut = <String>::sse_decode(deserializer);
         let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
+        let mut var_isWrapUnwrap = <bool>::sse_decode(deserializer);
         return crate::models::exchange::ExchangeQuoteInfo {
             provider: var_provider,
             amount_out: var_amountOut,
             permit_typed_data_json: var_permitTypedDataJson,
+            is_wrap_unwrap: var_isWrapUnwrap,
         };
     }
 }
@@ -9121,6 +9123,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeQuoteInf
             self.provider.into_into_dart().into_dart(),
             self.amount_out.into_into_dart().into_dart(),
             self.permit_typed_data_json.into_into_dart().into_dart(),
+            self.is_wrap_unwrap.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -10516,6 +10519,7 @@ impl SseEncode for crate::models::exchange::ExchangeQuoteInfo {
         <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
         <String>::sse_encode(self.amount_out, serializer);
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
+        <bool>::sse_encode(self.is_wrap_unwrap, serializer);
     }
 }
 

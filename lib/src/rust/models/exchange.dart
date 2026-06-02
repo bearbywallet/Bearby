@@ -65,15 +65,23 @@ class ExchangeQuoteInfo {
   /// when the API returns no permit (`permitData: null`).
   final String? permitTypedDataJson;
 
+  /// `true` when this is a 1:1 native ↔ wrapped-native wrap/unwrap (no router, no approval/
+  /// permit, no fee). The UI renders it as "Wrap"/"Unwrap" and runs a single-step flow.
+  final bool isWrapUnwrap;
+
   const ExchangeQuoteInfo({
     required this.provider,
     required this.amountOut,
     this.permitTypedDataJson,
+    required this.isWrapUnwrap,
   });
 
   @override
   int get hashCode =>
-      provider.hashCode ^ amountOut.hashCode ^ permitTypedDataJson.hashCode;
+      provider.hashCode ^
+      amountOut.hashCode ^
+      permitTypedDataJson.hashCode ^
+      isWrapUnwrap.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -82,7 +90,8 @@ class ExchangeQuoteInfo {
           runtimeType == other.runtimeType &&
           provider == other.provider &&
           amountOut == other.amountOut &&
-          permitTypedDataJson == other.permitTypedDataJson;
+          permitTypedDataJson == other.permitTypedDataJson &&
+          isWrapUnwrap == other.isWrapUnwrap;
 }
 
 /// Display metadata composed on the Dart side and threaded into every tx built for a swap.

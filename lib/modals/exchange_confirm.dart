@@ -57,6 +57,7 @@ void showExchangeConfirmModal({
   required String tokenOut,
   required String amountOut,
   required bool isNativeIn,
+  required bool isWrapUnwrap,
   required int slippageBps,
   required VoidCallback onDone,
   VoidCallback? onDismiss,
@@ -78,6 +79,7 @@ void showExchangeConfirmModal({
       tokenOut: tokenOut,
       amountOut: amountOut,
       isNativeIn: isNativeIn,
+      isWrapUnwrap: isWrapUnwrap,
       slippageBps: slippageBps,
       onDone: onDone,
     ),
@@ -97,6 +99,7 @@ class _ExchangeConfirmContent extends StatefulWidget {
   final String tokenOut;
   final String amountOut;
   final bool isNativeIn;
+  final bool isWrapUnwrap;
   final int slippageBps;
   final VoidCallback onDone;
 
@@ -109,6 +112,7 @@ class _ExchangeConfirmContent extends StatefulWidget {
     required this.tokenOut,
     required this.amountOut,
     required this.isNativeIn,
+    required this.isWrapUnwrap,
     required this.slippageBps,
     required this.onDone,
   });
@@ -169,7 +173,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         : null;
     _isLedger = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
-    _plan = widget.isNativeIn
+    // Native input and pure wrap/unwrap are single-tx: no ERC-20 approve / Permit2 needed.
+    _plan = (widget.isNativeIn || widget.isWrapUnwrap)
         ? const <_Step>[_Step.swap]
         : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
 
@@ -180,12 +185,20 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     _payText = _format(appState, widget.fromToken, widget.amountInWei);
     _getText = _format(appState, widget.toToken, widget.amountOut);
 
-    final providerIcon = exchangeProviderIconAsset(widget.provider);
+    // Wrap/unwrap is provider-less (a direct WETH deposit/withdraw): a neutral icon and title,
+    // no "\u00b7 Provider" suffix. A normal swap carries the chosen DEX's icon and name.
+    final providerIcon = widget.isWrapUnwrap
+        ? 'assets/icons/swap.svg'
+        : exchangeProviderIconAsset(widget.provider);
     final providerName = exchangeProviderName(widget.provider);
     _display = ExchangeTxDisplay(
       providerIcon: providerIcon,
-      swapTitle: 'Swap',
-      swapInfo: '$_payText \u2192 $_getText \u00b7 $providerName',
+      swapTitle: widget.isWrapUnwrap
+          ? wrapVerb(isNativeIn: widget.isNativeIn)
+          : 'Swap',
+      swapInfo: widget.isWrapUnwrap
+          ? '$_payText \u2192 $_getText'
+          : '$_payText \u2192 $_getText \u00b7 $providerName',
       approveTitle: 'Approve ${widget.fromToken.symbol}',
       permitTitle: 'Permit2 \u00b7 $providerName',
       outToken: BaseTokenInfo(
@@ -586,7 +599,9 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   String _stepLabel(_Step step) => switch (step) {
         _Step.approve => 'Approve token',
         _Step.permit => 'Sign permit (EIP-712)',
-        _Step.swap => 'Swap on ${exchangeProviderName(widget.provider)}',
+        _Step.swap => widget.isWrapUnwrap
+            ? wrapVerb(isNativeIn: widget.isNativeIn)
+            : 'Swap on ${exchangeProviderName(widget.provider)}',
       };
 
   Widget _stepRow(AppTheme theme, _Step step) {
@@ -732,6 +747,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        _metaRow(theme, 'Provider', _routeValue(theme)),
         if (addr != null && addr.isNotEmpty)
           _metaRow(theme, 'Recipient', CopyContent(address: addr)),
         _metaRow(
@@ -758,6 +774,32 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
             '${tier.icon} ${tier.title(context)}',
             style: theme.bodyText1.copyWith(color: theme.textPrimary),
           ),
+        ),
+      ],
+    );
+  }
+
+  /// Route value for the meta panel: "Wrap"/"Unwrap" for a native↔wrapped op, else the chosen
+  /// DEX's icon + name.
+  Widget _routeValue(AppTheme theme) {
+    if (widget.isWrapUnwrap) {
+      return Text(
+        wrapVerb(isNativeIn: widget.isNativeIn),
+        style: theme.bodyText1.copyWith(color: theme.textPrimary),
+      );
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          exchangeProviderIconAsset(widget.provider),
+          width: 18,
+          height: 18,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          exchangeProviderName(widget.provider),
+          style: theme.bodyText1.copyWith(color: theme.textPrimary),
         ),
       ],
     );

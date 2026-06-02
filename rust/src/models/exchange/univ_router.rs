@@ -107,12 +107,21 @@ mod sol_types {
             function approve(address spender, uint256 amount) external returns (bool);
         }
     }
+
+    sol! {
+        // Canonical WETH9 / WBNB wrap interface. `deposit` mints the wrapped token 1:1 to
+        // `msg.sender` for the attached `value`; `withdraw` burns it and returns native coin.
+        interface IWETH {
+            function deposit() external payable;
+            function withdraw(uint256 amount) external;
+        }
+    }
 }
 
 use sol_types::{
     executeCall, quoteExactInputSingleCall, PermitDetails, PermitSingle, QuoteExactInputSingleParams,
 };
-use sol_types::{IERC20, IPermit2};
+use sol_types::{IERC20, IPermit2, IWETH};
 
 /// `Copy` bundle of a single chain's deployment addresses for one DEX.
 #[frb(ignore)]
@@ -199,6 +208,42 @@ fn resolve_in<'a>(is_native_in: bool, weth: &'a str, from_asset: &'a str) -> Cow
     } else {
         Cow::Borrowed(from_asset)
     }
+}
+
+/// Resolve `(from_asset, to_asset)` into the WETH-substituted `(token_in, token_out)` pair,
+/// plus whether the output is native and whether this is a pure **wrap/unwrap**. The latter is
+/// true when both sides resolve to WETH — i.e. native ↔ wrapped-native, which has no V3 pool and
+/// must be served by [`build_wrap_tx`] instead of a router swap.
+fn resolve_pair(
+    addrs: &RouterAddrs,
+    from_asset: &str,
+    to_asset: &str,
+    is_native_in: bool,
+) -> Result<(String, String, bool, bool), String> {
+    let weth = addrs.weth.to_string();
+    let (tout, is_native_out) = resolve_out(to_asset, addrs.chain_id)?;
+    let token_out = if is_native_out {
+        weth.clone()
+    } else {
+        tout.into_owned()
+    };
+    let token_in = resolve_in(is_native_in, &weth, from_asset).into_owned();
+    let is_wrap_unwrap = token_in.eq_ignore_ascii_case(&token_out);
+    Ok((token_in, token_out, is_native_out, is_wrap_unwrap))
+}
+
+/// Whether `(from_asset → to_asset)` on this DEX config is a pure native ↔ wrapped-native
+/// wrap/unwrap (1:1, no router, no approval/permit). Used by the api layer to short-circuit the
+/// quote loop and skip the approve/permit legs.
+#[frb(ignore)]
+pub fn is_wrap_unwrap(
+    cfg: &RouterConfig,
+    from_asset: &str,
+    to_asset: &str,
+    is_native_in: bool,
+) -> Result<bool, String> {
+    let (_, _, _, wrap) = resolve_pair(&cfg.addrs, from_asset, to_asset, is_native_in)?;
+    Ok(wrap)
 }
 
 fn v3_path(tin: &Address, fee: u32, tout: &Address) -> Vec<u8> {
@@ -509,6 +554,44 @@ fn build_router_tx(
     )))
 }
 
+/// Build a 1:1 native ↔ wrapped-native transaction directly against the WETH/WBNB contract:
+/// `deposit()` with `value = amount` (wrap) or `withdraw(amount)` (unwrap). No router, no Permit2,
+/// no platform fee — `withdraw` burns the caller's own balance, so it needs no approval either.
+fn build_wrap_tx(
+    weth: Address,
+    chain_id: u64,
+    chain_hash: u64,
+    from: Address,
+    amount: &str,
+    is_native_in: bool,
+) -> Result<TransactionRequest, String> {
+    let amt = U256::from_str(amount).map_err(|e| e.to_string())?;
+    let (data, value) = if is_native_in {
+        (IWETH::depositCall {}.abi_encode(), amt)
+    } else {
+        (IWETH::withdrawCall { amount: amt }.abi_encode(), U256::ZERO)
+    };
+
+    let mut tx = ETHTransactionRequest {
+        to: Some(AlloyTxKind::Call(weth)),
+        from: Some(from),
+        value: Some(value),
+        input: data.into(),
+        gas: Some(DEFAULT_APPROVE_GAS),
+        ..Default::default()
+    };
+    tx.chain_id = Some(chain_id);
+
+    Ok(TransactionRequest::Ethereum((
+        tx,
+        TransactionMetadata {
+            chain_hash,
+            broadcast: true,
+            ..Default::default()
+        },
+    )))
+}
+
 /// Quote orchestration for an EVM-DEX `ExchangeProvider` arm: pull the chain config, run the
 /// on-chain quote and (for ERC-20 inputs) attach the Permit2 JSON to sign. The displayed output
 /// has the platform fee subtracted. `provider` is echoed back into the returned quote.
@@ -525,14 +608,18 @@ pub async fn router_quote_info(
     let addrs = cfg.addrs;
     let is_native_in = asset.token.native;
 
-    let (tout, is_native_out) = resolve_out(to_asset, addrs.chain_id)?;
-    let token_out = if is_native_out {
-        addrs.weth.to_string()
-    } else {
-        tout.into_owned()
-    };
+    let (token_in, token_out, _is_native_out, is_wrap_unwrap) =
+        resolve_pair(&addrs, from_asset, to_asset, is_native_in)?;
 
-    let token_in = resolve_in(is_native_in, &addrs.weth.to_string(), from_asset).into_owned();
+    // Native ↔ wrapped-native: no pool, no quote — it's a 1:1 wrap/unwrap.
+    if is_wrap_unwrap {
+        return Ok(ExchangeQuoteInfo {
+            provider: provider.clone(),
+            amount_out: amount.to_string(),
+            permit_typed_data_json: None,
+            is_wrap_unwrap: true,
+        });
+    }
 
     let config = with_service(|core| {
         Ok(core
@@ -569,6 +656,7 @@ pub async fn router_quote_info(
         provider: provider.clone(),
         amount_out: net_out.to_string(),
         permit_typed_data_json,
+        is_wrap_unwrap: false,
     })
 }
 
@@ -593,13 +681,30 @@ pub async fn prepare_router_swap(
     is_native_in: bool,
 ) -> Result<PreparedSwap, String> {
     let addrs = cfg.addrs;
-    let (tout, is_native_out) = resolve_out(token_out, addrs.chain_id)?;
-    let resolved_out = if is_native_out {
-        addrs.weth.to_string()
-    } else {
-        tout.into_owned()
-    };
-    let resolved_in = resolve_in(is_native_in, &addrs.weth.to_string(), token_in).into_owned();
+    let (resolved_in, resolved_out, is_native_out, is_wrap_unwrap) =
+        resolve_pair(&addrs, token_in, token_out, is_native_in)?;
+
+    // Wrap/unwrap: 1:1, no quote, no permit. `finalize_router_swap` detects it by
+    // `token_in == token_out` and builds the deposit/withdraw tx.
+    if is_wrap_unwrap {
+        let blob = QuoteBlob {
+            chain_id: addrs.chain_id,
+            universal_router: addrs.universal_router.to_string(),
+            token_in: resolved_in.clone(),
+            token_out: resolved_out,
+            amount_in: amount_in.to_string(),
+            amount_out: amount_in.to_string(),
+            fee_tier: 0,
+            permit_nonce: None,
+            is_native_in,
+            is_native_out,
+            slippage_bps,
+        };
+        return Ok(PreparedSwap {
+            permit_typed_data_json: None,
+            quote_blob: serde_json::to_string(&blob).map_err(|e| e.to_string())?,
+        });
+    }
 
     let config = with_service(|core| {
         Ok(core
@@ -666,31 +771,43 @@ pub async fn finalize_router_swap(
     let blob: QuoteBlob =
         serde_json::from_str(quote_blob).map_err(|e| format!("invalid quote_blob: {e}"))?;
 
-    let router = Address::from_str(&blob.universal_router).map_err(|e| e.to_string())?;
+    // Wrap/unwrap (native ↔ wrapped-native) is a direct WETH deposit/withdraw, not a router swap.
+    let tx = if blob.token_in.eq_ignore_ascii_case(&blob.token_out) {
+        let weth = Address::from_str(&blob.token_in).map_err(|e| e.to_string())?;
+        build_wrap_tx(
+            weth,
+            blob.chain_id,
+            chain_hash,
+            swapper,
+            &blob.amount_in,
+            blob.is_native_in,
+        )?
+    } else {
+        let router = Address::from_str(&blob.universal_router).map_err(|e| e.to_string())?;
+        let deadline = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_err(|e| e.to_string())?
+            .as_secs()
+            .saturating_add(20 * 60);
 
-    let deadline = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|e| e.to_string())?
-        .as_secs()
-        .saturating_add(20 * 60);
-
-    let tx = build_router_tx(
-        router,
-        blob.chain_id,
-        chain_hash,
-        swapper,
-        &blob.token_in,
-        &blob.token_out,
-        &blob.amount_in,
-        &blob.amount_out,
-        blob.fee_tier,
-        blob.slippage_bps,
-        deadline,
-        blob.is_native_in,
-        blob.is_native_out,
-        blob.permit_nonce,
-        permit_signature,
-    )?;
+        build_router_tx(
+            router,
+            blob.chain_id,
+            chain_hash,
+            swapper,
+            &blob.token_in,
+            &blob.token_out,
+            &blob.amount_in,
+            &blob.amount_out,
+            blob.fee_tier,
+            blob.slippage_bps,
+            deadline,
+            blob.is_native_in,
+            blob.is_native_out,
+            blob.permit_nonce,
+            permit_signature,
+        )?
+    };
 
     let evm_tx = match tx {
         TransactionRequest::Ethereum((eth, _)) => eth,
@@ -960,6 +1077,51 @@ mod engine_tests {
         assert_eq!(v["domain"]["chainId"], 1);
         assert_eq!(v["message"]["details"]["nonce"], "42");
         assert_eq!(v["message"]["spender"], addrs().universal_router.to_string());
+    }
+
+    #[test]
+    fn resolve_pair_flags_wrap_and_unwrap() {
+        let a = addrs(); // weth = 0xbbbb...bb
+        let weth = a.weth.to_string();
+
+        // native BNB (zero addr) -> WBNB == wrap
+        let (_, _, _, wrap) = resolve_pair(&a, NATIVE_SENTINEL, &weth, true).unwrap();
+        assert!(wrap);
+
+        // WBNB -> native BNB == unwrap
+        let (_, _, native_out, unwrap) = resolve_pair(&a, &weth, NATIVE_SENTINEL, false).unwrap();
+        assert!(unwrap);
+        assert!(native_out);
+
+        // WBNB -> some other token == normal swap
+        let (_, _, _, plain) = resolve_pair(&a, &weth, &addr(0x99).to_string(), false).unwrap();
+        assert!(!plain);
+    }
+
+    #[test]
+    fn build_wrap_tx_encodes_deposit_with_value() {
+        let tx = build_wrap_tx(addr(0xbb), 56, 1, addr(0xcc), "1000", true).unwrap();
+        let TransactionRequest::Ethereum((eth, _)) = tx else {
+            panic!("expected ethereum tx");
+        };
+        let data = eth.input.input.clone().unwrap();
+        assert_eq!(eth.value, Some(U256::from(1000u64)));
+        assert_eq!(&data[..4], IWETH::depositCall::SELECTOR.as_slice());
+        // deposit() selector is 0xd0e30db0.
+        assert_eq!(&data[..4], &[0xd0, 0xe3, 0x0d, 0xb0]);
+    }
+
+    #[test]
+    fn build_wrap_tx_encodes_withdraw_zero_value() {
+        let tx = build_wrap_tx(addr(0xbb), 56, 1, addr(0xcc), "1000", false).unwrap();
+        let TransactionRequest::Ethereum((eth, _)) = tx else {
+            panic!("expected ethereum tx");
+        };
+        let data = eth.input.input.clone().unwrap();
+        assert_eq!(eth.value, Some(U256::ZERO));
+        assert_eq!(&data[..4], IWETH::withdrawCall::SELECTOR.as_slice());
+        let decoded = IWETH::withdrawCall::abi_decode(&data).unwrap();
+        assert_eq!(decoded.amount, U256::from(1000u64));
     }
 
     #[test]

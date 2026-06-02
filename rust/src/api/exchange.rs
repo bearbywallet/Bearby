@@ -16,7 +16,8 @@ use zilpay::wallet::wallet_storage::StorageOperations;
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
 use crate::models::exchange::univ_router::{
-    finalize_router_swap, prepare_router_swap, router_check_approval, router_quote_info,
+    finalize_router_swap, is_wrap_unwrap, prepare_router_swap, router_check_approval,
+    router_quote_info,
 };
 use crate::models::exchange::{
     ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, PancakeMeta, UniswapMeta,
@@ -176,6 +177,25 @@ pub async fn fetch_exchange_quote(
         &destination,
         &asset.providers,
     );
+
+    // Native ↔ wrapped-native is a 1:1 wrap/unwrap independent of any DEX. Detect it once with the
+    // first resolvable provider (used only as a chain-context carrier) and emit a single quote,
+    // instead of a duplicate per DEX.
+    for provider in &asset.providers {
+        let Some(Ok(cfg)) = provider.router_config() else {
+            continue;
+        };
+        if is_wrap_unwrap(&cfg, &from_asset, &to_asset, asset.token.native).unwrap_or(false) {
+            dbg!("fetch_exchange_quote: wrap/unwrap detected", provider);
+            return Ok(vec![ExchangeQuoteInfo {
+                provider: provider.clone(),
+                amount_out: amount.clone(),
+                permit_typed_data_json: None,
+                is_wrap_unwrap: true,
+            }]);
+        }
+        break;
+    }
 
     let mut quotes = Vec::with_capacity(asset.providers.len());
     for provider in &asset.providers {
@@ -372,6 +392,9 @@ pub async fn execute_exchange_swap(
         None => return Err("unsupported exchange provider".to_string()),
     };
 
+    // A native ↔ wrapped-native wrap/unwrap is a single direct WETH tx — no approve, no permit.
+    let wrap = is_wrap_unwrap(&cfg, &token_in, &token_out, is_native_in).unwrap_or(false);
+
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -386,8 +409,8 @@ pub async fn execute_exchange_swap(
     let mut nonce = base.nonce;
     let mut results: Vec<HistoricalTransactionInfo> = Vec::with_capacity(2);
 
-    // One-time ERC-20 approval (to the Permit2 contract). Native inputs never need it.
-    if !is_native_in {
+    // One-time ERC-20 approval (to the Permit2 contract). Native inputs and wraps never need it.
+    if !is_native_in && !wrap {
         if let Some(approval) = router_check_approval(
             &cfg,
             swapper,

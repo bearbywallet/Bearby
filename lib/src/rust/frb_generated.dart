@@ -5429,12 +5429,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ExchangeQuoteInfo(
       provider: dco_decode_exchange_provider(arr[0]),
       amountOut: dco_decode_String(arr[1]),
       permitTypedDataJson: dco_decode_opt_String(arr[2]),
+      isWrapUnwrap: dco_decode_bool(arr[3]),
     );
   }
 
@@ -7365,10 +7366,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_provider = sse_decode_exchange_provider(deserializer);
     var var_amountOut = sse_decode_String(deserializer);
     var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
+    var var_isWrapUnwrap = sse_decode_bool(deserializer);
     return ExchangeQuoteInfo(
         provider: var_provider,
         amountOut: var_amountOut,
-        permitTypedDataJson: var_permitTypedDataJson);
+        permitTypedDataJson: var_permitTypedDataJson,
+        isWrapUnwrap: var_isWrapUnwrap);
   }
 
   @protected
@@ -9541,6 +9544,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_exchange_provider(self.provider, serializer);
     sse_encode_String(self.amountOut, serializer);
     sse_encode_opt_String(self.permitTypedDataJson, serializer);
+    sse_encode_bool(self.isWrapUnwrap, serializer);
   }
 
   @protected
