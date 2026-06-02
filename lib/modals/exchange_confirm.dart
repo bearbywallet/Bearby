@@ -6,10 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/exchange_provider_icon.dart';
-import 'package:bearby/components/gas_eip1559.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/image_cache.dart';
-import 'package:bearby/components/jazzicon.dart';
 import 'package:bearby/components/modal_drag_handle.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/swipe_button.dart';
@@ -18,18 +15,15 @@ import 'package:bearby/ledger/ledger_connector.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/eip712.dart';
-import 'package:bearby/mixins/gas_eip1559.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/gas.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
-import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Step model
@@ -43,21 +37,21 @@ enum _StepState { pending, active, done, skipped }
 // Entry point
 // ---------------------------------------------------------------------------
 
-/// Confirm sheet for an exchange (swap or cross-chain bridge). Unlike the generic transfer modal,
-/// this drives the whole approve → permit → swap sequence: software wallets run it as one batched
-/// Rust call ([executeExchangeSwap]) under a single unlock; Ledger wallets sign each step on the
-/// device (a device cannot sign a batch). Gas is always the Aggressive tier (applied in Rust).
+/// Confirm sheet for an exchange swap that doubles as a **route picker**: the caller passes every
+/// provider quote (best-first) and the sheet lets the user pick one, showing each route's output and
+/// (for native-in) a per-route gas estimate. It then drives the whole approve → permit → swap
+/// sequence: software wallets run it as one batched Rust call ([executeExchangeSwap]) under a single
+/// unlock; Ledger wallets sign each step on the device (a device cannot sign a batch). Gas is always
+/// the Aggressive tier (applied in Rust).
 void showExchangeConfirmModal({
   required BuildContext context,
-  required ExchangeProvider provider,
+  required List<ExchangeQuoteInfo> quotes,
   required FTokenInfo fromToken,
   required FTokenInfo toToken,
   required String amountInWei,
   required String tokenIn,
   required String tokenOut,
-  required String amountOut,
   required bool isNativeIn,
-  required bool isWrapUnwrap,
   required int slippageBps,
   required VoidCallback onDone,
   VoidCallback? onDismiss,
@@ -71,15 +65,13 @@ void showExchangeConfirmModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => _ExchangeConfirmContent(
-      provider: provider,
+      quotes: quotes,
       fromToken: fromToken,
       toToken: toToken,
       amountInWei: amountInWei,
       tokenIn: tokenIn,
       tokenOut: tokenOut,
-      amountOut: amountOut,
       isNativeIn: isNativeIn,
-      isWrapUnwrap: isWrapUnwrap,
       slippageBps: slippageBps,
       onDone: onDone,
     ),
@@ -91,28 +83,24 @@ void showExchangeConfirmModal({
 // ---------------------------------------------------------------------------
 
 class _ExchangeConfirmContent extends StatefulWidget {
-  final ExchangeProvider provider;
+  final List<ExchangeQuoteInfo> quotes;
   final FTokenInfo fromToken;
   final FTokenInfo toToken;
   final String amountInWei;
   final String tokenIn;
   final String tokenOut;
-  final String amountOut;
   final bool isNativeIn;
-  final bool isWrapUnwrap;
   final int slippageBps;
   final VoidCallback onDone;
 
   const _ExchangeConfirmContent({
-    required this.provider,
+    required this.quotes,
     required this.fromToken,
     required this.toToken,
     required this.amountInWei,
     required this.tokenIn,
     required this.tokenOut,
-    required this.amountOut,
     required this.isNativeIn,
-    required this.isWrapUnwrap,
     required this.slippageBps,
     required this.onDone,
   });
@@ -132,17 +120,20 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
   late final bool _isLedger;
 
-  /// Ordered list of steps the user will walk through; built once in [initState].
+  /// Ordered list of steps the user will walk through; built once in [didChangeDependencies].
   late final List<_Step> _plan;
 
-  /// Pre-formatted "you pay" amount (symbol included from [formatingAmount]).
+  /// Pre-formatted "you pay" amount (symbol included from [formatingAmount]); constant across routes.
   late final String _payText;
 
-  /// Pre-formatted "you get" amount (symbol included from [formatingAmount]).
-  late final String _getText;
+  /// Index of the chosen route in [_ExchangeConfirmContent.quotes] (0 = best). Drives the display.
+  int _selectedIndex = 0;
 
-  /// Display metadata composed once; threaded into every tx Rust builds.
-  late final ExchangeTxDisplay _display;
+  /// Per-route total fee in wei (native-in only); keyed by quote index. Filled progressively.
+  final Map<int, BigInt> _routeGasWei = <int, BigInt>{};
+
+  /// Guards the one-time l10n-dependent init in [didChangeDependencies].
+  bool _didInitDeps = false;
 
   /// Live status of each planned step; mutated only inside [setState].
   final Map<_Step, _StepState> _stepStates = <_Step, _StepState>{};
@@ -150,14 +141,12 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   /// Indented sub-line shown under the currently active step.
   String? _hint;
 
-  /// Live gas params for the swap, fetched against a preview tx (native-in only).
-  RequiredTxParamsInfo? _gasParams;
-  TransactionRequestInfo? _gasPreviewTx;
-  Timer? _gasTimer;
-
   bool _loading = false;
   bool _obscurePassword = true;
   String? _error;
+
+  ExchangeQuoteInfo get _selected => widget.quotes[_selectedIndex];
+  bool get _isWrapUnwrap => _selected.isWrapUnwrap;
 
   // -------------------------------------------------------------------------
   // Lifecycle
@@ -173,63 +162,86 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         : null;
     _isLedger = wallet?.walletType.contains(WalletType.ledger.name) ?? false;
 
-    // Native input and pure wrap/unwrap are single-tx: no ERC-20 approve / Permit2 needed.
-    _plan = (widget.isNativeIn || widget.isWrapUnwrap)
-        ? const <_Step>[_Step.swap]
-        : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
-
-    for (final s in _plan) {
-      _stepStates[s] = _StepState.pending;
-    }
-
-    _payText = _format(appState, widget.fromToken, widget.amountInWei);
-    _getText = _format(appState, widget.toToken, widget.amountOut);
-
-    // Wrap/unwrap is provider-less (a direct WETH deposit/withdraw): a neutral icon and title,
-    // no "\u00b7 Provider" suffix. A normal swap carries the chosen DEX's icon and name.
-    final providerIcon = widget.isWrapUnwrap
-        ? 'assets/icons/swap.svg'
-        : exchangeProviderIconAsset(widget.provider);
-    final providerName = exchangeProviderName(widget.provider);
-    _display = ExchangeTxDisplay(
-      providerIcon: providerIcon,
-      swapTitle: widget.isWrapUnwrap
-          ? wrapVerb(isNativeIn: widget.isNativeIn)
-          : 'Swap',
-      swapInfo: widget.isWrapUnwrap
-          ? '$_payText \u2192 $_getText'
-          : '$_payText \u2192 $_getText \u00b7 $providerName',
-      approveTitle: 'Approve ${widget.fromToken.symbol}',
-      permitTitle: 'Permit2 \u00b7 $providerName',
-      outToken: BaseTokenInfo(
-        value: widget.amountOut,
-        symbol: widget.toToken.symbol,
-        decimals: widget.toToken.decimals,
-      ),
-    );
-
     if (_isLedger) {
       appState.ledgerViewController.scanAndAutoConnect().then((_) {
         if (mounted) setState(() {});
       });
     }
+  }
 
-    // Preview the swap's network fee up front. Only native-in swaps can be estimated without a
-    // signed permit / on-chain allowance, so the rest fall back to the tier label.
+  /// One-time init that needs l10n (and a live context): the step plan, the constant "you pay"
+  /// text, and the per-route gas preview. Runs here rather than [initState] because
+  /// `AppLocalizations.of` is only valid once dependencies are available.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didInitDeps) return;
+    _didInitDeps = true;
+
+    final appState = context.read<AppState>();
+
+    // Native input and pure wrap/unwrap are single-tx: no ERC-20 approve / Permit2 needed.
+    _plan = (widget.isNativeIn || _isWrapUnwrap)
+        ? const <_Step>[_Step.swap]
+        : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
+    for (final s in _plan) {
+      _stepStates[s] = _StepState.pending;
+    }
+
+    _payText = _format(appState, widget.fromToken, widget.amountInWei);
+
+    // Preview each route's network fee up front. Only native-in swaps can be estimated without a
+    // signed permit / on-chain allowance, so ERC-20-input routes show no gas.
     if (widget.isNativeIn) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _initGasPreview());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _estimateAllRouteGas());
     }
   }
 
   @override
   void dispose() {
-    _gasTimer?.cancel();
     _swapSub?.cancel();
     _passwordController.dispose();
     if (_isLedger && context.mounted) {
       context.read<AppState>().ledgerViewController.stopScan();
     }
     super.dispose();
+  }
+
+  /// Localized "Wrap"/"Unwrap" verb for a native↔wrapped op (direction from [_ExchangeConfirmContent.isNativeIn]).
+  String _wrapVerb(AppLocalizations l10n) =>
+      widget.isNativeIn ? l10n.exchangeConfirmWrap : l10n.exchangeConfirmUnwrap;
+
+  /// "You get" text for a given route (recomputed per selection).
+  String _getTextFor(AppState appState, ExchangeQuoteInfo quote) =>
+      _format(appState, widget.toToken, quote.amountOut);
+
+  /// Build the tx display metadata for [quote]. Wrap/unwrap is provider-less (a direct WETH
+  /// deposit/withdraw): a neutral icon/title and no "\u00b7 Provider" suffix; a normal swap carries the
+  /// chosen DEX's icon and name. Single source of truth for both the confirm flow and gas preview.
+  ExchangeTxDisplay _displayFor(
+    AppState appState,
+    AppLocalizations l10n,
+    ExchangeQuoteInfo quote,
+  ) {
+    final providerName = exchangeProviderName(quote.provider);
+    final getText = _getTextFor(appState, quote);
+    final wrapTitle = _wrapVerb(l10n);
+    return ExchangeTxDisplay(
+      providerIcon: quote.isWrapUnwrap
+          ? 'assets/icons/swap.svg'
+          : exchangeProviderIconAsset(quote.provider),
+      swapTitle: quote.isWrapUnwrap ? wrapTitle : l10n.exchangePageTabSwap,
+      swapInfo: quote.isWrapUnwrap
+          ? '$_payText \u2192 $getText'
+          : '$_payText \u2192 $getText \u00b7 $providerName',
+      approveTitle: l10n.exchangeHistoryApprove(widget.fromToken.symbol),
+      permitTitle: l10n.exchangeHistoryPermit(providerName),
+      outToken: BaseTokenInfo(
+        value: quote.amountOut,
+        symbol: widget.toToken.symbol,
+        decimals: widget.toToken.decimals,
+      ),
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -303,66 +315,68 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   }
 
   // -------------------------------------------------------------------------
-  // Gas preview (native-in only) — same pipeline as the transfer modal: build a
-  // throwaway unsigned swap tx once, then poll [caclGasFee] on it. Never broadcasts.
+  // Per-route gas preview (native-in only) — reuses the swap-build pipeline: build a throwaway
+  // unsigned swap tx per route and run [caclGasFee] on it. Never broadcasts. ERC-20-input routes
+  // can't be simulated before the on-chain approval, so they show no gas.
   // -------------------------------------------------------------------------
 
-  Future<void> _initGasPreview() async {
+  void _estimateAllRouteGas() {
     final appState = context.read<AppState>();
     final wallet = appState.wallet;
-    if (wallet == null) return;
+    if (wallet == null || !widget.isNativeIn) return;
+    // Independent futures so each row fills in as it resolves; failures are swallowed per-route.
+    for (var i = 0; i < widget.quotes.length; i++) {
+      unawaited(_estimateRouteGas(appState, wallet.selectedAccount, i));
+    }
+  }
+
+  Future<void> _estimateRouteGas(
+    AppState appState,
+    BigInt accountIndex,
+    int index,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+    final quote = widget.quotes[index];
     try {
       final nonce = await estimateSwapBaseNonce(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
+        accountIndex: accountIndex,
       );
       final prep = await prepareExchangeSwap(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
-        provider: widget.provider,
+        accountIndex: accountIndex,
+        provider: quote.provider,
         tokenIn: widget.tokenIn,
         tokenOut: widget.tokenOut,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
         isNativeIn: true,
       );
+      final disp = _displayFor(appState, l10n, quote);
       final tx = await finalizeExchangeSwap(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
+        accountIndex: accountIndex,
         quoteBlob: prep.quoteBlob,
         permitSignature: null,
         nonce: nonce,
-        swapTitle: _display.swapTitle,
-        swapInfo: _display.swapInfo,
-        providerIcon: _display.providerIcon,
-        outToken: _display.outToken,
+        swapTitle: disp.swapTitle,
+        swapInfo: disp.swapInfo,
+        providerIcon: disp.providerIcon,
+        outToken: disp.outToken,
       );
-      if (!mounted) return;
-      _gasPreviewTx = tx;
-      await _refreshGas();
-      _gasTimer =
-          Timer.periodic(const Duration(seconds: 12), (_) => _refreshGas());
-    } catch (e) {
-      // Non-blocking: the modal still shows the Aggressive tier label.
-      debugPrint('swap gas preview failed: $e');
-    }
-  }
-
-  Future<void> _refreshGas() async {
-    final tx = _gasPreviewTx;
-    if (tx == null || !mounted) return;
-    final appState = context.read<AppState>();
-    final wallet = appState.wallet;
-    if (wallet == null) return;
-    try {
       final gas = await caclGasFee(
         params: tx,
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
+        accountIndex: accountIndex,
       );
-      if (mounted) setState(() => _gasParams = gas);
+      final wei = BigInt.tryParse(gas.fast);
+      if (mounted && wei != null) {
+        setState(() => _routeGasWei[index] = wei);
+      }
     } catch (e) {
-      debugPrint('swap gas refresh failed: $e');
+      // Non-blocking: the row simply shows no gas estimate.
+      debugPrint('route gas estimate failed: $e');
     }
   }
 
@@ -373,9 +387,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   /// Returns a future that completes only when the swap stream is done or errors, so the awaiting
   /// [SwipeButton] keeps its loading state for the entire approve → permit → swap sequence.
   Future<void> _confirmSoftware(AppState appState) {
+    final l10n = AppLocalizations.of(context);
     final wallet = appState.wallet;
-    if (wallet == null) {
-      setState(() => _error = 'No active account');
+    if (wallet == null || l10n == null) {
+      setState(() => _error = l10n?.exchangeConfirmNoAccount ?? '');
       return Future.value();
     }
 
@@ -389,13 +404,13 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final stream = executeExchangeSwap(
       walletIndex: appState.selectedWalletIndex,
       accountIndex: wallet.selectedAccount,
-      provider: widget.provider,
+      provider: _selected.provider,
       tokenIn: widget.tokenIn,
       tokenOut: widget.tokenOut,
       amountIn: widget.amountInWei,
       slippageBps: widget.slippageBps,
       isNativeIn: widget.isNativeIn,
-      display: _display,
+      display: _displayFor(appState, l10n, _selected),
       password: wallet.authType == 'none' ? _passwordController.text : null,
     );
 
@@ -427,10 +442,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   // -------------------------------------------------------------------------
 
   Future<void> _confirmLedger(AppState appState) async {
+    final l10n = AppLocalizations.of(context);
     final wallet = appState.wallet;
     final account = appState.account;
-    if (wallet == null || account == null) {
-      setState(() => _error = 'No active account');
+    if (wallet == null || account == null || l10n == null) {
+      setState(() => _error = l10n?.exchangeConfirmNoAccount ?? '');
       return;
     }
 
@@ -440,6 +456,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _resetSteps();
     });
 
+    final disp = _displayFor(appState, l10n, _selected);
     final ledger = appState.ledgerViewController;
     final walletIndexBig = appState.selectedWalletIndex;
     final accountIndexBig = wallet.selectedAccount;
@@ -454,17 +471,17 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       var swapNonce = baseNonce;
 
       if (!widget.isNativeIn) {
-        _onStage('approving', hint: 'Confirm approval on your Ledger…');
+        _onStage('approving', hint: l10n.exchangeConfirmHintApprove);
         final approval = await checkExchangeApproval(
           walletIndex: walletIndexBig,
           accountIndex: accountIndexBig,
-          provider: widget.provider,
+          provider: _selected.provider,
           tokenIn: widget.tokenIn,
           amountIn: widget.amountInWei,
           isNativeIn: widget.isNativeIn,
           nonce: baseNonce,
-          approveTitle: _display.approveTitle,
-          providerIcon: _display.providerIcon,
+          approveTitle: disp.approveTitle,
+          providerIcon: disp.providerIcon,
         );
         if (approval != null) {
           final sig = await ledger.signTransaction(
@@ -485,11 +502,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       }
 
       // Gap between approve and swap prep: show a transient hint with no step change.
-      if (mounted) setState(() => _hint = 'Preparing…');
+      if (mounted) setState(() => _hint = l10n.exchangeConfirmHintPreparing);
       final prep = await prepareExchangeSwap(
         walletIndex: walletIndexBig,
         accountIndex: accountIndexBig,
-        provider: widget.provider,
+        provider: _selected.provider,
         tokenIn: widget.tokenIn,
         tokenOut: widget.tokenOut,
         amountIn: widget.amountInWei,
@@ -500,7 +517,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       String? permitSignature;
       final permitJson = prep.permitTypedDataJson;
       if (permitJson != null) {
-        _onStage('permit', hint: 'Confirm permit on your Ledger…');
+        _onStage('permit', hint: l10n.exchangeConfirmHintPermit);
         permitSignature = await ledger.signEIP712HashedMessage(
           typedData: TypedDataEip712.fromJsonString(permitJson),
           account: account,
@@ -508,17 +525,17 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         );
       }
 
-      _onStage('swapping', hint: 'Confirm swap on your Ledger…');
+      _onStage('swapping', hint: l10n.exchangeConfirmHintSwap);
       final swapTx = await finalizeExchangeSwap(
         walletIndex: walletIndexBig,
         accountIndex: accountIndexBig,
         quoteBlob: prep.quoteBlob,
         permitSignature: permitSignature,
         nonce: swapNonce,
-        swapTitle: _display.swapTitle,
-        swapInfo: _display.swapInfo,
-        providerIcon: _display.providerIcon,
-        outToken: _display.outToken,
+        swapTitle: disp.swapTitle,
+        swapInfo: disp.swapInfo,
+        providerIcon: disp.providerIcon,
+        outToken: disp.outToken,
       );
       final swapSig = await ledger.signTransaction(
         transaction: swapTx,
@@ -596,15 +613,16 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         _StepState.skipped => theme.textSecondary.withValues(alpha: 0.4),
       };
 
-  String _stepLabel(_Step step) => switch (step) {
-        _Step.approve => 'Approve token',
-        _Step.permit => 'Sign permit (EIP-712)',
-        _Step.swap => widget.isWrapUnwrap
-            ? wrapVerb(isNativeIn: widget.isNativeIn)
-            : 'Swap on ${exchangeProviderName(widget.provider)}',
+  String _stepLabel(AppLocalizations l10n, _Step step) => switch (step) {
+        _Step.approve => l10n.exchangeConfirmStepApprove,
+        _Step.permit => l10n.exchangeConfirmStepPermit,
+        _Step.swap => _isWrapUnwrap
+            ? _wrapVerb(l10n)
+            : l10n.exchangeConfirmStepSwapOn(
+                exchangeProviderName(_selected.provider)),
       };
 
-  Widget _stepRow(AppTheme theme, _Step step) {
+  Widget _stepRow(AppTheme theme, AppLocalizations l10n, _Step step) {
     final state = _stepStates[step] ?? _StepState.pending;
     final activeHint = _hint;
     return Padding(
@@ -617,7 +635,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
               _glyph(theme, state),
               const SizedBox(width: 10),
               Text(
-                _stepLabel(step),
+                _stepLabel(l10n, step),
                 style: theme.bodyText1.copyWith(
                   color: _stepColor(theme, state),
                   decoration: state == _StepState.skipped
@@ -640,70 +658,160 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-  Widget _buildHero(AppState appState, AppTheme theme) {
-    return Row(
+  Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildAvatar(appState, theme, widget.fromToken),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            _payText,
-            style: theme.bodyText1.copyWith(color: theme.textPrimary),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          l10n.exchangeConfirmSelectRoute,
+          style: theme.titleMedium.copyWith(color: theme.textPrimary),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: SvgPicture.asset(
-            'assets/icons/swap.svg',
-            width: 14,
-            height: 14,
-            colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
-          ),
+        const SizedBox(height: 4),
+        Text(
+          l10n.exchangeConfirmBestRouteHint,
+          style: theme.bodyText2.copyWith(color: theme.textSecondary),
         ),
-        Expanded(
-          child: Text(
-            _getText,
-            style: theme.bodyText1.copyWith(color: theme.textPrimary),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.right,
-          ),
+        const SizedBox(height: 12),
+        Text(
+          '${l10n.exchangePagePay}: $_payText',
+          style: theme.bodyText2.copyWith(color: theme.textSecondary),
         ),
-        const SizedBox(width: 6),
-        _buildAvatar(appState, theme, widget.toToken),
+        const SizedBox(height: 8),
       ],
     );
   }
 
-  Widget _buildAvatar(AppState appState, AppTheme theme, FTokenInfo token) {
-    return SizedBox(
-      width: 28,
-      height: 28,
-      child: ClipOval(
-        child: AsyncImage(
-          url: processTokenLogo(
-            token: token,
-            shortName: appState.chain?.shortName ?? '',
-            theme: theme.value,
+  /// Selected route's gas as a native-token amount string, or `null` when not yet estimated /
+  /// not available (ERC-20 input). Pre-sized formatting via [formatingAmount].
+  String? _routeGasText(AppState appState, int index) {
+    final wei = _routeGasWei[index];
+    if (wei == null) return null;
+    final (text, _) = formatingAmount(
+      amount: wei,
+      symbol: widget.fromToken.symbol,
+      decimals: widget.fromToken.decimals,
+      rate: widget.fromToken.rate,
+      appState: appState,
+    );
+    return text;
+  }
+
+  Widget _buildRouteList(AppState appState, AppTheme theme, AppLocalizations l10n) {
+    return Column(
+      children: List<Widget>.generate(
+        widget.quotes.length,
+        (i) => _buildRouteRow(appState, theme, l10n, i),
+        growable: false,
+      ),
+    );
+  }
+
+  Widget _buildRouteRow(
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+    int index,
+  ) {
+    final quote = widget.quotes[index];
+    final selected = index == _selectedIndex;
+    final isBest = index == 0 && widget.quotes.length > 1;
+    final selectable = widget.quotes.length > 1;
+    final out = _format(appState, widget.toToken, quote.amountOut);
+    final gasText = _routeGasText(appState, index);
+    final gasLabel = gasText != null
+        ? l10n.exchangeConfirmAfterGas(gasText)
+        : l10n.exchangeConfirmGasNone;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: selectable ? () => setState(() => _selectedIndex = index) : null,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? theme.primaryPurple : theme.modalBorder,
+            width: 1.5,
           ),
-          width: 28,
-          height: 28,
-          fit: BoxFit.cover,
-          errorWidget: Jazzicon(seed: token.addr, diameter: 28),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    out,
+                    style: theme.titleMedium.copyWith(color: theme.textPrimary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isBest)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.success.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      l10n.exchangeConfirmBest,
+                      style: theme.labelSmall.copyWith(
+                        color: theme.success,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    gasLabel,
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (quote.isWrapUnwrap)
+                  Text(
+                    _wrapVerb(l10n),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                  )
+                else ...[
+                  SvgPicture.asset(
+                    exchangeProviderIconAsset(quote.provider),
+                    width: 16,
+                    height: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      l10n.exchangeConfirmVia(
+                          exchangeProviderName(quote.provider)),
+                      style: theme.bodyText2.copyWith(color: theme.textPrimary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTimeline(AppTheme theme) {
+  Widget _buildTimeline(AppTheme theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: _plan.map((s) => _stepRow(theme, s)).toList(growable: false),
+      children:
+          _plan.map((s) => _stepRow(theme, l10n, s)).toList(growable: false),
     );
   }
 
@@ -725,82 +833,36 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-  Widget _buildMeta(AppState appState, AppTheme theme) {
+  Widget _buildMeta(AppState appState, AppTheme theme, AppLocalizations l10n) {
     final addr = appState.account?.addr;
     final slippage = '${(widget.slippageBps / 100).toStringAsFixed(2)}%';
-    const tier = GasFeeOption.aggressive;
-
-    // Native-in: real Aggressive fee from the preview tx (`fast` is the total fee in wei).
-    String? feeText;
-    final gas = _gasParams;
-    if (gas != null && widget.isNativeIn) {
-      final (normalized, _) = formatingAmount(
-        amount: BigInt.tryParse(gas.fast) ?? BigInt.zero,
-        symbol: widget.fromToken.symbol,
-        decimals: widget.fromToken.decimals,
-        rate: widget.fromToken.rate,
-        appState: appState,
-      );
-      feeText = '≈ $normalized';
-    }
+    // Selected route's network fee (native-in only; same source as the row gas estimate).
+    final gasText =
+        widget.isNativeIn ? _routeGasText(appState, _selectedIndex) : null;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _metaRow(theme, 'Provider', _routeValue(theme)),
         if (addr != null && addr.isNotEmpty)
-          _metaRow(theme, 'Recipient', CopyContent(address: addr)),
+          _metaRow(theme, l10n.exchangeConfirmRecipient,
+              CopyContent(address: addr)),
         _metaRow(
           theme,
-          'Slippage',
+          l10n.exchangeConfirmSlippage,
           Text(
             slippage,
             style: theme.bodyText1.copyWith(color: theme.textPrimary),
           ),
         ),
-        if (feeText != null)
+        if (gasText != null)
           _metaRow(
             theme,
-            'Network fee',
+            l10n.exchangeConfirmNetworkFee,
             Text(
-              feeText,
+              l10n.exchangeConfirmAfterGas(gasText),
               style: theme.bodyText1.copyWith(color: theme.textPrimary),
             ),
           ),
-        _metaRow(
-          theme,
-          'Gas tier',
-          Text(
-            '${tier.icon} ${tier.title(context)}',
-            style: theme.bodyText1.copyWith(color: theme.textPrimary),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Route value for the meta panel: "Wrap"/"Unwrap" for a native↔wrapped op, else the chosen
-  /// DEX's icon + name.
-  Widget _routeValue(AppTheme theme) {
-    if (widget.isWrapUnwrap) {
-      return Text(
-        wrapVerb(isNativeIn: widget.isNativeIn),
-        style: theme.bodyText1.copyWith(color: theme.textPrimary),
-      );
-    }
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SvgPicture.asset(
-          exchangeProviderIconAsset(widget.provider),
-          width: 18,
-          height: 18,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          exchangeProviderName(widget.provider),
-          style: theme.bodyText1.copyWith(color: theme.textPrimary),
-        ),
       ],
     );
   }
@@ -813,6 +875,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return const SizedBox.shrink();
     final wallet = appState.wallet;
     final needsPassword =
         !_isLedger && wallet != null && wallet.authType == 'none';
@@ -858,24 +922,28 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                             onDismiss: () => setState(() => _error = null),
                           ),
                         ),
-                      _buildHero(appState, theme),
-                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: _buildHeader(theme, l10n),
+                      ),
+                      _buildRouteList(appState, theme, l10n),
+                      const SizedBox(height: 8),
                       // Force full-width so timeline stays left-aligned in the
                       // centred Column.
                       SizedBox(
                         width: double.infinity,
-                        child: _buildTimeline(theme),
+                        child: _buildTimeline(theme, l10n),
                       ),
                       const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
-                        child: _buildMeta(appState, theme),
+                        child: _buildMeta(appState, theme, l10n),
                       ),
                       if (needsPassword) ...[
                         const SizedBox(height: 12),
                         SmartInput(
                           controller: _passwordController,
-                          hint: 'Password',
+                          hint: l10n.exchangeConfirmPassword,
                           fontSize: 18,
                           height: 56,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -893,8 +961,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                       const SizedBox(height: 16),
                       SwipeButton(
                         text: currentError != null
-                            ? 'Unable to confirm'
-                            : 'Swipe to swap',
+                            ? l10n.exchangeConfirmUnable
+                            : l10n.exchangeConfirmSwipe,
                         disabled: _loading || ledgerNotReady,
                         onSwipeComplete: () async {
                           if (_isLedger) {

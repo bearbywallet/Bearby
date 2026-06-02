@@ -635,6 +635,150 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 block} other{{count} blocks}}'**
   String exchangeSettingsBlocks(int count);
 
+  /// No description provided for @exchangeConfirmSelectRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a route to perform a swap'**
+  String get exchangeConfirmSelectRoute;
+
+  /// No description provided for @exchangeConfirmBestRouteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Best route is selected by output amount'**
+  String get exchangeConfirmBestRouteHint;
+
+  /// No description provided for @exchangeConfirmBest.
+  ///
+  /// In en, this message translates to:
+  /// **'BEST'**
+  String get exchangeConfirmBest;
+
+  /// No description provided for @exchangeConfirmVia.
+  ///
+  /// In en, this message translates to:
+  /// **'via {provider}'**
+  String exchangeConfirmVia(String provider);
+
+  /// No description provided for @exchangeConfirmGasNone.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get exchangeConfirmGasNone;
+
+  /// No description provided for @exchangeConfirmAfterGas.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount}'**
+  String exchangeConfirmAfterGas(String amount);
+
+  /// No description provided for @exchangeConfirmNetworkFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Network fee'**
+  String get exchangeConfirmNetworkFee;
+
+  /// No description provided for @exchangeConfirmSlippage.
+  ///
+  /// In en, this message translates to:
+  /// **'Slippage'**
+  String get exchangeConfirmSlippage;
+
+  /// No description provided for @exchangeConfirmRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient'**
+  String get exchangeConfirmRecipient;
+
+  /// No description provided for @exchangeConfirmSwipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to swap'**
+  String get exchangeConfirmSwipe;
+
+  /// No description provided for @exchangeConfirmUnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm'**
+  String get exchangeConfirmUnable;
+
+  /// No description provided for @exchangeConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get exchangeConfirmPassword;
+
+  /// No description provided for @exchangeConfirmNoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'No active account'**
+  String get exchangeConfirmNoAccount;
+
+  /// No description provided for @exchangeConfirmStepApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve token'**
+  String get exchangeConfirmStepApprove;
+
+  /// No description provided for @exchangeConfirmStepPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign permit (EIP-712)'**
+  String get exchangeConfirmStepPermit;
+
+  /// No description provided for @exchangeConfirmStepSwapOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap on {provider}'**
+  String exchangeConfirmStepSwapOn(String provider);
+
+  /// No description provided for @exchangeConfirmWrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrap'**
+  String get exchangeConfirmWrap;
+
+  /// No description provided for @exchangeConfirmUnwrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Unwrap'**
+  String get exchangeConfirmUnwrap;
+
+  /// No description provided for @exchangeConfirmHintApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm approval on your Ledger…'**
+  String get exchangeConfirmHintApprove;
+
+  /// No description provided for @exchangeConfirmHintPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm permit on your Ledger…'**
+  String get exchangeConfirmHintPermit;
+
+  /// No description provided for @exchangeConfirmHintSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm swap on your Ledger…'**
+  String get exchangeConfirmHintSwap;
+
+  /// No description provided for @exchangeConfirmHintPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing…'**
+  String get exchangeConfirmHintPreparing;
+
+  /// No description provided for @exchangeHistoryApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve {symbol}'**
+  String exchangeHistoryApprove(String symbol);
+
+  /// No description provided for @exchangeHistoryPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Permit2 · {provider}'**
+  String exchangeHistoryPermit(String provider);
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:

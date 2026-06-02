@@ -286,6 +286,88 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get exchangeConfirmSelectRoute => 'Select a route to perform a swap';
+
+  @override
+  String get exchangeConfirmBestRouteHint => 'Best route is selected by output amount';
+
+  @override
+  String get exchangeConfirmBest => 'BEST';
+
+  @override
+  String exchangeConfirmVia(String provider) {
+    return 'via $provider';
+  }
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmNetworkFee => 'Network fee';
+
+  @override
+  String get exchangeConfirmSlippage => 'Slippage';
+
+  @override
+  String get exchangeConfirmRecipient => 'Recipient';
+
+  @override
+  String get exchangeConfirmSwipe => 'Swipe to swap';
+
+  @override
+  String get exchangeConfirmUnable => 'Unable to confirm';
+
+  @override
+  String get exchangeConfirmPassword => 'Password';
+
+  @override
+  String get exchangeConfirmNoAccount => 'No active account';
+
+  @override
+  String get exchangeConfirmStepApprove => 'Approve token';
+
+  @override
+  String get exchangeConfirmStepPermit => 'Sign permit (EIP-712)';
+
+  @override
+  String exchangeConfirmStepSwapOn(String provider) {
+    return 'Swap on $provider';
+  }
+
+  @override
+  String get exchangeConfirmWrap => 'Wrap';
+
+  @override
+  String get exchangeConfirmUnwrap => 'Unwrap';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Confirm approval on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Confirm permit on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Confirm swap on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintPreparing => 'Preparing…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return 'Approve $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
+  }
+
+  @override
   String get revealSecretKeyTitle => 'Reveal Secret Key';
 
   @override

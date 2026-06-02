@@ -285,6 +285,88 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get exchangeConfirmSelectRoute => '스왑할 경로를 선택하세요';
+
+  @override
+  String get exchangeConfirmBestRouteHint => '최적 경로는 출력 금액 기준으로 선택됩니다';
+
+  @override
+  String get exchangeConfirmBest => '최적';
+
+  @override
+  String exchangeConfirmVia(String provider) {
+    return '$provider 경유';
+  }
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmNetworkFee => '네트워크 수수료';
+
+  @override
+  String get exchangeConfirmSlippage => '슬리피지';
+
+  @override
+  String get exchangeConfirmRecipient => '받는 사람';
+
+  @override
+  String get exchangeConfirmSwipe => '밀어서 스왑';
+
+  @override
+  String get exchangeConfirmUnable => '확인할 수 없습니다';
+
+  @override
+  String get exchangeConfirmPassword => '비밀번호';
+
+  @override
+  String get exchangeConfirmNoAccount => '활성 계정이 없습니다';
+
+  @override
+  String get exchangeConfirmStepApprove => '토큰 승인';
+
+  @override
+  String get exchangeConfirmStepPermit => '퍼밋 서명 (EIP-712)';
+
+  @override
+  String exchangeConfirmStepSwapOn(String provider) {
+    return '$provider에서 스왑';
+  }
+
+  @override
+  String get exchangeConfirmWrap => '랩';
+
+  @override
+  String get exchangeConfirmUnwrap => '언랩';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Ledger에서 승인을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Ledger에서 퍼밋을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Ledger에서 스왑을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '준비 중…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '$symbol 승인';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
+  }
+
+  @override
   String get revealSecretKeyTitle => '비밀 키 공개';
 
   @override

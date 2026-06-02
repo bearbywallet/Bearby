@@ -19,17 +19,3 @@ String exchangeProviderName(ExchangeProvider provider) => provider.map(
       zIlSwap: (_) => 'ZilSwap',
       sunSwap: (_) => 'SunSwap',
     );
-
-/// Verb for a native↔wrapped-native operation: 'Wrap' (native in) or 'Unwrap' (native out).
-String wrapVerb({required bool isNativeIn}) => isNativeIn ? 'Wrap' : 'Unwrap';
-
-/// Short route label for the swap UI: 'Wrap'/'Unwrap' for a 1:1 native↔wrapped op, otherwise the
-/// provider name. Single source of truth shared by the page row and the confirm sheet.
-String exchangeRouteLabel(
-  ExchangeProvider provider, {
-  required bool isWrapUnwrap,
-  required bool isNativeIn,
-}) =>
-    isWrapUnwrap
-        ? wrapVerb(isNativeIn: isNativeIn)
-        : exchangeProviderName(provider);
