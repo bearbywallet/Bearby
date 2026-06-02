@@ -8,6 +8,7 @@ use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_tx::{update_tx_from_params, TransactionsManagement};
 use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::Background;
+use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
 use zilpay::network::evm::RequiredTxParams;
 use zilpay::proto::address::Address;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
@@ -18,9 +19,8 @@ use zilpay::wallet::wallet_storage::StorageOperations;
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
 use crate::models::exchange::thorchain::{
-    thorchain_check_approval, thorchain_finalize_swap,
-    thorchain_pool_set, thorchain_prepare_swap, thorchain_quote_info, thorchain_router_for_chain,
-    ThorchainBlob, ThorchainSource,
+    thorchain_check_approval, thorchain_finalize_swap, thorchain_pool_set, thorchain_prepare_swap,
+    thorchain_quote_info, thorchain_router_for_chain, ThorchainBlob, ThorchainSource,
 };
 use crate::models::exchange::univ_router::{
     finalize_router_swap, is_wrap_unwrap, prepare_router_swap, router_check_approval,
@@ -42,17 +42,13 @@ use crate::utils::helpers::parse_address;
 /// `false`: the THORChain `/thorchain/inbound_addresses` live check is dropped for speed; the
 /// swap quote itself will fail if a chain is actually paused.
 pub fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
-    let condidate = HashSet::from([
-        ExchangeProvider::Thorchain(ThorchainMeta::default()),
-        ExchangeProvider::Uniswap(Default::default()),
-        ExchangeProvider::PancakeSwap(Default::default()),
-    ]);
-
     let guard = BACKGROUND_SERVICE
         .try_read()
         .map_err(|_| "service lock contention".to_string())?;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let all_providers = service.core.get_providers();
+
+    dbg!("called bootstrap_exchange_providers");
 
     // Hardcoded THORChain tradeable pool assets (no REST call).
     let thorchain_pools = thorchain_pool_set();
@@ -67,9 +63,9 @@ pub fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
         .map(|p| (p.config.hash(), (p.config.slip_44, p.config.chain_id())))
         .collect();
 
-    // Exchange providers supported for a given token. DEX providers key off the chain; THORChain
-    // additionally requires the token to be a tradeable THORChain pool (not just any token on a
-    // supported chain), and carries its resolved asset id in [`ThorchainMeta`].
+    // Exchange providers are constructed explicitly per token — no default/empty candidates.
+    // Each branch gates on chain/token support (slip44, chain_id, addr_type, pool membership)
+    // before inserting the provider with its resolved metadata.
     let make_providers = |symbol: &str,
                           addr: &str,
                           native: bool,
@@ -77,24 +73,43 @@ pub fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
                           slip_44: u32,
                           chain_id: u64|
      -> HashSet<ExchangeProvider> {
-        condidate
-            .iter()
-            .filter(|p| p.is_support(addr_prefix, slip_44, chain_id))
-            .filter_map(|p| match p {
-                ExchangeProvider::Uniswap(_) => Some(ExchangeProvider::Uniswap(
-                    UniswapMeta::for_chain(chain_id).unwrap_or_default(),
-                )),
-                ExchangeProvider::PancakeSwap(_) => Some(ExchangeProvider::PancakeSwap(
-                    PancakeMeta::for_chain(chain_id).unwrap_or_default(),
-                )),
-                ExchangeProvider::Thorchain(_) => {
-                    ThorchainMeta::for_token(slip_44, chain_id, symbol, addr, native)
-                        .filter(|m| thorchain_pools.contains(&m.asset.to_lowercase()))
-                        .map(ExchangeProvider::Thorchain)
+        let mut providers = HashSet::new();
+
+        // Uniswap — EVM chains with a deployed Universal Router
+        if addr_prefix == 1 && crate::models::exchange::uniswap::is_supported_chain(chain_id) {
+            if let Some(meta) = UniswapMeta::for_chain(chain_id) {
+                providers.insert(ExchangeProvider::Uniswap(meta));
+            }
+        }
+
+        // PancakeSwap — EVM chains with a deployed Universal Router
+        if addr_prefix == 1 && crate::models::exchange::pancakeswap::is_supported_chain(chain_id) {
+            if let Some(meta) = PancakeMeta::for_chain(chain_id) {
+                providers.insert(ExchangeProvider::PancakeSwap(meta));
+            }
+        }
+
+        // Thorchain — cross-chain bridge (BTC, ETH, TRON, SOL) + pool membership gate
+        const THOR_SLIP44: &[u32] = &[BITCOIN, ETHEREUM, TRON, SOLANA];
+        if THOR_SLIP44.contains(&slip_44) {
+            if let Some(meta) = ThorchainMeta::for_token(slip_44, chain_id, symbol, addr, native) {
+                if thorchain_pools.contains(&meta.asset.to_lowercase()) {
+                    providers.insert(ExchangeProvider::Thorchain(meta));
                 }
-                other => Some(other.clone()),
-            })
-            .collect()
+            }
+        }
+
+        // ZIlSwap — Zilliqa chain
+        if addr_prefix == 0 && slip_44 == ZILLIQA {
+            providers.insert(ExchangeProvider::ZIlSwap(chain_id));
+        }
+
+        // SunSwap — TRON chain
+        if addr_prefix == 4 && slip_44 == TRON {
+            providers.insert(ExchangeProvider::SunSwap(chain_id));
+        }
+
+        providers
     };
 
     // Always not halted: DEX providers have no halt concept; THORChain halted status is no longer
