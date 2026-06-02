@@ -103,22 +103,36 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   // --- data ---------------------------------------------------------------
 
   Future<void> _bootstrap() async {
+    debugPrint('[exchange] bootstrap start');
     setState(() {
       _loadingAssets = true;
       _assetsError = null;
     });
 
     try {
+      debugPrint('[exchange] calling bootstrapExchangeProviders...');
       final all = await bootstrapExchangeProviders();
-      final chainHash = _appState.wallet?.chainHash;
+      debugPrint('[exchange] got ${all.length} assets, '
+          'withProviders=${all.where((a) => a.providers.isNotEmpty).length}');
 
-      // Uniswap routes a single hop on ONE chain, so both the "pay" and "get" sides live
-      // on the wallet's active chain. (Cross-chain bridging will arrive later as a
-      // separate provider, e.g. Thorchain.)
+      final chainHash = _appState.wallet?.chainHash;
+      debugPrint('[exchange] active chainHash=$chainHash');
+      // DEX (Uniswap/PancakeSwap) routes a single hop on ONE chain — both "pay" and "get"
+      // are same-chain. Thorchain bridges across chains, so when the active chain has Thorchain
+      // tokens the "get" list expands to every Thorchain-supported token on every chain.
       final pay = all
-          .where((a) => a.token.chainHash == chainHash && _isSwappableEvm(a))
+          .where((a) => a.token.chainHash == chainHash && _isSwappable(a))
           .toList();
-      final get = pay;
+      debugPrint('[exchange] pay side: ${pay.length} tokens');
+
+      final hasThorchain =
+          pay.any((a) => a.providers.any((p) => p.isThorchain));
+      debugPrint('[exchange] hasThorchain=$hasThorchain');
+
+      final get = hasThorchain
+          ? all.where((a) => a.providers.any((p) => p.isThorchain)).toList()
+          : pay;
+      debugPrint('[exchange] get side: ${get.length} tokens');
 
       ExchangeAsset? from;
       ExchangeAsset? to;
@@ -131,6 +145,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         to = a;
         break;
       }
+      debugPrint('[exchange] from=${from?.token.symbol} to=${to?.token.symbol}');
 
       if (!mounted) return;
       setState(() {
@@ -140,7 +155,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         _toAsset = to;
         _loadingAssets = false;
       });
-    } catch (e) {
+      debugPrint('[exchange] bootstrap done');
+    } catch (e, st) {
+      debugPrint('[exchange] bootstrap FAILED: $e\n$st');
       if (!mounted) return;
       setState(() {
         _loadingAssets = false;
@@ -149,17 +166,14 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
-  /// "You get" assets: every Uniswap token on the active chain, excluding whatever is
-  /// selected on the "pay" side.
+  /// "You get" assets: every swappable token, excluding whatever is selected on the "pay"
+  /// side. Same-chain for DEX; all Thorchain-pool tokens when bridging via Thorchain.
   List<ExchangeAsset> get _outAssets =>
       _getAssets.where((a) => a != _fromAsset).toList();
 
-  /// An EVM token that at least one on-chain DEX provider (Uniswap or PancakeSwap) supports.
-  static bool _isSwappableEvm(ExchangeAsset a) =>
-      a.token.addrType == 1 &&
-      a.providers.any((p) =>
-          p.whenOrNull(uniswap: (_) => true, pancakeSwap: (_) => true) ??
-          false);
+  /// A token that at least one exchange provider supports — DEX (Uniswap, PancakeSwap,
+  /// ZIlSwap, SunSwap) or cross-chain bridge (Thorchain).
+  static bool _isSwappable(ExchangeAsset a) => a.providers.isNotEmpty;
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
@@ -423,10 +437,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       );
     }
 
-    // Bootstrap is fast — don't flash any loading state. Render nothing until the
-    // assets land, then show the real cards.
+    // Show a spinner during bootstrap so the UI doesn't appear blank.
     if (from == null || to == null) {
-      return const SizedBox.shrink();
+      return const Center(child: CircularProgressIndicator());
     }
 
     final Widget cards = Column(
