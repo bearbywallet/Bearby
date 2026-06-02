@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -16,6 +17,7 @@ import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
+import 'package:bearby/modals/select_exchange_provider.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
@@ -59,20 +61,44 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   bool _hasDecimalPoint = false;
 
   bool _loadingQuote = false;
+  // All provider quotes for the current input (sorted best-first); `_selectedQuote` is the one
+  // driving "You get" and the swap — auto-set to the best, overridable via the provider picker.
+  List<ExchangeQuoteInfo> _quotes = const [];
   ExchangeQuoteInfo? _selectedQuote;
+
+  // Active chain at the last bootstrap — used to re-bootstrap when the network changes (the page
+  // is kept alive in a StatefulShellBranch, so initState runs only once).
+  BigInt? _lastChainHash;
 
   @override
   void initState() {
     super.initState();
     _appState = Provider.of<AppState>(context, listen: false);
+    _lastChainHash = _appState.wallet?.chainHash;
+    _appState.addListener(_onAppStateChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
   }
 
   @override
   void dispose() {
+    _appState.removeListener(_onAppStateChanged);
     _quoteTimer?.cancel();
     _btnController.dispose();
     super.dispose();
+  }
+
+  void _onAppStateChanged() {
+    final hash = _appState.wallet?.chainHash;
+    if (hash == _lastChainHash) return;
+    _lastChainHash = hash;
+    _quoteTimer?.cancel();
+    setState(() {
+      _amount = "0";
+      _hasDecimalPoint = false;
+      _quotes = const [];
+      _selectedQuote = null;
+    });
+    _bootstrap();
   }
 
   // --- data ---------------------------------------------------------------
@@ -91,7 +117,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       // on the wallet's active chain. (Cross-chain bridging will arrive later as a
       // separate provider, e.g. Thorchain.)
       final pay = all
-          .where((a) => a.token.chainHash == chainHash && _isUniswapEvm(a))
+          .where((a) => a.token.chainHash == chainHash && _isSwappableEvm(a))
           .toList();
       final get = pay;
 
@@ -129,10 +155,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   List<ExchangeAsset> get _outAssets =>
       _getAssets.where((a) => a != _fromAsset).toList();
 
-  /// An EVM token that at least one Uniswap provider supports.
-  static bool _isUniswapEvm(ExchangeAsset a) =>
+  /// An EVM token that at least one on-chain DEX provider (Uniswap or PancakeSwap) supports.
+  static bool _isSwappableEvm(ExchangeAsset a) =>
       a.token.addrType == 1 &&
-      a.providers.any((p) => p.whenOrNull(uniswap: (_) => true) ?? false);
+      a.providers.any((p) =>
+          p.whenOrNull(uniswap: (_) => true, pancakeSwap: (_) => true) ?? false);
 
   /// `tokenOut` for the swap. Same-chain only, so it's just the token address; native
   /// tokens already carry the zero address in the catalog (the Rust layer substitutes
@@ -152,7 +179,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) {
-      setState(() => _selectedQuote = null);
+      setState(() {
+        _quotes = const [];
+        _selectedQuote = null;
+      });
       return;
     }
 
@@ -166,12 +196,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         amount: amountWei.toString(),
         destination: account.addr,
       );
-      // Keep the best (highest output) quote — it drives "You get" and the swap tx.
+      // Sort best (highest output) first; auto-select it. The user can override via the picker.
       quotes.sort((a, b) => (BigInt.tryParse(b.amountOut) ?? BigInt.zero)
           .compareTo(BigInt.tryParse(a.amountOut) ?? BigInt.zero));
 
       if (!mounted) return;
       setState(() {
+        _quotes = quotes;
         _selectedQuote = quotes.isNotEmpty ? quotes.first : null;
         _loadingQuote = false;
       });
@@ -179,6 +210,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       debugPrint("exchange quote failed: $e");
       if (!mounted) return;
       setState(() {
+        _quotes = const [];
         _selectedQuote = null;
         _loadingQuote = false;
       });
@@ -227,6 +259,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       _fromAsset = asset;
       _amount = "0";
       _hasDecimalPoint = false;
+      _quotes = const [];
       _selectedQuote = null;
       if (_toAsset == asset || _toAsset == null) {
         final outs = _outAssets;
@@ -238,6 +271,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   void _selectTo(ExchangeAsset asset) {
     setState(() {
       _toAsset = asset;
+      _quotes = const [];
       _selectedQuote = null;
     });
     _scheduleQuote();
@@ -245,8 +279,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   bool get _canSwap {
     final from = _fromAsset;
-    if (from == null || _toAsset == null || _selectedQuote == null)
+    if (from == null || _toAsset == null || _selectedQuote == null) {
       return false;
+    }
     if (_amount.endsWith('.')) return false;
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) return false;
@@ -304,6 +339,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       tokenOut: tokenOut,
       amountOut: quote.amountOut,
       isNativeIn: fromToken.native,
+      isWrapUnwrap: quote.isWrapUnwrap,
       slippageBps: _slippageBps,
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),
@@ -537,6 +573,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                   _toAsset = from;
                   _amount = "0";
                   _hasDecimalPoint = false;
+                  _quotes = const [];
                   _selectedQuote = null;
                 });
               }
@@ -643,8 +680,74 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
               ),
             ],
           ),
+          _buildProviderRow(theme),
         ],
       ),
+    );
+  }
+
+  /// Route line under "You get": the selected provider (or "Wrap"/"Unwrap"), tappable to pick a
+  /// different provider when more than one quoted. Hidden until a quote lands.
+  Widget _buildProviderRow(AppTheme theme) {
+    final quote = _selectedQuote;
+    if (quote == null) return const SizedBox.shrink();
+
+    final multiple = _quotes.length > 1;
+    final label = exchangeRouteLabel(
+      quote.provider,
+      isWrapUnwrap: quote.isWrapUnwrap,
+      isNativeIn: _fromAsset?.token.native ?? false,
+    );
+
+    return GestureDetector(
+      onTap: multiple ? _showProviderPicker : null,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: Row(
+          children: [
+            Text(
+              'Via',
+              style: theme.bodyText2.copyWith(color: theme.textSecondary),
+            ),
+            const SizedBox(width: 8),
+            if (!quote.isWrapUnwrap) ...[
+              SvgPicture.asset(
+                exchangeProviderIconAsset(quote.provider),
+                width: 16,
+                height: 16,
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: theme.bodyText1.copyWith(color: theme.textPrimary),
+            ),
+            if (multiple) ...[
+              const SizedBox(width: 4),
+              SvgPicture.asset(
+                "assets/icons/tiny_down_arrow.svg",
+                width: 12,
+                height: 12,
+                colorFilter:
+                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showProviderPicker() {
+    final to = _toAsset;
+    if (to == null || _quotes.length < 2) return;
+    showExchangeProviderSelectModal(
+      context: context,
+      quotes: _quotes,
+      selected: _selectedQuote,
+      toToken: to.token,
+      onSelected: (q) => setState(() => _selectedQuote = q),
     );
   }
 

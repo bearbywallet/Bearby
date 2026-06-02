@@ -90,4 +90,7 @@ pub struct ExchangeQuoteInfo {
     /// Standard EIP-712 typed-data JSON to sign (Permit2). `None` for native input or
     /// when the API returns no permit (`permitData: null`).
     pub permit_typed_data_json: Option<String>,
+    /// `true` when this is a 1:1 native ↔ wrapped-native wrap/unwrap (no router, no approval/
+    /// permit, no fee). The UI renders it as "Wrap"/"Unwrap" and runs a single-step flow.
+    pub is_wrap_unwrap: bool,
 }
