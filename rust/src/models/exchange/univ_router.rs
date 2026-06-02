@@ -388,6 +388,7 @@ fn permit2_typed_data_json(addrs: &RouterAddrs, token_hex: &str, nonce: u64) -> 
 
 /// Read-only quote: probe every fee tier (and the Permit2 nonce for ERC-20 inputs) in a
 /// single batched `eth_call`, then keep the tier with the largest output.
+#[allow(clippy::too_many_arguments)]
 async fn router_quote(
     config: &ChainConfig,
     addrs: &RouterAddrs,
@@ -443,7 +444,7 @@ async fn router_quote(
             .and_then(|s| hex::decode(s).ok())
             .and_then(|b| decode_quote(&b));
         if let Some(out) = out {
-            if out > U256::ZERO && best.map_or(true, |(b, _)| out > b) {
+            if out > U256::ZERO && best.is_none_or(|(b, _)| out > b) {
                 best = Some((out, fee));
             }
         }

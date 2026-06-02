@@ -194,9 +194,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         amount: amountWei.toString(),
         destination: account.addr,
       );
-      // Sort best (highest output) first; auto-select it. The user can override via the picker.
-      quotes.sort((a, b) => (BigInt.tryParse(b.amountOut) ?? BigInt.zero)
-          .compareTo(BigInt.tryParse(a.amountOut) ?? BigInt.zero));
+      // Quotes are pre-sorted best-first by Rust; auto-select the first.
+      // The user can override via the route picker in the confirm modal.
 
       if (!mounted) return;
       setState(() {

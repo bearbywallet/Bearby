@@ -56,12 +56,12 @@ impl PancakeMeta {
             // BNB Chain (wrapped native = WBNB)
             56 => (
                 "0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB",
-                "0x1A0A18AC4BECDDbd6389559687d1A73d8927E416",
+                "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
                 "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
             ),
             8453 => (
                 "0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB",
-                "0xFE6508f0015C778Bdcc1fB5465bA5ebE224C9912",
+                "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
                 "0x4200000000000000000000000000000000000006",
             ),
             _ => return Err("unsupported chain".to_string()),
@@ -105,7 +105,7 @@ mod pancakeswap_tests {
         );
         assert_eq!(
             cfg.addrs.quoter_v2,
-            Address::from_str("0x1A0A18AC4BECDDbd6389559687d1A73d8927E416").unwrap()
+            Address::from_str("0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997").unwrap()
         );
         assert_eq!(
             cfg.addrs.permit2,

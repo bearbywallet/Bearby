@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::str::FromStr;
 use std::sync::Arc;
 
 use zilpay::alloy::primitives::Address as AlloyAddress;
@@ -228,6 +229,12 @@ pub async fn fetch_exchange_quote(
             quotes.push(quote);
         }
     }
+    // Sort by amount_out descending: best rate at index 0.
+    quotes.sort_by(|a, b| {
+        let a_val = U256::from_str(&a.amount_out).unwrap_or(U256::ZERO);
+        let b_val = U256::from_str(&b.amount_out).unwrap_or(U256::ZERO);
+        b_val.cmp(&a_val)
+    });
     if quotes.is_empty() {
         dbg!("fetch_exchange_quote: NO provider returned a quote");
         Err("No provider returned a quote".into())
@@ -509,6 +516,7 @@ pub async fn execute_exchange_swap(
 /// and if so return the unsigned approval tx — with FAST fees + the given `nonce` already applied —
 /// for a **Ledger** device to sign and broadcast first. Native inputs never need approval
 /// (`Ok(None)`). Software wallets don't call this; `execute_exchange_swap` handles approval inline.
+#[allow(clippy::too_many_arguments)]
 pub async fn check_exchange_approval(
     wallet_index: usize,
     account_index: usize,

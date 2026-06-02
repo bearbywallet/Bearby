@@ -1,6 +1,7 @@
 use flutter_rust_bridge::frb;
 use zilpay::serde::Deserialize;
 
+#[allow(dead_code)]
 const THORCHAIN_BASE_URLS: &[&str] = &[
     "https://thornode.thorchain.network",
     "https://gateway.liquify.com/chain/thorchain_api",
