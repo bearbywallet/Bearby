@@ -288,18 +288,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get exchangeConfirmSelectRoute => 'Выберите маршрут для обмена';
-
-  @override
-  String get exchangeConfirmBestRouteHint => 'Лучший маршрут выбирается по сумме на выходе';
-
-  @override
   String get exchangeConfirmBest => 'ЛУЧШИЙ';
-
-  @override
-  String exchangeConfirmVia(String provider) {
-    return 'через $provider';
-  }
 
   @override
   String get exchangeConfirmGasNone => '—';
@@ -308,9 +297,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String exchangeConfirmAfterGas(String amount) {
     return '≈ $amount';
   }
-
-  @override
-  String get exchangeConfirmNetworkFee => 'Комиссия сети';
 
   @override
   String get exchangeConfirmSlippage => 'Проскальзывание';
@@ -335,11 +321,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get exchangeConfirmStepPermit => 'Подписать разрешение (EIP-712)';
-
-  @override
-  String exchangeConfirmStepSwapOn(String provider) {
-    return 'Обмен через $provider';
-  }
 
   @override
   String get exchangeConfirmWrap => 'Обернуть';

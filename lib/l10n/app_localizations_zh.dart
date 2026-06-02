@@ -285,18 +285,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get exchangeConfirmSelectRoute => '选择交换路由';
-
-  @override
-  String get exchangeConfirmBestRouteHint => '最佳路由根据输出金额选择';
-
-  @override
   String get exchangeConfirmBest => '最佳';
-
-  @override
-  String exchangeConfirmVia(String provider) {
-    return '通过 $provider';
-  }
 
   @override
   String get exchangeConfirmGasNone => '—';
@@ -305,9 +294,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String exchangeConfirmAfterGas(String amount) {
     return '≈ $amount';
   }
-
-  @override
-  String get exchangeConfirmNetworkFee => '网络费用';
 
   @override
   String get exchangeConfirmSlippage => '滑点';
@@ -332,11 +318,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exchangeConfirmStepPermit => '签署许可 (EIP-712)';
-
-  @override
-  String exchangeConfirmStepSwapOn(String provider) {
-    return '通过 $provider 交换';
-  }
 
   @override
   String get exchangeConfirmWrap => '包装';

@@ -285,18 +285,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get exchangeConfirmSelectRoute => 'スワップするルートを選択';
-
-  @override
-  String get exchangeConfirmBestRouteHint => '最適なルートは出力額に基づいて選択されます';
-
-  @override
   String get exchangeConfirmBest => '最適';
-
-  @override
-  String exchangeConfirmVia(String provider) {
-    return '$provider 経由';
-  }
 
   @override
   String get exchangeConfirmGasNone => '—';
@@ -305,9 +294,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String exchangeConfirmAfterGas(String amount) {
     return '≈ $amount';
   }
-
-  @override
-  String get exchangeConfirmNetworkFee => 'ネットワーク手数料';
 
   @override
   String get exchangeConfirmSlippage => 'スリッページ';
@@ -332,11 +318,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get exchangeConfirmStepPermit => 'パーミットに署名 (EIP-712)';
-
-  @override
-  String exchangeConfirmStepSwapOn(String provider) {
-    return '$provider でスワップ';
-  }
 
   @override
   String get exchangeConfirmWrap => 'ラップ';

@@ -616,10 +616,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   String _stepLabel(AppLocalizations l10n, _Step step) => switch (step) {
         _Step.approve => l10n.exchangeConfirmStepApprove,
         _Step.permit => l10n.exchangeConfirmStepPermit,
-        _Step.swap => _isWrapUnwrap
-            ? _wrapVerb(l10n)
-            : l10n.exchangeConfirmStepSwapOn(
-                exchangeProviderName(_selected.provider)),
+        _Step.swap => _isWrapUnwrap ? _wrapVerb(l10n) : l10n.exchangePageTabSwap,
       };
 
   Widget _stepRow(AppTheme theme, AppLocalizations l10n, _Step step) {
@@ -658,28 +655,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-  Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.exchangeConfirmSelectRoute,
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          l10n.exchangeConfirmBestRouteHint,
-          style: theme.bodyText2.copyWith(color: theme.textSecondary),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          '${l10n.exchangePagePay}: $_payText',
-          style: theme.bodyText2.copyWith(color: theme.textSecondary),
-        ),
-        const SizedBox(height: 8),
-      ],
-    );
-  }
+
 
   /// Selected route's gas as a native-token amount string, or `null` when not yet estimated /
   /// not available (ERC-20 input). Pre-sized formatting via [formatingAmount].
@@ -735,72 +711,63 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
             width: 1.5,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    out,
-                    style: theme.titleMedium.copyWith(color: theme.textPrimary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (isBest)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: theme.success.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      l10n.exchangeConfirmBest,
-                      style: theme.labelSmall.copyWith(
-                        color: theme.success,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    gasLabel,
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (quote.isWrapUnwrap)
+            // Provider icon (or swap icon for wrap/unwrap).
+            if (quote.isWrapUnwrap)
+              SvgPicture.asset(
+                'assets/icons/swap.svg',
+                width: 28,
+                height: 28,
+                colorFilter:
+                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              )
+            else
+              SvgPicture.asset(
+                exchangeProviderIconAsset(quote.provider),
+                width: 28,
+                height: 28,
+              ),
+            const SizedBox(width: 12),
+            // Pay → Get amounts + gas.
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    _wrapVerb(l10n),
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
-                  )
-                else ...[
-                  SvgPicture.asset(
-                    exchangeProviderIconAsset(quote.provider),
-                    width: 16,
-                    height: 16,
+                    '$_payText → $out',
+                    style:
+                        theme.bodyText1.copyWith(color: theme.textPrimary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      l10n.exchangeConfirmVia(
-                          exchangeProviderName(quote.provider)),
-                      style: theme.bodyText2.copyWith(color: theme.textPrimary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    gasLabel,
+                    style: theme.bodyText2
+                        .copyWith(color: theme.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ],
+              ),
             ),
+            if (isBest)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: theme.success.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  l10n.exchangeConfirmBest,
+                  style: theme.labelSmall.copyWith(
+                    color: theme.success,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -836,9 +803,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   Widget _buildMeta(AppState appState, AppTheme theme, AppLocalizations l10n) {
     final addr = appState.account?.addr;
     final slippage = '${(widget.slippageBps / 100).toStringAsFixed(2)}%';
-    // Selected route's network fee (native-in only; same source as the row gas estimate).
-    final gasText =
-        widget.isNativeIn ? _routeGasText(appState, _selectedIndex) : null;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -854,15 +818,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
             style: theme.bodyText1.copyWith(color: theme.textPrimary),
           ),
         ),
-        if (gasText != null)
-          _metaRow(
-            theme,
-            l10n.exchangeConfirmNetworkFee,
-            Text(
-              l10n.exchangeConfirmAfterGas(gasText),
-              style: theme.bodyText1.copyWith(color: theme.textPrimary),
-            ),
-          ),
       ],
     );
   }
@@ -922,10 +877,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                             onDismiss: () => setState(() => _error = null),
                           ),
                         ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: _buildHeader(theme, l10n),
-                      ),
                       _buildRouteList(appState, theme, l10n),
                       const SizedBox(height: 8),
                       // Force full-width so timeline stays left-aligned in the

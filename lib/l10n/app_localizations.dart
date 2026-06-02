@@ -635,29 +635,11 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 block} other{{count} blocks}}'**
   String exchangeSettingsBlocks(int count);
 
-  /// No description provided for @exchangeConfirmSelectRoute.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a route to perform a swap'**
-  String get exchangeConfirmSelectRoute;
-
-  /// No description provided for @exchangeConfirmBestRouteHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Best route is selected by output amount'**
-  String get exchangeConfirmBestRouteHint;
-
   /// No description provided for @exchangeConfirmBest.
   ///
   /// In en, this message translates to:
   /// **'BEST'**
   String get exchangeConfirmBest;
-
-  /// No description provided for @exchangeConfirmVia.
-  ///
-  /// In en, this message translates to:
-  /// **'via {provider}'**
-  String exchangeConfirmVia(String provider);
 
   /// No description provided for @exchangeConfirmGasNone.
   ///
@@ -670,12 +652,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'≈ {amount}'**
   String exchangeConfirmAfterGas(String amount);
-
-  /// No description provided for @exchangeConfirmNetworkFee.
-  ///
-  /// In en, this message translates to:
-  /// **'Network fee'**
-  String get exchangeConfirmNetworkFee;
 
   /// No description provided for @exchangeConfirmSlippage.
   ///
@@ -724,12 +700,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign permit (EIP-712)'**
   String get exchangeConfirmStepPermit;
-
-  /// No description provided for @exchangeConfirmStepSwapOn.
-  ///
-  /// In en, this message translates to:
-  /// **'Swap on {provider}'**
-  String exchangeConfirmStepSwapOn(String provider);
 
   /// No description provided for @exchangeConfirmWrap.
   ///

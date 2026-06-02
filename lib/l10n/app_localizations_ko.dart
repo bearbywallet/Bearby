@@ -285,18 +285,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get exchangeConfirmSelectRoute => '스왑할 경로를 선택하세요';
-
-  @override
-  String get exchangeConfirmBestRouteHint => '최적 경로는 출력 금액 기준으로 선택됩니다';
-
-  @override
   String get exchangeConfirmBest => '최적';
-
-  @override
-  String exchangeConfirmVia(String provider) {
-    return '$provider 경유';
-  }
 
   @override
   String get exchangeConfirmGasNone => '—';
@@ -305,9 +294,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String exchangeConfirmAfterGas(String amount) {
     return '≈ $amount';
   }
-
-  @override
-  String get exchangeConfirmNetworkFee => '네트워크 수수료';
 
   @override
   String get exchangeConfirmSlippage => '슬리피지';
@@ -332,11 +318,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get exchangeConfirmStepPermit => '퍼밋 서명 (EIP-712)';
-
-  @override
-  String exchangeConfirmStepSwapOn(String provider) {
-    return '$provider에서 스왑';
-  }
 
   @override
   String get exchangeConfirmWrap => '랩';
