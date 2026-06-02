@@ -288,6 +288,88 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get exchangeConfirmSelectRoute => 'Выберите маршрут для обмена';
+
+  @override
+  String get exchangeConfirmBestRouteHint => 'Лучший маршрут выбирается по сумме на выходе';
+
+  @override
+  String get exchangeConfirmBest => 'ЛУЧШИЙ';
+
+  @override
+  String exchangeConfirmVia(String provider) {
+    return 'через $provider';
+  }
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmNetworkFee => 'Комиссия сети';
+
+  @override
+  String get exchangeConfirmSlippage => 'Проскальзывание';
+
+  @override
+  String get exchangeConfirmRecipient => 'Получатель';
+
+  @override
+  String get exchangeConfirmSwipe => 'Проведите для обмена';
+
+  @override
+  String get exchangeConfirmUnable => 'Не удалось подтвердить';
+
+  @override
+  String get exchangeConfirmPassword => 'Пароль';
+
+  @override
+  String get exchangeConfirmNoAccount => 'Нет активного аккаунта';
+
+  @override
+  String get exchangeConfirmStepApprove => 'Одобрить токен';
+
+  @override
+  String get exchangeConfirmStepPermit => 'Подписать разрешение (EIP-712)';
+
+  @override
+  String exchangeConfirmStepSwapOn(String provider) {
+    return 'Обмен через $provider';
+  }
+
+  @override
+  String get exchangeConfirmWrap => 'Обернуть';
+
+  @override
+  String get exchangeConfirmUnwrap => 'Развернуть';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Подтвердите одобрение на Ledger…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Подтвердите разрешение на Ledger…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Подтвердите обмен на Ledger…';
+
+  @override
+  String get exchangeConfirmHintPreparing => 'Подготовка…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return 'Одобрить $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
+  }
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

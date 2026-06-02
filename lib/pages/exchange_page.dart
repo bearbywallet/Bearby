@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -17,7 +16,6 @@ import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
-import 'package:bearby/modals/select_exchange_provider.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
@@ -327,19 +325,18 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final tokenOut = _outTokenParam(to);
     final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
 
-    // The confirm modal owns the whole approve → permit → swap sequence (batched for software
-    // wallets, step-by-step on Ledger), so the page just hands it the swap intent.
+    // The confirm modal owns route selection and the whole approve → permit → swap sequence
+    // (batched for software wallets, step-by-step on Ledger), so the page just hands it the
+    // full quote list (best-first) and the shared swap intent.
     showExchangeConfirmModal(
       context: context,
-      provider: quote.provider,
+      quotes: _quotes,
       fromToken: fromToken,
       toToken: to.token,
       amountInWei: amountInWei.toString(),
       tokenIn: tokenIn,
       tokenOut: tokenOut,
-      amountOut: quote.amountOut,
       isNativeIn: fromToken.native,
-      isWrapUnwrap: quote.isWrapUnwrap,
       slippageBps: _slippageBps,
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),
@@ -680,74 +677,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
               ),
             ],
           ),
-          _buildProviderRow(theme),
         ],
       ),
-    );
-  }
-
-  /// Route line under "You get": the selected provider (or "Wrap"/"Unwrap"), tappable to pick a
-  /// different provider when more than one quoted. Hidden until a quote lands.
-  Widget _buildProviderRow(AppTheme theme) {
-    final quote = _selectedQuote;
-    if (quote == null) return const SizedBox.shrink();
-
-    final multiple = _quotes.length > 1;
-    final label = exchangeRouteLabel(
-      quote.provider,
-      isWrapUnwrap: quote.isWrapUnwrap,
-      isNativeIn: _fromAsset?.token.native ?? false,
-    );
-
-    return GestureDetector(
-      onTap: multiple ? _showProviderPicker : null,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: Row(
-          children: [
-            Text(
-              'Via',
-              style: theme.bodyText2.copyWith(color: theme.textSecondary),
-            ),
-            const SizedBox(width: 8),
-            if (!quote.isWrapUnwrap) ...[
-              SvgPicture.asset(
-                exchangeProviderIconAsset(quote.provider),
-                width: 16,
-                height: 16,
-              ),
-              const SizedBox(width: 6),
-            ],
-            Text(
-              label,
-              style: theme.bodyText1.copyWith(color: theme.textPrimary),
-            ),
-            if (multiple) ...[
-              const SizedBox(width: 4),
-              SvgPicture.asset(
-                "assets/icons/tiny_down_arrow.svg",
-                width: 12,
-                height: 12,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showProviderPicker() {
-    final to = _toAsset;
-    if (to == null || _quotes.length < 2) return;
-    showExchangeProviderSelectModal(
-      context: context,
-      quotes: _quotes,
-      selected: _selectedQuote,
-      toToken: to.token,
-      onSelected: (q) => setState(() => _selectedQuote = q),
     );
   }
 

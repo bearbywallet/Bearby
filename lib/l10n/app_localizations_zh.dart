@@ -285,6 +285,88 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get exchangeConfirmSelectRoute => '选择交换路由';
+
+  @override
+  String get exchangeConfirmBestRouteHint => '最佳路由根据输出金额选择';
+
+  @override
+  String get exchangeConfirmBest => '最佳';
+
+  @override
+  String exchangeConfirmVia(String provider) {
+    return '通过 $provider';
+  }
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmNetworkFee => '网络费用';
+
+  @override
+  String get exchangeConfirmSlippage => '滑点';
+
+  @override
+  String get exchangeConfirmRecipient => '接收方';
+
+  @override
+  String get exchangeConfirmSwipe => '滑动以交换';
+
+  @override
+  String get exchangeConfirmUnable => '无法确认';
+
+  @override
+  String get exchangeConfirmPassword => '密码';
+
+  @override
+  String get exchangeConfirmNoAccount => '没有活动账户';
+
+  @override
+  String get exchangeConfirmStepApprove => '授权代币';
+
+  @override
+  String get exchangeConfirmStepPermit => '签署许可 (EIP-712)';
+
+  @override
+  String exchangeConfirmStepSwapOn(String provider) {
+    return '通过 $provider 交换';
+  }
+
+  @override
+  String get exchangeConfirmWrap => '包装';
+
+  @override
+  String get exchangeConfirmUnwrap => '解包';
+
+  @override
+  String get exchangeConfirmHintApprove => '请在 Ledger 上确认授权…';
+
+  @override
+  String get exchangeConfirmHintPermit => '请在 Ledger 上确认许可…';
+
+  @override
+  String get exchangeConfirmHintSwap => '请在 Ledger 上确认交换…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '准备中…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '授权 $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
+  }
+
+  @override
   String get revealSecretKeyTitle => '显示私钥';
 
   @override

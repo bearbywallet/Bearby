@@ -285,6 +285,88 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get exchangeConfirmSelectRoute => 'スワップするルートを選択';
+
+  @override
+  String get exchangeConfirmBestRouteHint => '最適なルートは出力額に基づいて選択されます';
+
+  @override
+  String get exchangeConfirmBest => '最適';
+
+  @override
+  String exchangeConfirmVia(String provider) {
+    return '$provider 経由';
+  }
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmNetworkFee => 'ネットワーク手数料';
+
+  @override
+  String get exchangeConfirmSlippage => 'スリッページ';
+
+  @override
+  String get exchangeConfirmRecipient => '受取人';
+
+  @override
+  String get exchangeConfirmSwipe => 'スワイプしてスワップ';
+
+  @override
+  String get exchangeConfirmUnable => '確認できません';
+
+  @override
+  String get exchangeConfirmPassword => 'パスワード';
+
+  @override
+  String get exchangeConfirmNoAccount => 'アクティブなアカウントがありません';
+
+  @override
+  String get exchangeConfirmStepApprove => 'トークンを承認';
+
+  @override
+  String get exchangeConfirmStepPermit => 'パーミットに署名 (EIP-712)';
+
+  @override
+  String exchangeConfirmStepSwapOn(String provider) {
+    return '$provider でスワップ';
+  }
+
+  @override
+  String get exchangeConfirmWrap => 'ラップ';
+
+  @override
+  String get exchangeConfirmUnwrap => 'アンラップ';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Ledger で承認を確認してください…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Ledger でパーミットを確認してください…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Ledger でスワップを確認してください…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '準備中…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '$symbol を承認';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
+  }
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override
