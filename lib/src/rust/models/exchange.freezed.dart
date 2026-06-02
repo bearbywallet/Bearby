@@ -167,7 +167,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(BigInt field0)? thorchain,
+    TResult Function(ThorchainMeta field0)? thorchain,
     TResult Function(UniswapMeta field0)? uniswap,
     TResult Function(PancakeMeta field0)? pancakeSwap,
     TResult Function(BigInt field0)? zIlSwap,
@@ -206,7 +206,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(BigInt field0) thorchain,
+    required TResult Function(ThorchainMeta field0) thorchain,
     required TResult Function(UniswapMeta field0) uniswap,
     required TResult Function(PancakeMeta field0) pancakeSwap,
     required TResult Function(BigInt field0) zIlSwap,
@@ -241,7 +241,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(BigInt field0)? thorchain,
+    TResult? Function(ThorchainMeta field0)? thorchain,
     TResult? Function(UniswapMeta field0)? uniswap,
     TResult? Function(PancakeMeta field0)? pancakeSwap,
     TResult? Function(BigInt field0)? zIlSwap,
@@ -271,7 +271,7 @@ class ExchangeProvider_Thorchain extends ExchangeProvider {
   const ExchangeProvider_Thorchain(this.field0) : super._();
 
   @override
-  final BigInt field0;
+  final ThorchainMeta field0;
 
   /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
@@ -306,7 +306,7 @@ abstract mixin class $ExchangeProvider_ThorchainCopyWith<$Res>
           $Res Function(ExchangeProvider_Thorchain) _then) =
       _$ExchangeProvider_ThorchainCopyWithImpl;
   @useResult
-  $Res call({BigInt field0});
+  $Res call({ThorchainMeta field0});
 }
 
 /// @nodoc
@@ -327,7 +327,7 @@ class _$ExchangeProvider_ThorchainCopyWithImpl<$Res>
       null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
-              as BigInt,
+              as ThorchainMeta,
     ));
   }
 }

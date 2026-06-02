@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -159,11 +160,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       a.providers.any((p) =>
           p.whenOrNull(uniswap: (_) => true, pancakeSwap: (_) => true) ?? false);
 
-  /// `tokenOut` for the swap. Same-chain only, so it's just the token address; native
-  /// tokens already carry the zero address in the catalog (the Rust layer substitutes
-  /// WETH internally for native input/output).
-  String _outTokenParam(ExchangeAsset to) => to.token.addr;
-
   void _scheduleQuote() {
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
@@ -189,18 +185,22 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     try {
       final quotes = await fetchExchangeQuote(
         asset: from,
-        fromAsset: from.token.addr,
-        toAsset: _outTokenParam(to),
+        to: to,
         amount: amountWei.toString(),
         destination: account.addr,
       );
+      // Same-chain shows DEX routes; cross-chain shows the THORChain bridge route. Keeping the list
+      // homogeneous avoids rate-comparing a different-asset bridge output against same-chain quotes.
       // Quotes are pre-sorted best-first by Rust; auto-select the first.
-      // The user can override via the route picker in the confirm modal.
+      final crossChain = from.token.chainHash != to.token.chainHash;
+      final routes = quotes
+          .where((q) => q.provider.isThorchain == crossChain)
+          .toList(growable: false);
 
       if (!mounted) return;
       setState(() {
-        _quotes = quotes;
-        _selectedQuote = quotes.isNotEmpty ? quotes.first : null;
+        _quotes = routes;
+        _selectedQuote = routes.isNotEmpty ? routes.first : null;
         _loadingQuote = false;
       });
     } catch (e) {
@@ -310,6 +310,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final isSupported = quote.provider.whenOrNull(
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
+          thorchain: (_) => true,
         ) ??
         false;
     if (!isSupported) {
@@ -317,25 +318,19 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       return;
     }
 
-    final fromToken = from.token;
-    // Native tokens already carry the zero address; the Rust layer substitutes WETH
-    // internally for native input (`isNativeIn`) and native output. Same-chain only.
-    final tokenIn = fromToken.addr;
-    final tokenOut = _outTokenParam(to);
-    final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
+    final amountInWei = toDecimalsWei(_amount, from.token.decimals);
 
-    // The confirm modal owns route selection and the whole approve → permit → swap sequence
+    // The confirm modal owns route selection and the whole approve → (permit) → swap sequence
     // (batched for software wallets, step-by-step on Ledger), so the page just hands it the
-    // full quote list (best-first) and the shared swap intent.
+    // full quote list (best-first) and the shared swap intent. `destination` is the recipient on
+    // the destination chain (self for same-chain swaps).
     showExchangeConfirmModal(
       context: context,
       quotes: _quotes,
-      fromToken: fromToken,
-      toToken: to.token,
+      from: from,
+      to: to,
       amountInWei: amountInWei.toString(),
-      tokenIn: tokenIn,
-      tokenOut: tokenOut,
-      isNativeIn: fromToken.native,
+      destination: account.addr,
       slippageBps: _slippageBps,
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),

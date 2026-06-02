@@ -11,12 +11,13 @@ use super::transactions::base_token::BaseTokenInfo;
 use std::collections::HashSet;
 
 pub use pancakeswap::PancakeMeta;
+pub use thorchain::ThorchainMeta;
 pub use univ_router::RouterConfig;
 pub use uniswap::UniswapMeta;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Hash, Clone)]
 pub enum ExchangeProvider {
-    Thorchain(u64),
+    Thorchain(ThorchainMeta),
     Uniswap(UniswapMeta),
     PancakeSwap(PancakeMeta),
     ZIlSwap(u64),
@@ -44,6 +45,11 @@ impl ExchangeProvider {
         }
     }
 
+    #[frb(ignore)]
+    pub fn is_thorchain(&self) -> bool {
+        matches!(self, Self::Thorchain(_))
+    }
+
     /// Resolve the shared Universal-Router engine config for the EVM-DEX variants
     /// (Uniswap, PancakeSwap). `None` for non-Universal-Router providers. This is the single
     /// place that maps a provider to its [`RouterConfig`], collapsing the per-function match
@@ -58,11 +64,23 @@ impl ExchangeProvider {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExchangeAsset {
     pub token: FTokenInfo,
     pub providers: HashSet<ExchangeProvider>,
     pub halted: bool,
+}
+
+impl ExchangeAsset {
+    /// The asset's resolved THORChain identity (chain + asset id), if it has a `Thorchain` provider.
+    /// Lets the bridge engine read the asset id straight off the asset instead of re-deriving it.
+    #[frb(ignore)]
+    pub fn thorchain_meta(&self) -> Option<&ThorchainMeta> {
+        self.providers.iter().find_map(|p| match p {
+            ExchangeProvider::Thorchain(meta) => Some(meta),
+            _ => None,
+        })
+    }
 }
 
 /// Display metadata composed on the Dart side and threaded into every tx built for a swap.

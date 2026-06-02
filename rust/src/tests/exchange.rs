@@ -99,29 +99,32 @@ mod exchange_tests {
         *done = true;
     }
 
-    /// Pick the bootstrapped asset that advertises a Uniswap provider, returning both the
-    /// asset and its `ExchangeProvider::Uniswap` variant.
-    async fn uniswap_asset() -> (ExchangeAsset, ExchangeProvider) {
+    /// Pick the bootstrapped native-ETH (chain 1) asset with a Uniswap provider, the USDC (chain 1)
+    /// destination asset, and the `ExchangeProvider::Uniswap` variant.
+    async fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
         let assets = bootstrap_exchange_providers().await.unwrap();
-        // The catalog now spans every chain, so pin to native ETH on Ethereum mainnet
-        // (chain 1): the empty `from_asset` resolves to WETH internally and the
-        // tests quote against USDC on chain 1.
         let asset = assets
-            .into_iter()
+            .iter()
             .find(|a| {
                 a.token.native
                     && a.providers
                         .iter()
                         .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
             })
+            .cloned()
             .expect("expected native ETH (chain 1) with a Uniswap provider");
+        let usdc = assets
+            .iter()
+            .find(|a| a.token.addr.eq_ignore_ascii_case(USDC_MAINNET))
+            .cloned()
+            .expect("expected USDC (chain 1) in the catalog");
         let provider = asset
             .providers
             .iter()
             .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
             .cloned()
             .unwrap();
-        (asset, provider)
+        (asset, usdc, provider)
     }
 
     #[zilpay::tokio::test]
@@ -147,19 +150,17 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_build_exchange_tx_native() {
         setup_eth_wallet().await;
-        let (_, provider) = uniswap_asset().await;
+        let (eth, usdc, provider) = uniswap_asset().await;
 
-        // is_native_in = true, so `token_in` is overridden to WETH
-        // internally — pass the zero address as a placeholder.
         let prepared = prepare_exchange_swap(
             0,
             0,
-            provider,
-            "0x0000000000000000000000000000000000000000".to_string(),
-            USDC_MAINNET.to_string(),
+            provider.clone(),
+            eth,
+            usdc,
             ONE_ETH.to_string(),
             50, // slippage_bps = 0.5%
-            true,
+            String::new(),
         )
         .await
         .expect("prepare native swap");
@@ -171,6 +172,7 @@ mod exchange_tests {
         let tx = finalize_exchange_swap(
             0,
             0,
+            provider,
             prepared.quote_blob,
             None,
             0,
@@ -195,12 +197,11 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_fetch_exchange_quote() {
         setup_eth_wallet().await;
-        let (asset, _) = uniswap_asset().await;
+        let (asset, usdc, _) = uniswap_asset().await;
 
         let quotes = fetch_exchange_quote(
             asset,
-            String::new(),
-            USDC_MAINNET.to_string(),
+            usdc,
             ONE_ETH.to_string(),
             "0x0000000000000000000000000000000000000001".to_string(),
         )
