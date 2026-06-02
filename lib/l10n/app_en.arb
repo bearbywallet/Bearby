@@ -309,17 +309,7 @@
       }
     }
   },
-  "exchangeConfirmSelectRoute": "Select a route to perform a swap",
-  "exchangeConfirmBestRouteHint": "Best route is selected by output amount",
   "exchangeConfirmBest": "BEST",
-  "exchangeConfirmVia": "via {provider}",
-  "@exchangeConfirmVia": {
-    "placeholders": {
-      "provider": {
-        "type": "String"
-      }
-    }
-  },
   "exchangeConfirmGasNone": "—",
   "exchangeConfirmAfterGas": "≈ {amount}",
   "@exchangeConfirmAfterGas": {
@@ -329,7 +319,6 @@
       }
     }
   },
-  "exchangeConfirmNetworkFee": "Network fee",
   "exchangeConfirmSlippage": "Slippage",
   "exchangeConfirmRecipient": "Recipient",
   "exchangeConfirmSwipe": "Swipe to swap",
@@ -338,14 +327,6 @@
   "exchangeConfirmNoAccount": "No active account",
   "exchangeConfirmStepApprove": "Approve token",
   "exchangeConfirmStepPermit": "Sign permit (EIP-712)",
-  "exchangeConfirmStepSwapOn": "Swap on {provider}",
-  "@exchangeConfirmStepSwapOn": {
-    "placeholders": {
-      "provider": {
-        "type": "String"
-      }
-    }
-  },
   "exchangeConfirmWrap": "Wrap",
   "exchangeConfirmUnwrap": "Unwrap",
   "exchangeConfirmHintApprove": "Confirm approval on your Ledger…",

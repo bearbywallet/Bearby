@@ -286,18 +286,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get exchangeConfirmSelectRoute => 'Select a route to perform a swap';
-
-  @override
-  String get exchangeConfirmBestRouteHint => 'Best route is selected by output amount';
-
-  @override
   String get exchangeConfirmBest => 'BEST';
-
-  @override
-  String exchangeConfirmVia(String provider) {
-    return 'via $provider';
-  }
 
   @override
   String get exchangeConfirmGasNone => '—';
@@ -306,9 +295,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String exchangeConfirmAfterGas(String amount) {
     return '≈ $amount';
   }
-
-  @override
-  String get exchangeConfirmNetworkFee => 'Network fee';
 
   @override
   String get exchangeConfirmSlippage => 'Slippage';
@@ -333,11 +319,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exchangeConfirmStepPermit => 'Sign permit (EIP-712)';
-
-  @override
-  String exchangeConfirmStepSwapOn(String provider) {
-    return 'Swap on $provider';
-  }
 
   @override
   String get exchangeConfirmWrap => 'Wrap';
