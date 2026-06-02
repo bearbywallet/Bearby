@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'exchange/pancakeswap.dart';
 import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -45,6 +46,9 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   const factory ExchangeProvider.uniswap(
     UniswapMeta field0,
   ) = ExchangeProvider_Uniswap;
+  const factory ExchangeProvider.pancakeSwap(
+    PancakeMeta field0,
+  ) = ExchangeProvider_PancakeSwap;
   const factory ExchangeProvider.zIlSwap(
     BigInt field0,
   ) = ExchangeProvider_ZIlSwap;

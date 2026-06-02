@@ -58,6 +58,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult Function(ExchangeProvider_Uniswap value)? uniswap,
+    TResult Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
     TResult Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
     TResult Function(ExchangeProvider_SunSwap value)? sunSwap,
     required TResult orElse(),
@@ -68,6 +69,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
+      case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
+        return pancakeSwap(_that);
       case ExchangeProvider_ZIlSwap() when zIlSwap != null:
         return zIlSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
@@ -94,6 +97,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult map<TResult extends Object?>({
     required TResult Function(ExchangeProvider_Thorchain value) thorchain,
     required TResult Function(ExchangeProvider_Uniswap value) uniswap,
+    required TResult Function(ExchangeProvider_PancakeSwap value) pancakeSwap,
     required TResult Function(ExchangeProvider_ZIlSwap value) zIlSwap,
     required TResult Function(ExchangeProvider_SunSwap value) sunSwap,
   }) {
@@ -103,6 +107,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap():
         return uniswap(_that);
+      case ExchangeProvider_PancakeSwap():
+        return pancakeSwap(_that);
       case ExchangeProvider_ZIlSwap():
         return zIlSwap(_that);
       case ExchangeProvider_SunSwap():
@@ -126,6 +132,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult? Function(ExchangeProvider_Uniswap value)? uniswap,
+    TResult? Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
     TResult? Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
     TResult? Function(ExchangeProvider_SunSwap value)? sunSwap,
   }) {
@@ -135,6 +142,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
+      case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
+        return pancakeSwap(_that);
       case ExchangeProvider_ZIlSwap() when zIlSwap != null:
         return zIlSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
@@ -160,6 +169,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(BigInt field0)? thorchain,
     TResult Function(UniswapMeta field0)? uniswap,
+    TResult Function(PancakeMeta field0)? pancakeSwap,
     TResult Function(BigInt field0)? zIlSwap,
     TResult Function(BigInt field0)? sunSwap,
     required TResult orElse(),
@@ -170,6 +180,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
+      case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
+        return pancakeSwap(_that.field0);
       case ExchangeProvider_ZIlSwap() when zIlSwap != null:
         return zIlSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
@@ -196,6 +208,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult when<TResult extends Object?>({
     required TResult Function(BigInt field0) thorchain,
     required TResult Function(UniswapMeta field0) uniswap,
+    required TResult Function(PancakeMeta field0) pancakeSwap,
     required TResult Function(BigInt field0) zIlSwap,
     required TResult Function(BigInt field0) sunSwap,
   }) {
@@ -205,6 +218,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap():
         return uniswap(_that.field0);
+      case ExchangeProvider_PancakeSwap():
+        return pancakeSwap(_that.field0);
       case ExchangeProvider_ZIlSwap():
         return zIlSwap(_that.field0);
       case ExchangeProvider_SunSwap():
@@ -228,6 +243,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(BigInt field0)? thorchain,
     TResult? Function(UniswapMeta field0)? uniswap,
+    TResult? Function(PancakeMeta field0)? pancakeSwap,
     TResult? Function(BigInt field0)? zIlSwap,
     TResult? Function(BigInt field0)? sunSwap,
   }) {
@@ -237,6 +253,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
+      case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
+        return pancakeSwap(_that.field0);
       case ExchangeProvider_ZIlSwap() when zIlSwap != null:
         return zIlSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
@@ -376,6 +394,73 @@ class _$ExchangeProvider_UniswapCopyWithImpl<$Res>
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
               as UniswapMeta,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ExchangeProvider_PancakeSwap extends ExchangeProvider {
+  const ExchangeProvider_PancakeSwap(this.field0) : super._();
+
+  @override
+  final PancakeMeta field0;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ExchangeProvider_PancakeSwapCopyWith<ExchangeProvider_PancakeSwap>
+      get copyWith => _$ExchangeProvider_PancakeSwapCopyWithImpl<
+          ExchangeProvider_PancakeSwap>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ExchangeProvider_PancakeSwap &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @override
+  String toString() {
+    return 'ExchangeProvider.pancakeSwap(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ExchangeProvider_PancakeSwapCopyWith<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProvider_PancakeSwapCopyWith(
+          ExchangeProvider_PancakeSwap value,
+          $Res Function(ExchangeProvider_PancakeSwap) _then) =
+      _$ExchangeProvider_PancakeSwapCopyWithImpl;
+  @useResult
+  $Res call({PancakeMeta field0});
+}
+
+/// @nodoc
+class _$ExchangeProvider_PancakeSwapCopyWithImpl<$Res>
+    implements $ExchangeProvider_PancakeSwapCopyWith<$Res> {
+  _$ExchangeProvider_PancakeSwapCopyWithImpl(this._self, this._then);
+
+  final ExchangeProvider_PancakeSwap _self;
+  final $Res Function(ExchangeProvider_PancakeSwap) _then;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(ExchangeProvider_PancakeSwap(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as PancakeMeta,
     ));
   }
 }

@@ -33,6 +33,7 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
+import 'models/exchange/pancakeswap.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -5170,6 +5171,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PancakeMeta dco_decode_box_autoadd_pancake_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_pancake_meta(raw);
+  }
+
+  @protected
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_qr_config_info(raw);
@@ -5402,10 +5409,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dco_decode_box_autoadd_uniswap_meta(raw[1]),
         );
       case 2:
+        return ExchangeProvider_PancakeSwap(
+          dco_decode_box_autoadd_pancake_meta(raw[1]),
+        );
+      case 3:
         return ExchangeProvider_ZIlSwap(
           dco_decode_u_64(raw[1]),
         );
-      case 3:
+      case 4:
         return ExchangeProvider_SunSwap(
           dco_decode_u_64(raw[1]),
         );
@@ -6112,6 +6123,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return OutPointInfo(
       txid: dco_decode_String(arr[0]),
       vout: dco_decode_u_32(arr[1]),
+    );
+  }
+
+  @protected
+  PancakeMeta dco_decode_pancake_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return PancakeMeta(
+      chainId: dco_decode_u_64(arr[0]),
     );
   }
 
@@ -7080,6 +7102,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PancakeMeta sse_decode_box_autoadd_pancake_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_pancake_meta(deserializer));
+  }
+
+  @protected
   QrConfigInfo sse_decode_box_autoadd_qr_config_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7316,9 +7345,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_field0 = sse_decode_box_autoadd_uniswap_meta(deserializer);
         return ExchangeProvider_Uniswap(var_field0);
       case 2:
+        var var_field0 = sse_decode_box_autoadd_pancake_meta(deserializer);
+        return ExchangeProvider_PancakeSwap(var_field0);
+      case 3:
         var var_field0 = sse_decode_u_64(deserializer);
         return ExchangeProvider_ZIlSwap(var_field0);
-      case 3:
+      case 4:
         var var_field0 = sse_decode_u_64(deserializer);
         return ExchangeProvider_SunSwap(var_field0);
       default:
@@ -8369,6 +8401,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PancakeMeta sse_decode_pancake_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chainId = sse_decode_u_64(deserializer);
+    return PancakeMeta(chainId: var_chainId);
+  }
+
+  @protected
   PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9288,6 +9327,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_pancake_meta(
+      PancakeMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_pancake_meta(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_qr_config_info(
       QrConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9476,11 +9522,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case ExchangeProvider_Uniswap(field0: final field0):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_uniswap_meta(field0, serializer);
-      case ExchangeProvider_ZIlSwap(field0: final field0):
+      case ExchangeProvider_PancakeSwap(field0: final field0):
         sse_encode_i_32(2, serializer);
+        sse_encode_box_autoadd_pancake_meta(field0, serializer);
+      case ExchangeProvider_ZIlSwap(field0: final field0):
+        sse_encode_i_32(3, serializer);
         sse_encode_u_64(field0, serializer);
       case ExchangeProvider_SunSwap(field0: final field0):
-        sse_encode_i_32(3, serializer);
+        sse_encode_i_32(4, serializer);
         sse_encode_u_64(field0, serializer);
     }
   }
@@ -10302,6 +10351,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.txid, serializer);
     sse_encode_u_32(self.vout, serializer);
+  }
+
+  @protected
+  void sse_encode_pancake_meta(PancakeMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.chainId, serializer);
   }
 
   @protected

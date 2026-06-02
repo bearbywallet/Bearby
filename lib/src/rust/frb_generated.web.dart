@@ -34,6 +34,7 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
+import 'models/exchange/pancakeswap.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -222,6 +223,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
+
+  @protected
+  PancakeMeta dco_decode_box_autoadd_pancake_meta(dynamic raw);
 
   @protected
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
@@ -552,6 +556,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OutPointInfo dco_decode_out_point_info(dynamic raw);
 
   @protected
+  PancakeMeta dco_decode_pancake_meta(dynamic raw);
+
+  @protected
   PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
   @protected
@@ -854,6 +861,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
       SseDeserializer deserializer);
+
+  @protected
+  PancakeMeta sse_decode_box_autoadd_pancake_meta(SseDeserializer deserializer);
 
   @protected
   QrConfigInfo sse_decode_box_autoadd_qr_config_info(
@@ -1222,6 +1232,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer);
 
   @protected
+  PancakeMeta sse_decode_pancake_meta(SseDeserializer deserializer);
+
+  @protected
   PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
       SseDeserializer deserializer);
 
@@ -1546,6 +1559,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_pancake_meta(
+      PancakeMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_qr_config_info(
@@ -1924,6 +1941,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_pancake_meta(PancakeMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_pending_withdrawal_info(
