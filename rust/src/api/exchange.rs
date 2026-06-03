@@ -41,7 +41,7 @@ use crate::utils::helpers::parse_address;
 /// membership is hardcoded (see [`THORCHAIN_POOLS`]) — no REST call. Halted status is always
 /// `false`: the THORChain `/thorchain/inbound_addresses` live check is dropped for speed; the
 /// swap quote itself will fail if a chain is actually paused.
-pub fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
+pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
     let guard = BACKGROUND_SERVICE
         .try_read()
         .map_err(|_| "service lock contention".to_string())?;

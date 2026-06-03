@@ -21,6 +21,7 @@ import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
@@ -64,6 +65,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   // driving "You get" and the swap — auto-set to the best, overridable via the provider picker.
   List<ExchangeQuoteInfo> _quotes = const [];
   ExchangeQuoteInfo? _selectedQuote;
+  // Recipient on the destination chain for the current `from → to` pair (self). Resolved during
+  // the quote fetch and reused by the swap handoff. Cross-chain (THORChain) needs the user's own
+  // address on the *target* chain, not the active-chain address.
+  String? _destination;
 
   // Active chain at the last bootstrap — used to re-bootstrap when the network changes (the page
   // is kept alive in a StatefulShellBranch, so initState runs only once).
@@ -180,6 +185,22 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
   }
 
+  /// Self-recipient on the destination chain. Same-chain swaps land on the active address; a
+  /// cross-chain (THORChain) bridge needs the user's own address on the *target* chain, which the
+  /// wallet already stores per chain type but only core can resolve.
+  Future<String?> _resolveDestination(
+      ExchangeAsset from, ExchangeAsset to) async {
+    final account = _appState.account;
+    final wallet = _appState.wallet;
+    if (account == null || wallet == null) return null;
+    if (from.token.chainHash == to.token.chainHash) return account.addr;
+    return getAccountAddressForChain(
+      walletIndex: _appState.selectedWalletIndex,
+      accountIndex: wallet.selectedAccount,
+      chainHash: to.token.chainHash,
+    );
+  }
+
   Future<void> _fetchQuotes() async {
     final account = _appState.account;
     final from = _fromAsset;
@@ -198,11 +219,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     setState(() => _loadingQuote = true);
 
     try {
+      final destination = await _resolveDestination(from, to);
+      if (destination == null) {
+        throw Exception('no wallet account on the destination chain');
+      }
+      if (!mounted) return;
+      _destination = destination;
       final quotes = await fetchExchangeQuote(
         asset: from,
         to: to,
         amount: amountWei.toString(),
-        destination: account.addr,
+        destination: destination,
       );
       // Same-chain shows DEX routes; cross-chain shows the THORChain bridge route. Keeping the list
       // homogeneous avoids rate-comparing a different-asset bridge output against same-chain quotes.
@@ -314,11 +341,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final from = _fromAsset;
     final to = _toAsset;
     final quote = _selectedQuote;
+    final destination = _destination;
     if (wallet == null ||
         account == null ||
         from == null ||
         to == null ||
-        quote == null) {
+        quote == null ||
+        destination == null) {
       return;
     }
 
@@ -345,7 +374,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       from: from,
       to: to,
       amountInWei: amountInWei.toString(),
-      destination: account.addr,
+      destination: destination,
       slippageBps: _slippageBps,
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),

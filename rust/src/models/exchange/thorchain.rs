@@ -147,6 +147,10 @@ pub async fn thorchain_get<T: DeserializeOwned>(
 ) -> Result<T, String> {
     let client = reqwest::Client::new();
     let mut last_err = String::new();
+    // Prefer the FIRST real HTTP-level error (which carries thornode's reason, e.g. a 5xx body
+    // saying "trading is halted") over transport failures from later dead fallback URLs — those
+    // would otherwise overwrite and mask the actual cause.
+    let mut have_http_err = false;
 
     for base in THORCHAIN_BASE_URLS {
         let url = format!("{base}{path}");
@@ -162,12 +166,31 @@ pub async fn thorchain_get<T: DeserializeOwned>(
             Ok(r) if r.status().is_success() => match r.text().await {
                 Ok(body) => match serde_json::from_str::<T>(&body) {
                     Ok(value) => return Ok(value),
-                    Err(e) => last_err = format!("{url}: decode {e}"),
+                    Err(e) => {
+                        last_err = format!("{url}: decode {e}");
+                        have_http_err = true;
+                    }
                 },
-                Err(e) => last_err = format!("{url}: body {e}"),
+                Err(e) => {
+                    last_err = format!("{url}: body {e}");
+                    have_http_err = true;
+                }
             },
-            Ok(r) => last_err = format!("{url}: status {}", r.status()),
-            Err(e) => last_err = format!("{url}: {e}"),
+            // Non-2xx: the body carries thornode's actual reason; keep the first one seen.
+            Ok(r) => {
+                if !have_http_err {
+                    let status = r.status();
+                    let body = r.text().await.unwrap_or_default();
+                    last_err = format!("{url}: status {status}: {body}");
+                    have_http_err = true;
+                }
+            }
+            // Transport failure (DNS/TLS/timeout) — only record if no real HTTP error seen yet.
+            Err(e) => {
+                if !have_http_err {
+                    last_err = format!("{url}: {e}");
+                }
+            }
         }
     }
 
