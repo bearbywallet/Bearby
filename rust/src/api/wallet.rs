@@ -220,6 +220,36 @@ pub async fn select_account(wallet_index: usize, account_index: usize) -> Result
     .map_err(Into::into)
 }
 
+/// The active account's address on `chain_hash`'s chain — the cross-chain swap recipient
+/// (self) on the destination chain. Returns the canonical per-chain string (`auto_format`),
+/// the same form `AccountInfo.addr` / `FTokenInfo.addr` use.
+pub async fn get_account_address_for_chain(
+    wallet_index: usize,
+    account_index: usize,
+    chain_hash: u64,
+) -> Result<String, String> {
+    with_service(|core| {
+        let slip44 = core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?
+            .config
+            .slip_44;
+        let wallet = core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .get_account_for_slip44(slip44, account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+
+        Ok(account.addr.auto_format())
+    })
+    .await
+    .map_err(Into::into)
+}
+
 pub async fn change_account_name(
     wallet_index: usize,
     account_index: usize,

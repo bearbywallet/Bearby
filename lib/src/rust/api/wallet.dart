@@ -38,6 +38,18 @@ Future<void> selectAccount(
     RustLib.instance.api.crateApiWalletSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+/// The active account's address on `chain_hash`'s chain — the cross-chain swap recipient
+/// (self) on the destination chain. Returns the canonical per-chain string (`auto_format`),
+/// the same form `AccountInfo.addr` / `FTokenInfo.addr` use.
+Future<String> getAccountAddressForChain(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiWalletGetAccountAddressForChain(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        chainHash: chainHash);
+
 Future<void> changeAccountName(
         {required BigInt walletIndex,
         required BigInt accountIndex,
