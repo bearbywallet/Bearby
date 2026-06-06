@@ -320,15 +320,12 @@ fn step_data_by_id<'a>(quote: &'a QuoteResponse, ids: &[&str]) -> Option<&'a Ste
     })
 }
 
-#[cfg(test)]
-fn swap_step_data(quote: &QuoteResponse) -> Option<&StepData> {
-    step_data_by_id(quote, &["deposit", "swap"]).or_else(|| {
-        quote.steps.iter().find_map(|step| {
-            (!step.id.eq_ignore_ascii_case("approve"))
-                .then(|| step.items.first().map(|item| &item.data))
-                .flatten()
-        })
-    })
+/// `true` when a step carries a complete EVM call (non-empty `to` + `data`). Used to skip
+/// incomplete relay steps (e.g. an `approve` whose calldata isn't populated yet) instead of
+/// failing the swap.
+fn step_has_evm_calldata(step: &StepData) -> bool {
+    step.to.as_deref().is_some_and(|v| !v.is_empty())
+        && step.data.as_deref().is_some_and(|v| !v.is_empty())
 }
 
 fn swap_step_data_owned(quote: QuoteResponse) -> Option<StepData> {
@@ -568,7 +565,11 @@ pub async fn relay_check_approval(
         return Ok(None);
     };
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
-    let Some(step) = step_data_by_id(&quote, &["approve"]) else {
+    // Only build the approval when relay returns complete calldata; an incomplete `approve` step
+    // is skipped rather than failing the whole swap.
+    let Some(step) =
+        step_data_by_id(&quote, &["approve"]).filter(|step| step_has_evm_calldata(step))
+    else {
         return Ok(None);
     };
     let tx = evm_tx_from_step(
@@ -732,9 +733,27 @@ mod tests {
         let quote: QuoteResponse = serde_json::from_str(raw).map_err(|e| e.to_string())?;
         assert_eq!(quote.details.currency_out.amount, "995");
         assert_eq!(quote.details.currency_out.minimum_amount, "990");
-        let step = swap_step_data(&quote).ok_or_else(|| "missing swap step".to_string())?;
+        let step = swap_step_data_owned(quote).ok_or_else(|| "missing swap step".to_string())?;
         assert_eq!(step.chain_id, Some(1));
         assert_eq!(parse_u64_value(step.gas.as_deref())?, Some(21_000));
         Ok(())
+    }
+
+    #[test]
+    fn step_calldata_completeness() {
+        let complete = StepData {
+            to: Some("0x0000000000000000000000000000000000000001".to_string()),
+            data: Some("0x095ea7b3".to_string()),
+            ..Default::default()
+        };
+        assert!(step_has_evm_calldata(&complete));
+
+        // An approve step relay hasn't populated yet (no calldata) is treated as incomplete.
+        let no_data = StepData {
+            to: Some("0x0000000000000000000000000000000000000001".to_string()),
+            ..Default::default()
+        };
+        assert!(!step_has_evm_calldata(&no_data));
+        assert!(!step_has_evm_calldata(&StepData::default()));
     }
 }
