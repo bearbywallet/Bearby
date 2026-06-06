@@ -557,6 +557,12 @@ abstract class AppLocalizations {
   /// **'You get'**
   String get exchangePageGet;
 
+  /// No description provided for @exchangePageRecipientTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select recipient'**
+  String get exchangePageRecipientTitle;
+
   /// No description provided for @exchangePageConfirm.
   ///
   /// In en, this message translates to:

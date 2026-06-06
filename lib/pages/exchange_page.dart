@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -13,10 +12,12 @@ import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
 import 'package:bearby/components/skeleton_box.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
+import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
@@ -39,7 +40,7 @@ class ExchangePage extends StatefulWidget {
 class _ExchangePageState extends State<ExchangePage>
     with StatusBarMixin, TickerProviderStateMixin {
   static const Duration _quoteDebounce = Duration(milliseconds: 400);
-  static const double _radialSize = 52;
+  static const double _radialSize = 40;
 
   late final AppState _appState;
   late final ExchangeState _exchangeState;
@@ -53,6 +54,7 @@ class _ExchangePageState extends State<ExchangePage>
   bool _hasDecimalPoint = false;
   BigInt? _lastChainHash;
   BigInt? _lastAccount;
+  String? _recipientOverride;
   bool _wasLoadingQuote = false;
 
   @override
@@ -99,6 +101,7 @@ class _ExchangePageState extends State<ExchangePage>
     setState(() {
       _amount = '0';
       _hasDecimalPoint = false;
+      _recipientOverride = null;
     });
     _bootstrap(initialFrom: _exchangeState.fromAsset);
   }
@@ -179,6 +182,7 @@ class _ExchangePageState extends State<ExchangePage>
     setState(() {
       _amount = '0';
       _hasDecimalPoint = false;
+      _recipientOverride = null;
     });
     _exchangeState.selectFrom(asset);
     if (_exchangeState.toAsset == asset || _exchangeState.toAsset == null) {
@@ -188,6 +192,7 @@ class _ExchangePageState extends State<ExchangePage>
   }
 
   void _selectTo(ExchangeAsset asset) {
+    setState(() => _recipientOverride = null);
     _exchangeState.selectTo(asset);
     _scheduleQuote();
   }
@@ -226,11 +231,15 @@ class _ExchangePageState extends State<ExchangePage>
       return;
     }
 
+    final defaultRecipient = provider.common.accountAddr;
+    final destination = _recipientOverride ?? defaultRecipient;
+
     showExchangeConfirmModal(
       context: context,
       from: from,
       to: to,
       amountInWei: toDecimalsWei(_amount, from.token.decimals).toString(),
+      destination: destination,
       slippageBps: state.slippageFor(provider),
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),
@@ -497,6 +506,7 @@ class _ExchangePageState extends State<ExchangePage>
               setState(() {
                 _amount = '0';
                 _hasDecimalPoint = false;
+                _recipientOverride = null;
               });
               state.selectFrom(to);
               state.selectTo(from);
@@ -554,6 +564,7 @@ class _ExchangePageState extends State<ExchangePage>
     final rateLabel =
         quote == null || from == null ? null : _rateLabel(from, to, quote);
     final recipient = to.providers.firstOrNull?.common.accountAddr ?? '';
+    final effectiveRecipient = _recipientOverride ?? recipient;
     final (outAmount, _) = quote == null
         ? ('0', '')
         : formatingAmount(
@@ -574,8 +585,8 @@ class _ExchangePageState extends State<ExchangePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (recipient.isNotEmpty)
-            CopyContent(address: recipient, isShort: true)
+          if (effectiveRecipient.isNotEmpty)
+            _buildRecipientButton(theme, l10n, effectiveRecipient, to)
           else
             Text(l10n.exchangePageGet,
                 style: theme.bodyText2.copyWith(color: theme.textSecondary)),
@@ -630,6 +641,37 @@ class _ExchangePageState extends State<ExchangePage>
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildRecipientButton(
+    AppTheme theme,
+    AppLocalizations l10n,
+    String address,
+    ExchangeAsset to,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        final chainHash = to.providers.firstOrNull?.common.chainHash;
+        showAddressSelectModal(
+          context: context,
+          chainHash: chainHash,
+          title: l10n.exchangePageRecipientTitle,
+          onAddressSelected: (info, _) {
+            setState(() => _recipientOverride = info.recipient);
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        shortenAddress(address),
+        style: theme.bodyText2.copyWith(
+          color: theme.primaryPurple,
+          decoration: TextDecoration.underline,
+          decorationColor: theme.primaryPurple,
+        ),
       ),
     );
   }

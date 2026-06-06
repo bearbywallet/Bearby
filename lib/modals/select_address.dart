@@ -17,6 +17,8 @@ import 'package:bearby/theme/app_theme.dart';
 void showAddressSelectModal({
   required BuildContext context,
   required Function(QRcodeScanResultInfo, String) onAddressSelected,
+  BigInt? chainHash,
+  String? title,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -29,15 +31,25 @@ void showAddressSelectModal({
     builder: (context) => Padding(
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: _AddressSelectModalContent(onAddressSelected: onAddressSelected),
+      child: _AddressSelectModalContent(
+        onAddressSelected: onAddressSelected,
+        chainHash: chainHash,
+        title: title,
+      ),
     ),
   );
 }
 
 class _AddressSelectModalContent extends StatefulWidget {
   final Function(QRcodeScanResultInfo, String) onAddressSelected;
+  final BigInt? chainHash;
+  final String? title;
 
-  const _AddressSelectModalContent({required this.onAddressSelected});
+  const _AddressSelectModalContent({
+    required this.onAddressSelected,
+    this.chainHash,
+    this.title,
+  });
 
   @override
   State<_AddressSelectModalContent> createState() =>
@@ -59,11 +71,14 @@ class _AddressSelectModalContentState
 
   Future<void> _loadAddresses() async {
     final appState = Provider.of<AppState>(context, listen: false);
+    final chainHash = widget.chainHash;
 
     try {
-      final categories = await getCombineSortAddresses(
-        walletIndex: appState.selectedWalletIndex,
-      );
+      final categories = chainHash == null
+          ? await getCombineSortAddresses(
+              walletIndex: appState.selectedWalletIndex,
+            )
+          : await getAddressesForChain(chainHash: chainHash);
 
       if (mounted) {
         setState(() {
@@ -165,7 +180,7 @@ class _AddressSelectModalContentState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
-        l10n.addressSelectModalContentTitle,
+        widget.title ?? l10n.addressSelectModalContentTitle,
         style: theme.titleMedium.copyWith(
           color: theme.textPrimary,
           shadows: [

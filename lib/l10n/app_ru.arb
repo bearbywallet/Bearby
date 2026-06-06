@@ -75,6 +75,7 @@
   "exchangePageTitle": "Обмен",
   "exchangePagePay": "Вы платите",
   "exchangePageGet": "Вы получаете",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "Подтвердить",
   "exchangeConfirmBest": "ЛУЧШИЙ",
   "exchangeConfirmGasNone": "—",

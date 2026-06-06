@@ -239,6 +239,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangePageGet => '受け取る';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '確認';
 
   @override

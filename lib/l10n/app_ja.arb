@@ -75,6 +75,7 @@
   "exchangePageTitle": "交換",
   "exchangePagePay": "支払う",
   "exchangePageGet": "受け取る",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "確認",
   "exchangeConfirmBest": "最適",
   "exchangeConfirmGasNone": "—",

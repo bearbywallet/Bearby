@@ -23,6 +23,9 @@ Future<void> removeFromAddressBook({required String addr}) =>
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();
 
+Future<List<Category>> getAddressesForChain({required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiBookGetAddressesForChain(chainHash: chainHash);
+
 Future<List<Category>> getCombineSortAddresses({required BigInt walletIndex}) =>
     RustLib.instance.api
         .crateApiBookGetCombineSortAddresses(walletIndex: walletIndex);

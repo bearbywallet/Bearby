@@ -239,6 +239,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangePageGet => '받을 금액';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '확인';
 
   @override

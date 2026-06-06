@@ -7,6 +7,7 @@ use crate::{
 };
 pub use zilpay::background::bg_book::AddressBookManagement;
 pub use zilpay::background::book::AddressBookEntry;
+use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
@@ -102,6 +103,70 @@ fn build_accounts_entries(
             })
             .collect()
     }
+}
+
+pub async fn get_addresses_for_chain(chain_hash: u64) -> Result<Vec<Category>, String> {
+    with_service(|core| {
+        let slip44 = core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?
+            .config
+            .slip_44;
+
+        let mut categories: Vec<Category> = core
+            .wallets
+            .iter()
+            .filter_map(|wallet| {
+                let data = wallet.get_wallet_data().ok()?;
+
+                let resolve_bip = if slip44 == BITCOIN {
+                    data.bip_preferences
+                        .get(&slip44)
+                        .copied()
+                        .unwrap_or_else(|| DerivationPath::default_bip(slip44))
+                } else {
+                    DerivationPath::BIP44_PURPOSE
+                };
+
+                let accounts = data
+                    .slip44_accounts
+                    .get(&slip44)
+                    .and_then(|bip_map| bip_map.get(&resolve_bip))?;
+
+                let entries = build_accounts_entries(accounts, &data.wallet_type, slip44);
+                if entries.is_empty() {
+                    return None;
+                }
+
+                Some(Category {
+                    name: data.wallet_name,
+                    entries,
+                })
+            })
+            .collect();
+
+        let book: Vec<Entry> = core
+            .get_address_book()
+            .into_iter()
+            .filter(|contact| contact.slip44 == slip44)
+            .map(|contact| Entry {
+                name: contact.name,
+                address: contact.addr.auto_format(),
+                tag: Some("book".to_string()),
+            })
+            .collect();
+
+        if !book.is_empty() {
+            categories.push(Category {
+                name: "book".to_string(),
+                entries: book,
+            });
+        }
+
+        Ok(categories)
+    })
+    .await
+    .map_err(Into::into)
 }
 
 pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Category>, String> {

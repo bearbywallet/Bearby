@@ -75,6 +75,7 @@
   "exchangePageTitle": "兑换",
   "exchangePagePay": "支付",
   "exchangePageGet": "获得",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "确认",
   "exchangeConfirmBest": "最佳",
   "exchangeConfirmGasNone": "—",

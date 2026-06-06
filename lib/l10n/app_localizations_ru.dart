@@ -239,6 +239,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangePageGet => 'Вы получаете';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => 'Подтвердить';
 
   @override

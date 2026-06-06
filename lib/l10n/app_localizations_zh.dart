@@ -239,6 +239,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangePageGet => '获得';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '确认';
 
   @override
