@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use zilpay::bitcoin::bip32::{ChildNumber, Fingerprint, Xpub};
 use zilpay::bitcoin::consensus::encode as btc_encode;
 use zilpay::bitcoin::hashes::Hash;
@@ -5,9 +6,8 @@ use zilpay::bitcoin::psbt::Psbt;
 use zilpay::bitcoin::secp256k1::Secp256k1;
 use zilpay::bitcoin::Transaction as BitcoinTransaction;
 use zilpay::bitcoin::Witness;
-use zilpay::sha2::{Digest, Sha256};
-use std::str::FromStr;
 use zilpay::crypto::bip49::DerivationPath;
+use zilpay::sha2::{Digest, Sha256};
 
 use crate::models::transactions::btc::{InputMetaInfo, TransactionBitcoin, TxOutInfo};
 use zilpay::proto::btc_utils::ByteCodec;
@@ -681,8 +681,9 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
 
         match addr_types[idx] {
             zilpay::bitcoin::AddressType::P2tr => {
-                let schnorr_sig = zilpay::bitcoin::taproot::Signature::from_slice(&sig_info.signature)
-                    .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
+                let schnorr_sig =
+                    zilpay::bitcoin::taproot::Signature::from_slice(&sig_info.signature)
+                        .map_err(|e| format!("Invalid Schnorr signature: {}", e))?;
                 psbt.inputs[idx].tap_key_sig = Some(schnorr_sig);
             }
             _ => {
@@ -738,7 +739,8 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                         let mut script_bytes = Vec::new();
                         script_bytes.push(rs_bytes.len() as u8);
                         script_bytes.extend_from_slice(rs_bytes);
-                        input.final_script_sig = Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
+                        input.final_script_sig =
+                            Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
                     }
                 }
                 input.partial_sigs.clear();
@@ -752,7 +754,8 @@ pub fn btc_ledger_finalize_psbt_with_sigs(
                     script_bytes.extend_from_slice(&sig_bytes);
                     script_bytes.push(pk_bytes.len() as u8);
                     script_bytes.extend_from_slice(&pk_bytes);
-                    input.final_script_sig = Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
+                    input.final_script_sig =
+                        Some(zilpay::bitcoin::ScriptBuf::from_bytes(script_bytes));
                 }
                 input.partial_sigs.clear();
             }
@@ -842,7 +845,8 @@ pub fn btc_ledger_prepare_psbt(
 
     // Pre-derive child keys for change=0,1 and index=0..GAP_LIMIT
     const GAP_LIMIT: u32 = 30;
-    let mut derived_keys: Vec<(zilpay::bitcoin::secp256k1::PublicKey, Vec<ChildNumber>)> = Vec::new();
+    let mut derived_keys: Vec<(zilpay::bitcoin::secp256k1::PublicKey, Vec<ChildNumber>)> =
+        Vec::new();
 
     for change in 0..=1u32 {
         let change_child = ChildNumber::from_normal_idx(change).map_err(|e| e.to_string())?;
@@ -897,7 +901,8 @@ pub fn btc_ledger_prepare_psbt(
                     let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
                     match zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey) {
                         Ok(cpk) => {
-                            zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == script_pubkey
+                            zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash())
+                                == script_pubkey
                         }
                         Err(_) => false,
                     }
@@ -907,14 +912,16 @@ pub fn btc_ledger_prepare_psbt(
                     match zilpay::bitcoin::CompressedPublicKey::try_from(btc_pk) {
                         Ok(cpk) => {
                             let wpkh = zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                            zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == script_pubkey
+                            zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash())
+                                == script_pubkey
                         }
                         Err(_) => false,
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
                     let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
-                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == script_pubkey
+                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash())
+                        == script_pubkey
                 }
                 _ => false,
             };
@@ -964,7 +971,8 @@ pub fn btc_ledger_prepare_psbt(
                     let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
                     let cpk = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
-                        zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash()) == txout.script_pubkey
+                        zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash())
+                            == txout.script_pubkey
                     } else {
                         false
                     }
@@ -974,14 +982,16 @@ pub fn btc_ledger_prepare_psbt(
                     let cpk = zilpay::bitcoin::CompressedPublicKey::try_from(btc_pubkey);
                     if let Ok(cpk) = cpk {
                         let wpkh = zilpay::bitcoin::ScriptBuf::new_p2wpkh(&cpk.wpubkey_hash());
-                        zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash()) == txout.script_pubkey
+                        zilpay::bitcoin::ScriptBuf::new_p2sh(&wpkh.script_hash())
+                            == txout.script_pubkey
                     } else {
                         false
                     }
                 }
                 DerivationPath::BIP44_PURPOSE => {
                     let btc_pubkey = zilpay::bitcoin::PublicKey::new(*pubkey);
-                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash()) == txout.script_pubkey
+                    zilpay::bitcoin::ScriptBuf::new_p2pkh(&btc_pubkey.pubkey_hash())
+                        == txout.script_pubkey
                 }
                 _ => false,
             };
@@ -1471,8 +1481,7 @@ mod tests {
     fn test_leaf_hash_vs_sha256() {
         let data = vec![0x01, 0x02, 0x03];
         let leaf_hash = btc_ledger_hash_leaf(data.clone());
-        let plain_hash =
-            btc_ledger_sha256(vec![0x00].into_iter().chain(data).collect());
+        let plain_hash = btc_ledger_sha256(vec![0x00].into_iter().chain(data).collect());
         assert_eq!(leaf_hash, plain_hash);
     }
 

@@ -171,7 +171,8 @@ pub async fn select_accounts_chain(
 }
 
 pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkConfigInfo>, String> {
-    let json_value_list: Value = zilpay::serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
+    let json_value_list: Value =
+        zilpay::serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
 
     let chains = json_value_list
         .as_array()

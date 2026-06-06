@@ -6,8 +6,8 @@ use std::str::FromStr;
 use flutter_rust_bridge::frb;
 use zilpay::alloy::primitives::Address;
 
-use super::{ProviderCommon, ProviderQuote};
 use super::univ_router::{RouterAddrs, RouterConfig};
+use super::{ProviderCommon, ProviderQuote};
 
 /// PancakeSwap V3 fee tiers (bips * 100): 0.01% / 0.05% / 0.25% / 1.00%.
 pub const PANCAKE_FEE_TIERS: &[u32] = &[100, 500, 2500, 10000];
@@ -100,22 +100,38 @@ impl PancakeMeta {
     }
 }
 
-
 #[cfg(test)]
 mod pancakeswap_tests {
     use super::*;
 
     fn meta(chain_id: u64) -> PancakeMeta {
-        PancakeMeta::for_chain(42, chain_id, 60, "0x0000000000000000000000000000000000000001")
-            .unwrap()
+        PancakeMeta::for_chain(
+            42,
+            chain_id,
+            60,
+            "0x0000000000000000000000000000000000000001",
+        )
+        .unwrap()
     }
 
     #[test]
     fn meta_for_chain_known_and_unknown() {
-        assert!(PancakeMeta::for_chain(42, 56, 60, "0x0000000000000000000000000000000000000001").is_some());
-        assert!(PancakeMeta::for_chain(42, 8453, 60, "0x0000000000000000000000000000000000000001").is_some());
-        assert!(PancakeMeta::for_chain(42, 1, 60, "0x0000000000000000000000000000000000000001").is_none());
-        assert!(PancakeMeta::for_chain(42, 999, 60, "0x0000000000000000000000000000000000000001").is_none());
+        assert!(
+            PancakeMeta::for_chain(42, 56, 60, "0x0000000000000000000000000000000000000001")
+                .is_some()
+        );
+        assert!(
+            PancakeMeta::for_chain(42, 8453, 60, "0x0000000000000000000000000000000000000001")
+                .is_some()
+        );
+        assert!(
+            PancakeMeta::for_chain(42, 1, 60, "0x0000000000000000000000000000000000000001")
+                .is_none()
+        );
+        assert!(
+            PancakeMeta::for_chain(42, 999, 60, "0x0000000000000000000000000000000000000001")
+                .is_none()
+        );
     }
 
     #[test]
@@ -123,16 +139,31 @@ mod pancakeswap_tests {
         let cfg = meta(56).resolve().unwrap();
         assert_eq!(cfg.addrs.chain_id, 56);
         assert_eq!(cfg.fee_tiers, PANCAKE_FEE_TIERS);
-        assert_eq!(cfg.addrs.universal_router, Address::from_str("0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB").unwrap());
-        assert_eq!(cfg.addrs.quoter_v2, Address::from_str("0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997").unwrap());
-        assert_eq!(cfg.addrs.permit2, Address::from_str("0x31c2F6fcFf4F8759b3Bd5Bf0e1084A055615c768").unwrap());
-        assert_eq!(cfg.addrs.weth, Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap());
+        assert_eq!(
+            cfg.addrs.universal_router,
+            Address::from_str("0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.quoter_v2,
+            Address::from_str("0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.permit2,
+            Address::from_str("0x31c2F6fcFf4F8759b3Bd5Bf0e1084A055615c768").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.weth,
+            Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap()
+        );
     }
 
     #[test]
     fn meta_resolve_base_shares_router() {
         let cfg = meta(8453).resolve().unwrap();
-        assert_eq!(cfg.addrs.universal_router, Address::from_str("0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB").unwrap());
+        assert_eq!(
+            cfg.addrs.universal_router,
+            Address::from_str("0xd9C500DfF816a1Da21A48A732d3498Bf09dc9AEB").unwrap()
+        );
     }
 
     #[test]

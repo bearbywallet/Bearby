@@ -6,11 +6,11 @@ use crate::{
         helpers::{parse_address, with_service},
     },
 };
-use zilpay::serde::Deserialize;
-use zilpay::serde_json::Value;
 use std::{collections::HashMap, sync::Arc};
 pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
+use zilpay::serde::Deserialize;
+use zilpay::serde_json::Value;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA},
@@ -480,12 +480,8 @@ async fn fetch_zilliqa_tokens(
     let client = zilpay::reqwest::Client::new();
 
     match addr {
-        Address::Secp256k1Bitcoin(_) => {
-            Err("btc is not supporting".to_string())
-        }
-        Address::Secp256k1Tron(_) => {
-            Err("tron token auto-discovery is not supported".to_string())
-        }
+        Address::Secp256k1Bitcoin(_) => Err("btc is not supporting".to_string()),
+        Address::Secp256k1Tron(_) => Err("tron token auto-discovery is not supported".to_string()),
         Address::Ed25519Solana(_) => {
             Err("solana token auto-discovery is not supported".to_string())
         }

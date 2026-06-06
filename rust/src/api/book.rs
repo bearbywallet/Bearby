@@ -6,8 +6,8 @@ use crate::{
     },
 };
 pub use zilpay::background::bg_book::AddressBookManagement;
-pub use zilpay::background::book::AddressBookEntry;
 use zilpay::background::bg_provider::ProvidersManagement;
+pub use zilpay::background::book::AddressBookEntry;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},

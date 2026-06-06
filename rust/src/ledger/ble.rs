@@ -3,8 +3,8 @@ use std::time::Duration;
 use btleplug::api::{Central, Manager as _, Peripheral as _, ScanFilter, WriteType};
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::StreamExt;
-use zilpay::tokio::sync::OnceCell;
 use uuid::Uuid;
+use zilpay::tokio::sync::OnceCell;
 
 use crate::ledger::device::{identify_ble_service_uuid, BLE_DEVICES};
 use crate::ledger::framing::{unwrap_ble_chunk, wrap_ble_apdu, BleReceiveState};
@@ -199,7 +199,8 @@ impl BleLedgerTransport {
         {
             // Try to read the MTU response with timeout
             if let Ok(mut notifs) = peripheral.notifications().await {
-                let timeout = zilpay::tokio::time::timeout(Duration::from_secs(2), notifs.next()).await;
+                let timeout =
+                    zilpay::tokio::time::timeout(Duration::from_secs(2), notifs.next()).await;
                 if let Ok(Some(notif)) = &timeout {
                     if notif.value.len() >= 6 && notif.value[0] == MTU_NEGOTIATE_CMD {
                         let negotiated = notif.value[5] as usize;

@@ -1,5 +1,5 @@
-use zilpay::tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
+use zilpay::tokio::sync::mpsc;
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},

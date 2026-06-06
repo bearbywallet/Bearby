@@ -13,8 +13,8 @@ use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{Address, U256};
 use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA};
-use zilpay::proto::AlloyTxKind;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
+use zilpay::proto::AlloyTxKind;
 use zilpay::reqwest;
 use zilpay::serde::{self, Deserialize, Serialize};
 use zilpay::serde_json;
@@ -84,7 +84,6 @@ impl RelayMeta {
             })
     }
 }
-
 
 #[frb(ignore)]
 pub fn is_supported_chain(chain_id: u64) -> bool {

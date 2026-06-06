@@ -9,7 +9,7 @@ mod exchange_tests {
         refresh_exchange_quotes,
     };
     use crate::api::provider::get_chains_providers_from_json;
-    use crate::api::wallet::{Bip39AddWalletParams, add_bip39_wallet};
+    use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
 
     use crate::api::backend::is_service_running;
     use crate::models::exchange::{
@@ -109,9 +109,9 @@ mod exchange_tests {
             .iter()
             .find(|a| {
                 a.token.native
-                    && a.providers
-                        .iter()
-                        .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1))
+                    && a.providers.iter().any(
+                        |p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1),
+                    )
             })
             .cloned()
             .expect("expected native ETH (chain 1) with a Uniswap provider");
@@ -168,8 +168,8 @@ mod exchange_tests {
             slippage_bps: 50,
         };
         let prepared = prepare_exchange_swap(params)
-        .await
-        .expect("prepare native swap");
+            .await
+            .expect("prepare native swap");
         assert!(
             prepared.permit_typed_data_json.is_none(),
             "native input needs no permit"

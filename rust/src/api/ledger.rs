@@ -3,10 +3,8 @@ use std::sync::Arc;
 
 use zilpay::background::bg_bitcoin::BitcoinManagement;
 use zilpay::{
-    background::bg_provider::ProvidersManagement,
-    crypto::bip49::split_path,
-    proto::btc_utils::ByteCodec,
-    wallet::wallet_storage::StorageOperations,
+    background::bg_provider::ProvidersManagement, crypto::bip49::split_path,
+    proto::btc_utils::ByteCodec, wallet::wallet_storage::StorageOperations,
 };
 pub use zilpay::{
     background::{bg_wallet::WalletManagement, BackgroundLedgerParams},
@@ -152,13 +150,13 @@ pub async fn add_ledger_account(
         let pub_key = if is_bitcoin {
             None
         } else {
-            let raw = key_or_addr.as_deref().ok_or(ServiceError::DecodePublicKey)?;
+            let raw = key_or_addr
+                .as_deref()
+                .ok_or(ServiceError::DecodePublicKey)?;
             Some(pubkey_from_provider(raw, &provider.config, zilliqa_legacy)?)
         };
 
-        let btc_chains = btc_chain
-            .map(btc_chain_info_map_to_core)
-            .transpose()?;
+        let btc_chains = btc_chain.map(btc_chain_info_map_to_core).transpose()?;
 
         wallet
             .add_ledger_account(name, ledger_index, pub_key, btc_chains, &provider.config)

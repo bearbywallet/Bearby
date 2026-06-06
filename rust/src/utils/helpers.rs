@@ -31,7 +31,8 @@ pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
-    zilpay::alloy::hex::decode(session_cipher.unwrap_or_default()).map_err(|_| ServiceError::DecodeSession)
+    zilpay::alloy::hex::decode(session_cipher.unwrap_or_default())
+        .map_err(|_| ServiceError::DecodeSession)
 }
 
 pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError> {
@@ -49,7 +50,8 @@ pub fn pubkey_from_provider(
 ) -> Result<PubKey, ServiceError> {
     let pub_key = match chain_config.slip_44 {
         slip44::SOLANA => {
-            let bytes = zilpay::alloy::hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
+            let bytes =
+                zilpay::alloy::hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
             let mut prefixed = vec![3u8];
             prefixed.extend_from_slice(&bytes);
             PubKey::try_from(prefixed.as_slice())?
