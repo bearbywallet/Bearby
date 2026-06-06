@@ -129,6 +129,13 @@ pub enum ExchangeProvider {
 }
 
 impl ExchangeProvider {
+    /// `true` for bridge providers that can route across chains (Relay).
+    /// `false` for same-chain DEX providers (Uniswap, PancakeSwap, ZilSwap, SunSwap).
+    #[frb(ignore)]
+    pub const fn is_bridge(&self) -> bool {
+        matches!(self, Self::Relay(_))
+    }
+
     #[frb(ignore)]
     pub fn common(&self) -> &ProviderCommon {
         match self {
