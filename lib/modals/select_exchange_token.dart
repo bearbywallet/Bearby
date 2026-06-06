@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/exchange_provider_icon.dart';
+import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/token_select_item.dart';
@@ -177,7 +177,7 @@ class _ExchangeTokenSelectContentState
                   balance: balance,
                   networkBadge: _buildNetworkBadge(appState, theme, asset.token),
                   providerIcons:
-                      asset.providers.map((p) => p.iconAsset).toList(),
+                      asset.providers.map((p) => p.common.iconAsset).toList(),
                   onTap: () {
                     widget.onSelected(asset);
                     Navigator.pop(context);

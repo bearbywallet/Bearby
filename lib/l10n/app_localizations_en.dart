@@ -260,30 +260,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangeSettingsPriceProtection => 'Price Protection';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => 'Number of sub-swaps';
-
-  @override
-  String get exchangeSettingsTimeBetween => 'Time between sub-swaps';
-
-  @override
   String get exchangeSettingsReset => 'Reset';
 
   @override
   String get exchangeSettingsSave => 'Save';
-
-  @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count blocks',
-      one: '1 block',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get exchangeConfirmBest => 'BEST';
@@ -313,6 +293,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exchangeConfirmNoAccount => 'No active account';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
 
   @override
   String get exchangeConfirmStepApprove => 'Approve token';

@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1008193426;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 759527674;
 
 // Section: executor
 
@@ -1737,32 +1737,19 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_provider =
-                <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
-            let api_from = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_amount_in = <String>::sse_decode(&mut deserializer);
-            let api_is_native_in = <bool>::sse_decode(&mut deserializer);
+            let api_auth = <crate::models::exchange::SwapAuth>::sse_decode(&mut deserializer);
+            let api_params = <crate::models::exchange::SwapParams>::sse_decode(&mut deserializer);
             let api_nonce = <u64>::sse_decode(&mut deserializer);
             let api_approve_title = <String>::sse_decode(&mut deserializer);
-            let api_provider_icon = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::exchange::check_exchange_approval(
-                            api_wallet_index,
-                            api_account_index,
-                            api_provider,
-                            api_from,
-                            api_to,
-                            api_amount_in,
-                            api_is_native_in,
+                            api_auth,
+                            api_params,
                             api_nonce,
                             api_approve_title,
-                            api_provider_icon,
                         )
                         .await?;
                         Ok(output_ok)
@@ -2191,18 +2178,10 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_provider =
-                <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
-            let api_from = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_amount_in = <String>::sse_decode(&mut deserializer);
-            let api_slippage_bps = <u32>::sse_decode(&mut deserializer);
+            let api_auth = <crate::models::exchange::SwapAuth>::sse_decode(&mut deserializer);
+            let api_params = <crate::models::exchange::SwapParams>::sse_decode(&mut deserializer);
             let api_display =
                 <crate::models::exchange::ExchangeTxDisplay>::sse_decode(&mut deserializer);
-            let api_password = <Option<String>>::sse_decode(&mut deserializer);
-            let api_passphrase = <Option<String>>::sse_decode(&mut deserializer);
             let api_sink =
                 <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
                     &mut deserializer,
@@ -2212,16 +2191,9 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::exchange::execute_exchange_swap(
-                            api_wallet_index,
-                            api_account_index,
-                            api_provider,
-                            api_from,
-                            api_to,
-                            api_amount_in,
-                            api_slippage_bps,
+                            api_auth,
+                            api_params,
                             api_display,
-                            api_password,
-                            api_passphrase,
                             api_sink,
                         )
                         .await?;
@@ -2264,51 +2236,6 @@ fn wire__crate__api__stake__fetch_evm_stake_impl(
                         let output_ok =
                             crate::api::stake::fetch_evm_stake(api_wallet_index, api_account_index)
                                 .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__exchange__fetch_exchange_quote_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "fetch_exchange_quote",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_asset = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_amount = <String>::sse_decode(&mut deserializer);
-            let api_destination = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::exchange::fetch_exchange_quote(
-                            api_asset,
-                            api_to,
-                            api_amount,
-                            api_destination,
-                        )
-                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2418,35 +2345,25 @@ fn wire__crate__api__exchange__finalize_exchange_swap_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
+            let api_auth = <crate::models::exchange::SwapAuth>::sse_decode(&mut deserializer);
             let api_provider =
                 <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
             let api_quote_blob = <String>::sse_decode(&mut deserializer);
             let api_permit_signature = <Option<String>>::sse_decode(&mut deserializer);
             let api_nonce = <u64>::sse_decode(&mut deserializer);
-            let api_swap_title = <String>::sse_decode(&mut deserializer);
-            let api_swap_info = <String>::sse_decode(&mut deserializer);
-            let api_provider_icon = <String>::sse_decode(&mut deserializer);
-            let api_out_token =
-                <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
-                    &mut deserializer,
-                );
+            let api_display =
+                <crate::models::exchange::ExchangeTxDisplay>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::exchange::finalize_exchange_swap(
-                            api_wallet_index,
-                            api_account_index,
+                            api_auth,
                             api_provider,
                             api_quote_blob,
                             api_permit_signature,
                             api_nonce,
-                            api_swap_title,
-                            api_swap_info,
-                            api_provider_icon,
-                            api_out_token,
+                            api_display,
                         )
                         .await?;
                         Ok(output_ok)
@@ -3916,28 +3833,13 @@ fn wire__crate__api__exchange__prepare_exchange_swap_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_provider =
-                <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
-            let api_from = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
-            let api_amount_in = <String>::sse_decode(&mut deserializer);
-            let api_slippage_bps = <u32>::sse_decode(&mut deserializer);
+            let api_params = <crate::models::exchange::SwapParams>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::prepare_exchange_swap(
-                            api_wallet_index,
-                            api_account_index,
-                            api_provider,
-                            api_from,
-                            api_to,
-                            api_amount_in,
-                            api_slippage_bps,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::exchange::prepare_exchange_swap(api_params).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -4020,6 +3922,47 @@ fn wire__crate__api__provider__provider_req_proxy_impl(
                         let output_ok =
                             crate::api::provider::provider_req_proxy(api_payload, api_chain_hash)
                                 .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__exchange__refresh_exchange_quotes_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "refresh_exchange_quotes",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_from = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
+            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
+            let api_amount = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::exchange::refresh_exchange_quotes(
+                            api_from, api_to, api_amount,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -6263,11 +6206,13 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
                 return crate::models::exchange::ExchangeProvider::PancakeSwap(var_field0);
             }
             3 => {
-                let mut var_field0 = <u64>::sse_decode(deserializer);
-                return crate::models::exchange::ExchangeProvider::ZIlSwap(var_field0);
+                let mut var_field0 =
+                    <crate::models::exchange::ZilSwapMeta>::sse_decode(deserializer);
+                return crate::models::exchange::ExchangeProvider::ZilSwap(var_field0);
             }
             4 => {
-                let mut var_field0 = <u64>::sse_decode(deserializer);
+                let mut var_field0 =
+                    <crate::models::exchange::SunSwapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
             }
             _ => {
@@ -6277,27 +6222,9 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
     }
 }
 
-impl SseDecode for crate::models::exchange::ExchangeQuoteInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_provider =
-            <crate::models::exchange::ExchangeProvider>::sse_decode(deserializer);
-        let mut var_amountOut = <String>::sse_decode(deserializer);
-        let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
-        let mut var_isWrapUnwrap = <bool>::sse_decode(deserializer);
-        return crate::models::exchange::ExchangeQuoteInfo {
-            provider: var_provider,
-            amount_out: var_amountOut,
-            permit_typed_data_json: var_permitTypedDataJson,
-            is_wrap_unwrap: var_isWrapUnwrap,
-        };
-    }
-}
-
 impl SseDecode for crate::models::exchange::ExchangeTxDisplay {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_providerIcon = <String>::sse_decode(deserializer);
         let mut var_swapTitle = <String>::sse_decode(deserializer);
         let mut var_swapInfo = <String>::sse_decode(deserializer);
         let mut var_approveTitle = <String>::sse_decode(deserializer);
@@ -6307,7 +6234,6 @@ impl SseDecode for crate::models::exchange::ExchangeTxDisplay {
                 deserializer,
             );
         return crate::models::exchange::ExchangeTxDisplay {
-            provider_icon: var_providerIcon,
             swap_title: var_swapTitle,
             swap_info: var_swapInfo,
             approve_title: var_approveTitle,
@@ -6682,20 +6608,6 @@ impl SseDecode for Vec<crate::models::exchange::ExchangeProvider> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::models::exchange::ExchangeProvider>::sse_decode(
-                deserializer,
-            ));
-        }
-        return ans_;
-    }
-}
-
-impl SseDecode for Vec<crate::models::exchange::ExchangeQuoteInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<crate::models::exchange::ExchangeQuoteInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -7306,6 +7218,19 @@ impl SseDecode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseDecode for Option<crate::models::exchange::ProviderQuote> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::models::exchange::ProviderQuote>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode
     for Option<(
         crate::models::transactions::btc::TransactionBitcoin,
@@ -7439,12 +7364,30 @@ impl SseDecode for crate::models::transactions::btc::OutPointInfo {
     }
 }
 
+impl SseDecode for crate::models::exchange::pancakeswap::PancakeCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_defaultSlippageBps = <u32>::sse_decode(deserializer);
+        let mut var_supportsPriceProtection = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::pancakeswap::PancakeCfg {
+            default_slippage_bps: var_defaultSlippageBps,
+            supports_price_protection: var_supportsPriceProtection,
+        };
+    }
+}
+
 impl SseDecode for crate::models::exchange::pancakeswap::PancakeMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_cfg =
+            <crate::models::exchange::pancakeswap::PancakeCfg>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
         return crate::models::exchange::pancakeswap::PancakeMeta {
-            chain_id: var_chainId,
+            common: var_common,
+            cfg: var_cfg,
+            quote: var_quote,
         };
     }
 }
@@ -7471,6 +7414,40 @@ impl SseDecode for crate::api::exchange::PreparedSwapInfo {
         return crate::api::exchange::PreparedSwapInfo {
             permit_typed_data_json: var_permitTypedDataJson,
             quote_blob: var_quoteBlob,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::ProviderCommon {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
+        let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_slip44 = <u32>::sse_decode(deserializer);
+        let mut var_accountAddr = <String>::sse_decode(deserializer);
+        let mut var_iconAsset = <String>::sse_decode(deserializer);
+        let mut var_displayName = <String>::sse_decode(deserializer);
+        return crate::models::exchange::ProviderCommon {
+            chain_hash: var_chainHash,
+            chain_id: var_chainId,
+            slip44: var_slip44,
+            account_addr: var_accountAddr,
+            icon_asset: var_iconAsset,
+            display_name: var_displayName,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::ProviderQuote {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_amountOut = <String>::sse_decode(deserializer);
+        let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
+        let mut var_isWrapUnwrap = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::ProviderQuote {
+            amount_out: var_amountOut,
+            permit_typed_data_json: var_permitTypedDataJson,
+            is_wrap_unwrap: var_isWrapUnwrap,
         };
     }
 }
@@ -7653,18 +7630,29 @@ impl SseDecode for (usize, String) {
     }
 }
 
+impl SseDecode for crate::models::exchange::relay::RelayCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_defaultSlippageBps = <u32>::sse_decode(deserializer);
+        let mut var_supportsPriceProtection = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::relay::RelayCfg {
+            default_slippage_bps: var_defaultSlippageBps,
+            supports_price_protection: var_supportsPriceProtection,
+        };
+    }
+}
+
 impl SseDecode for crate::models::exchange::relay::RelayMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_chainHash = <u64>::sse_decode(deserializer);
-        let mut var_chainId = <u64>::sse_decode(deserializer);
-        let mut var_slip44 = <u32>::sse_decode(deserializer);
-        let mut var_accountAddr = <String>::sse_decode(deserializer);
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_cfg = <crate::models::exchange::relay::RelayCfg>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
         return crate::models::exchange::relay::RelayMeta {
-            chain_hash: var_chainHash,
-            chain_id: var_chainId,
-            slip44: var_slip44,
-            account_addr: var_accountAddr,
+            common: var_common,
+            cfg: var_cfg,
+            quote: var_quote,
         };
     }
 }
@@ -7729,6 +7717,54 @@ impl SseDecode for crate::api::ledger_transport::RustLedgerHidDevice {
             product_id: var_productId,
             product_name: var_productName,
             model_id: var_modelId,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::SunSwapMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
+        return crate::models::exchange::SunSwapMeta {
+            common: var_common,
+            quote: var_quote,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::SwapAuth {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_walletIndex = <usize>::sse_decode(deserializer);
+        let mut var_accountIndex = <usize>::sse_decode(deserializer);
+        let mut var_password = <Option<String>>::sse_decode(deserializer);
+        let mut var_passphrase = <Option<String>>::sse_decode(deserializer);
+        return crate::models::exchange::SwapAuth {
+            wallet_index: var_walletIndex,
+            account_index: var_accountIndex,
+            password: var_password,
+            passphrase: var_passphrase,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::SwapParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_provider =
+            <crate::models::exchange::ExchangeProvider>::sse_decode(deserializer);
+        let mut var_from = <crate::models::exchange::ExchangeAsset>::sse_decode(deserializer);
+        let mut var_to = <crate::models::exchange::ExchangeAsset>::sse_decode(deserializer);
+        let mut var_amountIn = <String>::sse_decode(deserializer);
+        let mut var_slippageBps = <u32>::sse_decode(deserializer);
+        return crate::models::exchange::SwapParams {
+            provider: var_provider,
+            from: var_from,
+            to: var_to,
+            amount_in: var_amountIn,
+            slippage_bps: var_slippageBps,
         };
     }
 }
@@ -7963,12 +7999,29 @@ impl SseDecode for u8 {
     }
 }
 
+impl SseDecode for crate::models::exchange::uniswap::UniswapCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_defaultSlippageBps = <u32>::sse_decode(deserializer);
+        let mut var_supportsPriceProtection = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::uniswap::UniswapCfg {
+            default_slippage_bps: var_defaultSlippageBps,
+            supports_price_protection: var_supportsPriceProtection,
+        };
+    }
+}
+
 impl SseDecode for crate::models::exchange::uniswap::UniswapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_cfg = <crate::models::exchange::uniswap::UniswapCfg>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
         return crate::models::exchange::uniswap::UniswapMeta {
-            chain_id: var_chainId,
+            common: var_common,
+            cfg: var_cfg,
+            quote: var_quote,
         };
     }
 }
@@ -8094,6 +8147,19 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
             max_connections: var_maxConnections,
             request_timeout_secs: var_requestTimeoutSecs,
             rates_api_options: var_ratesApiOptions,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::ZilSwapMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
+        return crate::models::exchange::ZilSwapMeta {
+            common: var_common,
+            quote: var_quote,
         };
     }
 }
@@ -8331,144 +8397,147 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         57 => wire__crate__api__stake__fetch_evm_stake_impl(port, ptr, rust_vec_len, data_len),
-        58 => {
-            wire__crate__api__exchange__fetch_exchange_quote_impl(port, ptr, rust_vec_len, data_len)
-        }
-        59 => wire__crate__api__stake__fetch_scilla_stake_impl(port, ptr, rust_vec_len, data_len),
-        60 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        61 => wire__crate__api__exchange__finalize_exchange_swap_impl(
+        58 => wire__crate__api__stake__fetch_scilla_stake_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__api__exchange__finalize_exchange_swap_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        63 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        65 => wire__crate__api__qrcode__gen_png_qrcode_impl(port, ptr, rust_vec_len, data_len),
-        66 => wire__crate__api__qrcode__gen_svg_qrcode_impl(port, ptr, rust_vec_len, data_len),
-        67 => wire__crate__api__wallet__get_account_address_for_chain_impl(
+        62 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__crate__api__qrcode__gen_png_qrcode_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__api__qrcode__gen_svg_qrcode_impl(port, ptr, rust_vec_len, data_len),
+        66 => wire__crate__api__wallet__get_account_address_for_chain_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        68 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
-        69 => wire__crate__api__auth__get_biometric_type_impl(port, ptr, rust_vec_len, data_len),
-        70 => wire__crate__api__provider__get_chains_providers_from_json_impl(
+        67 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__crate__api__auth__get_biometric_type_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__crate__api__provider__get_chains_providers_from_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        71 => wire__crate__api__book__get_combine_sort_addresses_impl(
+        70 => wire__crate__api__book__get_combine_sort_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        72 => wire__crate__api__connections__get_connections_list_impl(
+        71 => wire__crate__api__connections__get_connections_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        73 => {
+        72 => {
             wire__crate__api__utils__get_currencies_tickets_impl(port, ptr, rust_vec_len, data_len)
         }
-        74 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        75 => wire__crate__api__transaction__get_history_impl(port, ptr, rust_vec_len, data_len),
-        76 => wire__crate__api__cache__get_image_bytes_impl(port, ptr, rust_vec_len, data_len),
-        77 => wire__crate__api__cache__get_image_name_impl(port, ptr, rust_vec_len, data_len),
-        78 => wire__crate__api__provider__get_networks_impl(port, ptr, rust_vec_len, data_len),
-        79 => wire__crate__api__provider__get_provider_impl(port, ptr, rust_vec_len, data_len),
-        80 => wire__crate__api__provider__get_providers_impl(port, ptr, rust_vec_len, data_len),
-        81 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        82 => wire__crate__api__wallet__get_zil_bech32_addresses_impl(
+        73 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__api__transaction__get_history_impl(port, ptr, rust_vec_len, data_len),
+        75 => wire__crate__api__cache__get_image_bytes_impl(port, ptr, rust_vec_len, data_len),
+        76 => wire__crate__api__cache__get_image_name_impl(port, ptr, rust_vec_len, data_len),
+        77 => wire__crate__api__provider__get_networks_impl(port, ptr, rust_vec_len, data_len),
+        78 => wire__crate__api__provider__get_provider_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__api__provider__get_providers_impl(port, ptr, rust_vec_len, data_len),
+        80 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__api__wallet__get_zil_bech32_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        83 => wire__crate__api__wallet__get_zil_eth_checksum_addresses_impl(
+        82 => wire__crate__api__wallet__get_zil_eth_checksum_addresses_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        84 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        86 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        87 => wire__crate__api__utils__is_valid_address_impl(port, ptr, rust_vec_len, data_len),
-        88 => wire__crate__api__methods__keypair_from_sk_impl(port, ptr, rust_vec_len, data_len),
-        89 => wire__crate__api__ledger_transport__ledger_ble_close_impl(
+        83 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        86 => wire__crate__api__utils__is_valid_address_impl(port, ptr, rust_vec_len, data_len),
+        87 => wire__crate__api__methods__keypair_from_sk_impl(port, ptr, rust_vec_len, data_len),
+        88 => wire__crate__api__ledger_transport__ledger_ble_close_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        90 => wire__crate__api__ledger_transport__ledger_ble_exchange_impl(
+        89 => wire__crate__api__ledger_transport__ledger_ble_exchange_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        91 => wire__crate__api__ledger_transport__ledger_ble_open_impl(
+        90 => wire__crate__api__ledger_transport__ledger_ble_open_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        92 => wire__crate__api__ledger_transport__ledger_ble_scan_impl(
+        91 => wire__crate__api__ledger_transport__ledger_ble_scan_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        93 => wire__crate__api__ledger_transport__ledger_hid_close_impl(
+        92 => wire__crate__api__ledger_transport__ledger_hid_close_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        94 => wire__crate__api__ledger_transport__ledger_hid_exchange_impl(
+        93 => wire__crate__api__ledger_transport__ledger_hid_exchange_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        95 => wire__crate__api__ledger_transport__ledger_hid_list_impl(
+        94 => wire__crate__api__ledger_transport__ledger_hid_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        96 => wire__crate__api__ledger_transport__ledger_hid_open_impl(
+        95 => wire__crate__api__ledger_transport__ledger_hid_open_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        97 => wire__crate__api__ledger__ledger_split_path_impl(port, ptr, rust_vec_len, data_len),
-        98 => wire__crate__api__backend__load_service_impl(port, ptr, rust_vec_len, data_len),
-        99 => wire__crate__api__wallet__make_keystore_file_impl(port, ptr, rust_vec_len, data_len),
-        100 => wire__crate__api__qrcode__parse_qrcode_str_impl(port, ptr, rust_vec_len, data_len),
-        101 => wire__crate__api__transaction__prepare_eip712_message_impl(
+        96 => wire__crate__api__ledger__ledger_split_path_impl(port, ptr, rust_vec_len, data_len),
+        97 => wire__crate__api__backend__load_service_impl(port, ptr, rust_vec_len, data_len),
+        98 => wire__crate__api__wallet__make_keystore_file_impl(port, ptr, rust_vec_len, data_len),
+        99 => wire__crate__api__qrcode__parse_qrcode_str_impl(port, ptr, rust_vec_len, data_len),
+        100 => wire__crate__api__transaction__prepare_eip712_message_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        102 => wire__crate__api__exchange__prepare_exchange_swap_impl(
+        101 => wire__crate__api__exchange__prepare_exchange_swap_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        103 => {
+        102 => {
             wire__crate__api__transaction__prepare_message_impl(port, ptr, rust_vec_len, data_len)
         }
-        104 => {
+        103 => {
             wire__crate__api__provider__provider_req_proxy_impl(port, ptr, rust_vec_len, data_len)
         }
+        104 => wire__crate__api__exchange__refresh_exchange_quotes_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
         105 => wire__crate__api__connections__remove_connections_impl(
             port,
             ptr,
@@ -8617,8 +8686,8 @@ fn pde_ffi_dispatcher_sync_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         17 => wire__crate__api__utils__address_to_hash_impl(ptr, rust_vec_len, data_len),
-        62 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
-        85 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
+        61 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
+        84 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
         137 => wire__crate__api__utils__to_wei_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
@@ -9163,7 +9232,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider
             crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
                 [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
@@ -9187,33 +9256,9 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeProvider
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeQuoteInfo {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.provider.into_into_dart().into_dart(),
-            self.amount_out.into_into_dart().into_dart(),
-            self.permit_typed_data_json.into_into_dart().into_dart(),
-            self.is_wrap_unwrap.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::exchange::ExchangeQuoteInfo
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeQuoteInfo>
-    for crate::models::exchange::ExchangeQuoteInfo
-{
-    fn into_into_dart(self) -> crate::models::exchange::ExchangeQuoteInfo {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeTxDisplay {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.provider_icon.into_into_dart().into_dart(),
             self.swap_title.into_into_dart().into_dart(),
             self.swap_info.into_into_dart().into_dart(),
             self.approve_title.into_into_dart().into_dart(),
@@ -9601,9 +9646,35 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::OutPoin
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::pancakeswap::PancakeCfg {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.default_slippage_bps.into_into_dart().into_dart(),
+            self.supports_price_protection.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::pancakeswap::PancakeCfg
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::pancakeswap::PancakeCfg>
+    for crate::models::exchange::pancakeswap::PancakeCfg
+{
+    fn into_into_dart(self) -> crate::models::exchange::pancakeswap::PancakeCfg {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::pancakeswap::PancakeMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.chain_id.into_into_dart().into_dart()].into_dart()
+        [
+            self.common.into_into_dart().into_dart(),
+            self.cfg.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -9661,6 +9732,53 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::exchange::PreparedSwapInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::ProviderCommon {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.chain_hash.into_into_dart().into_dart(),
+            self.chain_id.into_into_dart().into_dart(),
+            self.slip44.into_into_dart().into_dart(),
+            self.account_addr.into_into_dart().into_dart(),
+            self.icon_asset.into_into_dart().into_dart(),
+            self.display_name.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::ProviderCommon
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ProviderCommon>
+    for crate::models::exchange::ProviderCommon
+{
+    fn into_into_dart(self) -> crate::models::exchange::ProviderCommon {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::ProviderQuote {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.amount_out.into_into_dart().into_dart(),
+            self.permit_typed_data_json.into_into_dart().into_dart(),
+            self.is_wrap_unwrap.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::ProviderQuote
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ProviderQuote>
+    for crate::models::exchange::ProviderQuote
+{
+    fn into_into_dart(self) -> crate::models::exchange::ProviderQuote {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::qrcode::QRcodeScanResultInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -9708,13 +9826,33 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::qrcode::QrConfigInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::relay::RelayCfg {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.default_slippage_bps.into_into_dart().into_dart(),
+            self.supports_price_protection.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::relay::RelayCfg
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::relay::RelayCfg>
+    for crate::models::exchange::relay::RelayCfg
+{
+    fn into_into_dart(self) -> crate::models::exchange::relay::RelayCfg {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::relay::RelayMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.chain_hash.into_into_dart().into_dart(),
-            self.chain_id.into_into_dart().into_dart(),
-            self.slip44.into_into_dart().into_dart(),
-            self.account_addr.into_into_dart().into_dart(),
+            self.common.into_into_dart().into_dart(),
+            self.cfg.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -9804,6 +9942,74 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger_transport::RustLedgerH
     for crate::api::ledger_transport::RustLedgerHidDevice
 {
     fn into_into_dart(self) -> crate::api::ledger_transport::RustLedgerHidDevice {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::SunSwapMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.common.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::SunSwapMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::SunSwapMeta>
+    for crate::models::exchange::SunSwapMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::SunSwapMeta {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::SwapAuth {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.wallet_index.into_into_dart().into_dart(),
+            self.account_index.into_into_dart().into_dart(),
+            self.password.into_into_dart().into_dart(),
+            self.passphrase.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::SwapAuth
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::SwapAuth>
+    for crate::models::exchange::SwapAuth
+{
+    fn into_into_dart(self) -> crate::models::exchange::SwapAuth {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::SwapParams {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.provider.into_into_dart().into_dart(),
+            self.from.into_into_dart().into_dart(),
+            self.to.into_into_dart().into_dart(),
+            self.amount_in.into_into_dart().into_dart(),
+            self.slippage_bps.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::SwapParams
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::SwapParams>
+    for crate::models::exchange::SwapParams
+{
+    fn into_into_dart(self) -> crate::models::exchange::SwapParams {
         self
     }
 }
@@ -10047,9 +10253,35 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::btc::TxOutIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::uniswap::UniswapCfg {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.default_slippage_bps.into_into_dart().into_dart(),
+            self.supports_price_protection.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::uniswap::UniswapCfg
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::uniswap::UniswapCfg>
+    for crate::models::exchange::uniswap::UniswapCfg
+{
+    fn into_into_dart(self) -> crate::models::exchange::uniswap::UniswapCfg {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::uniswap::UniswapMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.chain_id.into_into_dart().into_dart()].into_dart()
+        [
+            self.common.into_into_dart().into_dart(),
+            self.cfg.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
@@ -10189,6 +10421,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletSettingsIn
     for crate::models::settings::WalletSettingsInfo
 {
     fn into_into_dart(self) -> crate::models::settings::WalletSettingsInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::ZilSwapMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.common.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::ZilSwapMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ZilSwapMeta>
+    for crate::models::exchange::ZilSwapMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::ZilSwapMeta {
         self
     }
 }
@@ -10591,13 +10844,13 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
                 <i32>::sse_encode(2, serializer);
                 <crate::models::exchange::pancakeswap::PancakeMeta>::sse_encode(field0, serializer);
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
                 <i32>::sse_encode(3, serializer);
-                <u64>::sse_encode(field0, serializer);
+                <crate::models::exchange::ZilSwapMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
                 <i32>::sse_encode(4, serializer);
-                <u64>::sse_encode(field0, serializer);
+                <crate::models::exchange::SunSwapMeta>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -10606,20 +10859,9 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
     }
 }
 
-impl SseEncode for crate::models::exchange::ExchangeQuoteInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
-        <String>::sse_encode(self.amount_out, serializer);
-        <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
-        <bool>::sse_encode(self.is_wrap_unwrap, serializer);
-    }
-}
-
 impl SseEncode for crate::models::exchange::ExchangeTxDisplay {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.provider_icon, serializer);
         <String>::sse_encode(self.swap_title, serializer);
         <String>::sse_encode(self.swap_info, serializer);
         <String>::sse_encode(self.approve_title, serializer);
@@ -10891,16 +11133,6 @@ impl SseEncode for Vec<crate::models::exchange::ExchangeProvider> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::exchange::ExchangeProvider>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Vec<crate::models::exchange::ExchangeQuoteInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::models::exchange::ExchangeQuoteInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -11367,6 +11599,16 @@ impl SseEncode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseEncode for Option<crate::models::exchange::ProviderQuote> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::exchange::ProviderQuote>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode
     for Option<(
         crate::models::transactions::btc::TransactionBitcoin,
@@ -11481,10 +11723,20 @@ impl SseEncode for crate::models::transactions::btc::OutPointInfo {
     }
 }
 
+impl SseEncode for crate::models::exchange::pancakeswap::PancakeCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.default_slippage_bps, serializer);
+        <bool>::sse_encode(self.supports_price_protection, serializer);
+    }
+}
+
 impl SseEncode for crate::models::exchange::pancakeswap::PancakeMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <u64>::sse_encode(self.chain_id, serializer);
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <crate::models::exchange::pancakeswap::PancakeCfg>::sse_encode(self.cfg, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
 
@@ -11502,6 +11754,27 @@ impl SseEncode for crate::api::exchange::PreparedSwapInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
         <String>::sse_encode(self.quote_blob, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::ProviderCommon {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.chain_hash, serializer);
+        <u64>::sse_encode(self.chain_id, serializer);
+        <u32>::sse_encode(self.slip44, serializer);
+        <String>::sse_encode(self.account_addr, serializer);
+        <String>::sse_encode(self.icon_asset, serializer);
+        <String>::sse_encode(self.display_name, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::ProviderQuote {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.amount_out, serializer);
+        <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);
+        <bool>::sse_encode(self.is_wrap_unwrap, serializer);
     }
 }
 
@@ -11651,13 +11924,20 @@ impl SseEncode for (usize, String) {
     }
 }
 
+impl SseEncode for crate::models::exchange::relay::RelayCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.default_slippage_bps, serializer);
+        <bool>::sse_encode(self.supports_price_protection, serializer);
+    }
+}
+
 impl SseEncode for crate::models::exchange::relay::RelayMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <u64>::sse_encode(self.chain_hash, serializer);
-        <u64>::sse_encode(self.chain_id, serializer);
-        <u32>::sse_encode(self.slip44, serializer);
-        <String>::sse_encode(self.account_addr, serializer);
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <crate::models::exchange::relay::RelayCfg>::sse_encode(self.cfg, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
 
@@ -11696,6 +11976,35 @@ impl SseEncode for crate::api::ledger_transport::RustLedgerHidDevice {
         <u16>::sse_encode(self.product_id, serializer);
         <String>::sse_encode(self.product_name, serializer);
         <String>::sse_encode(self.model_id, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::SunSwapMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::SwapAuth {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <usize>::sse_encode(self.wallet_index, serializer);
+        <usize>::sse_encode(self.account_index, serializer);
+        <Option<String>>::sse_encode(self.password, serializer);
+        <Option<String>>::sse_encode(self.passphrase, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::SwapParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ExchangeProvider>::sse_encode(self.provider, serializer);
+        <crate::models::exchange::ExchangeAsset>::sse_encode(self.from, serializer);
+        <crate::models::exchange::ExchangeAsset>::sse_encode(self.to, serializer);
+        <String>::sse_encode(self.amount_in, serializer);
+        <u32>::sse_encode(self.slippage_bps, serializer);
     }
 }
 
@@ -11866,10 +12175,20 @@ impl SseEncode for u8 {
     }
 }
 
+impl SseEncode for crate::models::exchange::uniswap::UniswapCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.default_slippage_bps, serializer);
+        <bool>::sse_encode(self.supports_price_protection, serializer);
+    }
+}
+
 impl SseEncode for crate::models::exchange::uniswap::UniswapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <u64>::sse_encode(self.chain_id, serializer);
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <crate::models::exchange::uniswap::UniswapCfg>::sse_encode(self.cfg, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
 
@@ -11952,6 +12271,14 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);
         <u8>::sse_encode(self.rates_api_options, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::ZilSwapMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
 

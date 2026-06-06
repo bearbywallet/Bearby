@@ -19,7 +19,7 @@ use zilpay::reqwest;
 use zilpay::serde::{self, Deserialize, Serialize};
 use zilpay::serde_json;
 
-use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
+use super::{ExchangeAsset, ProviderCommon, ProviderQuote};
 use crate::models::exchange::univ_router::PreparedSwap;
 use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
@@ -38,18 +38,26 @@ const SUPPORTED_EVM_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161, 43114];
 const DEFAULT_RELAY_EVM_GAS: u64 = 400_000;
 const DEFAULT_RELAY_APPROVE_GAS: u64 = 60_000;
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy)]
+pub struct RelayCfg {
+    pub default_slippage_bps: u32,
+    pub supports_price_protection: bool,
+}
+
+impl RelayCfg {
+    pub const fn default() -> Self {
+        Self {
+            default_slippage_bps: 30,
+            supports_price_protection: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct RelayMeta {
-    /// Bearby provider hash for the asset's chain.
-    pub chain_hash: u64,
-    /// Relay chain id. EVM chains use their normal EIP-155 id; Solana and Bitcoin use Relay's
-    /// synthetic ids.
-    pub chain_id: u64,
-    /// Bearby/BIP slip44 for address-family checks and future VM-specific finalizers.
-    pub slip44: u32,
-    /// Selected wallet account address on this asset's chain. Relay uses the source asset's address
-    /// as `user` and the destination asset's address as `recipient`.
-    pub account_addr: String,
+    pub common: ProviderCommon,
+    pub cfg: RelayCfg,
+    pub quote: Option<ProviderQuote>,
 }
 
 impl RelayMeta {
@@ -63,13 +71,20 @@ impl RelayMeta {
         relay_chain_id(slip44, chain_id)
             .filter(|id| is_supported_chain(*id))
             .map(|relay_chain_id| Self {
-                chain_hash,
-                chain_id: relay_chain_id,
-                slip44,
-                account_addr: account_addr.to_string(),
+                common: ProviderCommon {
+                    chain_hash,
+                    chain_id: relay_chain_id,
+                    slip44,
+                    account_addr: account_addr.to_owned(),
+                    icon_asset: "assets/icons/relay.svg".to_owned(),
+                    display_name: "Relay".to_owned(),
+                },
+                cfg: RelayCfg::default(),
+                quote: None,
             })
     }
 }
+
 
 #[frb(ignore)]
 pub fn is_supported_chain(chain_id: u64) -> bool {
@@ -215,11 +230,17 @@ pub struct RelayBlob {
 }
 
 #[frb(ignore)]
+fn relay_client() -> &'static reqwest::Client {
+    static CLIENT: std::sync::OnceLock<reqwest::Client> = std::sync::OnceLock::new();
+    CLIENT.get_or_init(reqwest::Client::new)
+}
+
+#[frb(ignore)]
 async fn relay_post<T: serde::de::DeserializeOwned>(
     path: &str,
     body: &(impl Serialize + Sync),
 ) -> Result<T, String> {
-    let client = reqwest::Client::new();
+    let client = relay_client();
     let payload = serde_json::to_string(body).map_err(|e| e.to_string())?;
     let mut last_err = String::new();
 
@@ -265,7 +286,7 @@ const fn relay_currency(asset: &ExchangeAsset, relay_chain_id: u64) -> Cow<'_, s
 fn relay_origin_chain_id(asset: &ExchangeAsset) -> Result<u64, String> {
     asset
         .relay_meta()
-        .map(|meta| meta.chain_id)
+        .map(|meta| meta.common.chain_id)
         .ok_or_else(|| "source is not a Relay asset".to_string())
 }
 
@@ -289,11 +310,11 @@ async fn fetch_quote(
     let destination_meta = to
         .relay_meta()
         .ok_or_else(|| "destination is not a Relay asset".to_string())?;
-    let origin_chain_id = origin_meta.chain_id;
-    let destination_chain_id = destination_meta.chain_id;
+    let origin_chain_id = origin_meta.common.chain_id;
+    let destination_chain_id = destination_meta.common.chain_id;
     let req = QuoteRequest {
-        user: origin_meta.account_addr.as_str(),
-        recipient: destination_meta.account_addr.as_str(),
+        user: origin_meta.common.account_addr.as_str(),
+        recipient: destination_meta.common.account_addr.as_str(),
         origin_chain_id,
         destination_chain_id,
         origin_currency: relay_currency(from, origin_chain_id),
@@ -329,20 +350,25 @@ fn step_has_evm_calldata(step: &StepData) -> bool {
 }
 
 fn swap_step_data_owned(quote: QuoteResponse) -> Option<StepData> {
-    let mut fallback = None;
-    for step in quote.steps {
-        let data = step.items.into_iter().next().map(|item| item.data);
-        if ["deposit", "swap"]
+    use std::ops::ControlFlow;
+
+    match quote.steps.into_iter().try_fold(None, |fallback, step| {
+        let is_primary = ["deposit", "swap"]
             .iter()
-            .any(|id| step.id.eq_ignore_ascii_case(id))
-        {
-            return data;
+            .any(|id| step.id.eq_ignore_ascii_case(id));
+        let is_approve = step.id.eq_ignore_ascii_case("approve");
+        let data = step.items.into_iter().next().map(|item| item.data);
+
+        if is_primary {
+            ControlFlow::Break(data)
+        } else if fallback.is_none() && !is_approve {
+            ControlFlow::Continue(data)
+        } else {
+            ControlFlow::Continue(fallback)
         }
-        if fallback.is_none() && !step.id.eq_ignore_ascii_case("approve") {
-            fallback = data;
-        }
+    }) {
+        ControlFlow::Break(primary) | ControlFlow::Continue(primary) => primary,
     }
-    fallback
 }
 
 fn parse_u256_value(value: Option<&str>) -> Result<U256, String> {
@@ -530,20 +556,38 @@ fn with_display(
 
 #[frb(ignore)]
 pub async fn relay_quote_info(
-    provider: &ExchangeProvider,
+    origin_meta: &RelayMeta,
     from: &ExchangeAsset,
     to: &ExchangeAsset,
     amount: &str,
-) -> Result<ExchangeQuoteInfo, String> {
-    evm_origin_chain_id(from)?;
-    let (quote, _, _) = fetch_quote(from, to, amount).await?;
+) -> Result<ProviderQuote, String> {
+    if !is_evm_relay_chain(origin_meta.common.chain_id) {
+        return Err("Relay supports only EVM-origin swaps for now".to_string());
+    }
+    let destination_meta = to
+        .relay_meta()
+        .ok_or_else(|| "destination is not a Relay asset".to_string())?;
+    let req = QuoteRequest {
+        user: origin_meta.common.account_addr.as_str(),
+        recipient: destination_meta.common.account_addr.as_str(),
+        origin_chain_id: origin_meta.common.chain_id,
+        destination_chain_id: destination_meta.common.chain_id,
+        origin_currency: relay_currency(from, origin_meta.common.chain_id),
+        destination_currency: relay_currency(to, destination_meta.common.chain_id),
+        amount,
+        trade_type: "EXACT_INPUT",
+        app_fees: [AppFee {
+            recipient: FEE_RECIPIENT,
+            fee: FEE_BIPS,
+        }],
+    };
+    let quote = relay_post::<QuoteResponse>("/quote", &req).await?;
     let amount_out = quote.details.currency_out.amount;
     if amount_out.is_empty() {
         return Err("relay quote missing amount out".to_string());
     }
 
-    Ok(ExchangeQuoteInfo {
-        provider: provider.clone(),
+    Ok(ProviderQuote {
         amount_out,
         permit_typed_data_json: None,
         is_wrap_unwrap: false,
@@ -676,12 +720,12 @@ mod tests {
                 1,
                 "0x0000000000000000000000000000000000000001"
             )
-            .map(|m| m.chain_id),
+            .map(|m| m.common.chain_id),
             Some(1)
         );
         assert_eq!(
             RelayMeta::for_chain(43, SOLANA, 101, "11111111111111111111111111111111")
-                .map(|m| m.chain_id),
+                .map(|m| m.common.chain_id),
             Some(RELAY_SOL_CHAIN_ID)
         );
         assert_eq!(

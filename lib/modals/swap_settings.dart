@@ -3,14 +3,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-/// Swap settings bottom sheet (Price Protection + TWAP). Layout-only for now: the
-/// sliders give drag feedback but nothing is persisted — Save just closes, Reset
-/// restores the local defaults.
-void showSwapSettingsModal({required BuildContext context}) {
+void showSwapSettingsModal({
+  required BuildContext context,
+  required ExchangeProvider activeProvider,
+  required ExchangeState exchangeState,
+}) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -19,32 +22,43 @@ void showSwapSettingsModal({required BuildContext context}) {
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (_) => const _SwapSettingsContent(),
+    builder: (_) => _SwapSettingsContent(
+      activeProvider: activeProvider,
+      exchangeState: exchangeState,
+    ),
   );
 }
 
 class _SwapSettingsContent extends StatefulWidget {
-  const _SwapSettingsContent();
+  final ExchangeProvider activeProvider;
+  final ExchangeState exchangeState;
+
+  const _SwapSettingsContent({
+    required this.activeProvider,
+    required this.exchangeState,
+  });
 
   @override
   State<_SwapSettingsContent> createState() => _SwapSettingsContentState();
 }
 
 class _SwapSettingsContentState extends State<_SwapSettingsContent> {
-  static const double _defaultProtection = 0.1;
-  static const double _defaultSubSwaps = 0;
-  static const double _defaultTimeBetween = 0;
+  late double _protection;
 
-  double _protection = _defaultProtection;
-  double _subSwaps = _defaultSubSwaps;
-  double _timeBetween = _defaultTimeBetween;
+  @override
+  void initState() {
+    super.initState();
+    _protection = widget.exchangeState.slippageFor(widget.activeProvider) / 100.0;
+  }
 
   void _reset() {
-    setState(() {
-      _protection = _defaultProtection;
-      _subSwaps = _defaultSubSwaps;
-      _timeBetween = _defaultTimeBetween;
-    });
+    setState(() => _protection = widget.activeProvider.defaultSlippageBps / 100.0);
+  }
+
+  void _save() {
+    final bps = (_protection * 100).round().clamp(10, 500);
+    widget.exchangeState.setSlippage(widget.activeProvider.common.displayName, bps);
+    Navigator.pop(context);
   }
 
   @override
@@ -69,8 +83,7 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
                   theme.cardBackground.withValues(alpha: 0.95),
                 ],
               ),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               border: Border(
                 top: BorderSide(
                   color: theme.textSecondary.withValues(alpha: 0.2),
@@ -88,9 +101,12 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          '${widget.activeProvider.common.displayName} Settings',
+                          style: theme.titleMedium.copyWith(color: theme.textPrimary),
+                        ),
+                        const SizedBox(height: 20),
                         _buildProtectionSection(theme, l10n),
-                        _divider(theme),
-                        _buildTwapSection(theme, l10n),
                         const SizedBox(height: 24),
                         _buildActions(theme, l10n),
                       ],
@@ -104,8 +120,6 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
       ),
     );
   }
-
-  // --- sections -----------------------------------------------------------
 
   Widget _buildProtectionSection(AppTheme theme, AppLocalizations l10n) {
     return Column(
@@ -128,43 +142,6 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
     );
   }
 
-  Widget _buildTwapSection(AppTheme theme, AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeader(theme, l10n.exchangeSettingsTwap),
-        const SizedBox(height: 16),
-        _sectionHeader(
-          theme,
-          l10n.exchangeSettingsSubSwaps,
-          trailing: _subSwaps.round().toString(),
-        ),
-        Slider(
-          value: _subSwaps,
-          max: 100,
-          divisions: 100,
-          activeColor: theme.textSecondary.withValues(alpha: 0.2),
-          inactiveColor: theme.textSecondary.withValues(alpha: 0.2),
-          onChanged: (v) => setState(() => _subSwaps = v),
-        ),
-        const SizedBox(height: 16),
-        _sectionHeader(
-          theme,
-          l10n.exchangeSettingsTimeBetween,
-          trailing: l10n.exchangeSettingsBlocks(_timeBetween.round()),
-        ),
-        Slider(
-          value: _timeBetween,
-          max: 3,
-          divisions: 3,
-          activeColor: theme.textSecondary.withValues(alpha: 0.2),
-          inactiveColor: theme.textSecondary.withValues(alpha: 0.2),
-          onChanged: (v) => setState(() => _timeBetween = v),
-        ),
-      ],
-    );
-  }
-
   Widget _buildActions(AppTheme theme, AppLocalizations l10n) {
     return Row(
       children: [
@@ -181,15 +158,13 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
           child: _actionButton(
             theme,
             label: l10n.exchangeSettingsSave,
-            onTap: () => Navigator.pop(context),
+            onTap: _save,
             filled: true,
           ),
         ),
       ],
     );
   }
-
-  // --- small pieces -------------------------------------------------------
 
   Widget _buildHandle(AppTheme theme) {
     return Container(
@@ -210,24 +185,12 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
     );
     return Row(
       children: [
-        Expanded(
-          child: Text(title, style: style, overflow: TextOverflow.ellipsis),
-        ),
+        Expanded(child: Text(title, style: style, overflow: TextOverflow.ellipsis)),
         if (trailing != null) ...[
           const SizedBox(width: 12),
           Text(trailing, style: style),
         ],
       ],
-    );
-  }
-
-  Widget _divider(AppTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Divider(
-        height: 1,
-        color: theme.textSecondary.withValues(alpha: 0.15),
-      ),
     );
   }
 
@@ -244,9 +207,7 @@ class _SwapSettingsContentState extends State<_SwapSettingsContent> {
         height: 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: filled
-              ? theme.primaryPurple
-              : theme.textSecondary.withValues(alpha: 0.12),
+          color: filled ? theme.primaryPurple : theme.textSecondary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(

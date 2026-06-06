@@ -85,6 +85,7 @@
   "exchangeConfirmUnable": "확인할 수 없습니다",
   "exchangeConfirmPassword": "비밀번호",
   "exchangeConfirmNoAccount": "활성 계정이 없습니다",
+  "exchangeConfirmNoQuote": "No quote available",
   "exchangeConfirmStepApprove": "토큰 승인",
   "exchangeConfirmStepPermit": "퍼밋 서명 (EIP-712)",
   "exchangeConfirmWrap": "랩",
@@ -101,19 +102,8 @@
   "exchangePageTabLimit": "지정가",
   "exchangePageTabBuySell": "구매/판매",
   "exchangeSettingsPriceProtection": "가격 보호",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "하위 스왑 수",
-  "exchangeSettingsTimeBetween": "하위 스왑 간격",
   "exchangeSettingsReset": "초기화",
   "exchangeSettingsSave": "저장",
-  "exchangeSettingsBlocks": "{count, plural, other{{count}개 블록}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "비밀 키 공개",
   "revealSecretKeyPasswordHint": "비밀번호",
   "revealSecretKeyInvalidPassword": "잘못된 비밀번호, 오류:",
@@ -472,8 +462,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{입력 {inputCount}개}} · {outputCount, plural, other{출력 {outputCount}개}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "전송",

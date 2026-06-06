@@ -28,7 +28,7 @@ use zilpay::rpc::{
 use zilpay::serde;
 use zilpay::serde_json::{self, json, Value};
 
-use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
+use super::{ExchangeAsset, ProviderQuote};
 use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::utils::errors::ServiceError;
@@ -404,13 +404,13 @@ async fn router_quote(
     let amt = U256::from_str(amount_in).map_err(|e| e.to_string())?;
 
     let mut calls: Vec<Value> = Vec::with_capacity(fee_tiers.len() + 1);
-    for &fee in fee_tiers {
+    calls.extend(fee_tiers.iter().map(|&fee| {
         let data = encode_quote(tin, tout, amt, fee);
-        calls.push(RpcProvider::<ChainConfig>::build_payload(
+        RpcProvider::<ChainConfig>::build_payload(
             json!([{ "to": addrs.quoter_v2.to_string(), "data": hex::encode_prefixed(&data) }, "latest"]),
             EvmMethods::Call,
-        ));
-    }
+        )
+    }));
     if !is_native_in {
         let owner_addr = Address::from_str(owner).map_err(|e| e.to_string())?;
         let data = IPermit2::allowanceCall {
@@ -431,25 +431,28 @@ async fn router_quote(
         .await
         .map_err(|e| e.to_string())?;
 
-    let mut best: Option<(U256, u32)> = None;
-    for (i, &fee) in fee_tiers.iter().enumerate() {
-        let Some(r) = res.get(i) else { continue };
-        if r.error.is_some() {
-            continue;
-        }
-        let out = r
-            .result
-            .as_ref()
-            .and_then(|v| v.as_str())
-            .and_then(|s| hex::decode(s).ok())
-            .and_then(|b| decode_quote(&b));
-        if let Some(out) = out {
-            if out > U256::ZERO && best.is_none_or(|(b, _)| out > b) {
-                best = Some((out, fee));
+    let (amount_out, fee_tier) = fee_tiers
+        .iter()
+        .enumerate()
+        .filter_map(|(i, &fee)| {
+            let r = res.get(i).filter(|r| r.error.is_none())?;
+            let out = r
+                .result
+                .as_ref()
+                .and_then(|v| v.as_str())
+                .and_then(|s| hex::decode(s).ok())
+                .and_then(|b| decode_quote(&b))
+                .filter(|&out| out > U256::ZERO)?;
+            Some((out, fee))
+        })
+        .reduce(|(best_out, best_fee), (out, fee)| {
+            if out > best_out {
+                (out, fee)
+            } else {
+                (best_out, best_fee)
             }
-        }
-    }
-    let (amount_out, fee_tier) = best.ok_or_else(|| "no liquidity for pair".to_string())?;
+        })
+        .ok_or_else(|| "no liquidity for pair".to_string())?;
 
     let nonce = if is_native_in {
         None
@@ -595,17 +598,16 @@ fn build_wrap_tx(
 
 /// Quote orchestration for an EVM-DEX `ExchangeProvider` arm: pull the chain config, run the
 /// on-chain quote and (for ERC-20 inputs) attach the Permit2 JSON to sign. The displayed output
-/// has the platform fee subtracted. `provider` is echoed back into the returned quote.
+/// has the platform fee subtracted.
 #[frb(ignore)]
 pub async fn router_quote_info(
     cfg: &RouterConfig,
-    provider: &ExchangeProvider,
     asset: &ExchangeAsset,
     from_asset: &str,
     to_asset: &str,
     amount: &str,
     destination: &str,
-) -> Result<ExchangeQuoteInfo, String> {
+) -> Result<ProviderQuote, String> {
     let addrs = cfg.addrs;
     let is_native_in = asset.token.native;
 
@@ -614,8 +616,7 @@ pub async fn router_quote_info(
 
     // Native ↔ wrapped-native: no pool, no quote — it's a 1:1 wrap/unwrap.
     if is_wrap_unwrap {
-        return Ok(ExchangeQuoteInfo {
-            provider: provider.clone(),
+        return Ok(ProviderQuote {
             amount_out: amount.to_string(),
             permit_typed_data_json: None,
             is_wrap_unwrap: true,
@@ -653,8 +654,7 @@ pub async fn router_quote_info(
         nonce.map(|nonce| permit2_typed_data_json(&addrs, &token_in, nonce))
     };
 
-    Ok(ExchangeQuoteInfo {
-        provider: provider.clone(),
+    Ok(ProviderQuote {
         amount_out: net_out.to_string(),
         permit_typed_data_json,
         is_wrap_unwrap: false,

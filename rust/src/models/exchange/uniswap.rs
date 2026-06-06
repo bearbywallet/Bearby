@@ -7,10 +7,11 @@ use std::str::FromStr;
 use flutter_rust_bridge::frb;
 use zilpay::alloy::primitives::Address;
 
+use super::{ProviderCommon, ProviderQuote};
 use super::univ_router::{RouterAddrs, RouterConfig};
 
 /// Uniswap V3 fee tiers (bips * 100): 0.01% / 0.05% / 0.30% / 1.00%.
-const UNISWAP_FEE_TIERS: &[u32] = &[100, 500, 3000, 10000];
+pub const UNISWAP_FEE_TIERS: &[u32] = &[100, 500, 3000, 10000];
 
 /// Canonical Permit2, identical on every Uniswap chain.
 const PERMIT2: &str = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
@@ -23,24 +24,56 @@ pub fn is_supported_chain(chain_id: u64) -> bool {
     SUPPORTED_CHAINS.contains(&chain_id)
 }
 
-/// FFI-safe Uniswap marker. Only the source chain id is needed — deployment addresses
-/// are resolved internally from a const table via [`UniswapMeta::resolve`].
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy)]
+pub struct UniswapCfg {
+    pub default_slippage_bps: u32,
+    pub supports_price_protection: bool,
+}
+
+impl UniswapCfg {
+    pub const fn default() -> Self {
+        Self {
+            default_slippage_bps: 50,
+            supports_price_protection: true,
+        }
+    }
+}
+
+/// FFI-safe Uniswap metadata. Quote data is mutable route state and is excluded from identity.
+#[derive(Debug, Clone)]
 pub struct UniswapMeta {
-    pub chain_id: u64,
+    pub common: ProviderCommon,
+    pub cfg: UniswapCfg,
+    pub quote: Option<ProviderQuote>,
 }
 
 impl UniswapMeta {
     /// `Some` iff `chain_id` has Universal Router + QuoterV2 deployments.
     #[frb(ignore)]
-    pub fn for_chain(chain_id: u64) -> Option<Self> {
-        is_supported_chain(chain_id).then_some(Self { chain_id })
+    pub fn for_chain(
+        chain_hash: u64,
+        chain_id: u64,
+        slip44: u32,
+        account_addr: &str,
+    ) -> Option<Self> {
+        is_supported_chain(chain_id).then(|| Self {
+            common: ProviderCommon {
+                chain_hash,
+                chain_id,
+                slip44,
+                account_addr: account_addr.to_owned(),
+                icon_asset: "assets/icons/uniswap.svg".to_owned(),
+                display_name: "Uniswap".to_owned(),
+            },
+            cfg: UniswapCfg::default(),
+            quote: None,
+        })
     }
 
     /// Parse the deployment table into the engine's [`RouterConfig`].
     #[frb(ignore)]
     pub fn resolve(&self) -> Result<RouterConfig, String> {
-        let (universal_router, quoter_v2, weth) = match self.chain_id {
+        let (universal_router, quoter_v2, weth) = match self.common.chain_id {
             1 => (
                 "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af",
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
@@ -51,7 +84,6 @@ impl UniswapMeta {
                 "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
                 "0x4200000000000000000000000000000000000006",
             ),
-            // BNB Chain (wrapped native = WBNB)
             56 => (
                 "0x1906c1d672b88cd1b9ac7593301ca990f94eae07",
                 "0x78D78E420Da98ad378D7799bE8f4AF69033EB077",
@@ -78,7 +110,7 @@ impl UniswapMeta {
         let parse = |s: &str| Address::from_str(s).map_err(|e| e.to_string());
         Ok(RouterConfig {
             addrs: RouterAddrs {
-                chain_id: self.chain_id,
+                chain_id: self.common.chain_id,
                 universal_router: parse(universal_router)?,
                 quoter_v2: parse(quoter_v2)?,
                 permit2: parse(PERMIT2)?,
@@ -89,54 +121,56 @@ impl UniswapMeta {
     }
 }
 
+
 #[cfg(test)]
 mod uniswap_tests {
     use super::*;
 
+    fn meta(chain_id: u64) -> UniswapMeta {
+        UniswapMeta::for_chain(42, chain_id, 60, "0x0000000000000000000000000000000000000001")
+            .unwrap()
+    }
+
     #[test]
     fn meta_for_chain_known_and_unknown() {
-        assert!(UniswapMeta::for_chain(1).is_some());
-        assert!(UniswapMeta::for_chain(56).is_some());
-        assert!(UniswapMeta::for_chain(8453).is_some());
-        assert!(UniswapMeta::for_chain(999).is_none());
+        assert!(UniswapMeta::for_chain(42, 1, 60, "0x0000000000000000000000000000000000000001").is_some());
+        assert!(UniswapMeta::for_chain(42, 56, 60, "0x0000000000000000000000000000000000000001").is_some());
+        assert!(UniswapMeta::for_chain(42, 8453, 60, "0x0000000000000000000000000000000000000001").is_some());
+        assert!(UniswapMeta::for_chain(42, 999, 60, "0x0000000000000000000000000000000000000001").is_none());
     }
 
     #[test]
     fn meta_resolve_bsc() {
-        let cfg = UniswapMeta::for_chain(56).unwrap().resolve().unwrap();
+        let cfg = meta(56).resolve().unwrap();
         assert_eq!(cfg.addrs.chain_id, 56);
         assert_eq!(cfg.fee_tiers, UNISWAP_FEE_TIERS);
-        assert_eq!(
-            cfg.addrs.universal_router,
-            Address::from_str("0x1906c1d672b88cd1b9ac7593301ca990f94eae07").unwrap()
-        );
-        assert_eq!(
-            cfg.addrs.quoter_v2,
-            Address::from_str("0x78D78E420Da98ad378D7799bE8f4AF69033EB077").unwrap()
-        );
-        assert_eq!(
-            cfg.addrs.weth,
-            Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap()
-        );
+        assert_eq!(cfg.addrs.universal_router, Address::from_str("0x1906c1d672b88cd1b9ac7593301ca990f94eae07").unwrap());
+        assert_eq!(cfg.addrs.quoter_v2, Address::from_str("0x78D78E420Da98ad378D7799bE8f4AF69033EB077").unwrap());
+        assert_eq!(cfg.addrs.weth, Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap());
     }
 
     #[test]
     fn meta_resolve_parses_addresses() {
-        let cfg = UniswapMeta::for_chain(1).unwrap().resolve().unwrap();
+        let cfg = meta(1).resolve().unwrap();
         assert_eq!(cfg.addrs.chain_id, 1);
-        assert_eq!(
-            cfg.addrs.universal_router,
-            Address::from_str("0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af").unwrap()
-        );
-        assert_eq!(
-            cfg.addrs.permit2,
-            Address::from_str("0x000000000022D473030F116dDEE9F6B43aC78BA3").unwrap()
-        );
+        assert_eq!(cfg.addrs.universal_router, Address::from_str("0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af").unwrap());
+        assert_eq!(cfg.addrs.permit2, Address::from_str("0x000000000022D473030F116dDEE9F6B43aC78BA3").unwrap());
     }
 
     #[test]
     fn meta_resolve_unsupported_chain() {
-        let meta = UniswapMeta { chain_id: 999 };
+        let meta = UniswapMeta {
+            common: ProviderCommon {
+                chain_hash: 42,
+                chain_id: 999,
+                slip44: 60,
+                account_addr: String::new(),
+                icon_asset: String::new(),
+                display_name: String::new(),
+            },
+            cfg: UniswapCfg::default(),
+            quote: None,
+        };
         assert!(meta.resolve().is_err());
     }
 

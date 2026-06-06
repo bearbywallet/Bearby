@@ -21,20 +21,19 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
 
-/// Synchronous bootstrap of all exchange providers across every registered chain.
+/// Bootstrap all exchange providers across every registered chain.
 Future<List<ExchangeAsset>> bootstrapExchangeProviders(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
-/// Quote `asset → to` across every provider on `asset`.
-Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
-        {required ExchangeAsset asset,
+/// Parallel quote refresh for all providers on `from`.
+Future<ExchangeAsset> refreshExchangeQuotes(
+        {required ExchangeAsset from,
         required ExchangeAsset to,
-        required String amount,
-        required String destination}) =>
-    RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
-        asset: asset, to: to, amount: amount, destination: destination);
+        required String amount}) =>
+    RustLib.instance.api.crateApiExchangeRefreshExchangeQuotes(
+        from: from, to: to, amount: amount);
 
 /// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
 /// sign the Permit2 EIP-712, build the Universal Router swap calldata, and broadcast approve (`N`) + swap (`N+1`)
@@ -43,97 +42,44 @@ Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
 /// use the step-by-step `check_exchange_approval` → `prepare_exchange_swap` → `finalize_exchange_swap`
 /// path instead (a device cannot sign a batch).
 Stream<String> executeExchangeSwap(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required ExchangeProvider provider,
-        required ExchangeAsset from,
-        required ExchangeAsset to,
-        required String amountIn,
-        required int slippageBps,
-        required ExchangeTxDisplay display,
-        String? password,
-        String? passphrase}) =>
+        {required SwapAuth auth,
+        required SwapParams params,
+        required ExchangeTxDisplay display}) =>
     RustLib.instance.api.crateApiExchangeExecuteExchangeSwap(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        provider: provider,
-        from: from,
-        to: to,
-        amountIn: amountIn,
-        slippageBps: slippageBps,
-        display: display,
-        password: password,
-        passphrase: passphrase);
+        auth: auth, params: params, display: display);
 
 /// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the swap,
 /// and if so return the unsigned approval tx — with FAST fees + the given `nonce` already applied —
 /// for a **Ledger** device to sign and broadcast first. Native inputs never need approval
 /// (`Ok(None)`). Software wallets don't call this; `execute_exchange_swap` handles approval inline.
 Future<TransactionRequestInfo?> checkExchangeApproval(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required ExchangeProvider provider,
-        required ExchangeAsset from,
-        required ExchangeAsset to,
-        required String amountIn,
-        required bool isNativeIn,
+        {required SwapAuth auth,
+        required SwapParams params,
         required BigInt nonce,
-        required String approveTitle,
-        required String providerIcon}) =>
+        required String approveTitle}) =>
     RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        provider: provider,
-        from: from,
-        to: to,
-        amountIn: amountIn,
-        isNativeIn: isNativeIn,
-        nonce: nonce,
-        approveTitle: approveTitle,
-        providerIcon: providerIcon);
+        auth: auth, params: params, nonce: nonce, approveTitle: approveTitle);
 
-Future<PreparedSwapInfo> prepareExchangeSwap(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required ExchangeProvider provider,
-        required ExchangeAsset from,
-        required ExchangeAsset to,
-        required String amountIn,
-        required int slippageBps}) =>
-    RustLib.instance.api.crateApiExchangePrepareExchangeSwap(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        provider: provider,
-        from: from,
-        to: to,
-        amountIn: amountIn,
-        slippageBps: slippageBps);
+Future<PreparedSwapInfo> prepareExchangeSwap({required SwapParams params}) =>
+    RustLib.instance.api.crateApiExchangePrepareExchangeSwap(params: params);
 
 /// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
 /// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
 /// the UI to broadcast via `send_signed_transactions`.
 Future<TransactionRequestInfo> finalizeExchangeSwap(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
+        {required SwapAuth auth,
         required ExchangeProvider provider,
         required String quoteBlob,
         String? permitSignature,
         required BigInt nonce,
-        required String swapTitle,
-        required String swapInfo,
-        required String providerIcon,
-        BaseTokenInfo? outToken}) =>
+        required ExchangeTxDisplay display}) =>
     RustLib.instance.api.crateApiExchangeFinalizeExchangeSwap(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
+        auth: auth,
         provider: provider,
         quoteBlob: quoteBlob,
         permitSignature: permitSignature,
         nonce: nonce,
-        swapTitle: swapTitle,
-        swapInfo: swapInfo,
-        providerIcon: providerIcon,
-        outToken: outToken);
+        display: display);
 
 /// Base pending nonce for the active account on its chain. The Ledger modal pins it once and passes
 /// `N` (approve) / `N+1` (swap) explicitly, since `eth_getTransactionCount(latest)` won't reflect a

@@ -50,74 +50,23 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   const factory ExchangeProvider.pancakeSwap(
     PancakeMeta field0,
   ) = ExchangeProvider_PancakeSwap;
-  const factory ExchangeProvider.zIlSwap(
-    BigInt field0,
-  ) = ExchangeProvider_ZIlSwap;
+  const factory ExchangeProvider.zilSwap(
+    ZilSwapMeta field0,
+  ) = ExchangeProvider_ZilSwap;
   const factory ExchangeProvider.sunSwap(
-    BigInt field0,
+    SunSwapMeta field0,
   ) = ExchangeProvider_SunSwap;
 }
 
-class ExchangeQuoteInfo {
-  final ExchangeProvider provider;
-  final String amountOut;
-
-  /// Standard EIP-712 typed-data JSON to sign (Permit2). `None` for native input or
-  /// when the API returns no permit (`permitData: null`).
-  final String? permitTypedDataJson;
-
-  /// `true` when this is a 1:1 native ↔ wrapped-native wrap/unwrap (no router, no approval/
-  /// permit, no fee). The UI renders it as "Wrap"/"Unwrap" and runs a single-step flow.
-  final bool isWrapUnwrap;
-
-  const ExchangeQuoteInfo({
-    required this.provider,
-    required this.amountOut,
-    this.permitTypedDataJson,
-    required this.isWrapUnwrap,
-  });
-
-  @override
-  int get hashCode =>
-      provider.hashCode ^
-      amountOut.hashCode ^
-      permitTypedDataJson.hashCode ^
-      isWrapUnwrap.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExchangeQuoteInfo &&
-          runtimeType == other.runtimeType &&
-          provider == other.provider &&
-          amountOut == other.amountOut &&
-          permitTypedDataJson == other.permitTypedDataJson &&
-          isWrapUnwrap == other.isWrapUnwrap;
-}
-
 /// Display metadata composed on the Dart side and threaded into every tx built for a swap.
-/// Passed as a single struct to keep the FFI surface small.
 class ExchangeTxDisplay {
-  /// Flutter local asset path, e.g. `"assets/icons/uniswap.svg"`.
-  final String providerIcon;
-
-  /// History title for the swap tx: `"Swap"`.
   final String swapTitle;
-
-  /// History detail line: `"1.5 BNB → 120 CAKE · Uniswap"`.
   final String swapInfo;
-
-  /// History title for the approve tx: `"Approve WORM"`.
   final String approveTitle;
-
-  /// History title for the software permit entry: `"Permit2 · Uniswap"`.
   final String permitTitle;
-
-  /// Destination token with the expected `amountOut` as `value` (wei string).
   final BaseTokenInfo? outToken;
 
   const ExchangeTxDisplay({
-    required this.providerIcon,
     required this.swapTitle,
     required this.swapInfo,
     required this.approveTitle,
@@ -127,7 +76,6 @@ class ExchangeTxDisplay {
 
   @override
   int get hashCode =>
-      providerIcon.hashCode ^
       swapTitle.hashCode ^
       swapInfo.hashCode ^
       approveTitle.hashCode ^
@@ -139,10 +87,187 @@ class ExchangeTxDisplay {
       identical(this, other) ||
       other is ExchangeTxDisplay &&
           runtimeType == other.runtimeType &&
-          providerIcon == other.providerIcon &&
           swapTitle == other.swapTitle &&
           swapInfo == other.swapInfo &&
           approveTitle == other.approveTitle &&
           permitTitle == other.permitTitle &&
           outToken == other.outToken;
+}
+
+/// Unified chain + account context shared by every provider variant.
+/// Participates in Hash/Eq/Ord and forms the provider identity key.
+class ProviderCommon {
+  final BigInt chainHash;
+  final BigInt chainId;
+  final int slip44;
+  final String accountAddr;
+  final String iconAsset;
+  final String displayName;
+
+  const ProviderCommon({
+    required this.chainHash,
+    required this.chainId,
+    required this.slip44,
+    required this.accountAddr,
+    required this.iconAsset,
+    required this.displayName,
+  });
+
+  @override
+  int get hashCode =>
+      chainHash.hashCode ^
+      chainId.hashCode ^
+      slip44.hashCode ^
+      accountAddr.hashCode ^
+      iconAsset.hashCode ^
+      displayName.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProviderCommon &&
+          runtimeType == other.runtimeType &&
+          chainHash == other.chainHash &&
+          chainId == other.chainId &&
+          slip44 == other.slip44 &&
+          accountAddr == other.accountAddr &&
+          iconAsset == other.iconAsset &&
+          displayName == other.displayName;
+}
+
+/// Per-provider quote result populated by quote refresh.
+/// Excluded from provider identity by the meta type implementations.
+class ProviderQuote {
+  final String amountOut;
+  final String? permitTypedDataJson;
+  final bool isWrapUnwrap;
+
+  const ProviderQuote({
+    required this.amountOut,
+    this.permitTypedDataJson,
+    required this.isWrapUnwrap,
+  });
+
+  @override
+  int get hashCode =>
+      amountOut.hashCode ^ permitTypedDataJson.hashCode ^ isWrapUnwrap.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProviderQuote &&
+          runtimeType == other.runtimeType &&
+          amountOut == other.amountOut &&
+          permitTypedDataJson == other.permitTypedDataJson &&
+          isWrapUnwrap == other.isWrapUnwrap;
+}
+
+class SunSwapMeta {
+  final ProviderCommon common;
+  final ProviderQuote? quote;
+
+  const SunSwapMeta({
+    required this.common,
+    this.quote,
+  });
+
+  @override
+  int get hashCode => common.hashCode ^ quote.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SunSwapMeta &&
+          runtimeType == other.runtimeType &&
+          common == other.common &&
+          quote == other.quote;
+}
+
+/// Who signs — wallet identity + credentials.
+class SwapAuth {
+  final BigInt walletIndex;
+  final BigInt accountIndex;
+  final String? password;
+  final String? passphrase;
+
+  const SwapAuth({
+    required this.walletIndex,
+    required this.accountIndex,
+    this.password,
+    this.passphrase,
+  });
+
+  @override
+  int get hashCode =>
+      walletIndex.hashCode ^
+      accountIndex.hashCode ^
+      password.hashCode ^
+      passphrase.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SwapAuth &&
+          runtimeType == other.runtimeType &&
+          walletIndex == other.walletIndex &&
+          accountIndex == other.accountIndex &&
+          password == other.password &&
+          passphrase == other.passphrase;
+}
+
+/// What to swap — provider carries chain context in `common()`.
+class SwapParams {
+  final ExchangeProvider provider;
+  final ExchangeAsset from;
+  final ExchangeAsset to;
+  final String amountIn;
+  final int slippageBps;
+
+  const SwapParams({
+    required this.provider,
+    required this.from,
+    required this.to,
+    required this.amountIn,
+    required this.slippageBps,
+  });
+
+  @override
+  int get hashCode =>
+      provider.hashCode ^
+      from.hashCode ^
+      to.hashCode ^
+      amountIn.hashCode ^
+      slippageBps.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SwapParams &&
+          runtimeType == other.runtimeType &&
+          provider == other.provider &&
+          from == other.from &&
+          to == other.to &&
+          amountIn == other.amountIn &&
+          slippageBps == other.slippageBps;
+}
+
+class ZilSwapMeta {
+  final ProviderCommon common;
+  final ProviderQuote? quote;
+
+  const ZilSwapMeta({
+    required this.common,
+    this.quote,
+  });
+
+  @override
+  int get hashCode => common.hashCode ^ quote.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ZilSwapMeta &&
+          runtimeType == other.runtimeType &&
+          common == other.common &&
+          quote == other.quote;
 }

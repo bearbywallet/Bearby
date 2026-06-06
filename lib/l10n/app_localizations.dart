@@ -599,24 +599,6 @@ abstract class AppLocalizations {
   /// **'Price Protection'**
   String get exchangeSettingsPriceProtection;
 
-  /// No description provided for @exchangeSettingsTwap.
-  ///
-  /// In en, this message translates to:
-  /// **'TWAP'**
-  String get exchangeSettingsTwap;
-
-  /// No description provided for @exchangeSettingsSubSwaps.
-  ///
-  /// In en, this message translates to:
-  /// **'Number of sub-swaps'**
-  String get exchangeSettingsSubSwaps;
-
-  /// No description provided for @exchangeSettingsTimeBetween.
-  ///
-  /// In en, this message translates to:
-  /// **'Time between sub-swaps'**
-  String get exchangeSettingsTimeBetween;
-
   /// No description provided for @exchangeSettingsReset.
   ///
   /// In en, this message translates to:
@@ -628,12 +610,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get exchangeSettingsSave;
-
-  /// No description provided for @exchangeSettingsBlocks.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 block} other{{count} blocks}}'**
-  String exchangeSettingsBlocks(int count);
 
   /// No description provided for @exchangeConfirmBest.
   ///
@@ -688,6 +664,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No active account'**
   String get exchangeConfirmNoAccount;
+
+  /// No description provided for @exchangeConfirmNoQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'No quote available'**
+  String get exchangeConfirmNoQuote;
 
   /// No description provided for @exchangeConfirmStepApprove.
   ///

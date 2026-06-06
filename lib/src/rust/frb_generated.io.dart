@@ -227,6 +227,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PancakeMeta dco_decode_box_autoadd_pancake_meta(dynamic raw);
 
   @protected
+  ProviderQuote dco_decode_box_autoadd_provider_quote(dynamic raw);
+
+  @protected
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
   @protected
@@ -240,6 +243,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
       dynamic raw);
+
+  @protected
+  SunSwapMeta dco_decode_box_autoadd_sun_swap_meta(dynamic raw);
+
+  @protected
+  SwapAuth dco_decode_box_autoadd_swap_auth(dynamic raw);
+
+  @protected
+  SwapParams dco_decode_box_autoadd_swap_params(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
@@ -268,6 +280,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
+
+  @protected
+  ZilSwapMeta dco_decode_box_autoadd_zil_swap_meta(dynamic raw);
 
   @protected
   BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
@@ -301,9 +316,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExchangeProvider dco_decode_exchange_provider(dynamic raw);
-
-  @protected
-  ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw);
 
   @protected
   ExchangeTxDisplay dco_decode_exchange_tx_display(dynamic raw);
@@ -380,9 +392,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ExchangeProvider> dco_decode_list_exchange_provider(dynamic raw);
-
-  @protected
-  List<ExchangeQuoteInfo> dco_decode_list_exchange_quote_info(dynamic raw);
 
   @protected
   List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
@@ -520,6 +529,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
 
   @protected
+  ProviderQuote? dco_decode_opt_box_autoadd_provider_quote(dynamic raw);
+
+  @protected
   (
     TransactionBitcoin,
     BitcoinMetadataInfo
@@ -558,6 +570,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OutPointInfo dco_decode_out_point_info(dynamic raw);
 
   @protected
+  PancakeCfg dco_decode_pancake_cfg(dynamic raw);
+
+  @protected
   PancakeMeta dco_decode_pancake_meta(dynamic raw);
 
   @protected
@@ -565,6 +580,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreparedSwapInfo dco_decode_prepared_swap_info(dynamic raw);
+
+  @protected
+  ProviderCommon dco_decode_provider_common(dynamic raw);
+
+  @protected
+  ProviderQuote dco_decode_provider_quote(dynamic raw);
 
   @protected
   QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
@@ -617,6 +638,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) dco_decode_record_usize_string(dynamic raw);
 
   @protected
+  RelayCfg dco_decode_relay_cfg(dynamic raw);
+
+  @protected
   RelayMeta dco_decode_relay_meta(dynamic raw);
 
   @protected
@@ -627,6 +651,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
+
+  @protected
+  SunSwapMeta dco_decode_sun_swap_meta(dynamic raw);
+
+  @protected
+  SwapAuth dco_decode_swap_auth(dynamic raw);
+
+  @protected
+  SwapParams dco_decode_swap_params(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
@@ -668,6 +701,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_u_8(dynamic raw);
 
   @protected
+  UniswapCfg dco_decode_uniswap_cfg(dynamic raw);
+
+  @protected
   UniswapMeta dco_decode_uniswap_meta(dynamic raw);
 
   @protected
@@ -690,6 +726,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
+
+  @protected
+  ZilSwapMeta dco_decode_zil_swap_meta(dynamic raw);
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -871,6 +910,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PancakeMeta sse_decode_box_autoadd_pancake_meta(SseDeserializer deserializer);
 
   @protected
+  ProviderQuote sse_decode_box_autoadd_provider_quote(
+      SseDeserializer deserializer);
+
+  @protected
   QrConfigInfo sse_decode_box_autoadd_qr_config_info(
       SseDeserializer deserializer);
 
@@ -885,6 +928,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
       SseDeserializer deserializer);
+
+  @protected
+  SunSwapMeta sse_decode_box_autoadd_sun_swap_meta(
+      SseDeserializer deserializer);
+
+  @protected
+  SwapAuth sse_decode_box_autoadd_swap_auth(SseDeserializer deserializer);
+
+  @protected
+  SwapParams sse_decode_box_autoadd_swap_params(SseDeserializer deserializer);
 
   @protected
   TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
@@ -914,6 +967,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer);
+
+  @protected
+  ZilSwapMeta sse_decode_box_autoadd_zil_swap_meta(
       SseDeserializer deserializer);
 
   @protected
@@ -951,10 +1008,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExchangeProvider sse_decode_exchange_provider(SseDeserializer deserializer);
-
-  @protected
-  ExchangeQuoteInfo sse_decode_exchange_quote_info(
-      SseDeserializer deserializer);
 
   @protected
   ExchangeTxDisplay sse_decode_exchange_tx_display(
@@ -1040,10 +1093,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ExchangeProvider> sse_decode_list_exchange_provider(
-      SseDeserializer deserializer);
-
-  @protected
-  List<ExchangeQuoteInfo> sse_decode_list_exchange_quote_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1200,6 +1249,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  ProviderQuote? sse_decode_opt_box_autoadd_provider_quote(
+      SseDeserializer deserializer);
+
+  @protected
   (
     TransactionBitcoin,
     BitcoinMetadataInfo
@@ -1240,6 +1293,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OutPointInfo sse_decode_out_point_info(SseDeserializer deserializer);
 
   @protected
+  PancakeCfg sse_decode_pancake_cfg(SseDeserializer deserializer);
+
+  @protected
   PancakeMeta sse_decode_pancake_meta(SseDeserializer deserializer);
 
   @protected
@@ -1248,6 +1304,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreparedSwapInfo sse_decode_prepared_swap_info(SseDeserializer deserializer);
+
+  @protected
+  ProviderCommon sse_decode_provider_common(SseDeserializer deserializer);
+
+  @protected
+  ProviderQuote sse_decode_provider_quote(SseDeserializer deserializer);
 
   @protected
   QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
@@ -1307,6 +1369,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
 
   @protected
+  RelayCfg sse_decode_relay_cfg(SseDeserializer deserializer);
+
+  @protected
   RelayMeta sse_decode_relay_meta(SseDeserializer deserializer);
 
   @protected
@@ -1320,6 +1385,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
       SseDeserializer deserializer);
+
+  @protected
+  SunSwapMeta sse_decode_sun_swap_meta(SseDeserializer deserializer);
+
+  @protected
+  SwapAuth sse_decode_swap_auth(SseDeserializer deserializer);
+
+  @protected
+  SwapParams sse_decode_swap_params(SseDeserializer deserializer);
 
   @protected
   TokenTransferParamsInfo sse_decode_token_transfer_params_info(
@@ -1368,6 +1442,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
+  UniswapCfg sse_decode_uniswap_cfg(SseDeserializer deserializer);
+
+  @protected
   UniswapMeta sse_decode_uniswap_meta(SseDeserializer deserializer);
 
   @protected
@@ -1392,6 +1469,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   WalletSettingsInfo sse_decode_wallet_settings_info(
       SseDeserializer deserializer);
+
+  @protected
+  ZilSwapMeta sse_decode_zil_swap_meta(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -1576,6 +1656,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       PancakeMeta self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_provider_quote(
+      ProviderQuote self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_qr_config_info(
       QrConfigInfo self, SseSerializer serializer);
 
@@ -1590,6 +1674,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_sun_swap_meta(
+      SunSwapMeta self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_swap_auth(
+      SwapAuth self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_swap_params(
+      SwapParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_token_transfer_params_info(
@@ -1621,6 +1717,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_zil_swap_meta(
+      ZilSwapMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_browser_settings_info(
@@ -1659,10 +1759,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_exchange_provider(
       ExchangeProvider self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_exchange_quote_info(
-      ExchangeQuoteInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_exchange_tx_display(
@@ -1752,10 +1848,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_exchange_provider(
       List<ExchangeProvider> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_exchange_quote_info(
-      List<ExchangeQuoteInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_explorer_info(
@@ -1919,6 +2011,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FTokenInfo? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_provider_quote(
+      ProviderQuote? self, SseSerializer serializer);
+
+  @protected
   void
       sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
           (TransactionBitcoin, BitcoinMetadataInfo)? self,
@@ -1958,6 +2054,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_out_point_info(OutPointInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_pancake_cfg(PancakeCfg self, SseSerializer serializer);
+
+  @protected
   void sse_encode_pancake_meta(PancakeMeta self, SseSerializer serializer);
 
   @protected
@@ -1967,6 +2066,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_prepared_swap_info(
       PreparedSwapInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_provider_common(
+      ProviderCommon self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_provider_quote(ProviderQuote self, SseSerializer serializer);
 
   @protected
   void sse_encode_q_rcode_scan_result_info(
@@ -2025,6 +2131,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       (BigInt, String) self, SseSerializer serializer);
 
   @protected
+  void sse_encode_relay_cfg(RelayCfg self, SseSerializer serializer);
+
+  @protected
   void sse_encode_relay_meta(RelayMeta self, SseSerializer serializer);
 
   @protected
@@ -2038,6 +2147,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_rust_ledger_hid_device(
       RustLedgerHidDevice self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_sun_swap_meta(SunSwapMeta self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_swap_auth(SwapAuth self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_swap_params(SwapParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(
@@ -2086,6 +2204,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_uniswap_cfg(UniswapCfg self, SseSerializer serializer);
+
+  @protected
   void sse_encode_uniswap_meta(UniswapMeta self, SseSerializer serializer);
 
   @protected
@@ -2110,6 +2231,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_zil_swap_meta(ZilSwapMeta self, SseSerializer serializer);
 }
 
 // Section: wire_class

@@ -260,29 +260,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangeSettingsPriceProtection => '价格保护';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => '子交换数量';
-
-  @override
-  String get exchangeSettingsTimeBetween => '子交换间隔';
-
-  @override
   String get exchangeSettingsReset => '重置';
 
   @override
   String get exchangeSettingsSave => '保存';
-
-  @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 个区块',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get exchangeConfirmBest => '最佳';
@@ -312,6 +293,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exchangeConfirmNoAccount => '没有活动账户';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
 
   @override
   String get exchangeConfirmStepApprove => '授权代币';

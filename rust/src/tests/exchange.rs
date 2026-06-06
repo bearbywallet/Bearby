@@ -5,14 +5,16 @@ mod exchange_tests {
 
     use crate::api::backend::load_service;
     use crate::api::exchange::{
-        bootstrap_exchange_providers, fetch_exchange_quote, finalize_exchange_swap,
-        prepare_exchange_swap,
+        bootstrap_exchange_providers, finalize_exchange_swap, prepare_exchange_swap,
+        refresh_exchange_quotes,
     };
     use crate::api::provider::get_chains_providers_from_json;
     use crate::api::wallet::{Bip39AddWalletParams, add_bip39_wallet};
 
     use crate::api::backend::is_service_running;
-    use crate::models::exchange::{ExchangeAsset, ExchangeProvider};
+    use crate::models::exchange::{
+        ExchangeAsset, ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams,
+    };
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
     use crate::service::background::BACKGROUND_SERVICE;
     use tempfile::tempdir;
@@ -109,7 +111,7 @@ mod exchange_tests {
                 a.token.native
                     && a.providers
                         .iter()
-                        .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
+                        .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1))
             })
             .cloned()
             .expect("expected native ETH (chain 1) with a Uniswap provider");
@@ -121,7 +123,7 @@ mod exchange_tests {
         let provider = asset
             .providers
             .iter()
-            .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
+            .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1))
             .cloned()
             .unwrap();
         (asset, usdc, provider)
@@ -152,15 +154,20 @@ mod exchange_tests {
         setup_eth_wallet().await;
         let (eth, usdc, provider) = uniswap_asset().await;
 
-        let prepared = prepare_exchange_swap(
-            0,
-            0,
-            provider.clone(),
-            eth,
-            usdc,
-            ONE_ETH.to_string(),
-            50, // slippage_bps = 0.5%
-        )
+        let auth = SwapAuth {
+            wallet_index: 0,
+            account_index: 0,
+            password: None,
+            passphrase: None,
+        };
+        let params = SwapParams {
+            provider: provider.clone(),
+            from: eth,
+            to: usdc,
+            amount_in: ONE_ETH.to_string(),
+            slippage_bps: 50,
+        };
+        let prepared = prepare_exchange_swap(params)
         .await
         .expect("prepare native swap");
         assert!(
@@ -169,16 +176,18 @@ mod exchange_tests {
         );
 
         let tx = finalize_exchange_swap(
-            0,
-            0,
+            auth,
             provider,
             prepared.quote_blob,
             None,
             0,
-            "Swap".to_string(),
-            "1 ETH → 1000 USDC · Uniswap".to_string(),
-            "assets/icons/uniswap.svg".to_string(),
-            None,
+            ExchangeTxDisplay {
+                swap_title: "Swap".to_string(),
+                swap_info: "1 ETH → 1000 USDC · Uniswap".to_string(),
+                approve_title: "Approve".to_string(),
+                permit_title: "Permit".to_string(),
+                out_token: None,
+            },
         )
         .await
         .expect("finalize native swap tx");
@@ -194,22 +203,20 @@ mod exchange_tests {
     /// access; run explicitly with: `cargo test -p rust_lib_zilpay exchange -- --ignored`.
     #[ignore]
     #[zilpay::tokio::test]
-    async fn test_fetch_exchange_quote() {
+    async fn test_refresh_exchange_quotes() {
         setup_eth_wallet().await;
         let (asset, usdc, _) = uniswap_asset().await;
 
-        let quotes = fetch_exchange_quote(
-            asset,
-            usdc,
-            ONE_ETH.to_string(),
-            "0x0000000000000000000000000000000000000001".to_string(),
-        )
-        .await
-        .expect("live uniswap quote");
+        let quoted = refresh_exchange_quotes(asset, usdc, ONE_ETH.to_string())
+            .await
+            .expect("live uniswap quote");
 
-        assert!(!quotes.is_empty(), "expected at least one quote");
-
-        let quote = &quotes[0];
+        let provider = quoted
+            .providers
+            .iter()
+            .find(|provider| provider.quote().is_some())
+            .expect("expected at least one quote");
+        let quote = provider.quote().expect("quote checked above");
         let out: U256 = quote.amount_out.parse().unwrap();
         assert!(out > U256::ZERO, "quote should return non-zero output");
         assert!(

@@ -4,44 +4,51 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../exchange.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class RelayMeta {
-  /// Bearby provider hash for the asset's chain.
-  final BigInt chainHash;
+class RelayCfg {
+  final int defaultSlippageBps;
+  final bool supportsPriceProtection;
 
-  /// Relay chain id. EVM chains use their normal EIP-155 id; Solana and Bitcoin use Relay's
-  /// synthetic ids.
-  final BigInt chainId;
-
-  /// Bearby/BIP slip44 for address-family checks and future VM-specific finalizers.
-  final int slip44;
-
-  /// Selected wallet account address on this asset's chain. Relay uses the source asset's address
-  /// as `user` and the destination asset's address as `recipient`.
-  final String accountAddr;
-
-  const RelayMeta({
-    required this.chainHash,
-    required this.chainId,
-    required this.slip44,
-    required this.accountAddr,
+  const RelayCfg({
+    required this.defaultSlippageBps,
+    required this.supportsPriceProtection,
   });
 
   @override
   int get hashCode =>
-      chainHash.hashCode ^
-      chainId.hashCode ^
-      slip44.hashCode ^
-      accountAddr.hashCode;
+      defaultSlippageBps.hashCode ^ supportsPriceProtection.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RelayCfg &&
+          runtimeType == other.runtimeType &&
+          defaultSlippageBps == other.defaultSlippageBps &&
+          supportsPriceProtection == other.supportsPriceProtection;
+}
+
+class RelayMeta {
+  final ProviderCommon common;
+  final RelayCfg cfg;
+  final ProviderQuote? quote;
+
+  const RelayMeta({
+    required this.common,
+    required this.cfg,
+    this.quote,
+  });
+
+  @override
+  int get hashCode => common.hashCode ^ cfg.hashCode ^ quote.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RelayMeta &&
           runtimeType == other.runtimeType &&
-          chainHash == other.chainHash &&
-          chainId == other.chainId &&
-          slip44 == other.slip44 &&
-          accountAddr == other.accountAddr;
+          common == other.common &&
+          cfg == other.cfg &&
+          quote == other.quote;
 }
