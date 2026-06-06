@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import 'exchange/pancakeswap.dart';
+import 'exchange/relay.dart';
 import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -40,6 +41,9 @@ class ExchangeAsset {
 sealed class ExchangeProvider with _$ExchangeProvider {
   const ExchangeProvider._();
 
+  const factory ExchangeProvider.relay(
+    RelayMeta field0,
+  ) = ExchangeProvider_Relay;
   const factory ExchangeProvider.uniswap(
     UniswapMeta field0,
   ) = ExchangeProvider_Uniswap;

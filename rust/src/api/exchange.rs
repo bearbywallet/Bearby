@@ -3,26 +3,23 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use zilpay::alloy::primitives::Address as AlloyAddress;
-use zilpay::background::bg_provider::ProvidersManagement;
-use zilpay::background::bg_tx::{update_tx_from_params, TransactionsManagement};
-use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::Background;
+use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::background::bg_tx::{TransactionsManagement, update_tx_from_params};
+use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::crypto::slip44::{TRON, ZILLIQA};
 use zilpay::network::evm::RequiredTxParams;
+use zilpay::proto::U256;
 use zilpay::proto::address::Address;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
-use zilpay::proto::U256;
 use zilpay::secrecy::SecretString;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
-use crate::models::exchange::univ_router::{
-    finalize_router_swap, is_wrap_unwrap, prepare_router_swap, router_check_approval,
-    router_quote_info,
-};
 use crate::models::exchange::{
-    ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, PancakeMeta, UniswapMeta,
+    ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, PancakeMeta, RelayMeta,
+    UniswapMeta,
 };
 use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
@@ -30,13 +27,31 @@ use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 
-/// Synchronous bootstrap of all exchange providers across every registered chain.
-pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
-    let guard = BACKGROUND_SERVICE
-        .try_read()
-        .map_err(|_| "service lock contention".to_string())?;
+/// Bootstrap all exchange providers across every registered chain.
+pub async fn bootstrap_exchange_providers(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<Vec<ExchangeAsset>, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let all_providers = service.core.get_providers();
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let mut relay_accounts: HashMap<u32, String> =
+        HashMap::with_capacity(wallet_data.slip44_accounts.len());
+    for (slip44, bip_accounts) in &wallet_data.slip44_accounts {
+        let accounts = bip_accounts
+            .get(&wallet_data.bip)
+            .or_else(|| bip_accounts.values().next());
+        if let Some(account) = accounts.and_then(|items| items.get(account_index)) {
+            relay_accounts.insert(*slip44, account.addr.auto_format());
+        }
+    }
 
     dbg!("called bootstrap_exchange_providers");
 
@@ -55,8 +70,10 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     // before inserting the provider with its resolved metadata.
     let make_providers = |addr_prefix: u8,
                           slip_44: u32,
-                          chain_id: u64|
+                          chain_id: u64,
+                          chain_hash: u64|
      -> HashSet<ExchangeProvider> {
+        let relay_account = relay_accounts.get(&slip_44);
         let mut providers = HashSet::new();
 
         // Uniswap — EVM chains with a deployed Universal Router
@@ -70,6 +87,13 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         if addr_prefix == 1 && crate::models::exchange::pancakeswap::is_supported_chain(chain_id) {
             if let Some(meta) = PancakeMeta::for_chain(chain_id) {
                 providers.insert(ExchangeProvider::PancakeSwap(meta));
+            }
+        }
+
+        // Relay — intent bridge. EVM chains use their EIP-155 ids; Solana/Bitcoin map to Relay ids.
+        if let Some(account_addr) = relay_account {
+            if let Some(meta) = RelayMeta::for_chain(chain_hash, slip_44, chain_id, account_addr) {
+                providers.insert(ExchangeProvider::Relay(meta));
             }
         }
 
@@ -99,7 +123,12 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         let chain_id = chain.chain_id();
         for token in chain.ftokens {
             let key = (token.chain_hash, token.addr.to_hash());
-            let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
+            let providers = make_providers(
+                token.addr.prefix_type(),
+                slip_44,
+                chain_id,
+                token.chain_hash,
+            );
             let halted = resolve_halted(&providers, slip_44, chain_id);
             assets.entry(key).or_insert_with(|| ExchangeAsset {
                 token: token.into(),
@@ -128,7 +157,12 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
+                    let providers = make_providers(
+                        token.addr.prefix_type(),
+                        slip_44,
+                        chain_id,
+                        token.chain_hash,
+                    );
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     assets.insert(
                         key,
@@ -171,10 +205,10 @@ pub async fn fetch_exchange_quote(
     // first resolvable provider (used only as a chain-context carrier) and emit a single quote,
     // instead of a duplicate per DEX.
     for provider in &asset.providers {
-        let Some(Ok(cfg)) = provider.router_config() else {
-            continue;
-        };
-        if is_wrap_unwrap(&cfg, from_asset, to_asset, asset.token.native).unwrap_or(false) {
+        if provider
+            .is_wrap_unwrap(&asset, &to, from_asset, to_asset)
+            .unwrap_or(false)
+        {
             dbg!("fetch_exchange_quote: wrap/unwrap detected", provider);
             return Ok(vec![ExchangeQuoteInfo {
                 provider: provider.clone(),
@@ -183,38 +217,14 @@ pub async fn fetch_exchange_quote(
                 is_wrap_unwrap: true,
             }]);
         }
-        break;
     }
 
     let mut quotes = Vec::with_capacity(asset.providers.len());
     for provider in &asset.providers {
         dbg!("fetch_exchange_quote: trying provider", provider);
-        // Universal-Router DEX providers (Uniswap, PancakeSwap) share one engine; everything
-        // else (ZilSwap, SunSwap) is not yet implemented and resolves to `None`.
-        let cfg = match provider.router_config() {
-            Some(Ok(cfg)) => cfg,
-            Some(Err(e)) => {
-                dbg!("fetch_exchange_quote: resolve FAILED", provider, &e);
-                continue;
-            }
-            None => {
-                dbg!(
-                    "fetch_exchange_quote: provider not yet implemented, skipping",
-                    provider
-                );
-                continue;
-            }
-        };
-        let result = router_quote_info(
-            &cfg,
-            provider,
-            &asset,
-            from_asset,
-            to_asset,
-            &amount,
-            &destination,
-        )
-        .await;
+        let result = provider
+            .quote_info(&asset, &to, from_asset, to_asset, &amount, &destination)
+            .await;
         if let Err(e) = &result {
             dbg!("fetch_exchange_quote: provider FAILED", provider, e);
         }
@@ -386,25 +396,15 @@ pub async fn execute_exchange_swap(
     to: ExchangeAsset,
     amount_in: String,
     slippage_bps: u32,
-    destination: String,
     display: ExchangeTxDisplay,
     password: Option<String>,
     passphrase: Option<String>,
     sink: StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let _ = &destination;
-
-    let token_in = from.token.addr.as_str();
-    let token_out = to.token.addr.as_str();
     let is_native_in = from.token.native;
-
-    let cfg = match provider.router_config() {
-        Some(res) => res?,
-        None => return Err("unsupported exchange provider".to_string()),
-    };
-
-    // A native ↔ wrapped-native wrap/unwrap is a single direct WETH tx — no approve, no permit.
-    let wrap = is_wrap_unwrap(&cfg, token_in, token_out, is_native_in).unwrap_or(false);
+    let wrap = provider
+        .is_wrap_unwrap(&from, &to, from.token.addr.as_str(), to.token.addr.as_str())
+        .unwrap_or(false);
 
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
@@ -420,18 +420,19 @@ pub async fn execute_exchange_swap(
     let mut nonce = base.nonce;
     let mut results: Vec<HistoricalTransactionInfo> = Vec::with_capacity(2);
 
-    // One-time ERC-20 approval (to the Permit2 contract). Native inputs and wraps never need it.
+    // One-time ERC-20 approval. Native inputs and wraps never need it.
     if !is_native_in && !wrap {
-        if let Some(approval) = router_check_approval(
-            &cfg,
-            swapper,
-            chain_hash,
-            token_in,
-            &amount_in,
-            display.approve_title.clone(),
-            display.provider_icon.clone(),
-        )
-        .await?
+        if let Some(approval) = provider
+            .check_approval(
+                swapper,
+                chain_hash,
+                &from,
+                &to,
+                &amount_in,
+                display.approve_title.clone(),
+                display.provider_icon.clone(),
+            )
+            .await?
         {
             let _ = sink.add("approving".to_string());
             let mut approve_tx: TransactionRequest = approval
@@ -453,17 +454,9 @@ pub async fn execute_exchange_swap(
         }
     }
 
-    let prepared = prepare_router_swap(
-        &cfg,
-        swapper,
-        chain_hash,
-        token_in,
-        token_out,
-        &amount_in,
-        slippage_bps,
-        is_native_in,
-    )
-    .await?;
+    let prepared = provider
+        .prepare_swap(swapper, chain_hash, &from, &to, &amount_in, slippage_bps)
+        .await?;
     let permit_signature: Option<String> = match prepared.permit_typed_data_json {
         Some(typed_data) => {
             let _ = sink.add("permit".to_string());
@@ -484,19 +477,20 @@ pub async fn execute_exchange_swap(
         None => None,
     };
 
-    let mut swap_tx: TransactionRequest = finalize_router_swap(
-        &prepared.quote_blob,
-        swapper,
-        chain_hash,
-        permit_signature.as_deref(),
-        display.swap_title,
-        display.swap_info,
-        display.provider_icon,
-        display.out_token,
-    )
-    .await?
-    .try_into()
-    .map_err(ServiceError::TransactionErrors)?;
+    let mut swap_tx: TransactionRequest = provider
+        .finalize_swap(
+            &prepared.quote_blob,
+            swapper,
+            chain_hash,
+            permit_signature.as_deref(),
+            display.swap_title,
+            display.swap_info,
+            display.provider_icon,
+            display.out_token,
+        )
+        .await?
+        .try_into()
+        .map_err(ServiceError::TransactionErrors)?;
     apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
 
@@ -525,7 +519,8 @@ pub async fn check_exchange_approval(
     wallet_index: usize,
     account_index: usize,
     provider: ExchangeProvider,
-    token_in: String,
+    from: ExchangeAsset,
+    to: ExchangeAsset,
     amount_in: String,
     is_native_in: bool,
     nonce: u64,
@@ -543,20 +538,17 @@ pub async fn check_exchange_approval(
     };
 
     let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let cfg = match provider.router_config() {
-        Some(res) => res?,
-        None => return Ok(None),
-    };
-    let approval = router_check_approval(
-        &cfg,
-        swapper,
-        chain_hash,
-        &token_in,
-        &amount_in,
-        approve_title,
-        provider_icon,
-    )
-    .await?;
+    let approval = provider
+        .check_approval(
+            swapper,
+            chain_hash,
+            &from,
+            &to,
+            &amount_in,
+            approve_title,
+            provider_icon,
+        )
+        .await?;
 
     match approval {
         Some(info) => {
@@ -587,19 +579,7 @@ pub async fn prepare_exchange_swap(
     to: ExchangeAsset,
     amount_in: String,
     slippage_bps: u32,
-    destination: String,
 ) -> Result<PreparedSwapInfo, String> {
-    let _ = &destination;
-
-    let token_in = from.token.addr.as_str();
-    let token_out = to.token.addr.as_str();
-    let is_native_in = from.token.native;
-
-    let cfg = match provider.router_config() {
-        Some(res) => res?,
-        None => return Err("unsupported exchange provider".to_string()),
-    };
-
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -607,17 +587,9 @@ pub async fn prepare_exchange_swap(
     };
 
     let (_signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let prepared = prepare_router_swap(
-        &cfg,
-        swapper,
-        chain_hash,
-        token_in,
-        token_out,
-        &amount_in,
-        slippage_bps,
-        is_native_in,
-    )
-    .await?;
+    let prepared = provider
+        .prepare_swap(swapper, chain_hash, &from, &to, &amount_in, slippage_bps)
+        .await?;
 
     Ok(PreparedSwapInfo {
         permit_typed_data_json: prepared.permit_typed_data_json,
@@ -641,8 +613,6 @@ pub async fn finalize_exchange_swap(
     provider_icon: String,
     out_token: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
-    let _ = &provider;
-
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -650,17 +620,18 @@ pub async fn finalize_exchange_swap(
     };
 
     let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let built = finalize_router_swap(
-        &quote_blob,
-        swapper,
-        chain_hash,
-        permit_signature.as_deref(),
-        swap_title,
-        swap_info,
-        provider_icon,
-        out_token,
-    )
-    .await?;
+    let built = provider
+        .finalize_swap(
+            &quote_blob,
+            swapper,
+            chain_hash,
+            permit_signature.as_deref(),
+            swap_title,
+            swap_info,
+            provider_icon,
+            out_token,
+        )
+        .await?;
     let mut swap_tx: TransactionRequest =
         built.try_into().map_err(ServiceError::TransactionErrors)?;
     apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
