@@ -4,24 +4,52 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../exchange.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-/// FFI-safe PancakeSwap marker. Only the source chain id is needed — deployment addresses
-/// are resolved internally from a const table via [`PancakeMeta::resolve`].
-class PancakeMeta {
-  final BigInt chainId;
+class PancakeCfg {
+  final int defaultSlippageBps;
+  final bool supportsPriceProtection;
 
-  const PancakeMeta({
-    required this.chainId,
+  const PancakeCfg({
+    required this.defaultSlippageBps,
+    required this.supportsPriceProtection,
   });
 
   @override
-  int get hashCode => chainId.hashCode;
+  int get hashCode =>
+      defaultSlippageBps.hashCode ^ supportsPriceProtection.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PancakeCfg &&
+          runtimeType == other.runtimeType &&
+          defaultSlippageBps == other.defaultSlippageBps &&
+          supportsPriceProtection == other.supportsPriceProtection;
+}
+
+/// FFI-safe PancakeSwap metadata. Quote data is excluded from identity.
+class PancakeMeta {
+  final ProviderCommon common;
+  final PancakeCfg cfg;
+  final ProviderQuote? quote;
+
+  const PancakeMeta({
+    required this.common,
+    required this.cfg,
+    this.quote,
+  });
+
+  @override
+  int get hashCode => common.hashCode ^ cfg.hashCode ^ quote.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PancakeMeta &&
           runtimeType == other.runtimeType &&
-          chainId == other.chainId;
+          common == other.common &&
+          cfg == other.cfg &&
+          quote == other.quote;
 }

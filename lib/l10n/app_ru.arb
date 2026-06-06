@@ -85,6 +85,7 @@
   "exchangeConfirmUnable": "Не удалось подтвердить",
   "exchangeConfirmPassword": "Пароль",
   "exchangeConfirmNoAccount": "Нет активного аккаунта",
+  "exchangeConfirmNoQuote": "No quote available",
   "exchangeConfirmStepApprove": "Одобрить токен",
   "exchangeConfirmStepPermit": "Подписать разрешение (EIP-712)",
   "exchangeConfirmWrap": "Обернуть",
@@ -101,19 +102,8 @@
   "exchangePageTabLimit": "Лимит",
   "exchangePageTabBuySell": "Купить/Продать",
   "exchangeSettingsPriceProtection": "Защита цены",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "Количество под-обменов",
-  "exchangeSettingsTimeBetween": "Время между под-обменами",
   "exchangeSettingsReset": "Сбросить",
   "exchangeSettingsSave": "Сохранить",
-  "exchangeSettingsBlocks": "{count, plural, =1{1 блок} few{{count} блока} many{{count} блоков} other{{count} блока}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",
   "revealSecretKeyInvalidPassword": "неверный пароль, ошибка:",
@@ -484,8 +474,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, one{# вход} few{# входа} many{# входов} other{# входа}} · {outputCount, plural, one{# выход} few{# выхода} many{# выходов} other{# выхода}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "Перевод",

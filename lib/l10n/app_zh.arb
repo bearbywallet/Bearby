@@ -85,6 +85,7 @@
   "exchangeConfirmUnable": "无法确认",
   "exchangeConfirmPassword": "密码",
   "exchangeConfirmNoAccount": "没有活动账户",
+  "exchangeConfirmNoQuote": "No quote available",
   "exchangeConfirmStepApprove": "授权代币",
   "exchangeConfirmStepPermit": "签署许可 (EIP-712)",
   "exchangeConfirmWrap": "包装",
@@ -101,19 +102,8 @@
   "exchangePageTabLimit": "限价",
   "exchangePageTabBuySell": "买卖",
   "exchangeSettingsPriceProtection": "价格保护",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "子交换数量",
-  "exchangeSettingsTimeBetween": "子交换间隔",
   "exchangeSettingsReset": "重置",
   "exchangeSettingsSave": "保存",
-  "exchangeSettingsBlocks": "{count, plural, other{{count} 个区块}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "显示私钥",
   "revealSecretKeyPasswordHint": "密码",
   "revealSecretKeyInvalidPassword": "密码无效，错误：",
@@ -472,8 +462,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{{inputCount} 个输入}} · {outputCount, plural, other{{outputCount} 个输出}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "转账",

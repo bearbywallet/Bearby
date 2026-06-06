@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/glass_message.dart';
 import 'package:bearby/components/modal_drag_handle.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -21,6 +20,7 @@ import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
@@ -36,15 +36,9 @@ enum _StepState { pending, active, done, skipped }
 // Entry point
 // ---------------------------------------------------------------------------
 
-/// Confirm sheet for an exchange swap that doubles as a **route picker**: the caller passes every
-/// provider quote (best-first) and the sheet lets the user pick one, showing each route's output and
-/// (for native-in) a per-route gas estimate. It then drives the whole approve → permit → swap
-/// sequence: software wallets run it as one batched Rust call ([executeExchangeSwap]) under a single
-/// unlock; Ledger wallets sign each step on the device (a device cannot sign a batch). Gas is always
-/// the Aggressive tier (applied in Rust).
+/// Confirm sheet for an exchange swap. Provider quotes live on [from.providers].
 void showExchangeConfirmModal({
   required BuildContext context,
-  required List<ExchangeQuoteInfo> quotes,
   required ExchangeAsset from,
   required ExchangeAsset to,
   required String amountInWei,
@@ -61,7 +55,6 @@ void showExchangeConfirmModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => _ExchangeConfirmContent(
-      quotes: quotes,
       from: from,
       to: to,
       amountInWei: amountInWei,
@@ -76,7 +69,6 @@ void showExchangeConfirmModal({
 // ---------------------------------------------------------------------------
 
 class _ExchangeConfirmContent extends StatefulWidget {
-  final List<ExchangeQuoteInfo> quotes;
   final ExchangeAsset from;
   final ExchangeAsset to;
   final String amountInWei;
@@ -85,7 +77,6 @@ class _ExchangeConfirmContent extends StatefulWidget {
   final VoidCallback onDone;
 
   const _ExchangeConfirmContent({
-    required this.quotes,
     required this.from,
     required this.to,
     required this.amountInWei,
@@ -114,7 +105,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   /// Pre-formatted "you pay" amount (symbol included from [formatingAmount]); constant across routes.
   late final String _payText;
 
-  /// Index of the chosen route in [_ExchangeConfirmContent.quotes] (0 = best). Drives the display.
+  /// Index of the chosen provider route (0 = best). Drives the display.
   int _selectedIndex = 0;
 
   /// Per-route total fee in wei (native-in only); keyed by quote index. Filled progressively.
@@ -133,8 +124,17 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   bool _obscurePassword = true;
   String? _error;
 
-  ExchangeQuoteInfo get _selected => widget.quotes[_selectedIndex];
-  bool get _isWrapUnwrap => _selected.isWrapUnwrap;
+  late final List<ExchangeProvider> _providers = widget.from.providers
+      .where((provider) => provider.quote != null)
+      .toList()
+    ..sort((a, b) {
+      final aValue = BigInt.tryParse(a.quote?.amountOut ?? '') ?? BigInt.zero;
+      final bValue = BigInt.tryParse(b.quote?.amountOut ?? '') ?? BigInt.zero;
+      return bValue.compareTo(aValue);
+    });
+
+  ExchangeProvider? get _selectedProvider => _providers.elementAtOrNull(_selectedIndex);
+  bool get _isWrapUnwrap => _selectedProvider?.quote?.isWrapUnwrap ?? false;
 
   // Derived from the two assets — no stored duplication.
   FTokenInfo get _fromToken => widget.from.token;
@@ -206,8 +206,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _isNativeIn ? l10n.exchangeConfirmWrap : l10n.exchangeConfirmUnwrap;
 
   /// "You get" text for a given route (recomputed per selection).
-  String _getTextFor(AppState appState, ExchangeQuoteInfo quote) =>
-      _format(appState, _toToken, quote.amountOut);
+  String _getTextFor(AppState appState, ExchangeProvider provider) {
+    final quote = provider.quote;
+    return _format(appState, _toToken, quote?.amountOut ?? '0');
+  }
 
   /// Build the tx display metadata for [quote]. Wrap/unwrap is provider-less (a direct WETH
   /// deposit/withdraw): a neutral icon/title and no "\u00b7 Provider" suffix; a normal swap carries the
@@ -215,23 +217,22 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   ExchangeTxDisplay _displayFor(
     AppState appState,
     AppLocalizations l10n,
-    ExchangeQuoteInfo quote,
+    ExchangeProvider provider,
   ) {
-    final providerName = quote.provider.displayName;
-    final getText = _getTextFor(appState, quote);
+    final quote = provider.quote;
+    final providerName = provider.common.displayName;
+    final getText = _getTextFor(appState, provider);
     final wrapTitle = _wrapVerb(l10n);
+    final isWrap = quote?.isWrapUnwrap ?? false;
     return ExchangeTxDisplay(
-      providerIcon: quote.isWrapUnwrap
-          ? 'assets/icons/swap.svg'
-          : quote.provider.iconAsset,
-      swapTitle: quote.isWrapUnwrap ? wrapTitle : l10n.exchangePageTabSwap,
-      swapInfo: quote.isWrapUnwrap
+      swapTitle: isWrap ? wrapTitle : l10n.exchangePageTabSwap,
+      swapInfo: isWrap
           ? '$_payText \u2192 $getText'
           : '$_payText \u2192 $getText \u00b7 $providerName',
       approveTitle: l10n.exchangeHistoryApprove(_fromToken.symbol),
       permitTitle: l10n.exchangeHistoryPermit(providerName),
       outToken: BaseTokenInfo(
-        value: quote.amountOut,
+        value: quote?.amountOut ?? '0',
         symbol: _toToken.symbol,
         decimals: _toToken.decimals,
       ),
@@ -319,7 +320,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final wallet = appState.wallet;
     if (wallet == null || !_isNativeIn) return;
     // Independent futures so each row fills in as it resolves; failures are swallowed per-route.
-    for (var i = 0; i < widget.quotes.length; i++) {
+    for (var i = 0; i < _providers.length; i++) {
       unawaited(_estimateRouteGas(appState, wallet.selectedAccount, i));
     }
   }
@@ -331,33 +332,29 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   ) async {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return;
-    final quote = widget.quotes[index];
+    final provider = _providers[index];
     try {
       final nonce = await estimateSwapBaseNonce(
         walletIndex: appState.selectedWalletIndex,
         accountIndex: accountIndex,
       );
-      final prep = await prepareExchangeSwap(
-        walletIndex: appState.selectedWalletIndex,
-        accountIndex: accountIndex,
-        provider: quote.provider,
+      final auth = SwapAuth(walletIndex: appState.selectedWalletIndex, accountIndex: accountIndex);
+      final params = SwapParams(
+        provider: provider,
         from: widget.from,
         to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
       );
-      final disp = _displayFor(appState, l10n, quote);
+      final prep = await prepareExchangeSwap(params: params);
+      final disp = _displayFor(appState, l10n, provider);
       final tx = await finalizeExchangeSwap(
-        walletIndex: appState.selectedWalletIndex,
-        accountIndex: accountIndex,
-        provider: quote.provider,
+        auth: auth,
+        provider: provider,
         quoteBlob: prep.quoteBlob,
         permitSignature: null,
         nonce: nonce,
-        swapTitle: disp.swapTitle,
-        swapInfo: disp.swapInfo,
-        providerIcon: disp.providerIcon,
-        outToken: disp.outToken,
+        display: disp,
       );
       final gas = await caclGasFee(
         params: tx,
@@ -395,16 +392,27 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     });
 
     final completer = Completer<void>();
-    final stream = executeExchangeSwap(
+    final selected = _selectedProvider;
+    if (selected == null) {
+      setState(() => _error = l10n.exchangeConfirmNoQuote);
+      return Future.value();
+    }
+    final auth = SwapAuth(
       walletIndex: appState.selectedWalletIndex,
       accountIndex: wallet.selectedAccount,
-      provider: _selected.provider,
+      password: wallet.authType == 'none' ? _passwordController.text : null,
+    );
+    final params = SwapParams(
+      provider: selected,
       from: widget.from,
       to: widget.to,
       amountIn: widget.amountInWei,
       slippageBps: widget.slippageBps,
-      display: _displayFor(appState, l10n, _selected),
-      password: wallet.authType == 'none' ? _passwordController.text : null,
+    );
+    final stream = executeExchangeSwap(
+      auth: auth,
+      params: params,
+      display: _displayFor(appState, l10n, selected),
     );
 
     _swapSub = stream.listen(
@@ -449,7 +457,12 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _resetSteps();
     });
 
-    final disp = _displayFor(appState, l10n, _selected);
+    final selected = _selectedProvider;
+    if (selected == null) {
+      setState(() => _error = l10n.exchangeConfirmNoQuote);
+      return;
+    }
+    final disp = _displayFor(appState, l10n, selected);
     final ledger = appState.ledgerViewController;
     final walletIndexBig = appState.selectedWalletIndex;
     final accountIndexBig = wallet.selectedAccount;
@@ -465,17 +478,19 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
       if (!_isNativeIn) {
         _onStage('approving', hint: l10n.exchangeConfirmHintApprove);
-        final approval = await checkExchangeApproval(
-          walletIndex: walletIndexBig,
-          accountIndex: accountIndexBig,
-          provider: _selected.provider,
+        final auth = SwapAuth(walletIndex: walletIndexBig, accountIndex: accountIndexBig);
+        final params = SwapParams(
+          provider: selected,
           from: widget.from,
           to: widget.to,
           amountIn: widget.amountInWei,
-          isNativeIn: _isNativeIn,
+          slippageBps: widget.slippageBps,
+        );
+        final approval = await checkExchangeApproval(
+          auth: auth,
+          params: params,
           nonce: baseNonce,
           approveTitle: disp.approveTitle,
-          providerIcon: disp.providerIcon,
         );
         if (approval != null) {
           final sig = await ledger.signTransaction(
@@ -497,15 +512,15 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
       // Gap between approve and swap prep: show a transient hint with no step change.
       if (mounted) setState(() => _hint = l10n.exchangeConfirmHintPreparing);
-      final prep = await prepareExchangeSwap(
-        walletIndex: walletIndexBig,
-        accountIndex: accountIndexBig,
-        provider: _selected.provider,
+      final auth = SwapAuth(walletIndex: walletIndexBig, accountIndex: accountIndexBig);
+      final params = SwapParams(
+        provider: selected,
         from: widget.from,
         to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
       );
+      final prep = await prepareExchangeSwap(params: params);
 
       String? permitSignature;
       final permitJson = prep.permitTypedDataJson;
@@ -520,16 +535,12 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
       _onStage('swapping', hint: l10n.exchangeConfirmHintSwap);
       final swapTx = await finalizeExchangeSwap(
-        walletIndex: walletIndexBig,
-        accountIndex: accountIndexBig,
-        provider: _selected.provider,
+        auth: auth,
+        provider: selected,
         quoteBlob: prep.quoteBlob,
         permitSignature: permitSignature,
         nonce: swapNonce,
-        swapTitle: disp.swapTitle,
-        swapInfo: disp.swapInfo,
-        providerIcon: disp.providerIcon,
-        outToken: disp.outToken,
+        display: disp,
       );
       final swapSig = await ledger.signTransaction(
         transaction: swapTx,
@@ -669,7 +680,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       AppState appState, AppTheme theme, AppLocalizations l10n) {
     return Column(
       children: List<Widget>.generate(
-        widget.quotes.length,
+        _providers.length,
         (i) => _buildRouteRow(appState, theme, l10n, i),
         growable: false,
       ),
@@ -682,10 +693,12 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     AppLocalizations l10n,
     int index,
   ) {
-    final quote = widget.quotes[index];
+    final provider = _providers[index];
     final selected = index == _selectedIndex;
-    final isBest = index == 0 && widget.quotes.length > 1;
-    final selectable = widget.quotes.length > 1;
+    final isBest = index == 0 && _providers.length > 1;
+    final selectable = _providers.length > 1;
+    final quote = provider.quote;
+    if (quote == null) return const SizedBox.shrink();
     final out = _format(appState, _toToken, quote.amountOut);
     final gasText = _routeGasText(appState, index);
     final gasLabel = gasText != null
@@ -718,7 +731,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
               )
             else
               SvgPicture.asset(
-                quote.provider.iconAsset,
+                provider.common.iconAsset,
                 width: 28,
                 height: 28,
               ),
@@ -809,6 +822,33 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
+  Widget _buildEmptyState(AppTheme theme, AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ModalDragHandle(theme: theme),
+              const SizedBox(height: 12),
+              Text(
+                l10n.exchangeConfirmNoQuote,
+                textAlign: TextAlign.center,
+                style: theme.bodyLarge.copyWith(color: theme.textSecondary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // -------------------------------------------------------------------------
   // Build
   // -------------------------------------------------------------------------
@@ -819,6 +859,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return const SizedBox.shrink();
+    if (_providers.isEmpty) return _buildEmptyState(theme, l10n);
     final wallet = appState.wallet;
     final needsPassword =
         !_isLedger && wallet != null && wallet.authType == 'none';

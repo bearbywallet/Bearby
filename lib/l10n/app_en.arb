@@ -296,19 +296,8 @@
   "exchangePageTabLimit": "Limit",
   "exchangePageTabBuySell": "Buy/Sell",
   "exchangeSettingsPriceProtection": "Price Protection",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "Number of sub-swaps",
-  "exchangeSettingsTimeBetween": "Time between sub-swaps",
   "exchangeSettingsReset": "Reset",
   "exchangeSettingsSave": "Save",
-  "exchangeSettingsBlocks": "{count, plural, =1{1 block} other{{count} blocks}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "exchangeConfirmBest": "BEST",
   "exchangeConfirmGasNone": "—",
   "exchangeConfirmAfterGas": "≈ {amount}",
@@ -325,6 +314,7 @@
   "exchangeConfirmUnable": "Unable to confirm",
   "exchangeConfirmPassword": "Password",
   "exchangeConfirmNoAccount": "No active account",
+  "exchangeConfirmNoQuote": "No quote available",
   "exchangeConfirmStepApprove": "Approve token",
   "exchangeConfirmStepPermit": "Sign permit (EIP-712)",
   "exchangeConfirmWrap": "Wrap",
@@ -818,7 +808,6 @@
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
   },
-
   "passwordSetupPageSubtitle": "Create Password",
   "@passwordSetupPageSubtitle": {
     "description": "Subtitle text displayed at the top of the PasswordSetupPage component"
@@ -1810,8 +1799,12 @@
   "@transactionDetailsModal_inputsOutputsSummary": {
     "description": "Subtitle showing input and output counts under the amount in BTC TransactionDetailsModal",
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "Transfer",

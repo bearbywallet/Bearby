@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'state/app_state.dart';
+import 'state/exchange_state.dart';
 import 'pages/main_page.dart';
 import 'pages/login_page.dart';
 import 'pages/initial_page.dart';
@@ -175,7 +177,10 @@ GoRouter createRouter(AppState appState) {
             routes: [
               GoRoute(
                 path: AppRoutes.exchange,
-                builder: (_, __) => const ExchangePage(),
+                builder: (_, __) => ChangeNotifierProvider<ExchangeState>(
+                  create: (_) => ExchangeState(),
+                  child: const ExchangePage(),
+                ),
               ),
             ],
           ),

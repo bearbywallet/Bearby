@@ -59,7 +59,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult Function(ExchangeProvider_Relay value)? relay,
     TResult Function(ExchangeProvider_Uniswap value)? uniswap,
     TResult Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
-    TResult Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
+    TResult Function(ExchangeProvider_ZilSwap value)? zilSwap,
     TResult Function(ExchangeProvider_SunSwap value)? sunSwap,
     required TResult orElse(),
   }) {
@@ -71,8 +71,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
         return pancakeSwap(_that);
-      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
-        return zIlSwap(_that);
+      case ExchangeProvider_ZilSwap() when zilSwap != null:
+        return zilSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that);
       case _:
@@ -98,7 +98,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     required TResult Function(ExchangeProvider_Relay value) relay,
     required TResult Function(ExchangeProvider_Uniswap value) uniswap,
     required TResult Function(ExchangeProvider_PancakeSwap value) pancakeSwap,
-    required TResult Function(ExchangeProvider_ZIlSwap value) zIlSwap,
+    required TResult Function(ExchangeProvider_ZilSwap value) zilSwap,
     required TResult Function(ExchangeProvider_SunSwap value) sunSwap,
   }) {
     final _that = this;
@@ -109,8 +109,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap():
         return pancakeSwap(_that);
-      case ExchangeProvider_ZIlSwap():
-        return zIlSwap(_that);
+      case ExchangeProvider_ZilSwap():
+        return zilSwap(_that);
       case ExchangeProvider_SunSwap():
         return sunSwap(_that);
     }
@@ -133,7 +133,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult? Function(ExchangeProvider_Relay value)? relay,
     TResult? Function(ExchangeProvider_Uniswap value)? uniswap,
     TResult? Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
-    TResult? Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
+    TResult? Function(ExchangeProvider_ZilSwap value)? zilSwap,
     TResult? Function(ExchangeProvider_SunSwap value)? sunSwap,
   }) {
     final _that = this;
@@ -144,8 +144,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
         return pancakeSwap(_that);
-      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
-        return zIlSwap(_that);
+      case ExchangeProvider_ZilSwap() when zilSwap != null:
+        return zilSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that);
       case _:
@@ -170,8 +170,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult Function(RelayMeta field0)? relay,
     TResult Function(UniswapMeta field0)? uniswap,
     TResult Function(PancakeMeta field0)? pancakeSwap,
-    TResult Function(BigInt field0)? zIlSwap,
-    TResult Function(BigInt field0)? sunSwap,
+    TResult Function(ZilSwapMeta field0)? zilSwap,
+    TResult Function(SunSwapMeta field0)? sunSwap,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -182,8 +182,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
         return pancakeSwap(_that.field0);
-      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
-        return zIlSwap(_that.field0);
+      case ExchangeProvider_ZilSwap() when zilSwap != null:
+        return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that.field0);
       case _:
@@ -209,8 +209,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     required TResult Function(RelayMeta field0) relay,
     required TResult Function(UniswapMeta field0) uniswap,
     required TResult Function(PancakeMeta field0) pancakeSwap,
-    required TResult Function(BigInt field0) zIlSwap,
-    required TResult Function(BigInt field0) sunSwap,
+    required TResult Function(ZilSwapMeta field0) zilSwap,
+    required TResult Function(SunSwapMeta field0) sunSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -220,8 +220,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap():
         return pancakeSwap(_that.field0);
-      case ExchangeProvider_ZIlSwap():
-        return zIlSwap(_that.field0);
+      case ExchangeProvider_ZilSwap():
+        return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap():
         return sunSwap(_that.field0);
     }
@@ -244,8 +244,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult? Function(RelayMeta field0)? relay,
     TResult? Function(UniswapMeta field0)? uniswap,
     TResult? Function(PancakeMeta field0)? pancakeSwap,
-    TResult? Function(BigInt field0)? zIlSwap,
-    TResult? Function(BigInt field0)? sunSwap,
+    TResult? Function(ZilSwapMeta field0)? zilSwap,
+    TResult? Function(SunSwapMeta field0)? sunSwap,
   }) {
     final _that = this;
     switch (_that) {
@@ -255,8 +255,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
         return pancakeSwap(_that.field0);
-      case ExchangeProvider_ZIlSwap() when zIlSwap != null:
-        return zIlSwap(_that.field0);
+      case ExchangeProvider_ZilSwap() when zilSwap != null:
+        return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that.field0);
       case _:
@@ -466,25 +466,25 @@ class _$ExchangeProvider_PancakeSwapCopyWithImpl<$Res>
 
 /// @nodoc
 
-class ExchangeProvider_ZIlSwap extends ExchangeProvider {
-  const ExchangeProvider_ZIlSwap(this.field0) : super._();
+class ExchangeProvider_ZilSwap extends ExchangeProvider {
+  const ExchangeProvider_ZilSwap(this.field0) : super._();
 
   @override
-  final BigInt field0;
+  final ZilSwapMeta field0;
 
   /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ExchangeProvider_ZIlSwapCopyWith<ExchangeProvider_ZIlSwap> get copyWith =>
-      _$ExchangeProvider_ZIlSwapCopyWithImpl<ExchangeProvider_ZIlSwap>(
+  $ExchangeProvider_ZilSwapCopyWith<ExchangeProvider_ZilSwap> get copyWith =>
+      _$ExchangeProvider_ZilSwapCopyWithImpl<ExchangeProvider_ZilSwap>(
           this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is ExchangeProvider_ZIlSwap &&
+            other is ExchangeProvider_ZilSwap &&
             (identical(other.field0, field0) || other.field0 == field0));
   }
 
@@ -493,27 +493,27 @@ class ExchangeProvider_ZIlSwap extends ExchangeProvider {
 
   @override
   String toString() {
-    return 'ExchangeProvider.zIlSwap(field0: $field0)';
+    return 'ExchangeProvider.zilSwap(field0: $field0)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ExchangeProvider_ZIlSwapCopyWith<$Res>
+abstract mixin class $ExchangeProvider_ZilSwapCopyWith<$Res>
     implements $ExchangeProviderCopyWith<$Res> {
-  factory $ExchangeProvider_ZIlSwapCopyWith(ExchangeProvider_ZIlSwap value,
-          $Res Function(ExchangeProvider_ZIlSwap) _then) =
-      _$ExchangeProvider_ZIlSwapCopyWithImpl;
+  factory $ExchangeProvider_ZilSwapCopyWith(ExchangeProvider_ZilSwap value,
+          $Res Function(ExchangeProvider_ZilSwap) _then) =
+      _$ExchangeProvider_ZilSwapCopyWithImpl;
   @useResult
-  $Res call({BigInt field0});
+  $Res call({ZilSwapMeta field0});
 }
 
 /// @nodoc
-class _$ExchangeProvider_ZIlSwapCopyWithImpl<$Res>
-    implements $ExchangeProvider_ZIlSwapCopyWith<$Res> {
-  _$ExchangeProvider_ZIlSwapCopyWithImpl(this._self, this._then);
+class _$ExchangeProvider_ZilSwapCopyWithImpl<$Res>
+    implements $ExchangeProvider_ZilSwapCopyWith<$Res> {
+  _$ExchangeProvider_ZilSwapCopyWithImpl(this._self, this._then);
 
-  final ExchangeProvider_ZIlSwap _self;
-  final $Res Function(ExchangeProvider_ZIlSwap) _then;
+  final ExchangeProvider_ZilSwap _self;
+  final $Res Function(ExchangeProvider_ZilSwap) _then;
 
   /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
@@ -521,11 +521,11 @@ class _$ExchangeProvider_ZIlSwapCopyWithImpl<$Res>
   $Res call({
     Object? field0 = null,
   }) {
-    return _then(ExchangeProvider_ZIlSwap(
+    return _then(ExchangeProvider_ZilSwap(
       null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
-              as BigInt,
+              as ZilSwapMeta,
     ));
   }
 }
@@ -536,7 +536,7 @@ class ExchangeProvider_SunSwap extends ExchangeProvider {
   const ExchangeProvider_SunSwap(this.field0) : super._();
 
   @override
-  final BigInt field0;
+  final SunSwapMeta field0;
 
   /// Create a copy of ExchangeProvider
   /// with the given fields replaced by the non-null parameter values.
@@ -570,7 +570,7 @@ abstract mixin class $ExchangeProvider_SunSwapCopyWith<$Res>
           $Res Function(ExchangeProvider_SunSwap) _then) =
       _$ExchangeProvider_SunSwapCopyWithImpl;
   @useResult
-  $Res call({BigInt field0});
+  $Res call({SunSwapMeta field0});
 }
 
 /// @nodoc
@@ -591,7 +591,7 @@ class _$ExchangeProvider_SunSwapCopyWithImpl<$Res>
       null == field0
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
-              as BigInt,
+              as SunSwapMeta,
     ));
   }
 }

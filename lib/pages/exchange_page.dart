@@ -15,14 +15,14 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
+import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
-import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
@@ -36,43 +36,27 @@ class ExchangePage extends StatefulWidget {
 }
 
 class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
-  static const int _slippageBps = 50; // 0.5%
   static const Duration _quoteDebounce = Duration(milliseconds: 400);
 
   late final AppState _appState;
+  late final ExchangeState _exchangeState;
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
   Timer? _quoteTimer;
 
   _OrderType _orderType = _OrderType.swap;
-
-  bool _loadingAssets = true;
-  String? _assetsError;
-  // "You pay" — our tokens on the active network (source = active wallet chain).
-  List<ExchangeAsset> _assets = const [];
-  // "You get" — swappable tokens across every Relay-supported chain; router-only pairs still
-  // resolve to same-chain quotes because non-Relay providers reject cross-chain pairs in Rust.
-  List<ExchangeAsset> _getAssets = const [];
-  ExchangeAsset? _fromAsset;
-  ExchangeAsset? _toAsset;
-
-  String _amount = "0";
+  String _amount = '0';
   bool _hasDecimalPoint = false;
-
-  bool _loadingQuote = false;
-  // All provider quotes for the current input (sorted best-first); `_selectedQuote` is the one
-  // driving "You get" and the swap — auto-set to the best, overridable via the provider picker.
-  List<ExchangeQuoteInfo> _quotes = const [];
-  ExchangeQuoteInfo? _selectedQuote;
-  // Active chain at the last bootstrap — used to re-bootstrap when the network changes (the page
-  // is kept alive in a StatefulShellBranch, so initState runs only once).
   BigInt? _lastChainHash;
+  BigInt? _lastAccount;
 
   @override
   void initState() {
     super.initState();
-    _appState = Provider.of<AppState>(context, listen: false);
+    _appState = context.read<AppState>();
+    _exchangeState = context.read<ExchangeState>();
     _lastChainHash = _appState.wallet?.chainHash;
+    _lastAccount = _appState.wallet?.selectedAccount;
     _appState.addListener(_onAppStateChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
   }
@@ -87,195 +71,70 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   void _onAppStateChanged() {
     final hash = _appState.wallet?.chainHash;
-    if (hash == _lastChainHash) return;
+    final account = _appState.wallet?.selectedAccount;
+    if (hash == _lastChainHash && account == _lastAccount) return;
     _lastChainHash = hash;
+    _lastAccount = account;
     _quoteTimer?.cancel();
     setState(() {
-      _amount = "0";
+      _amount = '0';
       _hasDecimalPoint = false;
-      _quotes = const [];
-      _selectedQuote = null;
     });
-    _bootstrap();
+    _bootstrap(initialFrom: _exchangeState.fromAsset);
   }
 
-  // --- data ---------------------------------------------------------------
+  ExchangeAsset? _nativeInitialAsset() {
+    final chainHash = _appState.wallet?.chainHash;
+    final token = _appState.wallet?.tokens
+        .where((t) => t.chainHash == chainHash && t.native)
+        .firstOrNull;
+    if (token == null) return null;
+    return ExchangeAsset(token: token, providers: const {}, halted: false);
+  }
 
-  Future<void> _bootstrap() async {
-    debugPrint('[exchange] bootstrap start');
-    setState(() {
-      _loadingAssets = true;
-      _assetsError = null;
-    });
-
-    try {
-      final wallet = _appState.wallet;
-      if (wallet == null) {
-        throw Exception('no wallet selected');
-      }
-      debugPrint('[exchange] calling bootstrapExchangeProviders...');
-      final all = await bootstrapExchangeProviders(
+  Future<void> _bootstrap({ExchangeAsset? initialFrom}) => _exchangeState.bootstrap(
         walletIndex: _appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
+        accountIndex: _appState.wallet?.selectedAccount ?? BigInt.zero,
+        activeChainHash: _appState.wallet?.chainHash,
+        initialFrom: initialFrom ?? _nativeInitialAsset(),
       );
-      debugPrint('[exchange] got ${all.length} assets, '
-          'withProviders=${all.where((a) => a.providers.isNotEmpty).length}');
 
-      final chainHash = _appState.wallet?.chainHash;
-      debugPrint('[exchange] active chainHash=$chainHash');
-      final pay = all
-          .where((a) => a.token.chainHash == chainHash && _isSwappable(a))
-          .toList();
-      debugPrint('[exchange] pay side: ${pay.length} tokens');
-
-      final get = all.where(_isSwappable).toList();
-      debugPrint('[exchange] get side: ${get.length} tokens');
-
-      ExchangeAsset? from;
-      ExchangeAsset? to;
-      if (pay.isNotEmpty) {
-        from = pay.firstWhere((a) => a.token.native, orElse: () => pay.first);
-      }
-      // Default the "get" side to the first token that isn't the "pay" token.
-      for (final a in get) {
-        if (a == from) continue;
-        to = a;
-        break;
-      }
-      debugPrint(
-          '[exchange] from=${from?.token.symbol} to=${to?.token.symbol}');
-
-      if (!mounted) return;
-      setState(() {
-        _assets = pay;
-        _getAssets = get;
-        _fromAsset = from;
-        _toAsset = to;
-        _loadingAssets = false;
-      });
-      debugPrint('[exchange] bootstrap done');
-    } catch (e, st) {
-      debugPrint('[exchange] bootstrap FAILED: $e\n$st');
-      if (!mounted) return;
-      setState(() {
-        _loadingAssets = false;
-        _assetsError = e.toString();
-      });
-    }
-  }
-
-  /// "You get" assets: same-chain router candidates plus cross-chain Relay candidates, excluding
-  /// whatever is selected on the "pay" side.
-  List<ExchangeAsset> get _outAssets {
-    final from = _fromAsset;
-    return _getAssets.where((a) {
-      if (a == from) return false;
+  List<ExchangeAsset> _outAssets(ExchangeState state) {
+    final from = state.fromAsset;
+    return state.getAssets.where((asset) {
+      if (asset == from) return false;
       if (from == null) return true;
-      if (a.token.chainHash == from.token.chainHash) return true;
-      return _hasRelay(from) && _hasRelay(a);
+      if (asset.token.chainHash == from.token.chainHash) return true;
+      return _hasRelay(from) && _hasRelay(asset);
     }).toList();
   }
 
-  /// A token that at least one exchange provider supports.
-  static bool _isSwappable(ExchangeAsset a) => a.providers.isNotEmpty;
-
-  static bool _hasRelay(ExchangeAsset a) => a.providers.any(
-        (p) => p.whenOrNull(relay: (_) => true) ?? false,
-      );
+  static bool _hasRelay(ExchangeAsset asset) =>
+      asset.providers.any((p) => p.whenOrNull(relay: (_) => true) ?? false);
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
-    _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
+    _quoteTimer = Timer(_quoteDebounce, () {
+      final from = _exchangeState.fromAsset;
+      if (from == null || _amount.endsWith('.')) return;
+      final amountWei = toDecimalsWei(_amount, from.token.decimals);
+      _exchangeState.setAmount(amountWei.toString());
+    });
   }
-
-  /// Relay fills the destination chain directly, so resolve the selected account address for the
-  /// output token's chain. Same-chain swaps naturally return the active account address.
-  Future<String?> _resolveDestination(
-      ExchangeAsset from, ExchangeAsset to) async {
-    final wallet = _appState.wallet;
-    final activeAccount = _appState.account;
-    if (wallet == null || activeAccount == null) return null;
-    if (from.token.chainHash == to.token.chainHash) return activeAccount.addr;
-
-    final chain = _appState.getChain(to.token.chainHash);
-    if (chain == null) return null;
-    final accountsByBip = wallet.accounts[chain.slip44];
-    if (accountsByBip == null || accountsByBip.isEmpty) return null;
-
-    final preferred = accountsByBip[wallet.bip];
-    final accounts = preferred ?? accountsByBip.values.first;
-    final selected = wallet.selectedAccount.toInt();
-    return accounts.elementAtOrNull(selected)?.addr ??
-        (accounts.isNotEmpty ? accounts.first.addr : null);
-  }
-
-  Future<void> _fetchQuotes() async {
-    final account = _appState.account;
-    final from = _fromAsset;
-    final to = _toAsset;
-    if (account == null || from == null || to == null) return;
-
-    final amountWei = toDecimalsWei(_amount, from.token.decimals);
-    if (amountWei <= BigInt.zero) {
-      setState(() {
-        _quotes = const [];
-        _selectedQuote = null;
-      });
-      return;
-    }
-
-    setState(() => _loadingQuote = true);
-
-    try {
-      final destination = await _resolveDestination(from, to);
-      if (destination == null) {
-        throw Exception('no wallet account');
-      }
-      if (!mounted) return;
-      final quotes = await fetchExchangeQuote(
-        asset: from,
-        to: to,
-        amount: amountWei.toString(),
-        destination: destination,
-      );
-      // Quotes are pre-sorted best-first by Rust; auto-select the first.
-      if (!mounted) return;
-      setState(() {
-        _quotes = quotes;
-        _selectedQuote = quotes.isNotEmpty ? quotes.first : null;
-        _loadingQuote = false;
-      });
-    } catch (e) {
-      debugPrint("exchange quote failed: $e");
-      if (!mounted) return;
-      setState(() {
-        _quotes = const [];
-        _selectedQuote = null;
-        _loadingQuote = false;
-      });
-    }
-  }
-
-  // --- input --------------------------------------------------------------
 
   void _onKeyPress(String value) {
-    if (value == ".") {
+    if (value == '.') {
       if (!_hasDecimalPoint) {
         setState(() {
           _hasDecimalPoint = true;
-          _amount = _amount == "0" ? "0." : "$_amount.";
+          _amount = _amount == '0' ? '0.' : '$_amount.';
         });
         _scheduleQuote();
       }
       return;
     }
-
     setState(() {
-      if (_hasDecimalPoint) {
-        _amount += value;
-      } else {
-        _amount = _amount == "0" ? value : "$_amount$value";
-      }
+      _amount = _hasDecimalPoint ? '$_amount$value' : (_amount == '0' ? value : '$_amount$value');
     });
     _scheduleQuote();
   }
@@ -286,7 +145,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         if (_amount.endsWith('.')) _hasDecimalPoint = false;
         _amount = _amount.substring(0, _amount.length - 1);
       } else {
-        _amount = "0";
+        _amount = '0';
         _hasDecimalPoint = false;
       }
     });
@@ -295,83 +154,56 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   void _selectFrom(ExchangeAsset asset) {
     setState(() {
-      _fromAsset = asset;
-      _amount = "0";
+      _amount = '0';
       _hasDecimalPoint = false;
-      _quotes = const [];
-      _selectedQuote = null;
-      if (_toAsset == asset || _toAsset == null) {
-        final outs = _outAssets;
-        _toAsset = outs.isNotEmpty ? outs.first : null;
-      }
     });
+    _exchangeState.selectFrom(asset);
+    if (_exchangeState.toAsset == asset || _exchangeState.toAsset == null) {
+      final outs = _outAssets(_exchangeState);
+      if (outs.isNotEmpty) _exchangeState.selectTo(outs.first);
+    }
   }
 
   void _selectTo(ExchangeAsset asset) {
-    setState(() {
-      _toAsset = asset;
-      _quotes = const [];
-      _selectedQuote = null;
-    });
+    _exchangeState.selectTo(asset);
     _scheduleQuote();
   }
 
-  bool get _canSwap {
-    final from = _fromAsset;
-    if (from == null || _toAsset == null || _selectedQuote == null) {
-      return false;
-    }
+  bool _canSwap(ExchangeState state) {
+    final from = state.fromAsset;
+    if (from == null || state.toAsset == null || state.selectedProvider == null) return false;
     if (_amount.endsWith('.')) return false;
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) return false;
-    final balance = BigInt.tryParse(
-            from.token.balances[_appState.accountBalanceKey] ?? '') ??
+    final balance = BigInt.tryParse(from.token.balances[_appState.accountBalanceKey] ?? '') ??
         BigInt.zero;
     return amountWei <= balance;
   }
 
-  // --- confirm ------------------------------------------------------------
+  void _handleSwap(ExchangeState state) {
+    if (!_canSwap(state)) return;
+    final from = state.fromAsset;
+    final to = state.toAsset;
+    final provider = state.selectedProvider;
+    if (from == null || to == null || provider == null) return;
 
-  void _handleSwap() {
-    if (!_canSwap) return;
-
-    final appState = _appState;
-    final wallet = appState.wallet;
-    final account = appState.account;
-    final from = _fromAsset;
-    final to = _toAsset;
-    final quote = _selectedQuote;
-    if (wallet == null ||
-        account == null ||
-        from == null ||
-        to == null ||
-        quote == null) {
-      return;
-    }
-
-    final isSupported = quote.provider.whenOrNull(
+    final supported = provider.whenOrNull(
           relay: (_) => true,
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
         ) ??
         false;
-    if (!isSupported) {
+    if (!supported) {
       _showError('Unsupported provider');
       return;
     }
 
-    final amountInWei = toDecimalsWei(_amount, from.token.decimals);
-
-    // The confirm modal owns route selection and the whole approve → (permit) → swap sequence
-    // (batched for software wallets, step-by-step on Ledger), so the page just hands it the
-    // full quote list (best-first) and the shared swap intent.
     showExchangeConfirmModal(
       context: context,
-      quotes: _quotes,
       from: from,
       to: to,
-      amountInWei: amountInWei.toString(),
-      slippageBps: _slippageBps,
+      amountInWei: toDecimalsWei(_amount, from.token.decimals).toString(),
+      slippageBps: state.slippageFor(provider),
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),
     );
@@ -383,28 +215,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: theme.cardBackground,
-        title: Text(
-          "Error",
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        content: Text(
-          message,
-          style: theme.bodyLarge.copyWith(color: theme.danger),
-        ),
+        title: Text('Error', style: theme.titleMedium.copyWith(color: theme.textPrimary)),
+        content: Text(message, style: theme.bodyLarge.copyWith(color: theme.danger)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              "OK",
-              style: theme.button.copyWith(color: theme.primaryPurple),
-            ),
+            child: Text('OK', style: theme.button.copyWith(color: theme.primaryPurple)),
           ),
         ],
       ),
     );
   }
-
-  // --- build --------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -425,17 +246,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: padding),
-                  child: _buildTabs(theme, l10n),
-                ),
-                Expanded(
-                  child: _buildBody(theme, l10n, padding),
-                ),
-              ],
+            child: Consumer<ExchangeState>(
+              builder: (context, exchange, _) => Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: padding),
+                    child: _buildTabs(theme, l10n, exchange),
+                  ),
+                  Expanded(child: _buildBody(theme, l10n, padding, exchange)),
+                ],
+              ),
             ),
           ),
         ),
@@ -443,37 +264,22 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildBody(AppTheme theme, AppLocalizations l10n, double padding) {
-    final from = _fromAsset;
-    final to = _toAsset;
-
-    // Only show a message once bootstrap finished with nothing to swap.
-    if (!_loadingAssets &&
-        (_assetsError != null || from == null || to == null)) {
+  Widget _buildBody(AppTheme theme, AppLocalizations l10n, double padding, ExchangeState state) {
+    final from = state.fromAsset;
+    final to = state.toAsset;
+    if (!state.loadingAssets && (state.assetsError != null || from == null || to == null)) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(padding),
           child: Text(
-            _assetsError ?? l10n.exchangePageNoAssets,
+            state.assetsError ?? l10n.exchangePageNoAssets,
             textAlign: TextAlign.center,
             style: theme.bodyLarge.copyWith(color: theme.textSecondary),
           ),
         ),
       );
     }
-
-    // Show a spinner during bootstrap so the UI doesn't appear blank.
-    if (from == null || to == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final Widget cards = Column(
-      children: [
-        _buildPayCard(from),
-        _buildDirectionButton(theme, from),
-        _buildGetCard(theme, l10n, to),
-      ],
-    );
+    if (from == null) return const Center(child: CircularProgressIndicator());
 
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(
@@ -487,16 +293,21 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              cards,
+              _buildPayCard(from, state),
+              _buildDirectionButton(theme, from, state),
+              if (to == null)
+                const SizedBox(height: 120)
+              else
+                _buildGetCard(theme, l10n, to, state),
               const SizedBox(height: 8),
               NumberKeyboard(
                 onKeyPressed: (value) => _onKeyPress(value.toString()),
                 onBackspace: _onBackspace,
-                onDotPress: () => _onKeyPress("."),
+                onDotPress: () => _onKeyPress('.'),
               ),
               RoundedLoadingButton(
                 controller: _btnController,
-                onPressed: !_canSwap ? null : _handleSwap,
+                onPressed: !_canSwap(state) ? null : () => _handleSwap(state),
                 color: theme.primaryPurple,
                 valueColor: theme.buttonText,
                 child: Text(
@@ -512,7 +323,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildTabs(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildTabs(AppTheme theme, AppLocalizations l10n, ExchangeState state) {
     Widget tab(String label, _OrderType type, bool enabled) {
       final selected = _orderType == type;
       return GestureDetector(
@@ -523,9 +334,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           child: Text(
             label,
             style: theme.titleSmall.copyWith(
-              color: selected
-                  ? theme.textPrimary
-                  : theme.textSecondary.withValues(alpha: enabled ? 1.0 : 0.5),
+              color: selected ? theme.textPrimary : theme.textSecondary.withValues(alpha: enabled ? 1.0 : 0.5),
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
@@ -543,16 +352,23 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           tab(l10n.exchangePageTabBuySell, _OrderType.buySell, false),
           const Spacer(),
           GestureDetector(
-            onTap: () => showSwapSettingsModal(context: context),
+            onTap: () {
+              final provider = state.selectedProvider;
+              if (provider == null) return;
+              showSwapSettingsModal(
+                context: context,
+                activeProvider: provider,
+                exchangeState: state,
+              );
+            },
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(4),
               child: SvgPicture.asset(
-                "assets/icons/gear.svg",
+                'assets/icons/gear.svg',
                 width: 22,
                 height: 22,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
               ),
             ),
           ),
@@ -561,12 +377,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildPayCard(ExchangeAsset from) {
+  Widget _buildPayCard(ExchangeAsset from, ExchangeState state) {
     final token = from.token;
-    final balance =
-        BigInt.tryParse(token.balances[_appState.accountBalanceKey] ?? '') ??
-            BigInt.zero;
-
+    final balance = BigInt.tryParse(token.balances[_appState.accountBalanceKey] ?? '') ?? BigInt.zero;
     return TokenAmountCard(
       amount: _amount,
       token: token,
@@ -580,32 +393,27 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       },
       onTokenTap: () => showExchangeTokenSelectModal(
         context: context,
-        assets: _assets,
+        assets: state.payAssets,
         onSelected: _selectFrom,
       ),
     );
   }
 
-  Widget _buildDirectionButton(AppTheme theme, ExchangeAsset? from) {
-    // Same-chain swaps are always reversible: the Rust backend handles native input
-    // (WRAP_ETH) and native output (UNWRAP_WETH), so either token can be the input.
-    final canFlip = from != null && _toAsset != null;
-
+  Widget _buildDirectionButton(AppTheme theme, ExchangeAsset? from, ExchangeState state) {
+    final canFlip = from != null && state.toAsset != null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: GestureDetector(
         onTap: canFlip
             ? () {
-                final to = _toAsset;
+                final to = state.toAsset;
                 if (to == null) return;
                 setState(() {
-                  _fromAsset = to;
-                  _toAsset = from;
-                  _amount = "0";
+                  _amount = '0';
                   _hasDecimalPoint = false;
-                  _quotes = const [];
-                  _selectedQuote = null;
                 });
+                state.selectFrom(to);
+                state.selectTo(from);
               }
             : null,
         child: Container(
@@ -614,20 +422,15 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           decoration: BoxDecoration(
             color: theme.cardBackground,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: theme.textSecondary.withValues(alpha: 0.2),
-              width: 1.5,
-            ),
+            border: Border.all(color: theme.textSecondary.withValues(alpha: 0.2), width: 1.5),
           ),
           child: Center(
             child: SvgPicture.asset(
-              "assets/icons/swap.svg",
+              'assets/icons/swap.svg',
               width: 20,
               height: 20,
               colorFilter: ColorFilter.mode(
-                canFlip
-                    ? theme.primaryPurple
-                    : theme.textSecondary.withValues(alpha: 0.4),
+                canFlip ? theme.primaryPurple : theme.textSecondary.withValues(alpha: 0.4),
                 BlendMode.srcIn,
               ),
             ),
@@ -637,12 +440,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildGetCard(
-      AppTheme theme, AppLocalizations l10n, ExchangeAsset to) {
+  Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to, ExchangeState state) {
     final token = to.token;
-    final quote = _selectedQuote;
+    final quote = state.selectedProvider?.quote;
     final (outAmount, _) = quote == null
-        ? ("0", "")
+        ? ('0', '')
         : formatingAmount(
             amount: BigInt.tryParse(quote.amountOut) ?? BigInt.zero,
             symbol: token.symbol,
@@ -654,19 +456,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
+        border: Border.all(color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.exchangePageGet,
-            style: theme.bodyText2.copyWith(color: theme.textSecondary),
-          ),
+          Text(l10n.exchangePageGet, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -675,12 +471,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                   duration: const Duration(milliseconds: 250),
                   layoutBuilder: (currentChild, previousChildren) => Stack(
                     alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      ...previousChildren,
-                      if (currentChild != null) currentChild,
-                    ],
+                    children: [...previousChildren, if (currentChild != null) currentChild],
                   ),
-                  child: (quote == null && _loadingQuote)
+                  child: (quote == null && state.loadingQuote)
                       ? SkeletonBox(
                           key: const ValueKey('get-skeleton'),
                           width: 150,
@@ -691,8 +484,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                           key: const ValueKey('get-value'),
                           style: theme.displayLarge.copyWith(
                             color: theme.textPrimary,
-                            fontSize:
-                                AdaptiveSize.getAdaptiveFontSize(context, 28),
+                            fontSize: AdaptiveSize.getAdaptiveFontSize(context, 28),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -704,7 +496,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                 token,
                 () => showExchangeTokenSelectModal(
                   context: context,
-                  assets: _outAssets,
+                  assets: _outAssets(state),
                   onSelected: _selectTo,
                 ),
               ),
@@ -715,20 +507,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildTokenSelector(
-    AppTheme theme,
-    FTokenInfo token,
-    VoidCallback onTap,
-  ) {
+  Widget _buildTokenSelector(AppTheme theme, FTokenInfo token, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: theme.textPrimary.withValues(alpha: 0.2),
-            width: 1.5,
-          ),
+          border: Border.all(color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -736,17 +521,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           children: [
             _buildTokenAvatar(theme, token),
             const SizedBox(width: 8),
-            Text(
-              token.symbol,
-              style: theme.bodyText1.copyWith(color: theme.textPrimary),
-            ),
+            Text(token.symbol, style: theme.bodyText1.copyWith(color: theme.textPrimary)),
             const SizedBox(width: 4),
             SvgPicture.asset(
-              "assets/icons/tiny_down_arrow.svg",
+              'assets/icons/tiny_down_arrow.svg',
               width: 12,
               height: 12,
-              colorFilter:
-                  ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
             ),
           ],
         ),
@@ -759,26 +540,21 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.textPrimary.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
+        border: Border.all(color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
         shape: BoxShape.circle,
       ),
       child: ClipOval(
         child: AsyncImage(
           url: processTokenLogo(
             token: token,
-            shortName: _appState.chain?.shortName ?? "",
+            shortName: _appState.chain?.shortName ?? '',
             theme: theme.value,
           ),
           width: 24,
           height: 24,
           fit: BoxFit.cover,
           errorWidget: Jazzicon(seed: token.addr, diameter: 24),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          loadingWidget: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
     );

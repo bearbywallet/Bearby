@@ -260,29 +260,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangeSettingsPriceProtection => '가격 보호';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => '하위 스왑 수';
-
-  @override
-  String get exchangeSettingsTimeBetween => '하위 스왑 간격';
-
-  @override
   String get exchangeSettingsReset => '초기화';
 
   @override
   String get exchangeSettingsSave => '저장';
-
-  @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count개 블록',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get exchangeConfirmBest => '최적';
@@ -312,6 +293,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get exchangeConfirmNoAccount => '활성 계정이 없습니다';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
 
   @override
   String get exchangeConfirmStepApprove => '토큰 승인';

@@ -85,6 +85,7 @@
   "exchangeConfirmUnable": "確認できません",
   "exchangeConfirmPassword": "パスワード",
   "exchangeConfirmNoAccount": "アクティブなアカウントがありません",
+  "exchangeConfirmNoQuote": "No quote available",
   "exchangeConfirmStepApprove": "トークンを承認",
   "exchangeConfirmStepPermit": "パーミットに署名 (EIP-712)",
   "exchangeConfirmWrap": "ラップ",
@@ -101,19 +102,8 @@
   "exchangePageTabLimit": "指値",
   "exchangePageTabBuySell": "売買",
   "exchangeSettingsPriceProtection": "価格保護",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "サブスワップ数",
-  "exchangeSettingsTimeBetween": "サブスワップ間隔",
   "exchangeSettingsReset": "リセット",
   "exchangeSettingsSave": "保存",
-  "exchangeSettingsBlocks": "{count, plural, other{{count}ブロック}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",
@@ -487,8 +477,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{{inputCount}件の入力}} · {outputCount, plural, other{{outputCount}件の出力}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "送金",
