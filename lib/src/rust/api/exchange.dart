@@ -6,7 +6,6 @@
 import '../frb_generated.dart';
 import '../models/exchange.dart';
 import '../models/exchange/pancakeswap.dart';
-import '../models/exchange/thorchain.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/access_list.dart';
@@ -19,19 +18,13 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `execute_thorchain_swap`, `resolve_swap_signer`, `set_eth_gas`
+// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
 
-/// Synchronous bootstrap of all exchange providers across every registered chain. THORChain pool
-/// membership is hardcoded (see [`THORCHAIN_POOLS`]) — no REST call. Halted status is always
-/// `false`: the THORChain `/thorchain/inbound_addresses` live check is dropped for speed; the
-/// swap quote itself will fail if a chain is actually paused.
+/// Synchronous bootstrap of all exchange providers across every registered chain.
 Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
     RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
 
-/// Quote `asset → to` across every provider on `asset`. Same-chain DEX providers (Uniswap,
-/// PancakeSwap) require `to` on the same chain; THORChain bridges to a different chain — its quote
-/// output is a different asset, so the UI renders THORChain as its own bridge route rather than
-/// rate-comparing it. `destination` is the recipient address on `to`'s chain (THORChain only).
+/// Quote `asset → to` across every provider on `asset`.
 Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
         {required ExchangeAsset asset,
         required ExchangeAsset to,

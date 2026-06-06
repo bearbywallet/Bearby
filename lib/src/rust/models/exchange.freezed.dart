@@ -56,7 +56,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult Function(ExchangeProvider_Uniswap value)? uniswap,
     TResult Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
     TResult Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
@@ -65,8 +64,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain() when thorchain != null:
-        return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
@@ -95,7 +92,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(ExchangeProvider_Thorchain value) thorchain,
     required TResult Function(ExchangeProvider_Uniswap value) uniswap,
     required TResult Function(ExchangeProvider_PancakeSwap value) pancakeSwap,
     required TResult Function(ExchangeProvider_ZIlSwap value) zIlSwap,
@@ -103,8 +99,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain():
-        return thorchain(_that);
       case ExchangeProvider_Uniswap():
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap():
@@ -130,7 +124,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ExchangeProvider_Thorchain value)? thorchain,
     TResult? Function(ExchangeProvider_Uniswap value)? uniswap,
     TResult? Function(ExchangeProvider_PancakeSwap value)? pancakeSwap,
     TResult? Function(ExchangeProvider_ZIlSwap value)? zIlSwap,
@@ -138,8 +131,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain() when thorchain != null:
-        return thorchain(_that);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
@@ -167,7 +158,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(ThorchainMeta field0)? thorchain,
     TResult Function(UniswapMeta field0)? uniswap,
     TResult Function(PancakeMeta field0)? pancakeSwap,
     TResult Function(BigInt field0)? zIlSwap,
@@ -176,8 +166,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain() when thorchain != null:
-        return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
@@ -206,7 +194,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(ThorchainMeta field0) thorchain,
     required TResult Function(UniswapMeta field0) uniswap,
     required TResult Function(PancakeMeta field0) pancakeSwap,
     required TResult Function(BigInt field0) zIlSwap,
@@ -214,8 +201,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain():
-        return thorchain(_that.field0);
       case ExchangeProvider_Uniswap():
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap():
@@ -241,7 +226,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(ThorchainMeta field0)? thorchain,
     TResult? Function(UniswapMeta field0)? uniswap,
     TResult? Function(PancakeMeta field0)? pancakeSwap,
     TResult? Function(BigInt field0)? zIlSwap,
@@ -249,8 +233,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
   }) {
     final _that = this;
     switch (_that) {
-      case ExchangeProvider_Thorchain() when thorchain != null:
-        return thorchain(_that.field0);
       case ExchangeProvider_Uniswap() when uniswap != null:
         return uniswap(_that.field0);
       case ExchangeProvider_PancakeSwap() when pancakeSwap != null:
@@ -262,73 +244,6 @@ extension ExchangeProviderPatterns on ExchangeProvider {
       case _:
         return null;
     }
-  }
-}
-
-/// @nodoc
-
-class ExchangeProvider_Thorchain extends ExchangeProvider {
-  const ExchangeProvider_Thorchain(this.field0) : super._();
-
-  @override
-  final ThorchainMeta field0;
-
-  /// Create a copy of ExchangeProvider
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $ExchangeProvider_ThorchainCopyWith<ExchangeProvider_Thorchain>
-      get copyWith =>
-          _$ExchangeProvider_ThorchainCopyWithImpl<ExchangeProvider_Thorchain>(
-              this, _$identity);
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ExchangeProvider_Thorchain &&
-            (identical(other.field0, field0) || other.field0 == field0));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, field0);
-
-  @override
-  String toString() {
-    return 'ExchangeProvider.thorchain(field0: $field0)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $ExchangeProvider_ThorchainCopyWith<$Res>
-    implements $ExchangeProviderCopyWith<$Res> {
-  factory $ExchangeProvider_ThorchainCopyWith(ExchangeProvider_Thorchain value,
-          $Res Function(ExchangeProvider_Thorchain) _then) =
-      _$ExchangeProvider_ThorchainCopyWithImpl;
-  @useResult
-  $Res call({ThorchainMeta field0});
-}
-
-/// @nodoc
-class _$ExchangeProvider_ThorchainCopyWithImpl<$Res>
-    implements $ExchangeProvider_ThorchainCopyWith<$Res> {
-  _$ExchangeProvider_ThorchainCopyWithImpl(this._self, this._then);
-
-  final ExchangeProvider_Thorchain _self;
-  final $Res Function(ExchangeProvider_Thorchain) _then;
-
-  /// Create a copy of ExchangeProvider
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? field0 = null,
-  }) {
-    return _then(ExchangeProvider_Thorchain(
-      null == field0
-          ? _self.field0
-          : field0 // ignore: cast_nullable_to_non_nullable
-              as ThorchainMeta,
-    ));
   }
 }
 

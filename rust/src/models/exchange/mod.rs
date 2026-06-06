@@ -1,23 +1,20 @@
 pub mod pancakeswap;
-pub mod thorchain;
-pub mod univ_router;
 pub mod uniswap;
+pub mod univ_router;
 
 use flutter_rust_bridge::frb;
-use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
+use zilpay::crypto::slip44::{TRON, ZILLIQA};
 
 use super::ftoken::FTokenInfo;
 use super::transactions::base_token::BaseTokenInfo;
 use std::collections::HashSet;
 
 pub use pancakeswap::PancakeMeta;
-pub use thorchain::ThorchainMeta;
-pub use univ_router::RouterConfig;
 pub use uniswap::UniswapMeta;
+pub use univ_router::RouterConfig;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Hash, Clone)]
 pub enum ExchangeProvider {
-    Thorchain(ThorchainMeta),
     Uniswap(UniswapMeta),
     PancakeSwap(PancakeMeta),
     ZIlSwap(u64),
@@ -28,10 +25,6 @@ impl ExchangeProvider {
     #[frb(ignore)]
     pub fn is_support(&self, addr_type: u8, slip44: u32, chain_id: u64) -> bool {
         match self {
-            Self::Thorchain(_) => {
-                const SLIP44: &[u32] = &[BITCOIN, ETHEREUM, TRON, SOLANA];
-                SLIP44.contains(&slip44)
-            }
             Self::Uniswap(_) => addr_type == 1 && uniswap::is_supported_chain(chain_id),
             Self::PancakeSwap(_) => addr_type == 1 && pancakeswap::is_supported_chain(chain_id),
             Self::ZIlSwap(_) => {
@@ -43,11 +36,6 @@ impl ExchangeProvider {
                 addr_type == 4 && SLIP44.contains(&slip44)
             }
         }
-    }
-
-    #[frb(ignore)]
-    pub fn is_thorchain(&self) -> bool {
-        matches!(self, Self::Thorchain(_))
     }
 
     /// Resolve the shared Universal-Router engine config for the EVM-DEX variants
@@ -69,18 +57,6 @@ pub struct ExchangeAsset {
     pub token: FTokenInfo,
     pub providers: HashSet<ExchangeProvider>,
     pub halted: bool,
-}
-
-impl ExchangeAsset {
-    /// The asset's resolved THORChain identity (chain + asset id), if it has a `Thorchain` provider.
-    /// Lets the bridge engine read the asset id straight off the asset instead of re-deriving it.
-    #[frb(ignore)]
-    pub fn thorchain_meta(&self) -> Option<&ThorchainMeta> {
-        self.providers.iter().find_map(|p| match p {
-            ExchangeProvider::Thorchain(meta) => Some(meta),
-            _ => None,
-        })
-    }
 }
 
 /// Display metadata composed on the Dart side and threaded into every tx built for a swap.

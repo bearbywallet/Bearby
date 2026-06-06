@@ -3,12 +3,11 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use zilpay::alloy::primitives::Address as AlloyAddress;
-use zilpay::background::bg_bitcoin::BitcoinManagement;
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_tx::{update_tx_from_params, TransactionsManagement};
 use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::Background;
-use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA, TRON, ZILLIQA};
+use zilpay::crypto::slip44::{TRON, ZILLIQA};
 use zilpay::network::evm::RequiredTxParams;
 use zilpay::proto::address::Address;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
@@ -18,29 +17,20 @@ use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
-use crate::models::exchange::thorchain::{
-    thorchain_check_approval, thorchain_finalize_swap, thorchain_pool_set, thorchain_prepare_swap,
-    thorchain_quote_info, thorchain_router_for_chain, ThorchainBlob, ThorchainSource,
-};
 use crate::models::exchange::univ_router::{
     finalize_router_swap, is_wrap_unwrap, prepare_router_swap, router_check_approval,
     router_quote_info,
 };
 use crate::models::exchange::{
-    ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, PancakeMeta,
-    ThorchainMeta, UniswapMeta,
+    ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo, ExchangeTxDisplay, PancakeMeta, UniswapMeta,
 };
 use crate::models::transactions::base_token::BaseTokenInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::helpers::parse_address;
 
-/// Synchronous bootstrap of all exchange providers across every registered chain. THORChain pool
-/// membership is hardcoded (see [`THORCHAIN_POOLS`]) — no REST call. Halted status is always
-/// `false`: the THORChain `/thorchain/inbound_addresses` live check is dropped for speed; the
-/// swap quote itself will fail if a chain is actually paused.
+/// Synchronous bootstrap of all exchange providers across every registered chain.
 pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String> {
     let guard = BACKGROUND_SERVICE
         .try_read()
@@ -49,9 +39,6 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     let all_providers = service.core.get_providers();
 
     dbg!("called bootstrap_exchange_providers");
-
-    // Hardcoded THORChain tradeable pool assets (no REST call).
-    let thorchain_pools = thorchain_pool_set();
 
     // Pre-size on the exact catalog token count (the slice iterators report exact hints).
     let total_tokens: usize = all_providers.iter().map(|p| p.config.ftokens.len()).sum();
@@ -66,10 +53,7 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     // Exchange providers are constructed explicitly per token — no default/empty candidates.
     // Each branch gates on chain/token support (slip44, chain_id, addr_type, pool membership)
     // before inserting the provider with its resolved metadata.
-    let make_providers = |symbol: &str,
-                          addr: &str,
-                          native: bool,
-                          addr_prefix: u8,
+    let make_providers = |addr_prefix: u8,
                           slip_44: u32,
                           chain_id: u64|
      -> HashSet<ExchangeProvider> {
@@ -89,16 +73,6 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
             }
         }
 
-        // Thorchain — cross-chain bridge (BTC, ETH, TRON, SOL) + pool membership gate
-        const THOR_SLIP44: &[u32] = &[BITCOIN, ETHEREUM, TRON, SOLANA];
-        if THOR_SLIP44.contains(&slip_44) {
-            if let Some(meta) = ThorchainMeta::for_token(slip_44, chain_id, symbol, addr, native) {
-                if thorchain_pools.contains(&meta.asset.to_lowercase()) {
-                    providers.insert(ExchangeProvider::Thorchain(meta));
-                }
-            }
-        }
-
         // ZIlSwap — Zilliqa chain
         if addr_prefix == 0 && slip_44 == ZILLIQA {
             providers.insert(ExchangeProvider::ZIlSwap(chain_id));
@@ -112,29 +86,20 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
         providers
     };
 
-    // Always not halted: DEX providers have no halt concept; THORChain halted status is no longer
-    // fetched live — the swap quote itself will fail if the chain is actually paused.
+    // Always not halted: DEX providers have no halt concept.
     let resolve_halted =
         |_providers: &HashSet<ExchangeProvider>, _slip_44: u32, _chain_id: u64| false;
 
     let mut assets: HashMap<(u64, usize), ExchangeAsset> = HashMap::with_capacity(total_tokens);
 
-    // 1. Catalog: every token on every chain, so all chains are offered for swap/bridge —
-    //    not just the wallet's currently selected one. Balances are filled in pass 2.
+    // 1. Catalog: every token on every chain. Balances are filled in pass 2.
     for provider in all_providers {
         let chain = provider.config;
         let slip_44 = chain.slip_44;
         let chain_id = chain.chain_id();
         for token in chain.ftokens {
             let key = (token.chain_hash, token.addr.to_hash());
-            let providers = make_providers(
-                &token.symbol,
-                &token.addr.auto_format(),
-                token.native,
-                token.addr.prefix_type(),
-                slip_44,
-                chain_id,
-            );
+            let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
             let halted = resolve_halted(&providers, slip_44, chain_id);
             assets.entry(key).or_insert_with(|| ExchangeAsset {
                 token: token.into(),
@@ -163,14 +128,7 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let providers = make_providers(
-                        &token.symbol,
-                        &token.addr.auto_format(),
-                        token.native,
-                        token.addr.prefix_type(),
-                        slip_44,
-                        chain_id,
-                    );
+                    let providers = make_providers(token.addr.prefix_type(), slip_44, chain_id);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     assets.insert(
                         key,
@@ -188,14 +146,7 @@ pub async fn bootstrap_exchange_providers() -> Result<Vec<ExchangeAsset>, String
     Ok(assets.into_values().collect())
 }
 
-/// Default slippage tolerance (bps) used when fetching a THORChain quote for display. The actual
-/// swap re-quotes with the user's chosen `slippage_bps` at execution time.
-const DEFAULT_TOLERANCE_BPS: u32 = 300;
-
-/// Quote `asset → to` across every provider on `asset`. Same-chain DEX providers (Uniswap,
-/// PancakeSwap) require `to` on the same chain; THORChain bridges to a different chain — its quote
-/// output is a different asset, so the UI renders THORChain as its own bridge route rather than
-/// rate-comparing it. `destination` is the recipient address on `to`'s chain (THORChain only).
+/// Quote `asset → to` across every provider on `asset`.
 pub async fn fetch_exchange_quote(
     asset: ExchangeAsset,
     to: ExchangeAsset,
@@ -238,28 +189,6 @@ pub async fn fetch_exchange_quote(
     let mut quotes = Vec::with_capacity(asset.providers.len());
     for provider in &asset.providers {
         dbg!("fetch_exchange_quote: trying provider", provider);
-        // THORChain is a cross-chain bridge quoted over REST, not the on-chain Universal Router.
-        if provider.is_thorchain() {
-            match thorchain_quote_info(
-                provider,
-                &asset,
-                &to,
-                &amount,
-                &destination,
-                DEFAULT_TOLERANCE_BPS,
-            )
-            .await
-            {
-                Ok(quote) => {
-                    dbg!("fetch_exchange_quote: thorchain OK", &quote.amount_out);
-                    quotes.push(quote);
-                }
-                Err(e) => {
-                    dbg!("fetch_exchange_quote: thorchain FAILED", &e);
-                }
-            }
-            continue;
-        }
         // Universal-Router DEX providers (Uniswap, PancakeSwap) share one engine; everything
         // else (ZilSwap, SunSwap) is not yet implemented and resolves to `None`.
         let cfg = match provider.router_config() {
@@ -463,24 +392,7 @@ pub async fn execute_exchange_swap(
     passphrase: Option<String>,
     sink: StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    // THORChain is a cross-chain bridge: native send + memo (BTC) or `router.depositWithExpiry`
-    // (EVM). No Universal Router, no Permit2 — a dedicated orchestrator handles it.
-    if provider.is_thorchain() {
-        return execute_thorchain_swap(
-            wallet_index,
-            account_index,
-            from,
-            to,
-            amount_in,
-            slippage_bps,
-            destination,
-            display,
-            password,
-            passphrase,
-            sink,
-        )
-        .await;
-    }
+    let _ = &destination;
 
     let token_in = from.token.addr.as_str();
     let token_out = to.token.addr.as_str();
@@ -604,169 +516,6 @@ pub async fn execute_exchange_swap(
     Ok(results)
 }
 
-/// **THORChain software-wallet orchestrator.** Under one unlock: re-quote for a fresh memo/expiry,
-/// then either (EVM) optionally `approve(router)` an ERC-20 and broadcast `router.depositWithExpiry`,
-/// or (BTC) broadcast a native send + `OP_RETURN` memo to the inbound vault. No Permit2, no
-/// approve+permit dance. Progress streams `approving`/`approved`/`swapping`/`done`.
-#[allow(clippy::too_many_arguments)]
-async fn execute_thorchain_swap(
-    wallet_index: usize,
-    account_index: usize,
-    from: ExchangeAsset,
-    to: ExchangeAsset,
-    amount_in: String,
-    slippage_bps: u32,
-    destination: String,
-    display: ExchangeTxDisplay,
-    password: Option<String>,
-    passphrase: Option<String>,
-    sink: StreamSink<String>,
-) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
-
-    let seed = unlock_seed(&core, wallet_index, password).await?;
-    let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
-
-    let prepared =
-        thorchain_prepare_swap(&from, &to, &amount_in, &destination, slippage_bps).await?;
-    let blob: ThorchainBlob =
-        zilpay::serde_json::from_str(&prepared.quote_blob).map_err(|e| e.to_string())?;
-
-    let wallet = core
-        .get_wallet_by_index(wallet_index)
-        .map_err(ServiceError::BackgroundError)?;
-    let data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let account = data
-        .get_account(account_index)
-        .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
-    let chain_hash = data.chain_hash;
-
-    let mut results: Vec<HistoricalTransactionInfo> = Vec::with_capacity(2);
-
-    match blob.source {
-        ThorchainSource::Evm {
-            router,
-            asset_addr,
-            is_native,
-            ..
-        } => {
-            let swapper = account.addr.to_alloy_addr();
-            let base = estimate_fast_params(&core, chain_hash, &account.addr).await?;
-            let mut nonce = base.nonce;
-
-            // ERC-20 input: one-time approve(router). Native input pays via `value`, no approval.
-            if !is_native {
-                if let Some(approval) = thorchain_check_approval(
-                    swapper,
-                    chain_hash,
-                    &router,
-                    &asset_addr,
-                    &blob.amount,
-                    display.approve_title.clone(),
-                    display.provider_icon.clone(),
-                )
-                .await?
-                {
-                    let _ = sink.add("approving".to_string());
-                    let mut approve_tx: TransactionRequest = approval
-                        .try_into()
-                        .map_err(ServiceError::TransactionErrors)?;
-                    apply_fast_fees(&mut approve_tx, &base, nonce)?;
-                    results.push(
-                        sign_and_broadcast_one(
-                            &core,
-                            wallet_index,
-                            account_index,
-                            &seed,
-                            &secret_passphrase,
-                            approve_tx,
-                        )
-                        .await?,
-                    );
-                    nonce += 1;
-                    let _ = sink.add("approved".to_string());
-                }
-            }
-
-            let mut swap_tx: TransactionRequest = thorchain_finalize_swap(
-                &prepared.quote_blob,
-                swapper,
-                chain_hash,
-                display.swap_title,
-                display.swap_info,
-                display.provider_icon,
-                display.out_token,
-            )
-            .await?
-            .try_into()
-            .map_err(ServiceError::TransactionErrors)?;
-            apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
-            apply_fast_fees(&mut swap_tx, &base, nonce)?;
-
-            let _ = sink.add("swapping".to_string());
-            results.push(
-                sign_and_broadcast_one(
-                    &core,
-                    wallet_index,
-                    account_index,
-                    &seed,
-                    &secret_passphrase,
-                    swap_tx,
-                )
-                .await?,
-            );
-            let _ = sink.add("done".to_string());
-        }
-        ThorchainSource::Btc { fee_rate } => {
-            let token = from
-                .token
-                .try_into()
-                .map_err(|e: zilpay::errors::token::TokenError| e.to_string())?;
-            let vault = parse_address(blob.vault)?;
-            let amount_sat = blob.amount.parse::<u64>().map_err(|e| e.to_string())?;
-
-            let mut swap_tx = core
-                .build_btc_deposit_with_memo(
-                    &token,
-                    account,
-                    vault,
-                    amount_sat,
-                    &blob.memo,
-                    Some(fee_rate),
-                )
-                .await
-                .map_err(ServiceError::BackgroundError)?;
-            if let TransactionRequest::Bitcoin((_, meta, _)) = &mut swap_tx {
-                meta.title = Some(display.swap_title);
-                meta.info = Some(display.swap_info);
-                meta.icon = Some(display.provider_icon);
-            }
-
-            let _ = sink.add("swapping".to_string());
-            results.push(
-                sign_and_broadcast_one(
-                    &core,
-                    wallet_index,
-                    account_index,
-                    &seed,
-                    &secret_passphrase,
-                    swap_tx,
-                )
-                .await?,
-            );
-            let _ = sink.add("done".to_string());
-        }
-    }
-
-    Ok(results)
-}
-
 /// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the swap,
 /// and if so return the unsigned approval tx — with FAST fees + the given `nonce` already applied —
 /// for a **Ledger** device to sign and broadcast first. Native inputs never need approval
@@ -794,36 +543,20 @@ pub async fn check_exchange_approval(
     };
 
     let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let approval = if provider.is_thorchain() {
-        // ERC-20 → THORChain router (resolved from inbound_addresses, since the approval step
-        // precedes the quote). Native is already short-circuited above.
-        let router = thorchain_router_for_chain(chain_hash).await?;
-        thorchain_check_approval(
-            swapper,
-            chain_hash,
-            &router,
-            &token_in,
-            &amount_in,
-            approve_title,
-            provider_icon,
-        )
-        .await?
-    } else {
-        let cfg = match provider.router_config() {
-            Some(res) => res?,
-            None => return Ok(None),
-        };
-        router_check_approval(
-            &cfg,
-            swapper,
-            chain_hash,
-            &token_in,
-            &amount_in,
-            approve_title,
-            provider_icon,
-        )
-        .await?
+    let cfg = match provider.router_config() {
+        Some(res) => res?,
+        None => return Ok(None),
     };
+    let approval = router_check_approval(
+        &cfg,
+        swapper,
+        chain_hash,
+        &token_in,
+        &amount_in,
+        approve_title,
+        provider_icon,
+    )
+    .await?;
 
     match approval {
         Some(info) => {
@@ -856,15 +589,7 @@ pub async fn prepare_exchange_swap(
     slippage_bps: u32,
     destination: String,
 ) -> Result<PreparedSwapInfo, String> {
-    // THORChain never has Permit2 typed data; the blob carries the memo + vault for finalize.
-    if provider.is_thorchain() {
-        let prepared =
-            thorchain_prepare_swap(&from, &to, &amount_in, &destination, slippage_bps).await?;
-        return Ok(PreparedSwapInfo {
-            permit_typed_data_json: None,
-            quote_blob: prepared.quote_blob,
-        });
-    }
+    let _ = &destination;
 
     let token_in = from.token.addr.as_str();
     let token_out = to.token.addr.as_str();
@@ -916,6 +641,8 @@ pub async fn finalize_exchange_swap(
     provider_icon: String,
     out_token: Option<BaseTokenInfo>,
 ) -> Result<TransactionRequestInfo, String> {
+    let _ = &provider;
+
     let core = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -923,33 +650,17 @@ pub async fn finalize_exchange_swap(
     };
 
     let (signer, swapper, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    // THORChain builds `router.depositWithExpiry` from the blob (EVM); the router engine builds the
-    // Universal Router `execute` calldata with the device-signed permit. BTC-source on Ledger isn't
-    // supported here (thorchain_finalize_swap returns an error for it).
-    let built = if provider.is_thorchain() {
-        thorchain_finalize_swap(
-            &quote_blob,
-            swapper,
-            chain_hash,
-            swap_title,
-            swap_info,
-            provider_icon,
-            out_token,
-        )
-        .await?
-    } else {
-        finalize_router_swap(
-            &quote_blob,
-            swapper,
-            chain_hash,
-            permit_signature.as_deref(),
-            swap_title,
-            swap_info,
-            provider_icon,
-            out_token,
-        )
-        .await?
-    };
+    let built = finalize_router_swap(
+        &quote_blob,
+        swapper,
+        chain_hash,
+        permit_signature.as_deref(),
+        swap_title,
+        swap_info,
+        provider_icon,
+        out_token,
+    )
+    .await?;
     let mut swap_tx: TransactionRequest =
         built.try_into().map_err(ServiceError::TransactionErrors)?;
     apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/glass_message.dart';
 import 'package:bearby/components/modal_drag_handle.dart';
@@ -84,8 +83,7 @@ class _ExchangeConfirmContent extends StatefulWidget {
   final ExchangeAsset to;
   final String amountInWei;
 
-  /// Recipient on the destination chain. Same address as the wallet for same-chain swaps; the
-  /// chosen recipient for a THORChain cross-chain bridge.
+  /// Recipient address. Same-chain swaps use the active account address.
   final String destination;
   final int slippageBps;
   final VoidCallback onDone;
@@ -148,9 +146,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   FTokenInfo get _toToken => widget.to.token;
   bool get _isNativeIn => widget.from.token.native;
 
-  /// THORChain bridge route: native send + memo / router deposit, never Permit2.
-  bool get _isThorchain => _selected.provider.isThorchain;
-
   // -------------------------------------------------------------------------
   // Lifecycle
   // -------------------------------------------------------------------------
@@ -183,13 +178,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
     final appState = context.read<AppState>();
 
-    // Native input and pure wrap/unwrap are single-tx. THORChain never uses Permit2, so an ERC-20
-    // bridge is approve → swap; an ERC-20 DEX swap is approve → permit → swap.
+    // Native input and pure wrap/unwrap are single-tx; ERC-20 swaps are approve → permit → swap.
     _plan = (_isNativeIn || _isWrapUnwrap)
         ? const <_Step>[_Step.swap]
-        : _isThorchain
-            ? const <_Step>[_Step.approve, _Step.swap]
-            : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
+        : const <_Step>[_Step.approve, _Step.permit, _Step.swap];
     for (final s in _plan) {
       _stepStates[s] = _StepState.pending;
     }
@@ -199,7 +191,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     // Preview each route's network fee up front. Only native-in swaps can be estimated without a
     // signed permit / on-chain allowance, so ERC-20-input routes show no gas.
     if (_isNativeIn) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _estimateAllRouteGas());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _estimateAllRouteGas());
     }
   }
 
@@ -624,7 +617,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   String _stepLabel(AppLocalizations l10n, _Step step) => switch (step) {
         _Step.approve => l10n.exchangeConfirmStepApprove,
         _Step.permit => l10n.exchangeConfirmStepPermit,
-        _Step.swap => _isWrapUnwrap ? _wrapVerb(l10n) : l10n.exchangePageTabSwap,
+        _Step.swap =>
+          _isWrapUnwrap ? _wrapVerb(l10n) : l10n.exchangePageTabSwap,
       };
 
   Widget _stepRow(AppTheme theme, AppLocalizations l10n, _Step step) {
@@ -663,8 +657,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     );
   }
 
-
-
   /// Selected route's gas as a native-token amount string, or `null` when not yet estimated /
   /// not available (ERC-20 input). Pre-sized formatting via [formatingAmount].
   String? _routeGasText(AppState appState, int index) {
@@ -680,7 +672,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     return text;
   }
 
-  Widget _buildRouteList(AppState appState, AppTheme theme, AppLocalizations l10n) {
+  Widget _buildRouteList(
+      AppState appState, AppTheme theme, AppLocalizations l10n) {
     return Column(
       children: List<Widget>.generate(
         widget.quotes.length,
@@ -744,16 +737,14 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                 children: [
                   Text(
                     '$_payText → $out',
-                    style:
-                        theme.bodyText1.copyWith(color: theme.textPrimary),
+                    style: theme.bodyText1.copyWith(color: theme.textPrimary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     gasLabel,
-                    style: theme.bodyText2
-                        .copyWith(color: theme.textSecondary),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -762,8 +753,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
             ),
             if (isBest)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: theme.success.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
@@ -809,27 +799,11 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   }
 
   Widget _buildMeta(AppTheme theme, AppLocalizations l10n) {
-    final recipient = widget.destination;
     final slippage = '${(widget.slippageBps / 100).toStringAsFixed(2)}%';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (recipient.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Row(
-              children: [
-                Text(
-                  l10n.exchangeConfirmRecipient,
-                  style:
-                      theme.bodyText2.copyWith(color: theme.textSecondary),
-                ),
-                const Spacer(),
-                CopyContent(address: recipient),
-              ],
-            ),
-          ),
         _metaRow(
           theme,
           l10n.exchangeConfirmSlippage,

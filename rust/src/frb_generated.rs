@@ -6246,24 +6246,19 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
         match tag_ {
             0 => {
                 let mut var_field0 =
-                    <crate::models::exchange::thorchain::ThorchainMeta>::sse_decode(deserializer);
-                return crate::models::exchange::ExchangeProvider::Thorchain(var_field0);
-            }
-            1 => {
-                let mut var_field0 =
                     <crate::models::exchange::uniswap::UniswapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::Uniswap(var_field0);
             }
-            2 => {
+            1 => {
                 let mut var_field0 =
                     <crate::models::exchange::pancakeswap::PancakeMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::PancakeSwap(var_field0);
             }
-            3 => {
+            2 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::ZIlSwap(var_field0);
             }
-            4 => {
+            3 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
             }
@@ -7714,20 +7709,6 @@ impl SseDecode for crate::api::ledger_transport::RustLedgerHidDevice {
     }
 }
 
-impl SseDecode for crate::models::exchange::thorchain::ThorchainMeta {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_chain = <String>::sse_decode(deserializer);
-        let mut var_asset = <String>::sse_decode(deserializer);
-        let mut var_chainId = <u64>::sse_decode(deserializer);
-        return crate::models::exchange::thorchain::ThorchainMeta {
-            chain: var_chain,
-            asset: var_asset,
-            chain_id: var_chainId,
-        };
-    }
-}
-
 impl SseDecode for crate::api::transaction::TokenTransferParamsInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9149,20 +9130,17 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeAsset>
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::models::exchange::ExchangeProvider::Thorchain(field0) => {
+            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
                 [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
+            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
-                [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
-            }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
-                [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+                [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -9776,28 +9754,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger_transport::RustLedgerH
     for crate::api::ledger_transport::RustLedgerHidDevice
 {
     fn into_into_dart(self) -> crate::api::ledger_transport::RustLedgerHidDevice {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::exchange::thorchain::ThorchainMeta {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.chain.into_into_dart().into_dart(),
-            self.asset.into_into_dart().into_dart(),
-            self.chain_id.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::exchange::thorchain::ThorchainMeta
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::thorchain::ThorchainMeta>
-    for crate::models::exchange::thorchain::ThorchainMeta
-{
-    fn into_into_dart(self) -> crate::models::exchange::thorchain::ThorchainMeta {
         self
     }
 }
@@ -10573,24 +10529,20 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::models::exchange::ExchangeProvider::Thorchain(field0) => {
-                <i32>::sse_encode(0, serializer);
-                <crate::models::exchange::thorchain::ThorchainMeta>::sse_encode(field0, serializer);
-            }
             crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
-                <i32>::sse_encode(1, serializer);
+                <i32>::sse_encode(0, serializer);
                 <crate::models::exchange::uniswap::UniswapMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
-                <i32>::sse_encode(2, serializer);
+                <i32>::sse_encode(1, serializer);
                 <crate::models::exchange::pancakeswap::PancakeMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
-                <i32>::sse_encode(3, serializer);
+                <i32>::sse_encode(2, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
-                <i32>::sse_encode(4, serializer);
+                <i32>::sse_encode(3, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             _ => {
@@ -11680,15 +11632,6 @@ impl SseEncode for crate::api::ledger_transport::RustLedgerHidDevice {
         <u16>::sse_encode(self.product_id, serializer);
         <String>::sse_encode(self.product_name, serializer);
         <String>::sse_encode(self.model_id, serializer);
-    }
-}
-
-impl SseEncode for crate::models::exchange::thorchain::ThorchainMeta {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.chain, serializer);
-        <String>::sse_encode(self.asset, serializer);
-        <u64>::sse_encode(self.chain_id, serializer);
     }
 }
 
