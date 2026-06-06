@@ -776,12 +776,17 @@ fn wire__crate__api__exchange__bootstrap_exchange_providers_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::exchange::bootstrap_exchange_providers().await?;
+                        let output_ok = crate::api::exchange::bootstrap_exchange_providers(
+                            api_wallet_index,
+                            api_account_index,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1736,7 +1741,8 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
             let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_provider =
                 <crate::models::exchange::ExchangeProvider>::sse_decode(&mut deserializer);
-            let api_token_in = <String>::sse_decode(&mut deserializer);
+            let api_from = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
+            let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
             let api_amount_in = <String>::sse_decode(&mut deserializer);
             let api_is_native_in = <bool>::sse_decode(&mut deserializer);
             let api_nonce = <u64>::sse_decode(&mut deserializer);
@@ -1750,7 +1756,8 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
                             api_wallet_index,
                             api_account_index,
                             api_provider,
-                            api_token_in,
+                            api_from,
+                            api_to,
                             api_amount_in,
                             api_is_native_in,
                             api_nonce,
@@ -2192,7 +2199,6 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
             let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
             let api_amount_in = <String>::sse_decode(&mut deserializer);
             let api_slippage_bps = <u32>::sse_decode(&mut deserializer);
-            let api_destination = <String>::sse_decode(&mut deserializer);
             let api_display =
                 <crate::models::exchange::ExchangeTxDisplay>::sse_decode(&mut deserializer);
             let api_password = <Option<String>>::sse_decode(&mut deserializer);
@@ -2213,7 +2219,6 @@ fn wire__crate__api__exchange__execute_exchange_swap_impl(
                             api_to,
                             api_amount_in,
                             api_slippage_bps,
-                            api_destination,
                             api_display,
                             api_password,
                             api_passphrase,
@@ -3919,7 +3924,6 @@ fn wire__crate__api__exchange__prepare_exchange_swap_impl(
             let api_to = <crate::models::exchange::ExchangeAsset>::sse_decode(&mut deserializer);
             let api_amount_in = <String>::sse_decode(&mut deserializer);
             let api_slippage_bps = <u32>::sse_decode(&mut deserializer);
-            let api_destination = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -3932,7 +3936,6 @@ fn wire__crate__api__exchange__prepare_exchange_swap_impl(
                             api_to,
                             api_amount_in,
                             api_slippage_bps,
-                            api_destination,
                         )
                         .await?;
                         Ok(output_ok)
@@ -6246,19 +6249,24 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
         match tag_ {
             0 => {
                 let mut var_field0 =
+                    <crate::models::exchange::relay::RelayMeta>::sse_decode(deserializer);
+                return crate::models::exchange::ExchangeProvider::Relay(var_field0);
+            }
+            1 => {
+                let mut var_field0 =
                     <crate::models::exchange::uniswap::UniswapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::Uniswap(var_field0);
             }
-            1 => {
+            2 => {
                 let mut var_field0 =
                     <crate::models::exchange::pancakeswap::PancakeMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::PancakeSwap(var_field0);
             }
-            2 => {
+            3 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::ZIlSwap(var_field0);
             }
-            3 => {
+            4 => {
                 let mut var_field0 = <u64>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
             }
@@ -7642,6 +7650,22 @@ impl SseDecode for (usize, String) {
         let mut var_field0 = <usize>::sse_decode(deserializer);
         let mut var_field1 = <String>::sse_decode(deserializer);
         return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for crate::models::exchange::relay::RelayMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
+        let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_slip44 = <u32>::sse_decode(deserializer);
+        let mut var_accountAddr = <String>::sse_decode(deserializer);
+        return crate::models::exchange::relay::RelayMeta {
+            chain_hash: var_chainHash,
+            chain_id: var_chainId,
+            slip44: var_slip44,
+            account_addr: var_accountAddr,
+        };
     }
 }
 
@@ -9130,17 +9154,20 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::ExchangeAsset>
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
+            crate::models::exchange::ExchangeProvider::Relay(field0) => {
                 [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
                 [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
                 [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+                [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -9677,6 +9704,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::qrcode::QrConfigInfo>
     for crate::models::qrcode::QrConfigInfo
 {
     fn into_into_dart(self) -> crate::models::qrcode::QrConfigInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::relay::RelayMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.chain_hash.into_into_dart().into_dart(),
+            self.chain_id.into_into_dart().into_dart(),
+            self.slip44.into_into_dart().into_dart(),
+            self.account_addr.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::relay::RelayMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::relay::RelayMeta>
+    for crate::models::exchange::relay::RelayMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::relay::RelayMeta {
         self
     }
 }
@@ -10529,20 +10579,24 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
+            crate::models::exchange::ExchangeProvider::Relay(field0) => {
                 <i32>::sse_encode(0, serializer);
+                <crate::models::exchange::relay::RelayMeta>::sse_encode(field0, serializer);
+            }
+            crate::models::exchange::ExchangeProvider::Uniswap(field0) => {
+                <i32>::sse_encode(1, serializer);
                 <crate::models::exchange::uniswap::UniswapMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
-                <i32>::sse_encode(1, serializer);
+                <i32>::sse_encode(2, serializer);
                 <crate::models::exchange::pancakeswap::PancakeMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::ZIlSwap(field0) => {
-                <i32>::sse_encode(2, serializer);
+                <i32>::sse_encode(3, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
-                <i32>::sse_encode(3, serializer);
+                <i32>::sse_encode(4, serializer);
                 <u64>::sse_encode(field0, serializer);
             }
             _ => {
@@ -11594,6 +11648,16 @@ impl SseEncode for (usize, String) {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.0, serializer);
         <String>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::relay::RelayMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.chain_hash, serializer);
+        <u64>::sse_encode(self.chain_id, serializer);
+        <u32>::sse_encode(self.slip44, serializer);
+        <String>::sse_encode(self.account_addr, serializer);
     }
 }
 

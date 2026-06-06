@@ -6,6 +6,7 @@
 import '../frb_generated.dart';
 import '../models/exchange.dart';
 import '../models/exchange/pancakeswap.dart';
+import '../models/exchange/relay.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/access_list.dart';
@@ -21,8 +22,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
 
 /// Synchronous bootstrap of all exchange providers across every registered chain.
-Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
-    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
+Future<List<ExchangeAsset>> bootstrapExchangeProviders(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
 /// Quote `asset → to` across every provider on `asset`.
 Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
@@ -47,7 +50,6 @@ Stream<String> executeExchangeSwap(
         required ExchangeAsset to,
         required String amountIn,
         required int slippageBps,
-        required String destination,
         required ExchangeTxDisplay display,
         String? password,
         String? passphrase}) =>
@@ -59,7 +61,6 @@ Stream<String> executeExchangeSwap(
         to: to,
         amountIn: amountIn,
         slippageBps: slippageBps,
-        destination: destination,
         display: display,
         password: password,
         passphrase: passphrase);
@@ -72,7 +73,8 @@ Future<TransactionRequestInfo?> checkExchangeApproval(
         {required BigInt walletIndex,
         required BigInt accountIndex,
         required ExchangeProvider provider,
-        required String tokenIn,
+        required ExchangeAsset from,
+        required ExchangeAsset to,
         required String amountIn,
         required bool isNativeIn,
         required BigInt nonce,
@@ -82,7 +84,8 @@ Future<TransactionRequestInfo?> checkExchangeApproval(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         provider: provider,
-        tokenIn: tokenIn,
+        from: from,
+        to: to,
         amountIn: amountIn,
         isNativeIn: isNativeIn,
         nonce: nonce,
@@ -96,8 +99,7 @@ Future<PreparedSwapInfo> prepareExchangeSwap(
         required ExchangeAsset from,
         required ExchangeAsset to,
         required String amountIn,
-        required int slippageBps,
-        required String destination}) =>
+        required int slippageBps}) =>
     RustLib.instance.api.crateApiExchangePrepareExchangeSwap(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -105,8 +107,7 @@ Future<PreparedSwapInfo> prepareExchangeSwap(
         from: from,
         to: to,
         amountIn: amountIn,
-        slippageBps: slippageBps,
-        destination: destination);
+        slippageBps: slippageBps);
 
 /// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
 /// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and

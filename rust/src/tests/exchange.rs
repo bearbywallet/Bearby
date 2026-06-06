@@ -9,7 +9,7 @@ mod exchange_tests {
         prepare_exchange_swap,
     };
     use crate::api::provider::get_chains_providers_from_json;
-    use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
+    use crate::api::wallet::{Bip39AddWalletParams, add_bip39_wallet};
 
     use crate::api::backend::is_service_running;
     use crate::models::exchange::{ExchangeAsset, ExchangeProvider};
@@ -101,8 +101,8 @@ mod exchange_tests {
 
     /// Pick the bootstrapped native-ETH (chain 1) asset with a Uniswap provider, the USDC (chain 1)
     /// destination asset, and the `ExchangeProvider::Uniswap` variant.
-    fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
-        let assets = bootstrap_exchange_providers().unwrap();
+    async fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
+        let assets = bootstrap_exchange_providers(0, 0).await.unwrap();
         let asset = assets
             .iter()
             .find(|a| {
@@ -131,7 +131,7 @@ mod exchange_tests {
     async fn test_bootstrap_exchange_providers() {
         setup_eth_wallet().await;
 
-        let assets = bootstrap_exchange_providers().unwrap();
+        let assets = bootstrap_exchange_providers(0, 0).await.unwrap();
 
         assert!(
             assets.iter().any(|a| {
@@ -150,7 +150,7 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_build_exchange_tx_native() {
         setup_eth_wallet().await;
-        let (eth, usdc, provider) = uniswap_asset();
+        let (eth, usdc, provider) = uniswap_asset().await;
 
         let prepared = prepare_exchange_swap(
             0,
@@ -160,7 +160,6 @@ mod exchange_tests {
             usdc,
             ONE_ETH.to_string(),
             50, // slippage_bps = 0.5%
-            String::new(),
         )
         .await
         .expect("prepare native swap");
@@ -197,7 +196,7 @@ mod exchange_tests {
     #[zilpay::tokio::test]
     async fn test_fetch_exchange_quote() {
         setup_eth_wallet().await;
-        let (asset, usdc, _) = uniswap_asset();
+        let (asset, usdc, _) = uniswap_asset().await;
 
         let quotes = fetch_exchange_quote(
             asset,

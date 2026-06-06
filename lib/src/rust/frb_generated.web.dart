@@ -35,6 +35,7 @@ import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
+import 'models/exchange/relay.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -234,6 +235,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (TransactionBitcoin, BitcoinMetadataInfo)
       dco_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
           dynamic raw);
+
+  @protected
+  RelayMeta dco_decode_box_autoadd_relay_meta(dynamic raw);
 
   @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
@@ -615,6 +619,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) dco_decode_record_usize_string(dynamic raw);
 
   @protected
+  RelayMeta dco_decode_relay_meta(dynamic raw);
+
+  @protected
   RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw);
 
   @protected
@@ -873,6 +880,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (TransactionBitcoin, BitcoinMetadataInfo)
       sse_decode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
           SseDeserializer deserializer);
+
+  @protected
+  RelayMeta sse_decode_box_autoadd_relay_meta(SseDeserializer deserializer);
 
   @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
@@ -1299,6 +1309,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
 
   @protected
+  RelayMeta sse_decode_relay_meta(SseDeserializer deserializer);
+
+  @protected
   RequiredTxParamsInfo sse_decode_required_tx_params_info(
       SseDeserializer deserializer);
 
@@ -1571,6 +1584,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
       (TransactionBitcoin, BitcoinMetadataInfo) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_relay_meta(
+      RelayMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_required_tx_params_info(
@@ -2008,6 +2025,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_usize_string(
       (BigInt, String) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_relay_meta(RelayMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_required_tx_params_info(

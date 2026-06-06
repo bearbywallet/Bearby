@@ -50,7 +50,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   String? _assetsError;
   // "You pay" — our tokens on the active network (source = active wallet chain).
   List<ExchangeAsset> _assets = const [];
-  // "You get" — every Uniswap-supported token on the active chain (same-chain swaps only).
+  // "You get" — swappable tokens across every Relay-supported chain; router-only pairs still
+  // resolve to same-chain quotes because non-Relay providers reject cross-chain pairs in Rust.
   List<ExchangeAsset> _getAssets = const [];
   ExchangeAsset? _fromAsset;
   ExchangeAsset? _toAsset;
@@ -63,10 +64,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   // driving "You get" and the swap — auto-set to the best, overridable via the provider picker.
   List<ExchangeQuoteInfo> _quotes = const [];
   ExchangeQuoteInfo? _selectedQuote;
-  // Recipient for the current same-chain `from → to` pair (self). Resolved during the quote fetch
-  // and reused by the swap handoff.
-  String? _destination;
-
   // Active chain at the last bootstrap — used to re-bootstrap when the network changes (the page
   // is kept alive in a StatefulShellBranch, so initState runs only once).
   BigInt? _lastChainHash;
@@ -112,20 +109,26 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     });
 
     try {
+      final wallet = _appState.wallet;
+      if (wallet == null) {
+        throw Exception('no wallet selected');
+      }
       debugPrint('[exchange] calling bootstrapExchangeProviders...');
-      final all = await bootstrapExchangeProviders();
+      final all = await bootstrapExchangeProviders(
+        walletIndex: _appState.selectedWalletIndex,
+        accountIndex: wallet.selectedAccount,
+      );
       debugPrint('[exchange] got ${all.length} assets, '
           'withProviders=${all.where((a) => a.providers.isNotEmpty).length}');
 
       final chainHash = _appState.wallet?.chainHash;
       debugPrint('[exchange] active chainHash=$chainHash');
-      // DEX routes a single hop on ONE chain — both "pay" and "get" are same-chain.
       final pay = all
           .where((a) => a.token.chainHash == chainHash && _isSwappable(a))
           .toList();
       debugPrint('[exchange] pay side: ${pay.length} tokens');
 
-      final get = pay;
+      final get = all.where(_isSwappable).toList();
       debugPrint('[exchange] get side: ${get.length} tokens');
 
       ExchangeAsset? from;
@@ -161,24 +164,49 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
-  /// "You get" assets: every swappable token on the same chain, excluding whatever is selected on
-  /// the "pay" side.
-  List<ExchangeAsset> get _outAssets =>
-      _getAssets.where((a) => a != _fromAsset).toList();
+  /// "You get" assets: same-chain router candidates plus cross-chain Relay candidates, excluding
+  /// whatever is selected on the "pay" side.
+  List<ExchangeAsset> get _outAssets {
+    final from = _fromAsset;
+    return _getAssets.where((a) {
+      if (a == from) return false;
+      if (from == null) return true;
+      if (a.token.chainHash == from.token.chainHash) return true;
+      return _hasRelay(from) && _hasRelay(a);
+    }).toList();
+  }
 
-  /// A token that at least one same-chain exchange provider supports.
+  /// A token that at least one exchange provider supports.
   static bool _isSwappable(ExchangeAsset a) => a.providers.isNotEmpty;
+
+  static bool _hasRelay(ExchangeAsset a) => a.providers.any(
+        (p) => p.whenOrNull(relay: (_) => true) ?? false,
+      );
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
   }
 
-  /// Same-chain swaps land on the active address.
+  /// Relay fills the destination chain directly, so resolve the selected account address for the
+  /// output token's chain. Same-chain swaps naturally return the active account address.
   Future<String?> _resolveDestination(
       ExchangeAsset from, ExchangeAsset to) async {
-    final account = _appState.account;
-    return account?.addr;
+    final wallet = _appState.wallet;
+    final activeAccount = _appState.account;
+    if (wallet == null || activeAccount == null) return null;
+    if (from.token.chainHash == to.token.chainHash) return activeAccount.addr;
+
+    final chain = _appState.getChain(to.token.chainHash);
+    if (chain == null) return null;
+    final accountsByBip = wallet.accounts[chain.slip44];
+    if (accountsByBip == null || accountsByBip.isEmpty) return null;
+
+    final preferred = accountsByBip[wallet.bip];
+    final accounts = preferred ?? accountsByBip.values.first;
+    final selected = wallet.selectedAccount.toInt();
+    return accounts.elementAtOrNull(selected)?.addr ??
+        (accounts.isNotEmpty ? accounts.first.addr : null);
   }
 
   Future<void> _fetchQuotes() async {
@@ -204,7 +232,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         throw Exception('no wallet account');
       }
       if (!mounted) return;
-      _destination = destination;
       final quotes = await fetchExchangeQuote(
         asset: from,
         to: to,
@@ -314,17 +341,16 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final from = _fromAsset;
     final to = _toAsset;
     final quote = _selectedQuote;
-    final destination = _destination;
     if (wallet == null ||
         account == null ||
         from == null ||
         to == null ||
-        quote == null ||
-        destination == null) {
+        quote == null) {
       return;
     }
 
     final isSupported = quote.provider.whenOrNull(
+          relay: (_) => true,
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
         ) ??
@@ -345,7 +371,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       from: from,
       to: to,
       amountInWei: amountInWei.toString(),
-      destination: destination,
       slippageBps: _slippageBps,
       onDone: () => context.go(AppRoutes.history),
       onDismiss: () => _btnController.reset(),

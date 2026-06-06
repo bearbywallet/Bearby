@@ -48,7 +48,6 @@ void showExchangeConfirmModal({
   required ExchangeAsset from,
   required ExchangeAsset to,
   required String amountInWei,
-  required String destination,
   required int slippageBps,
   required VoidCallback onDone,
   VoidCallback? onDismiss,
@@ -66,7 +65,6 @@ void showExchangeConfirmModal({
       from: from,
       to: to,
       amountInWei: amountInWei,
-      destination: destination,
       slippageBps: slippageBps,
       onDone: onDone,
     ),
@@ -83,8 +81,6 @@ class _ExchangeConfirmContent extends StatefulWidget {
   final ExchangeAsset to;
   final String amountInWei;
 
-  /// Recipient address. Same-chain swaps use the active account address.
-  final String destination;
   final int slippageBps;
   final VoidCallback onDone;
 
@@ -93,7 +89,6 @@ class _ExchangeConfirmContent extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amountInWei,
-    required this.destination,
     required this.slippageBps,
     required this.onDone,
   });
@@ -350,7 +345,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
-        destination: widget.destination,
       );
       final disp = _displayFor(appState, l10n, quote);
       final tx = await finalizeExchangeSwap(
@@ -409,7 +403,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       to: widget.to,
       amountIn: widget.amountInWei,
       slippageBps: widget.slippageBps,
-      destination: widget.destination,
       display: _displayFor(appState, l10n, _selected),
       password: wallet.authType == 'none' ? _passwordController.text : null,
     );
@@ -476,7 +469,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
           walletIndex: walletIndexBig,
           accountIndex: accountIndexBig,
           provider: _selected.provider,
-          tokenIn: _fromToken.addr,
+          from: widget.from,
+          to: widget.to,
           amountIn: widget.amountInWei,
           isNativeIn: _isNativeIn,
           nonce: baseNonce,
@@ -511,7 +505,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         to: widget.to,
         amountIn: widget.amountInWei,
         slippageBps: widget.slippageBps,
-        destination: widget.destination,
       );
 
       String? permitSignature;
