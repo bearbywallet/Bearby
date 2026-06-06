@@ -35,7 +35,6 @@ import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
-import 'models/exchange/thorchain.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -239,9 +238,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
       dynamic raw);
-
-  @protected
-  ThorchainMeta dco_decode_box_autoadd_thorchain_meta(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
@@ -628,9 +624,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
 
   @protected
-  ThorchainMeta dco_decode_thorchain_meta(dynamic raw);
-
-  @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
 
   @protected
@@ -883,10 +876,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
-      SseDeserializer deserializer);
-
-  @protected
-  ThorchainMeta sse_decode_box_autoadd_thorchain_meta(
       SseDeserializer deserializer);
 
   @protected
@@ -1322,9 +1311,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  ThorchainMeta sse_decode_thorchain_meta(SseDeserializer deserializer);
-
-  @protected
   TokenTransferParamsInfo sse_decode_token_transfer_params_info(
       SseDeserializer deserializer);
 
@@ -1589,10 +1575,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_thorchain_meta(
-      ThorchainMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_token_transfer_params_info(
@@ -2038,9 +2020,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_rust_ledger_hid_device(
       RustLedgerHidDevice self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_thorchain_meta(ThorchainMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(

@@ -5,7 +5,6 @@
 
 import '../frb_generated.dart';
 import 'exchange/pancakeswap.dart';
-import 'exchange/thorchain.dart';
 import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -41,9 +40,6 @@ class ExchangeAsset {
 sealed class ExchangeProvider with _$ExchangeProvider {
   const ExchangeProvider._();
 
-  const factory ExchangeProvider.thorchain(
-    ThorchainMeta field0,
-  ) = ExchangeProvider_Thorchain;
   const factory ExchangeProvider.uniswap(
     UniswapMeta field0,
   ) = ExchangeProvider_Uniswap;

@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/exchange_provider_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -21,7 +20,6 @@ import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/exchange.dart';
-import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
@@ -65,9 +63,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   // driving "You get" and the swap — auto-set to the best, overridable via the provider picker.
   List<ExchangeQuoteInfo> _quotes = const [];
   ExchangeQuoteInfo? _selectedQuote;
-  // Recipient on the destination chain for the current `from → to` pair (self). Resolved during
-  // the quote fetch and reused by the swap handoff. Cross-chain (THORChain) needs the user's own
-  // address on the *target* chain, not the active-chain address.
+  // Recipient for the current same-chain `from → to` pair (self). Resolved during the quote fetch
+  // and reused by the swap handoff.
   String? _destination;
 
   // Active chain at the last bootstrap — used to re-bootstrap when the network changes (the page
@@ -122,21 +119,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
       final chainHash = _appState.wallet?.chainHash;
       debugPrint('[exchange] active chainHash=$chainHash');
-      // DEX (Uniswap/PancakeSwap) routes a single hop on ONE chain — both "pay" and "get"
-      // are same-chain. Thorchain bridges across chains, so when the active chain has Thorchain
-      // tokens the "get" list expands to every Thorchain-supported token on every chain.
+      // DEX routes a single hop on ONE chain — both "pay" and "get" are same-chain.
       final pay = all
           .where((a) => a.token.chainHash == chainHash && _isSwappable(a))
           .toList();
       debugPrint('[exchange] pay side: ${pay.length} tokens');
 
-      final hasThorchain =
-          pay.any((a) => a.providers.any((p) => p.isThorchain));
-      debugPrint('[exchange] hasThorchain=$hasThorchain');
-
-      final get = hasThorchain
-          ? all.where((a) => a.providers.any((p) => p.isThorchain)).toList()
-          : pay;
+      final get = pay;
       debugPrint('[exchange] get side: ${get.length} tokens');
 
       ExchangeAsset? from;
@@ -150,7 +139,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         to = a;
         break;
       }
-      debugPrint('[exchange] from=${from?.token.symbol} to=${to?.token.symbol}');
+      debugPrint(
+          '[exchange] from=${from?.token.symbol} to=${to?.token.symbol}');
 
       if (!mounted) return;
       setState(() {
@@ -171,13 +161,12 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
-  /// "You get" assets: every swappable token, excluding whatever is selected on the "pay"
-  /// side. Same-chain for DEX; all Thorchain-pool tokens when bridging via Thorchain.
+  /// "You get" assets: every swappable token on the same chain, excluding whatever is selected on
+  /// the "pay" side.
   List<ExchangeAsset> get _outAssets =>
       _getAssets.where((a) => a != _fromAsset).toList();
 
-  /// A token that at least one exchange provider supports — DEX (Uniswap, PancakeSwap,
-  /// ZIlSwap, SunSwap) or cross-chain bridge (Thorchain).
+  /// A token that at least one same-chain exchange provider supports.
   static bool _isSwappable(ExchangeAsset a) => a.providers.isNotEmpty;
 
   void _scheduleQuote() {
@@ -185,20 +174,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
   }
 
-  /// Self-recipient on the destination chain. Same-chain swaps land on the active address; a
-  /// cross-chain (THORChain) bridge needs the user's own address on the *target* chain, which the
-  /// wallet already stores per chain type but only core can resolve.
+  /// Same-chain swaps land on the active address.
   Future<String?> _resolveDestination(
       ExchangeAsset from, ExchangeAsset to) async {
     final account = _appState.account;
-    final wallet = _appState.wallet;
-    if (account == null || wallet == null) return null;
-    if (from.token.chainHash == to.token.chainHash) return account.addr;
-    return getAccountAddressForChain(
-      walletIndex: _appState.selectedWalletIndex,
-      accountIndex: wallet.selectedAccount,
-      chainHash: to.token.chainHash,
-    );
+    return account?.addr;
   }
 
   Future<void> _fetchQuotes() async {
@@ -221,7 +201,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     try {
       final destination = await _resolveDestination(from, to);
       if (destination == null) {
-        throw Exception('no wallet account on the destination chain');
+        throw Exception('no wallet account');
       }
       if (!mounted) return;
       _destination = destination;
@@ -231,18 +211,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         amount: amountWei.toString(),
         destination: destination,
       );
-      // Same-chain shows DEX routes; cross-chain shows the THORChain bridge route. Keeping the list
-      // homogeneous avoids rate-comparing a different-asset bridge output against same-chain quotes.
       // Quotes are pre-sorted best-first by Rust; auto-select the first.
-      final crossChain = from.token.chainHash != to.token.chainHash;
-      final routes = quotes
-          .where((q) => q.provider.isThorchain == crossChain)
-          .toList(growable: false);
-
       if (!mounted) return;
       setState(() {
-        _quotes = routes;
-        _selectedQuote = routes.isNotEmpty ? routes.first : null;
+        _quotes = quotes;
+        _selectedQuote = quotes.isNotEmpty ? quotes.first : null;
         _loadingQuote = false;
       });
     } catch (e) {
@@ -354,7 +327,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final isSupported = quote.provider.whenOrNull(
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
-          thorchain: (_) => true,
         ) ??
         false;
     if (!isSupported) {
@@ -366,8 +338,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
     // The confirm modal owns route selection and the whole approve → (permit) → swap sequence
     // (batched for software wallets, step-by-step on Ledger), so the page just hands it the
-    // full quote list (best-first) and the shared swap intent. `destination` is the recipient on
-    // the destination chain (self for same-chain swaps).
+    // full quote list (best-first) and the shared swap intent.
     showExchangeConfirmModal(
       context: context,
       quotes: _quotes,
