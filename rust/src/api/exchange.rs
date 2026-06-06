@@ -142,6 +142,15 @@ pub async fn bootstrap_exchange_providers(
     let resolve_halted =
         |_providers: &HashSet<ExchangeProvider>, _slip_44: u32, _chain_id: u64| false;
 
+    // Cross-chain destinations can only be reached via a bridge — strip chain-local DEX
+    // providers in-place (retain avoids a second allocation) for any foreign-chain token.
+    let active_chain_hash = wallet_data.chain_hash;
+    let scope_providers = |providers: &mut HashSet<ExchangeProvider>, token_chain_hash: u64| {
+        if token_chain_hash != active_chain_hash {
+            providers.retain(ExchangeProvider::is_bridge);
+        }
+    };
+
     let mut assets: HashMap<(u64, usize), ExchangeAsset> = HashMap::with_capacity(total_tokens);
 
     // 1. Catalog: every token on every chain. Balances are filled in pass 2.
@@ -154,12 +163,13 @@ pub async fn bootstrap_exchange_providers(
         let chain_id = chain.chain_id();
         for token in chain.ftokens {
             let key = (token.chain_hash, token.addr.to_hash());
-            let providers = make_providers(
+            let mut providers = make_providers(
                 token.addr.prefix_type(),
                 slip_44,
                 chain_id,
                 token.chain_hash,
             );
+            scope_providers(&mut providers, token.chain_hash);
             let halted = resolve_halted(&providers, slip_44, chain_id);
             assets.entry(key).or_insert_with(|| ExchangeAsset {
                 token: token.into(),
@@ -188,12 +198,13 @@ pub async fn bootstrap_exchange_providers(
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let providers = make_providers(
+                    let mut providers = make_providers(
                         token.addr.prefix_type(),
                         slip_44,
                         chain_id,
                         token.chain_hash,
                     );
+                    scope_providers(&mut providers, token.chain_hash);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     assets.insert(
                         key,
