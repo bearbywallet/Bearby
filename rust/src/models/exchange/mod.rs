@@ -234,7 +234,9 @@ impl ExchangeProvider {
             Self::Uniswap(_) | Self::PancakeSwap(_)
                 if from.token.chain_hash == to.token.chain_hash =>
             {
-                let cfg = self.router_config().ok_or_else(|| "no engine".to_string())??;
+                let cfg = self
+                    .router_config()
+                    .ok_or_else(|| "no engine".to_string())??;
                 univ_router::is_wrap_unwrap(&cfg, from_asset, to_asset, from.token.native)
             }
             _ => Ok(false),
@@ -269,7 +271,9 @@ impl ExchangeProvider {
                 if from.token.chain_hash != to.token.chain_hash {
                     return Err("cross-chain swap not supported".to_string());
                 }
-                let cfg = self.router_config().ok_or_else(|| "no engine".to_string())??;
+                let cfg = self
+                    .router_config()
+                    .ok_or_else(|| "no engine".to_string())??;
                 univ_router::router_quote_info(
                     &cfg,
                     from,
@@ -302,7 +306,9 @@ impl ExchangeProvider {
                 if from.token.native {
                     return Ok(None);
                 }
-                let cfg = self.router_config().ok_or_else(|| "no engine".to_string())??;
+                let cfg = self
+                    .router_config()
+                    .ok_or_else(|| "no engine".to_string())??;
                 univ_router::router_check_approval(
                     &cfg,
                     swapper,
@@ -348,7 +354,9 @@ impl ExchangeProvider {
                 if from.token.chain_hash != to.token.chain_hash {
                     return Err("cross-chain swap not supported".to_string());
                 }
-                let cfg = self.router_config().ok_or_else(|| "no engine".to_string())??;
+                let cfg = self
+                    .router_config()
+                    .ok_or_else(|| "no engine".to_string())??;
                 univ_router::prepare_router_swap(
                     &cfg,
                     swapper,
@@ -395,13 +403,7 @@ impl ExchangeProvider {
             }
             Self::Relay(_) => {
                 relay::relay_finalize_swap(
-                    quote_blob,
-                    swapper,
-                    chain_hash,
-                    swap_title,
-                    swap_info,
-                    icon,
-                    out_token,
+                    quote_blob, swapper, chain_hash, swap_title, swap_info, icon, out_token,
                 )
                 .await
             }

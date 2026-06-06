@@ -15,12 +15,14 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{
-    address, aliases::{U160, U24, U48}, Address, Bytes, U256,
+    address,
+    aliases::{U160, U24, U48},
+    Address, Bytes, U256,
 };
 use zilpay::alloy::sol_types::{SolCall, SolValue};
+use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
-use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::rpc::{
     common::JsonRPC, methods::EvmMethods, network_config::ChainConfig, provider::RpcProvider,
     zil_interfaces::ResultRes,
@@ -119,9 +121,10 @@ mod sol_types {
 }
 
 use sol_types::{
-    executeCall, quoteExactInputSingleCall, PermitDetails, PermitSingle, QuoteExactInputSingleParams,
+    executeCall, quoteExactInputSingleCall, PermitDetails, PermitSingle,
+    QuoteExactInputSingleParams,
 };
-use sol_types::{IERC20, IPermit2, IWETH};
+use sol_types::{IPermit2, IERC20, IWETH};
 
 /// `Copy` bundle of a single chain's deployment addresses for one DEX.
 #[frb(ignore)]
@@ -189,7 +192,9 @@ struct SwapPlan {
 fn resolve_out(to_asset: &str, source_chain: u64) -> Result<(Cow<'_, str>, bool), String> {
     if let Some((chain_part, addr)) = to_asset.split_once(':') {
         if !chain_part.is_empty() && chain_part.bytes().all(|b| b.is_ascii_digit()) {
-            let chain: u64 = chain_part.parse().map_err(|_| "invalid chain id".to_string())?;
+            let chain: u64 = chain_part
+                .parse()
+                .map_err(|_| "invalid chain id".to_string())?;
             if chain != source_chain {
                 return Err("cross-chain swap not supported".to_string());
             }
@@ -317,7 +322,13 @@ fn build_execute_calldata(plan: SwapPlan, deadline: U256) -> Vec<u8> {
     let path = v3_path(&token_in, fee_tier, &token_out);
     commands.push(CMD_V3_SWAP_EXACT_IN);
     inputs.push(
-        (ADDRESS_THIS, amount_in, U256::ZERO, Bytes::from(path), payer_is_user)
+        (
+            ADDRESS_THIS,
+            amount_in,
+            U256::ZERO,
+            Bytes::from(path),
+            payer_is_user,
+        )
             .abi_encode_params()
             .into(),
     );
@@ -334,7 +345,11 @@ fn build_execute_calldata(plan: SwapPlan, deadline: U256) -> Vec<u8> {
         inputs.push((recipient, amount_out_min).abi_encode_params().into());
     } else {
         commands.push(CMD_SWEEP);
-        inputs.push((token_out, recipient, amount_out_min).abi_encode_params().into());
+        inputs.push(
+            (token_out, recipient, amount_out_min)
+                .abi_encode_params()
+                .into(),
+        );
     }
 
     executeCall {
@@ -1077,7 +1092,10 @@ mod engine_tests {
         assert_eq!(v["primaryType"], "PermitSingle");
         assert_eq!(v["domain"]["chainId"], 1);
         assert_eq!(v["message"]["details"]["nonce"], "42");
-        assert_eq!(v["message"]["spender"], addrs().universal_router.to_string());
+        assert_eq!(
+            v["message"]["spender"],
+            addrs().universal_router.to_string()
+        );
     }
 
     #[test]

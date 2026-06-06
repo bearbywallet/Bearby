@@ -1,15 +1,16 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use zilpay::background::Background;
 use zilpay::background::bg_provider::ProvidersManagement;
-use zilpay::background::bg_tx::{TransactionsManagement, update_tx_from_params};
+use zilpay::background::bg_tx::{update_tx_from_params, TransactionsManagement};
 use zilpay::background::bg_wallet::WalletManagement;
+use zilpay::background::Background;
 use zilpay::crypto::slip44::{TRON, ZILLIQA};
 use zilpay::network::evm::RequiredTxParams;
-use zilpay::proto::U256;
 use zilpay::proto::address::Address;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
+use zilpay::proto::U256;
+use zilpay::rpc::network_config::ChainConfig;
 use zilpay::secrecy::SecretString;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
@@ -22,9 +23,13 @@ use crate::models::exchange::{
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::errors::{BackgroundError, ServiceError};
 
-/// Bootstrap all exchange providers across every registered chain.
+fn chain_matches_network(chain: &ChainConfig, is_testnet: bool) -> bool {
+    chain.testnet.unwrap_or(false) == is_testnet
+}
+
+/// Bootstrap exchange providers and tokens for chains matching the current wallet network.
 pub async fn bootstrap_exchange_providers(
     wallet_index: usize,
     account_index: usize,
@@ -39,6 +44,13 @@ pub async fn bootstrap_exchange_providers(
     let wallet_data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let current_is_testnet = all_providers
+        .iter()
+        .find(|p| p.config.hash() == wallet_data.chain_hash)
+        .map(|p| p.config.testnet.unwrap_or(false))
+        .ok_or(ServiceError::BackgroundError(
+            BackgroundError::ProviderNotExists(wallet_data.chain_hash),
+        ))?;
     let mut relay_accounts: HashMap<u32, String> =
         HashMap::with_capacity(wallet_data.slip44_accounts.len());
     for (slip44, bip_accounts) in &wallet_data.slip44_accounts {
@@ -51,12 +63,17 @@ pub async fn bootstrap_exchange_providers(
     }
 
     // Pre-size on the exact catalog token count (the slice iterators report exact hints).
-    let total_tokens: usize = all_providers.iter().map(|p| p.config.ftokens.len()).sum();
+    let total_tokens: usize = all_providers
+        .iter()
+        .filter(|p| chain_matches_network(&p.config, current_is_testnet))
+        .map(|p| p.config.ftokens.len())
+        .sum();
 
     // chain_hash -> (slip44, chain_id), so custom wallet tokens can resolve their chain
     // after the catalog pass below consumes the provider configs.
     let chain_meta: HashMap<u64, (u32, u64)> = all_providers
         .iter()
+        .filter(|p| chain_matches_network(&p.config, current_is_testnet))
         .map(|p| (p.config.hash(), (p.config.slip_44, p.config.chain_id())))
         .collect();
 
@@ -74,14 +91,20 @@ pub async fn bootstrap_exchange_providers(
         if let Some(account_addr) = account_addr {
             // Uniswap — EVM chains with a deployed Universal Router.
             if addr_prefix == 1 && crate::models::exchange::uniswap::is_supported_chain(chain_id) {
-                if let Some(meta) = UniswapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr) {
+                if let Some(meta) =
+                    UniswapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
+                {
                     providers.insert(ExchangeProvider::Uniswap(meta));
                 }
             }
 
             // PancakeSwap — EVM chains with a deployed Universal Router.
-            if addr_prefix == 1 && crate::models::exchange::pancakeswap::is_supported_chain(chain_id) {
-                if let Some(meta) = PancakeMeta::for_chain(chain_hash, chain_id, slip_44, account_addr) {
+            if addr_prefix == 1
+                && crate::models::exchange::pancakeswap::is_supported_chain(chain_id)
+            {
+                if let Some(meta) =
+                    PancakeMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
+                {
                     providers.insert(ExchangeProvider::PancakeSwap(meta));
                 }
             }
@@ -122,7 +145,10 @@ pub async fn bootstrap_exchange_providers(
     let mut assets: HashMap<(u64, usize), ExchangeAsset> = HashMap::with_capacity(total_tokens);
 
     // 1. Catalog: every token on every chain. Balances are filled in pass 2.
-    for provider in all_providers {
+    for provider in all_providers
+        .into_iter()
+        .filter(|p| chain_matches_network(&p.config, current_is_testnet))
+    {
         let chain = provider.config;
         let slip_44 = chain.slip_44;
         let chain_id = chain.chain_id();

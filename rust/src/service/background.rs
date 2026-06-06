@@ -1,8 +1,8 @@
 use crate::utils::errors::ServiceError;
 use std::sync::{Arc, LazyLock};
+use zilpay::background::{bg_storage::StorageManagement, Background};
 use zilpay::tokio::sync::RwLock;
 use zilpay::tokio::task::JoinHandle;
-use zilpay::background::{bg_storage::StorageManagement, Background};
 
 pub struct ServiceBackground {
     pub running: bool,

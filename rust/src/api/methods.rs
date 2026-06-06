@@ -1,8 +1,8 @@
 use crate::{models::keypair::KeyPairInfo, utils::helpers::decode_secret_key};
-use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::background::bg_crypto::CryptoOperations;
 pub use zilpay::background::Background;
 use zilpay::proto::keypair::KeyPair;
+use zilpay::secrecy::{ExposeSecret, SecretString};
 
 pub fn gen_bip39_words(count: u8) -> Result<String, String> {
     Background::gen_bip39(count)

@@ -3,8 +3,8 @@ use std::{
     hash::{DefaultHasher, Hash, Hasher},
 };
 
-use zilpay::serde_json::Value;
 use zilpay::proto::address::Address;
+use zilpay::serde_json::Value;
 pub use zilpay::{
     errors::network::NetworkErrors,
     rpc::network_config::{ChainConfig, Explorer},
@@ -76,11 +76,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
 
         Self {
             chain_id,
-            ftokens: value
-                .ftokens
-                .into_iter()
-                .map(Into::into)
-                .collect(),
+            ftokens: value.ftokens.into_iter().map(Into::into).collect(),
             logo: value.logo,
             diff_block_time: value.diff_block_time,
             testnet: value.testnet,
@@ -263,7 +259,8 @@ impl NetworkConfigInfo {
 
                 let ens = obj
                     .get("ens")
-                    .and_then(|v| v.as_str()).map(|str| str.to_string());
+                    .and_then(|v| v.as_str())
+                    .map(|str| str.to_string());
 
                 Ok(NetworkConfigInfo {
                     name: obj
