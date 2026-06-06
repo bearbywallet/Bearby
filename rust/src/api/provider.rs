@@ -196,6 +196,6 @@ mod provider_tests {
         let content = fs::read_to_string(path).unwrap();
         let providers = get_chains_providers_from_json(content).unwrap();
 
-        assert_eq!(providers.len(), 12);
+        assert_eq!(providers.len(), 13);
     }
 }
