@@ -75,6 +75,7 @@
   "exchangePageTitle": "교환",
   "exchangePagePay": "보낼 금액",
   "exchangePageGet": "받을 금액",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "확인",
   "exchangeConfirmBest": "최적",
   "exchangeConfirmGasNone": "—",

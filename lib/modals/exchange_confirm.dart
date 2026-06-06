@@ -11,6 +11,7 @@ import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/ledger/ledger_connector.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
+import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/eip712.dart';
 import 'package:bearby/mixins/wallet_type.dart';
@@ -42,6 +43,7 @@ void showExchangeConfirmModal({
   required ExchangeAsset from,
   required ExchangeAsset to,
   required String amountInWei,
+  required String destination,
   required int slippageBps,
   required VoidCallback onDone,
   VoidCallback? onDismiss,
@@ -58,6 +60,7 @@ void showExchangeConfirmModal({
       from: from,
       to: to,
       amountInWei: amountInWei,
+      destination: destination,
       slippageBps: slippageBps,
       onDone: onDone,
     ),
@@ -72,6 +75,7 @@ class _ExchangeConfirmContent extends StatefulWidget {
   final ExchangeAsset from;
   final ExchangeAsset to;
   final String amountInWei;
+  final String destination;
 
   final int slippageBps;
   final VoidCallback onDone;
@@ -80,6 +84,7 @@ class _ExchangeConfirmContent extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amountInWei,
+    required this.destination,
     required this.slippageBps,
     required this.onDone,
   });
@@ -133,7 +138,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       return bValue.compareTo(aValue);
     });
 
-  ExchangeProvider? get _selectedProvider => _providers.elementAtOrNull(_selectedIndex);
+  ExchangeProvider? get _selectedProvider =>
+      _providers.elementAtOrNull(_selectedIndex);
   bool get _isWrapUnwrap => _selectedProvider?.quote?.isWrapUnwrap ?? false;
 
   // Derived from the two assets — no stored duplication.
@@ -338,7 +344,9 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         walletIndex: appState.selectedWalletIndex,
         accountIndex: accountIndex,
       );
-      final auth = SwapAuth(walletIndex: appState.selectedWalletIndex, accountIndex: accountIndex);
+      final auth = SwapAuth(
+          walletIndex: appState.selectedWalletIndex,
+          accountIndex: accountIndex);
       final params = SwapParams(
         provider: provider,
         from: widget.from,
@@ -478,7 +486,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
       if (!_isNativeIn) {
         _onStage('approving', hint: l10n.exchangeConfirmHintApprove);
-        final auth = SwapAuth(walletIndex: walletIndexBig, accountIndex: accountIndexBig);
+        final auth = SwapAuth(
+            walletIndex: walletIndexBig, accountIndex: accountIndexBig);
         final params = SwapParams(
           provider: selected,
           from: widget.from,
@@ -512,7 +521,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
       // Gap between approve and swap prep: show a transient hint with no step change.
       if (mounted) setState(() => _hint = l10n.exchangeConfirmHintPreparing);
-      final auth = SwapAuth(walletIndex: walletIndexBig, accountIndex: accountIndexBig);
+      final auth =
+          SwapAuth(walletIndex: walletIndexBig, accountIndex: accountIndexBig);
       final params = SwapParams(
         provider: selected,
         from: widget.from,
@@ -815,6 +825,14 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
           l10n.exchangeConfirmSlippage,
           Text(
             slippage,
+            style: theme.bodyText1.copyWith(color: theme.textPrimary),
+          ),
+        ),
+        _metaRow(
+          theme,
+          l10n.exchangeConfirmRecipient,
+          Text(
+            shortenAddress(widget.destination),
             style: theme.bodyText1.copyWith(color: theme.textPrimary),
           ),
         ),
