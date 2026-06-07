@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -101,7 +102,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                         children: [
                           SwitchSettingItem(
                             backgroundColor: theme.cardBackground,
-                            iconPath: "assets/icons/pin.svg",
+                            icon: AppIcon.pin,
                             title:
                                 l10n.appearanceSettingsPageCompactNumbersTitle,
                             description: l10n

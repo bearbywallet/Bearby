@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -220,14 +221,10 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
                                     ),
                                   );
                                 }),
-                                SvgPicture.asset(
-                                  "assets/icons/down_arrow.svg",
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.textSecondary.withValues(alpha: 0.1),
-                                    BlendMode.srcIn,
-                                  ),
+                                AppIconView(
+                                  icon: AppIcon.arrowDown,
+                                  size: 20,
+                                  color: theme.textSecondary.withValues(alpha: 0.1),
                                 ),
                                 WalletSelectionCard(
                                   address: _address,

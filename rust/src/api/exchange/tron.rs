@@ -19,6 +19,17 @@ use crate::models::transactions::transaction_metadata::TransactionMetadataInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 
+/// Parse a TRON address from either base58 ("T...") or Relay's 21-byte hex format ("41...").
+/// Relay encodes contract addresses as 21-byte hex with the 0x41 TRON version-byte prefix.
+fn tron_addr(s: &str) -> Result<Address, String> {
+    if s.len() == 42 && s.starts_with("41") {
+        let bytes = zilpay::alloy::hex::decode(s)
+            .map_err(|e| format!("invalid TRON address hex: {e}"))?;
+        return Address::from_tron_bytes(&bytes).map_err(|e| e.to_string());
+    }
+    Address::from_str_hex(s).map_err(|e| e.to_string())
+}
+
 fn parse_tron_call_value(value: &str) -> Result<i64, String> {
     if value.is_empty() {
         Ok(0)
@@ -46,7 +57,7 @@ pub async fn finalize_tron_relay(
     display: RelayDisplay,
 ) -> Result<TransactionRequestInfo, String> {
     let owner = Address::from_str_hex(account_addr).map_err(|e| e.to_string())?;
-    let router = Address::from_str_hex(to).map_err(|e| e.to_string())?;
+    let router = tron_addr(to)?;
     let data = zilpay::alloy::hex::decode(data_hex.strip_prefix("0x").unwrap_or(data_hex))
         .map_err(|e| format!("bad calldata: {e}"))?;
     let call_value = parse_tron_call_value(value_str)?;

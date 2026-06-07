@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
@@ -184,9 +185,7 @@ class _ArgonSettingsModalContentState
             child: SmartInput(
               controller: _secretController,
               obscureText: _obscurePassword,
-              rightIconPath: _obscurePassword
-                  ? "assets/icons/close_eye.svg"
-                  : "assets/icons/open_eye.svg",
+              rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
               hint: localizations.argonSettingsModalContentSecretHint,
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,

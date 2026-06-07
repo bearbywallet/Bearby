@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,14 +85,10 @@ class _CopyContentState extends State<CopyContent>
                   color: theme.textSecondary,
                 ),
               ),
-              SvgPicture.asset(
-                _isCopied ? 'assets/icons/check.svg' : 'assets/icons/copy.svg',
-                width: 14,
-                height: 14,
-                colorFilter: ColorFilter.mode(
-                  _isCopied ? theme.success : theme.textSecondary,
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: _isCopied ? AppIcon.check : AppIcon.copy,
+                size: 14,
+                color: _isCopied ? theme.success : theme.textSecondary,
               ),
             ],
           ),

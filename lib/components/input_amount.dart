@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -150,12 +151,10 @@ class TokenAmountCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 4),
-            SvgPicture.asset(
-              "assets/icons/tiny_down_arrow.svg",
-              width: 12,
-              height: 12,
-              colorFilter:
-                  ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+            AppIconView(
+              icon: AppIcon.arrowDown,
+              size: 12,
+              color: theme.textSecondary,
             ),
           ],
         ),
@@ -170,14 +169,10 @@ class TokenAmountCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         if (isExceeded)
-          SvgPicture.asset(
-            "assets/icons/warning.svg",
-            width: 15,
-            height: 15,
-            colorFilter: ColorFilter.mode(
-              theme.warning.withValues(alpha: 0.7),
-              BlendMode.srcIn,
-            ),
+          AppIconView(
+            icon: AppIcon.warning,
+            size: 15,
+            color: theme.warning.withValues(alpha: 0.7),
           ),
         if (isExceeded) const SizedBox(width: 4),
         Flexible(

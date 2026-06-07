@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -295,7 +296,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             SmartInput(
               controller: _walletNameController,
               hint: l10n.walletPageWalletNameHint,
-              rightIconPath: "assets/icons/edit.svg",
+              rightIcon: AppIcon.edit,
               disabled: _loading,
             ),
             const SizedBox(height: 16),
@@ -605,7 +606,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                         color: theme.primaryPurple,
                         valueColor: theme.buttonText,
                         onPressed: _saveSelectedAccounts,
-                        successIcon: "assets/icons/ok.svg",
+                        successIcon: AppIcon.ok,
                         child: Text(
                           _createWallet
                               ? l10n.addLedgerAccountPageCreateButton

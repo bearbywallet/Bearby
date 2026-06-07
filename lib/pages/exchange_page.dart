@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -242,7 +243,7 @@ class _ExchangePageState extends State<ExchangePage>
       amountInWei: toDecimalsWei(_amount, from.token.decimals).toString(),
       destination: destination,
       slippageBps: state.slippageFor(provider),
-      onDone: () => context.go(AppRoutes.history),
+      onDone: _btnController.reset,
       onDismiss: () => _btnController.reset(),
     );
   }
@@ -421,12 +422,10 @@ class _ExchangePageState extends State<ExchangePage>
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: SvgPicture.asset(
-                'assets/icons/gear.svg',
-                width: 22,
-                height: 22,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              child: AppIconView(
+                icon: AppIcon.gear,
+                size: 22,
+                color: theme.textSecondary,
               ),
             ),
           ),
@@ -523,16 +522,12 @@ class _ExchangePageState extends State<ExchangePage>
               color: theme.textSecondary.withValues(alpha: 0.2), width: 1.5),
         ),
         child: Center(
-          child: SvgPicture.asset(
-            'assets/icons/swap.svg',
-            width: 20,
-            height: 20,
-            colorFilter: ColorFilter.mode(
-              canFlip
-                  ? theme.primaryPurple
-                  : theme.textSecondary.withValues(alpha: 0.4),
-              BlendMode.srcIn,
-            ),
+          child: AppIconView(
+            icon: AppIcon.swap,
+            size: 20,
+            color: canFlip
+                ? theme.primaryPurple
+                : theme.textSecondary.withValues(alpha: 0.4),
           ),
         ),
       ),
@@ -698,12 +693,10 @@ class _ExchangePageState extends State<ExchangePage>
             Text(token.symbol,
                 style: theme.bodyText1.copyWith(color: theme.textPrimary)),
             const SizedBox(width: 4),
-            SvgPicture.asset(
-              'assets/icons/tiny_down_arrow.svg',
-              width: 12,
-              height: 12,
-              colorFilter:
-                  ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+            AppIconView(
+              icon: AppIcon.arrowDown,
+              size: 12,
+              color: theme.textSecondary,
             ),
           ],
         ),

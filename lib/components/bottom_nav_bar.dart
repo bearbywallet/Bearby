@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -46,16 +47,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         onTap: () => onTap(index),
                         child: Container(
                           color: Colors.transparent,
-                          child: SvgPicture.asset(
-                            item.iconPath,
-                            colorFilter: ColorFilter.mode(
-                              index == currentIndex
-                                  ? theme.primaryPurple
-                                  : theme.textSecondary,
-                              BlendMode.srcIn,
-                            ),
-                            width: 40,
-                            height: 40,
+                          child: AppIconView(
+                            icon: item.icon,
+                            color: index == currentIndex
+                                ? theme.primaryPurple
+                                : theme.textSecondary,
+                            size: 40,
                           ),
                         ),
                       ),
@@ -72,7 +69,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
 }
 
 class CustomBottomNavigationBarItem {
-  final String iconPath;
+  final AppIcon icon;
 
-  CustomBottomNavigationBarItem({required this.iconPath});
+  const CustomBottomNavigationBarItem({required this.icon});
 }

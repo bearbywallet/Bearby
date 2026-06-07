@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/settings_item.dart';
 import 'package:bearby/components/wallet_section.dart';
@@ -145,19 +146,19 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageCurrency,
-                                trailingSvgPath: 'assets/icons/currency.svg',
+                                trailingIcon: AppIcon.currency,
                                 onTap: () => context.push(AppRoutes.currency),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAppearance,
-                                trailingSvgPath: 'assets/icons/appearance.svg',
+                                trailingIcon: AppIcon.appearance,
                                 onTap: () => context.push(AppRoutes.appearance),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageNotifications,
-                                trailingSvgPath: 'assets/icons/bell.svg',
+                                trailingIcon: AppIcon.bell,
                                 onTap: () => context.push(AppRoutes.notifications),
                               ),
                               SettingsItem(
@@ -165,7 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: true,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAddressBook,
-                                trailingSvgPath: 'assets/icons/book.svg',
+                                trailingIcon: AppIcon.book,
                                 onTap: () => context.push(AppRoutes.addressBook),
                               ),
                             ]),
@@ -176,13 +177,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageSecurityPrivacy,
-                                trailingSvgPath: 'assets/icons/shield.svg',
+                                trailingIcon: AppIcon.shield,
                                 onTap: () => context.push(AppRoutes.security),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageNetworks,
-                                trailingSvgPath: 'assets/icons/globe.svg',
+                                trailingIcon: AppIcon.globe,
                                 onTap: () => context.push(AppRoutes.networks),
                               ),
                               SettingsItem(
@@ -190,13 +191,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageLanguage,
-                                trailingSvgPath: 'assets/icons/language.svg',
+                                trailingIcon: AppIcon.language,
                                 onTap: () => context.push(AppRoutes.language),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageBrowser,
-                                trailingSvgPath: 'assets/icons/browser.svg',
+                                trailingIcon: AppIcon.browser,
                                 onTap: () => context.push(AppRoutes.browserSettings),
                               ),
                             ]),
@@ -207,21 +208,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTelegram,
-                                trailingSvgPath: 'assets/icons/telegram.svg',
+                                trailingWidget: SvgPicture.asset('assets/icons/telegram.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
                                 onTap: () => socialMediaService.openTelegram(
                                     chatUrl: 'https://t.me/+S7Dqp9ORznE1NDIy'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTwitter,
-                                trailingSvgPath: 'assets/icons/x.svg',
+                                trailingWidget: SvgPicture.asset('assets/icons/x.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
                                 onTap: () => socialMediaService.openX(
                                     username: 'BearbyPro'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageGitHub,
-                                trailingSvgPath: 'assets/icons/github.svg',
+                                trailingWidget: SvgPicture.asset('assets/icons/github.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
                                 onTap: () => socialMediaService.openGitHub(
                                   username: 'bearbywallet',
                                 ),
@@ -231,7 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: true,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageAbout,
-                                trailingSvgPath: 'assets/icons/info.svg',
+                                trailingIcon: AppIcon.info,
                                 onTap: () => context.push(AppRoutes.about),
                               ),
                             ]),

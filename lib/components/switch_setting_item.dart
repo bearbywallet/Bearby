@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
 
 class SwitchSettingItem extends StatelessWidget {
   final String title;
-  final String iconPath;
+  final AppIcon icon;
   final String description;
   final bool value;
   final ValueChanged<bool> onChanged;
@@ -14,7 +14,7 @@ class SwitchSettingItem extends StatelessWidget {
   const SwitchSettingItem({
     super.key,
     required this.title,
-    required this.iconPath,
+    required this.icon,
     required this.description,
     required this.value,
     required this.onChanged,
@@ -32,15 +32,11 @@ class SwitchSettingItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
+              AppIconView(
+              icon: icon,
+              size: 24,
+              color: theme.textPrimary,
+            ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(

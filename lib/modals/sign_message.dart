@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -507,9 +508,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                               focusedBorderColor: primaryColor,
                               disabled: _isLoading,
                               obscureText: _obscurePassword,
-                              rightIconPath: _obscurePassword
-                                  ? 'assets/icons/close_eye.svg'
-                                  : 'assets/icons/open_eye.svg',
+                              rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                               onRightIconTap: () => setState(
                                   () => _obscurePassword = !_obscurePassword),
                               onChanged: (_) => setState(() => _error = null),

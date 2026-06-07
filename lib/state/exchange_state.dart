@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:bearby/src/rust/api/exchange.dart';
+import 'package:bearby/src/rust/api/exchange/bootstrap.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/exchange/pancakeswap.dart';
 import 'package:bearby/src/rust/models/exchange/relay.dart';

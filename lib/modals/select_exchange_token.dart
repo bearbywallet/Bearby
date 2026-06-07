@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/exchange_state.dart';
@@ -116,7 +117,7 @@ class _ExchangeTokenSelectContentState
             child: SmartInput(
               controller: _searchController,
               hint: l10n.tokenSelectModalContentSearchHint,
-              leftIconPath: 'assets/icons/search.svg',
+              leftIcon: AppIcon.search,
               onChanged: (value) => setState(() => _searchQuery = value),
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,

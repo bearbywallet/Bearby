@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -30,14 +31,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/back.svg',
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
+              icon: AppIconView(
+                icon: AppIcon.arrowLeft,
+                size: 24,
+                color: theme.textPrimary,
               ),
               onPressed: onBackPressed,
             ),

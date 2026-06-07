@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/address_avatar.dart';
 import 'package:bearby/components/copy_content.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/modals/wallet_header.dart';
@@ -70,10 +71,9 @@ class _WalletHeaderState extends State<WalletHeader>
                   account: widget.account,
                 ),
               ),
-              HoverSvgIcon(
-                assetName: 'assets/icons/gear.svg',
-                width: gearSize,
-                height: gearSize,
+              HoverIcon(
+                icon: AppIcon.gear,
+                size: gearSize,
                 padding: EdgeInsets.fromLTRB(spacing * 2, 0, 0, 0),
                 color: theme.textSecondary,
                 onTap: widget.onSettings,

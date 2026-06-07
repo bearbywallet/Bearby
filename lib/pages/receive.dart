@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -196,14 +197,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SvgPicture.asset(
-                                        "assets/icons/warning.svg",
-                                        width: 24,
-                                        height: 24,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.warning,
-                                          BlendMode.srcIn,
-                                        ),
+                                      AppIconView(
+                                        icon: AppIcon.warning,
+                                        size: 24,
+            color: theme.warning,
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
@@ -278,7 +275,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                     }
                                   },
                                   height: 50,
-                                  rightIconPath: "assets/icons/edit.svg",
+                                  rightIcon: AppIcon.edit,
                                   borderColor: theme.cardBackground,
                                   focusedBorderColor: theme.primaryPurple,
                                   fontSize: 14,
@@ -368,11 +365,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         TileButton(
-          icon: SvgPicture.asset(
-            isCopied ? "assets/icons/check.svg" : "assets/icons/copy.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: isCopied ? AppIcon.check : AppIcon.copy,
+            size: 24,
+                        color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: () async {
@@ -383,11 +379,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
         TileButton(
-          icon: SvgPicture.asset(
-            "assets/icons/hash.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: AppIcon.key,
+            size: 24,
+                        color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: _handleAmountDialog,
@@ -397,14 +392,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         ),
         if (account != null && chain.slip44 == kZilliqaSlip44)
           TileButton(
-            icon: SvgPicture.asset(
-              useLegacyAddress
-                  ? "assets/icons/scilla.svg"
-                  : "assets/icons/solidity.svg",
-              width: 24,
-              height: 24,
-              colorFilter:
-                  ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+            icon: AppIconView(
+              icon: AppIcon.file,
+              size: 24,
+              color: theme.primaryPurple,
             ),
             disabled: legacyAddress == null || account.addrType == 0,
             onPressed: () {
@@ -419,11 +410,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
             defaultBorderSide: BorderSide(color: theme.modalBorder),
           ),
         TileButton(
-          icon: SvgPicture.asset(
-            "assets/icons/share.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: AppIcon.share,
+            size: 24,
+                        color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: () async {

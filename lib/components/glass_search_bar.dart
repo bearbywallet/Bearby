@@ -2,10 +2,11 @@ import 'dart:math' show pi, sin;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class GlassSearchBar extends StatefulWidget {
   final TextEditingController controller;
@@ -14,8 +15,8 @@ class GlassSearchBar extends StatefulWidget {
   final Function(String)? onChanged;
   final Function(bool)? onFocusChanged;
   final Function()? onRightIconTap;
-  final String leftIconPath;
-  final String? rightIconPath;
+  final AppIcon leftIcon;
+  final AppIcon? rightIcon;
   final TextInputType keyboardType;
 
   const GlassSearchBar({
@@ -26,8 +27,8 @@ class GlassSearchBar extends StatefulWidget {
     this.onChanged,
     this.onFocusChanged,
     this.onRightIconTap,
-    this.leftIconPath = 'assets/icons/search.svg',
-    this.rightIconPath,
+    this.leftIcon = AppIcon.search,
+    this.rightIcon,
     this.keyboardType = TextInputType.text,
   });
 
@@ -92,6 +93,63 @@ class GlassSearchBarState extends State<GlassSearchBar>
     super.dispose();
   }
 
+  Widget _buildContentRow(AppTheme theme, Color iconColor) {
+    final rightIcon = widget.rightIcon;
+
+    return Positioned.fill(
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: AppIconView(
+              icon: widget.leftIcon,
+              size: 18,
+              color: iconColor,
+            ),
+          ),
+          Expanded(
+            child: TextFormField(
+              controller: widget.controller,
+              focusNode: _focusNode,
+              onChanged: widget.onChanged,
+              onFieldSubmitted: widget.onSubmitted,
+              style: theme.bodyText1.copyWith(
+                color: theme.textPrimary,
+                fontSize: 15,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: widget.hint,
+                hintStyle: theme.bodyText1.copyWith(
+                  color: theme.textSecondary,
+                  fontSize: 15,
+                ),
+                contentPadding: EdgeInsets.zero,
+              ),
+              autocorrect: false,
+              enableSuggestions: false,
+              autofillHints: null,
+              keyboardType: widget.keyboardType,
+            ),
+          ),
+          if (rightIcon != null)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onRightIconTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: AppIconView(
+                  icon: rightIcon,
+                  size: 18,
+                  color: iconColor,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -125,7 +183,6 @@ class GlassSearchBarState extends State<GlassSearchBar>
             height: 48,
             child: Stack(
               children: [
-                // Layer 0 — Blur backdrop
                 Positioned.fill(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
@@ -135,8 +192,6 @@ class GlassSearchBarState extends State<GlassSearchBar>
                     ),
                   ),
                 ),
-
-                // Layer 1 — Glass body with animated border + shadow
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -156,68 +211,7 @@ class GlassSearchBarState extends State<GlassSearchBar>
                     ),
                   ),
                 ),
-
-                // Layer 2 — Content row
-                Positioned.fill(
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: SvgPicture.asset(
-                          widget.leftIconPath,
-                          width: 18,
-                          height: 18,
-                          colorFilter: ColorFilter.mode(
-                            iconColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          controller: widget.controller,
-                          focusNode: _focusNode,
-                          onChanged: widget.onChanged,
-                          onFieldSubmitted: widget.onSubmitted,
-                          style: theme.bodyText1.copyWith(
-                            color: theme.textPrimary,
-                            fontSize: 15,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: widget.hint,
-                            hintStyle: theme.bodyText1.copyWith(
-                              color: theme.textSecondary,
-                              fontSize: 15,
-                            ),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          autocorrect: false,
-                          enableSuggestions: false,
-                          autofillHints: null,
-                          keyboardType: widget.keyboardType,
-                        ),
-                      ),
-                      if (widget.rightIconPath != null)
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: widget.onRightIconTap,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: SvgPicture.asset(
-                              widget.rightIconPath!,
-                              width: 18,
-                              height: 18,
-                              colorFilter: ColorFilter.mode(
-                                iconColor,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                _buildContentRow(theme, iconColor),
               ],
             ),
           );

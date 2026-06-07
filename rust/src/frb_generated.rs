@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1311491490;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 462620167;
 
 // Section: executor
 
@@ -754,7 +754,7 @@ fn wire__crate__api__utils__bitcoin_address_type_from_address_impl(
         },
     )
 }
-fn wire__crate__api__exchange__bootstrap_exchange_providers_impl(
+fn wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -782,11 +782,12 @@ fn wire__crate__api__exchange__bootstrap_exchange_providers_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::bootstrap_exchange_providers(
-                            api_wallet_index,
-                            api_account_index,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::exchange::bootstrap::bootstrap_exchange_providers(
+                                api_wallet_index,
+                                api_account_index,
+                            )
+                            .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1715,7 +1716,7 @@ fn wire__crate__api__wallet__change_wallet_name_impl(
         },
     )
 }
-fn wire__crate__api__exchange__check_exchange_approval_impl(
+fn wire__crate__api__exchange__ledger__check_exchange_approval_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1745,7 +1746,7 @@ fn wire__crate__api__exchange__check_exchange_approval_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::check_exchange_approval(
+                        let output_ok = crate::api::exchange::ledger::check_exchange_approval(
                             api_auth,
                             api_params,
                             api_nonce,
@@ -2115,7 +2116,7 @@ fn wire__crate__api__transaction__encode_tx_rlp_impl(
         },
     )
 }
-fn wire__crate__api__exchange__estimate_swap_base_nonce_impl(
+fn wire__crate__api__exchange__ledger__estimate_swap_base_nonce_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2143,7 +2144,7 @@ fn wire__crate__api__exchange__estimate_swap_base_nonce_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::estimate_swap_base_nonce(
+                        let output_ok = crate::api::exchange::ledger::estimate_swap_base_nonce(
                             api_wallet_index,
                             api_account_index,
                         )
@@ -2323,7 +2324,7 @@ fn wire__crate__api__token__fetch_token_meta_impl(
         },
     )
 }
-fn wire__crate__api__exchange__finalize_exchange_swap_impl(
+fn wire__crate__api__exchange__ledger__finalize_exchange_swap_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2357,7 +2358,7 @@ fn wire__crate__api__exchange__finalize_exchange_swap_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::finalize_exchange_swap(
+                        let output_ok = crate::api::exchange::ledger::finalize_exchange_swap(
                             api_auth,
                             api_provider,
                             api_quote_blob,
@@ -3848,7 +3849,7 @@ fn wire__crate__api__transaction__prepare_eip712_message_impl(
         },
     )
 }
-fn wire__crate__api__exchange__prepare_exchange_swap_impl(
+fn wire__crate__api__exchange__ledger__prepare_exchange_swap_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3876,7 +3877,7 @@ fn wire__crate__api__exchange__prepare_exchange_swap_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::exchange::prepare_exchange_swap(api_params).await?;
+                            crate::api::exchange::ledger::prepare_exchange_swap(api_params).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3967,7 +3968,7 @@ fn wire__crate__api__provider__provider_req_proxy_impl(
         },
     )
 }
-fn wire__crate__api__exchange__refresh_exchange_quotes_impl(
+fn wire__crate__api__exchange__bootstrap__refresh_exchange_quotes_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3996,7 +3997,7 @@ fn wire__crate__api__exchange__refresh_exchange_quotes_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::exchange::refresh_exchange_quotes(
+                        let output_ok = crate::api::exchange::bootstrap::refresh_exchange_quotes(
                             api_from, api_to, api_amount,
                         )
                         .await?;
@@ -7443,12 +7444,12 @@ impl SseDecode for crate::models::stake::PendingWithdrawalInfo {
     }
 }
 
-impl SseDecode for crate::api::exchange::PreparedSwapInfo {
+impl SseDecode for crate::api::exchange::ledger::PreparedSwapInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_permitTypedDataJson = <Option<String>>::sse_decode(deserializer);
         let mut var_quoteBlob = <String>::sse_decode(deserializer);
-        return crate::api::exchange::PreparedSwapInfo {
+        return crate::api::exchange::ledger::PreparedSwapInfo {
             permit_typed_data_json: var_permitTypedDataJson,
             quote_blob: var_quoteBlob,
         };
@@ -8255,7 +8256,7 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__exchange__bootstrap_exchange_providers_impl(
+        21 => wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8381,7 +8382,7 @@ fn pde_ffi_dispatcher_primary_impl(
         42 => wire__crate__api__transaction__cacl_gas_fee_impl(port, ptr, rust_vec_len, data_len),
         43 => wire__crate__api__wallet__change_account_name_impl(port, ptr, rust_vec_len, data_len),
         44 => wire__crate__api__wallet__change_wallet_name_impl(port, ptr, rust_vec_len, data_len),
-        45 => wire__crate__api__exchange__check_exchange_approval_impl(
+        45 => wire__crate__api__exchange__ledger__check_exchange_approval_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8421,7 +8422,7 @@ fn pde_ffi_dispatcher_primary_impl(
         52 => wire__crate__api__wallet__delete_account_impl(port, ptr, rust_vec_len, data_len),
         53 => wire__crate__api__wallet__delete_wallet_impl(port, ptr, rust_vec_len, data_len),
         54 => wire__crate__api__transaction__encode_tx_rlp_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__api__exchange__estimate_swap_base_nonce_impl(
+        55 => wire__crate__api__exchange__ledger__estimate_swap_base_nonce_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8436,7 +8437,7 @@ fn pde_ffi_dispatcher_primary_impl(
         57 => wire__crate__api__stake__fetch_evm_stake_impl(port, ptr, rust_vec_len, data_len),
         58 => wire__crate__api__stake__fetch_scilla_stake_impl(port, ptr, rust_vec_len, data_len),
         59 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        60 => wire__crate__api__exchange__finalize_exchange_swap_impl(
+        60 => wire__crate__api__exchange__ledger__finalize_exchange_swap_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8560,7 +8561,7 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        102 => wire__crate__api__exchange__prepare_exchange_swap_impl(
+        102 => wire__crate__api__exchange__ledger__prepare_exchange_swap_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8572,7 +8573,7 @@ fn pde_ffi_dispatcher_primary_impl(
         104 => {
             wire__crate__api__provider__provider_req_proxy_impl(port, ptr, rust_vec_len, data_len)
         }
-        105 => wire__crate__api__exchange__refresh_exchange_quotes_impl(
+        105 => wire__crate__api__exchange__bootstrap__refresh_exchange_quotes_impl(
             port,
             ptr,
             rust_vec_len,
@@ -9751,7 +9752,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::stake::PendingWithdrawalIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::exchange::PreparedSwapInfo {
+impl flutter_rust_bridge::IntoDart for crate::api::exchange::ledger::PreparedSwapInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.permit_typed_data_json.into_into_dart().into_dart(),
@@ -9761,13 +9762,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::exchange::PreparedSwapInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::exchange::PreparedSwapInfo
+    for crate::api::exchange::ledger::PreparedSwapInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::exchange::PreparedSwapInfo>
-    for crate::api::exchange::PreparedSwapInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::api::exchange::ledger::PreparedSwapInfo>
+    for crate::api::exchange::ledger::PreparedSwapInfo
 {
-    fn into_into_dart(self) -> crate::api::exchange::PreparedSwapInfo {
+    fn into_into_dart(self) -> crate::api::exchange::ledger::PreparedSwapInfo {
         self
     }
 }
@@ -11789,7 +11790,7 @@ impl SseEncode for crate::models::stake::PendingWithdrawalInfo {
     }
 }
 
-impl SseEncode for crate::api::exchange::PreparedSwapInfo {
+impl SseEncode for crate::api::exchange::ledger::PreparedSwapInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<String>>::sse_encode(self.permit_typed_data_json, serializer);

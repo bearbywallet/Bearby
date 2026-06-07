@@ -1,45 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
-class HoverSvgIcon extends StatefulWidget {
-  final String assetName;
-  final double width;
-  final double height;
+class HoverIcon extends StatefulWidget {
+  final AppIcon icon;
+  final double size;
   final VoidCallback onTap;
   final Color? color;
-  final EdgeInsets? padding;
-  final BlendMode? blendMode;
+  final EdgeInsets padding;
 
-  const HoverSvgIcon({
+  const HoverIcon({
     super.key,
-    required this.assetName,
-    required this.width,
-    required this.height,
+    required this.icon,
+    required this.size,
     required this.onTap,
     this.color,
     this.padding = const EdgeInsets.all(8.0),
-    this.blendMode,
   });
 
   @override
-  State<HoverSvgIcon> createState() => HoverSvgIconState();
+  State<HoverIcon> createState() => _HoverIconState();
 }
 
-class HoverSvgIconState extends State<HoverSvgIcon> {
+class _HoverIconState extends State<HoverIcon> {
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final iconColor = widget.color ?? theme.textPrimary;
-    final effectiveBlendMode = widget.blendMode ?? BlendMode.srcIn;
 
     return Container(
       constraints: BoxConstraints(
-        minWidth: widget.width + 16,
-        minHeight: widget.height + 16,
+        minWidth: widget.size + 16,
+        minHeight: widget.size + 16,
       ),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -48,17 +44,13 @@ class HoverSvgIconState extends State<HoverSvgIcon> {
         onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onTap,
         child: Padding(
-          padding: widget.padding!,
+          padding: widget.padding,
           child: Opacity(
             opacity: _isPressed ? 0.5 : 1.0,
-            child: SvgPicture.asset(
-              widget.assetName,
-              width: widget.width,
-              height: widget.height,
-              colorFilter: ColorFilter.mode(
-                iconColor,
-                effectiveBlendMode,
-              ),
+            child: AppIconView(
+              icon: widget.icon,
+              size: widget.size,
+              color: iconColor,
             ),
           ),
         ),

@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/linear_refresh_indicator.dart';
 import 'package:bearby/components/net_btn.dart';
 import 'package:bearby/components/tile_button.dart';
@@ -151,14 +152,10 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
           child: Row(
             children: [
               TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/send.svg",
-                  width: iconSizeTileButton,
-                  height: iconSizeTileButton,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
+                icon: AppIconView(
+                  icon: AppIcon.send,
+                  size: iconSizeTileButton,
+                  color: theme.primaryPurple,
                 ),
                 title: l10n.homePageSendButton,
                 onPressed: () {
@@ -174,14 +171,10 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
               ),
               SizedBox(width: adaptivePaddingCard),
               TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/receive.svg",
-                  width: iconSizeTileButton,
-                  height: iconSizeTileButton,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
+                icon: AppIconView(
+                  icon: AppIcon.receive,
+                  size: iconSizeTileButton,
+                  color: theme.primaryPurple,
                 ),
                 title: l10n.homePageReceiveButton,
                 onPressed: () {
@@ -194,12 +187,10 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   appState.chain?.slip44 == kZilliqaSlip44) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
-                  icon: SvgPicture.asset(
-                    "assets/icons/anchor.svg",
-                    width: iconSizeTileButton,
-                    height: iconSizeTileButton,
-                    colorFilter:
-                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                  icon: AppIconView(
+                    icon: AppIcon.anchor,
+                    size: iconSizeTileButton,
+                    color: theme.primaryPurple,
                   ),
                   title: "Stake",
                   onPressed: () async {
@@ -215,14 +206,12 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       .contains(WalletType.ledger.name)) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
-                  icon: SvgPicture.asset(
-                    appState.account?.addrType == kScillaAddressType
-                        ? "assets/icons/scilla.svg"
-                        : "assets/icons/solidity.svg",
-                    width: iconSizeTileButton,
-                    height: iconSizeTileButton,
-                    colorFilter:
-                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                  icon: AppIconView(
+                    icon: appState.account?.addrType == kScillaAddressType
+                        ? AppIcon.file
+                        : AppIcon.file,
+                    size: iconSizeTileButton,
+                    color: theme.primaryPurple,
                   ),
                   title: appState.account?.addrType == kScillaAddressType
                       ? "Scilla"
@@ -267,12 +256,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     chain: appState.chain!,
                   ),
                   SizedBox(width: spacing),
-                  HoverSvgIcon(
-                    assetName: appState.hideBalance
-                        ? 'assets/icons/close_eye.svg'
-                        : 'assets/icons/open_eye.svg',
-                    width: iconSizeSmall,
-                    height: iconSizeSmall,
+                  HoverIcon(
+                    icon: AppIconState.balanceVisibility(hidden: appState.hideBalance),
+                    size: iconSizeSmall,
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
@@ -285,12 +271,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 children: [
                   if (appState.wallet != null &&
                       appState.wallet!.tokens.length > 1)
-                    HoverSvgIcon(
-                      assetName: appState.isTileView
-                          ? 'assets/icons/tiles.svg'
-                          : 'assets/icons/lines.svg',
-                      width: iconSizeManage,
-                      height: iconSizeManage,
+                    HoverIcon(
+                      icon: AppIconState.tokenLayout(isTileView: appState.isTileView),
+                      size: iconSizeManage,
                       padding: const EdgeInsets.all(0),
                       color: theme.textSecondary,
                       onTap: () async {
@@ -298,10 +281,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       },
                     ),
                   SizedBox(width: spacing),
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/manage.svg',
-                    width: iconSizeManage,
-                    height: iconSizeManage,
+                  HoverIcon(
+                    icon: AppIcon.manage,
+                    size: iconSizeManage,
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary,
                     onTap: () {

@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 
 import 'dart:io';
@@ -375,9 +376,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                             focusedBorderColor: theme.primaryPurple,
                             disabled: !_canInteract || _selectedFile == null,
                             obscureText: _obscurePassword,
-                            rightIconPath: _obscurePassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
+                            rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                             onRightIconTap: _canInteract
                                 ? () => setState(
                                     () => _obscurePassword = !_obscurePassword)

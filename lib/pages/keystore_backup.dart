@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -247,9 +248,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
                           ),
                           state.wallet?.walletName ?? "",
                         ),
-                        rightIconPath: _obscureConfirmPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscureConfirmPassword),
                         onRightIconTap: () => setState(() =>
                             _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),

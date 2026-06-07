@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -103,8 +104,8 @@ class _ConnectedDappsModalContentState
               height: 48,
               fontSize: 16,
               padding: EdgeInsets.symmetric(horizontal: 16),
-              leftIconPath: 'assets/icons/search.svg',
-              rightIconPath: "assets/icons/close.svg",
+              leftIcon: AppIcon.search,
+              rightIcon: AppIcon.close,
               onRightIconTap: () {
                 _searchController.text = "";
               },

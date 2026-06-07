@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -534,9 +535,7 @@ class _ConfirmTransactionContentState
                           focusedBorderColor: primaryColor,
                           disabled: _isDisabled,
                           obscureText: _obscurePassword,
-                          rightIconPath: _obscurePassword
-                              ? 'assets/icons/close_eye.svg'
-                              : 'assets/icons/open_eye.svg',
+                          rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                           onRightIconTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
                           textColor: textColor,

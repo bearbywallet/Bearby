@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
 
@@ -42,24 +43,22 @@ class BiometricSwitch extends StatelessWidget {
     }
   }
 
-  String get _iconPath {
+  AppIcon? get _icon {
     switch (biometricType) {
       case "touchId":
-        return 'assets/icons/fingerprint.svg';
-      case "faceId":
-        return 'assets/icons/face_id.svg';
-      case "opticId":
-        return 'assets/icons/face_id.svg';
       case "fingerprint":
-        return 'assets/icons/fingerprint.svg';
+        return AppIcon.fingerprint;
+      case "faceId":
+      case "opticId":
+        return AppIcon.faceId;
       case "biometric":
-        return 'assets/icons/biometric.svg';
+        return AppIcon.biometric;
       case "password":
       case "pinCode":
-        return 'assets/icons/pin.svg';
+        return AppIcon.pin;
       case "none":
       default:
-        return '';
+        return null;
     }
   }
 
@@ -70,6 +69,7 @@ class BiometricSwitch extends StatelessWidget {
     }
 
     final theme = Provider.of<AppState>(context).currentTheme;
+    final icon = _icon;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -78,15 +78,12 @@ class BiometricSwitch extends StatelessWidget {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                _iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
+              if (icon != null)
+                AppIconView(
+                  icon: icon,
+                  size: 24,
+                  color: theme.textPrimary,
                 ),
-              ),
               const SizedBox(width: 4),
               Text(
                 _authMethodText(context),

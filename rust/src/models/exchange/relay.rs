@@ -38,6 +38,7 @@ pub const RELAY_SOL_CHAIN_ID: u64 = 792_703_809;
 pub const RELAY_TRON_CHAIN_ID: u64 = 728_126_428;
 const RELAY_BTC_NATIVE: &str = "bc1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmql8k8";
 const RELAY_SOL_NATIVE: &str = "11111111111111111111111111111111";
+const RELAY_TRON_NATIVE: &str = "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb";
 
 const SUPPORTED_EVM_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161, 43114];
 const DEFAULT_RELAY_EVM_GAS: u64 = 400_000;
@@ -218,6 +219,11 @@ pub struct StepData {
     pub instructions: Option<serde_json::Value>,
     pub address_lookup_table_addresses: Option<Vec<String>>,
     pub psbt: Option<String>,
+    /// TriggerSmartContract parameter block returned by Relay for TRON-origin steps.
+    /// Relay uses a "parameter" key (instead of EVM-style to/data) with fields:
+    /// contract_address, data, call_value, owner_address.
+    #[serde(rename = "parameter")]
+    pub tron_tx: Option<serde_json::Value>,
 }
 
 #[frb(ignore)]
@@ -377,6 +383,7 @@ const fn relay_currency(asset: &ExchangeAsset, relay_chain_id: u64) -> Cow<'_, s
     match (relay_chain_id, asset.token.native) {
         (RELAY_BTC_CHAIN_ID, true) => Cow::Borrowed(RELAY_BTC_NATIVE),
         (RELAY_SOL_CHAIN_ID, true) => Cow::Borrowed(RELAY_SOL_NATIVE),
+        (RELAY_TRON_CHAIN_ID, true) => Cow::Borrowed(RELAY_TRON_NATIVE),
         _ => Cow::Borrowed(asset.token.addr.as_str()),
     }
 }
@@ -587,22 +594,48 @@ fn evm_blob_from_step(
 }
 
 fn tron_blob_from_step(mut step: StepData, chain_hash: u64) -> Result<RelayBlob, String> {
-    let to = step
-        .to
+    // Fast path: Relay returned EVM-style to/data fields for this TRON step.
+    if let (Some(to), Some(data)) = (
+        step.to.take().filter(|v| !v.is_empty()),
+        step.data.take().filter(|v| !v.is_empty()),
+    ) {
+        return Ok(RelayBlob {
+            source: RelaySource::Tron {
+                to,
+                data,
+                value: step.value.unwrap_or_else(|| "0".to_string()),
+            },
+            chain_hash,
+        });
+    }
+
+    // Standard path: Relay returns TRON TriggerSmartContract params in a "parameter" block.
+    let param = step
+        .tron_tx
         .take()
+        .ok_or_else(|| "relay Tron tx missing parameter".to_string())?;
+
+    let to = param
+        .get("contract_address")
+        .and_then(serde_json::Value::as_str)
         .filter(|v| !v.is_empty())
-        .ok_or_else(|| "relay Tron tx missing to".to_string())?;
-    let data = step
-        .data
-        .take()
-        .filter(|v| !v.is_empty())
-        .ok_or_else(|| "relay Tron tx missing data".to_string())?;
+        .ok_or_else(|| "relay Tron tx missing contract_address".to_string())?
+        .to_owned();
+
+    let data = param
+        .get("data")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or("")
+        .to_owned();
+
+    let value = param
+        .get("call_value")
+        .and_then(serde_json::Value::as_i64)
+        .unwrap_or(0)
+        .to_string();
+
     Ok(RelayBlob {
-        source: RelaySource::Tron {
-            to,
-            data,
-            value: step.value.unwrap_or_else(|| "0".to_string()),
-        },
+        source: RelaySource::Tron { to, data, value },
         chain_hash,
     })
 }
@@ -789,18 +822,46 @@ async fn tron_relay_check_approval(
     provider_icon: String,
 ) -> Result<Option<TransactionRequestInfo>, String> {
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
-    let Some(step) =
-        step_data_by_id(&quote, &["approve"]).filter(|step| step_has_evm_calldata(step))
-    else {
+
+    // TRON steps carry calldata in the "parameter" block (tron_tx), not EVM-style to/data.
+    let Some(step) = step_data_by_id(&quote, &["approve"]).filter(|step| {
+        step.tron_tx
+            .as_ref()
+            .and_then(|p| p.get("contract_address"))
+            .and_then(serde_json::Value::as_str)
+            .is_some_and(|v| !v.is_empty())
+    }) else {
         return Ok(None);
     };
+
+    let param = step
+        .tron_tx
+        .as_ref()
+        .ok_or_else(|| "approve step missing parameter".to_string())?;
+
+    let contract_addr = param
+        .get("contract_address")
+        .and_then(serde_json::Value::as_str)
+        .filter(|v| !v.is_empty())
+        .unwrap_or_default();
+
+    let calldata = param
+        .get("data")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default();
+
+    let call_value = param
+        .get("call_value")
+        .and_then(serde_json::Value::as_i64)
+        .unwrap_or(0)
+        .to_string();
 
     crate::api::exchange::tron::finalize_tron_relay(
         swapper,
         chain_hash,
-        step.to.as_deref().unwrap_or_default(),
-        step.data.as_deref().unwrap_or_default(),
-        step.value.as_deref().unwrap_or("0"),
+        contract_addr,
+        calldata,
+        &call_value,
         RelayDisplay {
             swap_title: approve_title,
             swap_info: String::new(),

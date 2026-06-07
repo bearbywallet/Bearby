@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -176,14 +177,10 @@ class _LanguageItemState extends State<_LanguageItem> {
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 200),
                     opacity: widget.isSelected ? 1.0 : 0.0,
-                    child: SvgPicture.asset(
-                      'assets/icons/ok.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter: ColorFilter.mode(
-                        theme.primaryPurple,
-                        BlendMode.srcIn,
-                      ),
+                    child: AppIconView(
+                      icon: AppIcon.ok,
+                      size: 20,
+                      color: theme.primaryPurple,
                     ),
                   ),
                 ],

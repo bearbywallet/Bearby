@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import '../../components/button.dart';
 import '../../components/smart_input.dart';
@@ -165,9 +166,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                         disabled: _disabled,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         obscureText: _obscureCurrentPassword,
-                        rightIconPath: _obscureCurrentPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscureCurrentPassword),
                         onRightIconTap: () => setState(() =>
                             _obscureCurrentPassword = !_obscureCurrentPassword),
                         onChanged: (_) => _errorMessage.isNotEmpty
@@ -184,9 +183,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                         disabled: _disabled,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         obscureText: _obscureNewPassword,
-                        rightIconPath: _obscureNewPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscureNewPassword),
                         onRightIconTap: () => setState(
                             () => _obscureNewPassword = !_obscureNewPassword),
                         onChanged: (_) => _errorMessage.isNotEmpty
@@ -203,9 +200,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                         disabled: _disabled,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         obscureText: _obscureConfirmPassword,
-                        rightIconPath: _obscureConfirmPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscureConfirmPassword),
                         onRightIconTap: () => setState(() =>
                             _obscureConfirmPassword = !_obscureConfirmPassword),
                         onChanged: (_) => _errorMessage.isNotEmpty
