@@ -2,7 +2,6 @@ import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/components/button_item.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/switch_setting_item.dart';

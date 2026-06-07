@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/mixins/pressable_animation.dart';

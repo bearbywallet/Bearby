@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';

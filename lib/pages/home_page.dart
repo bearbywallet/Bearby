@@ -19,7 +19,6 @@ import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';

@@ -1,6 +1,5 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
 
