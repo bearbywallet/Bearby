@@ -5,16 +5,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
-import 'package:bearby/components/jazzicon.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
 import 'package:bearby/components/skeleton_box.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/select_address.dart';
@@ -23,7 +21,6 @@ import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -693,7 +690,7 @@ class _ExchangePageState extends State<ExchangePage>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTokenAvatar(theme, token),
+            TokenAvatar(token: token, appState: _appState),
             const SizedBox(width: 8),
             Text(token.symbol,
                 style: theme.bodyText1.copyWith(color: theme.textPrimary)),
@@ -710,74 +707,5 @@ class _ExchangePageState extends State<ExchangePage>
       ),
     );
   }
-
-  Widget? _buildNetworkBadge(AppTheme theme, FTokenInfo token) {
-    final NetworkConfigInfo? chain;
-    try {
-      chain = _appState.getChain(token.chainHash);
-    } catch (_) {
-      return null;
-    }
-    if (chain == null) return null;
-    return Container(
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        shape: BoxShape.circle,
-        border: Border.all(color: theme.cardBackground, width: 1.5),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: viewChain(network: chain, theme: theme.value),
-          width: 14,
-          height: 14,
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTokenAvatar(AppTheme theme, FTokenInfo token) {
-    final badge = _buildNetworkBadge(theme, token);
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              border: Border.all(
-                  color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
-              shape: BoxShape.circle,
-            ),
-            child: ClipOval(
-              child: AsyncImage(
-                url: processTokenLogo(
-                  token: token,
-                  shortName: _appState.chain?.shortName ?? '',
-                  theme: theme.value,
-                ),
-                width: 24,
-                height: 24,
-                fit: BoxFit.cover,
-                errorWidget: Jazzicon(seed: token.addr, diameter: 24),
-                loadingWidget:
-                    const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              ),
-            ),
-          ),
-          if (badge != null)
-            Positioned(
-              right: -2,
-              bottom: -2,
-              child: badge,
-            ),
-        ],
-      ),
-    );
-  }
 }
+

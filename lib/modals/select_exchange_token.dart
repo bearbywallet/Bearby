@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/exchange_state.dart';
-import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/token_select_item.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
 /// Bottom-sheet picker over a list of [ExchangeAsset] (already filtered to the active
@@ -39,35 +35,6 @@ void showExchangeTokenSelectModal({
         ),
       );
     },
-  );
-}
-
-/// Small chain icon for the token's `chainHash`, overlaid on the token avatar. Returns
-/// null when the chain can't be resolved so the avatar simply renders without a badge.
-Widget? _buildNetworkBadge(AppState appState, AppTheme theme, FTokenInfo token) {
-  final NetworkConfigInfo? chain;
-  try {
-    chain = appState.getChain(token.chainHash);
-  } catch (_) {
-    return null;
-  }
-  if (chain == null) return null;
-  return Container(
-    width: 16,
-    height: 16,
-    decoration: BoxDecoration(
-      color: theme.cardBackground,
-      shape: BoxShape.circle,
-      border: Border.all(color: theme.cardBackground, width: 1.5),
-    ),
-    child: ClipOval(
-      child: AsyncImage(
-        url: viewChain(network: chain, theme: theme.value),
-        width: 16,
-        height: 16,
-        fit: BoxFit.contain,
-      ),
-    ),
   );
 }
 
@@ -175,7 +142,7 @@ class _ExchangeTokenSelectContentState
                 return TokenSelectItem(
                   ftoken: asset.token,
                   balance: balance,
-                  networkBadge: _buildNetworkBadge(appState, theme, asset.token),
+                  networkBadge: TokenAvatar.buildNetworkBadge(appState, theme, asset.token),
                   providerIcons:
                       asset.providers.map((p) => p.common.iconAsset).toList(),
                   onTap: () {
