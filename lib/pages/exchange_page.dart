@@ -23,6 +23,7 @@ import 'package:bearby/modals/swap_settings.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -710,29 +711,72 @@ class _ExchangePageState extends State<ExchangePage>
     );
   }
 
-  Widget _buildTokenAvatar(AppTheme theme, FTokenInfo token) {
+  Widget? _buildNetworkBadge(AppTheme theme, FTokenInfo token) {
+    final NetworkConfigInfo? chain;
+    try {
+      chain = _appState.getChain(token.chainHash);
+    } catch (_) {
+      return null;
+    }
+    if (chain == null) return null;
     return Container(
-      width: 24,
-      height: 24,
+      width: 14,
+      height: 14,
       decoration: BoxDecoration(
-        border: Border.all(
-            color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
+        color: theme.cardBackground,
         shape: BoxShape.circle,
+        border: Border.all(color: theme.cardBackground, width: 1.5),
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: processTokenLogo(
-            token: token,
-            shortName: _appState.chain?.shortName ?? '',
-            theme: theme.value,
-          ),
-          width: 24,
-          height: 24,
-          fit: BoxFit.cover,
-          errorWidget: Jazzicon(seed: token.addr, diameter: 24),
-          loadingWidget:
-              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          url: viewChain(network: chain, theme: theme.value),
+          width: 14,
+          height: 14,
+          fit: BoxFit.contain,
         ),
+      ),
+    );
+  }
+
+  Widget _buildTokenAvatar(AppTheme theme, FTokenInfo token) {
+    final badge = _buildNetworkBadge(theme, token);
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: AsyncImage(
+                url: processTokenLogo(
+                  token: token,
+                  shortName: _appState.chain?.shortName ?? '',
+                  theme: theme.value,
+                ),
+                width: 24,
+                height: 24,
+                fit: BoxFit.cover,
+                errorWidget: Jazzicon(seed: token.addr, diameter: 24),
+                loadingWidget:
+                    const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+            ),
+          ),
+          if (badge != null)
+            Positioned(
+              right: -2,
+              bottom: -2,
+              child: badge,
+            ),
+        ],
       ),
     );
   }
