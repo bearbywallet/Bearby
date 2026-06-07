@@ -113,13 +113,16 @@ class _ExchangePageState extends State<ExchangePage>
     return ExchangeAsset(token: token, providers: const {}, halted: false);
   }
 
-  Future<void> _bootstrap({ExchangeAsset? initialFrom}) =>
-      _exchangeState.bootstrap(
-        walletIndex: _appState.selectedWalletIndex,
-        accountIndex: _appState.wallet?.selectedAccount ?? BigInt.zero,
-        activeChainHash: _appState.wallet?.chainHash,
-        initialFrom: initialFrom ?? _nativeInitialAsset(),
-      );
+  Future<void> _bootstrap({ExchangeAsset? initialFrom}) {
+    final walletIndex = _appState.selectedWalletIndexOrNull;
+    if (walletIndex == null) return Future.value();
+    return _exchangeState.bootstrap(
+      walletIndex: walletIndex,
+      accountIndex: _appState.wallet?.selectedAccount ?? BigInt.zero,
+      activeChainHash: _appState.wallet?.chainHash,
+      initialFrom: initialFrom ?? _nativeInitialAsset(),
+    );
+  }
 
   List<ExchangeAsset> _outAssets(ExchangeState state) {
     final from = state.fromAsset;
