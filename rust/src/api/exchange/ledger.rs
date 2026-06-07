@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use zilpay::proto::tx::TransactionRequest;
 
+use crate::models::exchange::relay::RelayOrigin;
 use crate::models::exchange::{ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::background::BACKGROUND_SERVICE;
@@ -14,6 +15,14 @@ use super::evm::{
 pub struct PreparedSwapInfo {
     pub permit_typed_data_json: Option<String>,
     pub quote_blob: String,
+}
+
+fn is_relay_tron_origin(provider: &ExchangeProvider, params: &SwapParams) -> bool {
+    provider.is_relay()
+        && matches!(
+            RelayOrigin::from_addr_type(params.from.token.addr_type),
+            Some(RelayOrigin::Tron)
+        )
 }
 
 pub async fn check_exchange_approval(
@@ -40,6 +49,7 @@ pub async fn check_exchange_approval(
         .await?;
 
     match approval {
+        Some(info) if is_relay_tron_origin(&params.provider, &params) => Ok(Some(info)),
         Some(info) => {
             let mut tx: TransactionRequest =
                 info.try_into().map_err(ServiceError::TransactionErrors)?;
@@ -79,7 +89,7 @@ pub async fn finalize_exchange_swap(
 
     let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
     let chain_hash = provider.common().chain_hash;
-    let mut swap_tx: TransactionRequest = provider
+    let finalized = provider
         .finalize_swap(
             &quote_blob,
             permit_signature.as_deref(),
@@ -87,7 +97,12 @@ pub async fn finalize_exchange_swap(
             display.swap_info,
             display.out_token,
         )
-        .await?
+        .await?;
+    if provider.is_relay() && finalized.tron.is_some() {
+        return Ok(finalized);
+    }
+
+    let mut swap_tx: TransactionRequest = finalized
         .try_into()
         .map_err(ServiceError::TransactionErrors)?;
     apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;

@@ -2,6 +2,7 @@ mod bootstrap;
 mod evm;
 mod ledger;
 mod svm;
+pub(crate) mod tron;
 
 // Flutter-facing re-exports — only what FRB needs to see.
 pub use bootstrap::{bootstrap_exchange_providers, refresh_exchange_quotes};
@@ -30,7 +31,7 @@ pub async fn execute_exchange_swap(
                 Err("Relay Bitcoin-origin swaps are not supported yet".to_string())
             }
             Some(RelayOrigin::Tron) => {
-                Err("Relay TRON-origin swaps are not supported yet".to_string())
+                tron::execute_tron_exchange_swap(auth, params, display, sink).await
             }
             Some(RelayOrigin::Evm) | None => {
                 evm::execute_evm_exchange_swap(auth, params, display, sink).await

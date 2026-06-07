@@ -325,10 +325,8 @@ impl ExchangeProvider {
                 if from.token.addr_type == 3 || from.token.native {
                     return Ok(None);
                 }
-                let swapper = AlloyAddress::from_str(&common.account_addr)
-                    .map_err(|e| e.to_string())?;
                 relay::relay_check_approval(
-                    swapper,
+                    common.account_addr.as_str(),
                     chain_hash,
                     from,
                     to,

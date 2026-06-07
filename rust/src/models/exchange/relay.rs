@@ -35,6 +35,7 @@ const RELAY_BASE_URLS: &[&str] = &["https://api.relay.link"];
 
 pub const RELAY_BTC_CHAIN_ID: u64 = 8_253_038;
 pub const RELAY_SOL_CHAIN_ID: u64 = 792_703_809;
+pub const RELAY_TRON_CHAIN_ID: u64 = 728_126_428;
 const RELAY_BTC_NATIVE: &str = "bc1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmql8k8";
 const RELAY_SOL_NATIVE: &str = "11111111111111111111111111111111";
 
@@ -120,6 +121,7 @@ pub fn is_supported_chain(chain_id: u64) -> bool {
     SUPPORTED_EVM_CHAINS.contains(&chain_id)
         || chain_id == RELAY_BTC_CHAIN_ID
         || chain_id == RELAY_SOL_CHAIN_ID
+        || chain_id == RELAY_TRON_CHAIN_ID
 }
 
 /// Map an origin address type to a Relay chain identifier.
@@ -130,6 +132,7 @@ pub const fn relay_chain_id(addr_type: u8, evm_chain_id: u64) -> Option<u64> {
         1 => Some(evm_chain_id),
         2 => Some(RELAY_BTC_CHAIN_ID),
         3 => Some(RELAY_SOL_CHAIN_ID),
+        4 => Some(RELAY_TRON_CHAIN_ID),
         _ => None,
     }
 }
@@ -301,6 +304,11 @@ pub enum RelaySource {
     Btc {
         psbt: String,
     },
+    Tron {
+        to: String,
+        data: String,
+        value: String,
+    },
 }
 
 #[frb(ignore)]
@@ -312,11 +320,11 @@ pub struct RelayBlob {
 }
 
 /// Display metadata for the swap confirmation UI.
-struct RelayDisplay {
-    swap_title: String,
-    swap_info: String,
-    icon: String,
-    out_token: Option<BaseTokenInfo>,
+pub(crate) struct RelayDisplay {
+    pub(crate) swap_title: String,
+    pub(crate) swap_info: String,
+    pub(crate) icon: String,
+    pub(crate) out_token: Option<BaseTokenInfo>,
 }
 
 #[frb(ignore)]
@@ -578,6 +586,27 @@ fn evm_blob_from_step(
     })
 }
 
+fn tron_blob_from_step(mut step: StepData, chain_hash: u64) -> Result<RelayBlob, String> {
+    let to = step
+        .to
+        .take()
+        .filter(|v| !v.is_empty())
+        .ok_or_else(|| "relay Tron tx missing to".to_string())?;
+    let data = step
+        .data
+        .take()
+        .filter(|v| !v.is_empty())
+        .ok_or_else(|| "relay Tron tx missing data".to_string())?;
+    Ok(RelayBlob {
+        source: RelaySource::Tron {
+            to,
+            data,
+            value: step.value.unwrap_or_else(|| "0".to_string()),
+        },
+        chain_hash,
+    })
+}
+
 fn blob_from_step(
     step: StepData,
     origin_chain_id: u64,
@@ -615,6 +644,7 @@ fn blob_from_step(
                 chain_hash,
             })
         }
+        RELAY_TRON_CHAIN_ID => tron_blob_from_step(step, chain_hash),
         _ => Err("relay origin chain not supported".to_string()),
     }
 }
@@ -689,7 +719,7 @@ pub async fn relay_quote_info(
 #[allow(clippy::too_many_arguments)]
 #[frb(ignore)]
 pub async fn relay_check_approval(
-    swapper: Address,
+    swapper: &str,
     chain_hash: u64,
     from: &ExchangeAsset,
     to: &ExchangeAsset,
@@ -697,41 +727,89 @@ pub async fn relay_check_approval(
     approve_title: String,
     provider_icon: String,
 ) -> Result<Option<TransactionRequestInfo>, String> {
-    let Ok(origin_chain_id) = evm_origin_chain_id(from) else {
-        return Ok(None);
-    };
+    if let Ok(origin_chain_id) = evm_origin_chain_id(from) {
+        let swapper = Address::from_str(swapper).map_err(|e| e.to_string())?;
+        let (quote, _, _) = fetch_quote(from, to, amount).await?;
+        // Only build the approval when relay returns complete calldata; an incomplete `approve` step
+        // is skipped rather than failing the whole swap.
+        let Some(step) =
+            step_data_by_id(&quote, &["approve"]).filter(|step| step_has_evm_calldata(step))
+        else {
+            return Ok(None);
+        };
+        let tx = evm_tx_from_step(
+            step,
+            origin_chain_id,
+            chain_hash,
+            swapper,
+            DEFAULT_RELAY_APPROVE_GAS,
+        )?;
+        let TransactionRequest::Ethereum((evm_tx, _)) = tx else {
+            return Err("expected Ethereum tx".to_string());
+        };
+
+        return Ok(Some(
+            TransactionRequest::Ethereum((
+                evm_tx,
+                TransactionMetadata {
+                    chain_hash,
+                    broadcast: true,
+                    title: Some(approve_title),
+                    icon: Some(provider_icon),
+                    ..Default::default()
+                },
+            ))
+            .into(),
+        ));
+    }
+
+    if from.token.addr_type == 4 && !from.token.native {
+        return tron_relay_check_approval(
+            swapper,
+            chain_hash,
+            from,
+            to,
+            amount,
+            approve_title,
+            provider_icon,
+        )
+        .await;
+    }
+
+    Ok(None)
+}
+
+async fn tron_relay_check_approval(
+    swapper: &str,
+    chain_hash: u64,
+    from: &ExchangeAsset,
+    to: &ExchangeAsset,
+    amount: &str,
+    approve_title: String,
+    provider_icon: String,
+) -> Result<Option<TransactionRequestInfo>, String> {
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
-    // Only build the approval when relay returns complete calldata; an incomplete `approve` step
-    // is skipped rather than failing the whole swap.
     let Some(step) =
         step_data_by_id(&quote, &["approve"]).filter(|step| step_has_evm_calldata(step))
     else {
         return Ok(None);
     };
-    let tx = evm_tx_from_step(
-        step,
-        origin_chain_id,
-        chain_hash,
-        swapper,
-        DEFAULT_RELAY_APPROVE_GAS,
-    )?;
-    let TransactionRequest::Ethereum((evm_tx, _)) = tx else {
-        return Err("expected Ethereum tx".to_string());
-    };
 
-    Ok(Some(
-        TransactionRequest::Ethereum((
-            evm_tx,
-            TransactionMetadata {
-                chain_hash,
-                broadcast: true,
-                title: Some(approve_title),
-                icon: Some(provider_icon),
-                ..Default::default()
-            },
-        ))
-        .into(),
-    ))
+    crate::api::exchange::tron::finalize_tron_relay(
+        swapper,
+        chain_hash,
+        step.to.as_deref().unwrap_or_default(),
+        step.data.as_deref().unwrap_or_default(),
+        step.value.as_deref().unwrap_or("0"),
+        RelayDisplay {
+            swap_title: approve_title,
+            swap_info: String::new(),
+            icon: provider_icon,
+            out_token: None,
+        },
+    )
+    .await
+    .map(Some)
 }
 
 #[frb(ignore)]
@@ -744,11 +822,8 @@ pub async fn relay_prepare_swap(
         Some(RelayOrigin::Btc) => {
             return Err("Relay Bitcoin-origin swaps are not supported yet".to_string());
         }
-        Some(RelayOrigin::Tron) => {
-            return Err("Relay TRON-origin swaps are not supported yet".to_string());
-        }
         None => return Err("Relay origin address type is not supported".to_string()),
-        Some(RelayOrigin::Evm) | Some(RelayOrigin::Svm) => {}
+        Some(RelayOrigin::Evm) | Some(RelayOrigin::Svm) | Some(RelayOrigin::Tron) => {}
     }
     let origin_chain_id = relay_origin_chain_id(from)?;
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
@@ -821,6 +896,22 @@ pub async fn relay_finalize_swap(
             "Relay Bitcoin-origin swaps require external PSBT signing/finalization, which is not available yet"
                 .to_string(),
         ),
+        RelaySource::Tron { to, data, value } => {
+            crate::api::exchange::tron::finalize_tron_relay(
+                account_addr,
+                chain_hash,
+                &to,
+                &data,
+                &value,
+                RelayDisplay {
+                    swap_title,
+                    swap_info,
+                    icon: provider_icon,
+                    out_token,
+                },
+            )
+            .await
+        }
     }
 }
 
