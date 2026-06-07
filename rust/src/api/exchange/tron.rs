@@ -51,11 +51,14 @@ pub async fn finalize_tron_relay(
         .map_err(|e| format!("bad calldata: {e}"))?;
     let call_value = parse_tron_call_value(value_str)?;
 
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = Arc::clone(
+        &BACKGROUND_SERVICE
+            .read()
+            .await
+            .as_ref()
+            .ok_or(ServiceError::NotRunning)?
+            .core,
+    );
 
     let provider = core
         .get_provider(chain_hash)
@@ -134,11 +137,14 @@ pub(super) async fn execute_tron_exchange_swap(
         ..
     } = display;
 
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = Arc::clone(
+        &BACKGROUND_SERVICE
+            .read()
+            .await
+            .as_ref()
+            .ok_or(ServiceError::NotRunning)?
+            .core,
+    );
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
 

@@ -17,11 +17,14 @@ pub(super) async fn execute_svm_exchange_swap(
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
     let SwapParams { provider, from, to, amount_in, slippage_bps } = params;
 
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = Arc::clone(
+        &BACKGROUND_SERVICE
+            .read()
+            .await
+            .as_ref()
+            .ok_or(ServiceError::NotRunning)?
+            .core,
+    );
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
