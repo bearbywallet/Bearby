@@ -104,17 +104,10 @@ class _SettingsItemState extends State<SettingsItem> {
             if (tw != null)
               tw
             else if (trailingIcon != null)
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.modalBorder,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: AppIconView(
-                  icon: trailingIcon,
-                  color: theme.textSecondary,
-                  size: sizes.iconSize * 0.7,
-                ),
+              AppIconView(
+                icon: trailingIcon,
+                color: theme.textSecondary,
+                size: sizes.iconSize * 0.7,
               )
             else
               const SizedBox.shrink(),

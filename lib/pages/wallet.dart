@@ -447,17 +447,10 @@ class _WalletPageState extends State<WalletPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: AppIconView(
-                icon: item.icon,
-                size: _iconSize * 0.7,
-                color: theme.textPrimary,
-              ),
+            AppIconView(
+              icon: item.icon,
+              size: _iconSize * 0.7,
+              color: theme.textPrimary,
             ),
             const SizedBox(width: 12),
             Expanded(
