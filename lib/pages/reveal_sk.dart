@@ -258,14 +258,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       ),
       child: Column(
         children: [
-          SvgPicture.asset(
-            "assets/icons/clock.svg",
-            width: iconSize,
-            height: iconSize,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+          AppIconView(
+            icon: AppIcon.time,
+            size: iconSize,
+            color: theme.primaryPurple,
           ),
           const SizedBox(height: 16),
           Text(

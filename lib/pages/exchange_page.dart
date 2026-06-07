@@ -420,7 +420,7 @@ class _ExchangePageState extends State<ExchangePage>
             child: Padding(
               padding: const EdgeInsets.all(4),
               child: AppIconView(
-                icon: AppIcon.gear,
+                icon: AppIcon.settings,
                 size: 22,
                 color: theme.textSecondary,
               ),

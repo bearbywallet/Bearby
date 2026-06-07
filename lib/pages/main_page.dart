@@ -79,7 +79,7 @@ class MainPageState extends State<MainPage> {
           items: [
             const CustomBottomNavigationBarItem(icon: AppIcon.wallet),
             const CustomBottomNavigationBarItem(icon: AppIcon.history),
-            const CustomBottomNavigationBarItem(icon: AppIcon.swap),
+            const CustomBottomNavigationBarItem(icon: AppIcon.exchange),
             const CustomBottomNavigationBarItem(icon: AppIcon.nav),
           ],
           currentIndex: widget.shell.currentIndex,
