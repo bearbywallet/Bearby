@@ -136,11 +136,14 @@ pub(super) async fn execute_evm_exchange_swap(
         .is_wrap_unwrap(&from, &to, from.token.addr.as_str(), to.token.addr.as_str())
         .unwrap_or(false);
 
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = Arc::clone(
+        &BACKGROUND_SERVICE
+            .read()
+            .await
+            .as_ref()
+            .ok_or(ServiceError::NotRunning)?
+            .core,
+    );
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
