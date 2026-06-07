@@ -1,10 +1,8 @@
-import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
 
@@ -56,27 +54,13 @@ class TokenSelectItem extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(iconSize / 2),
-                    child: AsyncImage(
-                      url: processTokenLogo(
-                        token: ftoken,
-                        shortName: appState.chain?.shortName ?? "",
-                        theme: theme.value,
-                      ),
-                      width: iconSize,
-                      height: iconSize,
-                      fit: BoxFit.contain,
-                      errorWidget: Jazzicon(
-                        seed: ftoken.addr,
-                        diameter: iconSize,
-                      ),
-                      loadingWidget: const Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    ),
+                  TokenAvatar(
+                    token: ftoken,
+                    size: iconSize,
+                    appState: appState,
+                    showNetworkBadge: false,
+                    showBorder: false,
+                    fit: BoxFit.contain,
                   ),
                   if (badge != null)
                     Positioned(

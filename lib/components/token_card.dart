@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
 
@@ -45,8 +44,7 @@ class _TokenCardState extends State<TokenCard>
   }
 
   Widget _buildIcon(AppState state, double iconSize) {
-    final theme = state.currentTheme;
-    FTokenInfo token = FTokenInfo(
+    final FTokenInfo token = FTokenInfo(
       name: widget.ftoken.name,
       symbol: widget.ftoken.symbol,
       decimals: widget.ftoken.decimals,
@@ -60,41 +58,14 @@ class _TokenCardState extends State<TokenCard>
       logo: widget.ftoken.logo ?? state.wallet?.tokens.first.logo,
     );
 
-    return Container(
-      width: iconSize,
-      height: iconSize,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-            color: theme.primaryPurple.withValues(alpha: 0.1), width: 2),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: processTokenLogo(
-            token: token,
-            shortName: state.chain?.shortName ?? '',
-            theme: theme.value,
-          ),
-          width: iconSize,
-          height: iconSize,
-          fit: BoxFit.contain,
-          errorWidget: Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.textPrimary.withValues(alpha: 0.08),
-            ),
-            child: Icon(
-              Icons.image_not_supported_outlined,
-              size: iconSize * 0.55,
-              color: theme.textSecondary,
-            ),
-          ),
-          loadingWidget:
-              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-        ),
-      ),
+    return TokenAvatar(
+      token: token,
+      size: iconSize,
+      appState: state,
+      showNetworkBadge: false,
+      borderColor: state.currentTheme.primaryPurple.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
     );
   }
 

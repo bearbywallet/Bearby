@@ -1,13 +1,13 @@
+import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -872,53 +872,15 @@ class _AmountSection extends StatelessWidget {
     final theme = appState.currentTheme;
     final token = _findMatchingToken();
 
-    return Container(
-      width: 45,
-      height: 45,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: transaction.icon ??
-              (token != null
-                  ? processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? "",
-                      theme: theme.value,
-                    )
-                  : null),
-          width: 45,
-          height: 45,
-          fit: BoxFit.contain,
-          errorWidget: Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.background,
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/warning.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          ),
-        ),
-      ),
+    return TokenAvatar(
+      token: token,
+      size: 45,
+      appState: appState,
+      showNetworkBadge: false,
+      iconUrl: transaction.icon,
+      borderColor: theme.primaryPurple.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
     );
   }
 
