@@ -41,7 +41,7 @@ class TokenAvatar extends StatelessWidget {
   /// Builds a small chain-network badge widget for [token], or null when the
   /// chain cannot be resolved.  Used internally by [TokenAvatar] and can be
   /// called directly when composing custom avatar layouts (e.g. TokenSelectItem).
-  static double defaultBadgeSize(double avatarSize) => avatarSize * 0.25;
+  static double defaultBadgeSize(double avatarSize) => avatarSize * 0.50;
 
   static Widget? buildNetworkBadge(
     AppState appState,
@@ -80,20 +80,20 @@ class TokenAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = appState.currentTheme;
     final badge = switch ((showNetworkBadge, token)) {
-      (true, final t?) => buildNetworkBadge(
-          appState, theme, t,
+      (true, final t?) => buildNetworkBadge(appState, theme, t,
           badgeSize: defaultBadgeSize(size)),
       _ => null,
     };
 
-    final String? resolvedUrl = iconUrl ?? switch (token) {
-      final t? => processTokenLogo(
-          token: t,
-          shortName: appState.chain?.shortName ?? '',
-          theme: theme.value,
-        ),
-      _ => null,
-    };
+    final String? resolvedUrl = iconUrl ??
+        switch (token) {
+          final t? => processTokenLogo(
+              token: t,
+              shortName: appState.chain?.shortName ?? '',
+              theme: theme.value,
+            ),
+          _ => null,
+        };
 
     return SizedBox(
       width: size,
@@ -107,8 +107,8 @@ class TokenAvatar extends StatelessWidget {
             decoration: BoxDecoration(
               border: showBorder
                   ? Border.all(
-                      color:
-                          borderColor ?? theme.textPrimary.withValues(alpha: 0.2),
+                      color: borderColor ??
+                          theme.textPrimary.withValues(alpha: 0.2),
                       width: borderWidth,
                     )
                   : null,
