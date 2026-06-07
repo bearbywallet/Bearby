@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -160,7 +161,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               _buildPreferenceItem(
                 state,
                 l10n.securityPageTokensFetcherTitle,
-                'assets/icons/globe.svg',
+                AppIcon.globe,
                 l10n.securityPageTokensFetcherDescription,
                 true,
                 state.wallet!.settings.tokensListFetcher,
@@ -177,7 +178,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               _buildPreferenceItem(
                 state,
                 l10n.securityPageEnsDomains,
-                'assets/icons/graph.svg',
+                AppIcon.graph,
                 l10n.securityPageEnsDescription,
                 true,
                 state.wallet!.settings.ensEnabled,
@@ -194,7 +195,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               _buildPreferenceItem(
                 state,
                 l10n.securityPageIpfsGateway,
-                'assets/icons/ipfs.svg',
+                AppIcon.ipfs,
                 l10n.securityPageIpfsDescription,
                 true,
                 state.wallet!.settings.ipfsNode != null,
@@ -213,7 +214,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               _buildPreferenceItem(
                 state,
                 l10n.securityPageNodeRanking,
-                'assets/icons/server.svg',
+                AppIcon.server,
                 l10n.securityPageNodeDescription,
                 true,
                 state.wallet!.settings.nodeRankingEnabled,
@@ -235,7 +236,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
   Widget _buildPreferenceItem(
     AppState state,
     String title,
-    String iconPath,
+    AppIcon icon,
     String description,
     bool hasSwitch,
     bool value,
@@ -255,14 +256,10 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
           children: [
             Row(
               children: [
-                SvgPicture.asset(
-                  iconPath,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
-                  ),
+                AppIconView(
+                  icon: icon,
+                  size: 24,
+                  color: theme.textPrimary,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -356,7 +353,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
           child: _buildClearDataItem(
             theme,
             l10n.securityPageClearImageCache,
-            'assets/icons/cache.svg',
+            AppIcon.cache,
             l10n.securityPageClearImageCacheDescription,
             () => _clearImageCache(state),
             _loading.contains('imageCache'),
@@ -369,7 +366,7 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
   Widget _buildClearDataItem(
     AppTheme theme,
     String title,
-    String iconPath,
+    AppIcon icon,
     String description,
     VoidCallback onTap,
     bool isLoading,
@@ -383,15 +380,11 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
+              AppIconView(
+                  icon: icon,
+                  size: 24,
+                  color: theme.textPrimary,
                 ),
-              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(

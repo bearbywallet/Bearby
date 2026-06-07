@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/modal_drag_handle.dart';
 import 'package:bearby/components/swipe_button.dart';
@@ -499,10 +500,9 @@ class _RpcSection extends StatelessWidget {
                       ),
                     ),
                     if (canDelete)
-                      HoverSvgIcon(
-                        assetName: 'assets/icons/minus.svg',
-                        width: 20,
-                        height: 20,
+                      HoverIcon(
+                        icon: AppIcon.minus,
+                        size: 20,
                         color: theme.danger,
                         onTap: () => onRemove(rpc),
                       ),

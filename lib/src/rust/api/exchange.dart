@@ -9,106 +9,15 @@ import '../models/exchange/pancakeswap.dart';
 import '../models/exchange/relay.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
-import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
 import '../models/transactions/btc.dart';
-import '../models/transactions/evm.dart';
 import '../models/transactions/history.dart';
-import '../models/transactions/request.dart';
-import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `apply_fast_fees`, `apply_swap_gas_limit`, `buffer_gas`, `estimate_fast_params`, `eth_gas`, `resolve_swap_signer`, `set_eth_gas`
-
-/// Bootstrap all exchange providers across every registered chain.
-Future<List<ExchangeAsset>> bootstrapExchangeProviders(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders(
-        walletIndex: walletIndex, accountIndex: accountIndex);
-
-/// Parallel quote refresh for all providers on `from`.
-Future<ExchangeAsset> refreshExchangeQuotes(
-        {required ExchangeAsset from,
-        required ExchangeAsset to,
-        required String amount}) =>
-    RustLib.instance.api.crateApiExchangeRefreshExchangeQuotes(
-        from: from, to: to, amount: amount);
-
-/// **Software-wallet swap orchestrator.** Under a SINGLE unlock: optionally approve the ERC-20,
-/// sign the Permit2 EIP-712, build the Universal Router swap calldata, and broadcast approve (`N`) + swap (`N+1`)
-/// back-to-back (EVM nonce ordering guarantees the approve executes first). Returns the broadcast
-/// histories. Progress streams as `approving`/`approved`/`permit`/`swapping`/`done`. Ledger wallets
-/// use the step-by-step `check_exchange_approval` → `prepare_exchange_swap` → `finalize_exchange_swap`
-/// path instead (a device cannot sign a batch).
 Stream<String> executeExchangeSwap(
         {required SwapAuth auth,
         required SwapParams params,
         required ExchangeTxDisplay display}) =>
     RustLib.instance.api.crateApiExchangeExecuteExchangeSwap(
         auth: auth, params: params, display: display);
-
-/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the swap,
-/// and if so return the unsigned approval tx — with FAST fees + the given `nonce` already applied —
-/// for a **Ledger** device to sign and broadcast first. Native inputs never need approval
-/// (`Ok(None)`). Software wallets don't call this; `execute_exchange_swap` handles approval inline.
-Future<TransactionRequestInfo?> checkExchangeApproval(
-        {required SwapAuth auth,
-        required SwapParams params,
-        required BigInt nonce,
-        required String approveTitle}) =>
-    RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
-        auth: auth, params: params, nonce: nonce, approveTitle: approveTitle);
-
-Future<PreparedSwapInfo> prepareExchangeSwap({required SwapParams params}) =>
-    RustLib.instance.api.crateApiExchangePrepareExchangeSwap(params: params);
-
-/// **Ledger final step.** Attach the device-signed permit signature, build the Universal Router swap
-/// calldata, and return the swap tx with FAST fees + the given `nonce` already applied — ready for the device to sign and
-/// the UI to broadcast via `send_signed_transactions`.
-Future<TransactionRequestInfo> finalizeExchangeSwap(
-        {required SwapAuth auth,
-        required ExchangeProvider provider,
-        required String quoteBlob,
-        String? permitSignature,
-        required BigInt nonce,
-        required ExchangeTxDisplay display}) =>
-    RustLib.instance.api.crateApiExchangeFinalizeExchangeSwap(
-        auth: auth,
-        provider: provider,
-        quoteBlob: quoteBlob,
-        permitSignature: permitSignature,
-        nonce: nonce,
-        display: display);
-
-/// Base pending nonce for the active account on its chain. The Ledger modal pins it once and passes
-/// `N` (approve) / `N+1` (swap) explicitly, since `eth_getTransactionCount(latest)` won't reflect a
-/// just-broadcast approve between device prompts.
-Future<BigInt> estimateSwapBaseNonce(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiExchangeEstimateSwapBaseNonce(
-        walletIndex: walletIndex, accountIndex: accountIndex);
-
-/// **Ledger step.** Re-quote and surface the Permit2 typed data to sign on-device, plus the opaque
-/// quote blob to feed back into [`finalize_exchange_swap`]. Native inputs / routings without a
-/// Permit2 authorization return `permit_typed_data_json: None`.
-class PreparedSwapInfo {
-  final String? permitTypedDataJson;
-  final String quoteBlob;
-
-  const PreparedSwapInfo({
-    this.permitTypedDataJson,
-    required this.quoteBlob,
-  });
-
-  @override
-  int get hashCode => permitTypedDataJson.hashCode ^ quoteBlob.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreparedSwapInfo &&
-          runtimeType == other.runtimeType &&
-          permitTypedDataJson == other.permitTypedDataJson &&
-          quoteBlob == other.quoteBlob;
-}

@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -202,7 +203,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                   child: SmartInput(
                     controller: _searchController,
                     hint: l10n.setupNetworkSettingsPageSearchHint,
-                    leftIconPath: 'assets/icons/search.svg',
+                    leftIcon: AppIcon.search,
                     onChanged: (value) => setState(() => _searchQuery = value),
                     borderColor: theme.textPrimary,
                     focusedBorderColor: theme.primaryPurple,

@@ -10,6 +10,8 @@ import 'api/btc_ledger.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/exchange.dart';
+import 'api/exchange/bootstrap.dart';
+import 'api/exchange/ledger.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
 import 'api/local_storage.dart';
@@ -112,7 +114,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 1311491490;
+  int get rustContentHash => 462620167;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -189,8 +191,9 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
       {required String addr});
 
-  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders(
-      {required BigInt walletIndex, required BigInt accountIndex});
+  Future<List<ExchangeAsset>>
+      crateApiExchangeBootstrapBootstrapExchangeProviders(
+          {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
       {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos});
@@ -285,7 +288,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiWalletChangeWalletName(
       {required BigInt walletIndex, required String newName});
 
-  Future<TransactionRequestInfo?> crateApiExchangeCheckExchangeApproval(
+  Future<TransactionRequestInfo?> crateApiExchangeLedgerCheckExchangeApproval(
       {required SwapAuth auth,
       required SwapParams params,
       required BigInt nonce,
@@ -321,7 +324,7 @@ abstract class RustLibApi extends BaseApi {
       required TransactionRequestInfo tx,
       required int slip44});
 
-  Future<BigInt> crateApiExchangeEstimateSwapBaseNonce(
+  Future<BigInt> crateApiExchangeLedgerEstimateSwapBaseNonce(
       {required BigInt walletIndex, required BigInt accountIndex});
 
   Stream<String> crateApiExchangeExecuteExchangeSwap(
@@ -338,7 +341,7 @@ abstract class RustLibApi extends BaseApi {
   Future<FTokenInfo> crateApiTokenFetchTokenMeta(
       {required String addr, required BigInt walletIndex});
 
-  Future<TransactionRequestInfo> crateApiExchangeFinalizeExchangeSwap(
+  Future<TransactionRequestInfo> crateApiExchangeLedgerFinalizeExchangeSwap(
       {required SwapAuth auth,
       required ExchangeProvider provider,
       required String quoteBlob,
@@ -462,7 +465,7 @@ abstract class RustLibApi extends BaseApi {
   Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
       {required String typedDataJson});
 
-  Future<PreparedSwapInfo> crateApiExchangePrepareExchangeSwap(
+  Future<PreparedSwapInfo> crateApiExchangeLedgerPrepareExchangeSwap(
       {required SwapParams params});
 
   Future<Uint8List> crateApiTransactionPrepareMessage(
@@ -473,7 +476,7 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiProviderProviderReqProxy(
       {required String payload, required BigInt chainHash});
 
-  Future<ExchangeAsset> crateApiExchangeRefreshExchangeQuotes(
+  Future<ExchangeAsset> crateApiExchangeBootstrapRefreshExchangeQuotes(
       {required ExchangeAsset from,
       required ExchangeAsset to,
       required String amount});
@@ -1143,8 +1146,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders(
-      {required BigInt walletIndex, required BigInt accountIndex}) {
+  Future<List<ExchangeAsset>>
+      crateApiExchangeBootstrapBootstrapExchangeProviders(
+          {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1157,17 +1161,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_list_exchange_asset,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
+      constMeta: kCrateApiExchangeBootstrapBootstrapExchangeProvidersConstMeta,
       argValues: [walletIndex, accountIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta =>
-      const TaskConstMeta(
-        debugName: "bootstrap_exchange_providers",
-        argNames: ["walletIndex", "accountIndex"],
-      );
+  TaskConstMeta
+      get kCrateApiExchangeBootstrapBootstrapExchangeProvidersConstMeta =>
+          const TaskConstMeta(
+            debugName: "bootstrap_exchange_providers",
+            argNames: ["walletIndex", "accountIndex"],
+          );
 
   @override
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
@@ -1832,7 +1837,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<TransactionRequestInfo?> crateApiExchangeCheckExchangeApproval(
+  Future<TransactionRequestInfo?> crateApiExchangeLedgerCheckExchangeApproval(
       {required SwapAuth auth,
       required SwapParams params,
       required BigInt nonce,
@@ -1851,13 +1856,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_opt_box_autoadd_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeCheckExchangeApprovalConstMeta,
+      constMeta: kCrateApiExchangeLedgerCheckExchangeApprovalConstMeta,
       argValues: [auth, params, nonce, approveTitle],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeCheckExchangeApprovalConstMeta =>
+  TaskConstMeta get kCrateApiExchangeLedgerCheckExchangeApprovalConstMeta =>
       const TaskConstMeta(
         debugName: "check_exchange_approval",
         argNames: ["auth", "params", "nonce", "approveTitle"],
@@ -2107,7 +2112,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt> crateApiExchangeEstimateSwapBaseNonce(
+  Future<BigInt> crateApiExchangeLedgerEstimateSwapBaseNonce(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -2121,13 +2126,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_u_64,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeEstimateSwapBaseNonceConstMeta,
+      constMeta: kCrateApiExchangeLedgerEstimateSwapBaseNonceConstMeta,
       argValues: [walletIndex, accountIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeEstimateSwapBaseNonceConstMeta =>
+  TaskConstMeta get kCrateApiExchangeLedgerEstimateSwapBaseNonceConstMeta =>
       const TaskConstMeta(
         debugName: "estimate_swap_base_nonce",
         argNames: ["walletIndex", "accountIndex"],
@@ -2247,7 +2252,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<TransactionRequestInfo> crateApiExchangeFinalizeExchangeSwap(
+  Future<TransactionRequestInfo> crateApiExchangeLedgerFinalizeExchangeSwap(
       {required SwapAuth auth,
       required ExchangeProvider provider,
       required String quoteBlob,
@@ -2270,13 +2275,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeFinalizeExchangeSwapConstMeta,
+      constMeta: kCrateApiExchangeLedgerFinalizeExchangeSwapConstMeta,
       argValues: [auth, provider, quoteBlob, permitSignature, nonce, display],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeFinalizeExchangeSwapConstMeta =>
+  TaskConstMeta get kCrateApiExchangeLedgerFinalizeExchangeSwapConstMeta =>
       const TaskConstMeta(
         debugName: "finalize_exchange_swap",
         argNames: [
@@ -3363,7 +3368,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<PreparedSwapInfo> crateApiExchangePrepareExchangeSwap(
+  Future<PreparedSwapInfo> crateApiExchangeLedgerPrepareExchangeSwap(
       {required SwapParams params}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -3376,13 +3381,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_prepared_swap_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangePrepareExchangeSwapConstMeta,
+      constMeta: kCrateApiExchangeLedgerPrepareExchangeSwapConstMeta,
       argValues: [params],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangePrepareExchangeSwapConstMeta =>
+  TaskConstMeta get kCrateApiExchangeLedgerPrepareExchangeSwapConstMeta =>
       const TaskConstMeta(
         debugName: "prepare_exchange_swap",
         argNames: ["params"],
@@ -3446,7 +3451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<ExchangeAsset> crateApiExchangeRefreshExchangeQuotes(
+  Future<ExchangeAsset> crateApiExchangeBootstrapRefreshExchangeQuotes(
       {required ExchangeAsset from,
       required ExchangeAsset to,
       required String amount}) {
@@ -3463,13 +3468,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_exchange_asset,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeRefreshExchangeQuotesConstMeta,
+      constMeta: kCrateApiExchangeBootstrapRefreshExchangeQuotesConstMeta,
       argValues: [from, to, amount],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeRefreshExchangeQuotesConstMeta =>
+  TaskConstMeta get kCrateApiExchangeBootstrapRefreshExchangeQuotesConstMeta =>
       const TaskConstMeta(
         debugName: "refresh_exchange_quotes",
         argNames: ["from", "to", "amount"],

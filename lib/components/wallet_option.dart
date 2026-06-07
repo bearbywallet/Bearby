@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
@@ -13,7 +13,7 @@ class WalletOption extends StatelessWidget {
   final int walletIndex;
   final bool isSelected;
   final VoidCallback onTap;
-  final List<String>? icons;
+  final List<AppIcon>? icons;
   final EdgeInsetsGeometry? padding;
 
   const WalletOption({
@@ -135,17 +135,14 @@ class WalletOption extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: icons!
-                          .map((iconPath) => Padding(
+                          .map((icon) => Padding(
                                 padding: const EdgeInsets.all(4),
-                                child: SvgPicture.asset(
-                                  iconPath,
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                      isSelected
-                                          ? theme.primaryPurple
-                                          : theme.textPrimary,
-                                      BlendMode.srcIn),
+                                child: AppIconView(
+                                  icon: icon,
+                                  size: 24,
+                                  color: isSelected
+                                      ? theme.primaryPurple
+                                      : theme.textPrimary,
                                 ),
                               ))
                           .toList(),

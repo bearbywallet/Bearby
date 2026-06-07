@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:bearby/components/counter.dart';
@@ -354,9 +355,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                             horizontal: 20),
                                         focusedBorderColor: theme.primaryPurple,
                                         obscureText: _obscurePassword,
-                                        rightIconPath: _obscurePassword
-                                            ? "assets/icons/close_eye.svg"
-                                            : "assets/icons/open_eye.svg",
+                                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                                         onRightIconTap: () {
                                           setState(() {
                                             _obscurePassword =

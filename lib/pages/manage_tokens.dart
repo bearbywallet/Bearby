@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -463,8 +464,8 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                   child: SmartInput(
                     controller: _searchController,
                     hint: l10n.manageTokensSearchHint,
-                    leftIconPath: 'assets/icons/search.svg',
-                    rightIconPath: 'assets/icons/close.svg',
+                    leftIcon: AppIcon.search,
+                    rightIcon: AppIcon.close,
                     onChanged: _onSearchChanged,
                     onRightIconTap: () {
                       _searchController.clear();

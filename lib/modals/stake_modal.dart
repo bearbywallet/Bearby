@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -435,7 +436,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
           borderColor: theme.textSecondary.withValues(alpha: 0.3),
           focusedBorderColor: theme.primaryPurple,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          rightIconPath: "assets/icons/zil.svg",
+          rightIcon: AppIcon.zil,
         ),
       ],
     );

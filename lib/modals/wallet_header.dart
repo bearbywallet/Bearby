@@ -2,7 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/wallet_card.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
@@ -156,11 +157,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          HoverSvgIcon(
-            assetName: "assets/icons/plus.svg",
+          HoverIcon(
+            icon: AppIcon.plus,
             color: theme.textPrimary,
-            width: 40,
-            height: 40,
+            size: 40,
             onTap: () {
               if (appState.wallet!.walletType
                   .contains(WalletType.ledger.name)) {
@@ -174,11 +174,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             },
           ),
           if (appState.wallet!.selectedAccount != BigInt.zero)
-            HoverSvgIcon(
-              assetName: "assets/icons/minus.svg",
+            HoverIcon(
+              icon: AppIcon.minus,
               color: theme.danger,
-              width: 40,
-              height: 40,
+              size: 40,
               onTap: _deleteSelectedAccount,
             ),
         ],

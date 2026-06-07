@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 class SettingsItem extends StatefulWidget {
   final String title;
-  final String trailingSvgPath;
+  final AppIcon? trailingIcon;
+  final Widget? trailingWidget;
   final VoidCallback onTap;
   final bool isFirst;
   final bool isLast;
@@ -14,7 +16,8 @@ class SettingsItem extends StatefulWidget {
   const SettingsItem({
     super.key,
     required this.title,
-    required this.trailingSvgPath,
+    this.trailingIcon,
+    this.trailingWidget,
     required this.onTap,
     this.isFirst = false,
     this.isLast = false,
@@ -64,6 +67,8 @@ class _SettingsItemState extends State<SettingsItem> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final sizes = _getDynamicSizes(context);
     final borderRadius = _getBorderRadius(sizes.borderRadius);
+    final tw = widget.trailingWidget;
+    final trailingIcon = widget.trailingIcon;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -96,22 +101,23 @@ class _SettingsItemState extends State<SettingsItem> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SvgPicture.asset(
-                widget.trailingSvgPath,
-                colorFilter: ColorFilter.mode(
-                  theme.textSecondary,
-                  BlendMode.srcIn,
+            if (tw != null)
+              tw
+            else if (trailingIcon != null)
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.modalBorder,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                width: sizes.iconSize * 0.7,
-                height: sizes.iconSize * 0.7,
-              ),
-            ),
+                child: AppIconView(
+                  icon: trailingIcon,
+                  color: theme.textSecondary,
+                  size: sizes.iconSize * 0.7,
+                ),
+              )
+            else
+              const SizedBox.shrink(),
           ],
         ),
       ),

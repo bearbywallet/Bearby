@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:provider/provider.dart';
 import 'package:bearby/components/linear_refresh_indicator.dart';
 import 'package:bearby/components/transaction_item.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/glass_search_bar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -143,10 +144,9 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
           ),
           Row(
             children: [
-              HoverSvgIcon(
-                assetName: 'assets/icons/down_arrow.svg',
-                width: 24,
-                height: 24,
+              HoverIcon(
+                icon: AppIcon.arrowDown,
+                size: 24,
                 onTap: () {
                   setState(() {
                     _sortType = _sortType == SortType.date
@@ -156,10 +156,9 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
                 },
                 color: appState.currentTheme.textPrimary,
               ),
-              HoverSvgIcon(
-                assetName: 'assets/icons/minus.svg',
-                width: 24,
-                height: 24,
+              HoverIcon(
+                icon: AppIcon.minus,
+                size: 24,
                 onTap: () {
                   _clearAllTransactions(appState);
                 },
@@ -292,7 +291,7 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
                   child: GlassSearchBar(
                     controller: _searchController,
                     hint: AppLocalizations.of(context)!.historyPageSearchHint,
-                    rightIconPath: "assets/icons/close.svg",
+                    rightIcon: AppIcon.close,
                     onChanged: (value) {
                       setState(() {});
                     },

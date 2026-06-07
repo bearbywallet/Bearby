@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -159,10 +160,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                                   onChanged: _validatePrivateKey,
                                   keyboardType: TextInputType.text,
                                   autofocus: true,
-                                  leftIconPath: 'assets/icons/key.svg',
-                                  rightIconPath: _isValidating
-                                      ? 'assets/icons/loading.svg'
-                                      : null,
+                                  leftIcon: AppIcon.key,
+                                  rightIcon: AppIconState.loading(isLoading: _isValidating),
                                   secondaryColor: theme.textSecondary,
                                   backgroundColor: theme.cardBackground,
                                   textColor: theme.textPrimary,

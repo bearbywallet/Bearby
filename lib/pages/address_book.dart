@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -127,7 +128,7 @@ class _AddressBookPageState extends State<AddressBookPage> with StatusBarMixin {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SwitchSettingItem(
                     backgroundColor: theme.cardBackground,
-                    iconPath: "assets/icons/history.svg",
+                    icon: AppIcon.history,
                     title: l10n.transactionHistoryTitle,
                     description: l10n.transactionHistoryDescription,
                     value: state.showAddressesThroughTransactionHistory,

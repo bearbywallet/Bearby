@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -242,21 +243,21 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
           _buildActionRow(
             theme,
             l10n.aboutPagePrivacyPolicy,
-            'assets/icons/shield.svg',
+            AppIcon.shield,
             false,
             () => _launchUrl('https://bearby.io/policy'),
           ),
           _buildActionRow(
             theme,
             l10n.aboutPageTermsOfService,
-            'assets/icons/document.svg',
+            AppIcon.document,
             false,
             () => _launchUrl('https://bearby.io/terms'),
           ),
           _buildActionRow(
             theme,
             l10n.aboutPageLicenses,
-            'assets/icons/licenses.svg',
+            AppIcon.puzzle,
             true,
             () => _showLicensePage(context, l10n),
           ),
@@ -339,7 +340,7 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   Widget _buildActionRow(
     AppTheme theme,
     String title,
-    String iconPath,
+    AppIcon icon,
     bool last,
     VoidCallback onTap,
   ) {
@@ -360,14 +361,10 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
         ),
         child: Row(
           children: [
-            SvgPicture.asset(
-              iconPath,
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                theme.textPrimary,
-                BlendMode.srcIn,
-              ),
+            AppIconView(
+              icon: icon,
+              size: 24,
+              color: theme.textPrimary,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -379,14 +376,10 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
                 ),
               ),
             ),
-            SvgPicture.asset(
-              'assets/icons/right_arrow.svg',
-              width: 16,
-              height: 16,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
-              ),
+            AppIconView(
+              icon: AppIcon.arrowRight,
+              size: 16,
+              color: theme.textSecondary,
             ),
           ],
         ),

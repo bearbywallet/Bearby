@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/src/rust/models/settings.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -37,7 +39,7 @@ extension BrowserSettingsInfoExtension on BrowserSettingsInfo {
 class ButtonItem extends StatefulWidget {
   final AppTheme theme;
   final String title;
-  final String iconPath;
+  final AppIcon icon;
   final String description;
   final VoidCallback onTap;
   final String? subtitleText;
@@ -46,7 +48,7 @@ class ButtonItem extends StatefulWidget {
     super.key,
     required this.theme,
     required this.title,
-    required this.iconPath,
+    required this.icon,
     required this.description,
     required this.onTap,
     this.subtitleText,
@@ -84,15 +86,11 @@ class _ButtonItemState extends State<ButtonItem>
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(
-                    widget.iconPath,
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      widget.theme.textPrimary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+                  AppIconView(
+                  icon: widget.icon,
+                  size: 24,
+                  color: widget.theme.textPrimary,
+                ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -117,15 +115,11 @@ class _ButtonItemState extends State<ButtonItem>
                       ],
                     ),
                   ),
-                  SvgPicture.asset(
-                    'assets/icons/chevron_right.svg',
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      widget.theme.textSecondary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+                  AppIconView(
+                  icon: AppIcon.chevronRight,
+                  size: 24,
+                  color: widget.theme.textSecondary,
+                ),
                 ],
               ),
               if (widget.description.isNotEmpty) ...[

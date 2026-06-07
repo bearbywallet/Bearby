@@ -1,14 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/state/app_state.dart';
 
 class WalletListItem extends StatefulWidget {
   final String title;
   final String subtitle;
-  final dynamic icon;
+  final Widget icon;
   final VoidCallback? onTap;
   final bool disabled;
 
@@ -81,7 +82,7 @@ class _WalletListItemState extends State<WalletListItem>
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    Opacity(opacity: opacity, child: _buildIcon()),
+                    Opacity(opacity: opacity, child: widget.icon),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -115,14 +116,10 @@ class _WalletListItemState extends State<WalletListItem>
                     ),
                     Opacity(
                       opacity: opacity,
-                      child: SvgPicture.asset(
-                        'assets/icons/chevron_right.svg',
-                        width: 24,
-                        height: 24,
-                        colorFilter: ColorFilter.mode(
-                          theme.primaryPurple.withValues(alpha: 0.6),
-                          BlendMode.srcIn,
-                        ),
+                      child: AppIconView(
+                        icon: AppIcon.chevronRight,
+                        size: 24,
+                        color: theme.primaryPurple.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -135,18 +132,4 @@ class _WalletListItemState extends State<WalletListItem>
     );
   }
 
-  Widget _buildIcon() {
-    if (widget.icon is IconData) {
-      return Icon(widget.icon as IconData);
-    } else if (widget.icon is Widget) {
-      return widget.icon;
-    } else if (widget.icon is String) {
-      return Image.asset(
-        widget.icon,
-        width: 24,
-        height: 24,
-      );
-    }
-    return Container();
-  }
 }

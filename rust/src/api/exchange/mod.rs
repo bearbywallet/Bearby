@@ -1,6 +1,6 @@
-mod bootstrap;
+pub mod bootstrap;
 mod evm;
-mod ledger;
+pub mod ledger;
 mod svm;
 pub(crate) mod tron;
 

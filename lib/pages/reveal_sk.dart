@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -159,9 +160,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                           state.selectedWalletIndex,
                           state.wallet!.selectedAccount,
                         ),
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                         onRightIconTap: () => setState(
                             () => _obscurePassword = !_obscurePassword),
                       ),

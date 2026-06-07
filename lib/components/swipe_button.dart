@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -160,14 +161,10 @@ class _SwipeButtonState extends State<SwipeButton>
                                 color: thumbColor,
                                 shape: BoxShape.circle,
                               ),
-                              child: SvgPicture.asset(
-                                "assets/icons/right_circle_arrow.svg",
-                                width: widget.height * 0.4,
-                                height: widget.height * 0.4,
-                                colorFilter: ColorFilter.mode(
-                                  theme.background,
-                                  BlendMode.srcIn,
-                                ),
+                              child: AppIconView(
+                                icon: AppIcon.arrowRight,
+                                size: widget.height * 0.4,
+                                color: theme.background,
                               ),
                             ),
                           ],

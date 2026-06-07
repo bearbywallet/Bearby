@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -77,14 +78,10 @@ class NetworkDownButtonState extends State<NetworkDownButton>
                   ),
                 ],
                 const SizedBox(width: 6),
-                SvgPicture.asset(
-                  "assets/icons/tiny_down_arrow.svg",
-                  width: 10,
-                  height: 10,
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
-                  ),
+                AppIconView(
+                  icon: AppIcon.arrowDown,
+                  size: 10,
+                  color: theme.textSecondary,
                 ),
               ],
             ),

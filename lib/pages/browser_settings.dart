@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
@@ -285,7 +286,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
                 theme: theme,
                 title:
                     AppLocalizations.of(context)!.browserSettingsSearchEngine,
-                iconPath: 'assets/icons/search.svg',
+                icon: AppIcon.search,
                 description: AppLocalizations.of(context)!
                     .browserSettingsSearchEngineDescription,
                 onTap: () => _showSearchEngineModal(appState),
@@ -299,7 +300,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
                 theme: theme,
                 title: AppLocalizations.of(context)!
                     .browserSettingsContentBlocking,
-                iconPath: 'assets/icons/shield.svg',
+                icon: AppIcon.shield,
                 description: AppLocalizations.of(context)!
                     .browserSettingsContentBlockingDescription,
                 onTap: () => _showContentBlockingModal(appState),
@@ -338,7 +339,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
             children: [
               SwitchSettingItem(
                 title: AppLocalizations.of(context)!.browserSettingsCookies,
-                iconPath: 'assets/icons/cookie.svg',
+                icon: AppIcon.cookie,
                 description: AppLocalizations.of(context)!
                     .browserSettingsCookiesDescription,
                 value: settings.cookiesEnabled,
@@ -348,7 +349,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               SwitchSettingItem(
                 title: AppLocalizations.of(context)!.browserSettingsDoNotTrack,
-                iconPath: 'assets/icons/shield.svg',
+                icon: AppIcon.shield,
                 description: AppLocalizations.of(context)!
                     .browserSettingsDoNotTrackDescription,
                 value: settings.doNotTrack,
@@ -359,7 +360,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
               SwitchSettingItem(
                 title:
                     AppLocalizations.of(context)!.browserSettingsIncognitoMode,
-                iconPath: 'assets/icons/incognito.svg',
+                icon: AppIcon.incognito,
                 description: AppLocalizations.of(context)!
                     .browserSettingsIncognitoModeDescription,
                 value: settings.incognitoMode,
@@ -396,7 +397,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
             children: [
               SwitchSettingItem(
                 title: AppLocalizations.of(context)!.browserSettingsCache,
-                iconPath: 'assets/icons/cache.svg',
+                icon: AppIcon.cache,
                 description: AppLocalizations.of(context)!
                     .browserSettingsCacheDescription,
                 value: settings.cacheEnabled,
@@ -432,7 +433,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
               _buildClearDataItem(
                 theme,
                 AppLocalizations.of(context)!.browserSettingsClearCookies,
-                'assets/icons/cookie.svg',
+                AppIcon.cookie,
                 AppLocalizations.of(context)!
                     .browserSettingsClearCookiesDescription,
                 () => _clearCookies(appState),
@@ -443,7 +444,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
               _buildClearDataItem(
                 theme,
                 AppLocalizations.of(context)!.browserSettingsClearCache,
-                'assets/icons/cache.svg',
+                AppIcon.cache,
                 AppLocalizations.of(context)!
                     .browserSettingsClearCacheDescription,
                 () => _clearCache(appState),
@@ -454,7 +455,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
               _buildClearDataItem(
                 theme,
                 AppLocalizations.of(context)!.browserSettingsClearLocalStorage,
-                'assets/icons/data.svg',
+                AppIcon.data,
                 AppLocalizations.of(context)!
                     .browserSettingsClearLocalStorageDescription,
                 () => _clearLocalStorage(appState),
@@ -470,7 +471,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
   Widget _buildClearDataItem(
     AppTheme theme,
     String title,
-    String iconPath,
+    AppIcon icon,
     String description,
     VoidCallback onTap,
     bool isLoading,
@@ -480,14 +481,10 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SvgPicture.asset(
-            iconPath,
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.textPrimary,
-              BlendMode.srcIn,
-            ),
+          AppIconView(
+            icon: icon,
+            size: 24,
+            color: theme.textPrimary,
           ),
           const SizedBox(width: 16),
           Expanded(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import '../components/bottom_nav_bar.dart';
 import '../state/app_state.dart';
 
@@ -75,10 +77,10 @@ class MainPageState extends State<MainPage> {
       bottomNavigationBar: SafeArea(
         child: CustomBottomNavigationBar(
           items: [
-            CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),
-            CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
-            CustomBottomNavigationBarItem(iconPath: 'assets/icons/swap.svg'),
-            CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
+            const CustomBottomNavigationBarItem(icon: AppIcon.wallet),
+            const CustomBottomNavigationBarItem(icon: AppIcon.history),
+            const CustomBottomNavigationBarItem(icon: AppIcon.swap),
+            const CustomBottomNavigationBarItem(icon: AppIcon.nav),
           ],
           currentIndex: widget.shell.currentIndex,
           onTap: _onItemTapped,

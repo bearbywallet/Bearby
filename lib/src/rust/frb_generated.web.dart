@@ -13,6 +13,8 @@ import 'api/btc_ledger.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/exchange.dart';
+import 'api/exchange/bootstrap.dart';
+import 'api/exchange/ledger.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
 import 'api/local_storage.dart';

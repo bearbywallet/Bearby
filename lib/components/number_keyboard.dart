@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -85,14 +86,10 @@ class NumberKeyboardState extends State<NumberKeyboard>
           height: 50,
           alignment: Alignment.center,
           child: isIcon
-              ? SvgPicture.asset(
-                  "assets/icons/backspace.svg",
-                  width: 30,
-                  height: 30,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary.withValues(alpha: isActive ? 1.0 : 0.5),
-                    BlendMode.srcIn,
-                  ),
+              ? AppIconView(
+                  icon: AppIcon.backspace,
+                  size: 30,
+                  color: theme.textPrimary.withValues(alpha: isActive ? 1.0 : 0.5),
                 )
               : Text(
                   value,

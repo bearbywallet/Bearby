@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -200,7 +201,7 @@ class _AddressSelectModalContentState
       child: SmartInput(
         controller: _searchController,
         hint: l10n.addressSelectModalContentSearchHint,
-        leftIconPath: 'assets/icons/qrcode.svg',
+        leftIcon: AppIcon.qrCode,
         onChanged: (value) async {
           try {
             bool isAddress = await isValidAddress(addr: value);
