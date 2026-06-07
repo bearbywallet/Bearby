@@ -1,0 +1,114 @@
+use std::sync::Arc;
+
+use zilpay::proto::tx::TransactionRequest;
+
+use crate::models::exchange::{ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams};
+use crate::models::transactions::request::TransactionRequestInfo;
+use crate::service::background::BACKGROUND_SERVICE;
+use crate::utils::errors::ServiceError;
+
+use super::evm::{
+    apply_fast_fees, apply_swap_gas_limit, estimate_fast_params, resolve_swap_signer,
+};
+
+pub struct PreparedSwapInfo {
+    pub permit_typed_data_json: Option<String>,
+    pub quote_blob: String,
+}
+
+pub async fn check_exchange_approval(
+    auth: SwapAuth,
+    params: SwapParams,
+    nonce: u64,
+    approve_title: String,
+) -> Result<Option<TransactionRequestInfo>, String> {
+    if params.from.token.native {
+        return Ok(None);
+    }
+
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
+    let chain_hash = params.provider.common().chain_hash;
+    let approval = params
+        .provider
+        .check_approval(&params.from, &params.to, &params.amount_in, approve_title)
+        .await?;
+
+    match approval {
+        Some(info) => {
+            let mut tx: TransactionRequest =
+                info.try_into().map_err(ServiceError::TransactionErrors)?;
+            let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+            apply_fast_fees(&mut tx, &base, nonce)?;
+            Ok(Some(tx.into()))
+        }
+        None => Ok(None),
+    }
+}
+
+pub async fn prepare_exchange_swap(params: SwapParams) -> Result<PreparedSwapInfo, String> {
+    let prepared = params
+        .provider
+        .prepare_swap(&params.from, &params.to, &params.amount_in, params.slippage_bps)
+        .await?;
+
+    Ok(PreparedSwapInfo {
+        permit_typed_data_json: prepared.permit_typed_data_json,
+        quote_blob: prepared.quote_blob,
+    })
+}
+
+pub async fn finalize_exchange_swap(
+    auth: SwapAuth,
+    provider: ExchangeProvider,
+    quote_blob: String,
+    permit_signature: Option<String>,
+    nonce: u64,
+    display: ExchangeTxDisplay,
+) -> Result<TransactionRequestInfo, String> {
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
+    let chain_hash = provider.common().chain_hash;
+    let mut swap_tx: TransactionRequest = provider
+        .finalize_swap(
+            &quote_blob,
+            permit_signature.as_deref(),
+            display.swap_title,
+            display.swap_info,
+            display.out_token,
+        )
+        .await?
+        .try_into()
+        .map_err(ServiceError::TransactionErrors)?;
+    apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
+    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+    apply_fast_fees(&mut swap_tx, &base, nonce)?;
+
+    Ok(swap_tx.into())
+}
+
+pub async fn estimate_swap_base_nonce(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<u64, String> {
+    let core = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        Arc::clone(&service.core)
+    };
+
+    let (signer, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
+    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+
+    Ok(base.nonce)
+}
