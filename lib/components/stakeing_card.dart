@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -217,11 +217,10 @@ class _ErrorIcon extends StatelessWidget {
         color: theme.danger.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: SvgPicture.asset(
-        'assets/icons/zil.svg',
-        width: 28,
-        height: 28,
-        colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+      child: AppIconView(
+        icon: AppIcon.zil,
+        size: 28,
+        color: theme.warning,
       ),
     );
   }
@@ -301,11 +300,10 @@ class _PendingWithdrawalsHeader extends StatelessWidget {
             color: theme.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: SvgPicture.asset(
-            'assets/icons/clock.svg',
-            width: 16,
-            height: 16,
-            colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+          child: AppIconView(
+            icon: AppIcon.time,
+            size: 16,
+            color: theme.warning,
           ),
         ),
         const SizedBox(width: 8),
@@ -662,12 +660,10 @@ class _DelegatedAmountDisplay extends StatelessWidget {
                 color: theme.primaryPurple.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: SvgPicture.asset(
-                'assets/icons/piggy.svg',
-                width: 14,
-                height: 14,
-                colorFilter:
-                    ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+              child: AppIconView(
+                icon: AppIcon.trophy,
+                size: 14,
+                color: theme.primaryPurple,
               ),
             ),
             const SizedBox(width: 6),
@@ -767,11 +763,10 @@ class _ClaimableAmountCard extends StatelessWidget {
               color: theme.warning.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: SvgPicture.asset(
-              'assets/icons/trophy.svg',
-              width: 12,
-              height: 12,
-              colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+            child: AppIconView(
+              icon: AppIcon.trophy,
+              size: 12,
+              color: theme.warning,
             ),
           ),
           const SizedBox(width: 6),
@@ -924,10 +919,9 @@ class _LiquidStakingInfo extends StatelessWidget {
               width: 20,
               height: 20,
               fit: BoxFit.contain,
-              errorWidget: SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 20,
-                height: 20,
+              errorWidget: AppIconView(
+                icon: AppIcon.warning,
+                size: 20,
               ),
               loadingWidget: const Center(
                 child: CircularProgressIndicator(strokeWidth: 2),
@@ -1138,11 +1132,10 @@ class _ClaimRewardsButton extends StatelessWidget {
               color: theme.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: SvgPicture.asset(
-              'assets/icons/trophy.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(theme.success, BlendMode.srcIn),
+            child: AppIconView(
+              icon: AppIcon.trophy,
+              size: 20,
+              color: theme.success,
             ),
           ),
           const SizedBox(width: 12),
