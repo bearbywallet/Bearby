@@ -4,8 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/gas_eip1559.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/components/token_transfer_amount.dart';
 import 'package:bearby/components/transaction_amount_display.dart';
@@ -14,7 +14,6 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/modals/edit_gas_dialog.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -596,55 +595,16 @@ class _ConfirmTransactionContentState
   }
 
   Widget _buildTokenLogo(AppState state, Color primaryColor) {
-    const imageSize = 54.0;
-    final theme = state.currentTheme;
-    final icon = widget.tx.metadata.icon;
-
-    if (icon != null) {
-      return Container(
-        width: imageSize,
-        height: imageSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border:
-              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
-        ),
-        child: ClipOval(
-            child: AsyncImage(
-                url: icon,
-                width: imageSize,
-                height: imageSize,
-                fit: BoxFit.contain)),
-      );
-    }
-
-    try {
-      final token = state.wallet!.tokens
-          .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
-      return Container(
-        width: imageSize,
-        height: imageSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border:
-              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
-        ),
-        child: ClipOval(
-          child: AsyncImage(
-            url: processTokenLogo(
-              token: token,
-              shortName: state.chain?.shortName ?? "",
-              theme: theme.value,
-            ),
-            width: imageSize,
-            height: imageSize,
-            fit: BoxFit.contain,
-          ),
-        ),
-      );
-    } catch (_) {
-      return const SizedBox.shrink();
-    }
+    return TokenAvatar(
+      token: widget.token,
+      size: 54,
+      appState: state,
+      showNetworkBadge: false,
+      iconUrl: widget.tx.metadata.icon,
+      borderColor: primaryColor.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
+    );
   }
 
   Widget _buildTransferDetails(

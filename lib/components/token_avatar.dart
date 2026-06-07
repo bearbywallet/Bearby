@@ -11,10 +11,17 @@ import 'package:bearby/theme/app_theme.dart';
 /// corner.  Uses [AsyncImage] for the logo and falls back to a broken-image icon
 /// when the URL fails to load.
 class TokenAvatar extends StatelessWidget {
-  final FTokenInfo token;
+  final FTokenInfo? token;
   final double size;
   final AppState appState;
   final bool showNetworkBadge;
+  final String? iconUrl;
+  final Widget? errorWidget;
+  final Widget? loadingWidget;
+  final Color? borderColor;
+  final double borderWidth;
+  final bool showBorder;
+  final BoxFit fit;
 
   const TokenAvatar({
     super.key,
@@ -22,16 +29,25 @@ class TokenAvatar extends StatelessWidget {
     this.size = 24,
     required this.appState,
     this.showNetworkBadge = true,
+    this.iconUrl,
+    this.errorWidget,
+    this.loadingWidget,
+    this.borderColor,
+    this.borderWidth = 1.5,
+    this.showBorder = true,
+    this.fit = BoxFit.cover,
   });
 
   /// Builds a small chain-network badge widget for [token], or null when the
   /// chain cannot be resolved.  Used internally by [TokenAvatar] and can be
   /// called directly when composing custom avatar layouts (e.g. TokenSelectItem).
+  static double defaultBadgeSize(double avatarSize) => avatarSize * 0.25;
+
   static Widget? buildNetworkBadge(
     AppState appState,
     AppTheme theme,
     FTokenInfo token, {
-    double badgeSize = 14,
+    double? badgeSize,
   }) {
     final NetworkConfigInfo? chain;
     try {
@@ -39,10 +55,11 @@ class TokenAvatar extends StatelessWidget {
     } catch (_) {
       return null;
     }
+    final double effectiveBadgeSize = badgeSize ?? defaultBadgeSize(40);
     if (chain == null) return null;
     return Container(
-      width: badgeSize,
-      height: badgeSize,
+      width: effectiveBadgeSize,
+      height: effectiveBadgeSize,
       decoration: BoxDecoration(
         color: theme.cardBackground,
         shape: BoxShape.circle,
@@ -51,8 +68,8 @@ class TokenAvatar extends StatelessWidget {
       child: ClipOval(
         child: AsyncImage(
           url: viewChain(network: chain, theme: theme.value),
-          width: badgeSize,
-          height: badgeSize,
+          width: effectiveBadgeSize,
+          height: effectiveBadgeSize,
           fit: BoxFit.contain,
         ),
       ),
@@ -62,7 +79,21 @@ class TokenAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = appState.currentTheme;
-    final badge = showNetworkBadge ? buildNetworkBadge(appState, theme, token) : null;
+    final badge = switch ((showNetworkBadge, token)) {
+      (true, final t?) => buildNetworkBadge(
+          appState, theme, t,
+          badgeSize: defaultBadgeSize(size)),
+      _ => null,
+    };
+
+    final String? resolvedUrl = iconUrl ?? switch (token) {
+      final t? => processTokenLogo(
+          token: t,
+          shortName: appState.chain?.shortName ?? '',
+          theme: theme.value,
+        ),
+      _ => null,
+    };
 
     return SizedBox(
       width: size,
@@ -74,30 +105,30 @@ class TokenAvatar extends StatelessWidget {
             width: size,
             height: size,
             decoration: BoxDecoration(
-              border: Border.all(
-                color: theme.textPrimary.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
+              border: showBorder
+                  ? Border.all(
+                      color:
+                          borderColor ?? theme.textPrimary.withValues(alpha: 0.2),
+                      width: borderWidth,
+                    )
+                  : null,
               shape: BoxShape.circle,
             ),
             child: ClipOval(
               child: AsyncImage(
-                url: processTokenLogo(
-                  token: token,
-                  shortName: appState.chain?.shortName ?? '',
-                  theme: theme.value,
-                ),
+                url: resolvedUrl,
                 width: size,
                 height: size,
-                fit: BoxFit.cover,
-                errorWidget: _brokenIcon(theme),
-                loadingWidget: Center(
-                  child: SizedBox(
-                    width: size * 0.5,
-                    height: size * 0.5,
-                    child: const CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
+                fit: fit,
+                errorWidget: errorWidget ?? _brokenIcon(theme),
+                loadingWidget: loadingWidget ??
+                    Center(
+                      child: SizedBox(
+                        width: size * 0.5,
+                        height: size * 0.5,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
               ),
             ),
           ),

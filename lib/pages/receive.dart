@@ -8,13 +8,11 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/custom_app_bar.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
-import 'package:bearby/components/jazzicon.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/select_token.dart';
@@ -39,7 +37,6 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   bool isPressedToken = false;
   int selectedToken = 0;
   String amount = "0";
-  Key _imageKey = UniqueKey();
   String? legacyAddress;
   bool useLegacyAddress = false;
 
@@ -97,7 +94,6 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
       onTokenSelected: (index) {
         setState(() {
           selectedToken = index;
-          _imageKey = UniqueKey();
         });
       },
     );
@@ -326,25 +322,12 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               height: 32,
               decoration: const BoxDecoration(shape: BoxShape.circle),
               child: Center(
-                child: ClipOval(
-                  child: AsyncImage(
-                    key: _imageKey,
-                    url: processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? "",
-                      theme: theme.value,
-                    ),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                    errorWidget: Jazzicon(
-                      seed: token.addr,
-                      diameter: 32,
-                    ),
-                    loadingWidget: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
+                child: TokenAvatar(
+                  token: token,
+                  size: 32,
+                  appState: appState,
+                  showNetworkBadge: false,
+                  showBorder: false,
                 ),
               ),
             ),

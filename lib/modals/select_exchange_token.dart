@@ -142,7 +142,8 @@ class _ExchangeTokenSelectContentState
                 return TokenSelectItem(
                   ftoken: asset.token,
                   balance: balance,
-                  networkBadge: TokenAvatar.buildNetworkBadge(appState, theme, asset.token),
+                  networkBadge: TokenAvatar.buildNetworkBadge(appState, theme, asset.token,
+                      badgeSize: TokenAvatar.defaultBadgeSize(40)),
                   providerIcons:
                       asset.providers.map((p) => p.common.iconAsset).toList(),
                   onTap: () {

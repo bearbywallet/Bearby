@@ -1,5 +1,5 @@
+import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,11 +8,11 @@ import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -52,7 +52,8 @@ void showBtcTransactionDetailsModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (_) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: BtcTransactionDetailsModal(transaction: transaction),
     ),
   );
@@ -104,7 +105,9 @@ class BtcTransactionDetailsModal extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildTransactionGroup(context, theme, l10n),
-                  if (btc != null && !btc.isCoinbase && btc.input.isNotEmpty) ...[
+                  if (btc != null &&
+                      !btc.isCoinbase &&
+                      btc.input.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _buildFromGroup(btc, theme, l10n),
                   ],
@@ -303,7 +306,8 @@ class BtcTransactionDetailsModal extends StatelessWidget {
         DetailItem(
           label: l10n.transactionDetailsModal_fee,
           theme: theme,
-          valueWidget: _AmountValue(amount: feeStr, fiat: feeFiat, theme: theme),
+          valueWidget:
+              _AmountValue(amount: feeStr, fiat: feeFiat, theme: theme),
         ),
         DetailItem(
           label: l10n.transactionDetailsModal_inputValue,
@@ -404,7 +408,8 @@ class _AmountCard extends StatelessWidget {
     return DetailGroupCard(
       title: l10n.amountSection_transfer,
       theme: theme,
-      headerTrailing: _StatusBadge(status: transaction.status, theme: theme, l10n: l10n),
+      headerTrailing:
+          _StatusBadge(status: transaction.status, theme: theme, l10n: l10n),
       children: [_buildBody()],
     );
   }
@@ -432,7 +437,8 @@ class _AmountCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 2),
                     child: Text(
                       fiat,
-                      style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                      style:
+                          theme.bodyText2.copyWith(color: theme.textSecondary),
                     ),
                   ),
                 if (btc != null)
@@ -458,45 +464,15 @@ class _AmountCard extends StatelessWidget {
 
   Widget _buildIcon() {
     final token = _findMatchingToken();
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.12),
-          width: 1.5,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: transaction.icon ??
-              (token != null
-                  ? processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? '',
-                      theme: theme.value,
-                    )
-                  : null),
-          width: 44,
-          height: 44,
-          fit: BoxFit.contain,
-          errorWidget: SvgPicture.asset(
-            'assets/icons/warning.svg',
-            width: 18,
-            height: 18,
-            colorFilter:
-                ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
-          ),
-          loadingWidget: const Center(
-            child: SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-        ),
-      ),
+    return TokenAvatar(
+      token: token,
+      size: 44,
+      appState: appState,
+      showNetworkBadge: false,
+      iconUrl: transaction.icon,
+      borderColor: theme.primaryPurple.withValues(alpha: 0.12),
+      borderWidth: 1.5,
+      fit: BoxFit.contain,
     );
   }
 

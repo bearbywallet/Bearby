@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
@@ -68,48 +67,16 @@ class _HistoryItemState extends State<HistoryItem>
       );
     }
 
-    // Remote URL or token logo fallback — existing path.
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-              color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
-      child: ClipOval(
-        child: AsyncImage(
-          url: icon ??
-              (token != null
-                  ? processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? '',
-                      theme: theme.value,
-                    )
-                  : null),
-          width: 32,
-          height: 32,
-          fit: BoxFit.contain,
-          errorWidget: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.background,
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/warning.svg',
-              width: 16,
-              height: 16,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-          loadingWidget: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2)),
-        ),
-      ),
+    // Remote URL or token logo fallback — use TokenAvatar.
+    return TokenAvatar(
+      token: token,
+      size: 32,
+      appState: appState,
+      showNetworkBadge: false,
+      iconUrl: icon,
+      borderColor: theme.primaryPurple.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
     );
   }
 
