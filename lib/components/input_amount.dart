@@ -15,6 +15,8 @@ import 'package:bearby/theme/app_theme.dart';
 /// 25% / 50% / 100% chips. Presentational only — the caller supplies the [token] and
 /// [balance] and reacts to [onAmountChanged] (chips) and [onTokenTap] (selector).
 class TokenAmountCard extends StatelessWidget {
+  static const List<int> _percentOptions = <int>[0, 25, 50, 100];
+
   final String amount;
   final FTokenInfo token;
   final BigInt balance;
@@ -32,7 +34,8 @@ class TokenAmountCard extends StatelessWidget {
 
   void _setPercent(int percent) {
     final portion = balance * BigInt.from(percent) ~/ BigInt.from(100);
-    onAmountChanged(fromWei(value: portion.toString(), decimals: token.decimals));
+    onAmountChanged(
+        fromWei(value: portion.toString(), decimals: token.decimals));
   }
 
   @override
@@ -55,7 +58,7 @@ class TokenAmountCard extends StatelessWidget {
         children: [
           _buildAmountRow(context, theme, bigAmount, appState),
           const SizedBox(height: 8),
-          _buildBalanceRow(theme),
+          _buildBalanceRow(theme, bigAmount),
         ],
       ),
     );
@@ -92,7 +95,7 @@ class TokenAmountCard extends StatelessWidget {
       appState: appState,
     );
 
-    final fontSize = _calculateAdaptiveFontSize(context, amount);
+    final fontSize = _calculateAdaptiveFontSize(context);
     final showConverted = appState.wallet?.settings.currencyConvert != null &&
         converted.isNotEmpty;
 
@@ -198,8 +201,7 @@ class TokenAmountCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBalanceRow(AppTheme theme) {
-    final currentAmount = toDecimalsWei(amount, token.decimals);
+  Widget _buildBalanceRow(AppTheme theme, BigInt currentAmount) {
     final bool isExceeded = currentAmount > balance;
 
     return Row(
@@ -227,48 +229,77 @@ class TokenAmountCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        _percentChip(theme, '0%', () => _setPercent(0)),
-        const SizedBox(width: 8),
-        _percentChip(theme, '25%', () => _setPercent(25)),
-        const SizedBox(width: 8),
-        _percentChip(theme, '50%', () => _setPercent(50)),
-        const SizedBox(width: 8),
-        _percentChip(theme, '100%', () => _setPercent(100)),
+        ...List<Widget>.generate(_percentOptions.length * 2 - 1, (index) {
+          if (index.isOdd) {
+            return const SizedBox(width: 8);
+          }
+
+          final percent = _percentOptions[index ~/ 2];
+          return _percentChip(
+            theme,
+            percent,
+            _isPercentActive(percent, currentAmount),
+            () => _setPercent(percent),
+          );
+        }),
       ],
     );
   }
 
-  Widget _percentChip(AppTheme theme, String label, VoidCallback onTap) {
+  bool _isPercentActive(int percent, BigInt currentAmount) {
+    if (percent == 0) {
+      return currentAmount == BigInt.zero;
+    }
+
+    if (balance == BigInt.zero) {
+      return false;
+    }
+
+    final portion = balance * BigInt.from(percent) ~/ BigInt.from(100);
+    return currentAmount == portion;
+  }
+
+  Widget _percentChip(
+    AppTheme theme,
+    int percent,
+    bool isActive,
+    VoidCallback onTap,
+  ) {
+    final backgroundColor = isActive
+        ? theme.primaryPurple.withValues(alpha: 0.22)
+        : theme.textPrimary.withValues(alpha: 0.1);
+    final borderColor = isActive
+        ? theme.primaryPurple.withValues(alpha: 0.7)
+        : Colors.transparent;
+    final textColor = isActive
+        ? theme.primaryPurple
+        : theme.textPrimary.withValues(alpha: 0.7);
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: theme.textPrimary.withValues(alpha: 0.1),
+          color: backgroundColor,
+          border: Border.all(color: borderColor),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          label,
+          '$percent%',
           style: theme.labelSmall.copyWith(
-            color: theme.textPrimary.withValues(alpha: 0.7),
+            color: textColor,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
     );
   }
 
-  double _calculateAdaptiveFontSize(BuildContext context, String text) {
+  double _calculateAdaptiveFontSize(BuildContext context) {
     const baseSize = 32.0;
-    const minSize = 16.0;
-
-    if (text.length <= 8) {
-      return AdaptiveSize.getAdaptiveFontSize(context, baseSize);
-    }
-
-    final scaleFactor = 1 - ((text.length - 8) * 0.08);
-    final adjustedSize = (baseSize * scaleFactor).clamp(minSize, baseSize);
-
-    return AdaptiveSize.getAdaptiveFontSize(context, adjustedSize);
+    return AdaptiveSize.getAdaptiveFontSize(context, baseSize);
   }
 }
