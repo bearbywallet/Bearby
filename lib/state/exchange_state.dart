@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 
 import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
+import 'package:bearby/src/rust/models/exchange/pancakeswap.dart';
+import 'package:bearby/src/rust/models/exchange/relay.dart';
+import 'package:bearby/src/rust/models/exchange/uniswap.dart';
 
 extension ExchangeProviderMeta on ExchangeProvider {
   ProviderCommon get common => map(
@@ -160,7 +163,11 @@ class ExchangeState extends ChangeNotifier {
     final to = _toAsset;
     final amount = _pendingAmountWei;
     if (from == null || to == null || amount == null) return;
-    if ((BigInt.tryParse(amount) ?? BigInt.zero) <= BigInt.zero) return;
+    if ((BigInt.tryParse(amount) ?? BigInt.zero) <= BigInt.zero) {
+      _stopPolling();
+      _clearQuotes();
+      return;
+    }
 
     _loadingQuote = true;
     notifyListeners();
@@ -172,6 +179,52 @@ class ExchangeState extends ChangeNotifier {
       _loadingQuote = false;
       notifyListeners();
     }
+  }
+
+  /// Remove quotes from all providers on [_fromAsset] so the UI reflects a
+  /// zero-amount state instead of showing stale data from a previous fetch.
+  void _clearQuotes() {
+    final from = _fromAsset;
+    if (from == null) return;
+
+    final cleared = ExchangeAsset(
+      token: from.token,
+      providers: from.providers.map(_stripQuote).toSet(),
+      halted: from.halted,
+    );
+
+    if (_fromAsset != cleared) {
+      _fromAsset = cleared;
+      notifyListeners();
+    }
+  }
+
+  static ExchangeProvider _stripQuote(ExchangeProvider p) {
+    return p.map(
+      relay: (v) => ExchangeProvider.relay(RelayMeta(
+        common: v.field0.common,
+        cfg: v.field0.cfg,
+        quote: null,
+      )),
+      uniswap: (v) => ExchangeProvider.uniswap(UniswapMeta(
+        common: v.field0.common,
+        cfg: v.field0.cfg,
+        quote: null,
+      )),
+      pancakeSwap: (v) => ExchangeProvider.pancakeSwap(PancakeMeta(
+        common: v.field0.common,
+        cfg: v.field0.cfg,
+        quote: null,
+      )),
+      zilSwap: (v) => ExchangeProvider.zilSwap(ZilSwapMeta(
+        common: v.field0.common,
+        quote: null,
+      )),
+      sunSwap: (v) => ExchangeProvider.sunSwap(SunSwapMeta(
+        common: v.field0.common,
+        quote: null,
+      )),
+    );
   }
 
   @override
