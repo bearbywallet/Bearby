@@ -274,7 +274,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       icon: AppIconState.tokenLayout(isTileView: appState.isTileView),
                       size: iconSizeManage,
                       padding: const EdgeInsets.all(0),
-                      color: theme.textSecondary,
+                      color: theme.textSecondary.withValues(alpha: 0.5),
                       onTap: () async {
                         await appState.updateIsTileView(!appState.isTileView);
                       },
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     icon: AppIcon.manage,
                     size: iconSizeManage,
                     padding: const EdgeInsets.all(0),
-                    color: theme.textSecondary,
+                    color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
                       context.push(AppRoutes.manageTokens);
                     },
