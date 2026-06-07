@@ -585,41 +585,45 @@ class _ExchangePageState extends State<ExchangePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (effectiveRecipient.isNotEmpty)
-            _buildRecipientButton(theme, l10n, effectiveRecipient, to)
-          else
-            Text(l10n.exchangePageGet,
-                style: theme.bodyText2.copyWith(color: theme.textSecondary)),
+          _buildRecipientButton(theme, l10n, effectiveRecipient, to),
           const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  layoutBuilder: (currentChild, previousChildren) => Stack(
-                    alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      ...previousChildren,
-                      if (currentChild != null) currentChild
-                    ],
-                  ),
-                  child: (quote == null && state.loadingQuote)
-                      ? SkeletonBox(
-                          key: const ValueKey('get-skeleton'),
-                          width: 150,
-                          height: AdaptiveSize.getAdaptiveFontSize(context, 28),
-                        )
-                      : Text(
-                          outAmount,
-                          key: const ValueKey('get-value'),
-                          style: theme.displayLarge.copyWith(
-                            color: theme.textPrimary,
-                            fontSize:
+                child: SizedBox(
+                  height: AdaptiveSize.getAdaptiveFontSize(context, 36),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    layoutBuilder: (currentChild, previousChildren) => Stack(
+                      alignment: AlignmentDirectional.centerStart,
+                      children: [
+                        ...previousChildren,
+                        if (currentChild != null) currentChild
+                      ],
+                    ),
+                    child: (quote == null && state.loadingQuote)
+                        ? SkeletonBox(
+                            key: const ValueKey('get-skeleton'),
+                            width: 150,
+                            height:
                                 AdaptiveSize.getAdaptiveFontSize(context, 28),
+                          )
+                        : Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              outAmount,
+                              key: const ValueKey('get-value'),
+                              style: theme.displayLarge.copyWith(
+                                color: theme.textPrimary,
+                                fontSize:
+                                    AdaptiveSize.getAdaptiveFontSize(
+                                        context, 28),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                  ),
                 ),
               ),
               _buildTokenSelector(
@@ -633,13 +637,11 @@ class _ExchangePageState extends State<ExchangePage>
               ),
             ],
           ),
-          if (rateLabel != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              rateLabel,
-              style: theme.bodyText2.copyWith(color: theme.textSecondary),
-            ),
-          ],
+          const SizedBox(height: 6),
+          Text(
+            rateLabel ?? '-',
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
+          ),
         ],
       ),
     );
