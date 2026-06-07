@@ -12,12 +12,16 @@ use std::time::Duration;
 use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{Address, U256};
-use zilpay::crypto::slip44::{BITCOIN, ETHEREUM, SOLANA};
+use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::network::solana::{SolanaMessageBuild, SolanaOperations};
+use zilpay::proto::solana_tx::SolanaTransaction;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
 use zilpay::reqwest;
 use zilpay::serde::{self, Deserialize, Serialize};
 use zilpay::serde_json;
+use zilpay::solana_instruction::{AccountMeta, Instruction};
+use zilpay::solana_pubkey::Pubkey;
 
 use super::{ExchangeAsset, ProviderCommon, ProviderQuote};
 use crate::models::exchange::univ_router::PreparedSwap;
@@ -37,6 +41,28 @@ const RELAY_SOL_NATIVE: &str = "11111111111111111111111111111111";
 const SUPPORTED_EVM_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161, 43114];
 const DEFAULT_RELAY_EVM_GAS: u64 = 400_000;
 const DEFAULT_RELAY_APPROVE_GAS: u64 = 60_000;
+
+/// Origin-chain runtime classifier derived from the token address type.
+/// Used to route swap execution without inspecting slip44.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RelayOrigin {
+    Evm,
+    Svm,
+    Btc,
+    Tron,
+}
+
+impl RelayOrigin {
+    pub(crate) const fn from_addr_type(addr_type: u8) -> Option<Self> {
+        match addr_type {
+            1 => Some(Self::Evm),
+            3 => Some(Self::Svm),
+            2 => Some(Self::Btc),
+            4 => Some(Self::Tron),
+            _ => None,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct RelayCfg {
@@ -61,20 +87,24 @@ pub struct RelayMeta {
 }
 
 impl RelayMeta {
+    /// Construct a `RelayMeta` for the given origin chain.
+    ///
+    /// `addr_type` is the address-family classifier from `Address::prefix_type()`:
+    /// 1 = EVM, 2 = BTC, 3 = Solana, 4 = TRON.
     #[frb(ignore)]
     pub fn for_chain(
         chain_hash: u64,
-        slip44: u32,
+        addr_type: u8,
         chain_id: u64,
         account_addr: &str,
     ) -> Option<Self> {
-        relay_chain_id(slip44, chain_id)
+        relay_chain_id(addr_type, chain_id)
             .filter(|id| is_supported_chain(*id))
             .map(|relay_chain_id| Self {
                 common: ProviderCommon {
                     chain_hash,
                     chain_id: relay_chain_id,
-                    slip44,
+                    slip44: u32::from(addr_type),
                     account_addr: account_addr.to_owned(),
                     icon_asset: "assets/icons/relay.svg".to_owned(),
                     display_name: "Relay".to_owned(),
@@ -92,12 +122,14 @@ pub fn is_supported_chain(chain_id: u64) -> bool {
         || chain_id == RELAY_SOL_CHAIN_ID
 }
 
+/// Map an origin address type to a Relay chain identifier.
+/// Returns `None` for address families that Relay does not recognise.
 #[frb(ignore)]
-pub const fn relay_chain_id(slip44: u32, chain_id: u64) -> Option<u64> {
-    match (slip44, chain_id) {
-        (ETHEREUM, id) => Some(id),
-        (BITCOIN, _) => Some(RELAY_BTC_CHAIN_ID),
-        (SOLANA, _) => Some(RELAY_SOL_CHAIN_ID),
+pub const fn relay_chain_id(addr_type: u8, evm_chain_id: u64) -> Option<u64> {
+    match addr_type {
+        1 => Some(evm_chain_id),
+        2 => Some(RELAY_BTC_CHAIN_ID),
+        3 => Some(RELAY_SOL_CHAIN_ID),
         _ => None,
     }
 }
@@ -200,6 +232,55 @@ pub struct CurrencyAmount {
     pub minimum_amount: String,
 }
 
+// Minimal wire structs for parsing the Relay Solana instruction format.
+// These never cross Flutter — they are immediately converted to native Solana types.
+
+#[frb(ignore)]
+#[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde", rename_all = "camelCase")]
+struct RelaySvmAccountWire {
+    pubkey: String,
+    is_signer: bool,
+    is_writable: bool,
+}
+
+#[frb(ignore)]
+#[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde", rename_all = "camelCase")]
+struct RelaySvmInstructionWire {
+    program_id: String,
+    keys: Vec<RelaySvmAccountWire>,
+    data: String,
+}
+
+impl TryFrom<RelaySvmAccountWire> for AccountMeta {
+    type Error = String;
+
+    fn try_from(value: RelaySvmAccountWire) -> Result<Self, Self::Error> {
+        Ok(Self {
+            pubkey: Pubkey::from_str(&value.pubkey).map_err(|e| e.to_string())?,
+            is_signer: value.is_signer,
+            is_writable: value.is_writable,
+        })
+    }
+}
+
+impl TryFrom<RelaySvmInstructionWire> for Instruction {
+    type Error = String;
+
+    fn try_from(value: RelaySvmInstructionWire) -> Result<Self, Self::Error> {
+        let mut accounts = Vec::with_capacity(value.keys.len());
+        for key in value.keys {
+            accounts.push(AccountMeta::try_from(key)?);
+        }
+        Ok(Self {
+            program_id: Pubkey::from_str(&value.program_id).map_err(|e| e.to_string())?,
+            accounts,
+            data: hex::decode(&value.data).map_err(|e| e.to_string())?,
+        })
+    }
+}
+
 #[frb(ignore)]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(crate = "zilpay::serde")]
@@ -212,8 +293,10 @@ pub enum RelaySource {
         gas: Option<u64>,
     },
     Svm {
-        instructions_json: String,
-        address_lookup_table_addresses: Vec<String>,
+        instructions: Vec<Instruction>,
+        /// Base58-encoded address lookup table addresses; kept as strings for
+        /// reliable serde round-trip without requiring Pubkey serde feature.
+        lookup_table_addresses: Vec<String>,
     },
     Btc {
         psbt: String,
@@ -226,6 +309,14 @@ pub enum RelaySource {
 pub struct RelayBlob {
     pub source: RelaySource,
     pub chain_hash: u64,
+}
+
+/// Display metadata for the swap confirmation UI.
+struct RelayDisplay {
+    swap_title: String,
+    swap_info: String,
+    icon: String,
+    out_token: Option<BaseTokenInfo>,
 }
 
 #[frb(ignore)]
@@ -495,14 +586,19 @@ fn blob_from_step(
     match origin_chain_id {
         id if is_evm_relay_chain(id) => evm_blob_from_step(step, id, chain_hash),
         RELAY_SOL_CHAIN_ID => {
-            let instructions = step
+            let raw = step
                 .instructions
                 .ok_or_else(|| "relay Solana tx missing instructions".to_string())?;
+            let wire: Vec<RelaySvmInstructionWire> =
+                serde_json::from_value(raw).map_err(|e| e.to_string())?;
+            let mut instructions = Vec::with_capacity(wire.len());
+            for w in wire {
+                instructions.push(Instruction::try_from(w)?);
+            }
             Ok(RelayBlob {
                 source: RelaySource::Svm {
-                    instructions_json: serde_json::to_string(&instructions)
-                        .map_err(|e| e.to_string())?,
-                    address_lookup_table_addresses: step
+                    instructions,
+                    lookup_table_addresses: step
                         .address_lookup_table_addresses
                         .unwrap_or_default(),
                 },
@@ -560,9 +656,6 @@ pub async fn relay_quote_info(
     to: &ExchangeAsset,
     amount: &str,
 ) -> Result<ProviderQuote, String> {
-    if !is_evm_relay_chain(origin_meta.common.chain_id) {
-        return Err("Relay supports only EVM-origin swaps for now".to_string());
-    }
     let destination_meta = to
         .relay_meta()
         .ok_or_else(|| "destination is not a Relay asset".to_string())?;
@@ -647,7 +740,17 @@ pub async fn relay_prepare_swap(
     to: &ExchangeAsset,
     amount: &str,
 ) -> Result<PreparedSwap, String> {
-    let origin_chain_id = evm_origin_chain_id(from)?;
+    match RelayOrigin::from_addr_type(from.token.addr_type) {
+        Some(RelayOrigin::Btc) => {
+            return Err("Relay Bitcoin-origin swaps are not supported yet".to_string());
+        }
+        Some(RelayOrigin::Tron) => {
+            return Err("Relay TRON-origin swaps are not supported yet".to_string());
+        }
+        None => return Err("Relay origin address type is not supported".to_string()),
+        Some(RelayOrigin::Evm) | Some(RelayOrigin::Svm) => {}
+    }
+    let origin_chain_id = relay_origin_chain_id(from)?;
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
     let step =
         swap_step_data_owned(quote).ok_or_else(|| "relay quote missing swap step".to_string())?;
@@ -663,7 +766,7 @@ pub async fn relay_prepare_swap(
 #[frb(ignore)]
 pub async fn relay_finalize_swap(
     quote_blob: &str,
-    swapper: Address,
+    account_addr: &str,
     chain_hash: u64,
     swap_title: String,
     swap_info: String,
@@ -681,6 +784,7 @@ pub async fn relay_finalize_swap(
             value,
             gas,
         } => {
+            let swapper = Address::from_str(account_addr).map_err(|e| e.to_string())?;
             let tx = build_evm_tx(
                 RelayEvmTx {
                     chain_id,
@@ -695,15 +799,87 @@ pub async fn relay_finalize_swap(
             )?;
             with_display(tx, chain_hash, swap_title, swap_info, provider_icon, out_token)
         }
-        RelaySource::Svm { .. } => Err(
-            "Relay Solana-origin swaps require Solana v0/ALT message signing, which is not available yet"
-                .to_string(),
-        ),
+        RelaySource::Svm {
+            instructions,
+            lookup_table_addresses,
+        } => {
+            finalize_svm_relay(
+                account_addr,
+                chain_hash,
+                &instructions,
+                &lookup_table_addresses,
+                RelayDisplay {
+                    swap_title,
+                    swap_info,
+                    icon: provider_icon,
+                    out_token,
+                },
+            )
+            .await
+        }
         RelaySource::Btc { .. } => Err(
             "Relay Bitcoin-origin swaps require external PSBT signing/finalization, which is not available yet"
                 .to_string(),
         ),
     }
+}
+
+/// Build and return a Solana `TransactionRequestInfo` for a Relay SVM-origin swap.
+///
+/// Fetches the latest blockhash and resolves any address lookup tables via the
+/// Solana provider, then delegates message construction to the core builder.
+async fn finalize_svm_relay(
+    payer_addr: &str,
+    chain_hash: u64,
+    instructions: &[Instruction],
+    lookup_table_addresses: &[String],
+    display: RelayDisplay,
+) -> Result<TransactionRequestInfo, String> {
+    let payer = Pubkey::from_str(payer_addr).map_err(|e| e.to_string())?;
+
+    let mut pubkey_tables = Vec::with_capacity(lookup_table_addresses.len());
+    for addr in lookup_table_addresses {
+        pubkey_tables.push(Pubkey::from_str(addr.as_str()).map_err(|e| e.to_string())?);
+    }
+
+    let provider = {
+        let guard = crate::service::background::BACKGROUND_SERVICE.read().await;
+        let svc = guard
+            .as_ref()
+            .ok_or_else(|| "service not running".to_string())?;
+        svc.core
+            .get_provider(chain_hash)
+            .map_err(|e| e.to_string())?
+    };
+
+    let message = provider
+        .solana_build_message(SolanaMessageBuild {
+            payer: &payer,
+            instructions,
+            lookup_table_addresses: &pubkey_tables,
+        })
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let token_info = display.out_token.and_then(|t| {
+        U256::from_str(&t.value)
+            .ok()
+            .map(|value| (value, t.decimals, t.symbol))
+    });
+
+    Ok(TransactionRequest::Solana((
+        SolanaTransaction { message },
+        TransactionMetadata {
+            chain_hash,
+            broadcast: true,
+            title: Some(display.swap_title),
+            info: Some(display.swap_info),
+            icon: Some(display.icon),
+            token_info,
+            ..Default::default()
+        },
+    ))
+    .into())
 }
 
 #[cfg(test)]
@@ -713,27 +889,17 @@ mod tests {
     #[test]
     fn relay_meta_known_and_unknown() {
         assert_eq!(
-            RelayMeta::for_chain(
-                42,
-                ETHEREUM,
-                1,
-                "0x0000000000000000000000000000000000000001"
-            )
-            .map(|m| m.common.chain_id),
+            RelayMeta::for_chain(42, 1, 1, "0x0000000000000000000000000000000000000001")
+                .map(|m| m.common.chain_id),
             Some(1)
         );
         assert_eq!(
-            RelayMeta::for_chain(43, SOLANA, 101, "11111111111111111111111111111111")
+            RelayMeta::for_chain(43, 3, 101, "11111111111111111111111111111111")
                 .map(|m| m.common.chain_id),
             Some(RELAY_SOL_CHAIN_ID)
         );
         assert_eq!(
-            RelayMeta::for_chain(
-                44,
-                ETHEREUM,
-                11_155_111,
-                "0x0000000000000000000000000000000000000001"
-            ),
+            RelayMeta::for_chain(44, 1, 11_155_111, "0x0000000000000000000000000000000000000001"),
             None
         );
     }
@@ -798,5 +964,63 @@ mod tests {
         };
         assert!(!step_has_evm_calldata(&no_data));
         assert!(!step_has_evm_calldata(&StepData::default()));
+    }
+
+    #[test]
+    fn svm_wire_account_converts_to_account_meta() {
+        let wire = RelaySvmAccountWire {
+            pubkey: "11111111111111111111111111111111".to_string(),
+            is_signer: true,
+            is_writable: false,
+        };
+        let meta = AccountMeta::try_from(wire).unwrap();
+        assert!(meta.is_signer);
+        assert!(!meta.is_writable);
+    }
+
+    #[test]
+    fn svm_wire_instruction_converts() {
+        let wire = RelaySvmInstructionWire {
+            program_id: "11111111111111111111111111111111".to_string(),
+            keys: vec![RelaySvmAccountWire {
+                pubkey: "11111111111111111111111111111111".to_string(),
+                is_signer: false,
+                is_writable: true,
+            }],
+            data: "0x02000000".to_string(),
+        };
+        let ix = Instruction::try_from(wire).unwrap();
+        assert_eq!(ix.accounts.len(), 1);
+        assert_eq!(ix.data, [2, 0, 0, 0]);
+    }
+
+    #[test]
+    fn relay_blob_svm_round_trip() -> Result<(), String> {
+        use zilpay::solana_pubkey::Pubkey;
+        let ix = Instruction {
+            program_id: Pubkey::default(),
+            accounts: vec![],
+            data: vec![1, 2, 3],
+        };
+        let blob = RelayBlob {
+            source: RelaySource::Svm {
+                instructions: vec![ix],
+                lookup_table_addresses: vec![],
+            },
+            chain_hash: 99,
+        };
+        let json = serde_json::to_string(&blob).map_err(|e| e.to_string())?;
+        let decoded: RelayBlob = serde_json::from_str(&json).map_err(|e| e.to_string())?;
+        assert_eq!(decoded, blob);
+        Ok(())
+    }
+
+    #[test]
+    fn relay_origin_addr_type_classification() {
+        assert_eq!(RelayOrigin::from_addr_type(1), Some(RelayOrigin::Evm));
+        assert_eq!(RelayOrigin::from_addr_type(3), Some(RelayOrigin::Svm));
+        assert_eq!(RelayOrigin::from_addr_type(2), Some(RelayOrigin::Btc));
+        assert_eq!(RelayOrigin::from_addr_type(4), Some(RelayOrigin::Tron));
+        assert_eq!(RelayOrigin::from_addr_type(0), None);
     }
 }
