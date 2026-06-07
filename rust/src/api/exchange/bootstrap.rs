@@ -159,6 +159,7 @@ pub async fn bootstrap_exchange_providers(
             let key = (token.chain_hash, token.addr.to_hash());
             match assets.get_mut(&key) {
                 Some(existing) => {
+                    existing.token.rate = token.rate;
                     for (&account_idx, balance) in &token.balances {
                         existing
                             .token
