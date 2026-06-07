@@ -1,14 +1,11 @@
-import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -144,7 +141,7 @@ class TokenAmountCard extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTokenIcon(appState, theme),
+            TokenAvatar(token: token, appState: appState),
             const SizedBox(width: 8),
             Text(
               token.symbol,
@@ -162,85 +159,6 @@ class TokenAmountCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget? _buildNetworkBadge(AppState appState, AppTheme theme) {
-    final NetworkConfigInfo? chain;
-    try {
-      chain = appState.getChain(token.chainHash);
-    } catch (_) {
-      return null;
-    }
-    if (chain == null) return null;
-    return Container(
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        shape: BoxShape.circle,
-        border: Border.all(color: theme.cardBackground, width: 1.5),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: viewChain(network: chain, theme: theme.value),
-          width: 14,
-          height: 14,
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTokenIcon(AppState appState, AppTheme theme) {
-    final badge = _buildNetworkBadge(appState, theme);
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: theme.textPrimary.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: ClipOval(
-              child: AsyncImage(
-                key: ValueKey(token.addr),
-                url: processTokenLogo(
-                  token: token,
-                  shortName: appState.chain?.shortName ?? "",
-                  theme: theme.value,
-                ),
-                width: 24,
-                height: 24,
-                fit: BoxFit.cover,
-                errorWidget: Jazzicon(
-                  seed: token.addr,
-                  diameter: 24,
-                ),
-                loadingWidget: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          if (badge != null)
-            Positioned(
-              right: -2,
-              bottom: -2,
-              child: badge,
-            ),
-        ],
       ),
     );
   }
