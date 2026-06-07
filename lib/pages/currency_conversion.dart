@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/smart_input.dart';

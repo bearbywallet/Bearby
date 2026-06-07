@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
