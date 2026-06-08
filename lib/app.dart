@@ -47,7 +47,7 @@ class _BearbyAppState extends State<BearbyApp> {
 
               return MaterialApp.router(
                 routerConfig: _router,
-                // debugShowCheckedModeBanner: false,
+                debugShowCheckedModeBanner: false,
                 title:
                     AppLocalizations.of(context)?.appTitle ?? 'Bearby Wallet',
                 localizationsDelegates: const [
