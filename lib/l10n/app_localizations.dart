@@ -1373,10 +1373,10 @@ abstract class AppLocalizations {
   /// **'Telegram'**
   String get settingsPageTelegram;
 
-  /// Label for the Twitter settings item in the SettingsPage component
+  /// Label for the X (formerly Twitter) settings item in the SettingsPage component
   ///
   /// In en, this message translates to:
-  /// **'Twitter'**
+  /// **'X'**
   String get settingsPageTwitter;
 
   /// Label for the GitHub settings item in the SettingsPage component

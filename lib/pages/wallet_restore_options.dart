@@ -216,7 +216,7 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                           title: l10n.restoreWalletOptionsQRCodeTitle,
                           subtitle: l10n.restoreWalletOptionsQRCodeSubtitle,
                           icon: AppIconView(
-                            icon: AppIcon.qrCode,
+                            icon: AppIcon.scan,
                             size: 35,
                             color: theme.primaryPurple,
                           ),

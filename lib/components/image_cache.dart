@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/src/rust/api/cache.dart';
@@ -129,13 +130,13 @@ class _AsyncImageState extends State<AsyncImage> {
                 width: widget.width ?? 24,
                 height: widget.height ?? 24,
                 decoration: BoxDecoration(
-                  color: theme.danger.withValues(alpha: 0.2),
+                  color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.broken_image,
+                child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedHelpCircle,
                   size: (widget.width ?? 24) * 0.6,
-                  color: theme.danger,
+                  color: theme.warning,
                 ),
               ),
             ),
@@ -163,13 +164,13 @@ class _AsyncImageState extends State<AsyncImage> {
                 width: widget.width ?? 24,
                 height: widget.height ?? 24,
                 decoration: BoxDecoration(
-                  color: theme.danger.withValues(alpha: 0.2),
+                  color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.broken_image,
+                child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedHelpCircle,
                   size: (widget.width ?? 24) * 0.6,
-                  color: theme.danger,
+                  color: theme.warning,
                 ),
               ),
             );

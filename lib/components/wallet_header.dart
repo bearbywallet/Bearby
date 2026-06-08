@@ -78,7 +78,7 @@ class _WalletHeaderState extends State<WalletHeader>
                 children: [
                   if (widget.onScan != null) ...[
                     HoverIcon(
-                      icon: AppIcon.barcodeScan,
+                      icon: AppIcon.scan,
                       size: gearSize,
                       padding: const EdgeInsets.all(0),
                       color: theme.textSecondary,

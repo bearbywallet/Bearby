@@ -201,7 +201,7 @@ class _AddressSelectModalContentState
       child: SmartInput(
         controller: _searchController,
         hint: l10n.addressSelectModalContentSearchHint,
-        leftIcon: AppIcon.qrCode,
+        leftIcon: AppIcon.scan,
         onChanged: (value) async {
           try {
             bool isAddress = await isValidAddress(addr: value);

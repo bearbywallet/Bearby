@@ -797,9 +797,9 @@
   "@settingsPageTelegram": {
     "description": "Label for the Telegram settings item in the SettingsPage component"
   },
-  "settingsPageTwitter": "Twitter",
+  "settingsPageTwitter": "X",
   "@settingsPageTwitter": {
-    "description": "Label for the Twitter settings item in the SettingsPage component"
+    "description": "Label for the X (formerly Twitter) settings item in the SettingsPage component"
   },
   "settingsPageGitHub": "GitHub",
   "@settingsPageGitHub": {

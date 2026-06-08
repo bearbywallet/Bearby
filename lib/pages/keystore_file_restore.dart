@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:bearby/components/biometric_switch.dart';
@@ -349,12 +348,10 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                   title: l10n.restoreWalletOptionsKeyStoreTitle,
                   onBackPressed:
                       _canInteract ? () => Navigator.pop(context) : () {},
-                  actionIcon: SvgPicture.asset(
-                    'assets/icons/reload.svg',
-                    width: 24,
-                    height: 24,
-                    colorFilter:
-                        ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                  actionIcon: AppIconView(
+                    icon: AppIcon.reload,
+                    size: 24,
+                    color: theme.textPrimary,
                   ),
                   onActionPressed: _canInteract ? _loadBackupFiles : null,
                 ),
@@ -453,13 +450,10 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
           ),
           IconButton(
             onPressed: _canInteract ? _openFilePicker : null,
-            icon: SvgPicture.asset(
-              'assets/icons/plus.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                  _canInteract ? theme.textPrimary : theme.textSecondary,
-                  BlendMode.srcIn),
+            icon: AppIconView(
+              icon: AppIcon.plus,
+              size: 24,
+              color: _canInteract ? theme.textPrimary : theme.textSecondary,
             ),
             splashRadius: 20,
           ),
@@ -679,14 +673,10 @@ class _KeystoreFileCardState extends State<KeystoreFileCard>
         ),
       ),
       child: Center(
-        child: SvgPicture.asset(
-          'assets/icons/document.svg',
-          width: 20,
-          height: 20,
-          colorFilter: ColorFilter.mode(
-            widget.file.isValid ? accentColor : theme.textSecondary,
-            BlendMode.srcIn,
-          ),
+        child: AppIconView(
+          icon: AppIcon.file,
+          size: 20,
+          color: widget.file.isValid ? accentColor : theme.textSecondary,
         ),
       ),
     );
