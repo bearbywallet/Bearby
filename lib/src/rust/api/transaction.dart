@@ -14,6 +14,7 @@ import '../models/transactions/history.dart';
 import '../models/transactions/request.dart';
 import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
+import '../models/transactions/tron.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `sign_and_broadcast_one`, `unlock_seed`

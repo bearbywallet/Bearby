@@ -53,6 +53,7 @@ import 'models/transactions/history.dart';
 import 'models/transactions/request.dart';
 import 'models/transactions/scilla.dart';
 import 'models/transactions/transaction_metadata.dart';
+import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 
@@ -220,6 +221,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw);
 
   @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+
+  @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
 
   @protected
@@ -272,6 +276,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(
+      dynamic raw);
+
+  @protected
+  TransactionRequestTron dco_decode_box_autoadd_transaction_request_tron(
       dynamic raw);
 
   @protected
@@ -482,6 +490,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<RustLedgerHidDevice> dco_decode_list_rust_ledger_hid_device(dynamic raw);
 
   @protected
+  List<TronContractInfo> dco_decode_list_tron_contract_info(dynamic raw);
+
+  @protected
+  List<TronVoteInfo> dco_decode_list_tron_vote_info(dynamic raw);
+
+  @protected
   List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw);
 
   @protected
@@ -531,6 +545,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
 
   @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+
+  @protected
   ProviderQuote? dco_decode_opt_box_autoadd_provider_quote(dynamic raw);
 
   @protected
@@ -555,6 +572,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   TransactionRequestScilla?
       dco_decode_opt_box_autoadd_transaction_request_scilla(dynamic raw);
+
+  @protected
+  TransactionRequestTron? dco_decode_opt_box_autoadd_transaction_request_tron(
+      dynamic raw);
 
   @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
@@ -682,7 +703,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TransactionRequestScilla dco_decode_transaction_request_scilla(dynamic raw);
 
   @protected
+  TransactionRequestTron dco_decode_transaction_request_tron(dynamic raw);
+
+  @protected
   TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw);
+
+  @protected
+  TronContractInfo dco_decode_tron_contract_info(dynamic raw);
+
+  @protected
+  TronContractValue dco_decode_tron_contract_value(dynamic raw);
+
+  @protected
+  TronRawDataInfo dco_decode_tron_raw_data_info(dynamic raw);
+
+  @protected
+  TronVoteInfo dco_decode_tron_vote_info(dynamic raw);
 
   @protected
   TxInInfo dco_decode_tx_in_info(dynamic raw);
@@ -901,6 +937,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
   LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
       SseDeserializer deserializer);
 
@@ -959,6 +998,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(
+      SseDeserializer deserializer);
+
+  @protected
+  TransactionRequestTron sse_decode_box_autoadd_transaction_request_tron(
       SseDeserializer deserializer);
 
   @protected
@@ -1198,6 +1241,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<TronContractInfo> sse_decode_list_tron_contract_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<TronVoteInfo> sse_decode_list_tron_vote_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer);
 
   @protected
@@ -1251,6 +1302,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
   ProviderQuote? sse_decode_opt_box_autoadd_provider_quote(
       SseDeserializer deserializer);
 
@@ -1277,6 +1331,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TransactionRequestScilla?
       sse_decode_opt_box_autoadd_transaction_request_scilla(
           SseDeserializer deserializer);
+
+  @protected
+  TransactionRequestTron? sse_decode_opt_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer);
 
   @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
@@ -1422,8 +1480,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  TransactionRequestTron sse_decode_transaction_request_tron(
+      SseDeserializer deserializer);
+
+  @protected
   TransactionStatusInfo sse_decode_transaction_status_info(
       SseDeserializer deserializer);
+
+  @protected
+  TronContractInfo sse_decode_tron_contract_info(SseDeserializer deserializer);
+
+  @protected
+  TronContractValue sse_decode_tron_contract_value(
+      SseDeserializer deserializer);
+
+  @protected
+  TronRawDataInfo sse_decode_tron_raw_data_info(SseDeserializer deserializer);
+
+  @protected
+  TronVoteInfo sse_decode_tron_vote_info(SseDeserializer deserializer);
 
   @protected
   TxInInfo sse_decode_tx_in_info(SseDeserializer deserializer);
@@ -1646,6 +1721,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FinalOutputInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_i_64(
+      PlatformInt64 self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer);
 
@@ -1708,6 +1787,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_transaction_request_scilla(
       TransactionRequestScilla self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
@@ -1956,6 +2039,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<RustLedgerHidDevice> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_tron_contract_info(
+      List<TronContractInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_tron_vote_info(
+      List<TronVoteInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_tx_in_info(
       List<TxInInfo> self, SseSerializer serializer);
 
@@ -2013,6 +2104,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       FTokenInfo? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_i_64(
+      PlatformInt64? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_box_autoadd_provider_quote(
       ProviderQuote? self, SseSerializer serializer);
 
@@ -2037,6 +2132,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_scilla(
       TransactionRequestScilla? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_tron(
+      TransactionRequestTron? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
@@ -2184,8 +2283,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       TransactionRequestScilla self, SseSerializer serializer);
 
   @protected
+  void sse_encode_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer);
+
+  @protected
   void sse_encode_transaction_status_info(
       TransactionStatusInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tron_contract_info(
+      TronContractInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tron_contract_value(
+      TronContractValue self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tron_raw_data_info(
+      TronRawDataInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tron_vote_info(TronVoteInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_tx_in_info(TxInInfo self, SseSerializer serializer);

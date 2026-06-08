@@ -7,7 +7,6 @@ use zilpay::proto::address::Address;
 use zilpay::proto::tron_tx::TronTransaction;
 use zilpay::proto::tx::{TransactionMetadata, TransactionRequest};
 use zilpay::secrecy::SecretString;
-use zilpay::serde_json;
 
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
@@ -16,6 +15,7 @@ use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::models::transactions::transaction_metadata::TransactionMetadataInfo;
+use crate::models::transactions::tron::TransactionRequestTron;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 
@@ -23,8 +23,8 @@ use crate::utils::errors::ServiceError;
 /// Relay encodes contract addresses as 21-byte hex with the 0x41 TRON version-byte prefix.
 fn tron_addr(s: &str) -> Result<Address, String> {
     if s.len() == 42 && s.starts_with("41") {
-        let bytes = zilpay::alloy::hex::decode(s)
-            .map_err(|e| format!("invalid TRON address hex: {e}"))?;
+        let bytes =
+            zilpay::alloy::hex::decode(s).map_err(|e| format!("invalid TRON address hex: {e}"))?;
         return Address::from_tron_bytes(&bytes).map_err(|e| e.to_string());
     }
     Address::from_str_hex(s).map_err(|e| e.to_string())
@@ -103,10 +103,7 @@ pub async fn finalize_tron_relay(
     };
     tron_tx.set_fee_limit(u256_to_i64_fee(params.current)?);
 
-    let tron_json = tron_tx
-        .to_tron_web()
-        .map_err(|e| e.to_string())
-        .and_then(|w| serde_json::to_string(&w).map_err(|e| e.to_string()))?;
+    let tron_info = TransactionRequestTron::from(tron_tx.to_tron_web().map_err(|e| e.to_string())?);
 
     Ok(TransactionRequestInfo {
         metadata: TransactionMetadataInfo {
@@ -122,7 +119,7 @@ pub async fn finalize_tron_relay(
         scilla: None,
         evm: None,
         btc: None,
-        tron: Some(tron_json),
+        tron: Some(tron_info),
         solana: None,
     })
 }
