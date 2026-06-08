@@ -82,6 +82,9 @@ sealed class TronContractValue with _$TronContractValue {
     required PlatformInt64 frozenBalance,
     required int resource,
   }) = TronContractValue_FreezeBalanceV2Contract;
+  const factory TronContractValue.withdrawBalanceContract({
+    required String ownerAddress,
+  }) = TronContractValue_WithdrawBalanceContract;
   const factory TronContractValue.unfreezeBalanceV2Contract({
     required String ownerAddress,
     required PlatformInt64 unfreezeBalance,

@@ -6723,16 +6723,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           resource: dco_decode_i_32(raw[3]),
         );
       case 3:
+        return TronContractValue_WithdrawBalanceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 4:
         return TronContractValue_UnfreezeBalanceV2Contract(
           ownerAddress: dco_decode_String(raw[1]),
           unfreezeBalance: dco_decode_i_64(raw[2]),
           resource: dco_decode_i_32(raw[3]),
         );
-      case 4:
+      case 5:
         return TronContractValue_WithdrawExpireUnfreezeContract(
           ownerAddress: dco_decode_String(raw[1]),
         );
-      case 5:
+      case 6:
         return TronContractValue_DelegateResourceContract(
           ownerAddress: dco_decode_String(raw[1]),
           resource: dco_decode_i_32(raw[2]),
@@ -6741,45 +6745,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           lock: dco_decode_bool(raw[5]),
           lockPeriod: dco_decode_i_64(raw[6]),
         );
-      case 6:
+      case 7:
         return TronContractValue_UnDelegateResourceContract(
           ownerAddress: dco_decode_String(raw[1]),
           resource: dco_decode_i_32(raw[2]),
           balance: dco_decode_i_64(raw[3]),
           receiverAddress: dco_decode_String(raw[4]),
         );
-      case 7:
+      case 8:
         return TronContractValue_CancelAllUnfreezeV2Contract(
           ownerAddress: dco_decode_String(raw[1]),
         );
-      case 8:
+      case 9:
         return TronContractValue_TransferAssetContract(
           assetName: dco_decode_String(raw[1]),
           ownerAddress: dco_decode_String(raw[2]),
           toAddress: dco_decode_String(raw[3]),
           amount: dco_decode_i_64(raw[4]),
         );
-      case 9:
+      case 10:
         return TronContractValue_VoteWitnessContract(
           ownerAddress: dco_decode_String(raw[1]),
           votes: dco_decode_list_tron_vote_info(raw[2]),
           support: dco_decode_bool(raw[3]),
         );
-      case 10:
+      case 11:
         return TronContractValue_AccountCreateContract(
           ownerAddress: dco_decode_String(raw[1]),
           accountAddress: dco_decode_String(raw[2]),
         );
-      case 11:
+      case 12:
         return TronContractValue_AccountUpdateContract(
           ownerAddress: dco_decode_String(raw[1]),
           accountName: dco_decode_String(raw[2]),
         );
-      case 12:
+      case 13:
         return TronContractValue_AccountPermissionUpdateContract(
           ownerAddress: dco_decode_String(raw[1]),
         );
-      case 13:
+      case 14:
         return TronContractValue_Unknown(
           typeUrl: dco_decode_String(raw[1]),
           valueJson: dco_decode_String(raw[2]),
@@ -9351,17 +9355,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             resource: var_resource);
       case 3:
         var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_WithdrawBalanceContract(
+            ownerAddress: var_ownerAddress);
+      case 4:
+        var var_ownerAddress = sse_decode_String(deserializer);
         var var_unfreezeBalance = sse_decode_i_64(deserializer);
         var var_resource = sse_decode_i_32(deserializer);
         return TronContractValue_UnfreezeBalanceV2Contract(
             ownerAddress: var_ownerAddress,
             unfreezeBalance: var_unfreezeBalance,
             resource: var_resource);
-      case 4:
+      case 5:
         var var_ownerAddress = sse_decode_String(deserializer);
         return TronContractValue_WithdrawExpireUnfreezeContract(
             ownerAddress: var_ownerAddress);
-      case 5:
+      case 6:
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_resource = sse_decode_i_32(deserializer);
         var var_balance = sse_decode_i_64(deserializer);
@@ -9375,7 +9383,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             receiverAddress: var_receiverAddress,
             lock: var_lock,
             lockPeriod: var_lockPeriod);
-      case 6:
+      case 7:
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_resource = sse_decode_i_32(deserializer);
         var var_balance = sse_decode_i_64(deserializer);
@@ -9385,11 +9393,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             resource: var_resource,
             balance: var_balance,
             receiverAddress: var_receiverAddress);
-      case 7:
+      case 8:
         var var_ownerAddress = sse_decode_String(deserializer);
         return TronContractValue_CancelAllUnfreezeV2Contract(
             ownerAddress: var_ownerAddress);
-      case 8:
+      case 9:
         var var_assetName = sse_decode_String(deserializer);
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_toAddress = sse_decode_String(deserializer);
@@ -9399,7 +9407,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             ownerAddress: var_ownerAddress,
             toAddress: var_toAddress,
             amount: var_amount);
-      case 9:
+      case 10:
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_votes = sse_decode_list_tron_vote_info(deserializer);
         var var_support = sse_decode_bool(deserializer);
@@ -9407,21 +9415,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             ownerAddress: var_ownerAddress,
             votes: var_votes,
             support: var_support);
-      case 10:
+      case 11:
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_accountAddress = sse_decode_String(deserializer);
         return TronContractValue_AccountCreateContract(
             ownerAddress: var_ownerAddress, accountAddress: var_accountAddress);
-      case 11:
+      case 12:
         var var_ownerAddress = sse_decode_String(deserializer);
         var var_accountName = sse_decode_String(deserializer);
         return TronContractValue_AccountUpdateContract(
             ownerAddress: var_ownerAddress, accountName: var_accountName);
-      case 12:
+      case 13:
         var var_ownerAddress = sse_decode_String(deserializer);
         return TronContractValue_AccountPermissionUpdateContract(
             ownerAddress: var_ownerAddress);
-      case 13:
+      case 14:
         var var_typeUrl = sse_decode_String(deserializer);
         var var_valueJson = sse_decode_String(deserializer);
         return TronContractValue_Unknown(
@@ -11537,19 +11545,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(ownerAddress, serializer);
         sse_encode_i_64(frozenBalance, serializer);
         sse_encode_i_32(resource, serializer);
+      case TronContractValue_WithdrawBalanceContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(ownerAddress, serializer);
       case TronContractValue_UnfreezeBalanceV2Contract(
           ownerAddress: final ownerAddress,
           unfreezeBalance: final unfreezeBalance,
           resource: final resource
         ):
-        sse_encode_i_32(3, serializer);
+        sse_encode_i_32(4, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_i_64(unfreezeBalance, serializer);
         sse_encode_i_32(resource, serializer);
       case TronContractValue_WithdrawExpireUnfreezeContract(
           ownerAddress: final ownerAddress
         ):
-        sse_encode_i_32(4, serializer);
+        sse_encode_i_32(5, serializer);
         sse_encode_String(ownerAddress, serializer);
       case TronContractValue_DelegateResourceContract(
           ownerAddress: final ownerAddress,
@@ -11559,7 +11572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           lock: final lock,
           lockPeriod: final lockPeriod
         ):
-        sse_encode_i_32(5, serializer);
+        sse_encode_i_32(6, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_i_32(resource, serializer);
         sse_encode_i_64(balance, serializer);
@@ -11572,7 +11585,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           balance: final balance,
           receiverAddress: final receiverAddress
         ):
-        sse_encode_i_32(6, serializer);
+        sse_encode_i_32(7, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_i_32(resource, serializer);
         sse_encode_i_64(balance, serializer);
@@ -11580,7 +11593,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case TronContractValue_CancelAllUnfreezeV2Contract(
           ownerAddress: final ownerAddress
         ):
-        sse_encode_i_32(7, serializer);
+        sse_encode_i_32(8, serializer);
         sse_encode_String(ownerAddress, serializer);
       case TronContractValue_TransferAssetContract(
           assetName: final assetName,
@@ -11588,7 +11601,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           toAddress: final toAddress,
           amount: final amount
         ):
-        sse_encode_i_32(8, serializer);
+        sse_encode_i_32(9, serializer);
         sse_encode_String(assetName, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_String(toAddress, serializer);
@@ -11598,7 +11611,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           votes: final votes,
           support: final support
         ):
-        sse_encode_i_32(9, serializer);
+        sse_encode_i_32(10, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_list_tron_vote_info(votes, serializer);
         sse_encode_bool(support, serializer);
@@ -11606,26 +11619,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           ownerAddress: final ownerAddress,
           accountAddress: final accountAddress
         ):
-        sse_encode_i_32(10, serializer);
+        sse_encode_i_32(11, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_String(accountAddress, serializer);
       case TronContractValue_AccountUpdateContract(
           ownerAddress: final ownerAddress,
           accountName: final accountName
         ):
-        sse_encode_i_32(11, serializer);
+        sse_encode_i_32(12, serializer);
         sse_encode_String(ownerAddress, serializer);
         sse_encode_String(accountName, serializer);
       case TronContractValue_AccountPermissionUpdateContract(
           ownerAddress: final ownerAddress
         ):
-        sse_encode_i_32(12, serializer);
+        sse_encode_i_32(13, serializer);
         sse_encode_String(ownerAddress, serializer);
       case TronContractValue_Unknown(
           typeUrl: final typeUrl,
           valueJson: final valueJson
         ):
-        sse_encode_i_32(13, serializer);
+        sse_encode_i_32(14, serializer);
         sse_encode_String(typeUrl, serializer);
         sse_encode_String(valueJson, serializer);
     }
