@@ -159,29 +159,39 @@ impl ExchangeProvider {
     }
 
     #[frb(ignore)]
-    pub fn with_quote(self, quote: ProviderQuote) -> Self {
+    fn set_quote(self, quote: Option<ProviderQuote>) -> Self {
         match self {
             Self::Relay(mut m) => {
-                m.quote = Some(quote);
+                m.quote = quote;
                 Self::Relay(m)
             }
             Self::Uniswap(mut m) => {
-                m.quote = Some(quote);
+                m.quote = quote;
                 Self::Uniswap(m)
             }
             Self::PancakeSwap(mut m) => {
-                m.quote = Some(quote);
+                m.quote = quote;
                 Self::PancakeSwap(m)
             }
             Self::ZilSwap(mut m) => {
-                m.quote = Some(quote);
+                m.quote = quote;
                 Self::ZilSwap(m)
             }
             Self::SunSwap(mut m) => {
-                m.quote = Some(quote);
+                m.quote = quote;
                 Self::SunSwap(m)
             }
         }
+    }
+
+    #[frb(ignore)]
+    pub fn with_quote(self, quote: ProviderQuote) -> Self {
+        self.set_quote(Some(quote))
+    }
+
+    #[frb(ignore)]
+    pub fn without_quote(self) -> Self {
+        self.set_quote(None)
     }
 
     #[frb(ignore)]
