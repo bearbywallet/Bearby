@@ -14,12 +14,14 @@ class WalletHeader extends StatefulWidget {
   final AccountInfo account;
   final Function()? onTap;
   final VoidCallback onSettings;
+  final VoidCallback? onScan;
 
   const WalletHeader({
     super.key,
     required this.account,
     required this.onSettings,
     this.onTap,
+    this.onScan,
   });
 
   @override
@@ -71,6 +73,14 @@ class _WalletHeaderState extends State<WalletHeader>
                   account: widget.account,
                 ),
               ),
+              if (widget.onScan != null)
+                HoverIcon(
+                  icon: AppIcon.barcodeScan,
+                  size: gearSize,
+                  padding: const EdgeInsets.all(0),
+                  color: theme.textSecondary,
+                  onTap: widget.onScan!,
+                ),
               HoverIcon(
                 icon: AppIcon.gear,
                 size: gearSize,

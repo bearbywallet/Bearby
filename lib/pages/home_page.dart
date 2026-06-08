@@ -21,6 +21,7 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/router.dart';
 
 const double _ICON_SIZE_SMALL_BASE = 24.0;
@@ -137,6 +138,14 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     account: appState.account!,
                     onSettings: () {
                       context.push(AppRoutes.settings);
+                    },
+                    onScan: () {
+                      showQRScannerModal(
+                        context: context,
+                        onScanned: (result) {
+                          // Handle scanned QR code
+                        },
+                      );
                     },
                   ),
                 ),
@@ -262,6 +271,16 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
                       appState.setHideBalance(!appState.hideBalance);
+                    },
+                  ),
+                  SizedBox(width: spacing),
+                  HoverIcon(
+                    icon: AppIcon.lockWallet,
+                    size: iconSizeSmall,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.textSecondary.withValues(alpha: 0.5),
+                    onTap: () {
+                      appState.clearAuthentication();
                     },
                   ),
                 ],
