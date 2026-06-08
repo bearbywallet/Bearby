@@ -2,9 +2,10 @@ use std::collections::{HashMap, HashSet};
 
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_wallet::WalletManagement;
-use zilpay::crypto::slip44::{TRON, ZILLIQA};
+use zilpay::crypto::slip44::{BITCOIN, TRON, ZILLIQA};
 use zilpay::rpc::network_config::ChainConfig;
 use zilpay::wallet::wallet_storage::StorageOperations;
+use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 
 use crate::models::exchange::{
     ExchangeAsset, ExchangeProvider, PancakeMeta, ProviderQuote, RelayMeta, SunSwapMeta,
@@ -46,7 +47,54 @@ pub async fn bootstrap_exchange_providers(
             .get(&wallet_data.bip)
             .or_else(|| bip_accounts.values().next());
         if let Some(account) = accounts.and_then(|items| items.get(account_index)) {
-            relay_accounts.insert(*slip44, account.addr.auto_format());
+            if *slip44 == BITCOIN {
+                let btc_chain_hash = all_providers
+                    .iter()
+                    .find(|p| {
+                        p.config.slip_44 == BITCOIN
+                            && chain_matches_network(&p.config, current_is_testnet)
+                    })
+                    .map(|p| p.config.hash());
+                let btc_addr = match btc_chain_hash {
+                    Some(hash) => match wallet.get_btc_addresses(account_index, hash) {
+                        Ok(chains) => {
+                            match zilpay::wallet::bitcoin_wallet::pick_entry_with_most_utxo(&chains)
+                                .or_else(|_| zilpay::wallet::bitcoin_wallet::pick_primary_btc_entry(&chains))
+                            {
+                                Ok(entry) => {
+                                    let utxo_total: u64 =
+                                        entry.utxos.iter().map(|u| u.value).sum();
+                                    let addr = entry.address.auto_format();
+                                    eprintln!(
+                                        "[btc-relay] selected addr={addr} utxo_total_sat={utxo_total} utxo_count={}",
+                                        entry.utxos.len(),
+                                    );
+                                    addr
+                                }
+                                Err(e) => {
+                                    eprintln!(
+                                        "[btc-relay] pick_entry failed, falling back to account.addr: {e}"
+                                    );
+                                    account.addr.auto_format()
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!(
+                                "[btc-relay] get_btc_addresses failed, falling back to account.addr: {e}"
+                            );
+                            account.addr.auto_format()
+                        }
+                    },
+                    None => {
+                        eprintln!("[btc-relay] no BTC provider found, falling back to account.addr");
+                        account.addr.auto_format()
+                    }
+                };
+                relay_accounts.insert(*slip44, btc_addr);
+            } else {
+                relay_accounts.insert(*slip44, account.addr.auto_format());
+            }
         }
     }
 
@@ -206,12 +254,28 @@ pub async fn refresh_exchange_quotes(
 ) -> Result<ExchangeAsset, String> {
     let from_addr = from.token.addr.as_str();
     let to_addr = to.token.addr.as_str();
+    eprintln!(
+        "[exchange] refresh_quotes from_symbol={} from_chain={} from_addr_type={} \
+         from_native={} from_addr={} to_symbol={} to_chain={} to_addr_type={} \
+         to_native={} to_addr={} amount={} providers={}",
+        from.token.symbol,
+        from.token.chain_hash,
+        from.token.addr_type,
+        from.token.native,
+        from.token.addr,
+        to.token.symbol,
+        to.token.chain_hash,
+        to.token.addr_type,
+        to.token.native,
+        to.token.addr,
+        amount,
+        from.providers.len(),
+    );
 
-    if let Some(provider) = from
-        .providers
-        .iter()
-        .find(|p| p.is_wrap_unwrap(&from, &to, from_addr, to_addr).unwrap_or(false))
-    {
+    if let Some(provider) = from.providers.iter().find(|p| {
+        p.is_wrap_unwrap(&from, &to, from_addr, to_addr)
+            .unwrap_or(false)
+    }) {
         let quote = ProviderQuote {
             amount_out: amount,
             permit_typed_data_json: None,
@@ -242,7 +306,13 @@ pub async fn refresh_exchange_quotes(
             zilpay::tokio::task::spawn(async move {
                 let from_addr = from_asset.token.addr.clone();
                 let to_addr = to_asset.token.addr.clone();
-                provider
+                eprintln!(
+                    "[exchange] quote_provider_start provider={provider:?} from={} to={} amount={}",
+                    from_asset.token.symbol,
+                    to_asset.token.symbol,
+                    amount,
+                );
+                match provider
                     .quote_info(
                         &from_asset,
                         &to_asset,
@@ -251,8 +321,21 @@ pub async fn refresh_exchange_quotes(
                         &amount,
                     )
                     .await
-                    .ok()
-                    .map(|quote| provider.with_quote(quote))
+                {
+                    Ok(quote) => {
+                        eprintln!(
+                            "[exchange] quote_provider_ok provider={provider:?} amount_out={} permit={} wrap={}",
+                            quote.amount_out,
+                            quote.permit_typed_data_json.is_some(),
+                            quote.is_wrap_unwrap,
+                        );
+                        Some(provider.with_quote(quote))
+                    }
+                    Err(err) => {
+                        eprintln!("[exchange] quote_provider_err provider={provider:?} err={err}");
+                        Some(provider)
+                    }
+                }
             })
         })
         .collect();
@@ -263,6 +346,13 @@ pub async fn refresh_exchange_quotes(
             providers.insert(provider);
         }
     }
+
+    let quoted = providers.iter().filter(|p| p.quote().is_some()).count();
+
+    eprintln!(
+        "[exchange] refresh_quotes_done total_providers={} quoted_providers={quoted}",
+        providers.len(),
+    );
 
     Ok(ExchangeAsset {
         token: from_token,
