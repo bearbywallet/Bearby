@@ -20,12 +20,13 @@ import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/router.dart';
 
-const double _ICON_SIZE_SMALL_BASE = 24.0;
-const double _ICON_SIZE_TILE_BUTTON_BASE = 25.0;
+const double _ICON_SIZE_SMALL_BASE = 20.0;
+const double _ICON_SIZE_TILE_BUTTON_BASE = 22.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,6 +50,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
       _refreshData(appState);
     }
   }
+
+  bool _hasZilliqaExtras(AppState appState) =>
+      appState.account != null && appState.chain?.slip44 == kZilliqaSlip44;
 
   Future<void> _refreshData(AppState appState) async {
     if (_isRefreshing) return;
@@ -82,7 +86,6 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_SMALL_BASE);
     final iconSizeTileButton =
         AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_TILE_BUTTON_BASE);
-    final iconSizeManage = AdaptiveSize.getAdaptiveIconSize(context, 18);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final l10n = AppLocalizations.of(context)!;
@@ -154,95 +157,106 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         ),
       ),
       SliverToBoxAdapter(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        child: Padding(
           padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TileButton(
-                icon: AppIconView(
-                  icon: AppIcon.send,
-                  size: iconSizeTileButton,
-                  color: theme.primaryPurple,
-                ),
-                title: l10n.homePageSendButton,
-                onPressed: () {
-                  if (filteredTokens.isNotEmpty) {
-                    final originalIndex =
-                        appState.wallet!.tokens.indexOf(filteredTokens[0]);
-                    context.push(AppRoutes.send,
-                        extra: {'token_index': originalIndex});
-                  }
-                },
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: AppIconView(
-                  icon: AppIcon.receive,
-                  size: iconSizeTileButton,
-                  color: theme.primaryPurple,
-                ),
-                title: l10n.homePageReceiveButton,
-                onPressed: () {
-                  context.push(AppRoutes.receive);
-                },
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              if (appState.account != null &&
-                  appState.chain?.slip44 == kZilliqaSlip44) ...[
-                SizedBox(width: adaptivePaddingCard),
-                TileButton(
-                  icon: AppIconView(
-                    icon: AppIcon.anchor,
-                    size: iconSizeTileButton,
-                    color: theme.primaryPurple,
+              Row(
+                children: [
+                  Expanded(
+                    child: TileButton(
+                      icon: AppIconView(
+                        icon: AppIcon.send,
+                        size: iconSizeTileButton,
+                        color: theme.primaryPurple,
+                      ),
+                      title: l10n.homePageSendButton,
+                      fillWidth: true,
+                      onPressed: () {
+                        if (filteredTokens.isNotEmpty) {
+                          final originalIndex =
+                              appState.wallet!.tokens.indexOf(filteredTokens[0]);
+                          context.push(AppRoutes.send,
+                              extra: {'token_index': originalIndex});
+                        }
+                      },
+                      backgroundColor: theme.cardBackground,
+                      textColor: theme.primaryPurple,
+                    ),
                   ),
-                  title: "Stake",
-                  onPressed: () async {
-                    context.push(AppRoutes.zilStake);
-                  },
-                  backgroundColor: theme.cardBackground,
-                  textColor: theme.primaryPurple,
+                  SizedBox(width: adaptivePaddingCard),
+                  Expanded(
+                    child: TileButton(
+                      icon: AppIconView(
+                        icon: AppIcon.receive,
+                        size: iconSizeTileButton,
+                        color: theme.primaryPurple,
+                      ),
+                      title: l10n.homePageReceiveButton,
+                      fillWidth: true,
+                      onPressed: () => context.push(AppRoutes.receive),
+                      backgroundColor: theme.cardBackground,
+                      textColor: theme.primaryPurple,
+                    ),
+                  ),
+                ],
+              ),
+              if (_hasZilliqaExtras(appState)) ...[
+                SizedBox(height: adaptivePaddingCard),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      TileButton(
+                        icon: AppIconView(
+                          icon: AppIcon.anchor,
+                          size: iconSizeTileButton,
+                          color: theme.primaryPurple,
+                        ),
+                        title: "Stake",
+                        onPressed: () => context.push(AppRoutes.zilStake),
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
+                      ),
+                      if (!appState.wallet!.walletType
+                          .contains(WalletType.ledger.name)) ...[
+                        SizedBox(width: adaptivePaddingCard),
+                        TileButton(
+                          icon: SvgPicture.asset(
+                            appState.account?.addrType == kScillaAddressType
+                                ? 'assets/icons/scilla.svg'
+                                : 'assets/icons/solidity.svg',
+                            width: iconSizeTileButton,
+                            height: iconSizeTileButton,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          title: appState.account?.addrType == kScillaAddressType
+                              ? "Scilla"
+                              : "EVM",
+                          onPressed: () async {
+                            final walletIndex = appState.selectedWalletIndex;
+                            await zilliqaSwapChain(
+                              walletIndex: walletIndex,
+                              accountIndex: appState.wallet!.selectedAccount,
+                            );
+                            await appState.syncData();
+                            try {
+                              await syncBalances(walletIndex: walletIndex);
+                              await appState.syncData();
+                            } catch (_) {}
+                          },
+                          backgroundColor: theme.cardBackground,
+                          textColor: theme.primaryPurple,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
-              if (appState.account != null &&
-                  appState.chain?.slip44 == kZilliqaSlip44 &&
-                  !appState.wallet!.walletType
-                      .contains(WalletType.ledger.name)) ...[
-                SizedBox(width: adaptivePaddingCard),
-                TileButton(
-                  icon: AppIconView(
-                    icon: appState.account?.addrType == kScillaAddressType
-                        ? AppIcon.file
-                        : AppIcon.file,
-                    size: iconSizeTileButton,
-                    color: theme.primaryPurple,
-                  ),
-                  title: appState.account?.addrType == kScillaAddressType
-                      ? "Scilla"
-                      : "EVM",
-                  onPressed: () async {
-                    BigInt walletIndex = appState.selectedWalletIndex;
-                    await zilliqaSwapChain(
-                      walletIndex: walletIndex,
-                      accountIndex: appState.wallet!.selectedAccount,
-                    );
-                    await appState.syncData();
-
-                    try {
-                      await syncBalances(
-                        walletIndex: walletIndex,
-                      );
-                      await appState.syncData();
-                    } catch (_) {}
-                  },
-                  backgroundColor: theme.cardBackground,
-                  textColor: theme.primaryPurple,
-                ),
-              ]
             ],
           ),
         ),
@@ -291,7 +305,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       appState.wallet!.tokens.length > 1)
                     HoverIcon(
                       icon: AppIconState.tokenLayout(isTileView: appState.isTileView),
-                      size: iconSizeManage,
+                      size: iconSizeSmall,
                       padding: const EdgeInsets.all(0),
                       color: theme.textSecondary.withValues(alpha: 0.5),
                       onTap: () async {
@@ -301,7 +315,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   SizedBox(width: spacing),
                   HoverIcon(
                     icon: AppIcon.manage,
-                    size: iconSizeManage,
+                    size: iconSizeSmall,
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
@@ -322,7 +336,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 1.618,
+              childAspectRatio: 1.4,
               crossAxisSpacing: spacing,
               mainAxisSpacing: spacing,
             ),
