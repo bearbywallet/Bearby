@@ -2,6 +2,7 @@ import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bearby/components/input_amount.dart';
@@ -17,6 +18,7 @@ import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/swap_settings.dart';
+import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
@@ -246,7 +248,10 @@ class _ExchangePageState extends State<ExchangePage>
       amountInWei: toDecimalsWei(_amount, from.token.decimals).toString(),
       destination: destination,
       slippageBps: state.slippageFor(provider),
-      onDone: _btnController.reset,
+      onDone: () {
+        _btnController.reset();
+        if (mounted) context.go(AppRoutes.history);
+      },
       onDismiss: () => _btnController.reset(),
     );
   }
@@ -328,6 +333,8 @@ class _ExchangePageState extends State<ExchangePage>
     }
     if (from == null) return const Center(child: CircularProgressIndicator());
 
+    final canSwap = _canSwap(state);
+
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(
         physics: const BouncingScrollPhysics(),
@@ -366,12 +373,18 @@ class _ExchangePageState extends State<ExchangePage>
               ),
               RoundedLoadingButton(
                 controller: _btnController,
-                onPressed: !_canSwap(state) ? null : () => _handleSwap(state),
-                color: theme.primaryPurple,
+                onPressed: canSwap ? () => _handleSwap(state) : null,
+                color: canSwap
+                    ? theme.primaryPurple
+                    : theme.textSecondary.withValues(alpha: 0.18),
                 valueColor: theme.buttonText,
                 child: Text(
                   l10n.exchangePageConfirm,
-                  style: theme.titleMedium.copyWith(color: theme.buttonText),
+                  style: theme.titleMedium.copyWith(
+                    color: canSwap
+                        ? theme.buttonText
+                        : theme.textSecondary.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -561,11 +574,6 @@ class _ExchangePageState extends State<ExchangePage>
     final selectedProvider = state.selectedProvider;
     final quote = selectedProvider?.quote;
     final from = state.fromAsset;
-    debugPrint(
-      '[ExchangePage] getCard to=${to.token.symbol} '
-      'selectedProvider=${selectedProvider?.common.displayName} '
-      'quote=${quote?.amountOut} loading=${state.loadingQuote}',
-    );
     final rateLabel =
         quote == null || from == null ? null : _rateLabel(from, to, quote);
     final recipient = to.providers.firstOrNull?.common.accountAddr ?? '';

@@ -131,6 +131,15 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   bool _obscurePassword = true;
   String? _error;
 
+  String _errorFor(AppLocalizations l10n, Object error) {
+    final activeStep =
+        _plan.where((s) => _stepStates[s] == _StepState.active).firstOrNull;
+    final label = activeStep == null
+        ? l10n.exchangePageTabSwap
+        : _stepLabel(l10n, activeStep);
+    return '$label failed: $error';
+  }
+
   late final List<ExchangeProvider> _providers = widget.from.providers
       .where((provider) => provider.quote != null)
       .toList()
@@ -243,16 +252,18 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final wrapTitle = _wrapVerb(l10n);
     final isWrap = quote?.isWrapUnwrap ?? false;
     return ExchangeTxDisplay(
-      swapTitle: isWrap ? wrapTitle : l10n.exchangePageTabSwap,
+      swapTitle: isWrap
+          ? wrapTitle
+          : '${widget.from.token.symbol} > ${widget.to.token.symbol}',
       swapInfo: isWrap
           ? '$_payText \u2192 $getText'
           : '$_payText \u2192 $getText \u00b7 $providerName',
       approveTitle: l10n.exchangeHistoryApprove(_fromToken.symbol),
       permitTitle: l10n.exchangeHistoryPermit(providerName),
       outToken: BaseTokenInfo(
-        value: quote?.amountOut ?? '0',
-        symbol: _toToken.symbol,
-        decimals: _toToken.decimals,
+        value: widget.amountInWei,
+        symbol: widget.from.token.symbol,
+        decimals: widget.from.token.decimals,
       ),
     );
   }
@@ -437,22 +448,38 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       display: _displayFor(appState, l10n, selected),
     );
 
+    var receivedDone = false;
+    var failed = false;
+
+    void finishWithError(Object error) {
+      failed = true;
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = _errorFor(l10n, error);
+        });
+      }
+      if (!completer.isCompleted) completer.complete();
+    }
+
     _swapSub = stream.listen(
-      (step) => _onStage(step),
-      onError: (Object e) {
-        if (mounted) {
-          setState(() {
-            _loading = false;
-            _error = e.toString();
-          });
+      (step) {
+        const errorPrefix = 'error:';
+        if (step.startsWith(errorPrefix)) {
+          finishWithError(step.substring(errorPrefix.length));
+          return;
         }
-        if (!completer.isCompleted) completer.complete();
+        if (step == 'done') receivedDone = true;
+        _onStage(step);
       },
+      onError: finishWithError,
       onDone: () {
-        // onError already set _error and _loading=false; onDone always fires
-        // after onError on a closing stream — guard against accidental pop+nav.
         if (!completer.isCompleted) completer.complete();
-        if (_error != null) return;
+        if (failed) return;
+        if (!receivedDone) {
+          finishWithError(l10n.exchangeConfirmUnable);
+          return;
+        }
         _completeAndExit(appState);
       },
     );
@@ -582,7 +609,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _onStage('done');
       await _completeAndExit(appState);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) setState(() => _error = _errorFor(l10n, e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -958,7 +985,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                           focusedBorderColor: theme.primaryPurple,
                           disabled: _loading,
                           obscureText: _obscurePassword,
-                          rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
+                          rightIcon: AppIconState.passwordVisibility(
+                              obscured: _obscurePassword),
                           onRightIconTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
                           textColor: theme.textSecondary,
