@@ -77,6 +77,8 @@ enum AppIcon {
   trophy,
   usb,
   wallet,
+  bitcoinAmount,
+  bitcoinAddress,
   warning,
   zil,
 }
@@ -154,7 +156,7 @@ class AppIconView extends StatelessWidget {
         AppIcon.language => HugeIcons.strokeRoundedLanguageCircle,
         AppIcon.ledger => HugeIcons.strokeRoundedUsbConnected01,
         AppIcon.lines => HugeIcons.strokeRoundedListView,
-        AppIcon.lock => HugeIcons.strokeRoundedLock,
+        AppIcon.lock => HugeIcons.strokeRoundedAuthorized,
         AppIcon.logout => HugeIcons.strokeRoundedLogout01,
         AppIcon.looking => HugeIcons.strokeRoundedUserSearch01,
         AppIcon.manage => HugeIcons.strokeRoundedFilterMail,
@@ -177,13 +179,15 @@ class AppIconView extends StatelessWidget {
         AppIcon.share => HugeIcons.strokeRoundedShare01,
         AppIcon.shield => HugeIcons.strokeRoundedShield01,
         AppIcon.swap => HugeIcons.strokeRoundedExchange01,
-        AppIcon.time => HugeIcons.strokeRoundedClock01,
+        AppIcon.time => HugeIcons.strokeRoundedTimeHalfPass,
         AppIcon.tiles => HugeIcons.strokeRoundedGridView,
         AppIcon.trophy => HugeIcons.strokeRoundedAward01,
         AppIcon.usb => HugeIcons.strokeRoundedUsb,
         AppIcon.wallet => HugeIcons.strokeRoundedWallet01,
         AppIcon.warning => HugeIcons.strokeRoundedAlert02,
         AppIcon.zil => HugeIcons.strokeRoundedCoinsSwap,
+        AppIcon.bitcoinAmount => HugeIcons.strokeRoundedBitcoin01,
+        AppIcon.bitcoinAddress => HugeIcons.strokeRoundedBitcoinTransaction,
       };
 
   @override

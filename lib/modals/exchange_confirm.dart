@@ -588,11 +588,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
 
   /// Glyph for a step row: ✓ done / ◐ spinner / ○ pending / — skipped.
   Widget _glyph(AppTheme theme, _StepState state) => switch (state) {
-        _StepState.done => SvgPicture.asset(
-            'assets/icons/check.svg',
-            width: 14,
-            height: 14,
-            colorFilter: ColorFilter.mode(theme.success, BlendMode.srcIn),
+        _StepState.done => AppIconView(
+            icon: AppIcon.check,
+            size: 14,
+            color: theme.success,
           ),
         _StepState.active => SizedBox(
             width: 14,
@@ -734,12 +733,10 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
           children: [
             // Provider icon (or swap icon for wrap/unwrap).
             if (quote.isWrapUnwrap)
-              SvgPicture.asset(
-                'assets/icons/swap.svg',
-                width: 28,
-                height: 28,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              AppIconView(
+                icon: AppIcon.swap,
+                size: 28,
+                color: theme.textSecondary,
               )
             else
               SvgPicture.asset(
