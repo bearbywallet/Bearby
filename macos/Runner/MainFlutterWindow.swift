@@ -6,8 +6,7 @@ class MainFlutterWindow: NSWindow {
     private let defaultWindowHeight: CGFloat = 900
     private let minWindowWidth: CGFloat = 360
     private let minWindowHeight: CGFloat = 640
-    private let maxWindowWidth: CGFloat = 600
-    private let maxWindowHeight: CGFloat = 1100
+
 
     override func awakeFromNib() {
         let flutterViewController = FlutterViewController()
@@ -24,7 +23,6 @@ class MainFlutterWindow: NSWindow {
         }
 
         self.minSize = NSSize(width: minWindowWidth, height: minWindowHeight)
-        self.maxSize = NSSize(width: maxWindowWidth, height: maxWindowHeight)
 
         RegisterGeneratedPlugins(registry: flutterViewController)
 
