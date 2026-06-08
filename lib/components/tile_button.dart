@@ -12,6 +12,7 @@ class TileButton extends StatefulWidget {
   final Color textColor;
   final BorderSide? defaultBorderSide;
   final bool disabled;
+  final bool fillWidth;
 
   const TileButton({
     super.key,
@@ -22,6 +23,7 @@ class TileButton extends StatefulWidget {
     this.textColor = const Color(0xFF9D4BFF),
     this.defaultBorderSide,
     this.disabled = false,
+    this.fillWidth = false,
   });
 
   @override
@@ -73,14 +75,14 @@ class _TileButtonState extends State<TileButton>
       final double estimatedFontSize =
           (theme.caption.fontSize ?? 14.0) * scaleFactor;
       final double estimatedLineHeightFactor = theme.caption.height ?? 1.3;
-      final double actualTextHeightForTwoLines =
-          estimatedFontSize * 2 * estimatedLineHeightFactor;
+      final double actualTextHeight =
+          estimatedFontSize * estimatedLineHeightFactor;
       final double padding = 12.0 * buttonScale;
 
       containerSize = padding +
           iconSize +
           4.0 * buttonScale +
-          actualTextHeightForTwoLines +
+          actualTextHeight +
           padding;
     } else {
       containerSize = 48.0 * buttonScale;
@@ -133,8 +135,8 @@ class _TileButtonState extends State<TileButton>
       disabled: widget.disabled,
       enableHover: true,
       child: Container(
-        width: containerSize,
-        height: containerSize,
+        width: widget.fillWidth ? double.infinity : containerSize,
+        height: hasTitle ? null : containerSize,
         decoration: BoxDecoration(
           color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),

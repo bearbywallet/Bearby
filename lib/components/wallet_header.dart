@@ -50,8 +50,8 @@ class _WalletHeaderState extends State<WalletHeader>
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
-    final avatarSize = AdaptiveSize.getAdaptiveIconSize(context, 50);
-    final gearSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
+    final avatarSize = AdaptiveSize.getAdaptiveIconSize(context, 40);
+    final gearSize = AdaptiveSize.getAdaptiveIconSize(context, 26);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 8);
 
     return Padding(
@@ -73,20 +73,27 @@ class _WalletHeaderState extends State<WalletHeader>
                   account: widget.account,
                 ),
               ),
-              if (widget.onScan != null)
-                HoverIcon(
-                  icon: AppIcon.barcodeScan,
-                  size: gearSize,
-                  padding: const EdgeInsets.all(0),
-                  color: theme.textSecondary,
-                  onTap: widget.onScan!,
-                ),
-              HoverIcon(
-                icon: AppIcon.gear,
-                size: gearSize,
-                padding: EdgeInsets.fromLTRB(spacing * 2, 0, 0, 0),
-                color: theme.textSecondary,
-                onTap: widget.onSettings,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.onScan != null) ...[
+                    HoverIcon(
+                      icon: AppIcon.barcodeScan,
+                      size: gearSize,
+                      padding: const EdgeInsets.all(0),
+                      color: theme.textSecondary,
+                      onTap: widget.onScan!,
+                    ),
+                    SizedBox(width: spacing),
+                  ],
+                  HoverIcon(
+                    icon: AppIcon.gear,
+                    size: gearSize,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.textSecondary,
+                    onTap: widget.onSettings,
+                  ),
+                ],
               ),
             ],
           ),
