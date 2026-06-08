@@ -277,7 +277,12 @@ class _BrowserPageState extends State<BrowserPage>
     }
     if (appState.state.browserSettings.incognitoMode) {
       InAppWebViewController.clearAllCache();
-      controller.clearHistory();
+      try {
+        controller.clearHistory();
+      } catch (_) {
+        // clearHistory can fail on macOS if the webview's
+        // back-forward list is not yet initialized during onLoadStart.
+      }
     }
   }
 
