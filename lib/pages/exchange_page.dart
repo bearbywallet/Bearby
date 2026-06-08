@@ -139,8 +139,14 @@ class _ExchangePageState extends State<ExchangePage>
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDebounce, () {
       final from = _exchangeState.fromAsset;
+      final to = _exchangeState.toAsset;
       if (from == null || _amount.endsWith('.')) return;
       final amountWei = toDecimalsWei(_amount, from.token.decimals);
+      debugPrint(
+        '[ExchangePage] scheduleQuote from=${from.token.symbol} '
+        'to=${to?.token.symbol} amount=$_amount amountWei=$amountWei '
+        'fromProviders=${from.providers.length}',
+      );
       _exchangeState.setAmount(amountWei.toString());
     });
   }
@@ -552,8 +558,14 @@ class _ExchangePageState extends State<ExchangePage>
   Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to,
       ExchangeState state) {
     final token = to.token;
-    final quote = state.selectedProvider?.quote;
+    final selectedProvider = state.selectedProvider;
+    final quote = selectedProvider?.quote;
     final from = state.fromAsset;
+    debugPrint(
+      '[ExchangePage] getCard to=${to.token.symbol} '
+      'selectedProvider=${selectedProvider?.common.displayName} '
+      'quote=${quote?.amountOut} loading=${state.loadingQuote}',
+    );
     final rateLabel =
         quote == null || from == null ? null : _rateLabel(from, to, quote);
     final recipient = to.providers.firstOrNull?.common.accountAddr ?? '';
@@ -594,7 +606,7 @@ class _ExchangePageState extends State<ExchangePage>
                         if (currentChild != null) currentChild
                       ],
                     ),
-                    child: (quote == null && state.loadingQuote)
+                    child: quote == null
                         ? SkeletonBox(
                             key: const ValueKey('get-skeleton'),
                             width: 150,
