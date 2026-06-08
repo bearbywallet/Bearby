@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/enable_card.dart';
@@ -132,9 +133,9 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                         color: theme.primaryPurple,
                       ),
                     ),
-                    errorWidget: Icon(
-                      Icons.broken_image,
-                      color: theme.textSecondary,
+                    errorWidget: HugeIcon(
+                      icon: HugeIcons.strokeRoundedHelpCircle,
+                      color: theme.warning,
                       size: 24,
                     ),
                   ),

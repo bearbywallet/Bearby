@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
@@ -151,10 +152,10 @@ class TokenAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         color: theme.background,
       ),
-      child: Icon(
-        Icons.broken_image,
+      child: HugeIcon(
+        icon: HugeIcons.strokeRoundedHelpCircle,
         size: size * 0.6,
-        color: theme.textSecondary,
+        color: theme.warning,
       ),
     );
   }

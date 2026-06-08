@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/settings_item.dart';
@@ -208,21 +209,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTelegram,
-                                trailingWidget: SvgPicture.asset('assets/icons/telegram.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
+                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedTelegram, size: 26 * 0.7, color: theme.textSecondary,),
                                 onTap: () => socialMediaService.openTelegram(
                                     chatUrl: 'https://t.me/+S7Dqp9ORznE1NDIy'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTwitter,
-                                trailingWidget: SvgPicture.asset('assets/icons/x.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
+                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedNewTwitterEllipse, size: 26 * 0.7, color: theme.textSecondary,),
                                 onTap: () => socialMediaService.openX(
                                     username: 'BearbyPro'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageGitHub,
-                                trailingWidget: SvgPicture.asset('assets/icons/github.svg', colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn), width: 26 * 0.7, height: 26 * 0.7,),
+                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedGithub01, size: 26 * 0.7, color: theme.textSecondary,),
                                 onTap: () => socialMediaService.openGitHub(
                                   username: 'bearbywallet',
                                 ),
