@@ -2,7 +2,6 @@ import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -85,30 +84,40 @@ class TokenAmountCard extends StatelessWidget {
     BigInt bigAmount,
     AppState appState,
   ) {
+    final effectiveRate = token.rate != 0.0
+        ? token.rate
+        : (appState.wallet?.tokens
+                .where((t) => t.addr == token.addr)
+                .firstOrNull
+                ?.rate ??
+            0.0);
+
     final (_, converted) = formatingAmount(
       amount: bigAmount,
       symbol: token.symbol,
       decimals: token.decimals,
-      rate: token.rate,
+      rate: effectiveRate,
       appState: appState,
     );
 
-    final fontSize = _calculateAdaptiveFontSize(context);
     final showConverted = appState.wallet?.settings.currencyConvert != null &&
-        converted.isNotEmpty;
+        converted.isNotEmpty &&
+        converted != '-';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          amount,
-          style: theme.displayLarge.copyWith(
-            color: theme.textPrimary,
-            fontSize: fontSize,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            amount,
+            style: theme.displayLarge.copyWith(
+              color: theme.textPrimary,
+              fontSize: 32.0,
+            ),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         if (showConverted)
           Padding(
@@ -254,8 +263,4 @@ class TokenAmountCard extends StatelessWidget {
     );
   }
 
-  double _calculateAdaptiveFontSize(BuildContext context) {
-    const baseSize = 32.0;
-    return AdaptiveSize.getAdaptiveFontSize(context, baseSize);
-  }
 }

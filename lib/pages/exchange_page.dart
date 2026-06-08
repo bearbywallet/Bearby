@@ -584,7 +584,7 @@ class _ExchangePageState extends State<ExchangePage>
             children: [
               Expanded(
                 child: SizedBox(
-                  height: AdaptiveSize.getAdaptiveFontSize(context, 36),
+                  height: 36,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     layoutBuilder: (currentChild, previousChildren) => Stack(
@@ -598,22 +598,21 @@ class _ExchangePageState extends State<ExchangePage>
                         ? SkeletonBox(
                             key: const ValueKey('get-skeleton'),
                             width: 150,
-                            height:
-                                AdaptiveSize.getAdaptiveFontSize(context, 28),
+                            height: 28,
                           )
                         : Align(
                             alignment: Alignment.centerLeft,
-                            child: Text(
-                              outAmount,
-                              key: const ValueKey('get-value'),
-                              style: theme.displayLarge.copyWith(
-                                color: theme.textPrimary,
-                                fontSize:
-                                    AdaptiveSize.getAdaptiveFontSize(
-                                        context, 28),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                outAmount,
+                                key: const ValueKey('get-value'),
+                                style: theme.displayLarge.copyWith(
+                                  color: theme.textPrimary,
+                                  fontSize: 28,
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                   ),
