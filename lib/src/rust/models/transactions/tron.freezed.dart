@@ -57,6 +57,8 @@ extension TronContractValuePatterns on TronContractValue {
         triggerSmartContract,
     TResult Function(TronContractValue_FreezeBalanceV2Contract value)?
         freezeBalanceV2Contract,
+    TResult Function(TronContractValue_WithdrawBalanceContract value)?
+        withdrawBalanceContract,
     TResult Function(TronContractValue_UnfreezeBalanceV2Contract value)?
         unfreezeBalanceV2Contract,
     TResult Function(TronContractValue_WithdrawExpireUnfreezeContract value)?
@@ -90,6 +92,9 @@ extension TronContractValuePatterns on TronContractValue {
       case TronContractValue_FreezeBalanceV2Contract()
           when freezeBalanceV2Contract != null:
         return freezeBalanceV2Contract(_that);
+      case TronContractValue_WithdrawBalanceContract()
+          when withdrawBalanceContract != null:
+        return withdrawBalanceContract(_that);
       case TronContractValue_UnfreezeBalanceV2Contract()
           when unfreezeBalanceV2Contract != null:
         return unfreezeBalanceV2Contract(_that);
@@ -148,6 +153,8 @@ extension TronContractValuePatterns on TronContractValue {
         triggerSmartContract,
     required TResult Function(TronContractValue_FreezeBalanceV2Contract value)
         freezeBalanceV2Contract,
+    required TResult Function(TronContractValue_WithdrawBalanceContract value)
+        withdrawBalanceContract,
     required TResult Function(TronContractValue_UnfreezeBalanceV2Contract value)
         unfreezeBalanceV2Contract,
     required TResult Function(
@@ -182,6 +189,8 @@ extension TronContractValuePatterns on TronContractValue {
         return triggerSmartContract(_that);
       case TronContractValue_FreezeBalanceV2Contract():
         return freezeBalanceV2Contract(_that);
+      case TronContractValue_WithdrawBalanceContract():
+        return withdrawBalanceContract(_that);
       case TronContractValue_UnfreezeBalanceV2Contract():
         return unfreezeBalanceV2Contract(_that);
       case TronContractValue_WithdrawExpireUnfreezeContract():
@@ -227,6 +236,8 @@ extension TronContractValuePatterns on TronContractValue {
         triggerSmartContract,
     TResult? Function(TronContractValue_FreezeBalanceV2Contract value)?
         freezeBalanceV2Contract,
+    TResult? Function(TronContractValue_WithdrawBalanceContract value)?
+        withdrawBalanceContract,
     TResult? Function(TronContractValue_UnfreezeBalanceV2Contract value)?
         unfreezeBalanceV2Contract,
     TResult? Function(TronContractValue_WithdrawExpireUnfreezeContract value)?
@@ -259,6 +270,9 @@ extension TronContractValuePatterns on TronContractValue {
       case TronContractValue_FreezeBalanceV2Contract()
           when freezeBalanceV2Contract != null:
         return freezeBalanceV2Contract(_that);
+      case TronContractValue_WithdrawBalanceContract()
+          when withdrawBalanceContract != null:
+        return withdrawBalanceContract(_that);
       case TronContractValue_UnfreezeBalanceV2Contract()
           when unfreezeBalanceV2Contract != null:
         return unfreezeBalanceV2Contract(_that);
@@ -324,6 +338,7 @@ extension TronContractValuePatterns on TronContractValue {
     TResult Function(
             String ownerAddress, PlatformInt64 frozenBalance, int resource)?
         freezeBalanceV2Contract,
+    TResult Function(String ownerAddress)? withdrawBalanceContract,
     TResult Function(
             String ownerAddress, PlatformInt64 unfreezeBalance, int resource)?
         unfreezeBalanceV2Contract,
@@ -362,6 +377,9 @@ extension TronContractValuePatterns on TronContractValue {
           when freezeBalanceV2Contract != null:
         return freezeBalanceV2Contract(
             _that.ownerAddress, _that.frozenBalance, _that.resource);
+      case TronContractValue_WithdrawBalanceContract()
+          when withdrawBalanceContract != null:
+        return withdrawBalanceContract(_that.ownerAddress);
       case TronContractValue_UnfreezeBalanceV2Contract()
           when unfreezeBalanceV2Contract != null:
         return unfreezeBalanceV2Contract(
@@ -433,6 +451,7 @@ extension TronContractValuePatterns on TronContractValue {
     required TResult Function(
             String ownerAddress, PlatformInt64 frozenBalance, int resource)
         freezeBalanceV2Contract,
+    required TResult Function(String ownerAddress) withdrawBalanceContract,
     required TResult Function(
             String ownerAddress, PlatformInt64 unfreezeBalance, int resource)
         unfreezeBalanceV2Contract,
@@ -475,6 +494,8 @@ extension TronContractValuePatterns on TronContractValue {
       case TronContractValue_FreezeBalanceV2Contract():
         return freezeBalanceV2Contract(
             _that.ownerAddress, _that.frozenBalance, _that.resource);
+      case TronContractValue_WithdrawBalanceContract():
+        return withdrawBalanceContract(_that.ownerAddress);
       case TronContractValue_UnfreezeBalanceV2Contract():
         return unfreezeBalanceV2Contract(
             _that.ownerAddress, _that.unfreezeBalance, _that.resource);
@@ -533,6 +554,7 @@ extension TronContractValuePatterns on TronContractValue {
     TResult? Function(
             String ownerAddress, PlatformInt64 frozenBalance, int resource)?
         freezeBalanceV2Contract,
+    TResult? Function(String ownerAddress)? withdrawBalanceContract,
     TResult? Function(
             String ownerAddress, PlatformInt64 unfreezeBalance, int resource)?
         unfreezeBalanceV2Contract,
@@ -570,6 +592,9 @@ extension TronContractValuePatterns on TronContractValue {
           when freezeBalanceV2Contract != null:
         return freezeBalanceV2Contract(
             _that.ownerAddress, _that.frozenBalance, _that.resource);
+      case TronContractValue_WithdrawBalanceContract()
+          when withdrawBalanceContract != null:
+        return withdrawBalanceContract(_that.ownerAddress);
       case TronContractValue_UnfreezeBalanceV2Contract()
           when unfreezeBalanceV2Contract != null:
         return unfreezeBalanceV2Contract(
@@ -906,6 +931,76 @@ class _$TronContractValue_FreezeBalanceV2ContractCopyWithImpl<$Res>
           ? _self.resource
           : resource // ignore: cast_nullable_to_non_nullable
               as int,
+    ));
+  }
+}
+
+/// @nodoc
+
+class TronContractValue_WithdrawBalanceContract extends TronContractValue {
+  const TronContractValue_WithdrawBalanceContract({required this.ownerAddress})
+      : super._();
+
+  final String ownerAddress;
+
+  /// Create a copy of TronContractValue
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $TronContractValue_WithdrawBalanceContractCopyWith<
+          TronContractValue_WithdrawBalanceContract>
+      get copyWith => _$TronContractValue_WithdrawBalanceContractCopyWithImpl<
+          TronContractValue_WithdrawBalanceContract>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is TronContractValue_WithdrawBalanceContract &&
+            (identical(other.ownerAddress, ownerAddress) ||
+                other.ownerAddress == ownerAddress));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, ownerAddress);
+
+  @override
+  String toString() {
+    return 'TronContractValue.withdrawBalanceContract(ownerAddress: $ownerAddress)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $TronContractValue_WithdrawBalanceContractCopyWith<$Res>
+    implements $TronContractValueCopyWith<$Res> {
+  factory $TronContractValue_WithdrawBalanceContractCopyWith(
+          TronContractValue_WithdrawBalanceContract value,
+          $Res Function(TronContractValue_WithdrawBalanceContract) _then) =
+      _$TronContractValue_WithdrawBalanceContractCopyWithImpl;
+  @useResult
+  $Res call({String ownerAddress});
+}
+
+/// @nodoc
+class _$TronContractValue_WithdrawBalanceContractCopyWithImpl<$Res>
+    implements $TronContractValue_WithdrawBalanceContractCopyWith<$Res> {
+  _$TronContractValue_WithdrawBalanceContractCopyWithImpl(
+      this._self, this._then);
+
+  final TronContractValue_WithdrawBalanceContract _self;
+  final $Res Function(TronContractValue_WithdrawBalanceContract) _then;
+
+  /// Create a copy of TronContractValue
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? ownerAddress = null,
+  }) {
+    return _then(TronContractValue_WithdrawBalanceContract(
+      ownerAddress: null == ownerAddress
+          ? _self.ownerAddress
+          : ownerAddress // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

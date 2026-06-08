@@ -31,6 +31,9 @@ pub enum TronContractValue {
         frozen_balance: i64,
         resource: i32,
     },
+    WithdrawBalanceContract {
+        owner_address: String,
+    },
     UnfreezeBalanceV2Contract {
         owner_address: String,
         unfreeze_balance: i64,
@@ -181,6 +184,11 @@ impl TronContractValue {
                     resource: extract_i32_from(value, "resource")?,
                 })
             }
+            "type.googleapis.com/protocol.WithdrawBalanceContract" => {
+                Ok(Self::WithdrawBalanceContract {
+                    owner_address: extract_str_from(value, "owner_address")?,
+                })
+            }
             "type.googleapis.com/protocol.WithdrawExpireUnfreezeContract" => {
                 Ok(Self::WithdrawExpireUnfreezeContract {
                     owner_address: extract_str_from(value, "owner_address")?,
@@ -328,6 +336,9 @@ impl TronContractValue {
                 "owner_address": owner_address,
                 "unfreeze_balance": unfreeze_balance,
                 "resource": resource
+            })),
+            Self::WithdrawBalanceContract { owner_address } => Ok(serde_json::json!({
+                "owner_address": owner_address
             })),
             Self::WithdrawExpireUnfreezeContract { owner_address } => Ok(serde_json::json!({
                 "owner_address": owner_address
