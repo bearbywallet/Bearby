@@ -691,7 +691,7 @@ fn with_display(
     let TransactionRequest::Ethereum((evm_tx, _)) = tx else {
         return Err("expected Ethereum tx".to_string());
     };
-    Ok(TransactionRequest::Ethereum((
+    TransactionRequest::Ethereum((
         evm_tx,
         TransactionMetadata {
             chain_hash,
@@ -708,7 +708,7 @@ fn with_display(
         },
     ))
     .try_into()
-    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())
 }
 
 #[frb(ignore)]
@@ -880,11 +880,11 @@ pub async fn relay_prepare_swap(
     amount: &str,
 ) -> Result<PreparedSwap, String> {
     match RelayOrigin::from_addr_type(from.token.addr_type) {
-        Some(RelayOrigin::Btc) => {
-            return Err("Relay Bitcoin-origin swaps are not supported yet".to_string());
-        }
         None => return Err("Relay origin address type is not supported".to_string()),
-        Some(RelayOrigin::Evm) | Some(RelayOrigin::Svm) | Some(RelayOrigin::Tron) => {}
+        Some(RelayOrigin::Btc)
+        | Some(RelayOrigin::Evm)
+        | Some(RelayOrigin::Svm)
+        | Some(RelayOrigin::Tron) => {}
     }
     let origin_chain_id = relay_origin_chain_id(from)?;
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
@@ -1019,7 +1019,7 @@ async fn finalize_svm_relay(
             .map(|value| (value, t.decimals, t.symbol))
     });
 
-    Ok(TransactionRequest::Solana((
+    TransactionRequest::Solana((
         SolanaTransaction { message },
         TransactionMetadata {
             chain_hash,
@@ -1032,7 +1032,7 @@ async fn finalize_svm_relay(
         },
     ))
     .try_into()
-    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())
 }
 
 #[cfg(test)]

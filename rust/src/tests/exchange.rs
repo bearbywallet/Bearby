@@ -5,8 +5,8 @@ mod exchange_tests {
 
     use crate::api::backend::load_service;
     use crate::api::exchange::{
-        bootstrap_exchange_providers, finalize_exchange_swap, prepare_exchange_swap,
-        refresh_exchange_quotes,
+        bootstrap_exchange_providers, btc::psbt_destinations, finalize_exchange_swap,
+        prepare_exchange_swap, refresh_exchange_quotes,
     };
     use crate::api::provider::get_chains_providers_from_json;
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
@@ -19,7 +19,16 @@ mod exchange_tests {
     use crate::service::background::BACKGROUND_SERVICE;
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
+    use zilpay::base64::{engine::general_purpose::STANDARD, Engine as _};
+    use zilpay::bitcoin::absolute::LockTime;
+    use zilpay::bitcoin::opcodes::all::OP_RETURN;
+    use zilpay::bitcoin::psbt::Psbt;
+    use zilpay::bitcoin::script::Builder;
+    use zilpay::bitcoin::secp256k1::{Keypair, Secp256k1, SecretKey, XOnlyPublicKey};
+    use zilpay::bitcoin::transaction::Version;
+    use zilpay::bitcoin::{Address as BtcAddress, Amount, Network, ScriptBuf, Transaction, TxOut};
     use zilpay::crypto::slip44::ETHEREUM;
+    use zilpay::proto::address::Address;
     use zilpay::proto::U256;
     use zilpay::rpc::network_config::ChainConfig;
     use zilpay::tokio;
@@ -34,6 +43,54 @@ mod exchange_tests {
     // The service (and its crypto provider) can only be initialized once per process, so
     // all tests share a single boot guarded by this lock.
     static SETUP_DONE: Mutex<bool> = Mutex::const_new(false);
+
+    fn psbt_base64(script_pubkey: ScriptBuf, amount_sat: u64) -> Result<String, String> {
+        let tx = Transaction {
+            version: Version::TWO,
+            lock_time: LockTime::ZERO,
+            input: Vec::with_capacity(0),
+            output: vec![TxOut {
+                value: Amount::from_sat(amount_sat),
+                script_pubkey,
+            }],
+        };
+        let psbt = Psbt::from_unsigned_tx(tx).map_err(|e| e.to_string())?;
+
+        Ok(STANDARD.encode(psbt.serialize()))
+    }
+
+    #[test]
+    fn test_psbt_destinations_decodes_p2tr_output() -> Result<(), String> {
+        const AMOUNT_SAT: u64 = 12_345;
+
+        let secp = Secp256k1::new();
+        let secret_key = SecretKey::from_slice(&[1; 32]).map_err(|e| e.to_string())?;
+        let keypair = Keypair::from_secret_key(&secp, &secret_key);
+        let (internal_key, _) = XOnlyPublicKey::from_keypair(&keypair);
+        let addr = BtcAddress::p2tr(&secp, internal_key, None, Network::Bitcoin);
+        let expected_addr = addr.to_string();
+        let psbt = psbt_base64(addr.script_pubkey(), AMOUNT_SAT)?;
+        let destinations = psbt_destinations(&psbt, Network::Bitcoin)?;
+        let Some((Address::Secp256k1Bitcoin(bytes), amount_sat)) = destinations.first() else {
+            return Err("expected one Bitcoin destination".to_string());
+        };
+
+        assert_eq!(bytes.as_slice(), expected_addr.as_bytes());
+        assert_eq!(*amount_sat, AMOUNT_SAT);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_psbt_destinations_ignores_op_return_outputs() -> Result<(), String> {
+        let op_return = Builder::new().push_opcode(OP_RETURN).into_script();
+        let psbt = psbt_base64(op_return, 0)?;
+        let destinations = psbt_destinations(&psbt, Network::Bitcoin)?;
+
+        assert!(destinations.is_empty());
+
+        Ok(())
+    }
 
     /// Boot the service exactly once per test process: load mainnet chains and add a
     /// single mainnet-ETH wallet (wallet 0 / account 0). Idempotent across tests.
