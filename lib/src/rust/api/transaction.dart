@@ -141,6 +141,15 @@ Future<TransactionRequestInfo> updateTxWithParams(
     RustLib.instance.api.crateApiTransactionUpdateTxWithParams(
         tx: tx, params: params, balance: balance, chainHash: chainHash);
 
+/// Parse a TronWebTransaction JSON string into the typed FFI struct.
+/// Called by Dart when a dApp sends a Tron transaction.
+TransactionRequestTron parseTronTransaction({required String json}) =>
+    RustLib.instance.api.crateApiTransactionParseTronTransaction(json: json);
+
+/// Serialize a TransactionRequestTron back to JSON for dApp response.
+String tronTransactionToJson({required TransactionRequestTron tx}) =>
+    RustLib.instance.api.crateApiTransactionTronTransactionToJson(tx: tx);
+
 class Eip712Hashes {
   final Uint8List domainSeparator;
   final Uint8List hashStructMessage;

@@ -1,11 +1,14 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
+use flutter_rust_bridge::frb;
+
 use crate::frb_generated::StreamSink;
 use crate::models::ftoken::FTokenInfo;
 use crate::models::gas::RequiredTxParamsInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
+use crate::models::transactions::tron::TransactionRequestTron;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 use crate::utils::helpers::{parse_address, with_service};
@@ -23,6 +26,7 @@ use zilpay::crypto::bip49::{components_to_derivation_path, split_path, Derivatio
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
+use zilpay::proto::tron_tx::TronWebTransaction;
 use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
 use zilpay::proto::btc_utils::BtcAccountXpubsInput;
@@ -647,6 +651,24 @@ pub async fn update_tx_with_params(
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
 
     Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
+}
+
+/// Parse a TronWebTransaction JSON string into the typed FFI struct.
+/// Called by Dart when a dApp sends a Tron transaction.
+#[frb(sync)]
+pub fn parse_tron_transaction(json: String) -> Result<TransactionRequestTron, String> {
+    let tron_web: TronWebTransaction = zilpay::serde_json::from_str(&json)
+        .map_err(|e| format!("Invalid Tron transaction JSON: {e}"))?;
+    Ok(TransactionRequestTron::from(tron_web))
+}
+
+/// Serialize a TransactionRequestTron back to JSON for dApp response.
+#[frb(sync)]
+pub fn tron_transaction_to_json(tx: TransactionRequestTron) -> Result<String, String> {
+    let tron_web: TronWebTransaction = tx.try_into()
+        .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?;
+    zilpay::serde_json::to_string(&tron_web)
+        .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))
 }
 
 #[cfg(test)]
