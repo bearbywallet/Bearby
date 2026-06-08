@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/view_item.dart';
@@ -81,28 +82,20 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
                         WalletListItem(
                           title: l10n.addWalletOptionsNewWalletTitle,
                           subtitle: l10n.addWalletOptionsNewWalletSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/add.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.add,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => context.push(AppRoutes.genOptions, extra: {'chain': _chain}),
                         ),
                         WalletListItem(
                           title: l10n.addWalletOptionsExistingWalletTitle,
                           subtitle: l10n.addWalletOptionsExistingWalletSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/import.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.importWallet,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => context.push(AppRoutes.restoreOptions, extra: {'chain': _chain}),
                         ),
@@ -134,14 +127,10 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
                           disabled: true,
                           title: l10n.addWalletOptionsWatchAccountTitle,
                           subtitle: l10n.addWalletOptionsWatchAccountSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/looking.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.looking,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () {},
                         ),

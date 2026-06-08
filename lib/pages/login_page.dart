@@ -251,14 +251,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
           const Spacer(),
           IconButton(
             onPressed: _navigateToNewWallet,
-            icon: SvgPicture.asset(
-              'assets/icons/plus.svg',
-              width: 32,
-              height: 32,
-              colorFilter: ColorFilter.mode(
-                theme.currentTheme.textPrimary,
-                BlendMode.srcIn,
-              ),
+            icon: const AppIconView(
+              icon: AppIcon.plus,
+              size: 32,
             ),
           ),
         ],

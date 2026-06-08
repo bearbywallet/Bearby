@@ -379,7 +379,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         ),
         TileButton(
           icon: AppIconView(
-            icon: AppIcon.key,
+            icon: AppIcon.bitcoinAmount,
             size: 24,
                         color: theme.primaryPurple,
           ),
@@ -392,7 +392,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         if (account != null && chain.slip44 == kZilliqaSlip44)
           TileButton(
             icon: AppIconView(
-              icon: AppIcon.file,
+              icon: AppIcon.bitcoinAddress,
               size: 24,
               color: theme.primaryPurple,
             ),

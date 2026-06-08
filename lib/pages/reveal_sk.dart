@@ -2,7 +2,6 @@ import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/button.dart';
@@ -205,16 +204,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                       ),
                       SizedBox(height: adaptivePadding),
                       TileButton(
-                        icon: SvgPicture.asset(
-                          isCopied
-                              ? "assets/icons/check.svg"
-                              : "assets/icons/copy.svg",
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.primaryPurple,
-                            BlendMode.srcIn,
-                          ),
+                        icon: AppIconView(
+                          icon: isCopied ? AppIcon.check : AppIcon.copy,
+                          size: 24,
+                          color: theme.primaryPurple,
                         ),
                         onPressed: () => _handleCopy(keys?.sk ?? ""),
                         backgroundColor: theme.cardBackground,
@@ -314,14 +307,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/warning.svg",
-                width: 30,
-                height: 30,
-                colorFilter: ColorFilter.mode(
-                  theme.danger,
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: AppIcon.warning,
+                size: 30,
+                color: theme.danger,
               ),
               const SizedBox(width: 8),
               Text(

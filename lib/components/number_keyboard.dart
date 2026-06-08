@@ -86,7 +86,7 @@ class NumberKeyboardState extends State<NumberKeyboard>
           alignment: Alignment.center,
           child: isIcon
               ? AppIconView(
-                  icon: AppIcon.backspace,
+                  icon: AppIcon.arrowLeft,
                   size: 30,
                   color: theme.textPrimary.withValues(alpha: isActive ? 1.0 : 0.5),
                 )
