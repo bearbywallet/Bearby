@@ -63,14 +63,33 @@ class _WalletHeaderState extends State<WalletHeader>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              buildPressableWithOpacity(
-                onTap: () {
-                  _showWalletModal();
-                  widget.onTap?.call();
-                },
-                child: AvatarAddress(
-                  avatarSize: avatarSize,
-                  account: widget.account,
+              Flexible(
+                child: buildPressableWithOpacity(
+                  onTap: () {
+                    _showWalletModal();
+                    widget.onTap?.call();
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      AvatarAddress(
+                        avatarSize: avatarSize,
+                        account: widget.account,
+                      ),
+                      SizedBox(width: spacing),
+                      Flexible(
+                        child: Text(
+                          widget.account.name,
+                          style: theme.headline2.copyWith(
+                            color: theme.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Row(
@@ -98,22 +117,8 @@ class _WalletHeaderState extends State<WalletHeader>
             ],
           ),
           SizedBox(height: spacing),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                widget.account.name,
-                style: theme.headline2.copyWith(
-                  color: theme.textPrimary,
-                  fontSize: theme.headline2.fontSize,
-                ),
-              ),
-              SizedBox(width: spacing),
-              CopyContent(
-                address: widget.account.addr,
-              ),
-            ],
+          CopyContent(
+            address: widget.account.addr,
           ),
         ],
       ),
