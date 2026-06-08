@@ -177,14 +177,6 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           decoration: BoxDecoration(
             color: widget.color ?? theme.buttonBackground,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: [
-              BoxShadow(
-                color: (widget.color ?? theme.buttonBackground)
-                    .withValues(alpha: 0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
