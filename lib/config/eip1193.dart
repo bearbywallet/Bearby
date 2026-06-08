@@ -38,6 +38,10 @@ enum Web3EIP1193Method {
   tronRequestAccounts('tron_requestAccounts'),
   tronSignMessageV2('tron_signMessageV2'),
   tronSign('tron_sign'),
+  multiSign('multiSign'),
+  tronSignTypedData('_signTypedData'),
+  tronSignTypedDataV2('signTypedData'),
+  tronProviderRequest('tronProviderRequest'),
   unknown('unknown');
 
   final String value;
