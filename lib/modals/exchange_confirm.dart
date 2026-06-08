@@ -144,6 +144,16 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
       _providers.elementAtOrNull(_selectedIndex);
   bool get _isWrapUnwrap => _selectedProvider?.quote?.isWrapUnwrap ?? false;
 
+  bool _isBtcRelayOrigin(ExchangeProvider provider) =>
+      widget.from.token.addrType == 2 &&
+      provider.map(
+        relay: (_) => true,
+        uniswap: (_) => false,
+        pancakeSwap: (_) => false,
+        zilSwap: (_) => false,
+        sunSwap: (_) => false,
+      );
+
   // Derived from the two assets — no stored duplication.
   FTokenInfo get _fromToken => widget.from.token;
   FTokenInfo get _toToken => widget.to.token;
@@ -341,6 +351,8 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return;
     final provider = _providers[index];
+    if (_isBtcRelayOrigin(provider)) return;
+
     try {
       final nonce = await estimateSwapBaseNonce(
         walletIndex: appState.selectedWalletIndex,

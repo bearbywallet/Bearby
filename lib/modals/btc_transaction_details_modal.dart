@@ -14,7 +14,7 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/mixins/transaction_token.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/btc.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
@@ -463,7 +463,11 @@ class _AmountCard extends StatelessWidget {
   }
 
   Widget _buildIcon() {
-    final token = _findMatchingToken();
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
+
     return TokenAvatar(
       token: token,
       size: 44,
@@ -477,7 +481,10 @@ class _AmountCard extends StatelessWidget {
   }
 
   (String, String) _formatAmount() {
-    final token = appState.wallet?.tokens.first;
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
     final amount =
         BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
             BigInt.zero;
@@ -490,21 +497,6 @@ class _AmountCard extends StatelessWidget {
       rate: token?.rate ?? 0,
       appState: appState,
     );
-  }
-
-  FTokenInfo? _findMatchingToken() {
-    if (appState.wallet == null ||
-        transaction.tokenInfo == null ||
-        appState.account == null) {
-      return null;
-    }
-    try {
-      return appState.wallet!.tokens.firstWhere((t) =>
-          t.symbol == transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType);
-    } catch (_) {
-      return null;
-    }
   }
 }
 

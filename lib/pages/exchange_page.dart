@@ -579,7 +579,6 @@ class _ExchangePageState extends State<ExchangePage>
             rate: token.rate,
             appState: _appState,
           );
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -712,4 +711,3 @@ class _ExchangePageState extends State<ExchangePage>
     );
   }
 }
-

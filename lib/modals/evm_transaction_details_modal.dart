@@ -10,7 +10,7 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 
 import 'package:bearby/mixins/transaction_parsing.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/mixins/transaction_token.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/state/app_state.dart';
@@ -870,7 +870,10 @@ class _AmountSection extends StatelessWidget {
 
   Widget _buildTokenIcon() {
     final theme = appState.currentTheme;
-    final token = _findMatchingToken();
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
 
     return TokenAvatar(
       token: token,
@@ -885,12 +888,15 @@ class _AmountSection extends StatelessWidget {
   }
 
   (String, String) _formatAmount() {
-    final token = appState.wallet?.tokens.first;
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
     final amount =
         BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
             BigInt.zero;
     final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
-    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
+    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? '';
 
     return formatingAmount(
       amount: amount,
@@ -899,22 +905,6 @@ class _AmountSection extends StatelessWidget {
       rate: token?.rate ?? 0,
       appState: appState,
     );
-  }
-
-  FTokenInfo? _findMatchingToken() {
-    if (appState.wallet == null ||
-        transaction.tokenInfo == null ||
-        appState.account == null) {
-      return null;
-    }
-
-    try {
-      return appState.wallet!.tokens.firstWhere((t) =>
-          t.symbol == transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType);
-    } catch (_) {
-      return null;
-    }
   }
 }
 

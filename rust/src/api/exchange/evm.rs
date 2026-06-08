@@ -127,9 +127,20 @@ pub(super) async fn execute_evm_exchange_swap(
     display: ExchangeTxDisplay,
     sink: StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let SwapParams { provider, from, to, amount_in, slippage_bps } = params;
-    let ExchangeTxDisplay { approve_title, permit_title, swap_title, swap_info, out_token } =
-        display;
+    let SwapParams {
+        provider,
+        from,
+        to,
+        amount_in,
+        slippage_bps,
+    } = params;
+    let ExchangeTxDisplay {
+        approve_title,
+        permit_title,
+        swap_title,
+        swap_info,
+        out_token,
+    } = display;
 
     let is_native_in = from.token.native;
     let wrap = provider
@@ -161,8 +172,9 @@ pub(super) async fn execute_evm_exchange_swap(
             .await?
         {
             let _ = sink.add("approving".to_string());
-            let mut approve_tx: TransactionRequest =
-                approval.try_into().map_err(ServiceError::TransactionErrors)?;
+            let mut approve_tx: TransactionRequest = approval
+                .try_into()
+                .map_err(ServiceError::TransactionErrors)?;
             apply_fast_fees(&mut approve_tx, &base, nonce)?;
             results.push(
                 sign_and_broadcast_one(
@@ -180,7 +192,9 @@ pub(super) async fn execute_evm_exchange_swap(
         }
     }
 
-    let prepared = provider.prepare_swap(&from, &to, &amount_in, slippage_bps).await?;
+    let prepared = provider
+        .prepare_swap(&from, &to, &amount_in, slippage_bps)
+        .await?;
 
     let permit_signature = if let Some(typed_data) = prepared.permit_typed_data_json {
         let _ = sink.add("permit".to_string());

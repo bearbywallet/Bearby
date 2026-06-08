@@ -138,6 +138,7 @@ class ExchangeState extends ChangeNotifier {
   }
 
   void setAmount(String wei) {
+    debugPrint('[ExchangeState] setAmount wei=$wei');
     _pendingAmountWei = wei;
     _restartPollingIfReady();
   }
@@ -169,10 +170,16 @@ class ExchangeState extends ChangeNotifier {
       return;
     }
 
+    debugPrint(
+      '[ExchangeState] refreshOnce from=${from.token.symbol} '
+      'to=${to.token.symbol} amount=$amount providers=${from.providers.length}',
+    );
     _loadingQuote = true;
     notifyListeners();
     try {
       _fromAsset = await refreshExchangeQuotes(from: from, to: to, amount: amount);
+      final quoted = _fromAsset?.providers.where((p) => p.quote != null).length ?? 0;
+      debugPrint('[ExchangeState] refreshOnce done quotedProviders=$quoted');
     } catch (e) {
       debugPrint('[ExchangeState] quote refresh failed: $e');
     } finally {

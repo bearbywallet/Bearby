@@ -609,22 +609,31 @@ class _ConfirmTransactionContentState
   Widget _buildTransferDetails(
       AppState appState, Color textColor, Color secondaryColor) {
     try {
-      BaseTokenInfo token = widget.tx.metadata.tokenInfo ??
-          BaseTokenInfo(
-              value: '',
-              symbol: widget.token.symbol,
-              decimals: widget.token.decimals);
+      // outToken: destination token set by the exchange (e.g. BNB for BTC→BNB swap).
+      // null for plain sends.
+      final outToken = widget.tx.metadata.tokenInfo;
+
+      // For BTC transactions, always use the native BTC token for formatting
+      // satoshi amounts inside TokenTransferInfo. Using the output token's
+      // decimals (e.g. 18 for BNB) would make sats appear as ~0.
+      final nativeToken = BaseTokenInfo(
+          value: '',
+          symbol: widget.token.symbol,
+          decimals: widget.token.decimals);
 
       final signer = appState.account ??
           (throw Exception(AppLocalizations.of(context)!
               .confirmTransactionContentNoActiveAccount));
 
-      final amount = toDecimalsWei(widget.amount.toString(), token.decimals);
+      final isBtc = widget.tx.btc != null;
+
+      // For non-BTC txs keep existing behaviour: prefer outToken for display.
+      final displayToken = isBtc ? nativeToken : (outToken ?? nativeToken);
+
+      final amount = toDecimalsWei(widget.amount.toString(), displayToken.decimals);
       final balance = BigInt.tryParse(
               widget.token.balances[appState.accountBalanceKey] ?? '-') ??
           BigInt.zero;
-
-      final isBtc = widget.tx.btc != null;
 
       return Padding(
         padding: const EdgeInsets.all(16),
@@ -642,13 +651,17 @@ class _ConfirmTransactionContentState
             ],
             TokenTransferInfo(
               tx: widget.tx,
-              token: token,
+              token: displayToken,
               fromAddress: signer.addr,
               fromName: signer.name,
               toAddress: widget.to,
               textColor: textColor,
               secondaryColor: secondaryColor,
             ),
+            if (isBtc && outToken != null) ...[
+              const SizedBox(height: 12),
+              _buildSwapReceive(appState, outToken, textColor, secondaryColor),
+            ],
           ],
         ),
       );
@@ -656,5 +669,48 @@ class _ConfirmTransactionContentState
       debugPrint('Transfer details error: $e');
       return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildSwapReceive(AppState appState, BaseTokenInfo outToken,
+      Color textColor, Color secondaryColor) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = appState.currentTheme;
+
+    final outAmount = BigInt.tryParse(outToken.value) ?? BigInt.zero;
+    final double rate = appState.wallet?.tokens
+            .where((t) => t.symbol == outToken.symbol)
+            .map((t) => t.rate)
+            .firstOrNull ??
+        0.0;
+    final (formatted, _) = formatingAmount(
+      amount: outAmount,
+      symbol: outToken.symbol,
+      decimals: outToken.decimals,
+      rate: rate,
+      appState: appState,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.background.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.modalBorder.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            l10n.exchangePageGet,
+            style: theme.bodyText2.copyWith(color: secondaryColor),
+          ),
+          Text(
+            formatted,
+            style: theme.bodyText2
+                .copyWith(color: textColor, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
   }
 }
