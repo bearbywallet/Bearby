@@ -1,11 +1,10 @@
 use std::str::FromStr;
 use std::sync::Arc;
 
+use zilpay::alloy::hex;
 use zilpay::background::bg_bitcoin::BitcoinManagement;
-use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_wallet::WalletManagement;
-use zilpay::base64::{engine::general_purpose::STANDARD, Engine as _};
-use zilpay::bitcoin::{self, psbt::Psbt, Address as BtcAddress};
+use zilpay::bitcoin::psbt::Psbt;
 use zilpay::proto::address::Address;
 use zilpay::proto::tx::TransactionRequest;
 use zilpay::proto::U256;
@@ -20,31 +19,6 @@ use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-
-/// Parse a base64 PSBT into non-OP_RETURN outputs as `(Address::Secp256k1Bitcoin, amount_sat)`.
-pub(crate) fn psbt_destinations(
-    psbt_b64: &str,
-    network: bitcoin::Network,
-) -> Result<Vec<(Address, u64)>, String> {
-    let bytes = STANDARD
-        .decode(psbt_b64)
-        .map_err(|e| format!("psbt base64: {e}"))?;
-    let psbt = Psbt::deserialize(&bytes).map_err(|e| format!("psbt decode: {e}"))?;
-
-    psbt.unsigned_tx
-        .output
-        .iter()
-        .filter(|o| !o.script_pubkey.is_op_return())
-        .map(|o| {
-            let addr = BtcAddress::from_script(&o.script_pubkey, network)
-                .map_err(|e| format!("script→addr: {e}"))?;
-            Ok((
-                Address::Secp256k1Bitcoin(addr.to_string().into_bytes()),
-                o.value.to_sat(),
-            ))
-        })
-        .collect()
-}
 
 pub(super) async fn execute_btc_exchange_swap(
     auth: SwapAuth,
@@ -73,8 +47,35 @@ pub(super) async fn execute_btc_exchange_swap(
 
     let blob: RelayBlob = zilpay::serde_json::from_str(&prepared.quote_blob)
         .map_err(|e| format!("invalid relay quote blob: {e}"))?;
-    let psbt_b64 = match blob.source {
-        RelaySource::Btc { psbt } => psbt,
+    let (vault_addr, amount_sat) = match blob.source {
+        RelaySource::Btc { psbt } => {
+            let psbt_bytes = hex::decode(&psbt)
+                .map_err(|e| format!("invalid relay BTC PSBT hex: {e}"))?;
+            let psbt: Psbt =
+                Psbt::deserialize(&psbt_bytes)
+                    .map_err(|e| format!("invalid relay BTC PSBT: {e}"))?;
+            let tx = &psbt.unsigned_tx;
+            let vault_out = tx
+                .output
+                .iter()
+                .find(|o| o.value.to_sat() > 0 && !o.script_pubkey.is_op_return())
+                .ok_or_else(|| "relay BTC PSBT has no non-OP_RETURN output with value".to_string())?;
+            let vault_addr = Address::Secp256k1Bitcoin(
+                zilpay::bitcoin::Address::from_script(
+                    &vault_out.script_pubkey,
+                    zilpay::bitcoin::Network::Bitcoin,
+                )
+                .map_err(|e| format!("relay BTC PSBT vault address: {e}"))?
+                .to_string()
+                .into_bytes(),
+            );
+            let amount_sat = vault_out.value.to_sat();
+            eprintln!(
+                "[btc-swap] PSBT vault={} amount_sat={amount_sat}",
+                String::from_utf8_lossy(vault_addr.auto_format().as_bytes()),
+            );
+            (vault_addr, amount_sat)
+        }
         RelaySource::Evm { .. } | RelaySource::Svm { .. } | RelaySource::Tron { .. } => {
             return Err("expected RelaySource::Btc from quote".to_string());
         }
@@ -88,16 +89,6 @@ pub(super) async fn execute_btc_exchange_swap(
             .ok_or(ServiceError::NotRunning)?
             .core,
     );
-    let network = core
-        .get_provider(chain_hash)
-        .map_err(ServiceError::BackgroundError)?
-        .config
-        .bitcoin_network()
-        .unwrap_or(bitcoin::Network::Bitcoin);
-    let (vault_addr, amount_sat) = psbt_destinations(&psbt_b64, network)?
-        .into_iter()
-        .next()
-        .ok_or_else(|| "relay PSBT has no spendable outputs".to_string())?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());

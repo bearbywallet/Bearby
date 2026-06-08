@@ -350,6 +350,7 @@ async fn relay_post<T: serde::de::DeserializeOwned>(
 
     for base in RELAY_BASE_URLS {
         let url = format!("{base}{path}");
+        eprintln!("[relay] POST {url} payload={payload}");
         let resp = client
             .post(&url)
             .header("content-type", "application/json")
@@ -362,6 +363,7 @@ async fn relay_post<T: serde::de::DeserializeOwned>(
         match resp {
             Ok(r) if r.status().is_success() => {
                 let body = r.text().await.map_err(|e| format!("{url}: body {e}"))?;
+                eprintln!("[relay] OK {url} body={body}");
                 return serde_json::from_str::<T>(&body).map_err(|e| format!("{url}: decode {e}"));
             }
             Ok(r) => {
@@ -370,9 +372,13 @@ async fn relay_post<T: serde::de::DeserializeOwned>(
                     Ok(text) => text,
                     Err(e) => format!("body error: {e}"),
                 };
+                eprintln!("[relay] ERR {url} status={status} body={body}");
                 last_err = format!("{url}: {status}: {body}");
             }
-            Err(e) => last_err = format!("{url}: {e}"),
+            Err(e) => {
+                eprintln!("[relay] SEND_ERR {url}: {e}");
+                last_err = format!("{url}: {e}");
+            }
         }
     }
 
@@ -431,6 +437,24 @@ async fn fetch_quote(
             fee: FEE_BIPS,
         }],
     };
+    eprintln!(
+        "[relay] quote_req from_symbol={} from_native={} from_addr={} \
+         to_symbol={} to_native={} to_addr={} user={} recipient={} \
+         origin_chain={} destination_chain={} origin_currency={} destination_currency={} amount={}",
+        from.token.symbol,
+        from.token.native,
+        from.token.addr,
+        to.token.symbol,
+        to.token.native,
+        to.token.addr,
+        req.user,
+        req.recipient,
+        req.origin_chain_id,
+        req.destination_chain_id,
+        req.origin_currency,
+        req.destination_currency,
+        req.amount,
+    );
 
     relay_post::<QuoteResponse>("/quote", &req)
         .await
@@ -735,7 +759,22 @@ pub async fn relay_quote_info(
             fee: FEE_BIPS,
         }],
     };
+    eprintln!(
+        "[relay] quote_info_req origin_chain={} destination_chain={} \
+         origin_currency={} destination_currency={} user={} recipient={} amount={}",
+        req.origin_chain_id,
+        req.destination_chain_id,
+        req.origin_currency,
+        req.destination_currency,
+        req.user,
+        req.recipient,
+        req.amount,
+    );
     let quote = relay_post::<QuoteResponse>("/quote", &req).await?;
+    eprintln!(
+        "[relay] quote_info_out amount={} minimum_amount={}",
+        quote.details.currency_out.amount, quote.details.currency_out.minimum_amount,
+    );
     let amount_out = quote.details.currency_out.amount;
     if amount_out.is_empty() {
         return Err("relay quote missing amount out".to_string());
@@ -933,7 +972,14 @@ pub async fn relay_finalize_swap(
                 swapper,
                 DEFAULT_RELAY_EVM_GAS,
             )?;
-            with_display(tx, chain_hash, swap_title, swap_info, provider_icon, out_token)
+            with_display(
+                tx,
+                chain_hash,
+                swap_title,
+                swap_info,
+                provider_icon,
+                out_token,
+            )
         }
         RelaySource::Svm {
             instructions,
@@ -953,10 +999,9 @@ pub async fn relay_finalize_swap(
             )
             .await
         }
-        RelaySource::Btc { .. } => Err(
-            "Relay Bitcoin-origin swaps require external PSBT signing/finalization, which is not available yet"
-                .to_string(),
-        ),
+        RelaySource::Btc { .. } => {
+            Err("BTC-origin swaps are executed out-of-band via execute_exchange_swap".to_string())
+        }
         RelaySource::Tron { to, data, value } => {
             crate::api::exchange::tron::finalize_tron_relay(
                 account_addr,
