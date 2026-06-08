@@ -116,8 +116,6 @@ class BtcTransactionDetailsModal extends StatelessWidget {
                     _buildToGroup(btc, appState, theme, l10n),
                   ],
                   const SizedBox(height: 12),
-                  _buildNetworkGroup(appState, theme, l10n),
-                  const SizedBox(height: 12),
                   _buildFeesPropertiesGroup(appState, theme, l10n),
                   if (transaction.error != null) ...[
                     const SizedBox(height: 12),
@@ -215,29 +213,6 @@ class BtcTransactionDetailsModal extends StatelessWidget {
               ),
             ),
         const SizedBox(height: 4),
-      ],
-    );
-  }
-
-  Widget _buildNetworkGroup(
-    AppState appState,
-    AppTheme theme,
-    AppLocalizations l10n,
-  ) {
-    return DetailGroupCard(
-      title: l10n.transactionDetailsModal_network,
-      theme: theme,
-      children: [
-        DetailItem(
-          label: l10n.transactionDetailsModal_chainType,
-          value: transaction.chainType,
-          theme: theme,
-        ),
-        DetailItem(
-          label: l10n.transactionDetailsModal_networkName,
-          value: appState.getChain(transaction.chainHash)?.chain ?? 'Unknown',
-          theme: theme,
-        ),
       ],
     );
   }
@@ -463,7 +438,7 @@ class _AmountCard extends StatelessWidget {
   }
 
   Widget _buildIcon() {
-    final token = resolveTransactionToken(
+    final token = resolveTransactionIconToken(
       transaction: transaction,
       appState: appState,
     );

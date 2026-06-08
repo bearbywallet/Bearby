@@ -7,7 +7,7 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/mixins/transaction_token.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -44,7 +44,10 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildIcon(AppState appState) {
     final theme = appState.currentTheme;
-    final token = _findMatchingToken(appState);
+    final token = resolveTransactionIconToken(
+      transaction: widget.transaction,
+      appState: appState,
+    );
     final icon = widget.transaction.icon;
 
     // Local asset SVG (e.g. "assets/icons/uniswap.svg") — render directly.
@@ -78,22 +81,6 @@ class _HistoryItemState extends State<HistoryItem>
       borderWidth: 2,
       fit: BoxFit.contain,
     );
-  }
-
-  FTokenInfo? _findMatchingToken(AppState appState) {
-    if (appState.wallet == null ||
-        widget.transaction.tokenInfo == null ||
-        appState.account == null) {
-      return null;
-    }
-
-    try {
-      return appState.wallet!.tokens.firstWhere((t) =>
-          t.symbol == widget.transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType);
-    } catch (_) {
-      return null;
-    }
   }
 
   Color _getStatusColor(AppTheme theme) {
@@ -159,7 +146,10 @@ class _HistoryItemState extends State<HistoryItem>
       );
     }
 
-    final token = _findMatchingToken(appState);
+    final token = resolveTransactionToken(
+      transaction: widget.transaction,
+      appState: appState,
+    );
     final baseToken = appState.wallet?.tokens.first;
 
     final amount = BigInt.tryParse(
