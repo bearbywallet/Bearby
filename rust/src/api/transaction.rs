@@ -498,7 +498,7 @@ pub async fn create_token_transfer(
 
     tx.set_icon(params.icon);
 
-    Ok(tx.into())
+    Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
 }
 
 pub async fn cacl_gas_fee(
@@ -646,7 +646,7 @@ pub async fn update_tx_with_params(
 
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
 
-    Ok(tx.into())
+    Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
 }
 
 #[cfg(test)]

@@ -55,7 +55,9 @@ pub async fn check_exchange_approval(
                 info.try_into().map_err(ServiceError::TransactionErrors)?;
             let base = estimate_fast_params(&core, chain_hash, &signer).await?;
             apply_fast_fees(&mut tx, &base, nonce)?;
-            Ok(Some(tx.into()))
+            Ok(Some(
+                tx.try_into().map_err(ServiceError::TransactionErrors)?,
+            ))
         }
         None => Ok(None),
     }
@@ -64,7 +66,12 @@ pub async fn check_exchange_approval(
 pub async fn prepare_exchange_swap(params: SwapParams) -> Result<PreparedSwapInfo, String> {
     let prepared = params
         .provider
-        .prepare_swap(&params.from, &params.to, &params.amount_in, params.slippage_bps)
+        .prepare_swap(
+            &params.from,
+            &params.to,
+            &params.amount_in,
+            params.slippage_bps,
+        )
         .await?;
 
     Ok(PreparedSwapInfo {
@@ -109,7 +116,9 @@ pub async fn finalize_exchange_swap(
     let base = estimate_fast_params(&core, chain_hash, &signer).await?;
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
 
-    Ok(swap_tx.into())
+    Ok(swap_tx
+        .try_into()
+        .map_err(ServiceError::TransactionErrors)?)
 }
 
 pub async fn estimate_swap_base_nonce(

@@ -6997,6 +6997,32 @@ impl SseDecode for Vec<crate::api::ledger_transport::RustLedgerHidDevice> {
     }
 }
 
+impl SseDecode for Vec<crate::models::transactions::tron::TronContractInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::models::transactions::tron::TronContractInfo>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::transactions::tron::TronVoteInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::transactions::tron::TronVoteInfo>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::models::transactions::btc::TxInInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7256,6 +7282,17 @@ impl SseDecode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseDecode for Option<i64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<i64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::models::exchange::ProviderQuote> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7335,6 +7372,21 @@ impl SseDecode for Option<crate::models::transactions::scilla::TransactionReques
         if (<bool>::sse_decode(deserializer)) {
             return Some(
                 <crate::models::transactions::scilla::TransactionRequestScilla>::sse_decode(
+                    deserializer,
+                ),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::transactions::tron::TransactionRequestTron> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::models::transactions::tron::TransactionRequestTron>::sse_decode(
                     deserializer,
                 ),
             );
@@ -7926,7 +7978,10 @@ impl SseDecode for crate::models::transactions::request::TransactionRequestInfo 
             crate::models::transactions::btc::TransactionBitcoin,
             crate::models::transactions::btc::BitcoinMetadataInfo,
         )>>::sse_decode(deserializer);
-        let mut var_tron = <Option<String>>::sse_decode(deserializer);
+        let mut var_tron =
+            <Option<crate::models::transactions::tron::TransactionRequestTron>>::sse_decode(
+                deserializer,
+            );
         let mut var_solana = <Option<Vec<u8>>>::sse_decode(deserializer);
         return crate::models::transactions::request::TransactionRequestInfo {
             metadata: var_metadata,
@@ -7963,6 +8018,23 @@ impl SseDecode for crate::models::transactions::scilla::TransactionRequestScilla
     }
 }
 
+impl SseDecode for crate::models::transactions::tron::TransactionRequestTron {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_visible = <Option<bool>>::sse_decode(deserializer);
+        let mut var_txId = <Option<String>>::sse_decode(deserializer);
+        let mut var_rawData =
+            <crate::models::transactions::tron::TronRawDataInfo>::sse_decode(deserializer);
+        let mut var_rawDataHex = <String>::sse_decode(deserializer);
+        return crate::models::transactions::tron::TransactionRequestTron {
+            visible: var_visible,
+            tx_id: var_txId,
+            raw_data: var_rawData,
+            raw_data_hex: var_rawDataHex,
+        };
+    }
+}
+
 impl SseDecode for crate::models::transactions::history::TransactionStatusInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7972,6 +8044,163 @@ impl SseDecode for crate::models::transactions::history::TransactionStatusInfo {
             1 => crate::models::transactions::history::TransactionStatusInfo::Success,
             2 => crate::models::transactions::history::TransactionStatusInfo::Failed,
             _ => unreachable!("Invalid variant for TransactionStatusInfo: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::models::transactions::tron::TronContractInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_contractType = <String>::sse_decode(deserializer);
+        let mut var_typeUrl = <String>::sse_decode(deserializer);
+        let mut var_value =
+            <crate::models::transactions::tron::TronContractValue>::sse_decode(deserializer);
+        return crate::models::transactions::tron::TronContractInfo {
+            contract_type: var_contractType,
+            type_url: var_typeUrl,
+            value: var_value,
+        };
+    }
+}
+
+impl SseDecode for crate::models::transactions::tron::TronContractValue {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_toAddress = <String>::sse_decode(deserializer);
+                let mut var_amount = <i64>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::TransferContract {
+                    owner_address: var_ownerAddress,
+                    to_address: var_toAddress,
+                    amount: var_amount,
+                };
+            }
+            1 => {
+                let mut var_ownerAddress = <Option<String>>::sse_decode(deserializer);
+                let mut var_contractAddress = <Option<String>>::sse_decode(deserializer);
+                let mut var_callValue = <Option<i64>>::sse_decode(deserializer);
+                let mut var_data = <Option<String>>::sse_decode(deserializer);
+                let mut var_callTokenValue = <Option<i64>>::sse_decode(deserializer);
+                let mut var_tokenId = <Option<i64>>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::TriggerSmartContract{owner_address: var_ownerAddress, contract_address: var_contractAddress, call_value: var_callValue, data: var_data, call_token_value: var_callTokenValue, token_id: var_tokenId};
+            }
+            2 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_frozenBalance = <i64>::sse_decode(deserializer);
+                let mut var_resource = <i32>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::FreezeBalanceV2Contract{owner_address: var_ownerAddress, frozen_balance: var_frozenBalance, resource: var_resource};
+            }
+            3 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_unfreezeBalance = <i64>::sse_decode(deserializer);
+                let mut var_resource = <i32>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::UnfreezeBalanceV2Contract{owner_address: var_ownerAddress, unfreeze_balance: var_unfreezeBalance, resource: var_resource};
+            }
+            4 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::WithdrawExpireUnfreezeContract{owner_address: var_ownerAddress};
+            }
+            5 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_resource = <i32>::sse_decode(deserializer);
+                let mut var_balance = <i64>::sse_decode(deserializer);
+                let mut var_receiverAddress = <String>::sse_decode(deserializer);
+                let mut var_lock = <bool>::sse_decode(deserializer);
+                let mut var_lockPeriod = <i64>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::DelegateResourceContract{owner_address: var_ownerAddress, resource: var_resource, balance: var_balance, receiver_address: var_receiverAddress, lock: var_lock, lock_period: var_lockPeriod};
+            }
+            6 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_resource = <i32>::sse_decode(deserializer);
+                let mut var_balance = <i64>::sse_decode(deserializer);
+                let mut var_receiverAddress = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::UnDelegateResourceContract{owner_address: var_ownerAddress, resource: var_resource, balance: var_balance, receiver_address: var_receiverAddress};
+            }
+            7 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::CancelAllUnfreezeV2Contract{owner_address: var_ownerAddress};
+            }
+            8 => {
+                let mut var_assetName = <String>::sse_decode(deserializer);
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_toAddress = <String>::sse_decode(deserializer);
+                let mut var_amount = <i64>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::TransferAssetContract{asset_name: var_assetName, owner_address: var_ownerAddress, to_address: var_toAddress, amount: var_amount};
+            }
+            9 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_votes =
+                    <Vec<crate::models::transactions::tron::TronVoteInfo>>::sse_decode(
+                        deserializer,
+                    );
+                let mut var_support = <bool>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::VoteWitnessContract {
+                    owner_address: var_ownerAddress,
+                    votes: var_votes,
+                    support: var_support,
+                };
+            }
+            10 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_accountAddress = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::AccountCreateContract{owner_address: var_ownerAddress, account_address: var_accountAddress};
+            }
+            11 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                let mut var_accountName = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::AccountUpdateContract{owner_address: var_ownerAddress, account_name: var_accountName};
+            }
+            12 => {
+                let mut var_ownerAddress = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::AccountPermissionUpdateContract{owner_address: var_ownerAddress};
+            }
+            13 => {
+                let mut var_typeUrl = <String>::sse_decode(deserializer);
+                let mut var_valueJson = <String>::sse_decode(deserializer);
+                return crate::models::transactions::tron::TronContractValue::Unknown {
+                    type_url: var_typeUrl,
+                    value_json: var_valueJson,
+                };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::models::transactions::tron::TronRawDataInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_contract =
+            <Vec<crate::models::transactions::tron::TronContractInfo>>::sse_decode(deserializer);
+        let mut var_refBlockBytes = <String>::sse_decode(deserializer);
+        let mut var_refBlockHash = <String>::sse_decode(deserializer);
+        let mut var_expiration = <i64>::sse_decode(deserializer);
+        let mut var_feeLimit = <Option<i64>>::sse_decode(deserializer);
+        let mut var_timestamp = <i64>::sse_decode(deserializer);
+        return crate::models::transactions::tron::TronRawDataInfo {
+            contract: var_contract,
+            ref_block_bytes: var_refBlockBytes,
+            ref_block_hash: var_refBlockHash,
+            expiration: var_expiration,
+            fee_limit: var_feeLimit,
+            timestamp: var_timestamp,
+        };
+    }
+}
+
+impl SseDecode for crate::models::transactions::tron::TronVoteInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_voteAddress = <String>::sse_decode(deserializer);
+        let mut var_voteCount = <i64>::sse_decode(deserializer);
+        return crate::models::transactions::tron::TronVoteInfo {
+            vote_address: var_voteAddress,
+            vote_count: var_voteCount,
         };
     }
 }
@@ -10226,6 +10455,29 @@ impl
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TransactionRequestTron {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.visible.into_into_dart().into_dart(),
+            self.tx_id.into_into_dart().into_dart(),
+            self.raw_data.into_into_dart().into_dart(),
+            self.raw_data_hex.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TransactionRequestTron
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TransactionRequestTron>
+    for crate::models::transactions::tron::TransactionRequestTron
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TransactionRequestTron {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::transactions::history::TransactionStatusInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -10244,6 +10496,146 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::history::Tra
     for crate::models::transactions::history::TransactionStatusInfo
 {
     fn into_into_dart(self) -> crate::models::transactions::history::TransactionStatusInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TronContractInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.contract_type.into_into_dart().into_dart(),
+            self.type_url.into_into_dart().into_dart(),
+            self.value.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TronContractInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TronContractInfo>
+    for crate::models::transactions::tron::TronContractInfo
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TronContractInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TronContractValue {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {crate::models::transactions::tron::TronContractValue::TransferContract{owner_address,to_address,amount} => { [0.into_dart(),
+owner_address.into_into_dart().into_dart(),
+to_address.into_into_dart().into_dart(),
+amount.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::TriggerSmartContract{owner_address,contract_address,call_value,data,call_token_value,token_id} => { [1.into_dart(),
+owner_address.into_into_dart().into_dart(),
+contract_address.into_into_dart().into_dart(),
+call_value.into_into_dart().into_dart(),
+data.into_into_dart().into_dart(),
+call_token_value.into_into_dart().into_dart(),
+token_id.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::FreezeBalanceV2Contract{owner_address,frozen_balance,resource} => { [2.into_dart(),
+owner_address.into_into_dart().into_dart(),
+frozen_balance.into_into_dart().into_dart(),
+resource.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::UnfreezeBalanceV2Contract{owner_address,unfreeze_balance,resource} => { [3.into_dart(),
+owner_address.into_into_dart().into_dart(),
+unfreeze_balance.into_into_dart().into_dart(),
+resource.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::WithdrawExpireUnfreezeContract{owner_address} => { [4.into_dart(),
+owner_address.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::DelegateResourceContract{owner_address,resource,balance,receiver_address,lock,lock_period} => { [5.into_dart(),
+owner_address.into_into_dart().into_dart(),
+resource.into_into_dart().into_dart(),
+balance.into_into_dart().into_dart(),
+receiver_address.into_into_dart().into_dart(),
+lock.into_into_dart().into_dart(),
+lock_period.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::UnDelegateResourceContract{owner_address,resource,balance,receiver_address} => { [6.into_dart(),
+owner_address.into_into_dart().into_dart(),
+resource.into_into_dart().into_dart(),
+balance.into_into_dart().into_dart(),
+receiver_address.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::CancelAllUnfreezeV2Contract{owner_address} => { [7.into_dart(),
+owner_address.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::TransferAssetContract{asset_name,owner_address,to_address,amount} => { [8.into_dart(),
+asset_name.into_into_dart().into_dart(),
+owner_address.into_into_dart().into_dart(),
+to_address.into_into_dart().into_dart(),
+amount.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::VoteWitnessContract{owner_address,votes,support} => { [9.into_dart(),
+owner_address.into_into_dart().into_dart(),
+votes.into_into_dart().into_dart(),
+support.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::AccountCreateContract{owner_address,account_address} => { [10.into_dart(),
+owner_address.into_into_dart().into_dart(),
+account_address.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::AccountUpdateContract{owner_address,account_name} => { [11.into_dart(),
+owner_address.into_into_dart().into_dart(),
+account_name.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::AccountPermissionUpdateContract{owner_address} => { [12.into_dart(),
+owner_address.into_into_dart().into_dart()].into_dart() }
+crate::models::transactions::tron::TronContractValue::Unknown{type_url,value_json} => { [13.into_dart(),
+type_url.into_into_dart().into_dart(),
+value_json.into_into_dart().into_dart()].into_dart() }
+ _ => { unimplemented!(""); }}
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TronContractValue
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TronContractValue>
+    for crate::models::transactions::tron::TronContractValue
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TronContractValue {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TronRawDataInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.contract.into_into_dart().into_dart(),
+            self.ref_block_bytes.into_into_dart().into_dart(),
+            self.ref_block_hash.into_into_dart().into_dart(),
+            self.expiration.into_into_dart().into_dart(),
+            self.fee_limit.into_into_dart().into_dart(),
+            self.timestamp.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TronRawDataInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TronRawDataInfo>
+    for crate::models::transactions::tron::TronRawDataInfo
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TronRawDataInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TronVoteInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.vote_address.into_into_dart().into_dart(),
+            self.vote_count.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TronVoteInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TronVoteInfo>
+    for crate::models::transactions::tron::TronVoteInfo
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TronVoteInfo {
         self
     }
 }
@@ -11454,6 +11846,26 @@ impl SseEncode for Vec<crate::api::ledger_transport::RustLedgerHidDevice> {
     }
 }
 
+impl SseEncode for Vec<crate::models::transactions::tron::TronContractInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::transactions::tron::TronContractInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::transactions::tron::TronVoteInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::transactions::tron::TronVoteInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::models::transactions::btc::TxInInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -11640,6 +12052,16 @@ impl SseEncode for Option<crate::models::ftoken::FTokenInfo> {
     }
 }
 
+impl SseEncode for Option<i64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <i64>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::models::exchange::ProviderQuote> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -11708,6 +12130,18 @@ impl SseEncode for Option<crate::models::transactions::scilla::TransactionReques
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::models::transactions::scilla::TransactionRequestScilla>::sse_encode(
+                value, serializer,
+            );
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::transactions::tron::TransactionRequestTron> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transactions::tron::TransactionRequestTron>::sse_encode(
                 value, serializer,
             );
         }
@@ -12129,7 +12563,9 @@ impl SseEncode for crate::models::transactions::request::TransactionRequestInfo 
             crate::models::transactions::btc::TransactionBitcoin,
             crate::models::transactions::btc::BitcoinMetadataInfo,
         )>>::sse_encode(self.btc, serializer);
-        <Option<String>>::sse_encode(self.tron, serializer);
+        <Option<crate::models::transactions::tron::TransactionRequestTron>>::sse_encode(
+            self.tron, serializer,
+        );
         <Option<Vec<u8>>>::sse_encode(self.solana, serializer);
     }
 }
@@ -12148,6 +12584,16 @@ impl SseEncode for crate::models::transactions::scilla::TransactionRequestScilla
     }
 }
 
+impl SseEncode for crate::models::transactions::tron::TransactionRequestTron {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<bool>>::sse_encode(self.visible, serializer);
+        <Option<String>>::sse_encode(self.tx_id, serializer);
+        <crate::models::transactions::tron::TronRawDataInfo>::sse_encode(self.raw_data, serializer);
+        <String>::sse_encode(self.raw_data_hex, serializer);
+    }
+}
+
 impl SseEncode for crate::models::transactions::history::TransactionStatusInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -12162,6 +12608,100 @@ impl SseEncode for crate::models::transactions::history::TransactionStatusInfo {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::models::transactions::tron::TronContractInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.contract_type, serializer);
+        <String>::sse_encode(self.type_url, serializer);
+        <crate::models::transactions::tron::TronContractValue>::sse_encode(self.value, serializer);
+    }
+}
+
+impl SseEncode for crate::models::transactions::tron::TronContractValue {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {crate::models::transactions::tron::TronContractValue::TransferContract{owner_address,to_address,amount} => { <i32>::sse_encode(0, serializer); <String>::sse_encode(owner_address, serializer);
+<String>::sse_encode(to_address, serializer);
+<i64>::sse_encode(amount, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::TriggerSmartContract{owner_address,contract_address,call_value,data,call_token_value,token_id} => { <i32>::sse_encode(1, serializer); <Option<String>>::sse_encode(owner_address, serializer);
+<Option<String>>::sse_encode(contract_address, serializer);
+<Option<i64>>::sse_encode(call_value, serializer);
+<Option<String>>::sse_encode(data, serializer);
+<Option<i64>>::sse_encode(call_token_value, serializer);
+<Option<i64>>::sse_encode(token_id, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::FreezeBalanceV2Contract{owner_address,frozen_balance,resource} => { <i32>::sse_encode(2, serializer); <String>::sse_encode(owner_address, serializer);
+<i64>::sse_encode(frozen_balance, serializer);
+<i32>::sse_encode(resource, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::UnfreezeBalanceV2Contract{owner_address,unfreeze_balance,resource} => { <i32>::sse_encode(3, serializer); <String>::sse_encode(owner_address, serializer);
+<i64>::sse_encode(unfreeze_balance, serializer);
+<i32>::sse_encode(resource, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::WithdrawExpireUnfreezeContract{owner_address} => { <i32>::sse_encode(4, serializer); <String>::sse_encode(owner_address, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::DelegateResourceContract{owner_address,resource,balance,receiver_address,lock,lock_period} => { <i32>::sse_encode(5, serializer); <String>::sse_encode(owner_address, serializer);
+<i32>::sse_encode(resource, serializer);
+<i64>::sse_encode(balance, serializer);
+<String>::sse_encode(receiver_address, serializer);
+<bool>::sse_encode(lock, serializer);
+<i64>::sse_encode(lock_period, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::UnDelegateResourceContract{owner_address,resource,balance,receiver_address} => { <i32>::sse_encode(6, serializer); <String>::sse_encode(owner_address, serializer);
+<i32>::sse_encode(resource, serializer);
+<i64>::sse_encode(balance, serializer);
+<String>::sse_encode(receiver_address, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::CancelAllUnfreezeV2Contract{owner_address} => { <i32>::sse_encode(7, serializer); <String>::sse_encode(owner_address, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::TransferAssetContract{asset_name,owner_address,to_address,amount} => { <i32>::sse_encode(8, serializer); <String>::sse_encode(asset_name, serializer);
+<String>::sse_encode(owner_address, serializer);
+<String>::sse_encode(to_address, serializer);
+<i64>::sse_encode(amount, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::VoteWitnessContract{owner_address,votes,support} => { <i32>::sse_encode(9, serializer); <String>::sse_encode(owner_address, serializer);
+<Vec<crate::models::transactions::tron::TronVoteInfo>>::sse_encode(votes, serializer);
+<bool>::sse_encode(support, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::AccountCreateContract{owner_address,account_address} => { <i32>::sse_encode(10, serializer); <String>::sse_encode(owner_address, serializer);
+<String>::sse_encode(account_address, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::AccountUpdateContract{owner_address,account_name} => { <i32>::sse_encode(11, serializer); <String>::sse_encode(owner_address, serializer);
+<String>::sse_encode(account_name, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::AccountPermissionUpdateContract{owner_address} => { <i32>::sse_encode(12, serializer); <String>::sse_encode(owner_address, serializer);
+ }
+crate::models::transactions::tron::TronContractValue::Unknown{type_url,value_json} => { <i32>::sse_encode(13, serializer); <String>::sse_encode(type_url, serializer);
+<String>::sse_encode(value_json, serializer);
+ }
+ _ => { unimplemented!(""); }}
+    }
+}
+
+impl SseEncode for crate::models::transactions::tron::TronRawDataInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::models::transactions::tron::TronContractInfo>>::sse_encode(
+            self.contract,
+            serializer,
+        );
+        <String>::sse_encode(self.ref_block_bytes, serializer);
+        <String>::sse_encode(self.ref_block_hash, serializer);
+        <i64>::sse_encode(self.expiration, serializer);
+        <Option<i64>>::sse_encode(self.fee_limit, serializer);
+        <i64>::sse_encode(self.timestamp, serializer);
+    }
+}
+
+impl SseEncode for crate::models::transactions::tron::TronVoteInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.vote_address, serializer);
+        <i64>::sse_encode(self.vote_count, serializer);
     }
 }
 

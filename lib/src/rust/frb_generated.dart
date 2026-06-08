@@ -54,6 +54,7 @@ import 'models/transactions/history.dart';
 import 'models/transactions/request.dart';
 import 'models/transactions/scilla.dart';
 import 'models/transactions/transaction_metadata.dart';
+import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -5081,6 +5082,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_i_64(raw);
+  }
+
+  @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_ledger_params_input(raw);
@@ -5181,6 +5188,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_transaction_request_scilla(raw);
+  }
+
+  @protected
+  TransactionRequestTron dco_decode_box_autoadd_transaction_request_tron(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_tron(raw);
   }
 
   @protected
@@ -5839,6 +5853,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TronContractInfo> dco_decode_list_tron_contract_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tron_contract_info).toList();
+  }
+
+  @protected
+  List<TronVoteInfo> dco_decode_list_tron_vote_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tron_vote_info).toList();
+  }
+
+  @protected
   List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_tx_in_info).toList();
@@ -5982,6 +6008,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
+  }
+
+  @protected
   ProviderQuote? dco_decode_opt_box_autoadd_provider_quote(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_provider_quote(raw);
@@ -6032,6 +6064,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_transaction_request_scilla(raw);
+  }
+
+  @protected
+  TransactionRequestTron? dco_decode_opt_box_autoadd_transaction_request_tron(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_request_tron(raw);
   }
 
   @protected
@@ -6544,7 +6585,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       btc:
           dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
               arr[3]),
-      tron: dco_decode_opt_String(arr[4]),
+      tron: dco_decode_opt_box_autoadd_transaction_request_tron(arr[4]),
       solana: dco_decode_opt_list_prim_u_8_strict(arr[5]),
     );
   }
@@ -6568,9 +6609,156 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron dco_decode_transaction_request_tron(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return TransactionRequestTron(
+      visible: dco_decode_opt_box_autoadd_bool(arr[0]),
+      txId: dco_decode_opt_String(arr[1]),
+      rawData: dco_decode_tron_raw_data_info(arr[2]),
+      rawDataHex: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
   TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransactionStatusInfo.values[raw as int];
+  }
+
+  @protected
+  TronContractInfo dco_decode_tron_contract_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return TronContractInfo(
+      contractType: dco_decode_String(arr[0]),
+      typeUrl: dco_decode_String(arr[1]),
+      value: dco_decode_tron_contract_value(arr[2]),
+    );
+  }
+
+  @protected
+  TronContractValue dco_decode_tron_contract_value(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return TronContractValue_TransferContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          toAddress: dco_decode_String(raw[2]),
+          amount: dco_decode_i_64(raw[3]),
+        );
+      case 1:
+        return TronContractValue_TriggerSmartContract(
+          ownerAddress: dco_decode_opt_String(raw[1]),
+          contractAddress: dco_decode_opt_String(raw[2]),
+          callValue: dco_decode_opt_box_autoadd_i_64(raw[3]),
+          data: dco_decode_opt_String(raw[4]),
+          callTokenValue: dco_decode_opt_box_autoadd_i_64(raw[5]),
+          tokenId: dco_decode_opt_box_autoadd_i_64(raw[6]),
+        );
+      case 2:
+        return TronContractValue_FreezeBalanceV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+          frozenBalance: dco_decode_i_64(raw[2]),
+          resource: dco_decode_i_32(raw[3]),
+        );
+      case 3:
+        return TronContractValue_UnfreezeBalanceV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+          unfreezeBalance: dco_decode_i_64(raw[2]),
+          resource: dco_decode_i_32(raw[3]),
+        );
+      case 4:
+        return TronContractValue_WithdrawExpireUnfreezeContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 5:
+        return TronContractValue_DelegateResourceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          resource: dco_decode_i_32(raw[2]),
+          balance: dco_decode_i_64(raw[3]),
+          receiverAddress: dco_decode_String(raw[4]),
+          lock: dco_decode_bool(raw[5]),
+          lockPeriod: dco_decode_i_64(raw[6]),
+        );
+      case 6:
+        return TronContractValue_UnDelegateResourceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          resource: dco_decode_i_32(raw[2]),
+          balance: dco_decode_i_64(raw[3]),
+          receiverAddress: dco_decode_String(raw[4]),
+        );
+      case 7:
+        return TronContractValue_CancelAllUnfreezeV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 8:
+        return TronContractValue_TransferAssetContract(
+          assetName: dco_decode_String(raw[1]),
+          ownerAddress: dco_decode_String(raw[2]),
+          toAddress: dco_decode_String(raw[3]),
+          amount: dco_decode_i_64(raw[4]),
+        );
+      case 9:
+        return TronContractValue_VoteWitnessContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          votes: dco_decode_list_tron_vote_info(raw[2]),
+          support: dco_decode_bool(raw[3]),
+        );
+      case 10:
+        return TronContractValue_AccountCreateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          accountAddress: dco_decode_String(raw[2]),
+        );
+      case 11:
+        return TronContractValue_AccountUpdateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          accountName: dco_decode_String(raw[2]),
+        );
+      case 12:
+        return TronContractValue_AccountPermissionUpdateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 13:
+        return TronContractValue_Unknown(
+          typeUrl: dco_decode_String(raw[1]),
+          valueJson: dco_decode_String(raw[2]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  TronRawDataInfo dco_decode_tron_raw_data_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return TronRawDataInfo(
+      contract: dco_decode_list_tron_contract_info(arr[0]),
+      refBlockBytes: dco_decode_String(arr[1]),
+      refBlockHash: dco_decode_String(arr[2]),
+      expiration: dco_decode_i_64(arr[3]),
+      feeLimit: dco_decode_opt_box_autoadd_i_64(arr[4]),
+      timestamp: dco_decode_i_64(arr[5]),
+    );
+  }
+
+  @protected
+  TronVoteInfo dco_decode_tron_vote_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return TronVoteInfo(
+      voteAddress: dco_decode_String(arr[0]),
+      voteCount: dco_decode_i_64(arr[1]),
+    );
   }
 
   @protected
@@ -7167,6 +7355,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_i_64(deserializer));
+  }
+
+  @protected
   LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7275,6 +7469,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_transaction_request_scilla(deserializer));
+  }
+
+  @protected
+  TransactionRequestTron sse_decode_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_tron(deserializer));
   }
 
   @protected
@@ -8129,6 +8330,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TronContractInfo> sse_decode_list_tron_contract_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TronContractInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tron_contract_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<TronVoteInfo> sse_decode_list_tron_vote_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TronVoteInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tron_vote_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -8373,6 +8600,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_i_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   ProviderQuote? sse_decode_opt_box_autoadd_provider_quote(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8444,6 +8682,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_transaction_request_scilla(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionRequestTron? sse_decode_opt_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_request_tron(deserializer));
     } else {
       return null;
     }
@@ -8938,7 +9188,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_btc =
         sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
             deserializer);
-    var var_tron = sse_decode_opt_String(deserializer);
+    var var_tron =
+        sse_decode_opt_box_autoadd_transaction_request_tron(deserializer);
     var var_solana = sse_decode_opt_list_prim_u_8_strict(deserializer);
     return TransactionRequestInfo(
         metadata: var_metadata,
@@ -8973,11 +9224,181 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron sse_decode_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_visible = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_txId = sse_decode_opt_String(deserializer);
+    var var_rawData = sse_decode_tron_raw_data_info(deserializer);
+    var var_rawDataHex = sse_decode_String(deserializer);
+    return TransactionRequestTron(
+        visible: var_visible,
+        txId: var_txId,
+        rawData: var_rawData,
+        rawDataHex: var_rawDataHex);
+  }
+
+  @protected
   TransactionStatusInfo sse_decode_transaction_status_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return TransactionStatusInfo.values[inner];
+  }
+
+  @protected
+  TronContractInfo sse_decode_tron_contract_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_contractType = sse_decode_String(deserializer);
+    var var_typeUrl = sse_decode_String(deserializer);
+    var var_value = sse_decode_tron_contract_value(deserializer);
+    return TronContractInfo(
+        contractType: var_contractType, typeUrl: var_typeUrl, value: var_value);
+  }
+
+  @protected
+  TronContractValue sse_decode_tron_contract_value(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_toAddress = sse_decode_String(deserializer);
+        var var_amount = sse_decode_i_64(deserializer);
+        return TronContractValue_TransferContract(
+            ownerAddress: var_ownerAddress,
+            toAddress: var_toAddress,
+            amount: var_amount);
+      case 1:
+        var var_ownerAddress = sse_decode_opt_String(deserializer);
+        var var_contractAddress = sse_decode_opt_String(deserializer);
+        var var_callValue = sse_decode_opt_box_autoadd_i_64(deserializer);
+        var var_data = sse_decode_opt_String(deserializer);
+        var var_callTokenValue = sse_decode_opt_box_autoadd_i_64(deserializer);
+        var var_tokenId = sse_decode_opt_box_autoadd_i_64(deserializer);
+        return TronContractValue_TriggerSmartContract(
+            ownerAddress: var_ownerAddress,
+            contractAddress: var_contractAddress,
+            callValue: var_callValue,
+            data: var_data,
+            callTokenValue: var_callTokenValue,
+            tokenId: var_tokenId);
+      case 2:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_frozenBalance = sse_decode_i_64(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        return TronContractValue_FreezeBalanceV2Contract(
+            ownerAddress: var_ownerAddress,
+            frozenBalance: var_frozenBalance,
+            resource: var_resource);
+      case 3:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_unfreezeBalance = sse_decode_i_64(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        return TronContractValue_UnfreezeBalanceV2Contract(
+            ownerAddress: var_ownerAddress,
+            unfreezeBalance: var_unfreezeBalance,
+            resource: var_resource);
+      case 4:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_WithdrawExpireUnfreezeContract(
+            ownerAddress: var_ownerAddress);
+      case 5:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        var var_balance = sse_decode_i_64(deserializer);
+        var var_receiverAddress = sse_decode_String(deserializer);
+        var var_lock = sse_decode_bool(deserializer);
+        var var_lockPeriod = sse_decode_i_64(deserializer);
+        return TronContractValue_DelegateResourceContract(
+            ownerAddress: var_ownerAddress,
+            resource: var_resource,
+            balance: var_balance,
+            receiverAddress: var_receiverAddress,
+            lock: var_lock,
+            lockPeriod: var_lockPeriod);
+      case 6:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        var var_balance = sse_decode_i_64(deserializer);
+        var var_receiverAddress = sse_decode_String(deserializer);
+        return TronContractValue_UnDelegateResourceContract(
+            ownerAddress: var_ownerAddress,
+            resource: var_resource,
+            balance: var_balance,
+            receiverAddress: var_receiverAddress);
+      case 7:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_CancelAllUnfreezeV2Contract(
+            ownerAddress: var_ownerAddress);
+      case 8:
+        var var_assetName = sse_decode_String(deserializer);
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_toAddress = sse_decode_String(deserializer);
+        var var_amount = sse_decode_i_64(deserializer);
+        return TronContractValue_TransferAssetContract(
+            assetName: var_assetName,
+            ownerAddress: var_ownerAddress,
+            toAddress: var_toAddress,
+            amount: var_amount);
+      case 9:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_votes = sse_decode_list_tron_vote_info(deserializer);
+        var var_support = sse_decode_bool(deserializer);
+        return TronContractValue_VoteWitnessContract(
+            ownerAddress: var_ownerAddress,
+            votes: var_votes,
+            support: var_support);
+      case 10:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_accountAddress = sse_decode_String(deserializer);
+        return TronContractValue_AccountCreateContract(
+            ownerAddress: var_ownerAddress, accountAddress: var_accountAddress);
+      case 11:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_accountName = sse_decode_String(deserializer);
+        return TronContractValue_AccountUpdateContract(
+            ownerAddress: var_ownerAddress, accountName: var_accountName);
+      case 12:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_AccountPermissionUpdateContract(
+            ownerAddress: var_ownerAddress);
+      case 13:
+        var var_typeUrl = sse_decode_String(deserializer);
+        var var_valueJson = sse_decode_String(deserializer);
+        return TronContractValue_Unknown(
+            typeUrl: var_typeUrl, valueJson: var_valueJson);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  TronRawDataInfo sse_decode_tron_raw_data_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_contract = sse_decode_list_tron_contract_info(deserializer);
+    var var_refBlockBytes = sse_decode_String(deserializer);
+    var var_refBlockHash = sse_decode_String(deserializer);
+    var var_expiration = sse_decode_i_64(deserializer);
+    var var_feeLimit = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_timestamp = sse_decode_i_64(deserializer);
+    return TronRawDataInfo(
+        contract: var_contract,
+        refBlockBytes: var_refBlockBytes,
+        refBlockHash: var_refBlockHash,
+        expiration: var_expiration,
+        feeLimit: var_feeLimit,
+        timestamp: var_timestamp);
+  }
+
+  @protected
+  TronVoteInfo sse_decode_tron_vote_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_voteAddress = sse_decode_String(deserializer);
+    var var_voteCount = sse_decode_i_64(deserializer);
+    return TronVoteInfo(voteAddress: var_voteAddress, voteCount: var_voteCount);
   }
 
   @protected
@@ -9534,6 +9955,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_i_64(
+      PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9645,6 +10073,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       TransactionRequestScilla self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_transaction_request_scilla(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_tron(self, serializer);
   }
 
   @protected
@@ -10299,6 +10734,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_tron_contract_info(
+      List<TronContractInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tron_contract_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_tron_vote_info(
+      List<TronVoteInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tron_vote_info(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_tx_in_info(
       List<TxInInfo> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -10489,6 +10944,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_i_64(
+      PlatformInt64? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_i_64(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_provider_quote(
       ProviderQuote? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -10554,6 +11020,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_transaction_request_scilla(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_request_tron(
+      TransactionRequestTron? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_request_tron(self, serializer);
     }
   }
 
@@ -10922,7 +11399,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
     sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
         self.btc, serializer);
-    sse_encode_opt_String(self.tron, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_tron(self.tron, serializer);
     sse_encode_opt_list_prim_u_8_strict(self.solana, serializer);
   }
 
@@ -10941,10 +11418,180 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_bool(self.visible, serializer);
+    sse_encode_opt_String(self.txId, serializer);
+    sse_encode_tron_raw_data_info(self.rawData, serializer);
+    sse_encode_String(self.rawDataHex, serializer);
+  }
+
+  @protected
   void sse_encode_transaction_status_info(
       TransactionStatusInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_contract_info(
+      TronContractInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.contractType, serializer);
+    sse_encode_String(self.typeUrl, serializer);
+    sse_encode_tron_contract_value(self.value, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_contract_value(
+      TronContractValue self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case TronContractValue_TransferContract(
+          ownerAddress: final ownerAddress,
+          toAddress: final toAddress,
+          amount: final amount
+        ):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(toAddress, serializer);
+        sse_encode_i_64(amount, serializer);
+      case TronContractValue_TriggerSmartContract(
+          ownerAddress: final ownerAddress,
+          contractAddress: final contractAddress,
+          callValue: final callValue,
+          data: final data,
+          callTokenValue: final callTokenValue,
+          tokenId: final tokenId
+        ):
+        sse_encode_i_32(1, serializer);
+        sse_encode_opt_String(ownerAddress, serializer);
+        sse_encode_opt_String(contractAddress, serializer);
+        sse_encode_opt_box_autoadd_i_64(callValue, serializer);
+        sse_encode_opt_String(data, serializer);
+        sse_encode_opt_box_autoadd_i_64(callTokenValue, serializer);
+        sse_encode_opt_box_autoadd_i_64(tokenId, serializer);
+      case TronContractValue_FreezeBalanceV2Contract(
+          ownerAddress: final ownerAddress,
+          frozenBalance: final frozenBalance,
+          resource: final resource
+        ):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_64(frozenBalance, serializer);
+        sse_encode_i_32(resource, serializer);
+      case TronContractValue_UnfreezeBalanceV2Contract(
+          ownerAddress: final ownerAddress,
+          unfreezeBalance: final unfreezeBalance,
+          resource: final resource
+        ):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_64(unfreezeBalance, serializer);
+        sse_encode_i_32(resource, serializer);
+      case TronContractValue_WithdrawExpireUnfreezeContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_DelegateResourceContract(
+          ownerAddress: final ownerAddress,
+          resource: final resource,
+          balance: final balance,
+          receiverAddress: final receiverAddress,
+          lock: final lock,
+          lockPeriod: final lockPeriod
+        ):
+        sse_encode_i_32(5, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_32(resource, serializer);
+        sse_encode_i_64(balance, serializer);
+        sse_encode_String(receiverAddress, serializer);
+        sse_encode_bool(lock, serializer);
+        sse_encode_i_64(lockPeriod, serializer);
+      case TronContractValue_UnDelegateResourceContract(
+          ownerAddress: final ownerAddress,
+          resource: final resource,
+          balance: final balance,
+          receiverAddress: final receiverAddress
+        ):
+        sse_encode_i_32(6, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_32(resource, serializer);
+        sse_encode_i_64(balance, serializer);
+        sse_encode_String(receiverAddress, serializer);
+      case TronContractValue_CancelAllUnfreezeV2Contract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(7, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_TransferAssetContract(
+          assetName: final assetName,
+          ownerAddress: final ownerAddress,
+          toAddress: final toAddress,
+          amount: final amount
+        ):
+        sse_encode_i_32(8, serializer);
+        sse_encode_String(assetName, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(toAddress, serializer);
+        sse_encode_i_64(amount, serializer);
+      case TronContractValue_VoteWitnessContract(
+          ownerAddress: final ownerAddress,
+          votes: final votes,
+          support: final support
+        ):
+        sse_encode_i_32(9, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_list_tron_vote_info(votes, serializer);
+        sse_encode_bool(support, serializer);
+      case TronContractValue_AccountCreateContract(
+          ownerAddress: final ownerAddress,
+          accountAddress: final accountAddress
+        ):
+        sse_encode_i_32(10, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(accountAddress, serializer);
+      case TronContractValue_AccountUpdateContract(
+          ownerAddress: final ownerAddress,
+          accountName: final accountName
+        ):
+        sse_encode_i_32(11, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(accountName, serializer);
+      case TronContractValue_AccountPermissionUpdateContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(12, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_Unknown(
+          typeUrl: final typeUrl,
+          valueJson: final valueJson
+        ):
+        sse_encode_i_32(13, serializer);
+        sse_encode_String(typeUrl, serializer);
+        sse_encode_String(valueJson, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_tron_raw_data_info(
+      TronRawDataInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_tron_contract_info(self.contract, serializer);
+    sse_encode_String(self.refBlockBytes, serializer);
+    sse_encode_String(self.refBlockHash, serializer);
+    sse_encode_i_64(self.expiration, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.feeLimit, serializer);
+    sse_encode_i_64(self.timestamp, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_vote_info(TronVoteInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.voteAddress, serializer);
+    sse_encode_i_64(self.voteCount, serializer);
   }
 
   @protected

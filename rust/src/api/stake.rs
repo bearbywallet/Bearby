@@ -88,7 +88,7 @@ pub async fn build_claim_scilla_staking_rewards_tx(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_claim(&stake.into())?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -110,7 +110,7 @@ pub async fn build_tx_scilla_init_unstake(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_init_unstake(&stake.into())?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -133,7 +133,7 @@ pub async fn build_tx_scilla_complete_withdrawal(
         let contract = parse_address(stake.address)?;
         let tx = provider.build_tx_scilla_complete_withdrawal(contract)?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -155,7 +155,7 @@ pub async fn build_tx_scilla_withdraw_stake_avely(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_withdraw_stake_avely(&stake.into())?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -184,7 +184,7 @@ pub async fn build_tx_evm_stake_request(
         let amount: U256 = amount.parse().unwrap_or_default();
         let tx = provider.build_tx_evm_stake_request(amount, &provider_address, &account.addr)?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -217,7 +217,7 @@ pub async fn build_tx_evm_unstake_request(
             &account.addr,
         )?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -244,7 +244,7 @@ pub async fn build_tx_claim_unstake_request(
         let delegator_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_claim_unstake_request(&delegator_address, &account.addr)?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)
@@ -271,7 +271,7 @@ pub async fn build_tx_claim_reward_request(
         let provider_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_build_claim_reward_request(&provider_address, &account.addr)?;
 
-        Ok(tx.into())
+        Ok(tx.try_into().map_err(ServiceError::TransactionErrors)?)
     })
     .await
     .map_err(Into::into)

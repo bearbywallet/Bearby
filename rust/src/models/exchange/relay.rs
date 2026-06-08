@@ -660,9 +660,7 @@ fn blob_from_step(
             Ok(RelayBlob {
                 source: RelaySource::Svm {
                     instructions,
-                    lookup_table_addresses: step
-                        .address_lookup_table_addresses
-                        .unwrap_or_default(),
+                    lookup_table_addresses: step.address_lookup_table_addresses.unwrap_or_default(),
                 },
                 chain_hash,
             })
@@ -709,7 +707,8 @@ fn with_display(
             ..Default::default()
         },
     ))
-    .into())
+    .try_into()
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
 }
 
 #[frb(ignore)]
@@ -792,7 +791,8 @@ pub async fn relay_check_approval(
                     ..Default::default()
                 },
             ))
-            .into(),
+            .try_into()
+            .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?,
         ));
     }
 
@@ -1031,7 +1031,8 @@ async fn finalize_svm_relay(
             ..Default::default()
         },
     ))
-    .into())
+    .try_into()
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
 }
 
 #[cfg(test)]
@@ -1051,7 +1052,12 @@ mod tests {
             Some(RELAY_SOL_CHAIN_ID)
         );
         assert_eq!(
-            RelayMeta::for_chain(44, 1, 11_155_111, "0x0000000000000000000000000000000000000001"),
+            RelayMeta::for_chain(
+                44,
+                1,
+                11_155_111,
+                "0x0000000000000000000000000000000000000001"
+            ),
             None
         );
     }

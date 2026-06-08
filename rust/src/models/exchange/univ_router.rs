@@ -848,7 +848,8 @@ pub async fn finalize_router_swap(
             ..Default::default()
         },
     ))
-    .into())
+    .try_into()
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
 }
 
 /// Check whether the user's ERC-20 token has enough allowance for Permit2 to pull.
@@ -934,7 +935,8 @@ pub async fn router_check_approval(
                 ..Default::default()
             },
         ))
-        .into(),
+        .try_into()
+        .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?,
     ))
 }
 

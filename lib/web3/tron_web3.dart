@@ -14,6 +14,7 @@ import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
+import 'package:bearby/src/rust/models/transactions/tron.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -24,6 +25,81 @@ import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
+
+Map<String, Object?> _asObjectMap(Object? value, String label) {
+  if (value is Map) {
+    return Map<String, Object?>.from(value);
+  }
+  throw FormatException('Invalid TRON transaction $label');
+}
+
+String _stringField(Map<String, Object?> map, String key, String fallbackKey) {
+  final value = map[key] ?? map[fallbackKey];
+  if (value is String) return value;
+  throw FormatException('Invalid TRON transaction field: $key');
+}
+
+PlatformInt64 _int64Field(Map<String, Object?> map, String key) {
+  final value = map[key];
+  if (value is int) {
+    return value;
+  }
+  if (value is BigInt) {
+    return value.toInt();
+  }
+  if (value is String) {
+    final parsed = int.tryParse(value);
+    if (parsed != null) {
+      return parsed;
+    }
+  }
+  throw FormatException('Invalid TRON transaction integer: $key');
+}
+
+PlatformInt64? _optionalInt64Field(Map<String, Object?> map, String key) {
+  return map.containsKey(key) && map[key] != null
+      ? _int64Field(map, key)
+      : null;
+}
+
+TransactionRequestTron _tronRequestFromJson(Map<String, Object?> transaction) {
+  final rawData = _asObjectMap(
+      transaction['raw_data'] ?? transaction['rawData'], 'raw_data');
+  final rawContracts = rawData['contract'];
+  if (rawContracts is! List) {
+    throw const FormatException('Invalid TRON transaction contracts');
+  }
+
+  final contracts = rawContracts.map((contractObject) {
+    final contract = _asObjectMap(contractObject, 'contract');
+    final parameter = _asObjectMap(contract['parameter'], 'parameter');
+    final typeUrl = _stringField(parameter, 'type_url', 'typeUrl');
+    final value = _asObjectMap(parameter['value'], 'parameter.value');
+
+    return TronContractInfo(
+      contractType: _stringField(contract, 'type', 'contractType'),
+      typeUrl: typeUrl,
+      value: TronContractValue.unknown(
+        typeUrl: typeUrl,
+        valueJson: jsonEncode(value),
+      ),
+    );
+  }).toList(growable: false);
+
+  return TransactionRequestTron(
+    visible: transaction['visible'] as bool?,
+    txId: transaction['txID'] as String? ?? transaction['tx_id'] as String?,
+    rawData: TronRawDataInfo(
+      contract: contracts,
+      refBlockBytes: _stringField(rawData, 'ref_block_bytes', 'refBlockBytes'),
+      refBlockHash: _stringField(rawData, 'ref_block_hash', 'refBlockHash'),
+      expiration: _int64Field(rawData, 'expiration'),
+      feeLimit: _optionalInt64Field(rawData, 'fee_limit'),
+      timestamp: _int64Field(rawData, 'timestamp'),
+    ),
+    rawDataHex: _stringField(transaction, 'raw_data_hex', 'rawDataHex'),
+  );
+}
 
 class TronWeb3Handler {
   final InAppWebViewController webViewController;
@@ -333,7 +409,7 @@ class TronWeb3Handler {
         metadata: metadata,
         scilla: null,
         evm: null,
-        tron: jsonEncode(transaction),
+        tron: _tronRequestFromJson(transaction),
       );
 
       if (!context.mounted) {
@@ -955,7 +1031,7 @@ class TronWeb3Handler {
         metadata: metadata,
         scilla: null,
         evm: null,
-        tron: jsonEncode(transaction),
+        tron: _tronRequestFromJson(transaction),
       );
 
       if (!context.mounted) {
