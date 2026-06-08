@@ -830,7 +830,7 @@ pub async fn finalize_router_swap(
         _ => return Err("expected Ethereum tx".to_string()),
     };
 
-    Ok(TransactionRequest::Ethereum((
+    TransactionRequest::Ethereum((
         evm_tx,
         TransactionMetadata {
             chain_hash,
@@ -849,7 +849,7 @@ pub async fn finalize_router_swap(
         },
     ))
     .try_into()
-    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?)
+    .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())
 }
 
 /// Check whether the user's ERC-20 token has enough allowance for Permit2 to pull.
