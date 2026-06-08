@@ -46,7 +46,7 @@ class _TileButtonState extends State<TileButton>
 
   BorderSide _getBorderSide() {
     final base =
-        widget.defaultBorderSide ?? const BorderSide(color: Colors.transparent);
+        widget.defaultBorderSide ?? const BorderSide(color: Colors.transparent, width: 2.0);
     if (isHovered && !widget.disabled) {
       return base.copyWith(
         color: widget.textColor,
