@@ -15,7 +15,13 @@ pub(super) async fn execute_svm_exchange_swap(
     display: ExchangeTxDisplay,
     sink: StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let SwapParams { provider, from, to, amount_in, slippage_bps } = params;
+    let SwapParams {
+        provider,
+        from,
+        to,
+        amount_in,
+        slippage_bps,
+    } = params;
 
     let core = Arc::clone(
         &BACKGROUND_SERVICE
@@ -29,7 +35,9 @@ pub(super) async fn execute_svm_exchange_swap(
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
 
-    let prepared = provider.prepare_swap(&from, &to, &amount_in, slippage_bps).await?;
+    let prepared = provider
+        .prepare_swap(&from, &to, &amount_in, slippage_bps)
+        .await?;
 
     let swap_tx = provider
         .finalize_swap(

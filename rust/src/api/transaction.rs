@@ -26,12 +26,12 @@ use zilpay::crypto::bip49::{components_to_derivation_path, split_path, Derivatio
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 use zilpay::history::transaction::HistoricalTransaction;
-use zilpay::proto::tron_tx::TronWebTransaction;
 use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
 use zilpay::proto::btc_utils::BtcAccountXpubsInput;
 use zilpay::proto::pubkey::PubKey;
 use zilpay::proto::signature::Signature;
+use zilpay::proto::tron_tx::TronWebTransaction;
 pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 use zilpay::proto::utils::safe_chunk_transaction;
@@ -665,7 +665,8 @@ pub fn parse_tron_transaction(json: String) -> Result<TransactionRequestTron, St
 /// Serialize a TransactionRequestTron back to JSON for dApp response.
 #[frb(sync)]
 pub fn tron_transaction_to_json(tx: TransactionRequestTron) -> Result<String, String> {
-    let tron_web: TronWebTransaction = tx.try_into()
+    let tron_web: TronWebTransaction = tx
+        .try_into()
         .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?;
     zilpay::serde_json::to_string(&tron_web)
         .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))

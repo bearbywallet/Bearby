@@ -207,8 +207,9 @@ impl ExchangeProvider {
     #[frb(ignore)]
     pub fn is_support(&self, addr_type: u8, slip44: u32, chain_id: u64) -> bool {
         match self {
-            Self::Relay(_) => relay::relay_chain_id(addr_type, chain_id)
-                .is_some_and(relay::is_supported_chain),
+            Self::Relay(_) => {
+                relay::relay_chain_id(addr_type, chain_id).is_some_and(relay::is_supported_chain)
+            }
             Self::Uniswap(_) => addr_type == 1 && uniswap::is_supported_chain(chain_id),
             Self::PancakeSwap(_) => addr_type == 1 && pancakeswap::is_supported_chain(chain_id),
             Self::ZilSwap(_) => addr_type == 0 && slip44 == ZILLIQA,
@@ -304,8 +305,8 @@ impl ExchangeProvider {
                 if from.token.native {
                     return Ok(None);
                 }
-                let swapper = AlloyAddress::from_str(&common.account_addr)
-                    .map_err(|e| e.to_string())?;
+                let swapper =
+                    AlloyAddress::from_str(&common.account_addr).map_err(|e| e.to_string())?;
                 let cfg = self
                     .router_config()
                     .ok_or_else(|| "no engine".to_string())??;
@@ -354,8 +355,8 @@ impl ExchangeProvider {
                 if from.token.chain_hash != to.token.chain_hash {
                     return Err("cross-chain swap not supported".to_string());
                 }
-                let swapper = AlloyAddress::from_str(&common.account_addr)
-                    .map_err(|e| e.to_string())?;
+                let swapper =
+                    AlloyAddress::from_str(&common.account_addr).map_err(|e| e.to_string())?;
                 let cfg = self
                     .router_config()
                     .ok_or_else(|| "no engine".to_string())??;
@@ -390,8 +391,8 @@ impl ExchangeProvider {
         let icon = common.icon_asset.clone();
         match self {
             Self::Uniswap(_) | Self::PancakeSwap(_) => {
-                let swapper = AlloyAddress::from_str(&common.account_addr)
-                    .map_err(|e| e.to_string())?;
+                let swapper =
+                    AlloyAddress::from_str(&common.account_addr).map_err(|e| e.to_string())?;
                 univ_router::finalize_router_swap(
                     quote_blob,
                     swapper,
