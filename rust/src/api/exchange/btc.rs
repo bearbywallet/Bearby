@@ -24,7 +24,7 @@ pub(super) async fn execute_btc_exchange_swap(
     auth: SwapAuth,
     params: SwapParams,
     display: ExchangeTxDisplay,
-    sink: StreamSink<String>,
+    sink: &StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
     let SwapParams {
         provider,
@@ -70,10 +70,6 @@ pub(super) async fn execute_btc_exchange_swap(
                 .into_bytes(),
             );
             let amount_sat = vault_out.value.to_sat();
-            eprintln!(
-                "[btc-swap] PSBT vault={} amount_sat={amount_sat}",
-                String::from_utf8_lossy(vault_addr.auto_format().as_bytes()),
-            );
             (vault_addr, amount_sat)
         }
         RelaySource::Evm { .. } | RelaySource::Svm { .. } | RelaySource::Tron { .. } => {

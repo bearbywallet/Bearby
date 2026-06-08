@@ -23,22 +23,30 @@ pub async fn execute_exchange_swap(
     display: ExchangeTxDisplay,
     sink: StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    if params.provider.is_relay() {
-        return match RelayOrigin::from_addr_type(params.from.token.addr_type) {
+    let result = if params.provider.is_relay() {
+        match RelayOrigin::from_addr_type(params.from.token.addr_type) {
             Some(RelayOrigin::Svm) => {
-                svm::execute_svm_exchange_swap(auth, params, display, sink).await
+                svm::execute_svm_exchange_swap(auth, params, display, &sink).await
             }
             Some(RelayOrigin::Btc) => {
-                btc::execute_btc_exchange_swap(auth, params, display, sink).await
+                btc::execute_btc_exchange_swap(auth, params, display, &sink).await
             }
             Some(RelayOrigin::Tron) => {
-                tron::execute_tron_exchange_swap(auth, params, display, sink).await
+                tron::execute_tron_exchange_swap(auth, params, display, &sink).await
             }
             Some(RelayOrigin::Evm) | None => {
-                evm::execute_evm_exchange_swap(auth, params, display, sink).await
+                evm::execute_evm_exchange_swap(auth, params, display, &sink).await
             }
-        };
-    }
+        }
+    } else {
+        evm::execute_evm_exchange_swap(auth, params, display, &sink).await
+    };
 
-    evm::execute_evm_exchange_swap(auth, params, display, sink).await
+    match result {
+        Ok(history) => Ok(history),
+        Err(err) => {
+            let _ = sink.add(format!("error:{err}"));
+            Ok(Vec::new())
+        }
+    }
 }

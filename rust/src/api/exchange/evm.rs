@@ -125,7 +125,7 @@ pub(super) async fn execute_evm_exchange_swap(
     auth: SwapAuth,
     params: SwapParams,
     display: ExchangeTxDisplay,
-    sink: StreamSink<String>,
+    sink: &StreamSink<String>,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
     let SwapParams {
         provider,
