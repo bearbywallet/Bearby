@@ -6,7 +6,7 @@ import 'package:bearby/state/app_state.dart';
 enum AppIcon {
   // Intentional semantic aliases: check/ok, alert/warning, gear/manage/settings,
   // server/ipfs, chevronRight/arrowRight, lock/lockWallet share one glyph each.
-  add, alert, anchor, appearance,
+  add, alert, anchor, anchorSimple, appearance,
   arrowDown, arrowLeft, arrowRight,
   backspace, barcodeScan, bell,
   bincode, biometric, bluetooth,
@@ -71,6 +71,7 @@ class AppIconView extends StatelessWidget {
         AppIcon.add           => const IconData(0xe3d4, fontFamily: _f),
         AppIcon.alert         => const IconData(0xe4e0, fontFamily: _f),
         AppIcon.anchor        => const IconData(0xe514, fontFamily: _f),
+        AppIcon.anchorSimple  => const IconData(0xe5d8, fontFamily: _f),
         AppIcon.appearance    => const IconData(0xe6c8, fontFamily: _f),
         AppIcon.arrowDown     => const IconData(0xe03e, fontFamily: _f),
         AppIcon.arrowLeft     => const IconData(0xe058, fontFamily: _f),

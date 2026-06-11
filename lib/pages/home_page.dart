@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     children: [
                       TileButton(
                         icon: AppIconView(
-                          icon: AppIcon.anchor,
+                          icon: AppIcon.anchorSimple,
                           size: iconSizeTileButton,
                           color: theme.primaryPurple,
                         ),
