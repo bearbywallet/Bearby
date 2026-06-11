@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -63,22 +64,18 @@ class _InitialPageState extends State<InitialPage> with StatusBarMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/moon_sun.svg',
-                          width: 30,
-                          height: 30,
-                          colorFilter: ColorFilter.mode(
-                              theme.textPrimary, BlendMode.srcIn),
+                        icon: AppIconView(
+                          icon: AppIcon.theme,
+                          size: 30,
+                          color: theme.textPrimary,
                         ),
                         onPressed: _toggleTheme,
                       ),
                       IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/language.svg',
-                          width: 34,
-                          height: 34,
-                          colorFilter: ColorFilter.mode(
-                              theme.textPrimary, BlendMode.srcIn),
+                        icon: AppIconView(
+                          icon: AppIcon.language,
+                          size: 34,
+                          color: theme.textPrimary,
                         ),
                         onPressed: () => context.push(AppRoutes.language),
                       ),

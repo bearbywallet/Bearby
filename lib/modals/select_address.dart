@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -274,15 +273,11 @@ class _AddressSelectModalContentState
   Widget _buildCategoryHeader(CategoryInfo categoryInfo, AppTheme theme) {
     return Row(
       children: [
-        if (categoryInfo.iconPath != null) ...[
-          SvgPicture.asset(
-            categoryInfo.iconPath!,
-            width: 16,
-            height: 16,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple.withValues(alpha: 0.7),
-              BlendMode.srcIn,
-            ),
+        if (categoryInfo.icon != null) ...[
+          AppIconView(
+            icon: categoryInfo.icon!,
+            size: 16,
+            color: theme.primaryPurple.withValues(alpha: 0.7),
           ),
           const SizedBox(width: 8),
         ],
@@ -449,22 +444,22 @@ class _AddressSelectModalContentState
       case "my_accounts":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentMyAccounts,
-          iconPath: "assets/icons/wallet.svg",
+          icon: AppIcon.wallet,
         );
       case "book":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentAddressBook,
-          iconPath: "assets/icons/book.svg",
+          icon: AppIcon.book,
         );
       case "history":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentHistory,
-          iconPath: "assets/icons/history.svg",
+          icon: AppIcon.history,
         );
       default:
         return CategoryInfo(
           displayName: categoryName,
-          iconPath: "assets/icons/wallet.svg",
+          icon: AppIcon.wallet,
         );
     }
   }
@@ -513,10 +508,10 @@ class _AddressSelectModalContentState
 
 class CategoryInfo {
   final String displayName;
-  final String? iconPath;
+  final AppIcon? icon;
 
   CategoryInfo({
     required this.displayName,
-    this.iconPath,
+    this.icon,
   });
 }
