@@ -266,7 +266,7 @@ pub async fn change_account_name(
         acc.name = new_name;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
@@ -284,7 +284,7 @@ pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result
         data.wallet_name = new_name;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
