@@ -146,7 +146,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageCurrency,
-                                trailingIcon: AppIcon.currency,
+                                trailingIcon: AppIcon.bitcoinAmount,
                                 onTap: () => context.push(AppRoutes.currency),
                               ),
                               SettingsItem(
