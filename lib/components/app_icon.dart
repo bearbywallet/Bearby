@@ -12,7 +12,8 @@ enum AppIcon {
   bincode, biometric, bluetooth,
   book, browser, cache,
   check, chevronRight, close,
-  cookie, copy, currency,
+  compass, cookie, copy, currency,
+
   data, disconnect, document,
   dots, edit, exchange,
   faceId, file, fingerprint,
@@ -88,6 +89,7 @@ class AppIconView extends StatelessWidget {
         AppIcon.check         => const IconData(0xe184, fontFamily: _f),
         AppIcon.chevronRight  => const IconData(0xe13a, fontFamily: _f),
         AppIcon.close         => const IconData(0xe4f6, fontFamily: _f),
+        AppIcon.compass       => const IconData(0xe1c8, fontFamily: _f),
         AppIcon.cookie        => const IconData(0xe6ca, fontFamily: _f),
         AppIcon.copy          => const IconData(0xe1ca, fontFamily: _f),
         AppIcon.currency      => const IconData(0xe54c, fontFamily: _f),
