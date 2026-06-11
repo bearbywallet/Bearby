@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/state/app_state.dart';
@@ -250,11 +249,10 @@ class _DappListItem extends StatelessWidget {
           ),
           IconButton(
             onPressed: onDisconnect,
-            icon: SvgPicture.asset(
-              'assets/icons/disconnect.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(appTheme.danger, BlendMode.srcIn),
+            icon: AppIconView(
+              icon: AppIcon.disconnect,
+              size: 24,
+              color: appTheme.danger,
             ),
           ),
         ],

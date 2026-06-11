@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/jazzicon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -109,14 +108,10 @@ class _AddressBookPageState extends State<AddressBookPage> with StatusBarMixin {
                   child: CustomAppBar(
                     title: l10n.addressBookPageTitle,
                     onBackPressed: () => Navigator.pop(context),
-                    actionIcon: SvgPicture.asset(
-                      'assets/icons/plus.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        theme.textPrimary,
-                        BlendMode.srcIn,
-                      ),
+                    actionIcon: AppIconView(
+                      icon: AppIcon.plus,
+                      size: 24,
+                      color: theme.textPrimary,
                     ),
                     onActionPressed: () => showAddContactModal(
                       context: context,
@@ -156,14 +151,10 @@ class _AddressBookPageState extends State<AddressBookPage> with StatusBarMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/icons/book.svg',
-              width: 120,
-              height: 120,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary.withValues(alpha: 0.4),
-                BlendMode.srcIn,
-              ),
+            AppIconView(
+              icon: AppIcon.book,
+              size: 120,
+              color: theme.textSecondary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
@@ -252,14 +243,10 @@ class _AddressBookPageState extends State<AddressBookPage> with StatusBarMixin {
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: 24,
-                    icon: SvgPicture.asset(
-                      'assets/icons/close.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        theme.danger,
-                        BlendMode.srcIn,
-                      ),
+                    icon: AppIconView(
+                      icon: AppIcon.close,
+                      size: 24,
+                      color: theme.danger,
                     ),
                     tooltip: l10n.addressBookPageDeleteTooltip(address.name),
                     onPressed: () {

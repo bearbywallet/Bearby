@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -168,16 +168,12 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
                       child: CustomAppBar(
                         title: localizations.ledgerConnectPageTitle,
                         onBackPressed: () => Navigator.pop(context),
-                        actionIcon: SvgPicture.asset(
-                          'assets/icons/reload.svg',
-                          width: 28,
-                          height: 28,
-                          colorFilter: ColorFilter.mode(
-                            isBusy
-                                ? theme.textSecondary.withAlpha(128)
-                                : theme.textPrimary,
-                            BlendMode.srcIn,
-                          ),
+                        actionIcon: AppIconView(
+                          icon: AppIcon.reload,
+                          size: 28,
+                          color: isBusy
+                              ? theme.textSecondary.withAlpha(128)
+                              : theme.textPrimary,
                         ),
                         onActionPressed:
                             isBusy ? null : appState.ledgerViewController.scan,

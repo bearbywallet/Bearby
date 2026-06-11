@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -152,8 +152,8 @@ class TokenAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         color: theme.background,
       ),
-      child: HugeIcon(
-        icon: HugeIcons.strokeRoundedHelpCircle,
+      child: AppIconView(
+        icon: AppIcon.info,
         size: size * 0.6,
         color: theme.warning,
       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/settings_item.dart';
@@ -209,21 +208,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                 isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTelegram,
-                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedTelegram, size: 26 * 0.7, color: theme.textSecondary,),
+                                trailingWidget: AppIconView(icon: AppIcon.telegram, size: 26 * 0.7, color: theme.textSecondary),
                                 onTap: () => socialMediaService.openTelegram(
                                     chatUrl: 'https://t.me/+S7Dqp9ORznE1NDIy'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageTwitter,
-                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedNewTwitterEllipse, size: 26 * 0.7, color: theme.textSecondary,),
+                                trailingWidget: AppIconView(icon: AppIcon.twitter, size: 26 * 0.7, color: theme.textSecondary),
                                 onTap: () => socialMediaService.openX(
                                     username: 'BearbyPro'),
                               ),
                               SettingsItem(
                                 title: AppLocalizations.of(context)!
                                     .settingsPageGitHub,
-                                trailingWidget: HugeIcon(icon: HugeIcons.strokeRoundedGithub01, size: 26 * 0.7, color: theme.textSecondary,),
+                                trailingWidget: AppIconView(icon: AppIcon.github, size: 26 * 0.7, color: theme.textSecondary),
                                 onTap: () => socialMediaService.openGitHub(
                                   username: 'bearbywallet',
                                 ),
