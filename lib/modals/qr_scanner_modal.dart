@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -171,14 +172,10 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
                   child: _GlassButton(
                     theme: theme,
                     onPressed: () => Navigator.pop(context),
-                    child: SvgPicture.asset(
-                      'assets/icons/close.svg',
-                      width: 22,
-                      height: 22,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
+                    child: AppIconView(
+                      icon: AppIcon.close,
+                      size: 22,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -189,14 +186,10 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
                     child: _GlassButton(
                       theme: theme,
                       onPressed: _onPaste,
-                      child: SvgPicture.asset(
-                        'assets/icons/copy.svg',
-                        width: 22,
-                        height: 22,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
+                      child: AppIconView(
+                        icon: AppIcon.copy,
+                        size: 22,
+                        color: Colors.white,
                       ),
                     ),
                   ),

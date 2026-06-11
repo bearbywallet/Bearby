@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
@@ -405,12 +404,10 @@ class _ExplorersSection extends StatelessWidget {
                   width: 20,
                   height: 20,
                   fit: BoxFit.cover,
-                  errorWidget: SvgPicture.asset(
-                    'assets/icons/warning.svg',
-                    width: 16,
-                    height: 16,
-                    colorFilter:
-                        ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                  errorWidget: AppIconView(
+                    icon: AppIcon.warning,
+                    size: 16,
+                    color: theme.warning,
                   ),
                   loadingWidget: CircularProgressIndicator(
                       strokeWidth: 2, color: theme.primaryPurple),

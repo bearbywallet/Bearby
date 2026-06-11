@@ -218,14 +218,10 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                               ),
                             ),
                           )
-                        : SvgPicture.asset(
-                            'assets/icons/plus.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
+                        : AppIconView(
+                            icon: AppIcon.plus,
+                            size: 24,
+                            color: theme.textPrimary,
                           ),
                     onActionPressed: () => _createAccount(appState),
                   ),
@@ -318,14 +314,10 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                         ),
                                         child: Row(
                                           children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/biometric.svg',
-                                              width: 24,
-                                              height: 24,
-                                              colorFilter: ColorFilter.mode(
-                                                theme.textPrimary,
-                                                BlendMode.srcIn,
-                                              ),
+                                            AppIconView(
+                                              icon: AppIcon.biometric,
+                                              size: 24,
+                                              color: theme.textPrimary,
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(

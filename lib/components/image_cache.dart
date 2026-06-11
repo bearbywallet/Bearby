@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/src/rust/api/cache.dart';
@@ -133,8 +133,8 @@ class _AsyncImageState extends State<AsyncImage> {
                   color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: HugeIcon(
-                  icon: HugeIcons.strokeRoundedHelpCircle,
+                child: AppIconView(
+                  icon: AppIcon.info,
                   size: (widget.width ?? 24) * 0.6,
                   color: theme.warning,
                 ),
@@ -167,8 +167,8 @@ class _AsyncImageState extends State<AsyncImage> {
                   color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: HugeIcon(
-                  icon: HugeIcons.strokeRoundedHelpCircle,
+                child: AppIconView(
+                  icon: AppIcon.info,
                   size: (widget.width ?? 24) * 0.6,
                   color: theme.warning,
                 ),

@@ -2,7 +2,6 @@ import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/swipe_button.dart';
@@ -473,12 +472,10 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/warning.svg',
-                                    width: 24,
-                                    height: 24,
-                                    colorFilter: ColorFilter.mode(
-                                        theme.danger, BlendMode.srcIn),
+                                  AppIconView(
+                                    icon: AppIcon.warning,
+                                    size: 24,
+                                    color: theme.danger,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(

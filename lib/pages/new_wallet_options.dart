@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -102,14 +101,10 @@ class _AddWalletOptionsPageState extends State<AddWalletOptionsPage>
                         WalletListItem(
                           title: l10n.addWalletOptionsPairWithLedgerTitle,
                           subtitle: l10n.addWalletOptionsPairWithLedgerSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/ledger.svg',
-                            width: 25,
-                            height: 25,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.ledger,
+                            size: 25,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => context.push(AppRoutes.ledgerConnect, extra: {'chain': _chain}),
                         ),

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -437,14 +437,10 @@ class _ErrorSliver extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 80,
-                height: 80,
-                colorFilter: ColorFilter.mode(
-                  theme.danger.withValues(alpha: 0.6),
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: AppIcon.warning,
+                size: 80,
+                color: theme.danger.withValues(alpha: 0.6),
               ),
               const SizedBox(height: 24),
               Text(
@@ -496,14 +492,10 @@ class _EmptySliver extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/icons/anchor.svg',
-              width: 80,
-              height: 80,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary.withValues(alpha: 0.3),
-                BlendMode.srcIn,
-              ),
+            AppIconView(
+              icon: AppIcon.anchor,
+              size: 80,
+              color: theme.textSecondary.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 24),
             Text(

@@ -16,7 +16,6 @@ dependencies:
   path_provider: ^2.0.11
   provider: ^6.1.2
   flutter_svg: ^2.0.10+1
-  hugeicons: ^1.1.7
   local_auth: ^3.0.0
   device_info_plus: ^13.1.0
   package_info_plus: ^10.1.0
@@ -60,7 +59,11 @@ flutter:
         - asset: assets/fonts/Semibold.ttf   
           weight: 600                        
         - asset: assets/fonts/Ultralight.ttf
-          weight: 300    
+          weight: 300
+    - family: PhosphorRegular
+      fonts:
+        - asset: assets/fonts/Phosphor.ttf
+          weight: 400
 
 flutter_launcher_icons:
   android: true

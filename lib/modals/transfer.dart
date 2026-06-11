@@ -1,7 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/gas_eip1559.dart';
 import 'package:bearby/components/glass_message.dart';
@@ -498,14 +497,10 @@ class _ConfirmTransactionContentState
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/edit.svg',
-                                        width: 16,
-                                        height: 16,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.warning,
-                                          BlendMode.srcIn,
-                                        ),
+                                      AppIconView(
+                                        icon: AppIcon.edit,
+                                        size: 16,
+                                        color: theme.warning,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
