@@ -529,7 +529,7 @@ abstract class RustLibApi extends BaseApi {
       required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig,
-      String? bip86Xpub});
+      String? btcRotateXpub});
 
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
@@ -3800,7 +3800,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig,
-      String? bip86Xpub}) {
+      String? btcRotateXpub}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -3808,7 +3808,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_8(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         sse_encode_list_prim_u_8_loose(sig, serializer);
-        sse_encode_opt_String(bip86Xpub, serializer);
+        sse_encode_opt_String(btcRotateXpub, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 117, port: port_);
       },
@@ -3817,7 +3817,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionSendSignedTransactionsConstMeta,
-      argValues: [walletIndex, accountIndex, tx, sig, bip86Xpub],
+      argValues: [walletIndex, accountIndex, tx, sig, btcRotateXpub],
       apiImpl: this,
     ));
   }
@@ -3825,7 +3825,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTransactionSendSignedTransactionsConstMeta =>
       const TaskConstMeta(
         debugName: "send_signed_transactions",
-        argNames: ["walletIndex", "accountIndex", "tx", "sig", "bip86Xpub"],
+        argNames: ["walletIndex", "accountIndex", "tx", "sig", "btcRotateXpub"],
       );
 
   @override

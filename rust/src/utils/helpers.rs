@@ -75,7 +75,7 @@ pub fn pubkey_from_provider(
                         .iter()
                         .find(|t| t.native)
                         .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                        .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
+                        .unwrap_or(zilpay::bitcoin::AddressType::P2wpkh);
 
                     PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
                 }
@@ -106,7 +106,7 @@ pub fn secretkey_from_provider(
                 .iter()
                 .find(|t| t.native)
                 .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
+                .unwrap_or(zilpay::bitcoin::AddressType::P2wpkh);
             let network = chain_config
                 .bitcoin_network()
                 .unwrap_or(zilpay::bitcoin::Network::Bitcoin);

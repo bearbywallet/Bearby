@@ -25,13 +25,13 @@ Future<HistoricalTransactionInfo> sendSignedTransactions(
         required int accountIndex,
         required TransactionRequestInfo tx,
         required List<int> sig,
-        String? bip86Xpub}) =>
+        String? btcRotateXpub}) =>
     RustLib.instance.api.crateApiTransactionSendSignedTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         tx: tx,
         sig: sig,
-        bip86Xpub: bip86Xpub);
+        btcRotateXpub: btcRotateXpub);
 
 Future<HistoricalTransactionInfo> signSendTransactions(
         {required BigInt walletIndex,
