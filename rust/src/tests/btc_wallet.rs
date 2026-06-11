@@ -117,27 +117,27 @@ mod btc_wallet_tests {
         assert_eq!(wallet.auth_type, "none");
         assert_eq!(wallet.chain_hash, btc_chain_hash);
         assert_eq!(wallet.slip44, BITCOIN);
-        assert_eq!(wallet.bip, DerivationPath::BIP86_PURPOSE);
+        assert_eq!(wallet.bip, DerivationPath::BIP84_PURPOSE);
 
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
 
         assert_eq!(btc_accounts.len(), 1);
 
         let account = &btc_accounts[0];
-        let taproot_history = history.get(&zilpay::bitcoin::AddressType::P2tr).unwrap();
+        let segwit_history = history.get(&zilpay::bitcoin::AddressType::P2wpkh).unwrap();
 
-        assert!(taproot_history.get_internal().unwrap().history.is_empty());
-        assert!(taproot_history.get_internal().unwrap().utxos.is_empty());
-        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
-        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_internal().unwrap().history.is_empty());
+        assert!(segwit_history.get_internal().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_external().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_external().unwrap().utxos.is_empty());
 
         assert_eq!(
             account.addr,
-            taproot_history
+            segwit_history
                 .get_external()
                 .unwrap()
                 .address
@@ -203,16 +203,16 @@ mod btc_wallet_tests {
         let wallet = wallets.first().unwrap();
         assert_eq!(wallet.chain_hash, btc_chain_hash);
         assert_eq!(wallet.slip44, BITCOIN);
-        assert_eq!(wallet.bip, DerivationPath::BIP86_PURPOSE);
+        assert_eq!(wallet.bip, DerivationPath::BIP84_PURPOSE);
 
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         assert_eq!(
             btc_accounts[0].addr,
-            taproot_history
+            segwit_history
                 .get_external()
                 .unwrap()
                 .address
@@ -235,7 +235,7 @@ mod btc_wallet_tests {
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         let token = &wallet.tokens[0];
 
@@ -338,7 +338,7 @@ mod btc_wallet_tests {
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         assert_eq!(btc_accounts[1].addr_type, 2);
         assert_eq!(btc_accounts[1].pub_key, None);

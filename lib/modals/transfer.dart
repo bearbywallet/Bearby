@@ -290,7 +290,7 @@ class _ConfirmTransactionContentState
       sig: sig,
       walletIndex: appState.selectedWallet,
       accountIndex: accountIndex,
-      bip86Xpub: bip86Xpub,
+      btcRotateXpub: bip86Xpub,
     );
   }
 
@@ -530,7 +530,8 @@ class _ConfirmTransactionContentState
                           focusedBorderColor: primaryColor,
                           disabled: _isDisabled,
                           obscureText: _obscurePassword,
-                          rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
+                          rightIcon: AppIconState.passwordVisibility(
+                              obscured: _obscurePassword),
                           onRightIconTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
                           textColor: textColor,
@@ -625,7 +626,8 @@ class _ConfirmTransactionContentState
       // For non-BTC txs keep existing behaviour: prefer outToken for display.
       final displayToken = isBtc ? nativeToken : (outToken ?? nativeToken);
 
-      final amount = toDecimalsWei(widget.amount.toString(), displayToken.decimals);
+      final amount =
+          toDecimalsWei(widget.amount.toString(), displayToken.decimals);
       final balance = BigInt.tryParse(
               widget.token.balances[appState.accountBalanceKey] ?? '-') ??
           BigInt.zero;
