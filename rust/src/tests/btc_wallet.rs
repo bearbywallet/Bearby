@@ -137,11 +137,7 @@ mod btc_wallet_tests {
 
         assert_eq!(
             account.addr,
-            segwit_history
-                .get_external()
-                .unwrap()
-                .address
-                .auto_format()
+            segwit_history.get_external().unwrap().address.auto_format()
         );
         assert_eq!(account.name, "A");
         assert_eq!(account.index, 0);
@@ -212,11 +208,7 @@ mod btc_wallet_tests {
             .unwrap();
         assert_eq!(
             btc_accounts[0].addr,
-            segwit_history
-                .get_external()
-                .unwrap()
-                .address
-                .auto_format()
+            segwit_history.get_external().unwrap().address.auto_format()
         );
 
         sync_balances(0).await.unwrap();

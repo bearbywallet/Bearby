@@ -5,8 +5,8 @@ mod exchange_tests {
 
     use crate::api::backend::load_service;
     use crate::api::exchange::{
-        bootstrap_exchange_providers, finalize_exchange_swap,
-        prepare_exchange_swap, refresh_exchange_quotes,
+        bootstrap_exchange_providers, finalize_exchange_swap, prepare_exchange_swap,
+        refresh_exchange_quotes,
     };
     use crate::api::provider::get_chains_providers_from_json;
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
