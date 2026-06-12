@@ -703,12 +703,10 @@ fn blob_from_step(
             // Deposit-address flow: the unique address is required for attribution;
             // the PSBT (when present) is kept only as auxiliary data.
             let psbt = step.psbt.unwrap_or_default();
-            let deposit_address = deposit_address
-                .filter(|v| !v.is_empty())
-                .ok_or_else(|| {
-                    eprintln!("[btc-relay] step missing depositAddress (useDepositAddress flow)");
-                    "relay Bitcoin quote missing depositAddress".to_string()
-                })?;
+            let deposit_address = deposit_address.filter(|v| !v.is_empty()).ok_or_else(|| {
+                eprintln!("[btc-relay] step missing depositAddress (useDepositAddress flow)");
+                "relay Bitcoin quote missing depositAddress".to_string()
+            })?;
             eprintln!(
                 "[btc-relay] step deposit_address={deposit_address} psbt_len={}",
                 psbt.len(),
@@ -945,7 +943,12 @@ pub async fn relay_prepare_swap(
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
     let (step, deposit_address) =
         swap_step_data_owned(quote).ok_or_else(|| "relay quote missing swap step".to_string())?;
-    let blob = blob_from_step(step, deposit_address, origin_chain_id, from.token.chain_hash)?;
+    let blob = blob_from_step(
+        step,
+        deposit_address,
+        origin_chain_id,
+        from.token.chain_hash,
+    )?;
 
     Ok(PreparedSwap {
         permit_typed_data_json: None,

@@ -4,8 +4,8 @@ use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::crypto::slip44::{BITCOIN, TRON, ZILLIQA};
 use zilpay::rpc::network_config::ChainConfig;
-use zilpay::wallet::wallet_storage::StorageOperations;
 use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
+use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::{
     ExchangeAsset, ExchangeProvider, PancakeMeta, ProviderQuote, RelayMeta, SunSwapMeta,
@@ -59,8 +59,9 @@ pub async fn bootstrap_exchange_providers(
                     Some(hash) => match wallet.get_btc_addresses(account_index, hash) {
                         Ok(chains) => {
                             match zilpay::wallet::bitcoin_wallet::pick_entry_with_most_utxo(&chains)
-                                .or_else(|_| zilpay::wallet::bitcoin_wallet::pick_primary_btc_entry(&chains))
-                            {
+                                .or_else(|_| {
+                                    zilpay::wallet::bitcoin_wallet::pick_primary_btc_entry(&chains)
+                                }) {
                                 Ok(entry) => {
                                     let _utxo_total: u64 =
                                         entry.utxos.iter().map(|u| u.value).sum();
@@ -82,7 +83,9 @@ pub async fn bootstrap_exchange_providers(
                         }
                     },
                     None => {
-                        eprintln!("[btc-relay] no BTC provider found, falling back to account.addr");
+                        eprintln!(
+                            "[btc-relay] no BTC provider found, falling back to account.addr"
+                        );
                         account.addr.auto_format()
                     }
                 };
