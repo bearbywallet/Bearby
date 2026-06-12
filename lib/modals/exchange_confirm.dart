@@ -452,6 +452,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
     var failed = false;
 
     void finishWithError(Object error) {
+      debugPrint("error: $error");
       failed = true;
       if (mounted) {
         setState(() {
