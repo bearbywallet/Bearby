@@ -156,6 +156,12 @@ struct QuoteRequest<'a> {
     amount: &'a str,
     trade_type: &'static str,
     app_fees: [AppFee<'a>; 1],
+    /// BTC-origin only: ask Relay for a unique per-request deposit address so the
+    /// deposit may originate from any wallet address (we rebuild the tx ourselves).
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    use_deposit_address: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refund_to: Option<&'a str>,
 }
 
 #[frb(ignore)]
@@ -180,6 +186,8 @@ pub struct QuoteResponse {
 pub struct Step {
     pub id: String,
     pub kind: String,
+    #[serde(rename = "depositAddress")]
+    pub deposit_address: Option<String>,
     pub items: Vec<Item>,
 }
 
@@ -309,6 +317,10 @@ pub enum RelaySource {
     },
     Btc {
         psbt: String,
+        /// Unique per-request deposit address from Relay's deposit-address flow;
+        /// the on-chain deposit is attributed by this address, so it (not the
+        /// PSBT vault output) is the authoritative destination.
+        deposit_address: String,
     },
     Tron {
         to: String,
@@ -419,6 +431,7 @@ async fn fetch_quote(
         .ok_or_else(|| "destination is not a Relay asset".to_string())?;
     let origin_chain_id = origin_meta.common.chain_id;
     let destination_chain_id = destination_meta.common.chain_id;
+    let is_btc_origin = origin_chain_id == RELAY_BTC_CHAIN_ID;
     let req = QuoteRequest {
         user: origin_meta.common.account_addr.as_str(),
         recipient: destination_meta.common.account_addr.as_str(),
@@ -432,7 +445,15 @@ async fn fetch_quote(
             recipient: FEE_RECIPIENT,
             fee: FEE_BIPS,
         }],
+        use_deposit_address: is_btc_origin,
+        refund_to: is_btc_origin.then_some(origin_meta.common.account_addr.as_str()),
     };
+    if is_btc_origin {
+        eprintln!(
+            "[btc-relay] quote user={} refund_to={:?} use_deposit_address={} amount={amount}",
+            req.user, req.refund_to, req.use_deposit_address,
+        );
+    }
     relay_post::<QuoteResponse>("/quote", &req)
         .await
         .map(|quote| (quote, origin_chain_id, destination_chain_id))
@@ -455,15 +476,26 @@ fn step_has_evm_calldata(step: &StepData) -> bool {
         && step.data.as_deref().is_some_and(|v| !v.is_empty())
 }
 
-fn swap_step_data_owned(quote: QuoteResponse) -> Option<StepData> {
+/// Pick the primary swap/deposit step, returning its data together with the
+/// step-level `depositAddress` (set by Relay in the deposit-address flow).
+fn swap_step_data_owned(quote: QuoteResponse) -> Option<(StepData, Option<String>)> {
     use std::ops::ControlFlow;
 
     match quote.steps.into_iter().try_fold(None, |fallback, step| {
+        let Step {
+            id,
+            deposit_address,
+            items,
+            ..
+        } = step;
         let is_primary = ["deposit", "swap"]
             .iter()
-            .any(|id| step.id.eq_ignore_ascii_case(id));
-        let is_approve = step.id.eq_ignore_ascii_case("approve");
-        let data = step.items.into_iter().next().map(|item| item.data);
+            .any(|step_id| id.eq_ignore_ascii_case(step_id));
+        let is_approve = id.eq_ignore_ascii_case("approve");
+        let data = items
+            .into_iter()
+            .next()
+            .map(|item| (item.data, deposit_address));
 
         if is_primary {
             ControlFlow::Break(data)
@@ -643,6 +675,7 @@ fn tron_blob_from_step(mut step: StepData, chain_hash: u64) -> Result<RelayBlob,
 
 fn blob_from_step(
     step: StepData,
+    deposit_address: Option<String>,
     origin_chain_id: u64,
     chain_hash: u64,
 ) -> Result<RelayBlob, String> {
@@ -667,12 +700,24 @@ fn blob_from_step(
             })
         }
         RELAY_BTC_CHAIN_ID => {
-            let psbt = step
-                .psbt
+            // Deposit-address flow: the unique address is required for attribution;
+            // the PSBT (when present) is kept only as auxiliary data.
+            let psbt = step.psbt.unwrap_or_default();
+            let deposit_address = deposit_address
                 .filter(|v| !v.is_empty())
-                .ok_or_else(|| "relay Bitcoin tx missing psbt".to_string())?;
+                .ok_or_else(|| {
+                    eprintln!("[btc-relay] step missing depositAddress (useDepositAddress flow)");
+                    "relay Bitcoin quote missing depositAddress".to_string()
+                })?;
+            eprintln!(
+                "[btc-relay] step deposit_address={deposit_address} psbt_len={}",
+                psbt.len(),
+            );
             Ok(RelayBlob {
-                source: RelaySource::Btc { psbt },
+                source: RelaySource::Btc {
+                    psbt,
+                    deposit_address,
+                },
                 chain_hash,
             })
         }
@@ -722,6 +767,7 @@ pub async fn relay_quote_info(
     let destination_meta = to
         .relay_meta()
         .ok_or_else(|| "destination is not a Relay asset".to_string())?;
+    let is_btc_origin = origin_meta.common.chain_id == RELAY_BTC_CHAIN_ID;
     let req = QuoteRequest {
         user: origin_meta.common.account_addr.as_str(),
         recipient: destination_meta.common.account_addr.as_str(),
@@ -735,7 +781,15 @@ pub async fn relay_quote_info(
             recipient: FEE_RECIPIENT,
             fee: FEE_BIPS,
         }],
+        use_deposit_address: is_btc_origin,
+        refund_to: is_btc_origin.then_some(origin_meta.common.account_addr.as_str()),
     };
+    if is_btc_origin {
+        eprintln!(
+            "[btc-relay] quote_info user={} refund_to={:?} use_deposit_address={} amount={amount}",
+            req.user, req.refund_to, req.use_deposit_address,
+        );
+    }
     let quote = relay_post::<QuoteResponse>("/quote", &req).await?;
     let amount_out = quote.details.currency_out.amount;
     if amount_out.is_empty() {
@@ -889,9 +943,9 @@ pub async fn relay_prepare_swap(
     }
     let origin_chain_id = relay_origin_chain_id(from)?;
     let (quote, _, _) = fetch_quote(from, to, amount).await?;
-    let step =
+    let (step, deposit_address) =
         swap_step_data_owned(quote).ok_or_else(|| "relay quote missing swap step".to_string())?;
-    let blob = blob_from_step(step, origin_chain_id, from.token.chain_hash)?;
+    let blob = blob_from_step(step, deposit_address, origin_chain_id, from.token.chain_hash)?;
 
     Ok(PreparedSwap {
         permit_typed_data_json: None,
@@ -1107,7 +1161,9 @@ mod tests {
         let quote: QuoteResponse = serde_json::from_str(raw).map_err(|e| e.to_string())?;
         assert_eq!(quote.details.currency_out.amount, "995");
         assert_eq!(quote.details.currency_out.minimum_amount, "990");
-        let step = swap_step_data_owned(quote).ok_or_else(|| "missing swap step".to_string())?;
+        let (step, deposit_address) =
+            swap_step_data_owned(quote).ok_or_else(|| "missing swap step".to_string())?;
+        assert_eq!(deposit_address, None);
         assert_eq!(step.chain_id, Some(1));
         assert_eq!(parse_u64_value(step.gas.as_deref())?, Some(21_000));
         Ok(())
