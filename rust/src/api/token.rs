@@ -6,7 +6,7 @@ use crate::{
         helpers::{parse_address, with_service},
     },
 };
-use std::{collections::HashMap, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, sync::Arc};
 pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::serde::Deserialize;
@@ -22,6 +22,7 @@ use zilpay::{
 const UNISWAP_API_URL: &str =
     "https://interface.gateway.uniswap.org/v2/data.v1.DataApiService/GetPortfolio";
 const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
+const BEARBY_RATES_API_URL: &str = "https://rates.bearby.io/convert";
 const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
 const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
 const TRON_ACCOUNT_TOKENS_API: &str = "https://ts.endjgfsv.link/api/account/tokens";
@@ -157,6 +158,88 @@ struct SolanaTokenListResponse {
     content: Vec<SolanaTokenEntry>,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(crate = "zilpay::serde")]
+struct BearbyRate {
+    from: String,
+    rate: Option<f64>,
+}
+
+fn uppercase_cow(value: &str) -> Cow<'_, str> {
+    if value.bytes().all(|byte| !byte.is_ascii_lowercase()) {
+        Cow::Borrowed(value)
+    } else {
+        Cow::Owned(value.to_ascii_uppercase())
+    }
+}
+
+fn uppercase_owned(value: String) -> String {
+    if value.bytes().all(|byte| !byte.is_ascii_lowercase()) {
+        value
+    } else {
+        value.to_ascii_uppercase()
+    }
+}
+
+async fn fetch_bearby_rates<'a>(
+    client: &zilpay::reqwest::Client,
+    to: &str,
+    symbols: impl IntoIterator<Item = &'a str>,
+) -> Result<HashMap<String, f64>, String> {
+    let symbols_iter = symbols.into_iter();
+    let (lower_bound, upper_bound) = symbols_iter.size_hint();
+    let mut symbols_csv =
+        String::with_capacity(upper_bound.unwrap_or(lower_bound).saturating_mul(8));
+
+    symbols_iter
+        .filter(|symbol| !symbol.is_empty())
+        .map(uppercase_cow)
+        .enumerate()
+        .for_each(|(index, symbol)| {
+            if index != 0 {
+                symbols_csv.push(',');
+            }
+            symbols_csv.push_str(symbol.as_ref());
+        });
+
+    if symbols_csv.is_empty() {
+        return Ok(HashMap::with_capacity(0));
+    }
+
+    let to_upper = uppercase_cow(to);
+    let url = format!(
+        "{BEARBY_RATES_API_URL}?to={}&for={}",
+        to_upper.as_ref(),
+        symbols_csv
+    );
+
+    let response = client
+        .get(&url)
+        .header("User-Agent", "Bearby/1.0")
+        .send()
+        .await
+        .map_err(|e| format!("Bearby rates HTTP request failed: {e}"))?;
+
+    if !response.status().is_success() {
+        return Err(format!("Bearby rates API error: {}", response.status()));
+    }
+
+    let rates: Vec<BearbyRate> = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse Bearby rates response: {e}"))?;
+
+    let mut rate_map = HashMap::with_capacity(rates.len());
+
+    rates.into_iter().for_each(|entry| {
+        if let Some(rate) = entry.rate {
+            rate_map.insert(uppercase_owned(entry.from), rate);
+        }
+    });
+
+    Ok(rate_map)
+}
+
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
         let core = Arc::clone(&service.core);
@@ -237,28 +320,16 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 
             convert_rate
         }
-        TokenQuotesAPIOptions::CryptoCompare => {
-            let cryptocompare_url = format!(
-                "https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}",
-                native_token.symbol,
-                currency.to_uppercase()
-            );
+        TokenQuotesAPIOptions::BearbyRates => {
             let client = zilpay::reqwest::Client::new();
-            let response = client
-                .get(&cryptocompare_url)
-                .send()
-                .await
-                .map_err(|e| format!("HTTP request failed: {}", e))?;
-            let rate: Value = response
-                .json()
-                .await
-                .map_err(|e| format!("Failed to parse cryptocompare response: {}", e))?;
-            let convert_rate = rate
-                .get(currency.to_uppercase())
-                .and_then(|v| v.as_f64())
-                .unwrap_or_default();
+            let native_symbol = uppercase_cow(&native_token.symbol);
+            let rates =
+                fetch_bearby_rates(&client, currency, [native_token.symbol.as_str()]).await?;
 
-            convert_rate
+            match rates.get(native_symbol.as_ref()) {
+                Some(rate) => *rate,
+                None => 0.0,
+            }
         }
         _ => return Ok(()),
     };

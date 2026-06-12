@@ -1113,13 +1113,13 @@
   "@currencyConversionEngineCoingeckoSubtitle": {
     "description": "Subtitle for the 'Coingecko' engine option"
   },
-  "currencyConversionEngineCryptoCompare": "CryptoCompare",
-  "@currencyConversionEngineCryptoCompare": {
-    "description": "Title for the 'CryptoCompare' engine option"
+  "currencyConversionEngineBearbyRates": "Bearby Rates",
+  "@currencyConversionEngineBearbyRates": {
+    "description": "Title for the 'Bearby Rates' engine option"
   },
-  "currencyConversionEngineCryptoCompareSubtitle": "Fetch rates from CryptoCompare",
-  "@currencyConversionEngineCryptoCompareSubtitle": {
-    "description": "Subtitle for the 'CryptoCompare' engine option"
+  "currencyConversionEngineBearbyRatesSubtitle": "Fetch rates from Bearby",
+  "@currencyConversionEngineBearbyRatesSubtitle": {
+    "description": "Subtitle for the 'Bearby Rates' engine option"
   },
   "restoreWalletOptionsTitle": "Restore Wallet",
   "@restoreWalletOptionsTitle": {

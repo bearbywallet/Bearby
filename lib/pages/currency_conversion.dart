@@ -129,8 +129,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
           subtitle: l10n.currencyConversionEngineNoneSubtitle,
         ),
         ListItem(
-          title: l10n.currencyConversionEngineCryptoCompare,
-          subtitle: l10n.currencyConversionEngineCryptoCompareSubtitle,
+          title: l10n.currencyConversionEngineBearbyRates,
+          subtitle: l10n.currencyConversionEngineBearbyRatesSubtitle,
         ),
         ListItem(
           title: l10n.currencyConversionEngineCoingecko,
@@ -145,7 +145,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
   String _getEngineName(int index) {
     final l10n = AppLocalizations.of(context)!;
     return switch (index) {
-      1 => l10n.currencyConversionEngineCryptoCompare,
+      1 => l10n.currencyConversionEngineBearbyRates,
       2 => l10n.currencyConversionEngineCoingecko,
       _ => l10n.currencyConversionEngineNone,
     };
