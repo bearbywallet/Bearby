@@ -170,6 +170,48 @@ class AppLocalizationsRu extends AppLocalizations {
   String get receivePageAmountDialogConfirm => 'Подтвердить';
 
   @override
+  String get btcAddressesModalTitle => 'Адреса Bitcoin';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => 'Вложенный SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return 'Неизвестный ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => 'Текущий';
+
+  @override
+  String get btcAddressesModalUsed => 'Использован';
+
+  @override
+  String get btcAddressesModalEmpty => 'Адресов пока нет';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# транзакции',
+      many: '# транзакций',
+      few: '# транзакции',
+      one: '# транзакция',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => 'Безопасность';
 
   @override

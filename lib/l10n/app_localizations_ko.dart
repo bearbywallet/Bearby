@@ -170,6 +170,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String get receivePageAmountDialogConfirm => '확인';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin 주소';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => '중첩 SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return '알 수 없음 ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => '현재';
+
+  @override
+  String get btcAddressesModalUsed => '사용됨';
+
+  @override
+  String get btcAddressesModalEmpty => '아직 주소가 없습니다';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '거래 $count건',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => '보안';
 
   @override

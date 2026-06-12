@@ -170,6 +170,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receivePageAmountDialogConfirm => 'Confirm';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin addresses';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => 'Nested SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return 'Unknown ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => 'Current';
+
+  @override
+  String get btcAddressesModalUsed => 'Used';
+
+  @override
+  String get btcAddressesModalEmpty => 'No addresses yet';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count txs',
+      one: '1 tx',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => 'Security';
 
   @override

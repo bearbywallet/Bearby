@@ -624,5 +624,53 @@
   "qrCodeInvalidWordsError": "QR 코드에 유효하지 않은 BIP39 단어가 있습니다.",
   "qrCodeInvalidKeyError": "QR 코드에 유효하지 않은 개인 키가 있습니다.",
   "deprecatedLabel": "(사용 중단)",
-  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoin에서 사용 중단됨. BIP39를 사용하세요."
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoin에서 사용 중단됨. BIP39를 사용하세요.",
+  "btcAddressesModalTitle": "Bitcoin 주소",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "Legacy (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "중첩 SegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "알 수 없음 ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "현재",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "사용됨",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "아직 주소가 없습니다",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, other{거래 {count}건}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
