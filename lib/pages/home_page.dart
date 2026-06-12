@@ -139,6 +139,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 Expanded(
                   child: WalletHeader(
                     account: appState.account!,
+                    showCopyAddress: false,
                     onSettings: () {
                       context.push(AppRoutes.settings);
                     },
