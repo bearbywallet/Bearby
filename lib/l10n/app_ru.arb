@@ -636,5 +636,53 @@
   "qrCodeInvalidWordsError": "QR-код содержит недопустимые слова BIP39.",
   "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ.",
   "deprecatedLabel": "(Устарело)",
-  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Устарело для Bitcoin. Используйте BIP39."
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Устарело для Bitcoin. Используйте BIP39.",
+  "btcAddressesModalTitle": "Адреса Bitcoin",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "Legacy (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "Вложенный SegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "Неизвестный ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "Текущий",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "Использован",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "Адресов пока нет",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, one{# транзакция} few{# транзакции} many{# транзакций} other{# транзакции}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

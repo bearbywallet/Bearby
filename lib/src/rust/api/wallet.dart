@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import '../models/account.dart';
+import '../models/btc_chain.dart';
 import '../models/ftoken.dart';
 import '../models/keypair.dart';
 import '../models/settings.dart';
@@ -125,6 +126,15 @@ Future<String> zilliqaGetNFormat(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiWalletZilliqaGetNFormat(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+Future<Map<int, AddressChainInfo>> getBtcAddresses(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiWalletGetBtcAddresses(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        chainHash: chainHash);
 
 Future<Uint8List> makeKeystoreFile(
         {required BigInt walletIndex, required String password}) =>

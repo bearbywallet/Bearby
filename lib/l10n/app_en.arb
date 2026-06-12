@@ -215,6 +215,54 @@
   "@receivePageAmountDialogConfirm": {
     "description": "Confirm button text in amount dialog on ReceivePage"
   },
+  "btcAddressesModalTitle": "Bitcoin addresses",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "Legacy (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "Nested SegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "Unknown ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "Current",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "Used",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "No addresses yet",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, =1{1 tx} other{{count} txs}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "securityPageTitle": "Security",
   "@securityPageTitle": {
     "description": "Title for the SecurityPage"

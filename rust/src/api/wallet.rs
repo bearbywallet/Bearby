@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use zilpay::background::bg_provider::ProvidersManagement;
@@ -6,10 +7,12 @@ use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
 use zilpay::proto::address::Address;
+use zilpay::proto::btc_utils::ByteCodec;
 use zilpay::rpc::network_config::ChainConfig;
 use zilpay::secrecy::zeroize::Zeroize;
 use zilpay::secrecy::{ExposeSecret, SecretString};
 use zilpay::token::ft::FToken;
+use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;
 use zilpay::wallet::wallet_types::WalletTypes;
@@ -22,6 +25,7 @@ pub use zilpay::{
     proto::{pubkey::PubKey, secret_key::SecretKey},
 };
 
+use crate::models::btc_chain::AddressChainInfo;
 use crate::models::ftoken::FTokenInfo;
 use crate::models::keypair::KeyPairInfo;
 use crate::models::settings::WalletSettingsInfo;
@@ -551,6 +555,25 @@ pub async fn zilliqa_get_n_format(
         .ok_or(ServiceError::AccountTypeNotValid)?;
 
         Ok(address)
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn get_btc_addresses(
+    wallet_index: usize,
+    account_index: usize,
+    chain_hash: u64,
+) -> Result<HashMap<u8, AddressChainInfo>, String> {
+    with_wallet(wallet_index, |wallet| {
+        let chains = wallet
+            .get_btc_addresses(account_index, chain_hash)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(chains
+            .into_iter()
+            .map(|(addr_type, chain)| (addr_type.to_byte(), chain.into()))
+            .collect())
     })
     .await
     .map_err(Into::into)

@@ -170,6 +170,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get receivePageAmountDialogConfirm => '确认';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin 地址';
+
+  @override
+  String get btcAddressFormatLegacy => '传统 (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => '嵌套 SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return '未知 ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => '当前';
+
+  @override
+  String get btcAddressesModalUsed => '已使用';
+
+  @override
+  String get btcAddressesModalEmpty => '暂无地址';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 笔交易',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => '安全';
 
   @override

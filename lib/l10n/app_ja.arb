@@ -639,5 +639,53 @@
   "qrCodeInvalidWordsError": "QRコードに無効なBIP39ワードが含まれています。",
   "qrCodeInvalidKeyError": "QRコードに無効な秘密鍵が含まれています。",
   "deprecatedLabel": "(非推奨)",
-  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoinでは非推奨です。BIP39を使用してください。"
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoinでは非推奨です。BIP39を使用してください。",
+  "btcAddressesModalTitle": "Bitcoinアドレス",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "レガシー (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "ネストSegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "不明 ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "現在",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "使用済み",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "アドレスはまだありません",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, other{{count}件の取引}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

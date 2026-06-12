@@ -419,6 +419,66 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get receivePageAmountDialogConfirm;
 
+  /// Bitcoin receive addresses modal text: btcAddressesModalTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Bitcoin addresses'**
+  String get btcAddressesModalTitle;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatLegacy
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy (P2PKH)'**
+  String get btcAddressFormatLegacy;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit
+  ///
+  /// In en, this message translates to:
+  /// **'Nested SegWit (P2SH)'**
+  String get btcAddressFormatNestedSegwit;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatSegwit
+  ///
+  /// In en, this message translates to:
+  /// **'SegWit (P2WPKH)'**
+  String get btcAddressFormatSegwit;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatTaproot
+  ///
+  /// In en, this message translates to:
+  /// **'Taproot (P2TR)'**
+  String get btcAddressFormatTaproot;
+
+  /// Fallback label for an unknown Bitcoin address format byte
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown ({formatByte})'**
+  String btcAddressFormatUnknown(Object formatByte);
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalCurrent
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get btcAddressesModalCurrent;
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalUsed
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get btcAddressesModalUsed;
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalEmpty
+  ///
+  /// In en, this message translates to:
+  /// **'No addresses yet'**
+  String get btcAddressesModalEmpty;
+
+  /// Transaction count under each address in the Bitcoin addresses modal
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tx} other{{count} txs}}'**
+  String btcAddressesModalTxCount(int count);
+
   /// Title for the SecurityPage
   ///
   /// In en, this message translates to:
