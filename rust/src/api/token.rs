@@ -391,8 +391,19 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
             Ok(())
         }
         TRON => {
-            if let Some(&idx) = ftokens_indices.first() {
-                ftokens[idx].rate = convert_rate;
+            let symbols: Vec<&str> = ftokens_indices
+                .iter()
+                .map(|&idx| ftokens[idx].symbol.as_str())
+                .collect();
+
+            let client = zilpay::reqwest::Client::new();
+            let rates = fetch_bearby_rates(&client, currency, symbols).await?;
+
+            for &idx in &ftokens_indices {
+                let symbol_upper = ftokens[idx].symbol.to_uppercase();
+                if let Some(&rate) = rates.get(&symbol_upper) {
+                    ftokens[idx].rate = rate;
+                }
             }
 
             wallet
