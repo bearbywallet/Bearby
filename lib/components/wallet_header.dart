@@ -15,6 +15,7 @@ class WalletHeader extends StatefulWidget {
   final Function()? onTap;
   final VoidCallback onSettings;
   final VoidCallback? onScan;
+  final bool showCopyAddress;
 
   const WalletHeader({
     super.key,
@@ -22,6 +23,7 @@ class WalletHeader extends StatefulWidget {
     required this.onSettings,
     this.onTap,
     this.onScan,
+    this.showCopyAddress = true,
   });
 
   @override
@@ -116,10 +118,12 @@ class _WalletHeaderState extends State<WalletHeader>
               ),
             ],
           ),
-          SizedBox(height: spacing),
-          CopyContent(
-            address: widget.account.addr,
-          ),
+          if (widget.showCopyAddress) ...[
+            SizedBox(height: spacing),
+            CopyContent(
+              address: widget.account.addr,
+            ),
+          ],
         ],
       ),
     );
