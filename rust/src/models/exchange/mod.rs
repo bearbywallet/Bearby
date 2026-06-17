@@ -2,6 +2,7 @@ pub mod pancakeswap;
 pub mod relay;
 pub mod uniswap;
 pub mod univ_router;
+pub mod zilswap;
 
 use std::borrow::Cow;
 use std::collections::HashSet;
@@ -49,8 +50,13 @@ pub struct ZilSwapMeta {
 
 impl ZilSwapMeta {
     #[frb(ignore)]
-    pub fn for_chain(chain_hash: u64, chain_id: u64, slip44: u32, account_addr: &str) -> Self {
-        Self {
+    pub fn for_chain(
+        chain_hash: u64,
+        chain_id: u64,
+        slip44: u32,
+        account_addr: &str,
+    ) -> Option<Self> {
+        zilswap::is_supported_chain(chain_id).then(|| Self {
             common: ProviderCommon {
                 chain_hash,
                 chain_id,
@@ -60,7 +66,7 @@ impl ZilSwapMeta {
                 display_name: "ZilSwap".to_owned(),
             },
             quote: None,
-        }
+        })
     }
 }
 
@@ -220,9 +226,15 @@ impl ExchangeProvider {
             Self::Relay(_) => {
                 relay::relay_chain_id(addr_type, chain_id).is_some_and(relay::is_supported_chain)
             }
-            Self::Uniswap(_) => addr_type == 1 && uniswap::is_supported_chain(chain_id),
-            Self::PancakeSwap(_) => addr_type == 1 && pancakeswap::is_supported_chain(chain_id),
-            Self::ZilSwap(_) => addr_type == 0 && slip44 == ZILLIQA,
+            Self::Uniswap(_) => {
+                addr_type == 1 && slip44 != ZILLIQA && uniswap::is_supported_chain(chain_id)
+            }
+            Self::PancakeSwap(_) => {
+                addr_type == 1 && slip44 != ZILLIQA && pancakeswap::is_supported_chain(chain_id)
+            }
+            Self::ZilSwap(_) => {
+                addr_type == 0 && slip44 == ZILLIQA && zilswap::is_supported_chain(chain_id)
+            }
             Self::SunSwap(_) => addr_type == 4 && slip44 == TRON,
         }
     }
@@ -295,7 +307,10 @@ impl ExchangeProvider {
                 .await
             }
             Self::Relay(meta) => relay::relay_quote_info(meta, from, to, amount).await,
-            Self::ZilSwap(_) | Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::ZilSwap(meta) => {
+                zilswap::zilswap_quote_info(meta, from, to, from_asset, to_asset, amount).await
+            }
+            Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
     }
 
@@ -347,7 +362,10 @@ impl ExchangeProvider {
                 )
                 .await
             }
-            Self::ZilSwap(_) | Self::SunSwap(_) => Ok(None),
+            Self::ZilSwap(meta) => {
+                zilswap::zilswap_check_approval(meta, from, to, amount, approve_title, icon).await
+            }
+            Self::SunSwap(_) => Ok(None),
         }
     }
 
@@ -383,7 +401,10 @@ impl ExchangeProvider {
                 .await
             }
             Self::Relay(_) => relay::relay_prepare_swap(from, to, amount).await,
-            Self::ZilSwap(_) | Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::ZilSwap(meta) => {
+                zilswap::zilswap_prepare_swap(meta, from, to, amount, slippage_bps).await
+            }
+            Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
     }
 
@@ -427,7 +448,13 @@ impl ExchangeProvider {
                 )
                 .await
             }
-            Self::ZilSwap(_) | Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::ZilSwap(_) => {
+                zilswap::zilswap_finalize_swap(
+                    quote_blob, chain_hash, swap_title, swap_info, icon, out_token,
+                )
+                .await
+            }
+            Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
     }
 

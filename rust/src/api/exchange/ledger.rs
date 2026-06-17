@@ -11,6 +11,7 @@ use crate::utils::errors::ServiceError;
 use super::evm::{
     apply_fast_fees, apply_swap_gas_limit, estimate_fast_params, resolve_swap_signer,
 };
+use super::zil::{apply_zil_params, estimate_zil_params};
 
 pub struct PreparedSwapInfo {
     pub permit_typed_data_json: Option<String>,
@@ -51,8 +52,16 @@ pub async fn check_exchange_approval(
     match approval {
         Some(info) if is_relay_tron_origin(&params.provider, &params) => Ok(Some(info)),
         Some(info) => {
+            let is_scilla = info.scilla.is_some();
             let mut tx: TransactionRequest =
                 info.try_into().map_err(ServiceError::TransactionErrors)?;
+            if is_scilla {
+                let base = estimate_zil_params(&core, chain_hash, &signer).await?;
+                apply_zil_params(&mut tx, &base, nonce)?;
+                return Ok(Some(
+                    tx.try_into().map_err(ServiceError::TransactionErrors)?,
+                ));
+            }
             let base = estimate_fast_params(&core, chain_hash, &signer).await?;
             apply_fast_fees(&mut tx, &base, nonce)?;
             Ok(Some(
@@ -109,9 +118,17 @@ pub async fn finalize_exchange_swap(
         return Ok(finalized);
     }
 
+    let is_scilla = finalized.scilla.is_some();
     let mut swap_tx: TransactionRequest = finalized
         .try_into()
         .map_err(ServiceError::TransactionErrors)?;
+    if is_scilla {
+        let base = estimate_zil_params(&core, chain_hash, &signer).await?;
+        apply_zil_params(&mut swap_tx, &base, nonce)?;
+        return Ok(swap_tx
+            .try_into()
+            .map_err(ServiceError::TransactionErrors)?);
+    }
     apply_swap_gas_limit(&core, chain_hash, &mut swap_tx).await;
     let base = estimate_fast_params(&core, chain_hash, &signer).await?;
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
@@ -132,7 +149,12 @@ pub async fn estimate_swap_base_nonce(
     };
 
     let (signer, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
-    let base = estimate_fast_params(&core, chain_hash, &signer).await?;
+    let base = match signer {
+        zilpay::proto::address::Address::Secp256k1Sha256(_) => {
+            estimate_zil_params(&core, chain_hash, &signer).await?
+        }
+        _ => estimate_fast_params(&core, chain_hash, &signer).await?,
+    };
 
     Ok(base.nonce)
 }

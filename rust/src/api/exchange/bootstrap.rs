@@ -117,7 +117,10 @@ pub async fn bootstrap_exchange_providers(
         let mut providers = HashSet::with_capacity(5);
 
         if let Some(account_addr) = account_addr {
-            if addr_prefix == 1 && crate::models::exchange::uniswap::is_supported_chain(chain_id) {
+            if addr_prefix == 1
+                && slip_44 != ZILLIQA
+                && crate::models::exchange::uniswap::is_supported_chain(chain_id)
+            {
                 if let Some(meta) =
                     UniswapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
                 {
@@ -126,6 +129,7 @@ pub async fn bootstrap_exchange_providers(
             }
 
             if addr_prefix == 1
+                && slip_44 != ZILLIQA
                 && crate::models::exchange::pancakeswap::is_supported_chain(chain_id)
             {
                 if let Some(meta) =
@@ -142,12 +146,11 @@ pub async fn bootstrap_exchange_providers(
             }
 
             if addr_prefix == 0 && slip_44 == ZILLIQA {
-                providers.insert(ExchangeProvider::ZilSwap(ZilSwapMeta::for_chain(
-                    chain_hash,
-                    chain_id,
-                    slip_44,
-                    account_addr,
-                )));
+                if let Some(meta) =
+                    ZilSwapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
+                {
+                    providers.insert(ExchangeProvider::ZilSwap(meta));
+                }
             }
 
             if addr_prefix == 4 && slip_44 == TRON {
@@ -173,7 +176,7 @@ pub async fn bootstrap_exchange_providers(
         }
     };
 
-    let mut assets: HashMap<(u64, usize), ExchangeAsset> = HashMap::with_capacity(total_tokens);
+    let mut assets: HashMap<(u64, usize, u8), ExchangeAsset> = HashMap::with_capacity(total_tokens);
 
     for provider in all_providers
         .into_iter()
@@ -183,13 +186,9 @@ pub async fn bootstrap_exchange_providers(
         let slip_44 = chain.slip_44;
         let chain_id = chain.chain_id();
         for token in chain.ftokens {
-            let key = (token.chain_hash, token.addr.to_hash());
-            let mut providers = make_providers(
-                token.addr.prefix_type(),
-                slip_44,
-                chain_id,
-                token.chain_hash,
-            );
+            let addr_prefix = token.addr.prefix_type();
+            let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
+            let mut providers = make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
             scope_providers(&mut providers, token.chain_hash);
             let halted = resolve_halted(&providers, slip_44, chain_id);
             assets.entry(key).or_insert_with(|| ExchangeAsset {
@@ -202,7 +201,8 @@ pub async fn bootstrap_exchange_providers(
 
     for wallet in service.core.wallets.iter() {
         for token in wallet.get_ftokens().map_err(|e| e.to_string())? {
-            let key = (token.chain_hash, token.addr.to_hash());
+            let addr_prefix = token.addr.prefix_type();
+            let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
             match assets.get_mut(&key) {
                 Some(existing) => {
                     existing.token.rate = token.rate;
@@ -218,12 +218,8 @@ pub async fn bootstrap_exchange_providers(
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let mut providers = make_providers(
-                        token.addr.prefix_type(),
-                        slip_44,
-                        chain_id,
-                        token.chain_hash,
-                    );
+                    let mut providers =
+                        make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
                     scope_providers(&mut providers, token.chain_hash);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     assets.insert(
