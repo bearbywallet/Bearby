@@ -54,6 +54,8 @@ class _ExchangePageState extends State<ExchangePage>
   BigInt? _lastAccount;
   String? _recipientOverride;
   bool _wasLoadingQuote = false;
+  bool _firstFrameDone = false;
+  bool _wasVisible = false;
 
   @override
   void initState() {
@@ -68,7 +70,27 @@ class _ExchangePageState extends State<ExchangePage>
     );
     _appState.addListener(_onAppStateChanged);
     _exchangeState.addListener(_onExchangeStateChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _firstFrameDone = true;
+      _bootstrap();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // go_router keeps this branch alive in an IndexedStack and only toggles
+    // TickerMode when the tab becomes (in)active. Use that flip to re-fetch
+    // balances/assets on re-entry — initState runs only on the first visit.
+    final isVisible = TickerMode.valuesOf(context).enabled;
+    if (isVisible && !_wasVisible && _firstFrameDone) {
+      // Defer: didChangeDependencies runs during build, but _bootstrap calls
+      // notifyListeners() which would mark the provider dirty mid-build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _bootstrap(initialFrom: _exchangeState.fromAsset);
+      });
+    }
+    _wasVisible = isVisible;
   }
 
   @override
@@ -587,6 +609,11 @@ class _ExchangePageState extends State<ExchangePage>
             rate: token.rate,
             appState: _appState,
           );
+    final status = state.quoteStatus;
+    final amountInWei =
+        from == null ? BigInt.zero : toDecimalsWei(_amount, from.token.decimals);
+    final showSkeleton =
+        status == QuoteStatus.loading && amountInWei > BigInt.zero;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -613,7 +640,7 @@ class _ExchangePageState extends State<ExchangePage>
                         if (currentChild != null) currentChild
                       ],
                     ),
-                    child: quote == null
+                    child: showSkeleton
                         ? SkeletonBox(
                             key: const ValueKey('get-skeleton'),
                             width: 150,
