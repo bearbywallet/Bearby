@@ -42,6 +42,11 @@ extension ExchangeProviderMeta on ExchangeProvider {
       );
 }
 
+/// Display lifecycle of the current quote, distinct from [loadingQuote] (which
+/// only drives the countdown radial). The Get card renders off this so a
+/// `quote == null` does not get mistaken for "still loading".
+enum QuoteStatus { idle, loading, ready, noRoute }
+
 class ExchangeState extends ChangeNotifier {
   static const Duration pollInterval = Duration(seconds: 10);
 
@@ -55,6 +60,7 @@ class ExchangeState extends ChangeNotifier {
   Timer? _pollTimer;
   bool _loadingQuote = false;
   String? _pendingAmountWei;
+  QuoteStatus _quoteStatus = QuoteStatus.idle;
 
   List<ExchangeAsset> get payAssets => _payAssets;
   List<ExchangeAsset> get getAssets => _getAssets;
@@ -63,6 +69,7 @@ class ExchangeState extends ChangeNotifier {
   bool get loadingAssets => _loadingAssets;
   String? get assetsError => _assetsError;
   bool get loadingQuote => _loadingQuote;
+  QuoteStatus get quoteStatus => _quoteStatus;
 
   int slippageFor(ExchangeProvider provider) =>
       _slippageBps[provider.common.displayName] ?? provider.defaultSlippageBps;
@@ -121,12 +128,14 @@ class ExchangeState extends ChangeNotifier {
 
   void selectFrom(ExchangeAsset asset) {
     _fromAsset = asset;
+    _quoteStatus = QuoteStatus.idle;
     _stopPolling();
     notifyListeners();
   }
 
   void selectTo(ExchangeAsset asset) {
     _toAsset = asset;
+    _quoteStatus = QuoteStatus.idle;
     _restartPollingIfReady();
     notifyListeners();
   }
@@ -145,11 +154,15 @@ class ExchangeState extends ChangeNotifier {
 
   void clearQuotes() {
     _stopPolling();
+    _setQuoteStatus(QuoteStatus.idle);
   }
 
   void _restartPollingIfReady() {
     _stopPolling();
-    if (_fromAsset == null || _toAsset == null) return;
+    if (_fromAsset == null || _toAsset == null) {
+      _setQuoteStatus(QuoteStatus.idle);
+      return;
+    }
     unawaited(refreshOnce());
     _pollTimer = Timer.periodic(pollInterval, (_) => unawaited(refreshOnce()));
   }
@@ -163,10 +176,13 @@ class ExchangeState extends ChangeNotifier {
     final from = _fromAsset;
     final to = _toAsset;
     final amount = _pendingAmountWei;
-    if (from == null || to == null || amount == null) return;
-    if ((BigInt.tryParse(amount) ?? BigInt.zero) <= BigInt.zero) {
+    if (from == null ||
+        to == null ||
+        amount == null ||
+        (BigInt.tryParse(amount) ?? BigInt.zero) <= BigInt.zero) {
       _stopPolling();
       _clearQuotes();
+      _setQuoteStatus(QuoteStatus.idle);
       return;
     }
 
@@ -175,17 +191,27 @@ class ExchangeState extends ChangeNotifier {
       'to=${to.token.symbol} amount=$amount providers=${from.providers.length}',
     );
     _loadingQuote = true;
+    _quoteStatus = QuoteStatus.loading;
     notifyListeners();
     try {
-      _fromAsset = await refreshExchangeQuotes(from: from, to: to, amount: amount);
-      final quoted = _fromAsset?.providers.where((p) => p.quote != null).length ?? 0;
+      final next = await refreshExchangeQuotes(from: from, to: to, amount: amount);
+      _fromAsset = next;
+      final quoted = next.providers.where((p) => p.quote != null).length;
+      _quoteStatus = quoted > 0 ? QuoteStatus.ready : QuoteStatus.noRoute;
       debugPrint('[ExchangeState] refreshOnce done quotedProviders=$quoted');
     } catch (e) {
       debugPrint('[ExchangeState] quote refresh failed: $e');
+      _quoteStatus = QuoteStatus.noRoute;
     } finally {
       _loadingQuote = false;
       notifyListeners();
     }
+  }
+
+  void _setQuoteStatus(QuoteStatus status) {
+    if (_quoteStatus == status) return;
+    _quoteStatus = status;
+    notifyListeners();
   }
 
   /// Remove quotes from all providers on [_fromAsset] so the UI reflects a

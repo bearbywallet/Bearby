@@ -42,9 +42,9 @@
         "standard": "none"
       },
       {
-        "name": "Blockchain.com",
-        "icon": "https://blockstream.info/favicon.ico",
-        "url": "https://www.blockchain.com/explorer",
+        "name": "Blockstream",
+        "icon": "https://blockstream.info/img/favicon.png",
+        "url": "https://blockstream.info",
         "standard": "none"
       }
     ]
