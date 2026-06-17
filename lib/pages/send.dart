@@ -1,4 +1,5 @@
 import 'package:bearby/components/app_icon.dart';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:bearby/components/wallet_selector_card.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/modals/transfer.dart';
@@ -37,6 +39,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   int _tokenIndex = 0;
   String _amount = "0";
   bool _hasDecimalPoint = false;
+  bool _isFetchingToken = false;
   String? _address;
   String? _walletName;
 
@@ -208,6 +211,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
                                     token: token,
                                     balance: balance,
                                     onAmountChanged: _updateValue,
+                                    isTokenLoading: _isFetchingToken,
                                     onTokenTap: () => showTokenSelectModal(
                                       context: context,
                                       onTokenSelected: (int value) {
@@ -287,15 +291,14 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
         resolvedTokenIndex = argTokenIndex;
       }
 
-      if (argTokenAddress != null &&
-          argTokenAddress.isNotEmpty &&
-          wallet != null) {
-        final lowerAddr = argTokenAddress.toLowerCase();
-        for (var i = 0; i < wallet.tokens.length; i++) {
-          if (wallet.tokens[i].addr.toLowerCase() == lowerAddr) {
-            resolvedTokenIndex = i;
-            break;
-          }
+      if (argTokenAddress != null && wallet != null) {
+        final scannedTokenIndex = findScannedTokenIndex(
+          tokenAddress: argTokenAddress,
+          walletTokens: wallet.tokens,
+        );
+        if (scannedTokenIndex != -1 &&
+            !wallet.tokens[scannedTokenIndex].native) {
+          resolvedTokenIndex = scannedTokenIndex;
         }
       }
 
@@ -316,7 +319,52 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       }
 
       _initialized = true;
+      unawaited(_resolveScannedTokenAddress(argTokenAddress));
     }
+  }
+
+  Future<void> _resolveScannedTokenAddress(String? tokenAddress) async {
+    final wallet = _appState.wallet;
+    if (wallet == null ||
+        !shouldFetchScannedToken(
+          tokenAddress: tokenAddress,
+          walletTokens: wallet.tokens,
+        )) {
+      return;
+    }
+
+    setState(() => _isFetchingToken = true);
+
+    final result = await resolveScannedToken(
+      tokenAddress: tokenAddress,
+      walletTokens: wallet.tokens,
+      walletIndex: _appState.selectedWalletIndex,
+    );
+
+    if (result.added) {
+      try {
+        await _appState.syncData();
+      } catch (e) {
+        debugPrint('send token syncData failed: $e');
+      }
+    }
+
+    if (!mounted) return;
+
+    final updatedWallet = _appState.wallet;
+    final resolvedIndex = result.token == null || updatedWallet == null
+        ? -1
+        : findScannedTokenIndex(
+            tokenAddress: result.token!.addr,
+            walletTokens: updatedWallet.tokens,
+          );
+
+    setState(() {
+      _isFetchingToken = false;
+      if (resolvedIndex != -1) {
+        _tokenIndex = resolvedIndex;
+      }
+    });
   }
 
   void handleBackspace() {

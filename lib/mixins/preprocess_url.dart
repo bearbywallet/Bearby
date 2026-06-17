@@ -53,8 +53,10 @@ String processTokenLogo({
   required FTokenInfo token,
   required String shortName,
   required String theme,
+  String? fallbackLogo,
 }) {
-  if (token.logo == null) return 'assets/icons/warning.svg';
+  final template = token.logo ?? fallbackLogo;
+  if (template == null) return 'assets/icons/warning.svg';
 
   final replacements = <String, String>{
     'symbol': token.symbol.toLowerCase(),
@@ -64,7 +66,7 @@ String processTokenLogo({
   };
 
   return processUrlTemplate(
-    template: token.logo!,
+    template: template,
     theme: theme,
     replacements: replacements,
   );

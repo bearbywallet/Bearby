@@ -19,6 +19,7 @@ class TokenAmountCard extends StatelessWidget {
   final BigInt balance;
   final void Function(String amount) onAmountChanged;
   final VoidCallback onTokenTap;
+  final bool isTokenLoading;
 
   const TokenAmountCard({
     super.key,
@@ -27,6 +28,7 @@ class TokenAmountCard extends StatelessWidget {
     required this.balance,
     required this.onAmountChanged,
     required this.onTokenTap,
+    this.isTokenLoading = false,
   });
 
   void _setPercent(int percent) {
@@ -137,7 +139,7 @@ class TokenAmountCard extends StatelessWidget {
 
   Widget _buildTokenSelector(AppState appState, AppTheme theme) {
     return GestureDetector(
-      onTap: onTokenTap,
+      onTap: isTokenLoading ? null : onTokenTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -150,7 +152,17 @@ class TokenAmountCard extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TokenAvatar(token: token, appState: appState),
+            if (isTokenLoading)
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: theme.primaryPurple,
+                ),
+              )
+            else
+              TokenAvatar(token: token, appState: appState),
             const SizedBox(width: 8),
             Text(
               token.symbol,
@@ -262,5 +274,4 @@ class TokenAmountCard extends StatelessWidget {
       ),
     );
   }
-
 }

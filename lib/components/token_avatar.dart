@@ -92,6 +92,7 @@ class TokenAvatar extends StatelessWidget {
               token: t,
               shortName: appState.chain?.shortName ?? '',
               theme: theme.value,
+              fallbackLogo: appState.wallet?.tokens.firstOrNull?.logo,
             ),
           _ => null,
         };
