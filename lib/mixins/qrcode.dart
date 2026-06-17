@@ -1,4 +1,5 @@
 import 'package:bearby/config/ftokens.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 
 enum QrSecretKind { bearby, bip39Mnemonic, wifPrivateKey, hexPrivateKey, unknown }
 
@@ -162,4 +163,22 @@ Map<String, String?> parseCryptoUrl(String url) {
   }
 
   return result;
+}
+
+/// Cross-chain guard used by both deep-link handling and QR scanning.
+///
+/// Returns `true` when [targetChain] (the chain prefix of a payment URI /
+/// QR, e.g. "tron", "zil", "ethereum") refers to the same network as
+/// [network]. Compared case-insensitively against the network's
+/// `shortName`, ticker (`chain`) and display `name` — all sourced from
+/// `assets/chains/*.json` via [NetworkConfigInfo], so there are no
+/// hardcoded aliases to keep in sync.
+bool chainMatches(NetworkConfigInfo network, String targetChain) {
+  final target = targetChain.toLowerCase();
+
+  return <String>[
+    network.shortName,
+    network.chain,
+    network.name,
+  ].any((field) => field.toLowerCase() == target);
 }

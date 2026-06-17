@@ -632,6 +632,8 @@
   "addNetworkPageSuccess": "Сеть успешно добавлена",
   "qrCodeUnrecognizedError": "QR-код не распознан. Используйте поддерживаемый формат.",
   "qrCodeScanError": "Не удалось прочитать QR-код. Попробуйте ещё раз.",
+  "homePageQrScanErrorTitle": "Ошибка",
+  "homePageQrScanOkButton": "ОК",
   "qrCodeEmptySeedError": "QR-код не содержит слов сид-фразы.",
   "qrCodeInvalidWordsError": "QR-код содержит недопустимые слова BIP39.",
   "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ.",

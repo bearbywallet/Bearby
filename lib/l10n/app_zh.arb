@@ -620,6 +620,8 @@
   "addNetworkPageSuccess": "网络添加成功",
   "qrCodeUnrecognizedError": "无法识别二维码，请使用支持的格式。",
   "qrCodeScanError": "读取二维码失败，请重试。",
+  "homePageQrScanErrorTitle": "错误",
+  "homePageQrScanOkButton": "确定",
   "qrCodeEmptySeedError": "二维码不包含助记词。",
   "qrCodeInvalidWordsError": "二维码包含无效的 BIP39 单词。",
   "qrCodeInvalidKeyError": "二维码包含无效的私钥。",
