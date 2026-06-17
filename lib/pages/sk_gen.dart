@@ -11,6 +11,7 @@ import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/backup_confirmation_modal.dart';
 import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -28,11 +29,29 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
   KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
   bool _hasBackupWords = false;
   bool isCopied = false;
+  NetworkConfigInfo? _chain;
 
   @override
   void initState() {
     super.initState();
     _regenerateKeys();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
+
+    if (chain == null && _chain == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.pushReplacement(AppRoutes.netSetup);
+      });
+    } else if (_chain == null) {
+      setState(() {
+        _chain = chain;
+      });
+    }
   }
 
   Future<void> _regenerateKeys() async {
@@ -165,7 +184,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
                           backgroundColor: theme.primaryPurple,
                           text: l10n.secretKeyGeneratorPageNextButton,
                           onPressed: () {
-                            context.pushReplacement(AppRoutes.netSetup, extra: {'keys': _keyPair});
+                            context.push(AppRoutes.passSetup, extra: {'keys': _keyPair, 'chain': _chain});
                           },
                           borderRadius: 30.0,
                           height: 56.0,

@@ -169,27 +169,24 @@ class _ConfirmationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isConfirmed
-              ? theme.background
-              : theme.background.withValues(alpha: 0.2),
+      child: CheckboxListTile(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        child: CheckboxListTile(
-          title: Text(
-            text,
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
-            ),
+        tileColor: isConfirmed
+            ? theme.background
+            : theme.background.withValues(alpha: 0.2),
+        title: Text(
+          text,
+          style: TextStyle(
+            color: theme.textSecondary,
+            fontSize: 16,
           ),
-          tileColor: theme.buttonText,
-          value: isConfirmed,
-          onChanged: (value) => onConfirmed(value!),
-          controlAffinity: ListTileControlAffinity.leading,
-          activeColor: theme.primaryPurple,
         ),
+        value: isConfirmed,
+        onChanged: (value) => onConfirmed(value!),
+        controlAffinity: ListTileControlAffinity.leading,
+        activeColor: theme.primaryPurple,
       ),
     );
   }
