@@ -44,22 +44,8 @@ class _TokenCardState extends State<TokenCard>
   }
 
   Widget _buildIcon(AppState state, double iconSize) {
-    final FTokenInfo token = FTokenInfo(
-      name: widget.ftoken.name,
-      symbol: widget.ftoken.symbol,
-      decimals: widget.ftoken.decimals,
-      addr: widget.ftoken.addr,
-      addrType: widget.ftoken.addrType,
-      balances: {},
-      rate: 0,
-      default_: widget.ftoken.default_,
-      native: widget.ftoken.native,
-      chainHash: widget.ftoken.chainHash,
-      logo: widget.ftoken.logo ?? state.wallet?.tokens.first.logo,
-    );
-
     return TokenAvatar(
-      token: token,
+      token: widget.ftoken,
       size: iconSize,
       appState: state,
       showNetworkBadge: false,

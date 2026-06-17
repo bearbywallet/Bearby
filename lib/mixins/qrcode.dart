@@ -1,5 +1,8 @@
 import 'package:bearby/config/ftokens.dart';
+import 'package:bearby/src/rust/api/token.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
+import 'package:flutter/foundation.dart';
 
 enum QrSecretKind { bearby, bip39Mnemonic, wifPrivateKey, hexPrivateKey, unknown }
 
@@ -132,6 +135,72 @@ Map<String, String> parseQRSecretData(String qrData) {
   }
 
   return result;
+}
+
+String? _normalizeScannedTokenAddress(String? tokenAddress) {
+  final addr = tokenAddress?.trim();
+  if (addr == null || addr.isEmpty) return null;
+  return addr;
+}
+
+bool isNativeScannedTokenAddress(String? tokenAddress) {
+  final addr = _normalizeScannedTokenAddress(tokenAddress)?.toLowerCase();
+  return addr == zeroEVM || addr == zeroZIL;
+}
+
+int findScannedTokenIndex({
+  required String? tokenAddress,
+  required List<FTokenInfo> walletTokens,
+}) {
+  final addr = _normalizeScannedTokenAddress(tokenAddress);
+  if (addr == null) return -1;
+
+  final lower = addr.toLowerCase();
+  return walletTokens.indexWhere((token) => token.addr.toLowerCase() == lower);
+}
+
+bool shouldFetchScannedToken({
+  required String? tokenAddress,
+  required List<FTokenInfo> walletTokens,
+}) {
+  return _normalizeScannedTokenAddress(tokenAddress) != null &&
+      findScannedTokenIndex(
+            tokenAddress: tokenAddress,
+            walletTokens: walletTokens,
+          ) ==
+          -1 &&
+      !isNativeScannedTokenAddress(tokenAddress);
+}
+
+Future<({FTokenInfo? token, bool added})> resolveScannedToken({
+  required String? tokenAddress,
+  required List<FTokenInfo> walletTokens,
+  required BigInt walletIndex,
+}) async {
+  final addr = _normalizeScannedTokenAddress(tokenAddress);
+  if (addr == null) return (token: null, added: false);
+
+  final tokenIndex = findScannedTokenIndex(
+    tokenAddress: addr,
+    walletTokens: walletTokens,
+  );
+  if (tokenIndex != -1) {
+    final token = walletTokens[tokenIndex];
+    return (token: token.native ? null : token, added: false);
+  }
+
+  if (isNativeScannedTokenAddress(addr)) {
+    return (token: null, added: false);
+  }
+
+  try {
+    final meta = await fetchTokenMeta(addr: addr, walletIndex: walletIndex);
+    await addFtoken(meta: meta, walletIndex: walletIndex);
+    return (token: meta, added: true);
+  } catch (e) {
+    debugPrint('resolveScannedToken failed: $e');
+    return (token: null, added: false);
+  }
 }
 
 Map<String, String?> parseCryptoUrl(String url) {

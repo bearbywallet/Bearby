@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
   String? _errorMessage;
   bool _isRefreshing = false;
   bool _hasInitialSync = false;
+  bool _isHandlingScan = false;
 
   @override
   void didChangeDependencies() {
@@ -132,56 +133,65 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
   }
 
   Future<void> _handleQrScanResult(String rawData) async {
+    if (_isHandlingScan) return;
+
     final trimmed = rawData.trim();
     if (trimmed.isEmpty) return;
 
-    final appState = Provider.of<AppState>(context, listen: false);
-    final activeChain = appState.chain;
-
-    // Chain-aware parse (EIP-681 style: "chain:address?amount=...&token=...").
-    // A plain address with no scheme yields an empty map; we then treat the
-    // whole payload as the recipient.
-    final parsed = parseCryptoUrl(trimmed);
-    final String? qrChain = parsed['chain'];
-    final String address = (parsed['address'] ?? trimmed);
-    final String? amount = parsed['amount'];
-    final String? tokenAddress = parsed['token'];
-
-    final bool wrongChain = qrChain != null &&
-        qrChain.isNotEmpty &&
-        activeChain != null &&
-        !chainMatches(activeChain, qrChain);
-
-    if (wrongChain) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      _showScanError();
-      return;
-    }
+    _isHandlingScan = true;
 
     try {
-      final ok = await isValidAddress(addr: address);
-      if (!ok) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final activeChain = appState.chain;
+
+      // Chain-aware parse (EIP-681 style: "chain:address?amount=...&token=...").
+      // A plain address with no scheme yields an empty map; we then treat the
+      // whole payload as the recipient.
+      final parsed = parseCryptoUrl(trimmed);
+      final String? qrChain = parsed['chain'];
+      final String address = (parsed['address'] ?? trimmed);
+      final String? amount = parsed['amount'];
+      final String? tokenAddress = parsed['token'];
+
+      final bool wrongChain = qrChain != null &&
+          qrChain.isNotEmpty &&
+          activeChain != null &&
+          !chainMatches(activeChain, qrChain);
+
+      if (wrongChain) {
         if (!mounted) return;
         Navigator.of(context).pop();
         _showScanError();
         return;
       }
-    } catch (e) {
-      debugPrint('address validation error: $e');
+
+      try {
+        final ok = await isValidAddress(addr: address);
+        if (!ok) {
+          if (!mounted) return;
+          Navigator.of(context).pop();
+          _showScanError();
+          return;
+        }
+      } catch (e) {
+        debugPrint('address validation error: $e');
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showScanError();
+        return;
+      }
+
       if (!mounted) return;
       Navigator.of(context).pop();
-      _showScanError();
-      return;
-    }
 
-    if (!mounted) return;
-    Navigator.of(context).pop();
-    _goToSendPage(
-      recipient: address,
-      amount: amount,
-      tokenAddress: tokenAddress,
-    );
+      _goToSendPage(
+        recipient: address,
+        amount: amount,
+        tokenAddress: tokenAddress,
+      );
+    } finally {
+      _isHandlingScan = false;
+    }
   }
 
   @override
