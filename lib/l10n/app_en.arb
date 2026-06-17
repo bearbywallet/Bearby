@@ -2487,6 +2487,14 @@
   "@qrCodeScanError": {
     "description": "Error when QR code scanning or parsing throws an exception"
   },
+  "homePageQrScanErrorTitle": "Error",
+  "@homePageQrScanErrorTitle": {
+    "description": "Title of the error dialog shown when a scanned QR code cannot be used on the home page"
+  },
+  "homePageQrScanOkButton": "OK",
+  "@homePageQrScanOkButton": {
+    "description": "Dismiss button of the QR scan error dialog on the home page"
+  },
   "qrCodeEmptySeedError": "QR code contains no seed words.",
   "@qrCodeEmptySeedError": {
     "description": "Error when QR code produces an empty seed phrase"

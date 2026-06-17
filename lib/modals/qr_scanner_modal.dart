@@ -15,7 +15,7 @@ import 'package:bearby/l10n/app_localizations.dart';
 
 void showQRScannerModal({
   required BuildContext context,
-  required Function(String) onScanned,
+  required void Function(String) onScanned,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -35,7 +35,7 @@ void showQRScannerModal({
 }
 
 class _QRScannerModalContent extends StatefulWidget {
-  final Function(String) onScanned;
+  final void Function(String) onScanned;
 
   const _QRScannerModalContent({required this.onScanned});
 

@@ -274,16 +274,47 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     if (!_initialized) {
       final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
       final int? argTokenIndex = args?['token_index'];
+      final String? argRecipient = args?['recipient'] as String?;
+      final String? argAmount = args?['amount'] as String?;
+      final String? argTokenAddress = args?['token_address'] as String?;
       final wallet = _appState.wallet;
 
+      int? resolvedTokenIndex;
       if (argTokenIndex != null &&
           wallet != null &&
           argTokenIndex >= 0 &&
           argTokenIndex < wallet.tokens.length) {
-        setState(() {
-          _tokenIndex = argTokenIndex;
-        });
+        resolvedTokenIndex = argTokenIndex;
       }
+
+      if (argTokenAddress != null &&
+          argTokenAddress.isNotEmpty &&
+          wallet != null) {
+        final lowerAddr = argTokenAddress.toLowerCase();
+        for (var i = 0; i < wallet.tokens.length; i++) {
+          if (wallet.tokens[i].addr.toLowerCase() == lowerAddr) {
+            resolvedTokenIndex = i;
+            break;
+          }
+        }
+      }
+
+      setState(() {
+        if (resolvedTokenIndex != null) {
+          _tokenIndex = resolvedTokenIndex;
+        }
+      });
+
+      if (argRecipient != null && argRecipient.isNotEmpty) {
+        final QRcodeScanResultInfo info = QRcodeScanResultInfo(
+          recipient: argRecipient,
+          amount: argAmount,
+          tokenAddress: argTokenAddress,
+        );
+        final l10n = AppLocalizations.of(context);
+        _applyQrcode(info, l10n?.addressSelectModalContentUnknown ?? '');
+      }
+
       _initialized = true;
     }
   }
@@ -421,19 +452,24 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
     super.dispose();
   }
 
-  void updateAddress(QRcodeScanResultInfo params, String name) {
+  void _applyQrcode(QRcodeScanResultInfo params, String name) {
     setState(() {
       if (params.recipient.isNotEmpty) {
         _address = params.recipient;
       }
 
-      if (params.amount != null && params.amount!.isNotEmpty) {
-        _amount = params.amount!;
+      final amount = params.amount;
+      if (amount != null && amount.isNotEmpty) {
+        _amount = amount;
+        _hasDecimalPoint = amount.contains('.');
       }
 
       _walletName = name;
     });
+  }
 
+  void updateAddress(QRcodeScanResultInfo params, String name) {
+    _applyQrcode(params, name);
     context.pop();
   }
 

@@ -65,7 +65,7 @@ class DeepLinkService {
       final currentChain = appState.chain;
       final canNavigate = appState.account != null &&
           currentChain != null &&
-          _chainMatches(currentChain.shortName, chainName);
+          chainMatches(currentChain, chainName);
 
       if (canNavigate) {
         router.push(AppRoutes.send, extra: sendArgs);
@@ -77,29 +77,11 @@ class DeepLinkService {
     }
   }
 
-  bool _chainMatches(String currentChain, String targetChain) {
-    final current = currentChain.toLowerCase();
-    final target = targetChain.toLowerCase();
-
-    if (current == target) return true;
-
-    final chainAliases = {
-      'bnbchain': 'bnb',
-      'bnb': 'bnbchain',
-      'avalanche': 'avax',
-      'avax': 'avalanche',
-      'zilliqa': 'zil',
-      'zil': 'zilliqa',
-    };
-
-    return chainAliases[current] == target || chainAliases[target] == current;
-  }
-
   int _findWalletByChainName(AppState appState, String chainName) {
     for (int i = 0; i < appState.wallets.length; i++) {
       final chain = appState.chain;
 
-      if (chain != null && _chainMatches(chain.shortName, chainName)) {
+      if (chain != null && chainMatches(chain, chainName)) {
         return i;
       }
     }

@@ -14,10 +14,12 @@ import 'package:bearby/components/token_card.dart';
 import 'package:bearby/components/wallet_header.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -74,6 +76,112 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     await appState.syncData();
 
     _isRefreshing = false;
+  }
+
+  void _goToSendPage({String? recipient, String? amount, String? tokenAddress}) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final wallet = appState.wallet;
+    if (wallet == null) return;
+
+    final filteredTokens = wallet.tokens
+        .where((t) => t.addrType == appState.account?.addrType)
+        .toList();
+    if (filteredTokens.isEmpty) return;
+
+    final originalIndex = wallet.tokens.indexOf(filteredTokens.first);
+
+    final Map<String, Object> extra = <String, Object>{
+      'token_index': originalIndex,
+    };
+    if (recipient != null) extra['recipient'] = recipient;
+    if (amount != null) extra['amount'] = amount;
+    if (tokenAddress != null) extra['token_address'] = tokenAddress;
+
+    context.push(AppRoutes.send, extra: extra);
+  }
+
+  void _showScanError() {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext ctx) => AlertDialog(
+        backgroundColor: theme.cardBackground,
+        title: Text(
+          l10n.homePageQrScanErrorTitle,
+          style: theme.titleMedium.copyWith(color: theme.textPrimary),
+        ),
+        content: Text(
+          l10n.qrCodeUnrecognizedError,
+          style: theme.bodyLarge.copyWith(color: theme.danger),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              l10n.homePageQrScanOkButton,
+              style: theme.bodyLarge.copyWith(color: theme.primaryPurple),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleQrScanResult(String rawData) async {
+    final trimmed = rawData.trim();
+    if (trimmed.isEmpty) return;
+
+    final appState = Provider.of<AppState>(context, listen: false);
+    final activeChain = appState.chain;
+
+    // Chain-aware parse (EIP-681 style: "chain:address?amount=...&token=...").
+    // A plain address with no scheme yields an empty map; we then treat the
+    // whole payload as the recipient.
+    final parsed = parseCryptoUrl(trimmed);
+    final String? qrChain = parsed['chain'];
+    final String address = (parsed['address'] ?? trimmed);
+    final String? amount = parsed['amount'];
+    final String? tokenAddress = parsed['token'];
+
+    final bool wrongChain = qrChain != null &&
+        qrChain.isNotEmpty &&
+        activeChain != null &&
+        !chainMatches(activeChain, qrChain);
+
+    if (wrongChain) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      _showScanError();
+      return;
+    }
+
+    try {
+      final ok = await isValidAddress(addr: address);
+      if (!ok) {
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showScanError();
+        return;
+      }
+    } catch (e) {
+      debugPrint('address validation error: $e');
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      _showScanError();
+      return;
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+    _goToSendPage(
+      recipient: address,
+      amount: amount,
+      tokenAddress: tokenAddress,
+    );
   }
 
   @override
@@ -146,9 +254,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     onScan: () {
                       showQRScannerModal(
                         context: context,
-                        onScanned: (result) {
-                          // Handle scanned QR code
-                        },
+                        onScanned: _handleQrScanResult,
                       );
                     },
                   ),
@@ -174,14 +280,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                       ),
                       title: l10n.homePageSendButton,
                       fillWidth: true,
-                      onPressed: () {
-                        if (filteredTokens.isNotEmpty) {
-                          final originalIndex =
-                              appState.wallet!.tokens.indexOf(filteredTokens[0]);
-                          context.push(AppRoutes.send,
-                              extra: {'token_index': originalIndex});
-                        }
-                      },
+                      onPressed: () => _goToSendPage(),
                       backgroundColor: theme.cardBackground,
                       textColor: theme.primaryPurple,
                     ),
