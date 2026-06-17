@@ -253,6 +253,7 @@ class _ExchangePageState extends State<ExchangePage>
           relay: (_) => true,
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
+          zilSwap: (_) => true,
         ) ??
         false;
     if (!supported) {

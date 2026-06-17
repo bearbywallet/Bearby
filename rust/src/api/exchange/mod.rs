@@ -4,8 +4,8 @@ mod evm;
 pub mod ledger;
 mod svm;
 pub(crate) mod tron;
+mod zil;
 
-// Flutter-facing re-exports — only what FRB needs to see.
 pub use bootstrap::{bootstrap_exchange_providers, refresh_exchange_quotes};
 pub use ledger::{
     check_exchange_approval, estimate_swap_base_nonce, finalize_exchange_swap,
@@ -14,7 +14,7 @@ pub use ledger::{
 
 use crate::frb_generated::StreamSink;
 use crate::models::exchange::relay::RelayOrigin;
-use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
+use crate::models::exchange::{ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
 
 pub async fn execute_exchange_swap(
@@ -38,6 +38,8 @@ pub async fn execute_exchange_swap(
                 evm::execute_evm_exchange_swap(auth, params, display, &sink).await
             }
         }
+    } else if matches!(&params.provider, ExchangeProvider::ZilSwap(_)) {
+        zil::execute_zil_exchange_swap(auth, params, display, &sink).await
     } else {
         evm::execute_evm_exchange_swap(auth, params, display, &sink).await
     };
