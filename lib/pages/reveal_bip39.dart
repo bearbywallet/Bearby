@@ -7,8 +7,8 @@ import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/smart_input.dart';
-import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/load_button.dart';
+import 'package:bearby/config/settings.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
@@ -36,7 +36,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   bool _obscurePassword = true;
   String? seedPhrase;
   Timer? _countdownTimer;
-  int _remainingTime = 3600;
+  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -56,7 +56,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   void _startCountdown() {
     setState(() {
       isTimerActive = true;
-      _remainingTime = 3600;
+      _remainingTime = SecuritySettings.revealDelaySeconds;
     });
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -73,10 +73,9 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   }
 
   String _formatTime(int seconds) {
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
+    final minutes = seconds ~/ 60;
     final secs = seconds % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   void _onPasswordSubmit(BigInt walletIndex) async {
@@ -109,7 +108,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
             "${AppLocalizations.of(context)!.revealSecretPhraseInvalidPassword} $e";
       });
       _btnController.error();
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(SecuritySettings.errorResetDuration);
       _btnController.reset();
     }
   }
@@ -136,6 +135,16 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
               child: CustomAppBar(
                 title: AppLocalizations.of(context)!.revealSecretPhraseTitle,
                 onBackPressed: () => Navigator.pop(context),
+                actionIcon: (canShowPhrase && seedPhrase != null)
+                    ? AppIconView(
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
+                        size: 24,
+                        color: theme.textPrimary,
+                      )
+                    : null,
+                onActionPressed: (canShowPhrase && seedPhrase != null)
+                    ? () => _handleCopy(seedPhrase ?? "")
+                    : null,
               ),
             ),
             Expanded(
@@ -200,17 +209,6 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                         seedPhrase != null) ...[
                       _buildQrCode(theme),
                       _buildPhraseDisplay(theme),
-                      SizedBox(height: adaptivePadding),
-                      TileButton(
-                        icon: AppIconView(
-                          icon: isCopied ? AppIcon.check : AppIcon.copy,
-                          size: 24,
-                          color: theme.primaryPurple,
-                        ),
-                        onPressed: () => _handleCopy(seedPhrase ?? ""),
-                        backgroundColor: theme.cardBackground,
-                        textColor: theme.primaryPurple,
-                      ),
                       SizedBox(height: adaptivePadding),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
@@ -278,7 +276,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(
-            value: 1 - (_remainingTime / 3600),
+            value: 1 - (_remainingTime / SecuritySettings.revealDelaySeconds),
             backgroundColor: theme.background,
             valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
             borderRadius: BorderRadius.circular(4),
@@ -411,7 +409,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
       isCopied = true;
     });
 
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
 
     setState(() {
       isCopied = false;
