@@ -159,6 +159,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         relay: (_) => true,
         uniswap: (_) => false,
         pancakeSwap: (_) => false,
+        plunderSwap: (_) => false,
         zilSwap: (_) => false,
         sunSwap: (_) => false,
       );

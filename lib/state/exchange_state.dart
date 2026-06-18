@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:bearby/src/rust/api/exchange/bootstrap.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/exchange/pancakeswap.dart';
+import 'package:bearby/src/rust/models/exchange/plunderswap.dart';
 import 'package:bearby/src/rust/models/exchange/relay.dart';
 import 'package:bearby/src/rust/models/exchange/uniswap.dart';
 
@@ -13,6 +14,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         relay: (v) => v.field0.common,
         uniswap: (v) => v.field0.common,
         pancakeSwap: (v) => v.field0.common,
+        plunderSwap: (v) => v.field0.common,
         zilSwap: (v) => v.field0.common,
         sunSwap: (v) => v.field0.common,
       );
@@ -21,6 +23,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         relay: (v) => v.field0.quote,
         uniswap: (v) => v.field0.quote,
         pancakeSwap: (v) => v.field0.quote,
+        plunderSwap: (v) => v.field0.quote,
         zilSwap: (v) => v.field0.quote,
         sunSwap: (v) => v.field0.quote,
       );
@@ -29,6 +32,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         relay: (v) => v.field0.cfg.defaultSlippageBps,
         uniswap: (v) => v.field0.cfg.defaultSlippageBps,
         pancakeSwap: (v) => v.field0.cfg.defaultSlippageBps,
+        plunderSwap: (v) => v.field0.cfg.defaultSlippageBps,
         zilSwap: (_) => 50,
         sunSwap: (_) => 50,
       );
@@ -37,6 +41,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         relay: (v) => v.field0.cfg.supportsPriceProtection,
         uniswap: (v) => v.field0.cfg.supportsPriceProtection,
         pancakeSwap: (v) => v.field0.cfg.supportsPriceProtection,
+        plunderSwap: (v) => v.field0.cfg.supportsPriceProtection,
         zilSwap: (_) => false,
         sunSwap: (_) => false,
       );
@@ -245,6 +250,11 @@ class ExchangeState extends ChangeNotifier {
         quote: null,
       )),
       pancakeSwap: (v) => ExchangeProvider.pancakeSwap(PancakeMeta(
+        common: v.field0.common,
+        cfg: v.field0.cfg,
+        quote: null,
+      )),
+      plunderSwap: (v) => ExchangeProvider.plunderSwap(PlunderMeta(
         common: v.field0.common,
         cfg: v.field0.cfg,
         quote: null,

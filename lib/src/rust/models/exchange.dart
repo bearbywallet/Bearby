@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import 'exchange/pancakeswap.dart';
+import 'exchange/plunderswap.dart';
 import 'exchange/relay.dart';
 import 'exchange/uniswap.dart';
 import 'ftoken.dart';
@@ -50,6 +51,9 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   const factory ExchangeProvider.pancakeSwap(
     PancakeMeta field0,
   ) = ExchangeProvider_PancakeSwap;
+  const factory ExchangeProvider.plunderSwap(
+    PlunderMeta field0,
+  ) = ExchangeProvider_PlunderSwap;
   const factory ExchangeProvider.zilSwap(
     ZilSwapMeta field0,
   ) = ExchangeProvider_ZilSwap;
