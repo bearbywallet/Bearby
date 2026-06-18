@@ -325,8 +325,13 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   Future<void> _completeAndExit(AppState appState) async {
     await appState.syncData();
     if (!mounted) return;
+    final done = widget.onDone;
     Navigator.of(context).pop();
-    widget.onDone();
+    // Defer the tab switch: onDone calls context.go(), which tears down this
+    // branch. Running it synchronously right after pop() races the modal's
+    // teardown and trips _debugLocked / Duplicate GlobalKey assertions in
+    // NavigatorState.dispose.
+    WidgetsBinding.instance.addPostFrameCallback((_) => done());
   }
 
   /// Reset all steps to [_StepState.pending] before a fresh confirm attempt.
