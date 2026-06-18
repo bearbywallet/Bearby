@@ -8,8 +8,8 @@ import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/hex_key.dart';
 import 'package:bearby/components/smart_input.dart';
-import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/load_button.dart';
+import 'package:bearby/config/settings.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -37,7 +37,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   bool _obscurePassword = true;
   KeyPairInfo? keys;
   Timer? _countdownTimer;
-  int _remainingTime = 1800;
+  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -57,7 +57,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   void _startCountdown() {
     setState(() {
       isTimerActive = true;
-      _remainingTime = 1800;
+      _remainingTime = SecuritySettings.revealDelaySeconds;
     });
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -109,7 +109,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
         errorMessage = "${l10n.revealSecretKeyInvalidPassword} $e";
       });
       _btnController.error();
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(SecuritySettings.errorResetDuration);
       _btnController.reset();
     }
   }
@@ -137,6 +137,16 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
               child: CustomAppBar(
                 title: l10n.revealSecretKeyTitle,
                 onBackPressed: () => Navigator.pop(context),
+                actionIcon: (canShowKey && keys != null)
+                    ? AppIconView(
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
+                        size: 24,
+                        color: theme.textPrimary,
+                      )
+                    : null,
+                onActionPressed: (canShowKey && keys != null)
+                    ? () => _handleCopy(keys?.sk ?? "")
+                    : null,
               ),
             ),
             Expanded(
@@ -201,17 +211,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                       HexKeyDisplay(
                         hexKey: keys!.sk,
                         title: "",
-                      ),
-                      SizedBox(height: adaptivePadding),
-                      TileButton(
-                        icon: AppIconView(
-                          icon: isCopied ? AppIcon.check : AppIcon.copy,
-                          size: 24,
-                          color: theme.primaryPurple,
-                        ),
-                        onPressed: () => _handleCopy(keys?.sk ?? ""),
-                        backgroundColor: theme.cardBackground,
-                        textColor: theme.primaryPurple,
                       ),
                       SizedBox(height: adaptivePadding),
                       Container(
@@ -282,7 +281,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(
-            value: 1 - (_remainingTime / 1800),
+            value: 1 - (_remainingTime / SecuritySettings.revealDelaySeconds),
             backgroundColor: theme.background,
             valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
             borderRadius: BorderRadius.circular(4),
@@ -364,7 +363,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       isCopied = true;
     });
 
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
 
     setState(() {
       isCopied = false;
