@@ -261,19 +261,48 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                       _buildTokenSelector(appState, token),
                                       const SizedBox(height: 24),
                                       if (appState.account != null)
-                                        SizedBox(
-                                          width: 220,
-                                          height: 220,
-                                          child: AsyncQRcode(
-                                            data: generateCryptoUrl(
-                                              address: currentAddress,
-                                              chain: chain.shortName,
-                                              token: token.addr,
-                                              amount: amount,
+                                        GestureDetector(
+                                          onTap: () =>
+                                              handleCopy(currentAddress),
+                                          child: SizedBox(
+                                            width: 220,
+                                            height: 220,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                AsyncQRcode(
+                                                  data: generateCryptoUrl(
+                                                    address: currentAddress,
+                                                    chain: chain.shortName,
+                                                    token: token.addr,
+                                                    amount: amount,
+                                                  ),
+                                                  color: theme.primaryPurple,
+                                                  size: 220,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                                AnimatedOpacity(
+                                                  opacity: isCopied ? 1.0 : 0.0,
+                                                  duration: const Duration(
+                                                      milliseconds: 150),
+                                                  child: Container(
+                                                    width: 64,
+                                                    height: 64,
+                                                    decoration: BoxDecoration(
+                                                      color: theme.background
+                                                          .withValues(
+                                                              alpha: 0.9),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: AppIconView(
+                                                      icon: AppIcon.check,
+                                                      size: 36,
+                                                      color: theme.success,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            color: theme.primaryPurple,
-                                            size: 220,
-                                            fit: BoxFit.contain,
                                           ),
                                         ),
                                       const SizedBox(height: 16),
