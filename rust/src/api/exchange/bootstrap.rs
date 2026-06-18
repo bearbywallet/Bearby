@@ -19,6 +19,34 @@ fn chain_matches_network(chain: &ChainConfig, is_testnet: bool) -> bool {
     chain.testnet.unwrap_or(false) == is_testnet
 }
 
+const fn zilliqa_mode_addr_type(zil_evm_mode: bool) -> u8 {
+    if zil_evm_mode {
+        1
+    } else {
+        0
+    }
+}
+
+fn zilliqa_token_matches_mode(slip_44: u32, addr_prefix: u8, zil_evm_mode: bool) -> bool {
+    slip_44 != ZILLIQA || addr_prefix == zilliqa_mode_addr_type(zil_evm_mode)
+}
+
+fn provider_names(providers: &HashSet<ExchangeProvider>) -> String {
+    let mut names: Vec<&str> = providers
+        .iter()
+        .map(|provider| match provider {
+            ExchangeProvider::Relay(_) => "Relay",
+            ExchangeProvider::Uniswap(_) => "Uniswap",
+            ExchangeProvider::PancakeSwap(_) => "PancakeSwap",
+            ExchangeProvider::PlunderSwap(_) => "PlunderSwap",
+            ExchangeProvider::ZilSwap(_) => "ZilSwap",
+            ExchangeProvider::SunSwap(_) => "SunSwap",
+        })
+        .collect();
+    names.sort_unstable();
+    names.join(",")
+}
+
 pub async fn bootstrap_exchange_providers(
     wallet_index: usize,
     account_index: usize,
@@ -103,6 +131,15 @@ pub async fn bootstrap_exchange_providers(
             }
         }
     }
+
+    let zil_evm_mode = zil_evm_account.is_some();
+    let zil_mode_addr_type = zilliqa_mode_addr_type(zil_evm_mode);
+    eprintln!(
+        "[exchange-bootstrap] wallet_index={wallet_index} account_index={account_index} active_chain_hash={} current_is_testnet={current_is_testnet} zil_mode={} zil_addr_type={zil_mode_addr_type} relay_accounts={}",
+        wallet_data.chain_hash,
+        if zil_evm_mode { "evm" } else { "scilla" },
+        relay_accounts.len()
+    );
 
     let total_tokens: usize = all_providers
         .iter()
@@ -197,6 +234,7 @@ pub async fn bootstrap_exchange_providers(
     };
 
     let mut assets: HashMap<(u64, usize, u8), ExchangeAsset> = HashMap::with_capacity(total_tokens);
+    let mut skipped_mode_tokens = 0usize;
 
     for provider in all_providers
         .into_iter()
@@ -207,10 +245,29 @@ pub async fn bootstrap_exchange_providers(
         let chain_id = chain.chain_id();
         for token in chain.ftokens {
             let addr_prefix = token.addr.prefix_type();
+            if !zilliqa_token_matches_mode(slip_44, addr_prefix, zil_evm_mode) {
+                skipped_mode_tokens = skipped_mode_tokens.saturating_add(1);
+                eprintln!(
+                    "[exchange-bootstrap] skip mode-mismatch provider_token symbol={} chain_hash={} addr_type={} expected_addr_type={zil_mode_addr_type}",
+                    token.symbol,
+                    token.chain_hash,
+                    addr_prefix
+                );
+                continue;
+            }
             let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
             let mut providers = make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
             scope_providers(&mut providers, token.chain_hash);
             let halted = resolve_halted(&providers, slip_44, chain_id);
+            let names = provider_names(&providers);
+            if !providers.is_empty() {
+                eprintln!(
+                    "[exchange-bootstrap] add provider_token symbol={} chain_hash={} addr_type={} providers={names}",
+                    token.symbol,
+                    token.chain_hash,
+                    addr_prefix
+                );
+            }
             assets.entry(key).or_insert_with(|| ExchangeAsset {
                 token: token.into(),
                 providers,
@@ -222,6 +279,18 @@ pub async fn bootstrap_exchange_providers(
     for wallet in service.core.wallets.iter() {
         for token in wallet.get_ftokens().map_err(|e| e.to_string())? {
             let addr_prefix = token.addr.prefix_type();
+            if let Some(&(slip_44, _)) = chain_meta.get(&token.chain_hash) {
+                if !zilliqa_token_matches_mode(slip_44, addr_prefix, zil_evm_mode) {
+                    skipped_mode_tokens = skipped_mode_tokens.saturating_add(1);
+                    eprintln!(
+                        "[exchange-bootstrap] skip mode-mismatch wallet_token symbol={} chain_hash={} addr_type={} expected_addr_type={zil_mode_addr_type}",
+                        token.symbol,
+                        token.chain_hash,
+                        addr_prefix
+                    );
+                    continue;
+                }
+            }
             let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
             match assets.get_mut(&key) {
                 Some(existing) => {
@@ -242,6 +311,15 @@ pub async fn bootstrap_exchange_providers(
                         make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
                     scope_providers(&mut providers, token.chain_hash);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
+                    let names = provider_names(&providers);
+                    if !providers.is_empty() {
+                        eprintln!(
+                            "[exchange-bootstrap] add wallet_token symbol={} chain_hash={} addr_type={} providers={names}",
+                            token.symbol,
+                            token.chain_hash,
+                            addr_prefix
+                        );
+                    }
                     assets.insert(
                         key,
                         ExchangeAsset {
@@ -255,10 +333,16 @@ pub async fn bootstrap_exchange_providers(
         }
     }
 
-    Ok(assets
+    let result: Vec<ExchangeAsset> = assets
         .into_values()
         .filter(|asset| !asset.providers.is_empty())
-        .collect())
+        .collect();
+    eprintln!(
+        "[exchange-bootstrap] complete assets={} skipped_mode_tokens={skipped_mode_tokens}",
+        result.len()
+    );
+
+    Ok(result)
 }
 
 pub async fn refresh_exchange_quotes(
@@ -302,6 +386,7 @@ pub async fn refresh_exchange_quotes(
             zilpay::tokio::task::spawn(async move {
                 let from_addr = from_asset.token.addr.clone();
                 let to_addr = to_asset.token.addr.clone();
+                let provider_name = provider.common().display_name.clone();
                 match provider
                     .quote_info(
                         &from_asset,
@@ -313,7 +398,17 @@ pub async fn refresh_exchange_quotes(
                     .await
                 {
                     Ok(quote) => Some(provider.with_quote(quote)),
-                    Err(_err) => Some(provider.without_quote()),
+                    Err(err) => {
+                        eprintln!(
+                            "[exchange-quotes] provider={provider_name} from_symbol={} to_symbol={} from_addr_type={} to_addr_type={} amount={} error={err}",
+                            from_asset.token.symbol,
+                            to_asset.token.symbol,
+                            from_asset.token.addr_type,
+                            to_asset.token.addr_type,
+                            amount
+                        );
+                        Some(provider.without_quote())
+                    }
                 }
             })
         })
