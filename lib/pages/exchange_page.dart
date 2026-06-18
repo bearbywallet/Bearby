@@ -214,9 +214,12 @@ class _ExchangePageState extends State<ExchangePage>
       _recipientOverride = null;
     });
     _exchangeState.selectFrom(asset);
-    if (_exchangeState.toAsset == asset || _exchangeState.toAsset == null) {
-      final outs = _outAssets(_exchangeState);
-      if (outs.isNotEmpty) _exchangeState.selectTo(outs.first);
+    final to = _exchangeState.toAsset;
+    if (to == null) return;
+
+    final outs = _outAssets(_exchangeState);
+    if (to == asset || !outs.contains(to)) {
+      _exchangeState.clearTo();
     }
   }
 
@@ -342,8 +345,7 @@ class _ExchangePageState extends State<ExchangePage>
       ExchangeState state) {
     final from = state.fromAsset;
     final to = state.toAsset;
-    if (!state.loadingAssets &&
-        (state.assetsError != null || from == null || to == null)) {
+    if (!state.loadingAssets && (state.assetsError != null || from == null)) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(padding),
@@ -386,7 +388,7 @@ class _ExchangePageState extends State<ExchangePage>
                 ),
               ),
               if (to == null)
-                const SizedBox(height: 120)
+                _buildEmptyGetCard(theme, l10n, state)
               else
                 _buildGetCard(theme, l10n, to, state),
               const SizedBox(height: 8),
@@ -592,6 +594,52 @@ class _ExchangePageState extends State<ExchangePage>
     return '1 ${from.token.symbol} ≈ $rateAmount ${to.token.symbol}';
   }
 
+  Widget _buildEmptyGetCard(
+      AppTheme theme, AppLocalizations l10n, ExchangeState state) {
+    final outs = _outAssets(state);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.exchangePageGet,
+                  style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  outs.isEmpty ? l10n.exchangePageNoAssets : 'Select token',
+                  style: theme.displayLarge.copyWith(
+                    color: theme.textPrimary,
+                    fontSize: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _buildEmptyTokenSelector(
+            theme,
+            outs.isNotEmpty
+                ? () => showExchangeTokenSelectModal(
+                      context: context,
+                      assets: outs,
+                      onSelected: _selectTo,
+                    )
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to,
       ExchangeState state) {
     final token = to.token;
@@ -612,8 +660,9 @@ class _ExchangePageState extends State<ExchangePage>
             appState: _appState,
           );
     final status = state.quoteStatus;
-    final amountInWei =
-        from == null ? BigInt.zero : toDecimalsWei(_amount, from.token.decimals);
+    final amountInWei = from == null
+        ? BigInt.zero
+        : toDecimalsWei(_amount, from.token.decimals);
     final showSkeleton =
         status == QuoteStatus.loading && amountInWei > BigInt.zero;
     return Container(
@@ -713,6 +762,44 @@ class _ExchangePageState extends State<ExchangePage>
           color: theme.primaryPurple,
           decoration: TextDecoration.underline,
           decorationColor: theme.primaryPurple,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyTokenSelector(AppTheme theme, VoidCallback? onTap) {
+    final enabled = onTap != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: theme.textPrimary.withValues(alpha: enabled ? 0.2 : 0.08),
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Select',
+              style: theme.bodyText1.copyWith(
+                color: enabled
+                    ? theme.textPrimary
+                    : theme.textSecondary.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(width: 4),
+            AppIconView(
+              icon: AppIcon.arrowDown,
+              size: 12,
+              color: enabled
+                  ? theme.textSecondary
+                  : theme.textSecondary.withValues(alpha: 0.5),
+            ),
+          ],
         ),
       ),
     );

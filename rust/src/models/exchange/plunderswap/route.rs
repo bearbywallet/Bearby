@@ -137,6 +137,38 @@ fn v3_candidates<'a>(
         })
 }
 
+async fn request_quote_batch(
+    chain_config: &ChainConfig,
+    payload: &Value,
+) -> Result<Vec<ResultRes<Value>>, String> {
+    let provider: RpcProvider<ChainConfig> = RpcProvider::new(chain_config);
+    match provider.req::<Vec<ResultRes<Value>>>(payload.clone()).await {
+        Ok(res) => Ok(res),
+        Err(primary_error) => {
+            eprintln!("[plunderswap-quote] batch eth_call transport_error={primary_error}");
+            if chain_config.chain_id() != super::ZILLIQA_MAINNET_CHAIN_ID {
+                return Err(primary_error.to_string());
+            }
+
+            let client = zilpay::reqwest::Client::new();
+            let mut fallback_error = primary_error.to_string();
+            for url in ["https://api.zilliqa.com/evm", "https://api.zilliqa.com"] {
+                eprintln!("[plunderswap-quote] retry batch eth_call rpc_url={url}");
+                let response = client.post(url).json(payload).send().await;
+                match response {
+                    Ok(response) => match response.json::<Vec<ResultRes<Value>>>().await {
+                        Ok(res) => return Ok(res),
+                        Err(err) => fallback_error = err.to_string(),
+                    },
+                    Err(err) => fallback_error = err.to_string(),
+                }
+            }
+
+            Err(fallback_error)
+        }
+    }
+}
+
 #[frb(ignore)]
 pub(super) async fn quote_route(
     chain_hash: u64,
@@ -177,11 +209,23 @@ pub(super) async fn quote_route(
     .await
     .map_err(|e: ServiceError| e.to_string())?;
 
-    let provider: RpcProvider<ChainConfig> = RpcProvider::new(&chain_config);
-    let res = provider
-        .req::<Vec<ResultRes<Value>>>(Value::Array(calls))
-        .await
-        .map_err(|e| e.to_string())?;
+    eprintln!(
+        "[plunderswap-quote] batch eth_call count={} v2_paths={} v3_fees={} chain_hash={chain_hash} chain_id={} token_in={token_in} token_out={token_out} gross_amount={amount_in} net_amount={net_amount_in} rpc_nodes={}",
+        calls.len(),
+        v2_paths.len(),
+        cfg.fee_tiers.len(),
+        cfg.addrs.chain_id,
+        chain_config.rpc.join(",")
+    );
+
+    let payload = Value::Array(calls);
+    let res = request_quote_batch(&chain_config, &payload).await?;
+
+    let successful = res.iter().filter(|item| item.error.is_none()).count();
+    eprintln!(
+        "[plunderswap-quote] batch eth_call response count={} successful={successful}",
+        res.len()
+    );
 
     best_route(v2_candidates(&res, &v2_paths).chain(v3_candidates(
         &res,

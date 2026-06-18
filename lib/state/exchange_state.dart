@@ -86,8 +86,10 @@ class ExchangeState extends ChangeNotifier {
       null,
       (best, provider) {
         if (best == null) return provider;
-        final bestAmt = BigInt.tryParse(best.quote?.amountOut ?? '') ?? BigInt.zero;
-        final amount = BigInt.tryParse(provider.quote?.amountOut ?? '') ?? BigInt.zero;
+        final bestAmt =
+            BigInt.tryParse(best.quote?.amountOut ?? '') ?? BigInt.zero;
+        final amount =
+            BigInt.tryParse(provider.quote?.amountOut ?? '') ?? BigInt.zero;
         return amount > bestAmt ? provider : best;
       },
     );
@@ -109,17 +111,21 @@ class ExchangeState extends ChangeNotifier {
         walletIndex: walletIndex,
         accountIndex: accountIndex,
       );
-      final pay = all.where((a) => a.token.chainHash == activeChainHash).toList();
+      final pay =
+          all.where((a) => a.token.chainHash == activeChainHash).toList();
+      debugPrint(
+        '[ExchangeState] bootstrap all=${all.length} pay=${pay.length} '
+        'activeChainHash=$activeChainHash assets=${all.map(_assetDebug).join('; ')}',
+      );
       final get = all;
       final from = pay.isNotEmpty
           ? pay.firstWhere((a) => a.token.native, orElse: () => pay.first)
           : _fromAsset;
-      final to = _toAsset ?? get.where((a) => a != from).firstOrNull;
 
       _payAssets = pay;
       _getAssets = get;
       _fromAsset = from;
-      _toAsset = to;
+      _toAsset = _toAsset == from ? null : _toAsset;
       _loadingAssets = false;
       notifyListeners();
       _restartPollingIfReady();
@@ -142,6 +148,14 @@ class ExchangeState extends ChangeNotifier {
     _toAsset = asset;
     _quoteStatus = QuoteStatus.idle;
     _restartPollingIfReady();
+    notifyListeners();
+  }
+
+  void clearTo() {
+    _toAsset = null;
+    _stopPolling();
+    _clearQuotes();
+    _setQuoteStatus(QuoteStatus.idle);
     notifyListeners();
   }
 
@@ -199,7 +213,8 @@ class ExchangeState extends ChangeNotifier {
     _quoteStatus = QuoteStatus.loading;
     notifyListeners();
     try {
-      final next = await refreshExchangeQuotes(from: from, to: to, amount: amount);
+      final next =
+          await refreshExchangeQuotes(from: from, to: to, amount: amount);
       _fromAsset = next;
       final quoted = next.providers.where((p) => p.quote != null).length;
       _quoteStatus = quoted > 0 ? QuoteStatus.ready : QuoteStatus.noRoute;
@@ -235,6 +250,12 @@ class ExchangeState extends ChangeNotifier {
       _fromAsset = cleared;
       notifyListeners();
     }
+  }
+
+  static String _assetDebug(ExchangeAsset asset) {
+    final providers =
+        asset.providers.map((p) => p.common.displayName).join(',');
+    return '${asset.token.symbol}:addrType=${asset.token.addrType}:native=${asset.token.native}:providers=[$providers]';
   }
 
   static ExchangeProvider _stripQuote(ExchangeProvider p) {
