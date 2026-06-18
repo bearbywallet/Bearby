@@ -257,6 +257,7 @@ class _ExchangePageState extends State<ExchangePage>
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
           plunderSwap: (_) => true,
+          xBridge: (_) => true,
           zilSwap: (_) => true,
         ) ??
         false;
@@ -388,7 +389,7 @@ class _ExchangePageState extends State<ExchangePage>
                 ),
               ),
               if (to == null)
-                _buildEmptyGetCard(theme, l10n, state)
+                _buildEmptyGetCard(theme, state)
               else
                 _buildGetCard(theme, l10n, to, state),
               const SizedBox(height: 8),
@@ -594,8 +595,7 @@ class _ExchangePageState extends State<ExchangePage>
     return '1 ${from.token.symbol} ≈ $rateAmount ${to.token.symbol}';
   }
 
-  Widget _buildEmptyGetCard(
-      AppTheme theme, AppLocalizations l10n, ExchangeState state) {
+  Widget _buildEmptyGetCard(AppTheme theme, ExchangeState state) {
     final outs = _outAssets(state);
     return Container(
       padding: const EdgeInsets.all(14),
@@ -605,26 +605,8 @@ class _ExchangePageState extends State<ExchangePage>
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.exchangePageGet,
-                  style: theme.bodyText2.copyWith(color: theme.textSecondary),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  outs.isEmpty ? l10n.exchangePageNoAssets : 'Select token',
-                  style: theme.displayLarge.copyWith(
-                    color: theme.textPrimary,
-                    fontSize: 28,
-                  ),
-                ),
-              ],
-            ),
-          ),
           _buildEmptyTokenSelector(
             theme,
             outs.isNotEmpty
