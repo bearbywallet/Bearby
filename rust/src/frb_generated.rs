@@ -6350,10 +6350,15 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
             }
             3 => {
                 let mut var_field0 =
+                    <crate::models::exchange::plunderswap::PlunderMeta>::sse_decode(deserializer);
+                return crate::models::exchange::ExchangeProvider::PlunderSwap(var_field0);
+            }
+            4 => {
+                let mut var_field0 =
                     <crate::models::exchange::ZilSwapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::ZilSwap(var_field0);
             }
-            4 => {
+            5 => {
                 let mut var_field0 =
                     <crate::models::exchange::SunSwapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
@@ -7597,6 +7602,34 @@ impl SseDecode for crate::models::stake::PendingWithdrawalInfo {
             amount: var_amount,
             withdrawal_block: var_withdrawalBlock,
             claimable: var_claimable,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::plunderswap::PlunderCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_defaultSlippageBps = <u32>::sse_decode(deserializer);
+        let mut var_supportsPriceProtection = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::plunderswap::PlunderCfg {
+            default_slippage_bps: var_defaultSlippageBps,
+            supports_price_protection: var_supportsPriceProtection,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::plunderswap::PlunderMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_cfg =
+            <crate::models::exchange::plunderswap::PlunderCfg>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
+        return crate::models::exchange::plunderswap::PlunderMeta {
+            common: var_common,
+            cfg: var_cfg,
+            quote: var_quote,
         };
     }
 }
@@ -9620,11 +9653,14 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider
             crate::models::exchange::ExchangeProvider::PancakeSwap(field0) => {
                 [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::PlunderSwap(field0) => {
                 [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
-            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
                 [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
+                [5.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -10095,6 +10131,49 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::stake::PendingWithdrawalIn
     for crate::models::stake::PendingWithdrawalInfo
 {
     fn into_into_dart(self) -> crate::models::stake::PendingWithdrawalInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::plunderswap::PlunderCfg {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.default_slippage_bps.into_into_dart().into_dart(),
+            self.supports_price_protection.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::plunderswap::PlunderCfg
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::plunderswap::PlunderCfg>
+    for crate::models::exchange::plunderswap::PlunderCfg
+{
+    fn into_into_dart(self) -> crate::models::exchange::plunderswap::PlunderCfg {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::plunderswap::PlunderMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.common.into_into_dart().into_dart(),
+            self.cfg.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::plunderswap::PlunderMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::plunderswap::PlunderMeta>
+    for crate::models::exchange::plunderswap::PlunderMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::plunderswap::PlunderMeta {
         self
     }
 }
@@ -11397,12 +11476,16 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
                 <i32>::sse_encode(2, serializer);
                 <crate::models::exchange::pancakeswap::PancakeMeta>::sse_encode(field0, serializer);
             }
-            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
+            crate::models::exchange::ExchangeProvider::PlunderSwap(field0) => {
                 <i32>::sse_encode(3, serializer);
+                <crate::models::exchange::plunderswap::PlunderMeta>::sse_encode(field0, serializer);
+            }
+            crate::models::exchange::ExchangeProvider::ZilSwap(field0) => {
+                <i32>::sse_encode(4, serializer);
                 <crate::models::exchange::ZilSwapMeta>::sse_encode(field0, serializer);
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
-                <i32>::sse_encode(4, serializer);
+                <i32>::sse_encode(5, serializer);
                 <crate::models::exchange::SunSwapMeta>::sse_encode(field0, serializer);
             }
             _ => {
@@ -12341,6 +12424,23 @@ impl SseEncode for crate::models::stake::PendingWithdrawalInfo {
         <String>::sse_encode(self.amount, serializer);
         <u64>::sse_encode(self.withdrawal_block, serializer);
         <bool>::sse_encode(self.claimable, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::plunderswap::PlunderCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.default_slippage_bps, serializer);
+        <bool>::sse_encode(self.supports_price_protection, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::plunderswap::PlunderMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <crate::models::exchange::plunderswap::PlunderCfg>::sse_encode(self.cfg, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
 

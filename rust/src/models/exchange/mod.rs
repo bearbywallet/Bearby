@@ -1,4 +1,5 @@
 pub mod pancakeswap;
+pub mod plunderswap;
 pub mod relay;
 pub mod uniswap;
 pub mod univ_router;
@@ -17,6 +18,7 @@ use super::transactions::base_token::BaseTokenInfo;
 use super::transactions::request::TransactionRequestInfo;
 
 pub use pancakeswap::PancakeMeta;
+pub use plunderswap::PlunderMeta;
 pub use relay::RelayMeta;
 pub use uniswap::UniswapMeta;
 pub use univ_router::{PreparedSwap, RouterConfig};
@@ -122,6 +124,7 @@ macro_rules! identity_from_common {
 identity_from_common!(RelayMeta);
 identity_from_common!(UniswapMeta);
 identity_from_common!(PancakeMeta);
+identity_from_common!(PlunderMeta);
 identity_from_common!(ZilSwapMeta);
 identity_from_common!(SunSwapMeta);
 
@@ -130,13 +133,14 @@ pub enum ExchangeProvider {
     Relay(RelayMeta),
     Uniswap(UniswapMeta),
     PancakeSwap(PancakeMeta),
+    PlunderSwap(PlunderMeta),
     ZilSwap(ZilSwapMeta),
     SunSwap(SunSwapMeta),
 }
 
 impl ExchangeProvider {
     /// `true` for bridge providers that can route across chains (Relay).
-    /// `false` for same-chain DEX providers (Uniswap, PancakeSwap, ZilSwap, SunSwap).
+    /// `false` for same-chain DEX providers (Uniswap, PancakeSwap, PlunderSwap, ZilSwap, SunSwap).
     #[frb(ignore)]
     pub const fn is_bridge(&self) -> bool {
         matches!(self, Self::Relay(_))
@@ -148,6 +152,7 @@ impl ExchangeProvider {
             Self::Relay(m) => &m.common,
             Self::Uniswap(m) => &m.common,
             Self::PancakeSwap(m) => &m.common,
+            Self::PlunderSwap(m) => &m.common,
             Self::ZilSwap(m) => &m.common,
             Self::SunSwap(m) => &m.common,
         }
@@ -159,6 +164,7 @@ impl ExchangeProvider {
             Self::Relay(m) => m.quote.as_ref(),
             Self::Uniswap(m) => m.quote.as_ref(),
             Self::PancakeSwap(m) => m.quote.as_ref(),
+            Self::PlunderSwap(m) => m.quote.as_ref(),
             Self::ZilSwap(m) => m.quote.as_ref(),
             Self::SunSwap(m) => m.quote.as_ref(),
         }
@@ -178,6 +184,10 @@ impl ExchangeProvider {
             Self::PancakeSwap(mut m) => {
                 m.quote = quote;
                 Self::PancakeSwap(m)
+            }
+            Self::PlunderSwap(mut m) => {
+                m.quote = quote;
+                Self::PlunderSwap(m)
             }
             Self::ZilSwap(mut m) => {
                 m.quote = quote;
@@ -205,6 +215,7 @@ impl ExchangeProvider {
         match self {
             Self::Uniswap(m) => m.cfg.default_slippage_bps,
             Self::PancakeSwap(m) => m.cfg.default_slippage_bps,
+            Self::PlunderSwap(m) => m.cfg.default_slippage_bps,
             Self::Relay(m) => m.cfg.default_slippage_bps,
             Self::ZilSwap(_) | Self::SunSwap(_) => 50,
         }
@@ -215,6 +226,7 @@ impl ExchangeProvider {
         match self {
             Self::Uniswap(m) => m.cfg.supports_price_protection,
             Self::PancakeSwap(m) => m.cfg.supports_price_protection,
+            Self::PlunderSwap(m) => m.cfg.supports_price_protection,
             Self::Relay(m) => m.cfg.supports_price_protection,
             Self::ZilSwap(_) | Self::SunSwap(_) => false,
         }
@@ -231,6 +243,9 @@ impl ExchangeProvider {
             }
             Self::PancakeSwap(_) => {
                 addr_type == 1 && slip44 != ZILLIQA && pancakeswap::is_supported_chain(chain_id)
+            }
+            Self::PlunderSwap(_) => {
+                addr_type == 1 && slip44 == ZILLIQA && plunderswap::is_supported_chain(chain_id)
             }
             Self::ZilSwap(_) => {
                 addr_type == 0 && slip44 == ZILLIQA && zilswap::is_supported_chain(chain_id)
@@ -261,6 +276,9 @@ impl ExchangeProvider {
                     .ok_or_else(|| "no engine".to_string())??;
                 univ_router::is_wrap_unwrap(&cfg, from_asset, to_asset, from.token.native)
             }
+            Self::PlunderSwap(meta) if from.token.chain_hash == to.token.chain_hash => {
+                plunderswap::is_wrap_unwrap(meta, from, to, from_asset, to_asset)
+            }
             _ => Ok(false),
         }
     }
@@ -283,9 +301,11 @@ impl ExchangeProvider {
                         .then(|| Cow::Owned(p.common().account_addr.clone()))
                 })
                 .unwrap_or_else(|| Cow::Borrowed(self.common().account_addr.as_str())),
-            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) | Self::SunSwap(_) => {
-                Cow::Borrowed(self.common().account_addr.as_str())
-            }
+            Self::Uniswap(_)
+            | Self::PancakeSwap(_)
+            | Self::PlunderSwap(_)
+            | Self::ZilSwap(_)
+            | Self::SunSwap(_) => Cow::Borrowed(self.common().account_addr.as_str()),
         };
 
         match self {
@@ -309,6 +329,10 @@ impl ExchangeProvider {
             Self::Relay(meta) => relay::relay_quote_info(meta, from, to, amount).await,
             Self::ZilSwap(meta) => {
                 zilswap::zilswap_quote_info(meta, from, to, from_asset, to_asset, amount).await
+            }
+            Self::PlunderSwap(meta) => {
+                plunderswap::plunderswap_quote_info(meta, from, to, from_asset, to_asset, amount)
+                    .await
             }
             Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
@@ -365,6 +389,10 @@ impl ExchangeProvider {
             Self::ZilSwap(meta) => {
                 zilswap::zilswap_check_approval(meta, from, to, amount, approve_title, icon).await
             }
+            Self::PlunderSwap(meta) => {
+                plunderswap::plunderswap_check_approval(meta, from, to, amount, approve_title, icon)
+                    .await
+            }
             Self::SunSwap(_) => Ok(None),
         }
     }
@@ -403,6 +431,9 @@ impl ExchangeProvider {
             Self::Relay(_) => relay::relay_prepare_swap(from, to, amount).await,
             Self::ZilSwap(meta) => {
                 zilswap::zilswap_prepare_swap(meta, from, to, amount, slippage_bps).await
+            }
+            Self::PlunderSwap(meta) => {
+                plunderswap::plunderswap_prepare_swap(meta, from, to, amount, slippage_bps).await
             }
             Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
@@ -454,6 +485,14 @@ impl ExchangeProvider {
                 )
                 .await
             }
+            Self::PlunderSwap(_) => {
+                let swapper =
+                    AlloyAddress::from_str(&common.account_addr).map_err(|e| e.to_string())?;
+                plunderswap::plunderswap_finalize_swap(
+                    quote_blob, chain_hash, swapper, swap_title, swap_info, icon, out_token,
+                )
+                .await
+            }
             Self::SunSwap(_) => Err("provider not implemented".to_string()),
         }
     }
@@ -463,7 +502,7 @@ impl ExchangeProvider {
         match self {
             Self::Uniswap(m) => Some(m.resolve()),
             Self::PancakeSwap(m) => Some(m.resolve()),
-            Self::Relay(_) | Self::ZilSwap(_) | Self::SunSwap(_) => None,
+            Self::Relay(_) | Self::PlunderSwap(_) | Self::ZilSwap(_) | Self::SunSwap(_) => None,
         }
     }
 }
@@ -482,6 +521,7 @@ impl ExchangeAsset {
             ExchangeProvider::Relay(meta) => Some(meta),
             ExchangeProvider::Uniswap(_)
             | ExchangeProvider::PancakeSwap(_)
+            | ExchangeProvider::PlunderSwap(_)
             | ExchangeProvider::ZilSwap(_)
             | ExchangeProvider::SunSwap(_) => None,
         })

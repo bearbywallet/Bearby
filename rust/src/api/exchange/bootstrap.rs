@@ -3,13 +3,14 @@ use std::collections::{HashMap, HashSet};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::crypto::slip44::{BITCOIN, TRON, ZILLIQA};
+use zilpay::proto::pubkey::PubKey;
 use zilpay::rpc::network_config::ChainConfig;
 use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::{
-    ExchangeAsset, ExchangeProvider, PancakeMeta, ProviderQuote, RelayMeta, SunSwapMeta,
-    UniswapMeta, ZilSwapMeta,
+    ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote, RelayMeta,
+    SunSwapMeta, UniswapMeta, ZilSwapMeta,
 };
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::{BackgroundError, ServiceError};
@@ -42,11 +43,18 @@ pub async fn bootstrap_exchange_providers(
 
     let mut relay_accounts: HashMap<u32, String> =
         HashMap::with_capacity(wallet_data.slip44_accounts.len());
+    let mut zil_evm_account: Option<String> = None;
     for (slip44, bip_accounts) in &wallet_data.slip44_accounts {
         let accounts = bip_accounts
             .get(&wallet_data.bip)
             .or_else(|| bip_accounts.values().next());
         if let Some(account) = accounts.and_then(|items| items.get(account_index)) {
+            let is_zilliqa_evm = *slip44 == ZILLIQA
+                && matches!(&account.pub_key, Some(PubKey::Secp256k1Keccak256(_)));
+            if is_zilliqa_evm {
+                zil_evm_account = Some(account.addr.auto_format());
+            }
+
             if *slip44 == BITCOIN {
                 let btc_chain_hash = all_providers
                     .iter()
@@ -114,7 +122,7 @@ pub async fn bootstrap_exchange_providers(
                           chain_hash: u64|
      -> HashSet<ExchangeProvider> {
         let account_addr = relay_accounts.get(&slip_44);
-        let mut providers = HashSet::with_capacity(5);
+        let mut providers = HashSet::with_capacity(6);
 
         if let Some(account_addr) = account_addr {
             if addr_prefix == 1
@@ -150,6 +158,18 @@ pub async fn bootstrap_exchange_providers(
                     ZilSwapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
                 {
                     providers.insert(ExchangeProvider::ZilSwap(meta));
+                }
+            }
+
+            if addr_prefix == 1 && slip_44 == ZILLIQA {
+                if let Some(evm_addr) = zil_evm_account.as_deref() {
+                    if crate::models::exchange::plunderswap::is_supported_chain(chain_id) {
+                        if let Some(meta) =
+                            PlunderMeta::for_chain(chain_hash, chain_id, slip_44, evm_addr)
+                        {
+                            providers.insert(ExchangeProvider::PlunderSwap(meta));
+                        }
+                    }
                 }
             }
 

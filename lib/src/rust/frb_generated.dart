@@ -36,6 +36,7 @@ import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
+import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
@@ -5197,6 +5198,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlunderMeta dco_decode_box_autoadd_plunder_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_plunder_meta(raw);
+  }
+
+  @protected
   ProviderQuote dco_decode_box_autoadd_provider_quote(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_provider_quote(raw);
@@ -5476,10 +5483,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dco_decode_box_autoadd_pancake_meta(raw[1]),
         );
       case 3:
+        return ExchangeProvider_PlunderSwap(
+          dco_decode_box_autoadd_plunder_meta(raw[1]),
+        );
+      case 4:
         return ExchangeProvider_ZilSwap(
           dco_decode_box_autoadd_zil_swap_meta(raw[1]),
         );
-      case 4:
+      case 5:
         return ExchangeProvider_SunSwap(
           dco_decode_box_autoadd_sun_swap_meta(raw[1]),
         );
@@ -6237,6 +6248,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       amount: dco_decode_String(arr[0]),
       withdrawalBlock: dco_decode_u_64(arr[1]),
       claimable: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
+  PlunderCfg dco_decode_plunder_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return PlunderCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  PlunderMeta dco_decode_plunder_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PlunderMeta(
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_plunder_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
     );
   }
 
@@ -7477,6 +7513,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlunderMeta sse_decode_box_autoadd_plunder_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_plunder_meta(deserializer));
+  }
+
+  @protected
   ProviderQuote sse_decode_box_autoadd_provider_quote(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7762,9 +7805,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_field0 = sse_decode_box_autoadd_pancake_meta(deserializer);
         return ExchangeProvider_PancakeSwap(var_field0);
       case 3:
+        var var_field0 = sse_decode_box_autoadd_plunder_meta(deserializer);
+        return ExchangeProvider_PlunderSwap(var_field0);
+      case 4:
         var var_field0 = sse_decode_box_autoadd_zil_swap_meta(deserializer);
         return ExchangeProvider_ZilSwap(var_field0);
-      case 4:
+      case 5:
         var var_field0 = sse_decode_box_autoadd_sun_swap_meta(deserializer);
         return ExchangeProvider_SunSwap(var_field0);
       default:
@@ -8877,6 +8923,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         amount: var_amount,
         withdrawalBlock: var_withdrawalBlock,
         claimable: var_claimable);
+  }
+
+  @protected
+  PlunderCfg sse_decode_plunder_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return PlunderCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
+  PlunderMeta sse_decode_plunder_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_plunder_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return PlunderMeta(common: var_common, cfg: var_cfg, quote: var_quote);
   }
 
   @protected
@@ -10082,6 +10147,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_plunder_meta(
+      PlunderMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_plunder_meta(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_provider_quote(
       ProviderQuote self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -10322,11 +10394,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case ExchangeProvider_PancakeSwap(field0: final field0):
         sse_encode_i_32(2, serializer);
         sse_encode_box_autoadd_pancake_meta(field0, serializer);
-      case ExchangeProvider_ZilSwap(field0: final field0):
+      case ExchangeProvider_PlunderSwap(field0: final field0):
         sse_encode_i_32(3, serializer);
+        sse_encode_box_autoadd_plunder_meta(field0, serializer);
+      case ExchangeProvider_ZilSwap(field0: final field0):
+        sse_encode_i_32(4, serializer);
         sse_encode_box_autoadd_zil_swap_meta(field0, serializer);
       case ExchangeProvider_SunSwap(field0: final field0):
-        sse_encode_i_32(4, serializer);
+        sse_encode_i_32(5, serializer);
         sse_encode_box_autoadd_sun_swap_meta(field0, serializer);
     }
   }
@@ -11205,6 +11280,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.amount, serializer);
     sse_encode_u_64(self.withdrawalBlock, serializer);
     sse_encode_bool(self.claimable, serializer);
+  }
+
+  @protected
+  void sse_encode_plunder_cfg(PlunderCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
+  void sse_encode_plunder_meta(PlunderMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_plunder_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
   }
 
   @protected

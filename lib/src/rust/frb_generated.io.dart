@@ -35,6 +35,7 @@ import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
+import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
@@ -231,6 +232,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PancakeMeta dco_decode_box_autoadd_pancake_meta(dynamic raw);
+
+  @protected
+  PlunderMeta dco_decode_box_autoadd_plunder_meta(dynamic raw);
 
   @protected
   ProviderQuote dco_decode_box_autoadd_provider_quote(dynamic raw);
@@ -602,6 +606,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
   @protected
+  PlunderCfg dco_decode_plunder_cfg(dynamic raw);
+
+  @protected
+  PlunderMeta dco_decode_plunder_meta(dynamic raw);
+
+  @protected
   PreparedSwapInfo dco_decode_prepared_swap_info(dynamic raw);
 
   @protected
@@ -949,6 +959,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PancakeMeta sse_decode_box_autoadd_pancake_meta(SseDeserializer deserializer);
+
+  @protected
+  PlunderMeta sse_decode_box_autoadd_plunder_meta(SseDeserializer deserializer);
 
   @protected
   ProviderQuote sse_decode_box_autoadd_provider_quote(
@@ -1363,6 +1376,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  PlunderCfg sse_decode_plunder_cfg(SseDeserializer deserializer);
+
+  @protected
+  PlunderMeta sse_decode_plunder_meta(SseDeserializer deserializer);
+
+  @protected
   PreparedSwapInfo sse_decode_prepared_swap_info(SseDeserializer deserializer);
 
   @protected
@@ -1735,6 +1754,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_pancake_meta(
       PancakeMeta self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_plunder_meta(
+      PlunderMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_provider_quote(
@@ -2163,6 +2186,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_pending_withdrawal_info(
       PendingWithdrawalInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_plunder_cfg(PlunderCfg self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_plunder_meta(PlunderMeta self, SseSerializer serializer);
 
   @protected
   void sse_encode_prepared_swap_info(
