@@ -136,6 +136,27 @@ class SocialMediaService {
     }
   }
 
+  Future<void> openEmail({
+    required String email,
+    String? subject,
+    String? body,
+  }) async {
+    final Uri uri = Uri(
+      scheme: 'mailto',
+      path: email,
+      queryParameters: {
+        if (subject != null) 'subject': subject,
+        if (body != null) 'body': body,
+      },
+    );
+
+    try {
+      await launchUrl(uri);
+    } catch (e) {
+      debugPrint('Error launching email: $e');
+    }
+  }
+
   Future<void> _handleAppNotInstalled({
     required String webUrl,
     required String androidStore,

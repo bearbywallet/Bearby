@@ -213,6 +213,7 @@
   "settingsPageTelegram": "Telegram",
   "settingsPageTwitter": "X",
   "settingsPageGitHub": "GitHub",
+  "settingsPageEmail": "电子邮件",
   "settingsPageAbout": "关于",
   "passwordSetupPageSubtitle": "创建密码",
   "passwordSetupPageWalletNameHint": "钱包名称",

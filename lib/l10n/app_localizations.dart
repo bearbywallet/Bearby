@@ -1445,6 +1445,12 @@ abstract class AppLocalizations {
   /// **'GitHub'**
   String get settingsPageGitHub;
 
+  /// Label for the email support item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get settingsPageEmail;
+
   /// Label for the About settings item in the SettingsPage component
   ///
   /// In en, this message translates to:

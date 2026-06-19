@@ -716,6 +716,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPageGitHub => 'GitHub';
 
   @override
+  String get settingsPageEmail => '电子邮件';
+
+  @override
   String get settingsPageAbout => '关于';
 
   @override

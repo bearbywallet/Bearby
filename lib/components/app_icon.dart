@@ -15,7 +15,7 @@ enum AppIcon {
   compass, cookie, copy, currency,
 
   data, disconnect, document,
-  dots, edit, exchange,
+  dots, edit, email, exchange,
   faceId, file, fingerprint,
   gear, globe, graph,
   history, importWallet, incognito,
@@ -98,6 +98,7 @@ class AppIconView extends StatelessWidget {
         AppIcon.document      => const IconData(0xe23a, fontFamily: _f),
         AppIcon.dots          => const IconData(0xe1fe, fontFamily: _f),
         AppIcon.edit          => const IconData(0xe3b4, fontFamily: _f),
+        AppIcon.email         => const IconData(0xe0ac, fontFamily: _f),
         AppIcon.exchange      => const IconData(0xe0a0, fontFamily: _f),
         AppIcon.faceId        => const IconData(0xebb6, fontFamily: _f),
         AppIcon.file          => const IconData(0xe230, fontFamily: _f),

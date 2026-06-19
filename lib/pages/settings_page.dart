@@ -228,6 +228,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               SettingsItem(
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageEmail,
+                                trailingWidget: AppIconView(icon: AppIcon.email, size: 26 * 0.7, color: theme.textSecondary),
+                                onTap: () => socialMediaService.openEmail(
+                                  email: 'contact@bearby.io',
+                                  subject: 'Bearby Support',
+                                ),
+                              ),
+                              SettingsItem(
                                 isFirst: false,
                                 isLast: true,
                                 title: AppLocalizations.of(context)!

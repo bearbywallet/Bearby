@@ -213,6 +213,7 @@
   "settingsPageTelegram": "Telegram",
   "settingsPageTwitter": "X",
   "settingsPageGitHub": "GitHub",
+  "settingsPageEmail": "이메일",
   "settingsPageAbout": "정보",
   "passwordSetupPageSubtitle": "비밀번호 생성",
   "passwordSetupPageWalletNameHint": "지갑 이름",

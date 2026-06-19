@@ -853,6 +853,10 @@
   "@settingsPageGitHub": {
     "description": "Label for the GitHub settings item in the SettingsPage component"
   },
+  "settingsPageEmail": "Email",
+  "@settingsPageEmail": {
+    "description": "Label for the email support item in the SettingsPage component"
+  },
   "settingsPageAbout": "About",
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
