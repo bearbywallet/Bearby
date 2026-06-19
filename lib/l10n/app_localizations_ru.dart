@@ -719,6 +719,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsPageGitHub => 'GitHub';
 
   @override
+  String get settingsPageEmail => 'Почта';
+
+  @override
   String get settingsPageAbout => 'О приложении';
 
   @override

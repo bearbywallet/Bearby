@@ -716,6 +716,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsPageGitHub => 'GitHub';
 
   @override
+  String get settingsPageEmail => 'メール';
+
+  @override
   String get settingsPageAbout => 'アプリについて';
 
   @override

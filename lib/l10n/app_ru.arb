@@ -213,6 +213,7 @@
   "settingsPageTelegram": "Telegram",
   "settingsPageTwitter": "X",
   "settingsPageGitHub": "GitHub",
+  "settingsPageEmail": "Почта",
   "settingsPageAbout": "О приложении",
   "passwordSetupPageSubtitle": "Создать пароль",
   "passwordSetupPageWalletNameHint": "Название кошелька",

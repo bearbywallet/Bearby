@@ -716,6 +716,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsPageGitHub => 'GitHub';
 
   @override
+  String get settingsPageEmail => '이메일';
+
+  @override
   String get settingsPageAbout => '정보';
 
   @override
