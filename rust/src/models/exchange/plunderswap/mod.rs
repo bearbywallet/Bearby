@@ -1,4 +1,5 @@
 mod abi;
+pub(super) mod gate;
 mod math;
 mod route;
 mod tx;

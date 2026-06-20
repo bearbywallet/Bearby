@@ -1,4 +1,5 @@
 mod abi;
+pub(super) mod gate;
 mod math;
 mod route;
 mod tx;
@@ -210,7 +211,7 @@ struct ResolvedSwap {
 
 /// Convert a TRON base58 address (`T...`) to 20-byte EVM hex (`0x...`) for ABI
 /// calldata. EVM hex addresses and the native sentinel pass through unchanged.
-fn to_evm_hex(addr: &str) -> Result<String, String> {
+pub(super) fn to_evm_hex(addr: &str) -> Result<String, String> {
     if addr.starts_with("0x") || addr.is_empty() {
         return Ok(addr.to_owned());
     }

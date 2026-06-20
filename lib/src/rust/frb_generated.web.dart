@@ -630,6 +630,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QrConfigInfo dco_decode_qr_config_info(dynamic raw);
 
   @protected
+  (List<ExchangeAsset>, bool) dco_decode_record_list_exchange_asset_bool(
+      dynamic raw);
+
+  @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
       dco_decode_record_list_network_config_info_list_network_config_info(
           dynamic raw);
@@ -1402,6 +1406,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer);
+
+  @protected
+  (List<ExchangeAsset>, bool) sse_decode_record_list_exchange_asset_bool(
+      SseDeserializer deserializer);
 
   @protected
   (List<NetworkConfigInfo>, List<NetworkConfigInfo>)
@@ -2219,6 +2227,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_list_exchange_asset_bool(
+      (List<ExchangeAsset>, bool) self, SseSerializer serializer);
 
   @protected
   void sse_encode_record_list_network_config_info_list_network_config_info(
