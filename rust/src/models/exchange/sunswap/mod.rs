@@ -26,8 +26,8 @@ pub const TRON_MAINNET_CHAIN_ID: u64 = 728_126_428;
 pub const TRON_NILE_CHAIN_ID: u64 = 3_448_148_188;
 
 // Nile (deployed — dex-router/README.md "SunSwap Nile deployment").
-const NILE_FEE_ROUTER: &str = "TDFFv6NX5LmSM5CLT1GeCLrZZZzcikrNjv";
-const NILE_QUOTE_LENS: &str = "TRrqgpCdKHgpiFehMbj34UTeByWP5TSnik";
+const NILE_FEE_ROUTER: &str = "TVSy9pau8hqRwYNGJ4rU9LwebDbTQGHNVE";
+const NILE_QUOTE_LENS: &str = "TKvmxYRWK7Ea9YQ1LTyBpqfbJ2MTLXRWT9";
 const NILE_WTRX: &str = "TYsbWxNnyTgsZaTFaue9hqpxkU3Fkco94a";
 
 // Mainnet: WTRX known; fee router + lens NOT yet deployed.
