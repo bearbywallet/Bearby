@@ -37,8 +37,7 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
 
 pub async fn stop_service() -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
-    if let Some(background) = guard.as_mut() {
-        background.stop();
+    if guard.is_some() {
         *guard = None;
         Ok(())
     } else {
