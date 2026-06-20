@@ -54,7 +54,8 @@ mod btc_wallet_tests {
         {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            service.core.add_batch_providers(providers).unwrap();
+            let core = service.core.read().await;
+            core.add_batch_providers(providers).unwrap();
         }
 
         let global_data = get_data().await.unwrap();
@@ -103,7 +104,8 @@ mod btc_wallet_tests {
         let history = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = service.core.read().await;
+            let wallet = core.get_wallet_by_index(0).unwrap();
             wallet.get_btc_addresses(0, btc_chain_hash).unwrap()
         };
 
@@ -216,7 +218,8 @@ mod btc_wallet_tests {
         {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = service.core.read().await;
+            let wallet = core.get_wallet_by_index(0).unwrap();
             let _history = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
 
             // dbg!(&history);
@@ -237,7 +240,8 @@ mod btc_wallet_tests {
         let expected_balance: u64 = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = service.core.read().await;
+            let wallet = core.get_wallet_by_index(0).unwrap();
             let chains = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
             chains
                 .values()

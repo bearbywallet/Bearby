@@ -1,7 +1,9 @@
 use crate::{
     models::provider::NetworkConfigInfo,
-    service::background::BACKGROUND_SERVICE,
-    utils::{errors::ServiceError, helpers::with_service},
+    utils::{
+        errors::ServiceError,
+        helpers::{handle, with_service},
+    },
 };
 use zilpay::secrecy::SecretString;
 use zilpay::serde_json::Value;
@@ -66,10 +68,8 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
 }
 
 pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<String, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let provider = service
-        .core
+    let core = handle().await?;
+    let provider = core
         .get_provider(chain_hash)
         .map_err(ServiceError::BackgroundError)?;
 
@@ -158,13 +158,10 @@ pub async fn select_accounts_chain(
     chain_hash: u64,
     password: Option<String>,
 ) -> Result<(), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = handle().await?;
     let password = password.map(|p| SecretString::new(p.into()));
 
-    service
-        .core
-        .select_accounts_chain(wallet_index, chain_hash, password.as_ref())
+    core.select_accounts_chain(wallet_index, chain_hash, password.as_ref())
         .await
         .map_err(ServiceError::BackgroundError)
         .map_err(Into::into)

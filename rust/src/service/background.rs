@@ -1,14 +1,14 @@
 use crate::utils::errors::ServiceError;
 use std::sync::{Arc, LazyLock};
 use zilpay::background::{bg_storage::StorageManagement, Background};
-use zilpay::tokio::sync::RwLock;
+use zilpay::tokio::sync::{Mutex, RwLock};
 use zilpay::tokio::task::JoinHandle;
 
 pub struct ServiceBackground {
     pub running: bool,
-    pub block_handle: Option<JoinHandle<()>>,
-    pub history_handle: Option<JoinHandle<()>>,
-    pub core: Arc<Background>,
+    pub block_handle: Mutex<Option<JoinHandle<()>>>,
+    pub history_handle: Mutex<Option<JoinHandle<()>>>,
+    pub core: RwLock<Arc<Background>>,
 }
 
 pub static BACKGROUND_SERVICE: LazyLock<RwLock<Option<ServiceBackground>>> =
@@ -19,25 +19,14 @@ impl ServiceBackground {
         let core = Background::from_storage_path(path).map_err(ServiceError::BackgroundError)?;
 
         Ok(Self {
-            core: Arc::new(core),
+            core: RwLock::new(Arc::new(core)),
             running: true,
-            block_handle: None,
-            history_handle: None,
+            block_handle: Mutex::new(None),
+            history_handle: Mutex::new(None),
         })
     }
 
     pub fn stop(&mut self) {
         self.running = false;
-    }
-
-    pub fn get_wallet_mut(
-        &mut self,
-        wallet_index: usize,
-    ) -> Result<&mut zilpay::wallet::Wallet, ServiceError> {
-        Arc::get_mut(&mut self.core)
-            .ok_or(ServiceError::CoreAccess)?
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(ServiceError::WalletAccess(wallet_index))
     }
 }

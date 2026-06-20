@@ -11,7 +11,7 @@ use crate::models::transactions::request::TransactionRequestInfo;
 use crate::models::transactions::tron::TransactionRequestTron;
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::helpers::{parse_address, with_service};
+use crate::utils::helpers::{handle, parse_address, with_service};
 use zilpay::background::bg_bitcoin::BitcoinManagement;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;
@@ -141,9 +141,7 @@ pub async fn send_signed_transactions(
         .transpose()
         .map_err(|e| ServiceError::ParseError("btc_rotate_xpub".into(), e.to_string()))?;
 
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -208,9 +206,7 @@ pub async fn sign_send_transactions(
     passphrase: Option<String>,
     tx: TransactionRequestInfo,
 ) -> Result<HistoricalTransactionInfo, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -371,9 +367,7 @@ pub async fn sign_message(
     title: Option<String>,
     icon: Option<String>,
 ) -> Result<(String, String), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -404,9 +398,7 @@ pub async fn sign_typed_data_eip712(
     title: Option<String>,
     icon: Option<String>,
 ) -> Result<(String, String), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -471,9 +463,7 @@ pub struct TokenTransferParamsInfo {
 pub async fn create_token_transfer(
     params: TokenTransferParamsInfo,
 ) -> Result<TransactionRequestInfo, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
 
     let recipient = parse_address(params.recipient)?;
     let amount = U256::from_str_radix(&params.amount, 10)
@@ -520,46 +510,39 @@ pub async fn cacl_gas_fee(
     params: TransactionRequestInfo,
 ) -> Result<RequiredTxParamsInfo, String> {
     let chain_hash = params.metadata.chain_hash;
-    let gas = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        let chain = service
-            .core
-            .get_provider(chain_hash)
-            .map_err(ServiceError::BackgroundError)?;
-        let tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
-        let wallet = service
-            .core
-            .get_wallet_by_index(wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
-        let data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let sender_account = data
-            .get_account(account_index)
-            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+    let core = handle().await?;
+    let chain = core
+        .get_provider(chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
+    let wallet = core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let sender_account = data
+        .get_account(account_index)
+        .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
 
-        let mut gas = chain
-            .estimate_params_batch(&tx, &sender_account.addr, 4, None)
-            .await
-            .map_err(ServiceError::NetworkErrors)?;
+    let mut gas = chain
+        .estimate_params_batch(&tx, &sender_account.addr, 4, None)
+        .await
+        .map_err(ServiceError::NetworkErrors)?;
 
-        if gas.tx_estimate_gas == U256::ZERO {
-            match tx {
-                TransactionRequest::Zilliqa((tx, _)) => {
-                    gas.tx_estimate_gas = U256::from(tx.gas_limit);
-                }
-                TransactionRequest::Ethereum((tx, _)) => {
-                    gas.tx_estimate_gas = tx.gas.map(|gas| U256::from(gas)).unwrap_or(U256::ZERO);
-                }
-                TransactionRequest::Bitcoin(_) => {}
-                TransactionRequest::Tron(_) => {}
-                TransactionRequest::Solana(_) => {}
+    if gas.tx_estimate_gas == U256::ZERO {
+        match tx {
+            TransactionRequest::Zilliqa((tx, _)) => {
+                gas.tx_estimate_gas = U256::from(tx.gas_limit);
             }
+            TransactionRequest::Ethereum((tx, _)) => {
+                gas.tx_estimate_gas = tx.gas.map(U256::from).unwrap_or(U256::ZERO);
+            }
+            TransactionRequest::Bitcoin(_)
+            | TransactionRequest::Tron(_)
+            | TransactionRequest::Solana(_) => {}
         }
-
-        gas
-    };
+    }
 
     Ok(gas.into())
 }
@@ -567,11 +550,9 @@ pub async fn cacl_gas_fee(
 pub async fn check_pending_tranasctions(
     wallet_index: usize,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = handle().await?;
 
-    let history = service
-        .core
+    let history = core
         .check_pending_txns(wallet_index)
         .await
         .map_err(ServiceError::BackgroundError)?;
@@ -588,21 +569,23 @@ pub async fn start_history_worker(
     let (tx, mut rx) = mpsc::channel(10);
 
     {
-        let mut guard = BACKGROUND_SERVICE.write().await;
-        let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
-
-        let handle = service
-            .core
+        let core = handle().await?;
+        let worker_handle = core
             .start_txns_track_job(wallet_index, tx)
             .await
             .map_err(|e| e.to_string())?;
+        let guard = BACKGROUND_SERVICE.read().await;
+        let Some(service) = guard.as_ref() else {
+            worker_handle.abort();
+            return Err(ServiceError::NotRunning.into());
+        };
+        let mut history_handle = service.history_handle.lock().await;
 
-        if let Some(history_handle) = &service.history_handle {
-            history_handle.abort();
-            service.history_handle = None;
+        if let Some(previous_handle) = history_handle.take() {
+            previous_handle.abort();
         }
 
-        service.history_handle = Some(handle);
+        *history_handle = Some(worker_handle);
     }
 
     while let Some(msg) = rx.recv().await {
@@ -621,13 +604,12 @@ pub async fn start_history_worker(
 }
 
 pub async fn stop_history_worker() -> Result<(), String> {
-    let mut guard = BACKGROUND_SERVICE.write().await;
-    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut history_handle = service.history_handle.lock().await;
 
-    if let Some(history_handle) = &service.history_handle {
-        history_handle.abort();
-
-        service.history_handle = None;
+    if let Some(handle) = history_handle.take() {
+        handle.abort();
     }
 
     Ok(())
@@ -644,10 +626,7 @@ pub async fn update_tx_with_params(
     let balance: U256 = balance.parse().unwrap_or_default();
 
     if let TransactionRequest::Tron((ref mut tron_tx, _)) = tx {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        let core = Arc::clone(&service.core);
-
+        let core = handle().await?;
         let provider = core
             .get_provider(chain_hash)
             .map_err(ServiceError::BackgroundError)?;

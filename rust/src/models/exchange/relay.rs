@@ -1058,15 +1058,10 @@ async fn finalize_svm_relay(
         pubkey_tables.push(Pubkey::from_str(addr.as_str()).map_err(|e| e.to_string())?);
     }
 
-    let provider = {
-        let guard = crate::service::background::BACKGROUND_SERVICE.read().await;
-        let svc = guard
-            .as_ref()
-            .ok_or_else(|| "service not running".to_string())?;
-        svc.core
-            .get_provider(chain_hash)
-            .map_err(|e| e.to_string())?
-    };
+    let core = crate::utils::helpers::handle()
+        .await
+        .map_err(|e| e.to_string())?;
+    let provider = core.get_provider(chain_hash).map_err(|e| e.to_string())?;
 
     let message = provider
         .solana_build_message(SolanaMessageBuild {

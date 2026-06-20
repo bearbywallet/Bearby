@@ -15,8 +15,7 @@ use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
 use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::{errors::ServiceError, helpers::handle};
 
 const SWAP_ESTIMATE_BUFFER: (u64, u64) = (115, 100);
 const SWAP_API_FALLBACK_BUFFER: (u64, u64) = (140, 100);
@@ -147,14 +146,7 @@ pub(super) async fn execute_evm_exchange_swap(
         .is_wrap_unwrap(&from, &to, from.token.addr.as_str(), to.token.addr.as_str())
         .unwrap_or(false);
 
-    let core = Arc::clone(
-        &BACKGROUND_SERVICE
-            .read()
-            .await
-            .as_ref()
-            .ok_or(ServiceError::NotRunning)?
-            .core,
-    );
+    let core = handle().await?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());

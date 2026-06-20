@@ -1,13 +1,10 @@
-use std::sync::Arc;
-
 use zilpay::secrecy::SecretString;
 
 use crate::api::transaction::{sign_and_broadcast_one, unlock_seed};
 use crate::frb_generated::StreamSink;
 use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::{errors::ServiceError, helpers::handle};
 
 pub(super) async fn execute_svm_exchange_swap(
     auth: SwapAuth,
@@ -23,14 +20,7 @@ pub(super) async fn execute_svm_exchange_swap(
         slippage_bps,
     } = params;
 
-    let core = Arc::clone(
-        &BACKGROUND_SERVICE
-            .read()
-            .await
-            .as_ref()
-            .ok_or(ServiceError::NotRunning)?
-            .core,
-    );
+    let core = handle().await?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());

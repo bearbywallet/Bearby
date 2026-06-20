@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use flutter_rust_bridge::frb;
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::network::tron::TronOperations;
@@ -16,8 +14,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::models::transactions::transaction_metadata::TransactionMetadataInfo;
 use crate::models::transactions::tron::TransactionRequestTron;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::{errors::ServiceError, helpers::handle};
 
 /// Parse a TRON address from either base58 ("T...") or Relay's 21-byte hex format ("41...").
 /// Relay encodes contract addresses as 21-byte hex with the 0x41 TRON version-byte prefix.
@@ -62,14 +59,7 @@ pub async fn finalize_tron_relay(
         .map_err(|e| format!("bad calldata: {e}"))?;
     let call_value = parse_tron_call_value(value_str)?;
 
-    let core = Arc::clone(
-        &BACKGROUND_SERVICE
-            .read()
-            .await
-            .as_ref()
-            .ok_or(ServiceError::NotRunning)?
-            .core,
-    );
+    let core = handle().await?;
 
     let provider = core
         .get_provider(chain_hash)
@@ -145,14 +135,7 @@ pub(super) async fn execute_tron_exchange_swap(
         ..
     } = display;
 
-    let core = Arc::clone(
-        &BACKGROUND_SERVICE
-            .read()
-            .await
-            .as_ref()
-            .ok_or(ServiceError::NotRunning)?
-            .core,
-    );
+    let core = handle().await?;
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
 
