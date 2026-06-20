@@ -59,7 +59,7 @@ pub async fn finalize_tron_relay(
         .map_err(|e| format!("bad calldata: {e}"))?;
     let call_value = parse_tron_call_value(value_str)?;
 
-    let core = handle().await?;
+    let core = handle()?;
 
     let provider = core
         .get_provider(chain_hash)
@@ -135,7 +135,7 @@ pub(super) async fn execute_tron_exchange_swap(
         ..
     } = display;
 
-    let core = handle().await?;
+    let core = handle()?;
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
 

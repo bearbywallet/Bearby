@@ -4,7 +4,7 @@ use zilpay::secrecy::SecretString;
 use zilpay::session;
 
 pub async fn try_unlock_with_session(wallet_index: usize) -> Result<bool, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     core.unlock_wallet_with_session(wallet_index)
         .await
@@ -18,7 +18,7 @@ pub async fn try_unlock_with_password(
     wallet_index: usize,
     identifiers: Option<Vec<String>>,
 ) -> Result<bool, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = SecretString::new(password.into());
 
     core.unlock_wallet_with_password(&password, identifiers.as_deref(), wallet_index)

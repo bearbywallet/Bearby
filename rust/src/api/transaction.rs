@@ -141,7 +141,7 @@ pub async fn send_signed_transactions(
         .transpose()
         .map_err(|e| ServiceError::ParseError("btc_rotate_xpub".into(), e.to_string()))?;
 
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -206,7 +206,7 @@ pub async fn sign_send_transactions(
     passphrase: Option<String>,
     tx: TransactionRequestInfo,
 ) -> Result<HistoricalTransactionInfo, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -367,7 +367,7 @@ pub async fn sign_message(
     title: Option<String>,
     icon: Option<String>,
 ) -> Result<(String, String), String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -398,7 +398,7 @@ pub async fn sign_typed_data_eip712(
     title: Option<String>,
     icon: Option<String>,
 ) -> Result<(String, String), String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let seed_bytes = unlock_seed(&core, wallet_index, password).await?;
     let secret_passphrase = SecretString::new(passphrase.unwrap_or_default().into());
@@ -463,7 +463,7 @@ pub struct TokenTransferParamsInfo {
 pub async fn create_token_transfer(
     params: TokenTransferParamsInfo,
 ) -> Result<TransactionRequestInfo, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let recipient = parse_address(params.recipient)?;
     let amount = U256::from_str_radix(&params.amount, 10)
@@ -510,7 +510,7 @@ pub async fn cacl_gas_fee(
     params: TransactionRequestInfo,
 ) -> Result<RequiredTxParamsInfo, String> {
     let chain_hash = params.metadata.chain_hash;
-    let core = handle().await?;
+    let core = handle()?;
     let chain = core
         .get_provider(chain_hash)
         .map_err(ServiceError::BackgroundError)?;
@@ -550,7 +550,7 @@ pub async fn cacl_gas_fee(
 pub async fn check_pending_tranasctions(
     wallet_index: usize,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let history = core
         .check_pending_txns(wallet_index)
@@ -569,7 +569,7 @@ pub async fn start_history_worker(
     let (tx, mut rx) = mpsc::channel(10);
 
     {
-        let core = handle().await?;
+        let core = handle()?;
         let worker_handle = core
             .start_txns_track_job(wallet_index, tx)
             .await
@@ -626,7 +626,7 @@ pub async fn update_tx_with_params(
     let balance: U256 = balance.parse().unwrap_or_default();
 
     if let TransactionRequest::Tron((ref mut tron_tx, _)) = tx {
-        let core = handle().await?;
+        let core = handle()?;
         let provider = core
             .get_provider(chain_hash)
             .map_err(ServiceError::BackgroundError)?;

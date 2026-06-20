@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
+use zilpay::background::bg_storage::StorageManagement;
 use zilpay::tokio::sync::mpsc;
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
@@ -14,7 +17,7 @@ pub use zilpay::{
 use crate::{
     frb_generated::StreamSink,
     models::background::BackgroundState,
-    service::background::{ServiceBackground, BACKGROUND_SERVICE},
+    service::background::{CORE, ServiceBackground, BACKGROUND_SERVICE},
     utils::{
         errors::ServiceError,
         helpers::{get_background_state, handle, with_service},
@@ -25,13 +28,10 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     zilpay::init()?; // init pq ssl
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
-        let bg = ServiceBackground::from_path(path)?;
-        let core = bg
-            .core
-            .load_full()
-            .ok_or(ServiceError::NotRunning)?;
+        let core = Background::from_storage_path(path).map_err(ServiceError::BackgroundError)?;
         let state = get_background_state(&core)?;
-        *guard = Some(bg);
+        CORE.store(Some(Arc::new(core)));
+        *guard = Some(ServiceBackground::new());
         Ok(state)
     } else {
         Err("service already running".to_string())
@@ -41,6 +41,7 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
 pub async fn stop_service() -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_some() {
+        CORE.store(None);
         *guard = None;
         Ok(())
     } else {
@@ -49,7 +50,7 @@ pub async fn stop_service() -> Result<(), String> {
 }
 
 pub async fn is_service_running() -> bool {
-    BACKGROUND_SERVICE.read().await.is_some()
+    CORE.load().is_some()
 }
 
 pub async fn stop_block_worker() -> Result<(), String> {
@@ -76,7 +77,7 @@ pub async fn start_block_worker(
     let (tx, mut rx) = mpsc::channel(10);
 
     {
-        let core = handle().await?;
+        let core = handle()?;
         let worker_handle = core
             .start_block_track_job(wallet_index, tx)
             .await

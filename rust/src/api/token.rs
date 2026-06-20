@@ -240,7 +240,7 @@ async fn fetch_bearby_rates<'a>(
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     core.sync_ftokens_balances(wallet_index)
         .await
@@ -250,7 +250,7 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
 }
 
 pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -531,7 +531,7 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 }
 
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let address = parse_address(addr)?;
 
     let token_meta = core
@@ -729,7 +729,7 @@ async fn fetch_solana_tokens(
 }
 
 pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let wallet = core
         .get_wallet_by_index(wallet_index)
