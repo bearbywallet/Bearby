@@ -1059,7 +1059,6 @@ async fn finalize_svm_relay(
     }
 
     let core = crate::utils::helpers::handle()
-        .await
         .map_err(|e| e.to_string())?;
     let provider = core.get_provider(chain_hash).map_err(|e| e.to_string())?;
 

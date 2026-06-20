@@ -28,7 +28,7 @@ pub async fn scan_btc_account_history(
     ledger_index: u8,
     chain_hash: u64,
 ) -> Result<HashMap<u8, AddressChainInfo>, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let xpubs = zilpay::proto::btc_utils::BtcAccountXpubsInput::try_from(xpubs)
         .map_err(|e: ServiceError| e.to_string())?;
 
@@ -60,7 +60,7 @@ pub async fn add_ledger_wallet(
     wallet_settings: crate::models::settings::WalletSettingsInfo,
     ftokens: Vec<crate::models::ftoken::FTokenInfo>,
 ) -> Result<String, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let provider = core
         .get_provider(params.chain_hash)
         .map_err(ServiceError::BackgroundError)?;

@@ -17,7 +17,7 @@ pub async fn fetch_evm_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -43,7 +43,7 @@ pub async fn fetch_scilla_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;

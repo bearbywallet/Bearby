@@ -68,7 +68,7 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
 }
 
 pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<String, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let provider = core
         .get_provider(chain_hash)
         .map_err(ServiceError::BackgroundError)?;
@@ -158,7 +158,7 @@ pub async fn select_accounts_chain(
     chain_hash: u64,
     password: Option<String>,
 ) -> Result<(), String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = password.map(|p| SecretString::new(p.into()));
 
     core.select_accounts_chain(wallet_index, chain_hash, password.as_ref())

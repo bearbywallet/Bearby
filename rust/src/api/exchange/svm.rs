@@ -20,7 +20,7 @@ pub(super) async fn execute_svm_exchange_swap(
         slippage_bps,
     } = params;
 
-    let core = handle().await?;
+    let core = handle()?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());

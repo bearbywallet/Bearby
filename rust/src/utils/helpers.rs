@@ -15,7 +15,7 @@ pub use zilpay::{
 
 use crate::{
     models::{background::BackgroundState, wallet::WalletInfo},
-    service::background::BACKGROUND_SERVICE,
+    service::background::{CORE, MUTATION_MUTEX},
 };
 
 use super::errors::ServiceError;
@@ -166,67 +166,52 @@ pub fn get_last_wallet(service: &Background) -> Result<&Wallet, ServiceError> {
     service.wallets.last().ok_or(ServiceError::FailToSaveWallet)
 }
 
-/// Lock-free read: a single atomic load, zero `.await`, never contends with
-/// writers. Returns a shared `Arc<Background>` snapshot.
-pub async fn handle() -> Result<Arc<Background>, ServiceError> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-
-    service
-        .core
-        .load_full()
-        .ok_or(ServiceError::NotRunning)
+/// Lock-free atomic read. A single `ArcSwapOption::load_full` — zero locks,
+/// zero `.await`, never contends with writers. Returns a shared
+/// `Arc<Background>` snapshot.
+pub fn handle() -> Result<Arc<Background>, ServiceError> {
+    CORE.load_full().ok_or(ServiceError::NotRunning)
 }
 
-/// Copy-on-write mutation. Loads the current snapshot, clones it, applies `f`
-/// to the clone, then atomically publishes the result. Serialized by
-/// `ServiceBackground::mutation_mutex` to prevent lost-update races between
+/// Copy-on-write mutation. Loads the current `CORE` snapshot, clones it,
+/// applies `f` to the clone, then atomically publishes the result.
+/// Serialized by [`MUTATION_MUTEX`] to prevent lost-update races between
 /// concurrent mutations.
 pub async fn mutate_core<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut Background) -> Result<T, ServiceError>,
 {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let _lock = service.mutation_mutex.lock().await;
-    let current = service
-        .core
-        .load_full()
-        .ok_or(ServiceError::NotRunning)?;
+    let _lock = MUTATION_MUTEX.lock().await;
+    let current = CORE.load_full().ok_or(ServiceError::NotRunning)?;
     let mut next = (*current).clone();
     let result = f(&mut next)?;
 
-    service.core.store(Some(Arc::new(next)));
+    CORE.store(Some(Arc::new(next)));
 
     Ok(result)
 }
 
 /// Copy-on-write mutation with an async closure.
 ///
-/// **NB**: the mutation mutex is held across the `.await` in `f` — every
+/// **NB**: [`MUTATION_MUTEX`] is held across the `.await` in `f` — every
 /// concurrent `mutate_core` or `mutate_core_async` call blocks for the
 /// duration. Use only for fast structural changes (add/delete wallet,
 /// keystore restore); do **not** use for long network I/O. For network-heavy
-/// work, fetch data via `handle()` first, then install results with the sync
+/// work, fetch data via [`handle`] first, then install results with the sync
 /// [`mutate_core`].
 ///
-/// Readers (`handle()`) are **never** blocked — they see the pre-mutation
-/// snapshot until `store` publishes the result.
+/// Readers ([`handle`]) are **never** blocked — they see the pre-mutation
+/// snapshot until `CORE.store` publishes the result.
 pub async fn mutate_core_async<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: for<'a> AsyncFnOnce(&'a mut Background) -> Result<T, ServiceError>,
 {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let _lock = service.mutation_mutex.lock().await;
-    let current = service
-        .core
-        .load_full()
-        .ok_or(ServiceError::NotRunning)?;
+    let _lock = MUTATION_MUTEX.lock().await;
+    let current = CORE.load_full().ok_or(ServiceError::NotRunning)?;
     let mut next = (*current).clone();
     let result = f(&mut next).await?;
 
-    service.core.store(Some(Arc::new(next)));
+    CORE.store(Some(Arc::new(next)));
 
     Ok(result)
 }
@@ -235,7 +220,7 @@ pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&Background) -> Result<T, ServiceError>,
 {
-    let core = handle().await?;
+    let core = handle()?;
 
     f(&core)
 }
@@ -266,7 +251,7 @@ pub async fn with_wallet<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceEr
 where
     F: FnOnce(&Wallet) -> Result<T, ServiceError>,
 {
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core.get_wallet_by_index(wallet_index)?;
 
     f(wallet)

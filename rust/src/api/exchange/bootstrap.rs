@@ -212,7 +212,7 @@ pub async fn bootstrap_exchange_providers(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<ExchangeAsset>, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let all_providers = core.get_providers();
     let wallet = core
         .get_wallet_by_index(wallet_index)

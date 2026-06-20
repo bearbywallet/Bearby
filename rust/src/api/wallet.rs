@@ -139,7 +139,7 @@ pub async fn add_sk_wallet(
         .map(TryFrom::try_from)
         .collect::<Result<Vec<FToken>, TokenError>>()
         .map_err(ServiceError::TokenError)?;
-    let core = handle().await?;
+    let core = handle()?;
     let provider = core
         .get_provider(chain_hash)
         .map_err(ServiceError::BackgroundError)?;
@@ -187,7 +187,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         passphrase,
         password,
     } = params;
-    let core = handle().await?;
+    let core = handle()?;
     let password = password.map(|p| SecretString::new(p.into()));
 
     let seed = if let Some(mut pass) = password {
@@ -306,7 +306,7 @@ pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result
 }
 
 pub async fn delete_wallet(wallet_index: usize, password: Option<String>) -> Result<(), String> {
-    let core = handle().await?;
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -358,7 +358,7 @@ pub async fn set_biometric(
     password: Option<String>,
     new_biometric_type: String,
 ) -> Result<(), String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = password.map(|p| SecretString::new(p.into()));
 
     core.set_biometric(password.as_ref(), wallet_index, new_biometric_type.into())
@@ -374,7 +374,7 @@ pub async fn reveal_keypair(
     password: String,
     passphrase: Option<String>,
 ) -> Result<KeyPairInfo, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = SecretString::new(password.into());
     let seed = core
         .unlock_wallet_with_password(&password, None, wallet_index)
@@ -396,7 +396,7 @@ pub async fn reveal_bip39_phrase(
     password: String,
     _passphrase: Option<String>,
 ) -> Result<String, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = SecretString::new(password.into());
     let seed = core
         .unlock_wallet_with_password(&password, None, wallet_index)
@@ -569,7 +569,7 @@ pub async fn get_btc_addresses(
 }
 
 pub async fn make_keystore_file(wallet_index: usize, password: String) -> Result<Vec<u8>, String> {
-    let core = handle().await?;
+    let core = handle()?;
     let password = SecretString::new(password.into());
 
     let keystore_bytes = core

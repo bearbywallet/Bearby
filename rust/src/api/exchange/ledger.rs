@@ -33,7 +33,7 @@ pub async fn check_exchange_approval(
         return Ok(None);
     }
 
-    let core = handle().await?;
+    let core = handle()?;
 
     let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
     let chain_hash = params.provider.common().chain_hash;
@@ -90,7 +90,7 @@ pub async fn finalize_exchange_swap(
     nonce: u64,
     display: ExchangeTxDisplay,
 ) -> Result<TransactionRequestInfo, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
     let chain_hash = provider.common().chain_hash;
@@ -131,7 +131,7 @@ pub async fn estimate_swap_base_nonce(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<u64, String> {
-    let core = handle().await?;
+    let core = handle()?;
 
     let (signer, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
     let base = match signer {

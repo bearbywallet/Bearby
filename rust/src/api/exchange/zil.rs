@@ -87,7 +87,7 @@ pub(super) async fn execute_zil_exchange_swap(
         ..
     } = display;
 
-    let core = handle().await?;
+    let core = handle()?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());
