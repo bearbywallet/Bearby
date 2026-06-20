@@ -100,7 +100,7 @@ class AppIconView extends StatelessWidget {
         AppIcon.edit          => const IconData(0xe3b4, fontFamily: _f),
         AppIcon.email         => const IconData(0xe0ac, fontFamily: _f),
         AppIcon.exchange      => const IconData(0xe0a0, fontFamily: _f),
-        AppIcon.faceId        => const IconData(0xebb6, fontFamily: _f),
+        AppIcon.faceId        => const IconData(0xebb4, fontFamily: _f),
         AppIcon.file          => const IconData(0xe230, fontFamily: _f),
         AppIcon.fingerprint   => const IconData(0xe23e, fontFamily: _f),
         AppIcon.gear          => const IconData(0xe270, fontFamily: _f),
