@@ -359,13 +359,11 @@ pub async fn set_biometric(
     new_biometric_type: String,
 ) -> Result<(), String> {
     let core = handle().await?;
-    let mut password = password.map(|p| SecretString::new(p.into()));
+    let password = password.map(|p| SecretString::new(p.into()));
 
     core.set_biometric(password.as_ref(), wallet_index, new_biometric_type.into())
         .await
         .map_err(ServiceError::BackgroundError)?;
-
-    password.zeroize();
 
     Ok(())
 }
@@ -377,7 +375,7 @@ pub async fn reveal_keypair(
     passphrase: Option<String>,
 ) -> Result<KeyPairInfo, String> {
     let core = handle().await?;
-    let mut password = SecretString::new(password.into());
+    let password = SecretString::new(password.into());
     let seed = core
         .unlock_wallet_with_password(&password, None, wallet_index)
         .await
@@ -390,8 +388,6 @@ pub async fn reveal_keypair(
         .reveal_keypair(account_index, &seed, &secret_passphrase)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-    password.zeroize();
-
     Ok(keypair.into())
 }
 
@@ -401,7 +397,7 @@ pub async fn reveal_bip39_phrase(
     _passphrase: Option<String>,
 ) -> Result<String, String> {
     let core = handle().await?;
-    let mut password = SecretString::new(password.into());
+    let password = SecretString::new(password.into());
     let seed = core
         .unlock_wallet_with_password(&password, None, wallet_index)
         .await
@@ -412,8 +408,6 @@ pub async fn reveal_bip39_phrase(
     let m = wallet
         .reveal_mnemonic(&seed)
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-    password.zeroize();
 
     Ok(m.to_phrase().expose_secret().to_string())
 }
@@ -576,13 +570,12 @@ pub async fn get_btc_addresses(
 
 pub async fn make_keystore_file(wallet_index: usize, password: String) -> Result<Vec<u8>, String> {
     let core = handle().await?;
-    let mut password = SecretString::new(password.into());
+    let password = SecretString::new(password.into());
 
     let keystore_bytes = core
         .get_keystore(wallet_index, &password)
         .await
         .map_err(ServiceError::BackgroundError)?;
-    password.zeroize();
     Ok(keystore_bytes)
 }
 
@@ -591,7 +584,7 @@ pub async fn restore_from_keystore(
     password: String,
     biometric_type: String,
 ) -> Result<String, String> {
-    let mut password = SecretString::new(password.into());
+    let password = SecretString::new(password.into());
     let wallet_address = mutate_core_async(async |core| {
         core.load_keystore(keystore_bytes, &password, biometric_type.into())
             .await
@@ -601,8 +594,6 @@ pub async fn restore_from_keystore(
         Ok(zilpay::alloy::hex::encode(wallet.wallet_address))
     })
     .await?;
-
-    password.zeroize();
 
     Ok(wallet_address)
 }
