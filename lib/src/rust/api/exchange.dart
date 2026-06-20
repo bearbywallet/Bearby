@@ -8,6 +8,7 @@ import '../models/exchange.dart';
 import '../models/exchange/pancakeswap.dart';
 import '../models/exchange/plunderswap.dart';
 import '../models/exchange/relay.dart';
+import '../models/exchange/sunswap.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
 import '../models/transactions/base_token.dart';

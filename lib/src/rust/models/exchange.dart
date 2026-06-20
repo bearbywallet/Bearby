@@ -7,6 +7,7 @@ import '../frb_generated.dart';
 import 'exchange/pancakeswap.dart';
 import 'exchange/plunderswap.dart';
 import 'exchange/relay.dart';
+import 'exchange/sunswap.dart';
 import 'exchange/uniswap.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -164,27 +165,6 @@ class ProviderQuote {
           amountOut == other.amountOut &&
           permitTypedDataJson == other.permitTypedDataJson &&
           isWrapUnwrap == other.isWrapUnwrap;
-}
-
-class SunSwapMeta {
-  final ProviderCommon common;
-  final ProviderQuote? quote;
-
-  const SunSwapMeta({
-    required this.common,
-    this.quote,
-  });
-
-  @override
-  int get hashCode => common.hashCode ^ quote.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SunSwapMeta &&
-          runtimeType == other.runtimeType &&
-          common == other.common &&
-          quote == other.quote;
 }
 
 /// Who signs — wallet identity + credentials.

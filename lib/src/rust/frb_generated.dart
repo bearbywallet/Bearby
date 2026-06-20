@@ -38,6 +38,7 @@ import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
 import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
+import 'models/exchange/sunswap.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -6587,14 +6588,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SunSwapMeta dco_decode_sun_swap_meta(dynamic raw) {
+  SunSwapCfg dco_decode_sun_swap_cfg(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SunSwapCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  SunSwapMeta dco_decode_sun_swap_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return SunSwapMeta(
       common: dco_decode_provider_common(arr[0]),
-      quote: dco_decode_opt_box_autoadd_provider_quote(arr[1]),
+      cfg: dco_decode_sun_swap_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
     );
   }
 
@@ -9206,11 +9220,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SunSwapCfg sse_decode_sun_swap_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return SunSwapCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
   SunSwapMeta sse_decode_sun_swap_meta(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_sun_swap_cfg(deserializer);
     var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
-    return SunSwapMeta(common: var_common, quote: var_quote);
+    return SunSwapMeta(common: var_common, cfg: var_cfg, quote: var_quote);
   }
 
   @protected
@@ -11497,9 +11522,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_sun_swap_cfg(SunSwapCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
   void sse_encode_sun_swap_meta(SunSwapMeta self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_provider_common(self.common, serializer);
+    sse_encode_sun_swap_cfg(self.cfg, serializer);
     sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
   }
 

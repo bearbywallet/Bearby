@@ -379,12 +379,10 @@ pub async fn bootstrap_exchange_providers(
             }
 
             if addr_prefix == 4 && slip_44 == TRON {
-                providers.insert(ExchangeProvider::SunSwap(SunSwapMeta::for_chain(
-                    chain_hash,
-                    chain_id,
-                    slip_44,
-                    account_addr,
-                )));
+                if let Some(meta) = SunSwapMeta::for_chain(chain_hash, chain_id, slip_44, account_addr)
+                {
+                    providers.insert(ExchangeProvider::SunSwap(meta));
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 pub mod pancakeswap;
 pub mod plunderswap;
 pub mod relay;
+pub mod sunswap;
 pub mod uniswap;
 pub mod univ_router;
 pub mod zilswap;
@@ -20,6 +21,7 @@ use super::transactions::request::TransactionRequestInfo;
 pub use pancakeswap::PancakeMeta;
 pub use plunderswap::PlunderMeta;
 pub use relay::RelayMeta;
+pub use sunswap::SunSwapMeta;
 pub use uniswap::UniswapMeta;
 pub use univ_router::{PreparedSwap, RouterConfig};
 
@@ -69,29 +71,6 @@ impl ZilSwapMeta {
             },
             quote: None,
         })
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SunSwapMeta {
-    pub common: ProviderCommon,
-    pub quote: Option<ProviderQuote>,
-}
-
-impl SunSwapMeta {
-    #[frb(ignore)]
-    pub fn for_chain(chain_hash: u64, chain_id: u64, slip44: u32, account_addr: &str) -> Self {
-        Self {
-            common: ProviderCommon {
-                chain_hash,
-                chain_id,
-                slip44,
-                account_addr: account_addr.to_owned(),
-                icon_asset: "assets/icons/sunswap.svg".to_owned(),
-                display_name: "SunSwap".to_owned(),
-            },
-            quote: None,
-        }
     }
 }
 
@@ -216,8 +195,9 @@ impl ExchangeProvider {
             Self::Uniswap(m) => m.cfg.default_slippage_bps,
             Self::PancakeSwap(m) => m.cfg.default_slippage_bps,
             Self::PlunderSwap(m) => m.cfg.default_slippage_bps,
+            Self::SunSwap(m) => m.cfg.default_slippage_bps,
             Self::Relay(m) => m.cfg.default_slippage_bps,
-            Self::ZilSwap(_) | Self::SunSwap(_) => 50,
+            Self::ZilSwap(_) => 50,
         }
     }
 
@@ -227,8 +207,9 @@ impl ExchangeProvider {
             Self::Uniswap(m) => m.cfg.supports_price_protection,
             Self::PancakeSwap(m) => m.cfg.supports_price_protection,
             Self::PlunderSwap(m) => m.cfg.supports_price_protection,
+            Self::SunSwap(m) => m.cfg.supports_price_protection,
             Self::Relay(m) => m.cfg.supports_price_protection,
-            Self::ZilSwap(_) | Self::SunSwap(_) => false,
+            Self::ZilSwap(_) => false,
         }
     }
 
@@ -278,6 +259,9 @@ impl ExchangeProvider {
             }
             Self::PlunderSwap(meta) if from.token.chain_hash == to.token.chain_hash => {
                 plunderswap::is_wrap_unwrap(meta, from, to, from_asset, to_asset)
+            }
+            Self::SunSwap(meta) if from.token.chain_hash == to.token.chain_hash => {
+                sunswap::is_wrap_unwrap(meta, from, to, from_asset, to_asset)
             }
             _ => Ok(false),
         }
@@ -334,7 +318,9 @@ impl ExchangeProvider {
                 plunderswap::plunderswap_quote_info(meta, from, to, from_asset, to_asset, amount)
                     .await
             }
-            Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::SunSwap(meta) => {
+                sunswap::sunswap_quote_info(meta, from, to, from_asset, to_asset, amount).await
+            }
         }
     }
 
@@ -393,7 +379,9 @@ impl ExchangeProvider {
                 plunderswap::plunderswap_check_approval(meta, from, to, amount, approve_title, icon)
                     .await
             }
-            Self::SunSwap(_) => Ok(None),
+            Self::SunSwap(meta) => {
+                sunswap::sunswap_check_approval(meta, from, to, amount, approve_title, icon).await
+            }
         }
     }
 
@@ -435,7 +423,9 @@ impl ExchangeProvider {
             Self::PlunderSwap(meta) => {
                 plunderswap::plunderswap_prepare_swap(meta, from, to, amount, slippage_bps).await
             }
-            Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::SunSwap(meta) => {
+                sunswap::sunswap_prepare_swap(meta, from, to, amount, slippage_bps).await
+            }
         }
     }
 
@@ -493,7 +483,12 @@ impl ExchangeProvider {
                 )
                 .await
             }
-            Self::SunSwap(_) => Err("provider not implemented".to_string()),
+            Self::SunSwap(meta) => {
+                sunswap::sunswap_finalize_swap(
+                    meta, quote_blob, swap_title, swap_info, icon, out_token,
+                )
+                .await
+            }
         }
     }
 
