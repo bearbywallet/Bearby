@@ -257,7 +257,6 @@ class _ExchangePageState extends State<ExchangePage>
           uniswap: (_) => true,
           pancakeSwap: (_) => true,
           plunderSwap: (_) => true,
-          xBridge: (_) => true,
           zilSwap: (_) => true,
         ) ??
         false;

@@ -176,17 +176,20 @@ pub(super) async fn execute_evm_exchange_swap(
                 .try_into()
                 .map_err(ServiceError::TransactionErrors)?;
             apply_fast_fees(&mut approve_tx, &base, nonce)?;
-            results.push(
-                sign_and_broadcast_one(
-                    &core,
-                    auth.wallet_index,
-                    auth.account_index,
-                    &seed,
-                    &secret_passphrase,
-                    approve_tx,
-                )
-                .await?,
+            let approved = sign_and_broadcast_one(
+                &core,
+                auth.wallet_index,
+                auth.account_index,
+                &seed,
+                &secret_passphrase,
+                approve_tx,
+            )
+            .await?;
+            eprintln!(
+                "[evm-swap] approve broadcast hash={:?}",
+                approved.metadata.hash
             );
+            results.push(approved);
             nonce += 1;
             let _ = sink.add("approved".to_string());
         }
@@ -230,17 +233,17 @@ pub(super) async fn execute_evm_exchange_swap(
     apply_fast_fees(&mut swap_tx, &base, nonce)?;
 
     let _ = sink.add("swapping".to_string());
-    results.push(
-        sign_and_broadcast_one(
-            &core,
-            auth.wallet_index,
-            auth.account_index,
-            &seed,
-            &secret_passphrase,
-            swap_tx,
-        )
-        .await?,
-    );
+    let swapped = sign_and_broadcast_one(
+        &core,
+        auth.wallet_index,
+        auth.account_index,
+        &seed,
+        &secret_passphrase,
+        swap_tx,
+    )
+    .await?;
+    eprintln!("[evm-swap] swap broadcast hash={:?}", swapped.metadata.hash);
+    results.push(swapped);
     let _ = sink.add("done".to_string());
 
     Ok(results)

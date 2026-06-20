@@ -6,6 +6,7 @@ use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{aliases::U160, aliases::U24, Address, U256};
 use zilpay::alloy::sol_types::SolCall;
 use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::crypto::slip44;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
 use zilpay::rpc::{
@@ -14,7 +15,7 @@ use zilpay::rpc::{
 };
 use zilpay::serde_json::{json, Value};
 
-use super::abi::{swapV2Call, swapV3ExactInputSingleCall, IERC20, IWZIL};
+use super::abi::{swapV2Call, swapV3ExactInputCall, swapV3ExactInputSingleCall, IERC20, IWZIL};
 use super::math::amount_out_min;
 use super::{PlunderConfig, QuoteBlob, RouteKind, APPROVE_GAS, SWAP_GAS};
 use crate::models::transactions::base_token::BaseTokenInfo;
@@ -23,6 +24,16 @@ use crate::utils::errors::ServiceError;
 use crate::utils::helpers::with_service;
 
 const DEADLINE_WINDOW_SECS: u64 = 20 * 60;
+
+/// Max "infinite" approval per chain family. Zilliqa-bridged tokens (zUSDT/zUSDC) store
+/// allowances as `uint128` and revert on any value above `u128::MAX`; other EVM chains
+/// accept `U256::MAX`.
+const fn max_approval_amount(coin_type: u32) -> U256 {
+    match coin_type {
+        slip44::ZILLIQA => U256::from_limbs([u64::MAX, u64::MAX, 0, 0]), // u128::MAX = 2^128 - 1
+        _ => U256::MAX,
+    }
+}
 
 fn decode_erc20_allowance(data: &[u8]) -> Option<U256> {
     IERC20::allowanceCall::abi_decode_returns(data).ok()
@@ -81,6 +92,31 @@ pub(super) fn encode_swap_v3(
     .abi_encode()
 }
 
+#[allow(clippy::too_many_arguments)]
+#[frb(ignore)]
+pub(super) fn encode_swap_v3_path(
+    path: &[u8],
+    token_in: Address,
+    token_out: Address,
+    amount_in: U256,
+    amount_out_min: U256,
+    deadline: u64,
+    native_in: bool,
+    native_out: bool,
+) -> Vec<u8> {
+    swapV3ExactInputCall {
+        path: path.to_vec().into(),
+        tokenIn: token_in,
+        tokenOut: token_out,
+        amountIn: amount_in,
+        amountOutMin: amount_out_min,
+        deadline: U256::from(deadline),
+        nativeIn: native_in,
+        nativeOut: native_out,
+    }
+    .abi_encode()
+}
+
 fn encode_route_calldata(
     route: &RouteKind,
     amount_in: U256,
@@ -91,6 +127,11 @@ fn encode_route_calldata(
     native_out: bool,
 ) -> Result<Vec<u8>, String> {
     let min_out = amount_out_min(amount_out, slippage_bps);
+    eprintln!(
+        "[plunderswap-finalize] route={route:?} amount_in={amount_in} amount_out={amount_out} \
+         min_out={min_out} slippage_bps={slippage_bps} deadline={deadline} \
+         native_in={native_in} native_out={native_out}"
+    );
     match route {
         RouteKind::V2 { path } => Ok(encode_swap_v2(
             amount_in,
@@ -116,6 +157,28 @@ fn encode_route_calldata(
                 deadline,
                 native_in,
                 native_out,
+            ))
+        }
+        RouteKind::V3Path { path } => {
+            let hex_path = path.strip_prefix("0x").unwrap_or(path);
+            let packed = hex::decode(hex_path).map_err(|e| e.to_string())?;
+            // Packed path: addr(20) ‖ fee(3) ‖ … ‖ addr(20). The first/last 20
+            // bytes are the endpoints the fee-router's `_prepareV3Input` needs
+            // for pull/approve/wrap assertions (nativeIn → tokenIn==WZIL, etc).
+            let token_in = packed
+                .get(..20)
+                .map(Address::from_slice)
+                .ok_or_else(|| "v3 path too short for token_in".to_string())?;
+            let out_start = packed
+                .len()
+                .checked_sub(20)
+                .ok_or_else(|| "v3 path too short for token_out".to_string())?;
+            let token_out = packed
+                .get(out_start..)
+                .map(Address::from_slice)
+                .ok_or_else(|| "v3 path too short for token_out".to_string())?;
+            Ok(encode_swap_v3_path(
+                &packed, token_in, token_out, amount_in, min_out, deadline, native_in, native_out,
             ))
         }
         RouteKind::Wrap { .. } => Err("wrap route has no fee-router calldata".to_string()),
@@ -264,24 +327,28 @@ pub(super) fn build_finalized_swap(
             &blob.amount_in,
             blob.is_native_in,
         )?,
-        RouteKind::V2 { .. } | RouteKind::V3 { .. } => build_fee_router_tx(
-            Address::from_str(&blob.fee_router).map_err(|e| e.to_string())?,
-            blob.chain_id,
-            chain_hash,
-            swapper,
-            blob,
-            deadline_timestamp()?,
-        )?,
+        RouteKind::V2 { .. } | RouteKind::V3 { .. } | RouteKind::V3Path { .. } => {
+            build_fee_router_tx(
+                Address::from_str(&blob.fee_router).map_err(|e| e.to_string())?,
+                blob.chain_id,
+                chain_hash,
+                swapper,
+                blob,
+                deadline_timestamp()?,
+            )?
+        }
     };
 
     lift_with_metadata(tx, chain_hash, title, info, icon, out_token)
 }
 
+#[allow(clippy::too_many_arguments)]
 #[frb(ignore)]
 pub(super) async fn build_approval_if_needed(
     cfg: &PlunderConfig,
     owner: Address,
     chain_hash: u64,
+    slip44: u32,
     token: &str,
     amount: &str,
     approve_title: String,
@@ -324,12 +391,19 @@ pub(super) async fn build_approval_if_needed(
         .unwrap_or(U256::ZERO);
     let needed = U256::from_str(amount).map_err(|e| e.to_string())?;
     if current >= needed {
+        eprintln!("[plunderswap-approve] allowance already sufficient, skipping");
         return Ok(None);
     }
 
+    let approve_amount = max_approval_amount(slip44);
+    eprintln!(
+        "[plunderswap-approve] token={token} spender={} owner={owner} slip44={slip44} \
+         current_allowance={current} needed={needed} approve_amount={approve_amount}",
+        cfg.addrs.fee_router,
+    );
     let data = IERC20::approveCall {
         spender: cfg.addrs.fee_router,
-        amount: U256::MAX,
+        amount: approve_amount,
     }
     .abi_encode();
     let mut tx = ETHTransactionRequest {
@@ -449,5 +523,76 @@ mod tests {
         let decoded = IWZIL::withdrawCall::abi_decode(&data).map_err(|e| e.to_string())?;
         assert_eq!(decoded.amount, U256::from(1_000u64));
         Ok(())
+    }
+
+    #[test]
+    fn swap_v3_path_calldata_selector_and_args() -> Result<(), String> {
+        // Packed 2-hop V3 path: addr ‖ fee ‖ addr ‖ fee ‖ addr (66 bytes).
+        let mut packed = Vec::with_capacity(66);
+        packed.extend_from_slice(addr(0x11).as_slice());
+        packed.extend_from_slice(&500u32.to_be_bytes()[1..]);
+        packed.extend_from_slice(addr(0x55).as_slice());
+        packed.extend_from_slice(&3_000u32.to_be_bytes()[1..]);
+        packed.extend_from_slice(addr(0x22).as_slice());
+
+        let data = encode_swap_v3_path(
+            &packed,
+            addr(0x11),
+            addr(0x22),
+            U256::from(1_000u64),
+            U256::from(900u64),
+            789,
+            true,
+            false,
+        );
+        assert_eq!(
+            data.get(..4),
+            Some(swapV3ExactInputCall::SELECTOR.as_slice())
+        );
+        let decoded = swapV3ExactInputCall::abi_decode(&data).map_err(|e| e.to_string())?;
+        assert_eq!(decoded.tokenIn, addr(0x11));
+        assert_eq!(decoded.tokenOut, addr(0x22));
+        assert_eq!(decoded.amountIn, U256::from(1_000u64));
+        assert_eq!(decoded.amountOutMin, U256::from(900u64));
+        assert_eq!(decoded.deadline, U256::from(789u64));
+        assert!(decoded.nativeIn);
+        assert!(!decoded.nativeOut);
+        assert_eq!(decoded.path.as_ref(), &packed);
+        Ok(())
+    }
+
+    #[test]
+    fn encode_route_calldata_v3path_derives_endpoints() -> Result<(), String> {
+        // Packed path: addr(0x11) ‖ fee(500) ‖ addr(0x55) ‖ fee(3000) ‖ addr(0x22).
+        let mut packed = Vec::with_capacity(66);
+        packed.extend_from_slice(addr(0x11).as_slice());
+        packed.extend_from_slice(&500u32.to_be_bytes()[1..]);
+        packed.extend_from_slice(addr(0x55).as_slice());
+        packed.extend_from_slice(&3_000u32.to_be_bytes()[1..]);
+        packed.extend_from_slice(addr(0x22).as_slice());
+        let route = RouteKind::V3Path {
+            path: hex::encode_prefixed(&packed),
+        };
+        let data = encode_route_calldata(
+            &route,
+            U256::from(1_000u64),
+            U256::from(900u64),
+            50,
+            123,
+            false,
+            false,
+        )?;
+        let decoded = swapV3ExactInputCall::abi_decode(&data).map_err(|e| e.to_string())?;
+        // Endpoints derived from the packed path's first/last 20 bytes.
+        assert_eq!(decoded.tokenIn, addr(0x11));
+        assert_eq!(decoded.tokenOut, addr(0x22));
+        assert_eq!(decoded.path.as_ref(), &packed);
+        Ok(())
+    }
+
+    #[test]
+    fn max_approval_amount_caps_zilliqa_at_u128() {
+        assert_eq!(max_approval_amount(slip44::ZILLIQA), U256::from(u128::MAX));
+        assert_eq!(max_approval_amount(slip44::ETHEREUM), U256::MAX);
     }
 }
