@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'package:bearby/src/rust/api/exchange/bootstrap.dart';
+import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/exchange/pancakeswap.dart';
 import 'package:bearby/src/rust/models/exchange/plunderswap.dart';
@@ -67,6 +68,7 @@ class ExchangeState extends ChangeNotifier {
   bool _loadingQuote = false;
   String? _pendingAmountWei;
   QuoteStatus _quoteStatus = QuoteStatus.idle;
+  int _bootstrapGen = 0;
 
   List<ExchangeAsset> get payAssets => _payAssets;
   List<ExchangeAsset> get getAssets => _getAssets;
@@ -102,41 +104,108 @@ class ExchangeState extends ChangeNotifier {
     required BigInt? activeChainHash,
     required ExchangeAsset? initialFrom,
   }) async {
+    final gen = ++_bootstrapGen;
     _fromAsset = initialFrom ?? _fromAsset;
     _assetsError = null;
     _loadingAssets = true;
     notifyListeners();
 
     try {
-      final all = await bootstrapExchangeProviders(
+      // Phase 1 — sync FFI, instant. In-memory provider assembly only.
+      final candidates = bootstrapExchangeProviders(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
       );
-      final pay =
-          all.where((a) => a.token.chainHash == activeChainHash).toList();
-      debugPrint(
-        '[ExchangeState] bootstrap all=${all.length} pay=${pay.length} '
-        'activeChainHash=$activeChainHash assets=${all.map(_assetDebug).join('; ')}',
-      );
-      final get = all;
-      final from = pay.isNotEmpty
-          ? pay.firstWhere((a) => a.token.native, orElse: () => pay.first)
-          : _fromAsset;
-
-      _payAssets = pay;
-      _getAssets = get;
-      _fromAsset = from;
-      _toAsset = _toAsset == from ? null : _toAsset;
+      _publishAssets(candidates, activeChainHash);
       _loadingAssets = false;
       notifyListeners();
+      // Start polling immediately on candidates so the user sees an early quote before
+      // validation finishes. Phase 2 restarts below with the validated (possibly pruned) set.
+      _restartPollingIfReady();
+
+      // Phase 2 — async FFI, parallel eager gates.
+      final (validated, changed) =
+          await validateExchangeProviders(assets: candidates);
+      if (gen != _bootstrapGen) {
+        return; // a newer bootstrap won → drop this stale result
+      }
+      if (!changed) {
+        return; // no eager gate pruned anything → skip redundant republish + quote fetch
+      }
+      _publishAssets(validated, activeChainHash);
+      notifyListeners();
+      // Restart with validated assets: a provider pruned in phase 2 may have been the
+      // currently-polling from/to, so the poll must re-resolve the pair.
       _restartPollingIfReady();
     } catch (e, st) {
+      if (gen != _bootstrapGen) {
+        return;
+      }
       debugPrint('[ExchangeState] bootstrap failed: $e\n$st');
       _loadingAssets = false;
       _assetsError = e.toString();
       notifyListeners();
     }
   }
+
+  // Single source of truth for pay/get/from selection. Reused by both bootstrap phases so the
+  // interactive candidate list and the validated list derive selection identically. Preserves
+  // an existing user selection across the phase 1 → phase 2 window: if the user picked a token
+  // between phases, that selection is kept as long as the token survived validation (matched by
+  // chain_hash+addr+addr_type — token identity, not volatile rate/balance state).
+  void _publishAssets(List<ExchangeAsset> all, BigInt? activeChainHash) {
+    final pay =
+        all.where((a) => a.token.chainHash == activeChainHash).toList();
+    final prevFrom = _fromAsset;
+    final prevTo = _toAsset;
+    // Preserve the current selection if the token survived into the new set; otherwise fall back
+    // to the native default (or null when the active chain has nothing to pay with).
+    final from = _resolveSelection(prevFrom, pay) ??
+        (pay.isNotEmpty
+            ? pay.firstWhere((a) => a.token.native, orElse: () => pay.first)
+            : prevFrom);
+    assert(() {
+      debugPrint(
+        '[ExchangeState] bootstrap all=${all.length} pay=${pay.length} '
+        'activeChainHash=$activeChainHash assets=${all.map(_assetDebug).join('; ')}',
+      );
+      return true;
+    }());
+    _payAssets = pay;
+    _getAssets = all;
+    _fromAsset = from;
+    // Preserve the "to" selection the same way; clear it only if it now equals "from".
+    final to = _resolveSelection(prevTo, all);
+    _toAsset = to == from ? null : to;
+  }
+
+  /// Look up `selection` in `pool` by token identity (chain_hash+addr+addr_type). Returns the
+  /// refreshed instance from `pool` (so quote/balance state is current) or `null` if the token
+  /// was pruned / selection was never set.
+  ExchangeAsset? _resolveSelection(
+    ExchangeAsset? selection,
+    List<ExchangeAsset> pool,
+  ) {
+    if (selection == null) {
+      return null;
+    }
+    final key = _tokenKey(selection.token);
+    for (final asset in pool) {
+      if (_tokenKey(asset.token) == key) {
+        return asset;
+      }
+    }
+    return null;
+  }
+
+  static ({BigInt chainHash, String addr, int addrType}) _tokenKey(
+    FTokenInfo token,
+  ) =>
+      (
+        chainHash: token.chainHash,
+        addr: token.addr,
+        addrType: token.addrType,
+      );
 
   void selectFrom(ExchangeAsset asset) {
     _fromAsset = asset;

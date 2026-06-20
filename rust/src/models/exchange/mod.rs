@@ -1,3 +1,4 @@
+pub mod gate;
 pub mod pancakeswap;
 pub mod plunderswap;
 pub mod relay;
@@ -500,6 +501,31 @@ impl ExchangeProvider {
             Self::Relay(_) | Self::PlunderSwap(_) | Self::ZilSwap(_) | Self::SunSwap(_) => None,
         }
     }
+
+    /// Single source of truth for eager (load-time) validation. Returns the gate variant for
+    /// providers that can validate all their tokens at load time, or `None` for lazy-only
+    /// providers (validated by the 10s quote loop). Adding an eager provider = one arm here +
+    /// one module gate fn; the orchestrator derives from this automatically.
+    #[frb(ignore)]
+    pub const fn eager_gate(&self) -> Option<EagerGate> {
+        match self {
+            Self::PlunderSwap(_) => Some(EagerGate::Plunder),
+            Self::SunSwap(_) => Some(EagerGate::Sun),
+            Self::Relay(_) => Some(EagerGate::Relay),
+            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) => None,
+        }
+    }
+}
+
+/// Which eager (load-time) validation gate a provider supports. `None` (from
+/// [`ExchangeProvider::eager_gate`]) = lazy-only, validated by the 10s quote loop.
+/// Single source of truth: the orchestrator derives from
+/// [`ExchangeProvider::eager_gate`], so adding a provider = one arm there + one module fn.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum EagerGate {
+    Plunder,
+    Sun,
+    Relay,
 }
 
 #[derive(Debug, Clone)]

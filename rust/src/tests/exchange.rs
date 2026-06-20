@@ -105,7 +105,7 @@ mod exchange_tests {
     /// Pick the bootstrapped native-ETH (chain 1) asset with a Uniswap provider, the USDC (chain 1)
     /// destination asset, and the `ExchangeProvider::Uniswap` variant.
     async fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
-        let assets = bootstrap_exchange_providers(0, 0).await.unwrap();
+        let assets = bootstrap_exchange_providers(0, 0).unwrap();
         let asset = assets
             .iter()
             .find(|a| {
@@ -134,7 +134,7 @@ mod exchange_tests {
     async fn test_bootstrap_exchange_providers() {
         setup_eth_wallet().await;
 
-        let assets = bootstrap_exchange_providers(0, 0).await.unwrap();
+        let assets = bootstrap_exchange_providers(0, 0).unwrap();
 
         assert!(
             assets.iter().any(|a| {

@@ -13,12 +13,21 @@ import '../../models/exchange/uniswap.dart';
 import '../../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `chain_matches_network`, `gate_plunderswap_liquidity`, `has_plunderswap`, `plunder_probe_amount`, `provider_names`, `remove_plunderswap`, `request_plunder_gate_batch`, `zilliqa_mode_addr_type`, `zilliqa_token_matches_mode`
+// These functions are ignored because they are not marked as `pub`: `chain_matches_network`, `provider_names`, `zilliqa_mode_addr_type`, `zilliqa_token_matches_mode`
 
-Future<List<ExchangeAsset>> bootstrapExchangeProviders(
+List<ExchangeAsset> bootstrapExchangeProviders(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiExchangeBootstrapBootstrapExchangeProviders(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+/// Phase 2 — async provider validation. Runs every eager gate in parallel, pruning providers a
+/// single probe proves dead. Providers without an eager gate (Uniswap/Pancake/Relay/ZilSwap) are
+/// validated lazily by the 10s quote loop instead. Returns the validated list and whether any
+/// pruning actually occurred (caller skips redundant republish when `false`).
+Future<(List<ExchangeAsset>, bool)> validateExchangeProviders(
+        {required List<ExchangeAsset> assets}) =>
+    RustLib.instance.api
+        .crateApiExchangeBootstrapValidateExchangeProviders(assets: assets);
 
 Future<ExchangeAsset> refreshExchangeQuotes(
         {required ExchangeAsset from,

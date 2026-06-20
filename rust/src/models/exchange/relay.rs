@@ -6,14 +6,18 @@
 //! `ExchangeProvider::Relay` payload.
 
 use std::borrow::Cow;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use std::time::Duration;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
+use arc_swap::ArcSwapOption;
 use flutter_rust_bridge::frb;
 use zilpay::alloy::hex;
 use zilpay::alloy::primitives::{Address, U256};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::network::solana::{SolanaMessageBuild, SolanaOperations};
+use zilpay::proto::address::Address as ProtoAddress;
 use zilpay::proto::solana_tx::SolanaTransaction;
 use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
 use zilpay::proto::AlloyTxKind;
@@ -43,6 +47,10 @@ const RELAY_TRON_NATIVE: &str = "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb";
 const SUPPORTED_EVM_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161, 43114];
 const DEFAULT_RELAY_EVM_GAS: u64 = 400_000;
 const DEFAULT_RELAY_APPROVE_GAS: u64 = 60_000;
+
+/// Cache TTL for the GET /chains support matrix. One fetch feeds every validate across every
+/// chain; within TTL a validate is a lock-free cache load (no network).
+const RELAY_SUPPORT_TTL: Duration = Duration::from_secs(300);
 
 /// Origin-chain runtime classifier derived from the token address type.
 /// Used to route swap execution without inspecting slip44.
@@ -93,6 +101,11 @@ impl RelayMeta {
     ///
     /// `addr_type` is the address-family classifier from `Address::prefix_type()`:
     /// 1 = EVM, 2 = BTC, 3 = Solana, 4 = TRON.
+    ///
+    /// Token support is decided eagerly by the support gate
+    /// ([`evaluate_support_eager`]) from GET /chains, not here: native TRX, A7A5, wrapped-BTC on
+    /// TRON are pruned at load time because TRON is `tokenSupport: "Limited"` and they aren't
+    /// bridgeable currencies. No hardcoded per-token special cases.
     #[frb(ignore)]
     pub fn for_chain(
         chain_hash: u64,
@@ -1093,6 +1106,210 @@ async fn finalize_svm_relay(
     .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())
 }
 
+// ============================================================================
+// Eager support gate — data-driven token support via GET /chains.
+//
+// Relay returns a `tokenSupport` field per chain ("All" | "Limited"). On "All" chains every
+// token with solver/DEX liquidity is bridgeable, so liquidity is decided lazily at quote time and
+// the gate never prunes. On "Limited" chains only the listed currencies flagged
+// `supportsBridging: true` are bridgeable — everything else is pruned at load time. This makes
+// Relay an eager gate symmetric with Plunder/SunSwap, fed by one cached /chains fetch. The
+// hardcoded TRX branch is gone: native TRX is pruned because TRON is "Limited" and TRX isn't a
+// bridgeable currency.
+// ============================================================================
+
+/// Per-chain bridging support distilled from GET /chains.
+#[frb(ignore)]
+struct ChainSupport {
+    /// `tokenSupport == "All"`: every token with liquidity is bridgeable → never prune at load
+    /// time. When `true`, `bridgeable` is left empty (not built) to save allocations.
+    supports_all: bool,
+    /// Canonicalized bridgeable currency addresses. Consulted only when `!supports_all`.
+    bridgeable: HashSet<String>,
+}
+
+type SupportMatrix = HashMap<u64, ChainSupport>;
+
+#[frb(ignore)]
+struct CachedMatrix {
+    fetched_at: Instant,
+    matrix: Arc<SupportMatrix>,
+}
+
+/// Process-wide, lock-free cache. One GET /chains feeds every validate; mirrors the `CORE`
+/// pattern (`service/background.rs`). `const_empty()` allows static init with no `Lazy`.
+static RELAY_SUPPORT: ArcSwapOption<CachedMatrix> = ArcSwapOption::const_empty();
+
+/// Return a fresh-or-stale support matrix. Fast path: a load-full of the cache when within TTL.
+/// On miss/stale: fetch + rebuild + publish. On fetch error: serve the last good matrix if any,
+/// else `None` (caller fails open → prunes nothing).
+#[frb(ignore)]
+async fn support_matrix() -> Option<Arc<SupportMatrix>> {
+    if let Some(cached) = RELAY_SUPPORT.load_full() {
+        if cached.fetched_at.elapsed() < RELAY_SUPPORT_TTL {
+            return Some(Arc::clone(&cached.matrix));
+        }
+    }
+    match fetch_chains().await {
+        Ok(resp) => {
+            let matrix = Arc::new(build_matrix(resp));
+            RELAY_SUPPORT.store(Some(Arc::new(CachedMatrix {
+                fetched_at: Instant::now(),
+                matrix: Arc::clone(&matrix),
+            })));
+            Some(matrix)
+        }
+        Err(err) => {
+            eprintln!("[exchange-validate] Relay /chains fetch failed: {err}");
+            RELAY_SUPPORT.load_full().map(|c| Arc::clone(&c.matrix)) // stale-but-usable
+        }
+    }
+}
+
+#[frb(ignore)]
+#[frb(ignore)]
+#[derive(Deserialize)]
+#[serde(crate = "zilpay::serde")]
+struct ChainsResponse {
+    chains: Vec<ChainEntry>,
+}
+
+#[frb(ignore)]
+#[derive(Deserialize)]
+#[serde(crate = "zilpay::serde", rename_all = "camelCase")]
+struct ChainEntry {
+    id: u64,
+    token_support: Option<String>,
+    currency: Option<ChainCurrency>,
+    erc20_currencies: Option<Vec<ChainCurrency>>,
+}
+
+#[frb(ignore)]
+#[derive(Deserialize)]
+#[serde(crate = "zilpay::serde", rename_all = "camelCase")]
+struct ChainCurrency {
+    address: String,
+    supports_bridging: Option<bool>,
+}
+
+/// GET /chains via the shared `relay_client()` (same client as /quote). Iterates `RELAY_BASE_URLS`
+/// — no hardcoded URLs.
+#[frb(ignore)]
+async fn fetch_chains() -> Result<ChainsResponse, String> {
+    let client = relay_client();
+    let mut last_err = String::new();
+    for base in RELAY_BASE_URLS {
+        let url = format!("{base}/chains");
+        let resp = client
+            .get(&url)
+            .timeout(Duration::from_secs(10))
+            .send()
+            .await;
+        match resp {
+            Ok(r) if r.status().is_success() => {
+                let body = r.text().await.map_err(|e| format!("{url}: body {e}"))?;
+                return serde_json::from_str::<ChainsResponse>(&body)
+                    .map_err(|e| format!("{url}: decode {e}"));
+            }
+            Ok(r) => {
+                let status = r.status();
+                let body = r.text().await.unwrap_or_default();
+                last_err = format!("{url}: {status}: {body}");
+            }
+            Err(e) => last_err = format!("{url}: {e}"),
+        }
+    }
+    Err(format!("relay /chains failed: {last_err}"))
+}
+
+/// Map a Relay chain id to an address family (1 EVM, 2 BTC, 3 SOL, 4 TRON). EVM is the default —
+/// uses the existing `RELAY_*_CHAIN_ID` consts, no magic numbers. Mirrors
+/// [`RelayOrigin::from_addr_type`] but keys on the Relay chain id (the matrix is indexed by it).
+#[frb(ignore)]
+const fn relay_addr_family(relay_chain_id: u64) -> u8 {
+    match relay_chain_id {
+        RELAY_BTC_CHAIN_ID => 2,
+        RELAY_SOL_CHAIN_ID => 3,
+        RELAY_TRON_CHAIN_ID => 4,
+        _ => 1,
+    }
+}
+
+/// Canonical comparable key for a currency address. Applied identically to matrix entries and to
+/// the asset's `relay_currency`, so string equality is robust to format quirks:
+/// - EVM: lowercase (Relay returns lowercase hex; our `auto_format()` is EIP-55 checksummed).
+/// - TRON: parse base58 OR hex → canonical base58, so it matches whichever form Relay returns.
+/// - BTC (bech32, lowercase) / SOL (base58, case-significant): compared as-is.
+#[frb(ignore)]
+fn canonical_currency(family: u8, addr: &str) -> Option<Cow<'_, str>> {
+    match family {
+        1 => Some(Cow::Owned(addr.to_ascii_lowercase())),
+        4 => ProtoAddress::from_tron_address(addr)
+            .or_else(|_| ProtoAddress::from_str_hex(addr))
+            .ok()
+            .map(|a| Cow::Owned(a.auto_format())),
+        _ => Some(Cow::Borrowed(addr)),
+    }
+}
+
+#[frb(ignore)]
+fn build_matrix(resp: ChainsResponse) -> SupportMatrix {
+    let mut matrix = HashMap::with_capacity(resp.chains.len());
+    for chain in resp.chains {
+        let supports_all = chain.token_support.as_deref() == Some("All");
+        let family = relay_addr_family(chain.id);
+        let mut bridgeable = HashSet::new();
+        if !supports_all {
+            // Native + erc20 currencies flagged supportsBridging, canonicalized.
+            let entries = chain
+                .currency
+                .into_iter()
+                .chain(chain.erc20_currencies.unwrap_or_default());
+            for c in entries {
+                if c.supports_bridging.unwrap_or(false) {
+                    if let Some(key) = canonical_currency(family, &c.address) {
+                        bridgeable.insert(key.into_owned());
+                    }
+                }
+            }
+        }
+        matrix.insert(
+            chain.id,
+            ChainSupport {
+                supports_all,
+                bridgeable,
+            },
+        );
+    }
+    matrix
+}
+
+/// Returns indices of `assets` whose Relay route is NOT supported per GET /chains. Reuses
+/// `relay_currency` (single source of truth for the address Relay sees) + `relay_meta`. Fail-open:
+/// on fetch failure with no cache, prunes nothing (lazy /quote still catches dead routes).
+#[frb(ignore)]
+pub(in crate::models::exchange) async fn evaluate_support_eager(
+    assets: &[ExchangeAsset],
+) -> Vec<usize> {
+    let Some(matrix) = support_matrix().await else {
+        return Vec::new();
+    };
+    assets
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, asset)| {
+            let meta = asset.relay_meta()?;                  // not a Relay asset → skip
+            let chain = matrix.get(&meta.common.chain_id)?;   // chain absent → keep (fail-open)
+            if chain.supports_all {
+                return None;                                  // liquidity decided lazily
+            }
+            let currency = relay_currency(asset, meta.common.chain_id);
+            let key = canonical_currency(asset.token.addr_type, currency.as_ref())?;
+            (!chain.bridgeable.contains(key.as_ref())).then_some(idx)
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1110,14 +1327,19 @@ mod tests {
             Some(RELAY_SOL_CHAIN_ID)
         );
         assert_eq!(
-            RelayMeta::for_chain(
-                44,
-                1,
-                11_155_111,
-                "0x0000000000000000000000000000000000000001"
-            ),
+            RelayMeta::for_chain(44, 1, 11_155_111, "0x0000000000000000000000000000000000000001"),
             None
         );
+        // Native TRX now ALSO receives a Relay provider at this layer — whether it is bridgeable
+        // is decided by the support gate (evaluate_support_eager) from GET /chains, not here.
+        // See `matrix_limited_prunes_unlisted_tron_token` for the data-driven prune.
+        assert!(RelayMeta::for_chain(
+            46,
+            4,
+            RELAY_TRON_CHAIN_ID,
+            "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"
+        )
+        .is_some());
     }
 
     #[test]
@@ -1240,5 +1462,44 @@ mod tests {
         assert_eq!(RelayOrigin::from_addr_type(2), Some(RelayOrigin::Btc));
         assert_eq!(RelayOrigin::from_addr_type(4), Some(RelayOrigin::Tron));
         assert_eq!(RelayOrigin::from_addr_type(0), None);
+    }
+
+    #[test]
+    fn matrix_limited_prunes_unlisted_tron_token() {
+        // TRON is tokenSupport "Limited": native TRX is supportsBridging:false, USDT is true.
+        // Any unlisted token (e.g. A7A5) is pruned purely from data — no hardcoded branch.
+        let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
+          {"id":728126428,"tokenSupport":"Limited",
+           "currency":{"address":"T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb","supportsBridging":false},
+           "erc20Currencies":[{"address":"TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t","supportsBridging":true}]}
+        ]}"#).unwrap();
+        let m = build_matrix(resp);
+        let tron = m.get(&RELAY_TRON_CHAIN_ID).unwrap();
+        assert!(!tron.supports_all);
+        let usdt = canonical_currency(4, "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t").unwrap();
+        assert!(tron.bridgeable.contains(usdt.as_ref()));      // USDT kept
+        // Native TRX is not bridgeable → not in the bridgeable set → would be pruned by the gate.
+        let trx = canonical_currency(4, "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb").unwrap();
+        assert!(!tron.bridgeable.contains(trx.as_ref()));
+    }
+
+    #[test]
+    fn matrix_all_keeps_unflagged_token() {
+        // On an "All" chain a currency with supportsBridging:false (WBTC on Optimism) is still
+        // bridgeable — the bridgeable set is intentionally NOT built, so nothing is pruned.
+        let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
+          {"id":10,"tokenSupport":"All",
+           "currency":{"address":"0x0000000000000000000000000000000000000000","supportsBridging":true},
+           "erc20Currencies":[{"address":"0x68f180fcce6836688e9084f035309e29bf0a2095","supportsBridging":false}]}
+        ]}"#).unwrap();
+        let m = build_matrix(resp);
+        let op = m.get(&10).unwrap();
+        assert!(op.supports_all);
+        assert!(op.bridgeable.is_empty());
+    }
+
+    #[test]
+    fn canonical_evm_lowercases() {
+        assert_eq!(canonical_currency(1, "0xABCdef").unwrap(), "0xabcdef");
     }
 }

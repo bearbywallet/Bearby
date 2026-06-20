@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 800545721;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -2102224516;
 
 // Section: executor
 
@@ -755,16 +755,15 @@ fn wire__crate__api__utils__bitcoin_address_type_from_address_impl(
     )
 }
 fn wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "bootstrap_exchange_providers",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
         move || {
             let message = unsafe {
@@ -779,20 +778,13 @@ fn wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_account_index = <usize>::sse_decode(&mut deserializer);
             deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::exchange::bootstrap::bootstrap_exchange_providers(
-                                api_wallet_index,
-                                api_account_index,
-                            )
-                            .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
+            transform_result_sse::<_, String>((move || {
+                let output_ok = crate::api::exchange::bootstrap::bootstrap_exchange_providers(
+                    api_wallet_index,
+                    api_account_index,
+                )?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -5632,6 +5624,47 @@ fn wire__crate__api__transaction__update_tx_with_params_impl(
         },
     )
 }
+fn wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "validate_exchange_providers",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_assets =
+                <Vec<crate::models::exchange::ExchangeAsset>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::exchange::bootstrap::validate_exchange_providers(
+                                api_assets,
+                            )
+                            .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -7714,6 +7747,16 @@ impl SseDecode for crate::models::qrcode::QrConfigInfo {
     }
 }
 
+impl SseDecode for (Vec<crate::models::exchange::ExchangeAsset>, bool) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 =
+            <Vec<crate::models::exchange::ExchangeAsset>>::sse_decode(deserializer);
+        let mut var_field1 = <bool>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode
     for (
         Vec<crate::models::provider::NetworkConfigInfo>,
@@ -8641,12 +8684,6 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
         22 => wire__crate__api__btc_ledger__btc_ledger_build_psbt_from_struct_impl(
             port,
             ptr,
@@ -9084,22 +9121,28 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        146 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        146 => wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        147 => {
+        147 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        148 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        148 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        149 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        149 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        150 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -9113,6 +9156,11 @@ fn pde_ffi_dispatcher_sync_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         17 => wire__crate__api__utils__address_to_hash_impl(ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__exchange__bootstrap__bootstrap_exchange_providers_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
         61 => wire__crate__api__utils__from_wei_impl(ptr, rust_vec_len, data_len),
         86 => wire__crate__api__utils__intl_number_formating_impl(ptr, rust_vec_len, data_len),
         102 => {
@@ -12527,6 +12575,14 @@ impl SseEncode for crate::models::qrcode::QrConfigInfo {
         <u32>::sse_encode(self.color, serializer);
         <u8>::sse_encode(self.eye_shape, serializer);
         <u8>::sse_encode(self.data_module_shape, serializer);
+    }
+}
+
+impl SseEncode for (Vec<crate::models::exchange::ExchangeAsset>, bool) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::models::exchange::ExchangeAsset>>::sse_encode(self.0, serializer);
+        <bool>::sse_encode(self.1, serializer);
     }
 }
 
