@@ -37,6 +37,7 @@ import 'models/exchange.dart';
 import 'models/exchange/pancakeswap.dart';
 import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
+import 'models/exchange/sunswap.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -684,6 +685,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustLedgerHidDevice dco_decode_rust_ledger_hid_device(dynamic raw);
+
+  @protected
+  SunSwapCfg dco_decode_sun_swap_cfg(dynamic raw);
 
   @protected
   SunSwapMeta dco_decode_sun_swap_meta(dynamic raw);
@@ -1464,6 +1468,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RustLedgerHidDevice sse_decode_rust_ledger_hid_device(
       SseDeserializer deserializer);
+
+  @protected
+  SunSwapCfg sse_decode_sun_swap_cfg(SseDeserializer deserializer);
 
   @protected
   SunSwapMeta sse_decode_sun_swap_meta(SseDeserializer deserializer);
@@ -2277,6 +2284,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_rust_ledger_hid_device(
       RustLedgerHidDevice self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_sun_swap_cfg(SunSwapCfg self, SseSerializer serializer);
 
   @protected
   void sse_encode_sun_swap_meta(SunSwapMeta self, SseSerializer serializer);

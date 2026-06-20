@@ -38,6 +38,8 @@ pub async fn execute_exchange_swap(
                 evm::execute_evm_exchange_swap(auth, params, display, &sink).await
             }
         }
+    } else if matches!(&params.provider, ExchangeProvider::SunSwap(_)) {
+        tron::execute_tron_exchange_swap(auth, params, display, &sink).await
     } else if matches!(&params.provider, ExchangeProvider::ZilSwap(_)) {
         zil::execute_zil_exchange_swap(auth, params, display, &sink).await
     } else {

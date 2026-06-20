@@ -7,6 +7,7 @@ import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/exchange/pancakeswap.dart';
 import 'package:bearby/src/rust/models/exchange/plunderswap.dart';
 import 'package:bearby/src/rust/models/exchange/relay.dart';
+import 'package:bearby/src/rust/models/exchange/sunswap.dart';
 import 'package:bearby/src/rust/models/exchange/uniswap.dart';
 
 extension ExchangeProviderMeta on ExchangeProvider {
@@ -286,6 +287,7 @@ class ExchangeState extends ChangeNotifier {
       )),
       sunSwap: (v) => ExchangeProvider.sunSwap(SunSwapMeta(
         common: v.field0.common,
+        cfg: v.field0.cfg,
         quote: null,
       )),
     );

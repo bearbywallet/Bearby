@@ -8,11 +8,12 @@ import '../../models/exchange.dart';
 import '../../models/exchange/pancakeswap.dart';
 import '../../models/exchange/plunderswap.dart';
 import '../../models/exchange/relay.dart';
+import '../../models/exchange/sunswap.dart';
 import '../../models/exchange/uniswap.dart';
 import '../../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `chain_matches_network`
+// These functions are ignored because they are not marked as `pub`: `chain_matches_network`, `gate_plunderswap_liquidity`, `has_plunderswap`, `plunder_probe_amount`, `provider_names`, `remove_plunderswap`, `request_plunder_gate_batch`, `zilliqa_mode_addr_type`, `zilliqa_token_matches_mode`
 
 Future<List<ExchangeAsset>> bootstrapExchangeProviders(
         {required BigInt walletIndex, required BigInt accountIndex}) =>

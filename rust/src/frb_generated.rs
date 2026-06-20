@@ -6360,7 +6360,7 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
             }
             5 => {
                 let mut var_field0 =
-                    <crate::models::exchange::SunSwapMeta>::sse_decode(deserializer);
+                    <crate::models::exchange::sunswap::SunSwapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
             }
             _ => {
@@ -7949,14 +7949,28 @@ impl SseDecode for crate::api::ledger_transport::RustLedgerHidDevice {
     }
 }
 
-impl SseDecode for crate::models::exchange::SunSwapMeta {
+impl SseDecode for crate::models::exchange::sunswap::SunSwapCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_defaultSlippageBps = <u32>::sse_decode(deserializer);
+        let mut var_supportsPriceProtection = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::sunswap::SunSwapCfg {
+            default_slippage_bps: var_defaultSlippageBps,
+            supports_price_protection: var_supportsPriceProtection,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::sunswap::SunSwapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_cfg = <crate::models::exchange::sunswap::SunSwapCfg>::sse_decode(deserializer);
         let mut var_quote =
             <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
-        return crate::models::exchange::SunSwapMeta {
+        return crate::models::exchange::sunswap::SunSwapMeta {
             common: var_common,
+            cfg: var_cfg,
             quote: var_quote,
         };
     }
@@ -10413,23 +10427,45 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger_transport::RustLedgerH
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::exchange::SunSwapMeta {
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::sunswap::SunSwapCfg {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.default_slippage_bps.into_into_dart().into_dart(),
+            self.supports_price_protection.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::sunswap::SunSwapCfg
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::sunswap::SunSwapCfg>
+    for crate::models::exchange::sunswap::SunSwapCfg
+{
+    fn into_into_dart(self) -> crate::models::exchange::sunswap::SunSwapCfg {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::sunswap::SunSwapMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.common.into_into_dart().into_dart(),
+            self.cfg.into_into_dart().into_dart(),
             self.quote.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::exchange::SunSwapMeta
+    for crate::models::exchange::sunswap::SunSwapMeta
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::SunSwapMeta>
-    for crate::models::exchange::SunSwapMeta
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::sunswap::SunSwapMeta>
+    for crate::models::exchange::sunswap::SunSwapMeta
 {
-    fn into_into_dart(self) -> crate::models::exchange::SunSwapMeta {
+    fn into_into_dart(self) -> crate::models::exchange::sunswap::SunSwapMeta {
         self
     }
 }
@@ -11486,7 +11522,7 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
                 <i32>::sse_encode(5, serializer);
-                <crate::models::exchange::SunSwapMeta>::sse_encode(field0, serializer);
+                <crate::models::exchange::sunswap::SunSwapMeta>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -12674,10 +12710,19 @@ impl SseEncode for crate::api::ledger_transport::RustLedgerHidDevice {
     }
 }
 
-impl SseEncode for crate::models::exchange::SunSwapMeta {
+impl SseEncode for crate::models::exchange::sunswap::SunSwapCfg {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.default_slippage_bps, serializer);
+        <bool>::sse_encode(self.supports_price_protection, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::sunswap::SunSwapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <crate::models::exchange::sunswap::SunSwapCfg>::sse_encode(self.cfg, serializer);
         <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
     }
 }
