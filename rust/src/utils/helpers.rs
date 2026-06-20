@@ -185,6 +185,13 @@ where
     f(Arc::make_mut(&mut core))
 }
 
+/// Copy-on-write mutation with an async closure.
+///
+/// **NB**: the inner `core.write()` lock is held across the `.await` in `f`
+/// — every `handle()` reader blocks for the duration. Use only for fast
+/// structural changes (add/delete wallet, keystore restore); do **not** use
+/// for long network I/O. For network-heavy work, fetch data via `handle()`
+/// first, then install results with the sync [`mutate_core`].
 pub async fn mutate_core_async<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: for<'a> AsyncFnOnce(&'a mut Background) -> Result<T, ServiceError>,

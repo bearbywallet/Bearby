@@ -5,7 +5,6 @@ use zilpay::tokio::sync::{Mutex, RwLock};
 use zilpay::tokio::task::JoinHandle;
 
 pub struct ServiceBackground {
-    pub running: bool,
     pub block_handle: Mutex<Option<JoinHandle<()>>>,
     pub history_handle: Mutex<Option<JoinHandle<()>>>,
     pub core: RwLock<Arc<Background>>,
@@ -20,13 +19,8 @@ impl ServiceBackground {
 
         Ok(Self {
             core: RwLock::new(Arc::new(core)),
-            running: true,
             block_handle: Mutex::new(None),
             history_handle: Mutex::new(None),
         })
-    }
-
-    pub fn stop(&mut self) {
-        self.running = false;
     }
 }
