@@ -26,7 +26,10 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
         let bg = ServiceBackground::from_path(path)?;
-        let core = bg.core.read().await.clone();
+        let core = bg
+            .core
+            .load_full()
+            .ok_or(ServiceError::NotRunning)?;
         let state = get_background_state(&core)?;
         *guard = Some(bg);
         Ok(state)

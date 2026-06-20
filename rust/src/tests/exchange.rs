@@ -61,7 +61,7 @@ mod exchange_tests {
         {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            let core = service.core.read().await;
+            let core = service.core.load_full().unwrap();
             core.add_batch_providers(providers.clone()).unwrap();
         }
 

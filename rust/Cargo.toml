@@ -10,6 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 flutter_rust_bridge = "=2.12.0"
 
 thiserror = "1.0.63"
+arc-swap = "1"
 
 # zilpay_core = { git = "https://github.com/zilpay/zilpay-core.git", branch = "master" }
 zilpay_core = { path = "/Users/hicaru/projects/bearby/bearby-core" }

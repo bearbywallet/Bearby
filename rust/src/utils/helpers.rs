@@ -166,41 +166,69 @@ pub fn get_last_wallet(service: &Background) -> Result<&Wallet, ServiceError> {
     service.wallets.last().ok_or(ServiceError::FailToSaveWallet)
 }
 
+/// Lock-free read: a single atomic load, zero `.await`, never contends with
+/// writers. Returns a shared `Arc<Background>` snapshot.
 pub async fn handle() -> Result<Arc<Background>, ServiceError> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = service.core.read().await.clone();
 
-    Ok(core)
+    service
+        .core
+        .load_full()
+        .ok_or(ServiceError::NotRunning)
 }
 
+/// Copy-on-write mutation. Loads the current snapshot, clones it, applies `f`
+/// to the clone, then atomically publishes the result. Serialized by
+/// `ServiceBackground::mutation_mutex` to prevent lost-update races between
+/// concurrent mutations.
 pub async fn mutate_core<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut Background) -> Result<T, ServiceError>,
 {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let mut core = service.core.write().await;
+    let _lock = service.mutation_mutex.lock().await;
+    let current = service
+        .core
+        .load_full()
+        .ok_or(ServiceError::NotRunning)?;
+    let mut next = (*current).clone();
+    let result = f(&mut next)?;
 
-    f(Arc::make_mut(&mut core))
+    service.core.store(Some(Arc::new(next)));
+
+    Ok(result)
 }
 
 /// Copy-on-write mutation with an async closure.
 ///
-/// **NB**: the inner `core.write()` lock is held across the `.await` in `f`
-/// — every `handle()` reader blocks for the duration. Use only for fast
-/// structural changes (add/delete wallet, keystore restore); do **not** use
-/// for long network I/O. For network-heavy work, fetch data via `handle()`
-/// first, then install results with the sync [`mutate_core`].
+/// **NB**: the mutation mutex is held across the `.await` in `f` — every
+/// concurrent `mutate_core` or `mutate_core_async` call blocks for the
+/// duration. Use only for fast structural changes (add/delete wallet,
+/// keystore restore); do **not** use for long network I/O. For network-heavy
+/// work, fetch data via `handle()` first, then install results with the sync
+/// [`mutate_core`].
+///
+/// Readers (`handle()`) are **never** blocked — they see the pre-mutation
+/// snapshot until `store` publishes the result.
 pub async fn mutate_core_async<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: for<'a> AsyncFnOnce(&'a mut Background) -> Result<T, ServiceError>,
 {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let mut core = service.core.write().await;
+    let _lock = service.mutation_mutex.lock().await;
+    let current = service
+        .core
+        .load_full()
+        .ok_or(ServiceError::NotRunning)?;
+    let mut next = (*current).clone();
+    let result = f(&mut next).await?;
 
-    f(Arc::make_mut(&mut core)).await
+    service.core.store(Some(Arc::new(next)));
+
+    Ok(result)
 }
 
 pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>
