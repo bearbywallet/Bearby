@@ -1,23 +1,16 @@
 use zilpay::alloy::sol;
 
 sol! {
-    interface IPlunderRouterV2 {
-        function getAmountsOut(uint256 amountIn, address[] path)
-            external view returns (uint256[] amounts);
-    }
-}
-
-sol! {
-    struct QuoteExactInputSingleParams {
-        address tokenIn;
-        address tokenOut;
-        uint256 amountIn;
+    struct Quote {
+        uint8 routeType;
+        uint256 amountOut;
         uint24 fee;
-        uint160 sqrtPriceLimitX96;
+        address[] v2Path;
+        bytes v3Path;
     }
 
-    function quoteExactInputSingle(QuoteExactInputSingleParams params)
-        external returns (uint256 amountOut, uint160 sqrtPriceX96After, uint32 initializedTicksCrossed, uint256 gasEstimate);
+    function quoteBestRoute(address tokenIn, address tokenOut, uint256 amountIn)
+        external returns (Quote best);
 }
 
 sol! {
@@ -50,6 +43,20 @@ sol! {
         bool nativeOut
     ) external payable returns (uint256 amountOut);
 
+    /// Multi-hop V3 swap over a packed `addr ‖ fee ‖ addr ‖ … ‖ addr` path.
+    /// `tokenIn`/`tokenOut` are explicit because the fee-router's
+    /// `_prepareV3Input` needs them for pull/approve/wrap regardless of the
+    /// packed path (see PlunderFeeRouter.sol:234).
+    function swapV3ExactInput(
+        bytes path,
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        uint256 deadline,
+        bool nativeIn,
+        bool nativeOut
+    ) external payable returns (uint256 amountOut);
 }
 
 sol! {

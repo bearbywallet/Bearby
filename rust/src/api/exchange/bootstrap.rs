@@ -1,19 +1,26 @@
 use std::collections::{HashMap, HashSet};
+use std::str::FromStr;
 
+use zilpay::alloy::hex;
+use zilpay::alloy::primitives::{Address, U256};
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::crypto::slip44::{BITCOIN, TRON, ZILLIQA};
 use zilpay::proto::pubkey::PubKey;
-use zilpay::rpc::network_config::ChainConfig;
+use zilpay::rpc::{
+    common::JsonRPC, methods::EvmMethods, network_config::ChainConfig, provider::RpcProvider,
+    zil_interfaces::ResultRes,
+};
 use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::{
-    ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote, RelayMeta,
-    SunSwapMeta, UniswapMeta, ZilSwapMeta,
+    plunderswap, ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote,
+    RelayMeta, SunSwapMeta, UniswapMeta, ZilSwapMeta,
 };
 use crate::service::background::BACKGROUND_SERVICE;
 use crate::utils::errors::{BackgroundError, ServiceError};
+use zilpay::serde_json::{json, Value};
 
 fn chain_matches_network(chain: &ChainConfig, is_testnet: bool) -> bool {
     chain.testnet.unwrap_or(false) == is_testnet
@@ -45,6 +52,158 @@ fn provider_names(providers: &HashSet<ExchangeProvider>) -> String {
         .collect();
     names.sort_unstable();
     names.join(",")
+}
+
+fn has_plunderswap(providers: &HashSet<ExchangeProvider>) -> bool {
+    providers
+        .iter()
+        .any(|provider| matches!(provider, ExchangeProvider::PlunderSwap(_)))
+}
+
+fn remove_plunderswap(providers: &mut HashSet<ExchangeProvider>) {
+    providers.retain(|provider| !matches!(provider, ExchangeProvider::PlunderSwap(_)));
+}
+
+fn plunder_probe_amount() -> U256 {
+    // 1,000 WZIL. The lens receives post-fee amounts in normal quote flow, but
+    // bootstrap only cares whether a route exists and returns non-zero output.
+    U256::from(1_000_000_000_000_000_000_000u128)
+}
+
+async fn request_plunder_gate_batch(
+    chain_config: &ChainConfig,
+    payload: Value,
+) -> Result<Vec<ResultRes<Value>>, String> {
+    let provider: RpcProvider<ChainConfig> = RpcProvider::new(chain_config);
+    match provider.req::<Vec<ResultRes<Value>>>(payload.clone()).await {
+        Ok(res) => Ok(res),
+        Err(primary_error) => {
+            if chain_config.chain_id() != plunderswap::ZILLIQA_MAINNET_CHAIN_ID {
+                return Err(primary_error.to_string());
+            }
+
+            let client = zilpay::reqwest::Client::new();
+            let mut fallback_error = primary_error.to_string();
+            for url in ["https://api.zilliqa.com/evm", "https://api.zilliqa.com"] {
+                eprintln!("[exchange-bootstrap] retry Plunder liquidity gate rpc_url={url}");
+                let response = client.post(url).json(&payload).send().await;
+                match response {
+                    Ok(response) => match response.json::<Vec<ResultRes<Value>>>().await {
+                        Ok(res) => return Ok(res),
+                        Err(err) => fallback_error = err.to_string(),
+                    },
+                    Err(err) => fallback_error = err.to_string(),
+                }
+            }
+
+            Err(fallback_error)
+        }
+    }
+}
+
+async fn gate_plunderswap_liquidity(
+    chain_config: Option<&ChainConfig>,
+    assets: &mut HashMap<(u64, usize, u8), ExchangeAsset>,
+) {
+    let Some(chain_config) = chain_config else {
+        return;
+    };
+    let Some(meta) = PlunderMeta::for_chain(
+        chain_config.hash(),
+        chain_config.chain_id(),
+        chain_config.slip_44,
+        "0x0000000000000000000000000000000000000001",
+    ) else {
+        return;
+    };
+    let cfg = match meta.resolve() {
+        Ok(cfg) => cfg,
+        Err(err) => {
+            eprintln!("[exchange-bootstrap] Plunder liquidity gate config_error={err}");
+            return;
+        }
+    };
+
+    let candidates: Vec<((u64, usize, u8), String, Address)> = assets
+        .iter()
+        .filter_map(|(key, asset)| {
+            if !has_plunderswap(&asset.providers) || asset.token.native {
+                return None;
+            }
+            let token = Address::from_str(&asset.token.addr).ok()?;
+            if token == cfg.addrs.wzil {
+                return None;
+            }
+            Some((*key, asset.token.symbol.clone(), token))
+        })
+        .collect();
+
+    if candidates.is_empty() {
+        return;
+    }
+
+    // Gate on WZIL -> token reachability: the lens routes through configured hubs, so this also
+    // covers tokens that only pair via a hub (e.g. WZIL -> zUSDT -> token). A token reachable only
+    // through a non-WZIL hub is intentionally gated out — the exchange funds swaps from ZIL/WZIL.
+    let probe_amount = plunder_probe_amount();
+    let calls: Vec<Value> = candidates
+        .iter()
+        .map(|(_, _, token)| {
+            let data = plunderswap::encode_quote_lens_call(cfg.addrs.wzil, *token, probe_amount);
+            RpcProvider::<ChainConfig>::build_payload(
+                json!([
+                    {
+                        "to": cfg.addrs.quote_lens.to_string(),
+                        "data": hex::encode_prefixed(&data),
+                        "gas": format!("0x{:x}", plunderswap::QUOTE_LENS_GAS),
+                    },
+                    "latest"
+                ]),
+                EvmMethods::Call,
+            )
+        })
+        .collect();
+
+    eprintln!(
+        "[exchange-bootstrap] Plunder liquidity gate candidates={} lens={} gas=0x{:x}",
+        candidates.len(),
+        cfg.addrs.quote_lens,
+        plunderswap::QUOTE_LENS_GAS,
+    );
+
+    let results = match request_plunder_gate_batch(chain_config, Value::Array(calls)).await {
+        Ok(results) => results,
+        Err(err) => {
+            // Fail open: a transient RPC error must not strip PlunderSwap from liquid pairs.
+            // Genuinely dead pairs still surface "no liquidity" at quote time.
+            eprintln!("[exchange-bootstrap] Plunder liquidity gate skipped (rpc error): {err}");
+            return;
+        }
+    };
+
+    for (index, (key, symbol, token)) in candidates.iter().enumerate() {
+        // Fail open: only strip PlunderSwap on a *decoded* no-liquidity answer. A missing item,
+        // RPC item-error, or decode failure leaves the provider in place — quote time still gates
+        // genuinely-dead pairs, so a flaky probe never hides a working pair.
+        let confirmed_no_liquidity = results
+            .get(index)
+            .filter(|item| item.error.is_none())
+            .and_then(|item| item.result.as_ref())
+            .and_then(Value::as_str)
+            .and_then(|raw| hex::decode(raw).ok())
+            .and_then(|bytes| plunderswap::decode_quote_lens_return(&bytes))
+            .is_some_and(|quote| {
+                quote.route_type == plunderswap::ROUTE_NONE || quote.amount_out == U256::ZERO
+            });
+        if confirmed_no_liquidity {
+            if let Some(asset) = assets.get_mut(key) {
+                remove_plunderswap(&mut asset.providers);
+                eprintln!(
+                    "[exchange-bootstrap] remove PlunderSwap symbol={symbol} token={token} reason=no_liquidity"
+                );
+            }
+        }
+    }
 }
 
 pub async fn bootstrap_exchange_providers(
@@ -152,6 +311,15 @@ pub async fn bootstrap_exchange_providers(
         .filter(|p| chain_matches_network(&p.config, current_is_testnet))
         .map(|p| (p.config.hash(), (p.config.slip_44, p.config.chain_id())))
         .collect();
+
+    let plunder_chain_config = all_providers
+        .iter()
+        .find(|p| {
+            chain_matches_network(&p.config, current_is_testnet)
+                && p.config.slip_44 == ZILLIQA
+                && plunderswap::is_supported_chain(p.config.chain_id())
+        })
+        .map(|p| p.config.clone());
 
     let make_providers = |addr_prefix: u8,
                           slip_44: u32,
@@ -332,6 +500,8 @@ pub async fn bootstrap_exchange_providers(
             }
         }
     }
+
+    gate_plunderswap_liquidity(plunder_chain_config.as_ref(), &mut assets).await;
 
     let result: Vec<ExchangeAsset> = assets
         .into_values()

@@ -7,6 +7,7 @@ use std::str::FromStr;
 
 use flutter_rust_bridge::frb;
 use zilpay::alloy::primitives::{Address, U256};
+use zilpay::alloy::sol_types::SolCall;
 use zilpay::{serde, serde_json};
 
 use self::math::resolve_pair;
@@ -21,19 +22,21 @@ pub const ZILLIQA_MAINNET_CHAIN_ID: u64 = 32_769;
 /// `PlunderFeeRouter`'s input fee (1% = 100 bps). Quotes subtract it before routing.
 pub const PROXY_FEE_BPS: u32 = 100;
 
-/// V3 fee tiers to probe (bips * 100): 0.01% / 0.05% / 0.25% / 0.30% / 1.00%.
-///
-/// The live WZIL/pZIL fork test uses 0.25%; 0.30% is also probed to avoid
-/// silently missing pools deployed by Uni-style factories.
-pub const PLUNDER_V3_FEE_TIERS: &[u32] = &[100, 500, 2_500, 3_000, 10_000];
+/// Explicit gas limit for quote-lens `eth_call`s. The lens fans out into bounded
+/// per-pool probes, so callers must not rely on a low node default.
+pub const QUOTE_LENS_GAS: u64 = 10_000_000;
+
+pub const ROUTE_NONE: u8 = 0;
+pub const ROUTE_V2: u8 = 1;
+pub const ROUTE_V3_SINGLE: u8 = 2;
+pub const ROUTE_V3_PATH: u8 = 3;
 
 pub const SWAP_GAS: u64 = 400_000;
 pub const APPROVE_GAS: u64 = 60_000;
 
 const FEE_ROUTER: &str = "0x8F2e461aec4f75B3Bd6058FfCB121a832eb0711b";
 const WZIL: &str = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192";
-const ROUTER_V2: &str = "0x33C6a20D2a605da9Fd1F506ddEd449355f0564fe";
-const QUOTER_V2: &str = "0xAE4474364B8fc6Ce0fe8F888752540C05948AD94";
+const QUOTE_LENS: &str = "0x597d8653AE40073E660E95894eC33B3CDd12f267";
 
 #[frb(ignore)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -41,15 +44,49 @@ pub struct PlunderAddrs {
     pub chain_id: u64,
     pub fee_router: Address,
     pub wzil: Address,
-    pub router_v2: Address,
-    pub quoter_v2: Address,
+    pub quote_lens: Address,
 }
 
 #[frb(ignore)]
 #[derive(Clone, Debug)]
 pub struct PlunderConfig {
     pub addrs: PlunderAddrs,
-    pub fee_tiers: &'static [u32],
+}
+
+#[frb(ignore)]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct QuoteLensQuote {
+    pub route_type: u8,
+    pub amount_out: U256,
+    pub fee_tier: u32,
+    pub v2_path: Vec<Address>,
+    pub v3_path: Vec<u8>,
+}
+
+#[frb(ignore)]
+pub(crate) fn encode_quote_lens_call(
+    token_in: Address,
+    token_out: Address,
+    amount_in: U256,
+) -> Vec<u8> {
+    abi::quoteBestRouteCall {
+        tokenIn: token_in,
+        tokenOut: token_out,
+        amountIn: amount_in,
+    }
+    .abi_encode()
+}
+
+#[frb(ignore)]
+pub(crate) fn decode_quote_lens_return(data: &[u8]) -> Option<QuoteLensQuote> {
+    let best = abi::quoteBestRouteCall::abi_decode_returns(data).ok()?;
+    Some(QuoteLensQuote {
+        route_type: best.routeType,
+        amount_out: best.amountOut,
+        fee_tier: best.fee.to::<u32>(),
+        v2_path: best.v2Path,
+        v3_path: best.v3Path.to_vec(),
+    })
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -106,16 +143,13 @@ impl PlunderMeta {
     #[frb(ignore)]
     pub fn resolve(&self) -> Result<PlunderConfig, String> {
         let parse = |input: &str| Address::from_str(input).map_err(|e| e.to_string());
-        Ok(PlunderConfig {
-            addrs: PlunderAddrs {
-                chain_id: self.common.chain_id,
-                fee_router: parse(FEE_ROUTER)?,
-                wzil: parse(WZIL)?,
-                router_v2: parse(ROUTER_V2)?,
-                quoter_v2: parse(QUOTER_V2)?,
-            },
-            fee_tiers: PLUNDER_V3_FEE_TIERS,
-        })
+        let addrs = PlunderAddrs {
+            chain_id: self.common.chain_id,
+            fee_router: parse(FEE_ROUTER)?,
+            wzil: parse(WZIL)?,
+            quote_lens: parse(QUOTE_LENS)?,
+        };
+        Ok(PlunderConfig { addrs })
     }
 }
 
@@ -130,6 +164,12 @@ pub(super) enum RouteKind {
         token_in: String,
         token_out: String,
         fee_tier: u32,
+    },
+    /// Multi-hop V3 route. `path` is the `0x`-prefixed hex of the packed Uniswap
+    /// path bytes (`addr ‖ fee ‖ addr ‖ ... ‖ addr`), round-tripped verbatim into
+    /// `swapV3ExactInput` at finalize time.
+    V3Path {
+        path: String,
     },
     Wrap {
         token: String,
@@ -265,6 +305,7 @@ pub async fn plunderswap_check_approval(
         &resolved.cfg,
         owner,
         meta.common.chain_hash,
+        meta.common.slip44,
         from.token.addr.as_str(),
         amount,
         approve_title,
@@ -307,6 +348,12 @@ pub async fn plunderswap_prepare_swap(
         .await?;
         (plan.kind, plan.amount_out)
     };
+
+    eprintln!(
+        "[plunderswap-prepare] route={route:?} amount_in={amount_in} amount_out={amount_out} \
+         slippage_bps={slippage_bps} native_in={} native_out={}",
+        from.token.native, resolved.is_native_out
+    );
 
     let blob = QuoteBlob {
         chain_id: resolved.cfg.addrs.chain_id,
@@ -393,7 +440,6 @@ mod tests {
     fn resolve_parses_mainnet_addresses() -> Result<(), String> {
         let cfg = meta(ZILLIQA_MAINNET_CHAIN_ID).resolve()?;
         assert_eq!(cfg.addrs.chain_id, ZILLIQA_MAINNET_CHAIN_ID);
-        assert_eq!(cfg.fee_tiers, PLUNDER_V3_FEE_TIERS);
         assert_eq!(
             cfg.addrs.fee_router,
             Address::from_str(FEE_ROUTER).map_err(|e| e.to_string())?
@@ -403,14 +449,31 @@ mod tests {
             Address::from_str(WZIL).map_err(|e| e.to_string())?
         );
         assert_eq!(
-            cfg.addrs.router_v2,
-            Address::from_str(ROUTER_V2).map_err(|e| e.to_string())?
-        );
-        assert_eq!(
-            cfg.addrs.quoter_v2,
-            Address::from_str(QUOTER_V2).map_err(|e| e.to_string())?
+            cfg.addrs.quote_lens,
+            Address::from_str(QUOTE_LENS).map_err(|e| e.to_string())?
         );
         Ok(())
+    }
+
+    #[test]
+    fn quote_lens_abi_round_trips() {
+        use zilpay::alloy::primitives::aliases::U24;
+        use zilpay::alloy::sol_types::SolValue;
+
+        let quote = abi::Quote {
+            routeType: ROUTE_V3_SINGLE,
+            amountOut: U256::from(123u64),
+            fee: U24::from(2_500u64),
+            v2Path: Vec::new(),
+            v3Path: Vec::new().into(),
+        };
+        let bytes = (quote,).abi_encode_params();
+        let decoded = decode_quote_lens_return(&bytes).expect("quote decode");
+        assert_eq!(decoded.route_type, ROUTE_V3_SINGLE);
+        assert_eq!(decoded.amount_out, U256::from(123u64));
+        assert_eq!(decoded.fee_tier, 2_500);
+        assert!(decoded.v2_path.is_empty());
+        assert!(decoded.v3_path.is_empty());
     }
 
     #[test]
@@ -422,6 +485,29 @@ mod tests {
                 token_in: WZIL.to_string(),
                 token_out: "0xc85b0db68467dede96A7087F4d4C47731555cA7A".to_string(),
                 fee_tier: 2_500,
+            },
+            amount_in: "100".to_string(),
+            amount_out: "200".to_string(),
+            slippage_bps: 50,
+            is_native_in: true,
+            is_native_out: false,
+            recipient: "0x0000000000000000000000000000000000000001".to_string(),
+        };
+        let json = serde_json::to_string(&blob).map_err(|e| e.to_string())?;
+        let parsed: QuoteBlob = serde_json::from_str(&json).map_err(|e| e.to_string())?;
+        assert_eq!(parsed, blob);
+        Ok(())
+    }
+
+    #[test]
+    fn quote_blob_round_trips_v3path_route() -> Result<(), String> {
+        let blob = QuoteBlob {
+            chain_id: ZILLIQA_MAINNET_CHAIN_ID,
+            fee_router: FEE_ROUTER.to_string(),
+            route: RouteKind::V3Path {
+                // Packed 2-hop path placeholder: `addr ‖ fee ‖ addr ‖ fee ‖ addr`.
+                // Round-trip only exercises serde, so a literal hex suffices.
+                path: "0x00000000000000000000000094e18ae7dd5ee57b55f30c4b63e2760c09efb1920001f40000000000000000000000002274005778063684fbb1bfa96a2b725dc37d75f9000bb8000000000000000000000000c85b0db68467dede96a7087f4d4c47731555ca7a".to_string(),
             },
             amount_in: "100".to_string(),
             amount_out: "200".to_string(),
