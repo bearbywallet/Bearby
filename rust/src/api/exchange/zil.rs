@@ -14,8 +14,7 @@ use crate::frb_generated::StreamSink;
 use crate::models::exchange::zilswap::SWAP_GAS;
 use crate::models::exchange::{ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::history::HistoricalTransactionInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::{errors::ServiceError, helpers::handle};
 
 use super::evm::resolve_swap_signer;
 
@@ -88,14 +87,7 @@ pub(super) async fn execute_zil_exchange_swap(
         ..
     } = display;
 
-    let core = Arc::clone(
-        &BACKGROUND_SERVICE
-            .read()
-            .await
-            .as_ref()
-            .ok_or(ServiceError::NotRunning)?
-            .core,
-    );
+    let core = handle().await?;
 
     let seed = unlock_seed(&core, auth.wallet_index, auth.password).await?;
     let secret_passphrase = SecretString::new(auth.passphrase.unwrap_or_default().into());

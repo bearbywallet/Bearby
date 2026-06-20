@@ -61,7 +61,8 @@ mod exchange_tests {
         {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
-            service.core.add_batch_providers(providers.clone()).unwrap();
+            let core = service.core.read().await;
+            core.add_batch_providers(providers.clone()).unwrap();
         }
 
         let eth_chain = providers.iter().find(|c| c.slip_44 == ETHEREUM).unwrap();

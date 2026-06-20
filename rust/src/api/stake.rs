@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     network::zil::{ZilliqaEVMStakeing, ZilliqaScillaStakeing},
@@ -9,10 +7,9 @@ use zilpay::{
 
 use crate::{
     models::{stake::FinalOutputInfo, transactions::request::TransactionRequestInfo},
-    service::background::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        helpers::{parse_address, with_service},
+        helpers::{handle, parse_address, with_service},
     },
 };
 
@@ -20,9 +17,7 @@ pub async fn fetch_evm_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -48,9 +43,7 @@ pub async fn fetch_scilla_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle().await?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;

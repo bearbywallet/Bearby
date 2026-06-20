@@ -1,12 +1,11 @@
 use crate::{
     models::ftoken::FTokenInfo,
-    service::background::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        helpers::{parse_address, with_service},
+        helpers::{handle, parse_address, with_service},
     },
 };
-use std::{borrow::Cow, collections::HashMap, sync::Arc};
+use std::{borrow::Cow, collections::HashMap};
 pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::serde::Deserialize;
@@ -241,32 +240,25 @@ async fn fetch_bearby_rates<'a>(
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
-    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let core = Arc::clone(&service.core);
+    let core = handle().await?;
 
-        core.sync_ftokens_balances(wallet_index)
-            .await
-            .map_err(ServiceError::BackgroundError)?;
+    core.sync_ftokens_balances(wallet_index)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
 
-        Ok(())
-    } else {
-        Err(ServiceError::NotRunning.to_string())
-    }
+    Ok(())
 }
 
 pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let wallet = service
-        .core
+    let core = handle().await?;
+    let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
     let data = wallet
         .get_wallet_data()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     let currency: &str = data.settings.features.currency_convert.as_ref();
-    let chain = service
-        .core
+    let chain = core
         .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
     let chain_hash = chain.config.hash();
@@ -539,19 +531,15 @@ pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
 }
 
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {
-    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let core = Arc::clone(&service.core);
-        let address = parse_address(addr)?;
+    let core = handle().await?;
+    let address = parse_address(addr)?;
 
-        let token_meta = core
-            .fetch_ftoken_meta(wallet_index, address)
-            .await
-            .map_err(ServiceError::BackgroundError)?;
+    let token_meta = core
+        .fetch_ftoken_meta(wallet_index, address)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
 
-        Ok(token_meta.into())
-    } else {
-        Err(ServiceError::NotRunning.to_string())
-    }
+    Ok(token_meta.into())
 }
 
 async fn fetch_zilliqa_tokens(
@@ -741,11 +729,9 @@ async fn fetch_solana_tokens(
 }
 
 pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = handle().await?;
 
-    let wallet = service
-        .core
+    let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
     let data = wallet
@@ -754,8 +740,7 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
     let account = data
         .get_selected_account()
         .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let provider = service
-        .core
+    let provider = core
         .get_provider(data.chain_hash)
         .map_err(ServiceError::BackgroundError)?;
 

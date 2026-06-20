@@ -166,56 +166,73 @@ pub fn get_last_wallet(service: &Background) -> Result<&Wallet, ServiceError> {
     service.wallets.last().ok_or(ServiceError::FailToSaveWallet)
 }
 
-pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>
+pub async fn handle() -> Result<Arc<Background>, ServiceError> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = service.core.read().await.clone();
+
+    Ok(core)
+}
+
+pub async fn mutate_core<F, T>(f: F) -> Result<T, ServiceError>
 where
-    F: FnOnce(&zilpay::background::Background) -> Result<T, ServiceError>,
+    F: FnOnce(&mut Background) -> Result<T, ServiceError>,
 {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    f(&service.core)
+    let mut core = service.core.write().await;
+
+    f(Arc::make_mut(&mut core))
+}
+
+pub async fn mutate_core_async<F, T>(f: F) -> Result<T, ServiceError>
+where
+    F: for<'a> AsyncFnOnce(&'a mut Background) -> Result<T, ServiceError>,
+{
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut core = service.core.write().await;
+
+    f(Arc::make_mut(&mut core)).await
+}
+
+pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>
+where
+    F: FnOnce(&Background) -> Result<T, ServiceError>,
+{
+    let core = handle().await?;
+
+    f(&core)
 }
 
 pub async fn with_service_mut<F, T>(f: F) -> Result<T, ServiceError>
 where
-    F: FnOnce(&mut zilpay::background::Background) -> Result<T, ServiceError>,
+    F: FnOnce(&mut Background) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-
-        f(core)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    mutate_core(f).await
 }
 
 pub async fn with_wallet_mut<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut Wallet) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-
+    mutate_core(|core| {
         let wallet = core
             .wallets
             .get_mut(wallet_index)
             .ok_or(ServiceError::WalletAccess(wallet_index))?;
 
         f(wallet)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    })
+    .await
 }
 
 pub async fn with_wallet<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&Wallet) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let core = Arc::clone(&service.core);
-        let wallet = core.get_wallet_by_index(wallet_index)?;
+    let core = handle().await?;
+    let wallet = core.get_wallet_by_index(wallet_index)?;
 
-        f(wallet)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    f(wallet)
 }

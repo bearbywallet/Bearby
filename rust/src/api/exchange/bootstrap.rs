@@ -18,8 +18,10 @@ use crate::models::exchange::{
     plunderswap, ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote,
     RelayMeta, SunSwapMeta, UniswapMeta, ZilSwapMeta,
 };
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::{BackgroundError, ServiceError};
+use crate::utils::{
+    errors::{BackgroundError, ServiceError},
+    helpers::handle,
+};
 use zilpay::serde_json::{json, Value};
 
 fn chain_matches_network(chain: &ChainConfig, is_testnet: bool) -> bool {
@@ -210,11 +212,9 @@ pub async fn bootstrap_exchange_providers(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<ExchangeAsset>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let all_providers = service.core.get_providers();
-    let wallet = service
-        .core
+    let core = handle().await?;
+    let all_providers = core.get_providers();
+    let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
     let wallet_data = wallet
@@ -444,7 +444,7 @@ pub async fn bootstrap_exchange_providers(
         }
     }
 
-    for wallet in service.core.wallets.iter() {
+    for wallet in core.wallets.iter() {
         for token in wallet.get_ftokens().map_err(|e| e.to_string())? {
             let addr_prefix = token.addr.prefix_type();
             if let Some(&(slip_44, _)) = chain_meta.get(&token.chain_hash) {

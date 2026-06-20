@@ -1,12 +1,9 @@
-use std::sync::Arc;
-
 use zilpay::proto::tx::TransactionRequest;
 
 use crate::models::exchange::relay::RelayOrigin;
 use crate::models::exchange::{ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams};
 use crate::models::transactions::request::TransactionRequestInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use crate::utils::{errors::ServiceError, helpers::handle};
 
 use super::evm::{
     apply_fast_fees, apply_swap_gas_limit, estimate_fast_params, resolve_swap_signer,
@@ -36,11 +33,7 @@ pub async fn check_exchange_approval(
         return Ok(None);
     }
 
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = handle().await?;
 
     let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
     let chain_hash = params.provider.common().chain_hash;
@@ -97,11 +90,7 @@ pub async fn finalize_exchange_swap(
     nonce: u64,
     display: ExchangeTxDisplay,
 ) -> Result<TransactionRequestInfo, String> {
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = handle().await?;
 
     let (signer, _) = resolve_swap_signer(&core, auth.wallet_index, auth.account_index)?;
     let chain_hash = provider.common().chain_hash;
@@ -142,11 +131,7 @@ pub async fn estimate_swap_base_nonce(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<u64, String> {
-    let core = {
-        let guard = BACKGROUND_SERVICE.read().await;
-        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-        Arc::clone(&service.core)
-    };
+    let core = handle().await?;
 
     let (signer, chain_hash) = resolve_swap_signer(&core, wallet_index, account_index)?;
     let base = match signer {

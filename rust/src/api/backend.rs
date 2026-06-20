@@ -17,7 +17,7 @@ use crate::{
     service::background::{ServiceBackground, BACKGROUND_SERVICE},
     utils::{
         errors::ServiceError,
-        helpers::{get_background_state, with_service},
+        helpers::{get_background_state, handle, with_service},
     },
 };
 
@@ -26,7 +26,8 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
         let bg = ServiceBackground::from_path(path)?;
-        let state = get_background_state(&bg.core)?;
+        let core = bg.core.read().await.clone();
+        let state = get_background_state(&core)?;
         *guard = Some(bg);
         Ok(state)
     } else {
@@ -50,13 +51,12 @@ pub async fn is_service_running() -> bool {
 }
 
 pub async fn stop_block_worker() -> Result<(), String> {
-    let mut guard = BACKGROUND_SERVICE.write().await;
-    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut block_handle = service.block_handle.lock().await;
 
-    if let Some(block_handle) = &service.block_handle {
-        block_handle.abort();
-
-        service.block_handle = None;
+    if let Some(handle) = block_handle.take() {
+        handle.abort();
     }
 
     Ok(())
@@ -74,21 +74,23 @@ pub async fn start_block_worker(
     let (tx, mut rx) = mpsc::channel(10);
 
     {
-        let mut guard = BACKGROUND_SERVICE.write().await;
-        let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
-
-        let handle = service
-            .core
+        let core = handle().await?;
+        let worker_handle = core
             .start_block_track_job(wallet_index, tx)
             .await
             .map_err(|e| e.to_string())?;
+        let guard = BACKGROUND_SERVICE.read().await;
+        let Some(service) = guard.as_ref() else {
+            worker_handle.abort();
+            return Err(ServiceError::NotRunning.into());
+        };
+        let mut block_handle = service.block_handle.lock().await;
 
-        if let Some(block_handle) = &service.block_handle {
-            block_handle.abort();
-            service.block_handle = None;
+        if let Some(previous_handle) = block_handle.take() {
+            previous_handle.abort();
         }
 
-        service.block_handle = Some(handle);
+        *block_handle = Some(worker_handle);
     }
 
     while let Some(msg) = rx.recv().await {
