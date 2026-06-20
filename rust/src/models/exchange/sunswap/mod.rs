@@ -30,11 +30,10 @@ const NILE_FEE_ROUTER: &str = "TVSy9pau8hqRwYNGJ4rU9LwebDbTQGHNVE";
 const NILE_QUOTE_LENS: &str = "TKvmxYRWK7Ea9YQ1LTyBpqfbJ2MTLXRWT9";
 const NILE_WTRX: &str = "TYsbWxNnyTgsZaTFaue9hqpxkU3Fkco94a";
 
-// Mainnet: WTRX known; fee router + lens NOT yet deployed.
+// Mainnet (deployed — dex-router/README.md "SunSwap mainnet deployment").
 const MAINNET_WTRX: &str = "TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR";
-// TODO(mainnet): set after `tronbox migrate --network mainnet`.
-const MAINNET_FEE_ROUTER: Option<&str> = None;
-const MAINNET_QUOTE_LENS: Option<&str> = None;
+const MAINNET_FEE_ROUTER: Option<&str> = Some("TFRViCT6E8rqzpExaKw32w6FcVCaRS1rxM");
+const MAINNET_QUOTE_LENS: Option<&str> = Some("TSmHPMzhGmZZmjcCuWGAuDiG3BDJt9g4uh");
 
 /// Route-type consts (per `SunQuoteLens.sol`). No V2.
 pub const ROUTE_NONE: u8 = 0;
@@ -147,12 +146,8 @@ impl SunSwapMeta {
         let (fee_router_str, quote_lens_str, wtrx_str) = match self.common.chain_id {
             TRON_NILE_CHAIN_ID => (NILE_FEE_ROUTER, NILE_QUOTE_LENS, NILE_WTRX),
             TRON_MAINNET_CHAIN_ID => (
-                MAINNET_FEE_ROUTER.ok_or_else(|| {
-                    "SunSwap not deployed on TRON mainnet yet".to_string()
-                })?,
-                MAINNET_QUOTE_LENS.ok_or_else(|| {
-                    "SunSwap not deployed on TRON mainnet yet".to_string()
-                })?,
+                MAINNET_FEE_ROUTER.expect("checked by is_supported_chain"),
+                MAINNET_QUOTE_LENS.expect("checked by is_supported_chain"),
                 MAINNET_WTRX,
             ),
             _ => return Err("SunSwap not deployed on this chain".to_string()),
@@ -458,14 +453,14 @@ mod tests {
             "TXy123456789012345678901234567890AB"
         )
         .is_some());
-        // Mainnet is gated off until MAINNET_FEE_ROUTER is set.
+        // Mainnet is now deployed.
         assert!(SunSwapMeta::for_chain(
             42,
             TRON_MAINNET_CHAIN_ID,
             195,
             "TXy123456789012345678901234567890AB"
         )
-        .is_none());
+        .is_some());
         assert!(
             SunSwapMeta::for_chain(42, 1, 195, "TXy123456789012345678901234567890AB").is_none()
         );
@@ -482,12 +477,19 @@ mod tests {
     }
 
     #[test]
-    fn resolve_rejects_mainnet_until_deployed() {
-        let err = meta(TRON_MAINNET_CHAIN_ID)
-            .resolve()
-            .err()
-            .unwrap_or_default();
-        assert!(err.contains("mainnet"), "got: {err}");
+    fn resolve_parses_mainnet_addresses() -> Result<(), String> {
+        let cfg = meta(TRON_MAINNET_CHAIN_ID).resolve()?;
+        assert_eq!(cfg.addrs.chain_id, TRON_MAINNET_CHAIN_ID);
+        assert_eq!(
+            cfg.addrs.fee_router.auto_format(),
+            MAINNET_FEE_ROUTER.expect("mainnet deployed")
+        );
+        assert_eq!(cfg.addrs.wtrx.auto_format(), MAINNET_WTRX);
+        assert_eq!(
+            cfg.addrs.quote_lens.auto_format(),
+            MAINNET_QUOTE_LENS.expect("mainnet deployed")
+        );
+        Ok(())
     }
 
     #[test]
