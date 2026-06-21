@@ -11,6 +11,7 @@ flutter_rust_bridge = "=2.12.0"
 
 thiserror = "1.0.63"
 arc-swap = "1"
+futures = "0.3"
 
 # zilpay_core = { git = "https://github.com/zilpay/zilpay-core.git", branch = "master" }
 zilpay_core = { path = "/Users/hicaru/projects/bearby/bearby-core" }
@@ -19,7 +20,6 @@ zilpay_core = { path = "/Users/hicaru/projects/bearby/bearby-core" }
 hidapi = "2.6"
 btleplug = "0.11"
 uuid = { version = "1", features = ["v4"] }
-futures = "0.3"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
