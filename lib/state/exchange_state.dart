@@ -98,6 +98,22 @@ class ExchangeState extends ChangeNotifier {
     );
   }
 
+  /// Assets eligible as the "You get" side: all assets except the currently
+  /// selected [fromAsset], further filtered to same-chain tokens or tokens
+  /// that share a relay provider with the current from side.
+  List<ExchangeAsset> get outAssets {
+    final from = _fromAsset;
+    return _getAssets.where((asset) {
+      if (asset == from) return false;
+      if (from == null) return true;
+      if (asset.token.chainHash == from.token.chainHash) return true;
+      return _hasRelay(from) && _hasRelay(asset);
+    }).toList();
+  }
+
+  static bool _hasRelay(ExchangeAsset asset) =>
+      asset.providers.any((p) => p.whenOrNull(relay: (_) => true) ?? false);
+
   Future<void> bootstrap({
     required BigInt walletIndex,
     required BigInt accountIndex,

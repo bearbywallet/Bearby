@@ -146,19 +146,6 @@ class _ExchangePageState extends State<ExchangePage>
     );
   }
 
-  List<ExchangeAsset> _outAssets(ExchangeState state) {
-    final from = state.fromAsset;
-    return state.getAssets.where((asset) {
-      if (asset == from) return false;
-      if (from == null) return true;
-      if (asset.token.chainHash == from.token.chainHash) return true;
-      return _hasRelay(from) && _hasRelay(asset);
-    }).toList();
-  }
-
-  static bool _hasRelay(ExchangeAsset asset) =>
-      asset.providers.any((p) => p.whenOrNull(relay: (_) => true) ?? false);
-
   void _scheduleQuote() {
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDebounce, () {
@@ -217,7 +204,7 @@ class _ExchangePageState extends State<ExchangePage>
     final to = _exchangeState.toAsset;
     if (to == null) return;
 
-    final outs = _outAssets(_exchangeState);
+    final outs = _exchangeState.outAssets;
     if (to == asset || !outs.contains(to)) {
       _exchangeState.clearTo();
     }
@@ -495,7 +482,7 @@ class _ExchangePageState extends State<ExchangePage>
       },
       onTokenTap: () => showExchangeTokenSelectModal(
         context: context,
-        assets: state.payAssets,
+        assetSelector: (s) => s.payAssets,
         onSelected: _selectFrom,
       ),
     );
@@ -596,7 +583,7 @@ class _ExchangePageState extends State<ExchangePage>
   }
 
   Widget _buildEmptyGetCard(AppTheme theme, ExchangeState state) {
-    final outs = _outAssets(state);
+    final outs = state.outAssets;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -612,7 +599,7 @@ class _ExchangePageState extends State<ExchangePage>
             outs.isNotEmpty
                 ? () => showExchangeTokenSelectModal(
                       context: context,
-                      assets: outs,
+                      assetSelector: (s) => s.outAssets,
                       onSelected: _selectTo,
                     )
                 : null,
@@ -702,7 +689,7 @@ class _ExchangePageState extends State<ExchangePage>
                 token,
                 () => showExchangeTokenSelectModal(
                   context: context,
-                  assets: _outAssets(state),
+                  assetSelector: (s) => s.outAssets,
                   onSelected: _selectTo,
                 ),
               ),
