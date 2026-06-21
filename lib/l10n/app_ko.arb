@@ -47,6 +47,7 @@
   "networkPageAddError": "네트워크 추가 실패: ",
   "receivePageTitle": "수신",
   "receivePageWarning": "이 주소로 {chainName}({tokenSymbol}) 자산만 보내세요. 다른 자산은 영구적으로 손실됩니다.",
+  "receivePageBitcoinAddressRotationWarning": "Bitcoin은 개인정보 보호를 위해 주소 로테이션을 사용합니다. 이 수신 주소는 사용 후 변경될 수 있으며 이전 주소도 이 지갑에서 계속 유효합니다.",
   "receivePageAccountNameHint": "계정 이름",
   "receivePageAmountDialogTitle": "금액 입력",
   "receivePageAmountDialogHint": "0.0",

@@ -155,6 +155,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get receivePageBitcoinAddressRotationWarning => 'Bitcoinではプライバシーのためにアドレスローテーションを使用します。この受取アドレスは使用後に変わることがあります。以前のアドレスもこのウォレットで引き続き有効です。';
+
+  @override
   String get receivePageAccountNameHint => 'アカウント名';
 
   @override

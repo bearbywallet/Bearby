@@ -47,6 +47,7 @@
   "networkPageAddError": "Не удалось добавить сеть: ",
   "receivePageTitle": "Получить",
   "receivePageWarning": "Отправляйте только активы {chainName}({tokenSymbol}) на этот адрес. Другие активы будут потеряны навсегда.",
+  "receivePageBitcoinAddressRotationWarning": "Bitcoin использует ротацию адресов для приватности. Этот адрес для получения может измениться после использования; прежние адреса остаются действительными для этого кошелька.",
   "receivePageAccountNameHint": "Имя аккаунта",
   "receivePageAmountDialogTitle": "Введите сумму",
   "receivePageAmountDialogHint": "0.0",

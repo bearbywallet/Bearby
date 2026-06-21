@@ -47,6 +47,7 @@
   "networkPageAddError": "添加网络失败：",
   "receivePageTitle": "接收",
   "receivePageWarning": "仅向此地址发送 {chainName}({tokenSymbol}) 资产。其他资产将永久丢失。",
+  "receivePageBitcoinAddressRotationWarning": "Bitcoin 会使用地址轮换来保护隐私。此收款地址使用后可能会变化；之前的地址仍对该钱包有效。",
   "receivePageAccountNameHint": "账户名称",
   "receivePageAmountDialogTitle": "输入金额",
   "receivePageAmountDialogHint": "0.0",

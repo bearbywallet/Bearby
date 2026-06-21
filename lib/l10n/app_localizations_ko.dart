@@ -155,6 +155,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get receivePageBitcoinAddressRotationWarning => 'Bitcoin은 개인정보 보호를 위해 주소 로테이션을 사용합니다. 이 수신 주소는 사용 후 변경될 수 있으며 이전 주소도 이 지갑에서 계속 유효합니다.';
+
+  @override
   String get receivePageAccountNameHint => '계정 이름';
 
   @override

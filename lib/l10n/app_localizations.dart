@@ -389,6 +389,12 @@ abstract class AppLocalizations {
   /// **'Only send {chainName}({tokenSymbol}) assets to this address. Other assets will be lost forever.'**
   String receivePageWarning(Object chainName, Object tokenSymbol);
 
+  /// Warning message displayed on ReceivePage for Bitcoin address rotation
+  ///
+  /// In en, this message translates to:
+  /// **'Bitcoin uses address rotation for privacy. This receive address may change after it is used; previous addresses remain valid for this wallet.'**
+  String get receivePageBitcoinAddressRotationWarning;
+
   /// Hint text for account name input on ReceivePage
   ///
   /// In en, this message translates to:

@@ -155,6 +155,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get receivePageBitcoinAddressRotationWarning => 'Bitcoin 会使用地址轮换来保护隐私。此收款地址使用后可能会变化；之前的地址仍对该钱包有效。';
+
+  @override
   String get receivePageAccountNameHint => '账户名称';
 
   @override

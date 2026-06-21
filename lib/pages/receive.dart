@@ -235,8 +235,13 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          l10n.receivePageWarning(
-                                              chain.name, token.symbol),
+                                          chain.slip44 == kBitcoinlip44
+                                              ? l10n
+                                                  .receivePageBitcoinAddressRotationWarning
+                                              : l10n.receivePageWarning(
+                                                  chain.name,
+                                                  token.symbol,
+                                                ),
                                           style: theme.bodyText2.copyWith(
                                             color: theme.warning,
                                           ),

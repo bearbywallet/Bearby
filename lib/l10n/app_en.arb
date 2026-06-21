@@ -195,6 +195,10 @@
       "tokenSymbol": {}
     }
   },
+  "receivePageBitcoinAddressRotationWarning": "Bitcoin uses address rotation for privacy. This receive address may change after it is used; previous addresses remain valid for this wallet.",
+  "@receivePageBitcoinAddressRotationWarning": {
+    "description": "Warning message displayed on ReceivePage for Bitcoin address rotation"
+  },
   "receivePageAccountNameHint": "Account name",
   "@receivePageAccountNameHint": {
     "description": "Hint text for account name input on ReceivePage"

@@ -155,6 +155,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get receivePageBitcoinAddressRotationWarning => 'Bitcoin использует ротацию адресов для приватности. Этот адрес для получения может измениться после использования; прежние адреса остаются действительными для этого кошелька.';
+
+  @override
   String get receivePageAccountNameHint => 'Имя аккаунта';
 
   @override

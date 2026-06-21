@@ -155,6 +155,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get receivePageBitcoinAddressRotationWarning => 'Bitcoin uses address rotation for privacy. This receive address may change after it is used; previous addresses remain valid for this wallet.';
+
+  @override
   String get receivePageAccountNameHint => 'Account name';
 
   @override
