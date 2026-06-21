@@ -444,7 +444,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         ),
         TileButton(
           icon: AppIconView(
-            icon: AppIcon.bitcoinAmount,
+            icon: AppIcon.setAmount,
             size: 24,
             color: theme.primaryPurple,
           ),
