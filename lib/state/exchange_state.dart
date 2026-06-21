@@ -103,8 +103,12 @@ class ExchangeState extends ChangeNotifier {
   /// that share a relay provider with the current from side.
   List<ExchangeAsset> get outAssets {
     final from = _fromAsset;
+    // Exclude the "pay" token by token identity, NOT object identity: refreshOnce replaces
+    // _fromAsset with a freshly-quoted instance, so `asset == from` would no longer match the
+    // same token still sitting in _getAssets and would let the user pick from == to (e.g. TRX→TRX).
+    final fromKey = from == null ? null : _tokenKey(from.token);
     return _getAssets.where((asset) {
-      if (asset == from) return false;
+      if (fromKey != null && _tokenKey(asset.token) == fromKey) return false;
       if (from == null) return true;
       if (asset.token.chainHash == from.token.chainHash) return true;
       return _hasRelay(from) && _hasRelay(asset);
@@ -231,6 +235,12 @@ class ExchangeState extends ChangeNotifier {
   }
 
   void selectTo(ExchangeAsset asset) {
+    // Never allow the "get" token to equal the "pay" token (compared by token identity, since
+    // _fromAsset may be a freshly-quoted instance). Defense-in-depth behind outAssets filtering.
+    final from = _fromAsset;
+    if (from != null && _tokenKey(asset.token) == _tokenKey(from.token)) {
+      return;
+    }
     _toAsset = asset;
     _quoteStatus = QuoteStatus.idle;
     _restartPollingIfReady();
