@@ -326,7 +326,7 @@ class _EngineTile extends StatelessWidget {
           child: Row(
             children: [
               AppIconView(
-                icon: AppIcon.currency,
+                icon: AppIcon.bitcoinAmount,
                 size: 22,
                 color: theme.primaryPurple,
               ),
