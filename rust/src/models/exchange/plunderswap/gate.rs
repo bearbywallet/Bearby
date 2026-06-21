@@ -87,7 +87,9 @@ pub(in crate::models::exchange) async fn evaluate_liquidity_eager(
         return Vec::new();
     }
 
-    let probe_amount = U256::from(crate::models::exchange::gate::PROBE_AMOUNT);
+    let probe_amount = U256::from(crate::models::exchange::gate::probe_amount(
+        crate::models::exchange::plunderswap::WZIL_DECIMALS,
+    ));
     let calls: Vec<Value> = candidates
         .iter()
         .map(|(_, token)| build_lens_call(cfg.addrs.quote_lens, cfg.addrs.wzil, *token, probe_amount))

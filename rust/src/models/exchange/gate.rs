@@ -15,11 +15,21 @@ use crate::models::exchange::{
     ExchangeProvider,
 };
 
-/// Probe amount in wrapped-native base units (18 decimals): 1,000 WZIL / WTRX. The lens routes
+/// Probe amount in wrapped-native base units: 1,000 units scaled by `decimals`. The lens routes
 /// through configured hubs, so the probe only checks *whether a route exists and returns non-zero
 /// output* — the exact amount is not used as a quote. Large enough to avoid dust-rounding to zero
 /// on the first hop; small enough to stay clear of pool reserves on shallow pairs.
-pub(in crate::models::exchange) const PROBE_AMOUNT: u128 = 1_000 * 10u128.pow(18);
+///
+/// Parameterized because the two lenses wrap tokens of different precision: WZIL (18 decimals) on
+/// Zilliqa, WTRX (6 decimals) on TRON. A probe sized for 18 decimals against WTRX equals 10^15
+/// TRX, which exhausts the lens's per-probe gas cap, reverts every quoter probe to `ROUTE_NONE`,
+/// and strips healthy pairs (e.g. WTRX/USDT, WTRX/BTC). Each gate supplies its wrapped-native's
+/// decimals via [`crate::models::exchange::plunderswap::WZIL_DECIMALS`] /
+/// [`crate::models::exchange::sunswap::WTRX_DECIMALS`].
+#[must_use]
+pub(in crate::models::exchange) const fn probe_amount(decimals: u8) -> u128 {
+    1_000 * 10u128.pow(decimals as u32)
+}
 
 /// Dispatch an eager gate's probe against `assets`, returning the indices of assets confirmed to
 /// have NO route. Exhaustive match on [`EagerGate`] — no `Err`, no dead arms: adding a gate
@@ -91,4 +101,31 @@ pub(in crate::models::exchange) fn find_meta<'a, T: ?Sized>(
         .iter()
         .flat_map(|asset| asset.providers.iter())
         .find_map(matcher)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::probe_amount;
+    use crate::models::exchange::plunderswap::WZIL_DECIMALS;
+    use crate::models::exchange::sunswap::WTRX_DECIMALS;
+
+    #[test]
+    fn probe_amount_scales_by_wrapped_native_decimals() {
+        // WZIL (18 decimals): 1,000 units = 1,000 * 10^18.
+        assert_eq!(probe_amount(WZIL_DECIMALS), 1_000 * 10u128.pow(18));
+        // WTRX (6 decimals): 1,000 units = 1,000 * 10^6 = 10^9. The previous shared constant
+        // (1,000 * 10^18 = 10^21) probed with 10^15 TRX and reverted every quoter probe.
+        assert_eq!(probe_amount(WTRX_DECIMALS), 1_000 * 10u128.pow(6));
+        assert_eq!(probe_amount(WTRX_DECIMALS), 1_000_000_000);
+    }
+
+    #[test]
+    fn sunswap_probe_is_one_trillionth_of_the_buggy_amount() {
+        // Regression guard: the SunSwap probe must be 10^12x smaller than the old 18-dec probe,
+        // otherwise it exhausts the lens's per-probe gas cap and strips healthy pairs.
+        assert_eq!(
+            probe_amount(WZIL_DECIMALS) / probe_amount(WTRX_DECIMALS),
+            10u128.pow(12)
+        );
+    }
 }
