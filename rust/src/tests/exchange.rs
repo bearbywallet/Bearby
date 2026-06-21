@@ -16,7 +16,6 @@ mod exchange_tests {
         ExchangeAsset, ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams,
     };
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
-    use crate::service::background::BACKGROUND_SERVICE;
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
     use zilpay::crypto::slip44::ETHEREUM;
@@ -59,8 +58,6 @@ mod exchange_tests {
             .collect();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
             let core = crate::service::background::CORE.load_full().unwrap();
             core.add_batch_providers(providers.clone()).unwrap();
         }

@@ -21,7 +21,6 @@ mod btc_wallet_tests {
     };
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
-    use crate::service::background::BACKGROUND_SERVICE;
 
     const PASSWORD: &str = "test_password";
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
@@ -52,8 +51,6 @@ mod btc_wallet_tests {
             .collect();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
             let core = crate::service::background::CORE.load_full().unwrap();
             core.add_batch_providers(providers).unwrap();
         }
@@ -102,8 +99,6 @@ mod btc_wallet_tests {
             .unwrap();
 
         let history = {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
             let core = crate::service::background::CORE.load_full().unwrap();
             let wallet = core.get_wallet_by_index(0).unwrap();
             wallet.get_btc_addresses(0, btc_chain_hash).unwrap()
@@ -216,8 +211,6 @@ mod btc_wallet_tests {
         sync_balances(0).await.unwrap();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
             let core = crate::service::background::CORE.load_full().unwrap();
             let wallet = core.get_wallet_by_index(0).unwrap();
             let _history = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
@@ -238,8 +231,6 @@ mod btc_wallet_tests {
 
         let account = &btc_accounts[0];
         let expected_balance: u64 = {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
             let core = crate::service::background::CORE.load_full().unwrap();
             let wallet = core.get_wallet_by_index(0).unwrap();
             let chains = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
