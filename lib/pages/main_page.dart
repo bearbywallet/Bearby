@@ -25,15 +25,22 @@ class MainPageState extends State<MainPage> {
 
     if (!_hasInitialDataLoaded) {
       _hasInitialDataLoaded = true;
-      _loadInitialData();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _loadInitialData();
+      });
     }
   }
 
   Future<void> _loadInitialData() async {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    await appState.syncRates();
-    await appState.syncData();
+    try {
+      await appState.syncRates();
+      await appState.syncData();
+    } catch (e) {
+      debugPrint('initial data load error: $e');
+    }
   }
 
   void _onItemTapped(int index) {
