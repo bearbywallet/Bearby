@@ -27,9 +27,15 @@ void showBtcAddressesModal({required BuildContext context}) {
   );
 }
 
+enum _BtcAddressStatus { current, unused, used }
+
+const int _kSegwitAddrTypeByte = 2;
+const Duration _kSectionAnimationDuration = Duration(milliseconds: 150);
+const int _kMaxUnusedAddresses = 10;
+
 class _BtcAddressRow {
   final String address;
-  final bool isUsed;
+  final _BtcAddressStatus status;
   final int txCount;
   final String path;
   final String amount;
@@ -37,7 +43,7 @@ class _BtcAddressRow {
 
   const _BtcAddressRow({
     required this.address,
-    required this.isUsed,
+    required this.status,
     required this.txCount,
     required this.path,
     required this.amount,
@@ -45,7 +51,7 @@ class _BtcAddressRow {
   });
 
   @override
-  int get hashCode => Object.hash(address, isUsed, txCount, path, amount, fiat);
+  int get hashCode => Object.hash(address, status, txCount, path, amount, fiat);
 
   @override
   bool operator ==(Object other) =>
@@ -53,28 +59,30 @@ class _BtcAddressRow {
       other is _BtcAddressRow &&
           runtimeType == other.runtimeType &&
           address == other.address &&
-          isUsed == other.isUsed &&
+          status == other.status &&
           txCount == other.txCount &&
           path == other.path &&
           amount == other.amount &&
           fiat == other.fiat;
 
   @override
-  String toString() => '_BtcAddressRow(address: $address, isUsed: $isUsed, '
+  String toString() => '_BtcAddressRow(address: $address, status: $status, '
       'txCount: $txCount, path: $path, amount: $amount, fiat: $fiat)';
 }
 
 class _BtcAddressSection {
   final int addrTypeByte;
   final List<_BtcAddressRow> rows;
+  final _BtcAddressSummary summary;
 
   const _BtcAddressSection({
     required this.addrTypeByte,
     required this.rows,
+    required this.summary,
   });
 
   @override
-  int get hashCode => Object.hash(addrTypeByte, Object.hashAll(rows));
+  int get hashCode => Object.hash(addrTypeByte, Object.hashAll(rows), summary);
 
   @override
   bool operator ==(Object other) =>
@@ -82,11 +90,61 @@ class _BtcAddressSection {
       other is _BtcAddressSection &&
           runtimeType == other.runtimeType &&
           addrTypeByte == other.addrTypeByte &&
-          listEquals(rows, other.rows);
+          listEquals(rows, other.rows) &&
+          summary == other.summary;
+
+  @override
+  String toString() => '_BtcAddressSection(addrTypeByte: $addrTypeByte, '
+      'rows: $rows, summary: $summary)';
+}
+
+class _BtcAddressSummary {
+  final int current;
+  final int unused;
+  final int used;
+
+  const _BtcAddressSummary({
+    required this.current,
+    required this.unused,
+    required this.used,
+  });
+
+  @override
+  int get hashCode => Object.hash(current, unused, used);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _BtcAddressSummary &&
+          runtimeType == other.runtimeType &&
+          current == other.current &&
+          unused == other.unused &&
+          used == other.used;
 
   @override
   String toString() =>
-      '_BtcAddressSection(addrTypeByte: $addrTypeByte, rows: $rows)';
+      '_BtcAddressSummary(current: $current, unused: $unused, used: $used)';
+}
+
+class _BtcAddressModalData {
+  final List<_BtcAddressSection> sections;
+
+  const _BtcAddressModalData({required this.sections});
+
+  static const empty = _BtcAddressModalData(sections: <_BtcAddressSection>[]);
+
+  @override
+  int get hashCode => Object.hashAll(sections);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _BtcAddressModalData &&
+          runtimeType == other.runtimeType &&
+          listEquals(sections, other.sections);
+
+  @override
+  String toString() => '_BtcAddressModalData(sections: $sections)';
 }
 
 class _BtcAddressesModalContent extends StatefulWidget {
@@ -98,7 +156,8 @@ class _BtcAddressesModalContent extends StatefulWidget {
 }
 
 class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
-  List<_BtcAddressSection> _sections = const [];
+  final Set<int> _expandedSections = <int>{_kSegwitAddrTypeByte};
+  _BtcAddressModalData _data = _BtcAddressModalData.empty;
   bool _isLoading = true;
   String? _copiedAddress;
 
@@ -128,12 +187,13 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
         chainHash: chain.chainHash,
       );
       if (!mounted) return;
+      final data = _buildModalData(
+        chains: chains,
+        nativeToken: chain.ftokens.firstOrNull,
+        appState: appState,
+      );
       setState(() {
-        _sections = _buildSections(
-          chains: chains,
-          nativeToken: chain.ftokens.firstOrNull,
-          appState: appState,
-        );
+        _data = data;
         _isLoading = false;
       });
     } catch (e) {
@@ -174,51 +234,31 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
             maxHeight: MediaQuery.sizeOf(context).height * 0.9,
           ),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                theme.cardBackground.withValues(alpha: 0.85),
-                theme.cardBackground.withValues(alpha: 0.95),
-              ],
-            ),
+            color: theme.cardBackground,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border(
-              top: BorderSide(
-                color: theme.textSecondary.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: theme.primaryPurple.withValues(alpha: 0.15),
-                blurRadius: 30,
-                spreadRadius: 0,
-              ),
-            ],
           ),
           child: SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildHandle(theme),
-                _buildTitle(theme, l10n),
+                _buildHeader(theme, l10n),
                 if (_isLoading)
                   _buildLoading(theme)
-                else if (_sections.isEmpty)
+                else if (_data.sections.isEmpty)
                   _buildEmpty(theme, l10n)
                 else
                   Flexible(
                     child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
-                      itemCount: _sections.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      itemCount: _data.sections.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, index) => _buildSection(
                         theme,
                         l10n,
-                        _sections[index],
+                        _data.sections[index],
                       ),
                     ),
                   ),
@@ -242,19 +282,15 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
     );
   }
 
-  Widget _buildTitle(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
       child: Text(
         l10n.btcAddressesModalTitle,
+        textAlign: TextAlign.center,
         style: theme.titleMedium.copyWith(
           color: theme.textPrimary,
-          shadows: [
-            Shadow(
-              color: theme.primaryPurple.withValues(alpha: 0.3),
-              blurRadius: 8,
-            ),
-          ],
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -283,46 +319,113 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
     AppLocalizations l10n,
     _BtcAddressSection section,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(theme, _formatLabel(section.addrTypeByte, l10n)),
-        const SizedBox(height: 8),
-        ...List<Widget>.generate(section.rows.length, (index) {
-          final row = section.rows[index];
-          return Column(
-            children: [
-              _buildAddressRow(theme, l10n, row),
-              if (index < section.rows.length - 1) _buildDivider(theme),
-            ],
-          );
-        }),
-      ],
-    );
-  }
+    final isExpanded = _expandedSections.contains(section.addrTypeByte);
 
-  Widget _buildSectionHeader(AppTheme theme, String label) {
-    return Text(
-      label,
-      style: theme.bodyText2.copyWith(
-        color: theme.textPrimary,
-        fontWeight: FontWeight.w600,
-        shadows: [
-          Shadow(
-            color: theme.primaryPurple.withValues(alpha: 0.2),
-            blurRadius: 4,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.modalBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => _toggleSection(section.addrTypeByte),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Text(
+                    _formatLabel(section.addrTypeByte, l10n),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.bodyText2.copyWith(
+                      color: theme.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildSectionStats(theme, l10n, section.summary),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.25 : 0,
+                    duration: _kSectionAnimationDuration,
+                    curve: Curves.easeOutCubic,
+                    child: AppIconView(
+                      icon: AppIcon.chevronRight,
+                      size: 16,
+                      color: theme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: _kSectionAnimationDuration,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: isExpanded
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 1,
+                        color: theme.modalBorder,
+                      ),
+                      ListView.separated(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: section.rows.length,
+                        separatorBuilder: (_, __) => Container(
+                          height: 1,
+                          color: theme.modalBorder,
+                        ),
+                        itemBuilder: (_, index) => _buildAddressRow(
+                          theme,
+                          l10n,
+                          section.rows[index],
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDivider(AppTheme theme) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      color: theme.primaryPurple.withValues(alpha: 0.15),
-      endIndent: 16,
+  void _toggleSection(int addrTypeByte) {
+    setState(() {
+      if (_expandedSections.contains(addrTypeByte)) {
+        _expandedSections.remove(addrTypeByte);
+      } else {
+        _expandedSections.add(addrTypeByte);
+      }
+    });
+  }
+
+  Widget _buildSectionStats(
+    AppTheme theme,
+    AppLocalizations l10n,
+    _BtcAddressSummary summary,
+  ) {
+    return Text(
+      '${l10n.btcAddressesModalCurrent}: ${summary.current} · '
+      '${l10n.btcAddressesModalUnused}: ${summary.unused} · '
+      '${l10n.btcAddressesModalUsed}: ${summary.used}',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.end,
+      style: theme.caption.copyWith(
+        color: theme.textSecondary,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
     );
   }
 
@@ -335,17 +438,8 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
 
     return InkWell(
       onTap: () => _copyAddress(row.address),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            colors: [
-              theme.primaryPurple.withValues(alpha: 0.03),
-              Colors.transparent,
-            ],
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -362,7 +456,6 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
                               leftSize: 8, rightSize: 8),
                           style: theme.bodyText2.copyWith(
                             color: theme.textPrimary,
-                            fontWeight: FontWeight.w500,
                             fontFeatures: const [
                               FontFeature.tabularFigures(),
                             ],
@@ -370,22 +463,14 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      _buildTag(
-                        row.isUsed
-                            ? l10n.btcAddressesModalUsed
-                            : l10n.btcAddressesModalCurrent,
-                        row.isUsed
-                            ? theme.textSecondary
-                            : theme.primaryPurple,
-                        theme,
-                      ),
+                      _buildStatusDot(row.status, theme),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${row.path} · ${l10n.btcAddressesModalTxCount(row.txCount)}',
                     style: theme.caption.copyWith(
-                      color: theme.textSecondary.withValues(alpha: 0.8),
+                      color: theme.textSecondary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -402,14 +487,13 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
                     row.amount,
                     style: theme.bodyText2.copyWith(
                       color: theme.textPrimary,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   if (row.fiat.isNotEmpty)
                     Text(
                       row.fiat,
                       style: theme.caption.copyWith(
-                        color: theme.textSecondary.withValues(alpha: 0.7),
+                        color: theme.textSecondary,
                       ),
                     ),
                 ],
@@ -418,7 +502,7 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
             AppIconView(
               icon: isCopied ? AppIcon.check : AppIcon.copy,
               size: 18,
-              color: isCopied ? theme.success : theme.textSecondary,
+              color: theme.textSecondary,
             ),
           ],
         ),
@@ -426,35 +510,26 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
     );
   }
 
-  Widget _buildTag(String text, Color color, AppTheme theme) {
+  Widget _buildStatusDot(_BtcAddressStatus status, AppTheme theme) {
+    final Color color = switch (status) {
+      _BtcAddressStatus.current => theme.primaryPurple,
+      _BtcAddressStatus.unused => theme.success,
+      _BtcAddressStatus.used => theme.textSecondary,
+    };
+
     return Container(
       margin: const EdgeInsets.only(left: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      width: 7,
+      height: 7,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.25),
-            color.withValues(alpha: 0.15),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        text,
-        style: theme.labelSmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }
 }
 
-List<_BtcAddressSection> _buildSections({
+_BtcAddressModalData _buildModalData({
   required Map<int, AddressChainInfo> chains,
   required FTokenInfo? nativeToken,
   required AppState appState,
@@ -466,39 +541,93 @@ List<_BtcAddressSection> _buildSections({
     final chain = chains[byte];
     if (chain == null) continue;
 
-    final rows = <_BtcAddressRow>[];
-    BtcAddressEntryInfo? current;
+    final currentRows = <_BtcAddressRow>[];
+    final unusedRows = <_BtcAddressRow>[];
+    final usedRows = <_BtcAddressRow>[];
 
-    for (final entry in chain.external_) {
-      if (entry.history.isNotEmpty) {
-        rows.add(_rowFromEntry(entry, true, nativeToken, appState));
-      } else {
-        current ??= entry;
-      }
-    }
+    _appendBtcRows(
+      entries: chain.external_,
+      isExternal: true,
+      currentRows: currentRows,
+      unusedRows: unusedRows,
+      usedRows: usedRows,
+      nativeToken: nativeToken,
+      appState: appState,
+    );
+    _appendBtcRows(
+      entries: chain.internal,
+      isExternal: false,
+      currentRows: currentRows,
+      unusedRows: unusedRows,
+      usedRows: usedRows,
+      nativeToken: nativeToken,
+      appState: appState,
+    );
 
-    for (final entry in chain.internal) {
-      if (entry.history.isNotEmpty) {
-        rows.add(_rowFromEntry(entry, true, nativeToken, appState));
-      }
-    }
+    final rowCount = currentRows.length +
+        usedRows.length +
+        (unusedRows.length > _kMaxUnusedAddresses
+            ? _kMaxUnusedAddresses
+            : unusedRows.length);
+    if (rowCount == 0) continue;
 
-    final currentEntry = current;
-    if (currentEntry != null) {
-      rows.insert(0, _rowFromEntry(currentEntry, false, nativeToken, appState));
-    }
+    final limitedUnused = unusedRows.length > _kMaxUnusedAddresses
+        ? unusedRows.sublist(0, _kMaxUnusedAddresses)
+        : unusedRows;
 
-    if (rows.isNotEmpty) {
-      sections.add(_BtcAddressSection(addrTypeByte: byte, rows: rows));
-    }
+    sections.add(
+      _BtcAddressSection(
+        addrTypeByte: byte,
+        rows: List<_BtcAddressRow>.unmodifiable(<_BtcAddressRow>[
+          ...currentRows,
+          ...limitedUnused,
+          ...usedRows,
+        ]),
+        summary: _BtcAddressSummary(
+          current: currentRows.length,
+          unused: unusedRows.length,
+          used: usedRows.length,
+        ),
+      ),
+    );
   }
 
-  return List<_BtcAddressSection>.unmodifiable(sections);
+  return _BtcAddressModalData(
+    sections: List<_BtcAddressSection>.unmodifiable(sections),
+  );
+}
+
+void _appendBtcRows({
+  required List<BtcAddressEntryInfo> entries,
+  required bool isExternal,
+  required List<_BtcAddressRow> currentRows,
+  required List<_BtcAddressRow> unusedRows,
+  required List<_BtcAddressRow> usedRows,
+  required FTokenInfo? nativeToken,
+  required AppState appState,
+}) {
+  for (final entry in entries) {
+    final isUsed = entry.history.isNotEmpty || entry.utxos.isNotEmpty;
+
+    if (isUsed) {
+      usedRows.add(
+        _rowFromEntry(entry, _BtcAddressStatus.used, nativeToken, appState),
+      );
+    } else if (isExternal && currentRows.isEmpty) {
+      currentRows.add(
+        _rowFromEntry(entry, _BtcAddressStatus.current, nativeToken, appState),
+      );
+    } else {
+      unusedRows.add(
+        _rowFromEntry(entry, _BtcAddressStatus.unused, nativeToken, appState),
+      );
+    }
+  }
 }
 
 _BtcAddressRow _rowFromEntry(
   BtcAddressEntryInfo entry,
-  bool isUsed,
+  _BtcAddressStatus status,
   FTokenInfo? nativeToken,
   AppState appState,
 ) {
@@ -525,7 +654,7 @@ _BtcAddressRow _rowFromEntry(
 
   return _BtcAddressRow(
     address: entry.address,
-    isUsed: isUsed,
+    status: status,
     txCount: entry.history.length,
     path: entry.path,
     amount: amount,

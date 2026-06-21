@@ -196,6 +196,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get btcAddressesModalCurrent => '現在';
 
   @override
+  String get btcAddressesModalUnused => '未使用';
+
+  @override
   String get btcAddressesModalUsed => '使用済み';
 
   @override

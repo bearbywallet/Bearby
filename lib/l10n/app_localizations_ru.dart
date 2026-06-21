@@ -196,6 +196,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get btcAddressesModalCurrent => 'Текущий';
 
   @override
+  String get btcAddressesModalUnused => 'Неиспользован';
+
+  @override
   String get btcAddressesModalUsed => 'Использован';
 
   @override

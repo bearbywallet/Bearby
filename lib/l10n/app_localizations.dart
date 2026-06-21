@@ -467,6 +467,12 @@ abstract class AppLocalizations {
   /// **'Current'**
   String get btcAddressesModalCurrent;
 
+  /// Bitcoin receive addresses modal text: btcAddressesModalUnused
+  ///
+  /// In en, this message translates to:
+  /// **'Unused'**
+  String get btcAddressesModalUnused;
+
   /// Bitcoin receive addresses modal text: btcAddressesModalUsed
   ///
   /// In en, this message translates to:

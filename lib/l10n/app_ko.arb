@@ -660,6 +660,10 @@
   "@btcAddressesModalCurrent": {
     "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
   },
+  "btcAddressesModalUnused": "미사용",
+  "@btcAddressesModalUnused": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUnused"
+  },
   "btcAddressesModalUsed": "사용됨",
   "@btcAddressesModalUsed": {
     "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"

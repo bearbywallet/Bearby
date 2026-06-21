@@ -196,6 +196,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get btcAddressesModalCurrent => '현재';
 
   @override
+  String get btcAddressesModalUnused => '미사용';
+
+  @override
   String get btcAddressesModalUsed => '사용됨';
 
   @override

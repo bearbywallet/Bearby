@@ -250,6 +250,10 @@
   "@btcAddressesModalCurrent": {
     "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
   },
+  "btcAddressesModalUnused": "Unused",
+  "@btcAddressesModalUnused": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUnused"
+  },
   "btcAddressesModalUsed": "Used",
   "@btcAddressesModalUsed": {
     "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"

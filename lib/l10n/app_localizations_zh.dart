@@ -196,6 +196,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get btcAddressesModalCurrent => '当前';
 
   @override
+  String get btcAddressesModalUnused => '未使用';
+
+  @override
   String get btcAddressesModalUsed => '已使用';
 
   @override
