@@ -109,6 +109,8 @@
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://api.trongrid.io",
+      "https://tron.api.pocket.network",
+      "https://tron.drpc.org",
       "https://tron-rpc.publicnode.com",
       "https://tron-mainnet.gateway.tatum.io"
     ],
