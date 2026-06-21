@@ -11,13 +11,14 @@ import 'evm.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'scilla.dart';
 import 'transaction_metadata.dart';
+import 'tron.dart';
 
 class TransactionRequestInfo {
   final TransactionMetadataInfo metadata;
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
   final (TransactionBitcoin, BitcoinMetadataInfo)? btc;
-  final String? tron;
+  final TransactionRequestTron? tron;
   final Uint8List? solana;
 
   const TransactionRequestInfo({

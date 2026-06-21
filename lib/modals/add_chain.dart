@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/enable_card.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
@@ -132,9 +132,9 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                         color: theme.primaryPurple,
                       ),
                     ),
-                    errorWidget: Icon(
-                      Icons.broken_image,
-                      color: theme.textSecondary,
+                    errorWidget: AppIconView(
+                      icon: AppIcon.info,
+                      color: theme.warning,
                       size: 24,
                     ),
                   ),
@@ -142,12 +142,10 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: SvgPicture.asset(
-                  'assets/icons/right_circle_arrow.svg',
-                  width: 32,
-                  height: 32,
-                  colorFilter:
-                      ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+                child: AppIconView(
+                  icon: AppIcon.chevronRight,
+                  size: 32,
+                  color: theme.textSecondary,
                 ),
               ),
               Container(
@@ -172,14 +170,10 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                         color: theme.primaryPurple,
                       ),
                     ),
-                    errorWidget: SvgPicture.asset(
-                      'assets/icons/warning.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        theme.warning,
-                        BlendMode.srcIn,
-                      ),
+                    errorWidget: AppIconView(
+                      icon: AppIcon.warning,
+                      size: 24,
+                      color: theme.warning,
                     ),
                   ),
                 ),

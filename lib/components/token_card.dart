@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/shimmer_text.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 class TokenCard extends StatefulWidget {
   final FTokenInfo ftoken;
@@ -15,6 +16,8 @@ class TokenCard extends StatefulWidget {
   final VoidCallback? onTap;
   final bool hideBalance;
   final bool isTileView;
+  final bool isAmountLoading;
+  final bool isRateLoading;
 
   const TokenCard({
     super.key,
@@ -24,6 +27,8 @@ class TokenCard extends StatefulWidget {
     this.onTap,
     this.hideBalance = false,
     this.isTileView = false,
+    this.isAmountLoading = false,
+    this.isRateLoading = false,
   });
 
   @override
@@ -45,61 +50,46 @@ class _TokenCardState extends State<TokenCard>
   }
 
   Widget _buildIcon(AppState state, double iconSize) {
-    final theme = state.currentTheme;
-    FTokenInfo token = FTokenInfo(
-      name: widget.ftoken.name,
-      symbol: widget.ftoken.symbol,
-      decimals: widget.ftoken.decimals,
-      addr: widget.ftoken.addr,
-      addrType: widget.ftoken.addrType,
-      balances: {},
-      rate: 0,
-      default_: widget.ftoken.default_,
-      native: widget.ftoken.native,
-      chainHash: widget.ftoken.chainHash,
-      logo: widget.ftoken.logo ?? state.wallet?.tokens.first.logo,
-    );
-
-    return Container(
-      width: iconSize,
-      height: iconSize,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-            color: theme.primaryPurple.withValues(alpha: 0.1), width: 2),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: processTokenLogo(
-            token: token,
-            shortName: state.chain?.shortName ?? '',
-            theme: theme.value,
-          ),
-          width: iconSize,
-          height: iconSize,
-          fit: BoxFit.contain,
-          errorWidget: Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.textPrimary.withValues(alpha: 0.08),
-            ),
-            child: Icon(
-              Icons.image_not_supported_outlined,
-              size: iconSize * 0.55,
-              color: theme.textSecondary,
-            ),
-          ),
-          loadingWidget:
-              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-        ),
-      ),
+    return TokenAvatar(
+      token: widget.ftoken,
+      size: iconSize,
+      appState: state,
+      showNetworkBadge: false,
+      borderColor: state.currentTheme.primaryPurple.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
     );
   }
 
   String maskBalance() {
     return "*******";
+  }
+
+  Widget _amountText(
+    AppTheme theme,
+    String value,
+    TextStyle style, {
+    required bool loading,
+    required bool useSecondaryColor,
+  }) {
+    if (!loading) {
+      return Text(
+        value,
+        style: style,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      );
+    }
+
+    final Color textColor =
+        useSecondaryColor ? theme.textSecondary : theme.textPrimary;
+
+    return ShimmerText(
+      text: value,
+      style: style,
+      baseColor: textColor.withValues(alpha: 0.35),
+      highlightColor: textColor,
+    );
   }
 
   Widget _buildTileLayout(
@@ -144,23 +134,26 @@ class _TokenCardState extends State<TokenCard>
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(
+                child: _amountText(
+                  theme,
                   displayAmount,
-                  style: theme.subtitle1.copyWith(
+                  theme.subtitle1.copyWith(
                     color: theme.textPrimary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
-                  maxLines: 1,
+                  loading: widget.isAmountLoading,
+                  useSecondaryColor: false,
                 ),
               ),
               const SizedBox(height: 2),
               if (appState.wallet?.settings.currencyConvert != null)
-                Text(
+                _amountText(
+                  theme,
                   displayConverted,
-                  style: theme.caption.copyWith(color: theme.textSecondary),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  theme.caption.copyWith(color: theme.textSecondary),
+                  loading: widget.isRateLoading,
+                  useSecondaryColor: true,
                 ),
             ],
           ),
@@ -196,23 +189,25 @@ class _TokenCardState extends State<TokenCard>
                   maxLines: 1,
                 ),
                 const SizedBox(height: 8),
-                Text(
+                _amountText(
+                  theme,
                   displayAmount,
-                  style: theme.subtitle1.copyWith(
+                  theme.subtitle1.copyWith(
                     color: theme.textPrimary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  loading: widget.isAmountLoading,
+                  useSecondaryColor: false,
                 ),
                 const SizedBox(height: 4),
                 if (appState.wallet?.settings.currencyConvert != null)
-                  Text(
+                  _amountText(
+                    theme,
                     displayConverted,
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    theme.bodyText2.copyWith(color: theme.textSecondary),
+                    loading: widget.isRateLoading,
+                    useSecondaryColor: true,
                   ),
               ],
             ),

@@ -1,7 +1,8 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:provider/provider.dart';
 import 'package:bearby/components/btc_account_card.dart';
 import 'package:bearby/components/counter.dart';
@@ -295,7 +296,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             SmartInput(
               controller: _walletNameController,
               hint: l10n.walletPageWalletNameHint,
-              rightIconPath: "assets/icons/edit.svg",
+              rightIcon: AppIcon.edit,
               disabled: _loading,
             ),
             const SizedBox(height: 16),
@@ -466,11 +467,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       ),
       child: Row(
         children: [
-          SvgPicture.asset(
-            'assets/icons/ledger.svg',
-            width: 20,
-            height: 20,
-            colorFilter: ColorFilter.mode(theme.success, BlendMode.srcIn),
+          AppIconView(
+            icon: AppIcon.ledger,
+            size: 20,
+            color: theme.success,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -507,11 +507,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            'assets/icons/warning.svg',
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.danger, BlendMode.srcIn),
+          AppIconView(
+            icon: AppIcon.warning,
+            size: 24,
+            color: theme.danger,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -605,7 +604,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                         color: theme.primaryPurple,
                         valueColor: theme.buttonText,
                         onPressed: _saveSelectedAccounts,
-                        successIcon: "assets/icons/ok.svg",
+                        successIcon: AppIcon.ok,
                         child: Text(
                           _createWallet
                               ? l10n.addLedgerAccountPageCreateButton

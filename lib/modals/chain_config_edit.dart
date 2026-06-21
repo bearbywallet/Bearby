@@ -1,14 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/modal_drag_handle.dart';
 import 'package:bearby/components/swipe_button.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -255,6 +256,7 @@ class _TokenSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final token = config.ftokens.first;
+    final appState = Provider.of<AppState>(context, listen: false);
 
     return DetailGroupCard(
       title: l10n.chainInfoModalContentTokenTitle,
@@ -265,25 +267,16 @@ class _TokenSection extends StatelessWidget {
           child: Row(
             children: [
               if (token.logo != null)
-                ClipOval(
-                  child: AsyncImage(
-                    url: processTokenLogo(
-                        token: token,
-                        shortName: config.shortName,
-                        theme: theme.value),
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    errorWidget: SvgPicture.asset(
-                      'assets/icons/warning.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter:
-                          ColorFilter.mode(theme.warning, BlendMode.srcIn),
-                    ),
-                    loadingWidget: CircularProgressIndicator(
-                        strokeWidth: 2, color: theme.primaryPurple),
-                  ),
+                TokenAvatar(
+                  token: token,
+                  size: 40,
+                  appState: appState,
+                  showNetworkBadge: false,
+                  showBorder: false,
+                  iconUrl: processTokenLogo(
+                      token: token,
+                      shortName: config.shortName,
+                      theme: theme.value),
                 ),
               const SizedBox(width: 12),
               Expanded(
@@ -411,12 +404,10 @@ class _ExplorersSection extends StatelessWidget {
                   width: 20,
                   height: 20,
                   fit: BoxFit.cover,
-                  errorWidget: SvgPicture.asset(
-                    'assets/icons/warning.svg',
-                    width: 16,
-                    height: 16,
-                    colorFilter:
-                        ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                  errorWidget: AppIconView(
+                    icon: AppIcon.warning,
+                    size: 16,
+                    color: theme.warning,
                   ),
                   loadingWidget: CircularProgressIndicator(
                       strokeWidth: 2, color: theme.primaryPurple),
@@ -506,10 +497,9 @@ class _RpcSection extends StatelessWidget {
                       ),
                     ),
                     if (canDelete)
-                      HoverSvgIcon(
-                        assetName: 'assets/icons/minus.svg',
-                        width: 20,
-                        height: 20,
+                      HoverIcon(
+                        icon: AppIcon.minus,
+                        size: 20,
                         color: theme.danger,
                         onTap: () => onRemove(rpc),
                       ),

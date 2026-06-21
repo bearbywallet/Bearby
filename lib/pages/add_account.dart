@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:bearby/components/counter.dart';
@@ -217,14 +218,10 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                               ),
                             ),
                           )
-                        : SvgPicture.asset(
-                            'assets/icons/plus.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
+                        : AppIconView(
+                            icon: AppIcon.plus,
+                            size: 24,
+                            color: theme.textPrimary,
                           ),
                     onActionPressed: () => _createAccount(appState),
                   ),
@@ -317,14 +314,10 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                         ),
                                         child: Row(
                                           children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/biometric.svg',
-                                              width: 24,
-                                              height: 24,
-                                              colorFilter: ColorFilter.mode(
-                                                theme.textPrimary,
-                                                BlendMode.srcIn,
-                                              ),
+                                            AppIconView(
+                                              icon: AppIcon.biometric,
+                                              size: 24,
+                                              color: theme.textPrimary,
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(
@@ -354,9 +347,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                             horizontal: 20),
                                         focusedBorderColor: theme.primaryPurple,
                                         obscureText: _obscurePassword,
-                                        rightIconPath: _obscurePassword
-                                            ? "assets/icons/close_eye.svg"
-                                            : "assets/icons/open_eye.svg",
+                                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                                         onRightIconTap: () {
                                           setState(() {
                                             _obscurePassword =

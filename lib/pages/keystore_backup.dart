@@ -1,6 +1,7 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:bearby/components/button.dart';
@@ -247,9 +248,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
                           ),
                           state.wallet?.walletName ?? "",
                         ),
-                        rightIconPath: _obscureConfirmPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscureConfirmPassword),
                         onRightIconTap: () => setState(() =>
                             _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),
@@ -351,14 +350,10 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/warning.svg",
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.warning,
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: AppIcon.warning,
+                size: 24,
+                color: theme.warning,
               ),
               const SizedBox(width: 8),
               Text(

@@ -1,15 +1,15 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/hex_key.dart';
 import 'package:bearby/components/smart_input.dart';
-import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/load_button.dart';
+import 'package:bearby/config/settings.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
@@ -37,7 +37,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   bool _obscurePassword = true;
   KeyPairInfo? keys;
   Timer? _countdownTimer;
-  int _remainingTime = 1800;
+  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -57,7 +57,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   void _startCountdown() {
     setState(() {
       isTimerActive = true;
-      _remainingTime = 1800;
+      _remainingTime = SecuritySettings.revealDelaySeconds;
     });
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -109,7 +109,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
         errorMessage = "${l10n.revealSecretKeyInvalidPassword} $e";
       });
       _btnController.error();
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(SecuritySettings.errorResetDuration);
       _btnController.reset();
     }
   }
@@ -137,6 +137,16 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
               child: CustomAppBar(
                 title: l10n.revealSecretKeyTitle,
                 onBackPressed: () => Navigator.pop(context),
+                actionIcon: (canShowKey && keys != null)
+                    ? AppIconView(
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
+                        size: 24,
+                        color: theme.textPrimary,
+                      )
+                    : null,
+                onActionPressed: (canShowKey && keys != null)
+                    ? () => _handleCopy(keys?.sk ?? "")
+                    : null,
               ),
             ),
             Expanded(
@@ -159,9 +169,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                           state.selectedWalletIndex,
                           state.wallet!.selectedAccount,
                         ),
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                         onRightIconTap: () => setState(
                             () => _obscurePassword = !_obscurePassword),
                       ),
@@ -205,23 +213,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                         title: "",
                       ),
                       SizedBox(height: adaptivePadding),
-                      TileButton(
-                        icon: SvgPicture.asset(
-                          isCopied
-                              ? "assets/icons/check.svg"
-                              : "assets/icons/copy.svg",
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.primaryPurple,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        onPressed: () => _handleCopy(keys?.sk ?? ""),
-                        backgroundColor: theme.cardBackground,
-                        textColor: theme.primaryPurple,
-                      ),
-                      SizedBox(height: adaptivePadding),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: EdgeInsets.only(bottom: adaptivePadding),
@@ -259,14 +250,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       ),
       child: Column(
         children: [
-          SvgPicture.asset(
-            "assets/icons/clock.svg",
-            width: iconSize,
-            height: iconSize,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+          AppIconView(
+            icon: AppIcon.time,
+            size: iconSize,
+            color: theme.primaryPurple,
           ),
           const SizedBox(height: 16),
           Text(
@@ -294,7 +281,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(
-            value: 1 - (_remainingTime / 1800),
+            value: 1 - (_remainingTime / SecuritySettings.revealDelaySeconds),
             backgroundColor: theme.background,
             valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
             borderRadius: BorderRadius.circular(4),
@@ -319,14 +306,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/warning.svg",
-                width: 30,
-                height: 30,
-                colorFilter: ColorFilter.mode(
-                  theme.danger,
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: AppIcon.warning,
+                size: 30,
+                color: theme.danger,
               ),
               const SizedBox(width: 8),
               Text(
@@ -380,7 +363,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       isCopied = true;
     });
 
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
 
     setState(() {
       isCopied = false;

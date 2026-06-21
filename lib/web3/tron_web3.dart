@@ -14,6 +14,7 @@ import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
+import 'package:bearby/src/rust/api/transaction.dart' as rust_api;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -112,7 +113,7 @@ class TronWeb3Handler {
         handler(responseData);
         delete window.__bearby_response_handlers["$uuid"];
       } else {
-        window.dispatchEvent(new MessageEvent('message', { 
+        window.dispatchEvent(new MessageEvent('message', {
           data: responseData
         }));
       }
@@ -197,6 +198,22 @@ class TronWeb3Handler {
           message: message,
           context: context,
           appState: appState,
+        );
+        break;
+      case Web3EIP1193Method.multiSign:
+        await _handleMultiSign(message, context, appState);
+        break;
+      case Web3EIP1193Method.tronSignTypedData:
+      case Web3EIP1193Method.tronSignTypedDataV2:
+        await _handleSignTypedData(message, context, appState);
+        break;
+      case Web3EIP1193Method.tronProviderRequest:
+        final chain = appState.chain;
+        await _proxyRpcRequest(
+          method: (message.payload['payload'] as Map<String, dynamic>?)?['method'] as String? ?? method ?? '',
+          uuid: message.uuid,
+          params: (message.payload['payload'] as Map<String, dynamic>?)?['params'],
+          chainHash: chain?.chainHash ?? BigInt.zero,
         );
         break;
       case Web3EIP1193Method.walletSwitchEthereumChain:
@@ -317,7 +334,7 @@ class TronWeb3Handler {
         metadata: metadata,
         scilla: null,
         evm: null,
-        tron: jsonEncode(transaction),
+        tron: rust_api.parseTronTransaction(json: jsonEncode(transaction)),
       );
 
       if (!context.mounted) {
@@ -547,7 +564,7 @@ class TronWeb3Handler {
           appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
-        _sendNotification(eventName: 'dataChanged', data: {
+        await _sendNotification(eventName: 'dataChanged', data: {
           'address': addresses.first,
           'name': appState.account?.name,
           'type': 0,
@@ -616,16 +633,18 @@ class TronWeb3Handler {
             await appState.syncConnections();
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
-            _sendNotification(eventName: 'dataChanged', data: {
+            final isTronMethod =
+                method == Web3EIP1193Method.tronRequestAccounts.value;
+
+            await _sendNotification(eventName: 'dataChanged', data: {
               'address': connectedAddr.first,
               'name': appState.account?.name,
               'type': 0,
               'isAuth': true,
               'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
             });
-            final isTronMethod =
-                method == Web3EIP1193Method.tronRequestAccounts.value;
-            _sendResponse(
+
+            await _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
               result:
@@ -853,6 +872,217 @@ class TronWeb3Handler {
       );
     } finally {
       _removeActiveRequest(Web3EIP1193Method.getInitProviderData.value);
+    }
+  }
+
+  Future<void> _handleMultiSign(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    const method = 'multiSign';
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.resourceUnavailable,
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      final currentDomain = await _getCurrentDomain();
+      final connection =
+          Web3Utils.findConnected(currentDomain, appState.connections);
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'] as Map<String, dynamic>?;
+      if (params == null || params['transaction'] == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.invalidInput,
+          l10n?.web3ErrorInvalidParams(method, '') ?? '',
+        );
+      }
+
+      final Map<String, dynamic> transaction =
+          params['transaction'] as Map<String, dynamic>;
+      final txParams = transaction['raw_data'] as Map<String, dynamic>;
+      final Map<String, dynamic> contract = txParams['contract'][0];
+      final Map<String, dynamic> value = contract['parameter']['value'];
+      final String to = value['to_address'] ?? '';
+      final int? amount = value['amount'];
+      final BigInt valueAmount = BigInt.from(amount ?? 0);
+      final FTokenInfo? mbToken = appState.wallet?.tokens.first;
+      String? title = await webViewController.getTitle();
+
+      if (mbToken == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.internalError,
+          l10n?.web3ErrorNoNativeToken ?? '',
+        );
+      }
+
+      final tokenInfo = BaseTokenInfo(
+        value: valueAmount.toString(),
+        symbol: mbToken.symbol,
+        decimals: mbToken.decimals,
+      );
+      final metadata = TransactionMetadataInfo(
+        chainHash: appState.chain?.chainHash ?? BigInt.zero,
+        hash: null,
+        info: null,
+        icon: message.icon,
+        title: title ?? '',
+        signer: appState.account?.addr,
+        tokenInfo: tokenInfo,
+        broadcast: false,
+      );
+      final transactionRequest = TransactionRequestInfo(
+        metadata: metadata,
+        scilla: null,
+        evm: null,
+        tron: rust_api.parseTronTransaction(json: jsonEncode(transaction)),
+      );
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: transactionRequest,
+        to: to,
+        colors: connection.colors,
+        token: mbToken,
+        amount: fromWei(
+          value: valueAmount.toString(),
+          decimals: mbToken.decimals,
+        ).toString(),
+        onConfirm: (tx) {
+          _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: tx.tron,
+          );
+          if (context.mounted) Navigator.pop(context);
+          _removeActiveRequest(method);
+        },
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.userRejected,
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      debugPrint('Error in multiSign: $e');
+      _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'Error processing multiSign: $e',
+      );
+    }
+  }
+
+  Future<void> _handleSignTypedData(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.resourceUnavailable,
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      final currentDomain = await _getCurrentDomain();
+      final connection =
+          Web3Utils.findConnected(currentDomain, appState.connections);
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'] as Map<String, dynamic>?;
+      if (params == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          TronWeb3ErrorCode.invalidInput,
+          l10n?.web3ErrorInvalidParams(method, '') ?? '',
+        );
+      }
+
+      final dataToSign = jsonEncode(params['message'] ?? params);
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showSignMessageModal(
+        context: context,
+        message: dataToSign,
+        onMessageSigned: (pubkey, sig) async {
+          await _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: sig,
+          );
+          _removeActiveRequest(method);
+          if (context.mounted) Navigator.pop(context);
+        },
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            TronWeb3ErrorCode.internalError,
+            AppLocalizations.of(context)?.web3ErrorUserRejected ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+        appTitle: '',
+        appIcon: message.icon ?? '',
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      debugPrint('Error in $method: $e');
+      _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'Error processing $method: $e',
+      );
     }
   }
 

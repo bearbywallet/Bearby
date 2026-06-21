@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/address_avatar.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/src/rust/models/connection.dart';
@@ -135,10 +136,9 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
                   fit: BoxFit.cover,
                   errorWidget: Container(
                     color: secondaryColor.withValues(alpha: 0.1),
-                    child: HoverSvgIcon(
-                      assetName: 'assets/icons/warning.svg',
-                      width: 64,
-                      height: 64,
+                    child: HoverIcon(
+                      icon: AppIcon.warning,
+                      size: 64,
                       onTap: () {},
                       color: secondaryColor,
                     ),

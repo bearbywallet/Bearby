@@ -1,7 +1,9 @@
 use crate::{
     models::provider::NetworkConfigInfo,
-    service::background::BACKGROUND_SERVICE,
-    utils::{errors::ServiceError, helpers::with_service},
+    utils::{
+        errors::ServiceError,
+        helpers::{handle, with_service},
+    },
 };
 use zilpay::secrecy::SecretString;
 use zilpay::serde_json::Value;
@@ -66,10 +68,8 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
 }
 
 pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<String, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let provider = service
-        .core
+    let core = handle()?;
+    let provider = core
         .get_provider(chain_hash)
         .map_err(ServiceError::BackgroundError)?;
 
@@ -158,20 +158,18 @@ pub async fn select_accounts_chain(
     chain_hash: u64,
     password: Option<String>,
 ) -> Result<(), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = handle()?;
     let password = password.map(|p| SecretString::new(p.into()));
 
-    service
-        .core
-        .select_accounts_chain(wallet_index, chain_hash, password.as_ref())
+    core.select_accounts_chain(wallet_index, chain_hash, password.as_ref())
         .await
         .map_err(ServiceError::BackgroundError)
         .map_err(Into::into)
 }
 
 pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkConfigInfo>, String> {
-    let json_value_list: Value = zilpay::serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
+    let json_value_list: Value =
+        zilpay::serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
 
     let chains = json_value_list
         .as_array()
@@ -196,6 +194,6 @@ mod provider_tests {
         let content = fs::read_to_string(path).unwrap();
         let providers = get_chains_providers_from_json(content).unwrap();
 
-        assert_eq!(providers.len(), 12);
+        assert_eq!(providers.len(), 13);
     }
 }

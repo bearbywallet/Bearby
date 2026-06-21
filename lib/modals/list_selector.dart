@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 class ListItem {
@@ -188,14 +189,10 @@ class _ListSelectorModalContentState extends State<_ListSelectorModalContent> {
                           ),
                         ),
                         if (isSelected)
-                          SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          AppIconView(
+                            icon: AppIcon.ok,
+                            size: 24,
+                            color: theme.primaryPurple,
                           ),
                       ],
                     ),

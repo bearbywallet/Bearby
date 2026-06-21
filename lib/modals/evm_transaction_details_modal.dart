@@ -1,16 +1,16 @@
+import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 
 import 'package:bearby/mixins/transaction_parsing.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/mixins/transaction_token.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/state/app_state.dart';
@@ -870,65 +870,33 @@ class _AmountSection extends StatelessWidget {
 
   Widget _buildTokenIcon() {
     final theme = appState.currentTheme;
-    final token = _findMatchingToken();
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
 
-    return Container(
-      width: 45,
-      height: 45,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: transaction.icon ??
-              (token != null
-                  ? processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? "",
-                      theme: theme.value,
-                    )
-                  : null),
-          width: 45,
-          height: 45,
-          fit: BoxFit.contain,
-          errorWidget: Container(
-            width: 45,
-            height: 45,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.background,
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/warning.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          ),
-        ),
-      ),
+    return TokenAvatar(
+      token: token,
+      size: 45,
+      appState: appState,
+      showNetworkBadge: false,
+      iconUrl: transaction.icon,
+      borderColor: theme.primaryPurple.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
     );
   }
 
   (String, String) _formatAmount() {
-    final token = appState.wallet?.tokens.first;
+    final token = resolveTransactionToken(
+      transaction: transaction,
+      appState: appState,
+    );
     final amount =
         BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
             BigInt.zero;
     final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
-    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
+    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? '';
 
     return formatingAmount(
       amount: amount,
@@ -937,22 +905,6 @@ class _AmountSection extends StatelessWidget {
       rate: token?.rate ?? 0,
       appState: appState,
     );
-  }
-
-  FTokenInfo? _findMatchingToken() {
-    if (appState.wallet == null ||
-        transaction.tokenInfo == null ||
-        appState.account == null) {
-      return null;
-    }
-
-    try {
-      return appState.wallet!.tokens.firstWhere((t) =>
-          t.symbol == transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType);
-    } catch (_) {
-      return null;
-    }
   }
 }
 

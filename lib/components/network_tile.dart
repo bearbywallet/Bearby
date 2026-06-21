@@ -1,5 +1,5 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
@@ -155,11 +155,10 @@ class NetworkTile extends StatelessWidget {
     if (onEdit == null) return null;
 
     return IconButton(
-      icon: SvgPicture.asset(
-        "assets/icons/edit.svg",
-        width: iconSize,
-        height: iconSize,
-        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+      icon: AppIconView(
+        icon: AppIcon.edit,
+        size: iconSize,
+        color: iconColor,
       ),
       padding: const EdgeInsets.all(8),
       onPressed: isActive ? onEdit : null,

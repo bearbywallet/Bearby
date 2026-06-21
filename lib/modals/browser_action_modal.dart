@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/address_avatar.dart';
 import 'package:bearby/components/copy_content.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/state/app_state.dart';
@@ -146,7 +147,7 @@ class BrowserActionModal extends StatelessWidget {
       children: [
         _buildActionButton(
           theme: theme,
-          iconPath: 'assets/icons/reload.svg',
+          icon: AppIcon.reload,
           label: l10n.browserActionMenuRefresh,
           onTap: () {
             onRefresh();
@@ -155,7 +156,7 @@ class BrowserActionModal extends StatelessWidget {
         ),
         _buildActionButton(
           theme: theme,
-          iconPath: 'assets/icons/copy.svg',
+          icon: AppIcon.copy,
           label: l10n.browserActionMenuCopyLink,
           onTap: () {
             onCopyLink();
@@ -164,7 +165,7 @@ class BrowserActionModal extends StatelessWidget {
         ),
         _buildActionButton(
           theme: theme,
-          iconPath: 'assets/icons/share.svg',
+          icon: AppIcon.share,
           label: l10n.browserActionMenuShare,
           onTap: () {
             onShare();
@@ -177,17 +178,16 @@ class BrowserActionModal extends StatelessWidget {
 
   Widget _buildActionButton({
     required AppTheme theme,
-    required String iconPath,
+    required AppIcon icon,
     required String label,
     required VoidCallback onTap,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        HoverSvgIcon(
-          assetName: iconPath,
-          width: 28,
-          height: 28,
+        HoverIcon(
+          icon: icon,
+          size: 28,
           onTap: onTap,
           color: theme.textPrimary,
         ),

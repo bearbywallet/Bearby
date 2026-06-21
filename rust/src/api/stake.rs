@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     network::zil::{ZilliqaEVMStakeing, ZilliqaScillaStakeing},
@@ -9,10 +7,9 @@ use zilpay::{
 
 use crate::{
     models::{stake::FinalOutputInfo, transactions::request::TransactionRequestInfo},
-    service::background::BACKGROUND_SERVICE,
     utils::{
         errors::ServiceError,
-        helpers::{parse_address, with_service},
+        helpers::{handle, parse_address, with_service},
     },
 };
 
@@ -20,9 +17,7 @@ pub async fn fetch_evm_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -48,9 +43,7 @@ pub async fn fetch_scilla_stake(
     wallet_index: usize,
     account_index: usize,
 ) -> Result<Vec<FinalOutputInfo>, String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let core = Arc::clone(&service.core);
+    let core = handle()?;
     let wallet = core
         .get_wallet_by_index(wallet_index)
         .map_err(ServiceError::BackgroundError)?;
@@ -88,7 +81,7 @@ pub async fn build_claim_scilla_staking_rewards_tx(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_claim(&stake.into())?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -110,7 +103,7 @@ pub async fn build_tx_scilla_init_unstake(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_init_unstake(&stake.into())?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -133,7 +126,7 @@ pub async fn build_tx_scilla_complete_withdrawal(
         let contract = parse_address(stake.address)?;
         let tx = provider.build_tx_scilla_complete_withdrawal(contract)?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -155,7 +148,7 @@ pub async fn build_tx_scilla_withdraw_stake_avely(
             .map_err(ServiceError::BackgroundError)?;
         let tx = provider.build_tx_scilla_withdraw_stake_avely(&stake.into())?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -184,7 +177,7 @@ pub async fn build_tx_evm_stake_request(
         let amount: U256 = amount.parse().unwrap_or_default();
         let tx = provider.build_tx_evm_stake_request(amount, &provider_address, &account.addr)?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -217,7 +210,7 @@ pub async fn build_tx_evm_unstake_request(
             &account.addr,
         )?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -244,7 +237,7 @@ pub async fn build_tx_claim_unstake_request(
         let delegator_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_claim_unstake_request(&delegator_address, &account.addr)?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)
@@ -271,7 +264,7 @@ pub async fn build_tx_claim_reward_request(
         let provider_address = Address::from_eth_address(&stake.address)?;
         let tx = provider.build_tx_build_claim_reward_request(&provider_address, &account.addr)?;
 
-        Ok(tx.into())
+        tx.try_into().map_err(ServiceError::TransactionErrors)
     })
     .await
     .map_err(Into::into)

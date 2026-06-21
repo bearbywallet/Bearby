@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -129,8 +129,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
           subtitle: l10n.currencyConversionEngineNoneSubtitle,
         ),
         ListItem(
-          title: l10n.currencyConversionEngineCryptoCompare,
-          subtitle: l10n.currencyConversionEngineCryptoCompareSubtitle,
+          title: l10n.currencyConversionEngineBearbyRates,
+          subtitle: l10n.currencyConversionEngineBearbyRatesSubtitle,
         ),
         ListItem(
           title: l10n.currencyConversionEngineCoingecko,
@@ -145,7 +145,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
   String _getEngineName(int index) {
     final l10n = AppLocalizations.of(context)!;
     return switch (index) {
-      1 => l10n.currencyConversionEngineCryptoCompare,
+      1 => l10n.currencyConversionEngineBearbyRates,
       2 => l10n.currencyConversionEngineCoingecko,
       _ => l10n.currencyConversionEngineNone,
     };
@@ -210,8 +210,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
                                       controller: _searchController,
                                       hint: AppLocalizations.of(context)!
                                           .currencyConversionSearchHint,
-                                      leftIconPath: 'assets/icons/search.svg',
-                                      rightIconPath: 'assets/icons/close.svg',
+                                      leftIcon: AppIcon.search,
+                                      rightIcon: AppIcon.close,
                                       onChanged: _filterCurrencies,
                                       onRightIconTap: () {
                                         _searchController.clear();
@@ -325,12 +325,10 @@ class _EngineTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/currency.svg',
-                width: 22,
-                height: 22,
-                colorFilter:
-                    ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+              AppIconView(
+                icon: AppIcon.currency,
+                size: 22,
+                color: theme.primaryPurple,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -347,12 +345,10 @@ class _EngineTile extends StatelessWidget {
                   ],
                 ),
               ),
-              SvgPicture.asset(
-                'assets/icons/chevron_right.svg',
-                width: 20,
-                height: 20,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              AppIconView(
+                icon: AppIcon.chevronRight,
+                size: 20,
+                color: theme.textSecondary,
               ),
             ],
           ),
@@ -411,12 +407,10 @@ class _CurrencyTile extends StatelessWidget {
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 150),
                 opacity: isSelected ? 1.0 : 0.0,
-                child: SvgPicture.asset(
-                  'assets/icons/ok.svg',
-                  width: 20,
-                  height: 20,
-                  colorFilter:
-                      ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                child: AppIconView(
+                  icon: AppIcon.ok,
+                  size: 20,
+                  color: theme.primaryPurple,
                 ),
               ),
             ],

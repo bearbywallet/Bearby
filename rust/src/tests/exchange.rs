@@ -5,15 +5,17 @@ mod exchange_tests {
 
     use crate::api::backend::load_service;
     use crate::api::exchange::{
-        bootstrap_exchange_providers, build_exchange_tx, fetch_exchange_quote,
+        bootstrap_exchange_providers, finalize_exchange_swap, prepare_exchange_swap,
+        refresh_exchange_quotes,
     };
     use crate::api::provider::get_chains_providers_from_json;
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
 
     use crate::api::backend::is_service_running;
-    use crate::models::exchange::{ExchangeAsset, ExchangeProvider};
+    use crate::models::exchange::{
+        ExchangeAsset, ExchangeProvider, ExchangeTxDisplay, SwapAuth, SwapParams,
+    };
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
-    use crate::service::background::BACKGROUND_SERVICE;
     use tempfile::tempdir;
     use zilpay::background::bg_provider::ProvidersManagement;
     use zilpay::crypto::slip44::ETHEREUM;
@@ -56,9 +58,8 @@ mod exchange_tests {
             .collect();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
-            service.core.add_batch_providers(providers.clone()).unwrap();
+            let core = crate::service::background::CORE.load_full().unwrap();
+            core.add_batch_providers(providers.clone()).unwrap();
         }
 
         let eth_chain = providers.iter().find(|c| c.slip_44 == ETHEREUM).unwrap();
@@ -98,36 +99,39 @@ mod exchange_tests {
         *done = true;
     }
 
-    /// Pick the bootstrapped asset that advertises a Uniswap provider, returning both the
-    /// asset and its `ExchangeProvider::Uniswap` variant.
-    async fn uniswap_asset() -> (ExchangeAsset, ExchangeProvider) {
-        let assets = bootstrap_exchange_providers().await.unwrap();
-        // The catalog now spans every chain, so pin to native ETH on Ethereum mainnet
-        // (chain 1): the empty `from_asset` resolves to the API native sentinel and the
-        // tests quote against USDC on chain 1.
+    /// Pick the bootstrapped native-ETH (chain 1) asset with a Uniswap provider, the USDC (chain 1)
+    /// destination asset, and the `ExchangeProvider::Uniswap` variant.
+    async fn uniswap_asset() -> (ExchangeAsset, ExchangeAsset, ExchangeProvider) {
+        let assets = bootstrap_exchange_providers(0, 0).unwrap();
         let asset = assets
-            .into_iter()
+            .iter()
             .find(|a| {
                 a.token.native
-                    && a.providers
-                        .iter()
-                        .any(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
+                    && a.providers.iter().any(
+                        |p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1),
+                    )
             })
+            .cloned()
             .expect("expected native ETH (chain 1) with a Uniswap provider");
+        let usdc = assets
+            .iter()
+            .find(|a| a.token.addr.eq_ignore_ascii_case(USDC_MAINNET))
+            .cloned()
+            .expect("expected USDC (chain 1) in the catalog");
         let provider = asset
             .providers
             .iter()
-            .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.chain_id == 1))
+            .find(|p| matches!(p, ExchangeProvider::Uniswap(m) if m.common.chain_id == 1))
             .cloned()
             .unwrap();
-        (asset, provider)
+        (asset, usdc, provider)
     }
 
     #[zilpay::tokio::test]
     async fn test_bootstrap_exchange_providers() {
         setup_eth_wallet().await;
 
-        let assets = bootstrap_exchange_providers().await.unwrap();
+        let assets = bootstrap_exchange_providers(0, 0).unwrap();
 
         assert!(
             assets.iter().any(|a| {
@@ -139,35 +143,52 @@ mod exchange_tests {
         );
     }
 
-    /// Live build against the Trading API: native ETH -> USDC on mainnet (no permit, two
-    /// API calls). `#[ignore]`d because it needs network access; run explicitly with:
+    /// Live build via on-chain quoting: native ETH -> USDC on mainnet (no permit, one
+    /// batched `eth_call`). `#[ignore]`d because it needs network access; run explicitly with:
     /// `cargo test -p rust_lib_zilpay exchange -- --ignored`.
     #[ignore]
     #[zilpay::tokio::test]
     async fn test_build_exchange_tx_native() {
         setup_eth_wallet().await;
-        let (_, provider) = uniswap_asset().await;
+        let (eth, usdc, provider) = uniswap_asset().await;
 
-        // is_native_in = true, so `token_in` is overridden to the API native sentinel
-        // internally — pass the zero address as a placeholder.
-        let tx = build_exchange_tx(
-            0,
-            0,
+        let auth = SwapAuth {
+            wallet_index: 0,
+            account_index: 0,
+            password: None,
+            passphrase: None,
+        };
+        let params = SwapParams {
+            provider: provider.clone(),
+            from: eth,
+            to: usdc,
+            amount_in: ONE_ETH.to_string(),
+            slippage_bps: 50,
+        };
+        let prepared = prepare_exchange_swap(params)
+            .await
+            .expect("prepare native swap");
+        assert!(
+            prepared.permit_typed_data_json.is_none(),
+            "native input needs no permit"
+        );
+
+        let tx = finalize_exchange_swap(
+            auth,
             provider,
-            "0x0000000000000000000000000000000000000000".to_string(),
-            USDC_MAINNET.to_string(),
-            ONE_ETH.to_string(),
-            String::new(), // amount_out unused by the API arm
-            0,             // fee_tier unused
-            50,            // slippage_bps = 0.5%
-            0,             // deadline unused
-            true,
+            prepared.quote_blob,
             None,
-            None,
-            None,
+            0,
+            ExchangeTxDisplay {
+                swap_title: "Swap".to_string(),
+                swap_info: "1 ETH → 1000 USDC · Uniswap".to_string(),
+                approve_title: "Approve".to_string(),
+                permit_title: "Permit".to_string(),
+                out_token: None,
+            },
         )
         .await
-        .expect("build native swap tx");
+        .expect("finalize native swap tx");
 
         let evm = tx.evm.expect("evm tx present");
         assert_eq!(evm.chain_id, Some(1));
@@ -178,24 +199,22 @@ mod exchange_tests {
 
     /// Live read-only quote against the mainnet RPC. `#[ignore]`d because it needs network
     /// access; run explicitly with: `cargo test -p rust_lib_zilpay exchange -- --ignored`.
+    #[ignore]
     #[zilpay::tokio::test]
-    async fn test_fetch_exchange_quote() {
+    async fn test_refresh_exchange_quotes() {
         setup_eth_wallet().await;
-        let (asset, _) = uniswap_asset().await;
+        let (asset, usdc, _) = uniswap_asset().await;
 
-        let quotes = fetch_exchange_quote(
-            asset,
-            String::new(),
-            USDC_MAINNET.to_string(),
-            ONE_ETH.to_string(),
-            "0x0000000000000000000000000000000000000001".to_string(),
-        )
-        .await
-        .expect("live uniswap quote");
+        let quoted = refresh_exchange_quotes(asset, usdc, ONE_ETH.to_string())
+            .await
+            .expect("live uniswap quote");
 
-        assert!(!quotes.is_empty(), "expected at least one quote");
-
-        let quote = &quotes[0];
+        let provider = quoted
+            .providers
+            .iter()
+            .find(|provider| provider.quote().is_some())
+            .expect("expected at least one quote");
+        let quote = provider.quote().expect("quote checked above");
         let out: U256 = quote.amount_out.parse().unwrap();
         assert!(out > U256::ZERO, "quote should return non-zero output");
         assert!(

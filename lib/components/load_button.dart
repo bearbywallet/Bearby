@@ -1,8 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 enum ButtonState { idle, loading, success, error }
@@ -17,8 +18,8 @@ class RoundedLoadingButton extends StatefulWidget {
   final double loaderSize;
   final Color valueColor;
   final double borderRadius;
-  final String? successIcon;
-  final String? failedSvgAsset;
+  final AppIcon successIcon;
+  final AppIcon failedIcon;
   final Color errorColor;
 
   const RoundedLoadingButton({
@@ -32,8 +33,8 @@ class RoundedLoadingButton extends StatefulWidget {
     this.loaderSize = 24.0,
     this.valueColor = Colors.white,
     this.borderRadius = 30.0,
-    this.successIcon = 'assets/icons/ok.svg',
-    this.failedSvgAsset = 'assets/icons/close.svg',
+    this.successIcon = AppIcon.ok,
+    this.failedIcon = AppIcon.close,
     this.errorColor = Colors.red,
   });
 
@@ -116,14 +117,10 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
               width: _bounceAnimation.value,
               height: _bounceAnimation.value,
               child: _bounceAnimation.value > 20
-                  ? SvgPicture.asset(
-                      widget.successIcon!,
-                      width: widget.loaderSize,
-                      height: widget.loaderSize,
-                      colorFilter: ColorFilter.mode(
-                        widget.valueColor,
-                        BlendMode.srcIn,
-                      ),
+                  ? AppIconView(
+                      icon: widget.successIcon,
+                      size: widget.loaderSize,
+                      color: widget.valueColor,
                     )
                   : null,
             ),
@@ -147,14 +144,10 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
               width: _bounceAnimation.value,
               height: _bounceAnimation.value,
               child: _bounceAnimation.value > 20
-                  ? SvgPicture.asset(
-                      widget.failedSvgAsset!,
-                      width: widget.loaderSize,
-                      height: widget.loaderSize,
-                      colorFilter: ColorFilter.mode(
-                        widget.valueColor,
-                        BlendMode.srcIn,
-                      ),
+                  ? AppIconView(
+                      icon: widget.failedIcon,
+                      size: widget.loaderSize,
+                      color: widget.valueColor,
                     )
                   : null,
             ),
@@ -184,14 +177,6 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           decoration: BoxDecoration(
             color: widget.color ?? theme.buttonBackground,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: [
-              BoxShadow(
-                color: (widget.color ?? theme.buttonBackground)
-                    .withValues(alpha: 0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(

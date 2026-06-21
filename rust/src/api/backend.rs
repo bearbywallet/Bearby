@@ -1,5 +1,8 @@
-use zilpay::tokio::sync::mpsc;
+use std::sync::Arc;
+
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
+use zilpay::background::bg_storage::StorageManagement;
+use zilpay::tokio::sync::mpsc;
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
@@ -14,10 +17,10 @@ pub use zilpay::{
 use crate::{
     frb_generated::StreamSink,
     models::background::BackgroundState,
-    service::background::{ServiceBackground, BACKGROUND_SERVICE},
+    service::background::{CORE, ServiceBackground, BACKGROUND_SERVICE},
     utils::{
         errors::ServiceError,
-        helpers::{get_background_state, with_service},
+        helpers::{get_background_state, handle, with_service},
     },
 };
 
@@ -25,9 +28,10 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     zilpay::init()?; // init pq ssl
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
-        let bg = ServiceBackground::from_path(path)?;
-        let state = get_background_state(&bg.core)?;
-        *guard = Some(bg);
+        let core = Background::from_storage_path(path).map_err(ServiceError::BackgroundError)?;
+        let state = get_background_state(&core)?;
+        CORE.store(Some(Arc::new(core)));
+        *guard = Some(ServiceBackground::new());
         Ok(state)
     } else {
         Err("service already running".to_string())
@@ -36,8 +40,8 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
 
 pub async fn stop_service() -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
-    if let Some(background) = guard.as_mut() {
-        background.stop();
+    if guard.is_some() {
+        CORE.store(None);
         *guard = None;
         Ok(())
     } else {
@@ -46,17 +50,16 @@ pub async fn stop_service() -> Result<(), String> {
 }
 
 pub async fn is_service_running() -> bool {
-    BACKGROUND_SERVICE.read().await.is_some()
+    CORE.load().is_some()
 }
 
 pub async fn stop_block_worker() -> Result<(), String> {
-    let mut guard = BACKGROUND_SERVICE.write().await;
-    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let mut block_handle = service.block_handle.lock().await;
 
-    if let Some(block_handle) = &service.block_handle {
-        block_handle.abort();
-
-        service.block_handle = None;
+    if let Some(handle) = block_handle.take() {
+        handle.abort();
     }
 
     Ok(())
@@ -74,21 +77,23 @@ pub async fn start_block_worker(
     let (tx, mut rx) = mpsc::channel(10);
 
     {
-        let mut guard = BACKGROUND_SERVICE.write().await;
-        let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
-
-        let handle = service
-            .core
+        let core = handle()?;
+        let worker_handle = core
             .start_block_track_job(wallet_index, tx)
             .await
             .map_err(|e| e.to_string())?;
+        let guard = BACKGROUND_SERVICE.read().await;
+        let Some(service) = guard.as_ref() else {
+            worker_handle.abort();
+            return Err(ServiceError::NotRunning.into());
+        };
+        let mut block_handle = service.block_handle.lock().await;
 
-        if let Some(block_handle) = &service.block_handle {
-            block_handle.abort();
-            service.block_handle = None;
+        if let Some(previous_handle) = block_handle.take() {
+            previous_handle.abort();
         }
 
-        service.block_handle = Some(handle);
+        *block_handle = Some(worker_handle);
     }
 
     while let Some(msg) = rx.recv().await {

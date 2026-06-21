@@ -170,6 +170,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get receivePageAmountDialogConfirm => '确认';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin 地址';
+
+  @override
+  String get btcAddressFormatLegacy => '传统 (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => '嵌套 SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return '未知 ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => '当前';
+
+  @override
+  String get btcAddressesModalUsed => '已使用';
+
+  @override
+  String get btcAddressesModalEmpty => '暂无地址';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 笔交易',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => '安全';
 
   @override
@@ -239,6 +278,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangePageGet => '获得';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '确认';
 
   @override
@@ -260,28 +302,75 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangeSettingsPriceProtection => '价格保护';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => '子交换数量';
-
-  @override
-  String get exchangeSettingsTimeBetween => '子交换间隔';
-
-  @override
   String get exchangeSettingsReset => '重置';
 
   @override
   String get exchangeSettingsSave => '保存';
 
   @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 个区块',
-    );
-    return '$_temp0';
+  String get exchangeConfirmBest => '最佳';
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmSlippage => '滑点';
+
+  @override
+  String get exchangeConfirmRecipient => '接收方';
+
+  @override
+  String get exchangeConfirmSwipe => '滑动以交换';
+
+  @override
+  String get exchangeConfirmUnable => '无法确认';
+
+  @override
+  String get exchangeConfirmPassword => '密码';
+
+  @override
+  String get exchangeConfirmNoAccount => '没有活动账户';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
+
+  @override
+  String get exchangeConfirmStepApprove => '授权代币';
+
+  @override
+  String get exchangeConfirmStepPermit => '签署许可 (EIP-712)';
+
+  @override
+  String get exchangeConfirmWrap => '包装';
+
+  @override
+  String get exchangeConfirmUnwrap => '解包';
+
+  @override
+  String get exchangeConfirmHintApprove => '请在 Ledger 上确认授权…';
+
+  @override
+  String get exchangeConfirmHintPermit => '请在 Ledger 上确认许可…';
+
+  @override
+  String get exchangeConfirmHintSwap => '请在 Ledger 上确认交换…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '准备中…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '授权 $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
   }
 
   @override
@@ -621,10 +710,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPageTelegram => 'Telegram';
 
   @override
-  String get settingsPageTwitter => 'Twitter';
+  String get settingsPageTwitter => 'X';
 
   @override
   String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageEmail => '电子邮件';
 
   @override
   String get settingsPageAbout => '关于';
@@ -822,10 +914,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => '从 Coingecko 获取汇率';
 
   @override
-  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+  String get currencyConversionEngineBearbyRates => 'Bearby Rates';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => '从 CryptoCompare 获取汇率';
+  String get currencyConversionEngineBearbyRatesSubtitle => '从 Bearby 获取汇率';
 
   @override
   String get restoreWalletOptionsTitle => '恢复钱包';
@@ -1852,6 +1944,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get qrCodeScanError => '读取二维码失败，请重试。';
+
+  @override
+  String get homePageQrScanErrorTitle => '错误';
+
+  @override
+  String get homePageQrScanOkButton => '确定';
 
   @override
   String get qrCodeEmptySeedError => '二维码不包含助记词。';

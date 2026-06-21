@@ -170,6 +170,48 @@ class AppLocalizationsRu extends AppLocalizations {
   String get receivePageAmountDialogConfirm => 'Подтвердить';
 
   @override
+  String get btcAddressesModalTitle => 'Адреса Bitcoin';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => 'Вложенный SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return 'Неизвестный ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => 'Текущий';
+
+  @override
+  String get btcAddressesModalUsed => 'Использован';
+
+  @override
+  String get btcAddressesModalEmpty => 'Адресов пока нет';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# транзакции',
+      many: '# транзакций',
+      few: '# транзакции',
+      one: '# транзакция',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => 'Безопасность';
 
   @override
@@ -239,6 +281,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangePageGet => 'Вы получаете';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => 'Подтвердить';
 
   @override
@@ -260,31 +305,75 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangeSettingsPriceProtection => 'Защита цены';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => 'Количество под-обменов';
-
-  @override
-  String get exchangeSettingsTimeBetween => 'Время между под-обменами';
-
-  @override
   String get exchangeSettingsReset => 'Сбросить';
 
   @override
   String get exchangeSettingsSave => 'Сохранить';
 
   @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count блока',
-      many: '$count блоков',
-      few: '$count блока',
-      one: '1 блок',
-    );
-    return '$_temp0';
+  String get exchangeConfirmBest => 'ЛУЧШИЙ';
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmSlippage => 'Проскальзывание';
+
+  @override
+  String get exchangeConfirmRecipient => 'Получатель';
+
+  @override
+  String get exchangeConfirmSwipe => 'Проведите для обмена';
+
+  @override
+  String get exchangeConfirmUnable => 'Не удалось подтвердить';
+
+  @override
+  String get exchangeConfirmPassword => 'Пароль';
+
+  @override
+  String get exchangeConfirmNoAccount => 'Нет активного аккаунта';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
+
+  @override
+  String get exchangeConfirmStepApprove => 'Одобрить токен';
+
+  @override
+  String get exchangeConfirmStepPermit => 'Подписать разрешение (EIP-712)';
+
+  @override
+  String get exchangeConfirmWrap => 'Обернуть';
+
+  @override
+  String get exchangeConfirmUnwrap => 'Развернуть';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Подтвердите одобрение на Ledger…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Подтвердите разрешение на Ledger…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Подтвердите обмен на Ledger…';
+
+  @override
+  String get exchangeConfirmHintPreparing => 'Подготовка…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return 'Одобрить $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
   }
 
   @override
@@ -624,10 +713,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsPageTelegram => 'Telegram';
 
   @override
-  String get settingsPageTwitter => 'Twitter';
+  String get settingsPageTwitter => 'X';
 
   @override
   String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageEmail => 'Почта';
 
   @override
   String get settingsPageAbout => 'О приложении';
@@ -825,10 +917,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Получать курсы из Coingecko';
 
   @override
-  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+  String get currencyConversionEngineBearbyRates => 'Bearby Rates';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => 'Получать курсы из CryptoCompare';
+  String get currencyConversionEngineBearbyRatesSubtitle => 'Получать курсы из Bearby';
 
   @override
   String get restoreWalletOptionsTitle => 'Восстановить кошелек';
@@ -1861,6 +1953,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qrCodeScanError => 'Не удалось прочитать QR-код. Попробуйте ещё раз.';
+
+  @override
+  String get homePageQrScanErrorTitle => 'Ошибка';
+
+  @override
+  String get homePageQrScanOkButton => 'ОК';
 
   @override
   String get qrCodeEmptySeedError => 'QR-код не содержит слов сид-фразы.';

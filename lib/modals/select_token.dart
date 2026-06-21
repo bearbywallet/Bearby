@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/token_select_item.dart';
+import 'package:bearby/components/token_select_sheet.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
-import '../theme/app_theme.dart' as theme;
 import 'package:bearby/l10n/app_localizations.dart';
 
 void showTokenSelectModal({
@@ -24,7 +23,7 @@ void showTokenSelectModal({
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: _TokenSelectModalContent(
+        child: _TokenSelectContent(
           onTokenSelected: onTokenSelected,
         ),
       );
@@ -32,19 +31,16 @@ void showTokenSelectModal({
   );
 }
 
-class _TokenSelectModalContent extends StatefulWidget {
+class _TokenSelectContent extends StatefulWidget {
   final Function(int) onTokenSelected;
 
-  const _TokenSelectModalContent({
-    required this.onTokenSelected,
-  });
+  const _TokenSelectContent({required this.onTokenSelected});
 
   @override
-  State<_TokenSelectModalContent> createState() =>
-      _TokenSelectModalContentState();
+  State<_TokenSelectContent> createState() => _TokenSelectContentState();
 }
 
-class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
+class _TokenSelectContentState extends State<_TokenSelectContent> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -54,113 +50,44 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
-    final appState = Provider.of<AppState>(context, listen: false);
-    final tokens = appState.wallet?.tokens ?? [];
-    final l10n = AppLocalizations.of(context)!;
+  List<FTokenInfo> _filtered(AppState appState) {
+    if (appState.wallet == null) return [];
 
-    final double headerHeight = 84.0;
-    final double searchBarHeight = 80.0;
-    final double tokenItemHeight = 72.0;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
-
-    final double totalContentHeight = headerHeight +
-        searchBarHeight +
-        (tokens.length * tokenItemHeight) +
-        bottomPadding;
-
-    final double maxHeight = MediaQuery.of(context).size.height * 0.7;
-    final double containerHeight = totalContentHeight.clamp(0.0, maxHeight);
-
-    return Container(
-      height: containerHeight,
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 16),
-            decoration: BoxDecoration(
-              color: theme.modalBorder,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SmartInput(
-              controller: _searchController,
-              hint: l10n.tokenSelectModalContentSearchHint,
-              leftIconPath: 'assets/icons/search.svg',
-              onChanged: (value) => setState(() => _searchQuery = value),
-              borderColor: theme.textPrimary,
-              focusedBorderColor: theme.primaryPurple,
-              height: 48,
-              fontSize: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _getFilteredTokens(appState).length,
-              separatorBuilder: (context, index) => Divider(
-                height: 1,
-                color: theme.textSecondary.withValues(alpha: 0.1),
-              ),
-              itemBuilder: (context, index) {
-                return _buildTokenItem(
-                  theme,
-                  appState,
-                  _getFilteredTokens(appState)[index],
-                );
-              },
-            ),
-          ),
-          SizedBox(height: bottomPadding),
-        ],
-      ),
-    );
-  }
-
-  List<FTokenInfo> _getFilteredTokens(AppState appState) {
-    if (appState.wallet == null) {
-      return [];
-    }
-
-    final tokens = appState.wallet!.tokens;
-    return tokens
-        .where((token) => token.addrType == appState.account?.addrType)
-        .where((token) =>
-            token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            token.symbol.toLowerCase().contains(_searchQuery.toLowerCase()))
+    return appState.wallet!.tokens
+        .where((t) => t.addrType == appState.account?.addrType)
+        .where((t) =>
+            _searchQuery.isEmpty ||
+            t.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            t.symbol.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
   }
 
-  Widget _buildTokenItem(
-    theme.AppTheme theme,
-    AppState appState,
-    FTokenInfo token,
-  ) {
-    final tokens = appState.wallet!.tokens;
-    final tokenIndex = tokens.indexOf(token);
-    final bigBalance =
-        BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '-') ??
-            BigInt.zero;
+  @override
+  Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final tokens = _filtered(appState);
 
-    return TokenSelectItem(
-      ftoken: token,
-      balance: bigBalance,
-      onTap: () {
-        widget.onTokenSelected(tokenIndex);
-        Navigator.pop(context);
+    return TokenSelectSheet(
+      searchController: _searchController,
+      searchHint: l10n.tokenSelectModalContentSearchHint,
+      onSearchChanged: (value) => setState(() => _searchQuery = value),
+      itemCount: tokens.length,
+      itemBuilder: (context, index) {
+        final token = tokens[index];
+        final tokenIndex = appState.wallet!.tokens.indexOf(token);
+        final balance =
+            BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '') ??
+                BigInt.zero;
+
+        return TokenSelectItem(
+          ftoken: token,
+          balance: balance,
+          onTap: () {
+            widget.onTokenSelected(tokenIndex);
+            Navigator.pop(context);
+          },
+        );
       },
     );
   }

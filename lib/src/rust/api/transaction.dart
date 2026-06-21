@@ -14,8 +14,10 @@ import '../models/transactions/history.dart';
 import '../models/transactions/request.dart';
 import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
+import '../models/transactions/tron.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `sign_and_broadcast_one`, `unlock_seed`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
 Future<HistoricalTransactionInfo> sendSignedTransactions(
@@ -23,13 +25,13 @@ Future<HistoricalTransactionInfo> sendSignedTransactions(
         required int accountIndex,
         required TransactionRequestInfo tx,
         required List<int> sig,
-        String? bip86Xpub}) =>
+        String? btcRotateXpub}) =>
     RustLib.instance.api.crateApiTransactionSendSignedTransactions(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
         tx: tx,
         sig: sig,
-        bip86Xpub: bip86Xpub);
+        btcRotateXpub: btcRotateXpub);
 
 Future<HistoricalTransactionInfo> signSendTransactions(
         {required BigInt walletIndex,
@@ -138,6 +140,15 @@ Future<TransactionRequestInfo> updateTxWithParams(
         required BigInt chainHash}) =>
     RustLib.instance.api.crateApiTransactionUpdateTxWithParams(
         tx: tx, params: params, balance: balance, chainHash: chainHash);
+
+/// Parse a TronWebTransaction JSON string into the typed FFI struct.
+/// Called by Dart when a dApp sends a Tron transaction.
+TransactionRequestTron parseTronTransaction({required String json}) =>
+    RustLib.instance.api.crateApiTransactionParseTronTransaction(json: json);
+
+/// Serialize a TransactionRequestTron back to JSON for dApp response.
+String tronTransactionToJson({required TransactionRequestTron tx}) =>
+    RustLib.instance.api.crateApiTransactionTronTransactionToJson(tx: tx);
 
 class Eip712Hashes {
   final Uint8List domainSeparator;

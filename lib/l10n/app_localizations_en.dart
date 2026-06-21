@@ -170,6 +170,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get receivePageAmountDialogConfirm => 'Confirm';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin addresses';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => 'Nested SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return 'Unknown ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => 'Current';
+
+  @override
+  String get btcAddressesModalUsed => 'Used';
+
+  @override
+  String get btcAddressesModalEmpty => 'No addresses yet';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count txs',
+      one: '1 tx',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => 'Security';
 
   @override
@@ -239,6 +279,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangePageGet => 'You get';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => 'Confirm';
 
   @override
@@ -260,29 +303,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangeSettingsPriceProtection => 'Price Protection';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => 'Number of sub-swaps';
-
-  @override
-  String get exchangeSettingsTimeBetween => 'Time between sub-swaps';
-
-  @override
   String get exchangeSettingsReset => 'Reset';
 
   @override
   String get exchangeSettingsSave => 'Save';
 
   @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count blocks',
-      one: '1 block',
-    );
-    return '$_temp0';
+  String get exchangeConfirmBest => 'BEST';
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmSlippage => 'Slippage';
+
+  @override
+  String get exchangeConfirmRecipient => 'Recipient';
+
+  @override
+  String get exchangeConfirmSwipe => 'Swipe to swap';
+
+  @override
+  String get exchangeConfirmUnable => 'Unable to confirm';
+
+  @override
+  String get exchangeConfirmPassword => 'Password';
+
+  @override
+  String get exchangeConfirmNoAccount => 'No active account';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
+
+  @override
+  String get exchangeConfirmStepApprove => 'Approve token';
+
+  @override
+  String get exchangeConfirmStepPermit => 'Sign permit (EIP-712)';
+
+  @override
+  String get exchangeConfirmWrap => 'Wrap';
+
+  @override
+  String get exchangeConfirmUnwrap => 'Unwrap';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Confirm approval on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Confirm permit on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Confirm swap on your Ledger…';
+
+  @override
+  String get exchangeConfirmHintPreparing => 'Preparing…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return 'Approve $symbol';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
   }
 
   @override
@@ -622,10 +711,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPageTelegram => 'Telegram';
 
   @override
-  String get settingsPageTwitter => 'Twitter';
+  String get settingsPageTwitter => 'X';
 
   @override
   String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageEmail => 'Email';
 
   @override
   String get settingsPageAbout => 'About';
@@ -823,10 +915,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Fetch rates from Coingecko';
 
   @override
-  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+  String get currencyConversionEngineBearbyRates => 'Bearby Rates';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => 'Fetch rates from CryptoCompare';
+  String get currencyConversionEngineBearbyRatesSubtitle => 'Fetch rates from Bearby';
 
   @override
   String get restoreWalletOptionsTitle => 'Restore Wallet';
@@ -1855,6 +1947,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrCodeScanError => 'Failed to read QR code. Please try again.';
+
+  @override
+  String get homePageQrScanErrorTitle => 'Error';
+
+  @override
+  String get homePageQrScanOkButton => 'OK';
 
   @override
   String get qrCodeEmptySeedError => 'QR code contains no seed words.';

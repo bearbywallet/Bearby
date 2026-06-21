@@ -1,11 +1,11 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/gas_eip1559.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/components/token_transfer_amount.dart';
 import 'package:bearby/components/transaction_amount_display.dart';
@@ -14,7 +14,6 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/modals/edit_gas_dialog.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -291,7 +290,7 @@ class _ConfirmTransactionContentState
       sig: sig,
       walletIndex: appState.selectedWallet,
       accountIndex: accountIndex,
-      bip86Xpub: bip86Xpub,
+      btcRotateXpub: bip86Xpub,
     );
   }
 
@@ -498,14 +497,10 @@ class _ConfirmTransactionContentState
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/edit.svg',
-                                        width: 16,
-                                        height: 16,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.warning,
-                                          BlendMode.srcIn,
-                                        ),
+                                      AppIconView(
+                                        icon: AppIcon.edit,
+                                        size: 16,
+                                        color: theme.warning,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -535,9 +530,8 @@ class _ConfirmTransactionContentState
                           focusedBorderColor: primaryColor,
                           disabled: _isDisabled,
                           obscureText: _obscurePassword,
-                          rightIconPath: _obscurePassword
-                              ? 'assets/icons/close_eye.svg'
-                              : 'assets/icons/open_eye.svg',
+                          rightIcon: AppIconState.passwordVisibility(
+                              obscured: _obscurePassword),
                           onRightIconTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
                           textColor: textColor,
@@ -596,76 +590,47 @@ class _ConfirmTransactionContentState
   }
 
   Widget _buildTokenLogo(AppState state, Color primaryColor) {
-    const imageSize = 54.0;
-    final theme = state.currentTheme;
-    final icon = widget.tx.metadata.icon;
-
-    if (icon != null) {
-      return Container(
-        width: imageSize,
-        height: imageSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border:
-              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
-        ),
-        child: ClipOval(
-            child: AsyncImage(
-                url: icon,
-                width: imageSize,
-                height: imageSize,
-                fit: BoxFit.contain)),
-      );
-    }
-
-    try {
-      final token = state.wallet!.tokens
-          .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
-      return Container(
-        width: imageSize,
-        height: imageSize,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border:
-              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
-        ),
-        child: ClipOval(
-          child: AsyncImage(
-            url: processTokenLogo(
-              token: token,
-              shortName: state.chain?.shortName ?? "",
-              theme: theme.value,
-            ),
-            width: imageSize,
-            height: imageSize,
-            fit: BoxFit.contain,
-          ),
-        ),
-      );
-    } catch (_) {
-      return const SizedBox.shrink();
-    }
+    return TokenAvatar(
+      token: widget.token,
+      size: 54,
+      appState: state,
+      showNetworkBadge: false,
+      iconUrl: widget.tx.metadata.icon,
+      borderColor: primaryColor.withValues(alpha: 0.1),
+      borderWidth: 2,
+      fit: BoxFit.contain,
+    );
   }
 
   Widget _buildTransferDetails(
       AppState appState, Color textColor, Color secondaryColor) {
     try {
-      BaseTokenInfo token = widget.tx.metadata.tokenInfo ??
-          BaseTokenInfo(
-              value: '',
-              symbol: widget.token.symbol,
-              decimals: widget.token.decimals);
+      // outToken: destination token set by the exchange (e.g. BNB for BTC→BNB swap).
+      // null for plain sends.
+      final outToken = widget.tx.metadata.tokenInfo;
+
+      // For BTC transactions, always use the native BTC token for formatting
+      // satoshi amounts inside TokenTransferInfo. Using the output token's
+      // decimals (e.g. 18 for BNB) would make sats appear as ~0.
+      final nativeToken = BaseTokenInfo(
+          value: '',
+          symbol: widget.token.symbol,
+          decimals: widget.token.decimals);
 
       final signer = appState.account ??
           (throw Exception(AppLocalizations.of(context)!
               .confirmTransactionContentNoActiveAccount));
 
-      final amount = toDecimalsWei(widget.amount.toString(), token.decimals);
+      final isBtc = widget.tx.btc != null;
+
+      // For non-BTC txs keep existing behaviour: prefer outToken for display.
+      final displayToken = isBtc ? nativeToken : (outToken ?? nativeToken);
+
+      final amount =
+          toDecimalsWei(widget.amount.toString(), displayToken.decimals);
       final balance = BigInt.tryParse(
               widget.token.balances[appState.accountBalanceKey] ?? '-') ??
           BigInt.zero;
-
-      final isBtc = widget.tx.btc != null;
 
       return Padding(
         padding: const EdgeInsets.all(16),
@@ -683,13 +648,17 @@ class _ConfirmTransactionContentState
             ],
             TokenTransferInfo(
               tx: widget.tx,
-              token: token,
+              token: displayToken,
               fromAddress: signer.addr,
               fromName: signer.name,
               toAddress: widget.to,
               textColor: textColor,
               secondaryColor: secondaryColor,
             ),
+            if (isBtc && outToken != null) ...[
+              const SizedBox(height: 12),
+              _buildSwapReceive(appState, outToken, textColor, secondaryColor),
+            ],
           ],
         ),
       );
@@ -697,5 +666,48 @@ class _ConfirmTransactionContentState
       debugPrint('Transfer details error: $e');
       return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildSwapReceive(AppState appState, BaseTokenInfo outToken,
+      Color textColor, Color secondaryColor) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = appState.currentTheme;
+
+    final outAmount = BigInt.tryParse(outToken.value) ?? BigInt.zero;
+    final double rate = appState.wallet?.tokens
+            .where((t) => t.symbol == outToken.symbol)
+            .map((t) => t.rate)
+            .firstOrNull ??
+        0.0;
+    final (formatted, _) = formatingAmount(
+      amount: outAmount,
+      symbol: outToken.symbol,
+      decimals: outToken.decimals,
+      rate: rate,
+      appState: appState,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.background.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.modalBorder.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            l10n.exchangePageGet,
+            style: theme.bodyText2.copyWith(color: secondaryColor),
+          ),
+          Text(
+            formatted,
+            style: theme.bodyText2
+                .copyWith(color: textColor, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
   }
 }

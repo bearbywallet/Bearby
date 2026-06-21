@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/state/app_state.dart';
@@ -131,13 +131,12 @@ class _LedgerCardState extends State<LedgerCard> {
         ),
       ),
       child: Center(
-        child: SvgPicture.asset(
-          widget.device.connectionType == ConnectionType.ble
-              ? 'assets/icons/ble.svg'
-              : 'assets/icons/usb.svg',
-          width: 20,
-          height: 20,
-          colorFilter: ColorFilter.mode(accentColor, BlendMode.srcIn),
+        child: AppIconView(
+          icon: widget.device.connectionType == ConnectionType.ble
+              ? AppIcon.bluetooth
+              : AppIcon.usb,
+          size: 20,
+          color: accentColor,
         ),
       ),
     );
@@ -193,12 +192,11 @@ class _LedgerCardState extends State<LedgerCard> {
     } else if (widget.isConnected) {
       icon = const SizedBox.shrink(key: ValueKey('connected'));
     } else {
-      icon = SvgPicture.asset(
-        'assets/icons/chevron_right.svg',
+      icon = AppIconView(
+        icon: AppIcon.chevronRight,
         key: const ValueKey('idle'),
-        width: 24,
-        height: 24,
-        colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+        size: 24,
+        color: theme.textSecondary,
       );
     }
 

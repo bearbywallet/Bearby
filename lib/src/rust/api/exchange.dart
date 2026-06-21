@@ -5,85 +5,21 @@
 
 import '../frb_generated.dart';
 import '../models/exchange.dart';
+import '../models/exchange/pancakeswap.dart';
+import '../models/exchange/plunderswap.dart';
+import '../models/exchange/relay.dart';
+import '../models/exchange/sunswap.dart';
 import '../models/exchange/uniswap.dart';
 import '../models/ftoken.dart';
-import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
 import '../models/transactions/btc.dart';
-import '../models/transactions/evm.dart';
-import '../models/transactions/request.dart';
-import '../models/transactions/scilla.dart';
+import '../models/transactions/history.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<ExchangeAsset>> bootstrapExchangeProviders() =>
-    RustLib.instance.api.crateApiExchangeBootstrapExchangeProviders();
-
-Future<List<ExchangeQuoteInfo>> fetchExchangeQuote(
-        {required ExchangeAsset asset,
-        required String fromAsset,
-        required String toAsset,
-        required String amount,
-        required String destination}) =>
-    RustLib.instance.api.crateApiExchangeFetchExchangeQuote(
-        asset: asset,
-        fromAsset: fromAsset,
-        toAsset: toAsset,
-        amount: amount,
-        destination: destination);
-
-/// Check whether the chosen provider needs a one-time on-chain ERC-20 `approve` before the
-/// swap, and if so return the unsigned approval tx for the UI to sign+broadcast first. Native
-/// inputs never need approval (`Ok(None)`); the UI must call this before `build_exchange_tx`
-/// for ERC-20 inputs. Provider-agnostic: each arm forwards to its own approval check.
-Future<TransactionRequestInfo?> checkExchangeApproval(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required ExchangeProvider provider,
-        required String tokenIn,
-        required String amountIn,
-        required bool isNativeIn}) =>
-    RustLib.instance.api.crateApiExchangeCheckExchangeApproval(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        provider: provider,
-        tokenIn: tokenIn,
-        amountIn: amountIn,
-        isNativeIn: isNativeIn);
-
-/// Build the unsigned swap (or cross-chain bridge) transaction for the chosen provider.
-/// The UI signs and broadcasts it via the existing `sign_send_transactions` FFI. For
-/// native inputs `token_in` is ignored (the provider uses its own native sentinel); for
-/// ERC20 inputs requiring Permit2 the EIP-712 signature is produced internally from the
-/// freshly fetched quote and the supplied `password`/`passphrase`, so the UI never signs
-/// the permit itself.
-Future<TransactionRequestInfo> buildExchangeTx(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required ExchangeProvider provider,
-        required String tokenIn,
-        required String tokenOut,
-        required String amountIn,
-        required String amountOut,
-        required int feeTier,
-        required int slippageBps,
-        required BigInt deadline,
-        required bool isNativeIn,
-        BigInt? permitNonce,
-        String? password,
-        String? passphrase}) =>
-    RustLib.instance.api.crateApiExchangeBuildExchangeTx(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        provider: provider,
-        tokenIn: tokenIn,
-        tokenOut: tokenOut,
-        amountIn: amountIn,
-        amountOut: amountOut,
-        feeTier: feeTier,
-        slippageBps: slippageBps,
-        deadline: deadline,
-        isNativeIn: isNativeIn,
-        permitNonce: permitNonce,
-        password: password,
-        passphrase: passphrase);
+Stream<String> executeExchangeSwap(
+        {required SwapAuth auth,
+        required SwapParams params,
+        required ExchangeTxDisplay display}) =>
+    RustLib.instance.api.crateApiExchangeExecuteExchangeSwap(
+        auth: auth, params: params, display: display);

@@ -1,9 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/hoverd_svg.dart';
-import 'package:bearby/components/tile_button.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/wallet_card.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/wallet_type.dart';
@@ -156,11 +155,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          HoverSvgIcon(
-            assetName: "assets/icons/plus.svg",
+          HoverIcon(
+            icon: AppIcon.plus,
             color: theme.textPrimary,
-            width: 40,
-            height: 40,
+            size: 40,
             onTap: () {
               if (appState.wallet!.walletType
                   .contains(WalletType.ledger.name)) {
@@ -174,11 +172,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             },
           ),
           if (appState.wallet!.selectedAccount != BigInt.zero)
-            HoverSvgIcon(
-              assetName: "assets/icons/minus.svg",
+            HoverIcon(
+              icon: AppIcon.minus,
               color: theme.danger,
-              width: 40,
-              height: 40,
+              size: 40,
               onTap: _deleteSelectedAccount,
             ),
         ],
@@ -191,22 +188,23 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          TileButton(
-            icon: SvgPicture.asset(
-              'assets/icons/lock.svg',
-              width: 32,
-              height: 32,
-              colorFilter: ColorFilter.mode(
-                theme.primaryPurple,
-                BlendMode.srcIn,
+          GestureDetector(
+            onTap: _lockWallet,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: theme.primaryPurple.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: theme.primaryPurple.withValues(alpha: 0.25),
+                  width: 1.5,
+                ),
               ),
-            ),
-            onPressed: _lockWallet,
-            backgroundColor: theme.primaryPurple.withValues(alpha: 0.15),
-            textColor: theme.primaryPurple,
-            defaultBorderSide: BorderSide(
-              color: theme.primaryPurple.withValues(alpha: 0.3),
-              width: 2,
+              child: AppIconView(
+                icon: AppIcon.lock,
+                size: 22,
+                color: theme.primaryPurple,
+              ),
             ),
           ),
           const SizedBox(height: 16),

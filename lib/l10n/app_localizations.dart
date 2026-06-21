@@ -419,6 +419,66 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get receivePageAmountDialogConfirm;
 
+  /// Bitcoin receive addresses modal text: btcAddressesModalTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Bitcoin addresses'**
+  String get btcAddressesModalTitle;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatLegacy
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy (P2PKH)'**
+  String get btcAddressFormatLegacy;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit
+  ///
+  /// In en, this message translates to:
+  /// **'Nested SegWit (P2SH)'**
+  String get btcAddressFormatNestedSegwit;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatSegwit
+  ///
+  /// In en, this message translates to:
+  /// **'SegWit (P2WPKH)'**
+  String get btcAddressFormatSegwit;
+
+  /// Bitcoin receive addresses modal text: btcAddressFormatTaproot
+  ///
+  /// In en, this message translates to:
+  /// **'Taproot (P2TR)'**
+  String get btcAddressFormatTaproot;
+
+  /// Fallback label for an unknown Bitcoin address format byte
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown ({formatByte})'**
+  String btcAddressFormatUnknown(Object formatByte);
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalCurrent
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get btcAddressesModalCurrent;
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalUsed
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get btcAddressesModalUsed;
+
+  /// Bitcoin receive addresses modal text: btcAddressesModalEmpty
+  ///
+  /// In en, this message translates to:
+  /// **'No addresses yet'**
+  String get btcAddressesModalEmpty;
+
+  /// Transaction count under each address in the Bitcoin addresses modal
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tx} other{{count} txs}}'**
+  String btcAddressesModalTxCount(int count);
+
   /// Title for the SecurityPage
   ///
   /// In en, this message translates to:
@@ -557,6 +617,12 @@ abstract class AppLocalizations {
   /// **'You get'**
   String get exchangePageGet;
 
+  /// No description provided for @exchangePageRecipientTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select recipient'**
+  String get exchangePageRecipientTitle;
+
   /// No description provided for @exchangePageConfirm.
   ///
   /// In en, this message translates to:
@@ -599,24 +665,6 @@ abstract class AppLocalizations {
   /// **'Price Protection'**
   String get exchangeSettingsPriceProtection;
 
-  /// No description provided for @exchangeSettingsTwap.
-  ///
-  /// In en, this message translates to:
-  /// **'TWAP'**
-  String get exchangeSettingsTwap;
-
-  /// No description provided for @exchangeSettingsSubSwaps.
-  ///
-  /// In en, this message translates to:
-  /// **'Number of sub-swaps'**
-  String get exchangeSettingsSubSwaps;
-
-  /// No description provided for @exchangeSettingsTimeBetween.
-  ///
-  /// In en, this message translates to:
-  /// **'Time between sub-swaps'**
-  String get exchangeSettingsTimeBetween;
-
   /// No description provided for @exchangeSettingsReset.
   ///
   /// In en, this message translates to:
@@ -629,11 +677,125 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get exchangeSettingsSave;
 
-  /// No description provided for @exchangeSettingsBlocks.
+  /// No description provided for @exchangeConfirmBest.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 block} other{{count} blocks}}'**
-  String exchangeSettingsBlocks(int count);
+  /// **'BEST'**
+  String get exchangeConfirmBest;
+
+  /// No description provided for @exchangeConfirmGasNone.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get exchangeConfirmGasNone;
+
+  /// No description provided for @exchangeConfirmAfterGas.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount}'**
+  String exchangeConfirmAfterGas(String amount);
+
+  /// No description provided for @exchangeConfirmSlippage.
+  ///
+  /// In en, this message translates to:
+  /// **'Slippage'**
+  String get exchangeConfirmSlippage;
+
+  /// No description provided for @exchangeConfirmRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient'**
+  String get exchangeConfirmRecipient;
+
+  /// No description provided for @exchangeConfirmSwipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to swap'**
+  String get exchangeConfirmSwipe;
+
+  /// No description provided for @exchangeConfirmUnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm'**
+  String get exchangeConfirmUnable;
+
+  /// No description provided for @exchangeConfirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get exchangeConfirmPassword;
+
+  /// No description provided for @exchangeConfirmNoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'No active account'**
+  String get exchangeConfirmNoAccount;
+
+  /// No description provided for @exchangeConfirmNoQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'No quote available'**
+  String get exchangeConfirmNoQuote;
+
+  /// No description provided for @exchangeConfirmStepApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve token'**
+  String get exchangeConfirmStepApprove;
+
+  /// No description provided for @exchangeConfirmStepPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign permit (EIP-712)'**
+  String get exchangeConfirmStepPermit;
+
+  /// No description provided for @exchangeConfirmWrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrap'**
+  String get exchangeConfirmWrap;
+
+  /// No description provided for @exchangeConfirmUnwrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Unwrap'**
+  String get exchangeConfirmUnwrap;
+
+  /// No description provided for @exchangeConfirmHintApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm approval on your Ledger…'**
+  String get exchangeConfirmHintApprove;
+
+  /// No description provided for @exchangeConfirmHintPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm permit on your Ledger…'**
+  String get exchangeConfirmHintPermit;
+
+  /// No description provided for @exchangeConfirmHintSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm swap on your Ledger…'**
+  String get exchangeConfirmHintSwap;
+
+  /// No description provided for @exchangeConfirmHintPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing…'**
+  String get exchangeConfirmHintPreparing;
+
+  /// No description provided for @exchangeHistoryApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve {symbol}'**
+  String exchangeHistoryApprove(String symbol);
+
+  /// No description provided for @exchangeHistoryPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Permit2 · {provider}'**
+  String exchangeHistoryPermit(String provider);
 
   /// Title for the RevealSecretKey page
   ///
@@ -1271,10 +1433,10 @@ abstract class AppLocalizations {
   /// **'Telegram'**
   String get settingsPageTelegram;
 
-  /// Label for the Twitter settings item in the SettingsPage component
+  /// Label for the X (formerly Twitter) settings item in the SettingsPage component
   ///
   /// In en, this message translates to:
-  /// **'Twitter'**
+  /// **'X'**
   String get settingsPageTwitter;
 
   /// Label for the GitHub settings item in the SettingsPage component
@@ -1282,6 +1444,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GitHub'**
   String get settingsPageGitHub;
+
+  /// Label for the email support item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get settingsPageEmail;
 
   /// Label for the About settings item in the SettingsPage component
   ///
@@ -1673,17 +1841,17 @@ abstract class AppLocalizations {
   /// **'Fetch rates from Coingecko'**
   String get currencyConversionEngineCoingeckoSubtitle;
 
-  /// Title for the 'CryptoCompare' engine option
+  /// Title for the 'Bearby Rates' engine option
   ///
   /// In en, this message translates to:
-  /// **'CryptoCompare'**
-  String get currencyConversionEngineCryptoCompare;
+  /// **'Bearby Rates'**
+  String get currencyConversionEngineBearbyRates;
 
-  /// Subtitle for the 'CryptoCompare' engine option
+  /// Subtitle for the 'Bearby Rates' engine option
   ///
   /// In en, this message translates to:
-  /// **'Fetch rates from CryptoCompare'**
-  String get currencyConversionEngineCryptoCompareSubtitle;
+  /// **'Fetch rates from Bearby'**
+  String get currencyConversionEngineBearbyRatesSubtitle;
 
   /// Title for the Restore Wallet Options page
   ///
@@ -3664,6 +3832,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to read QR code. Please try again.'**
   String get qrCodeScanError;
+
+  /// Title of the error dialog shown when a scanned QR code cannot be used on the home page
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get homePageQrScanErrorTitle;
+
+  /// Dismiss button of the QR scan error dialog on the home page
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get homePageQrScanOkButton;
 
   /// Error when QR code produces an empty seed phrase
   ///

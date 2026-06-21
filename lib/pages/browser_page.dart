@@ -7,7 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/glass_search_bar.dart';
 import 'package:bearby/components/tile_button.dart';
@@ -276,7 +277,12 @@ class _BrowserPageState extends State<BrowserPage>
     }
     if (appState.state.browserSettings.incognitoMode) {
       InAppWebViewController.clearAllCache();
-      controller.clearHistory();
+      try {
+        controller.clearHistory();
+      } catch (_) {
+        // clearHistory can fail on macOS if the webview's
+        // back-forward list is not yet initialized during onLoadStart.
+      }
     }
   }
 
@@ -473,22 +479,20 @@ class _BrowserPageState extends State<BrowserPage>
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Row(
                 children: [
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/back.svg',
+                  HoverIcon(
+                    icon: AppIcon.arrowLeft,
                     onTap:
                         _canGoBack ? () => _webViewController?.goBack() : () {},
                     color: _canGoBack ? iconColor : iconDisabledColor,
-                    width: 24,
-                    height: 24,
+                    size: 24,
                   ),
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/forward.svg',
+                  HoverIcon(
+                    icon: AppIcon.arrowRight,
                     onTap: _canGoForward
                         ? () => _webViewController?.goForward()
                         : () {},
                     color: _canGoForward ? iconColor : iconDisabledColor,
-                    width: 24,
-                    height: 24,
+                    size: 24,
                   ),
                   Expanded(
                     child: TextField(
@@ -507,15 +511,14 @@ class _BrowserPageState extends State<BrowserPage>
                       enableSuggestions: false,
                     ),
                   ),
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/dots.svg',
+                  HoverIcon(
+                    icon: AppIcon.dots,
                     onTap: _showBrowserMenu,
                     color: iconColor,
-                    width: 24,
-                    height: 24,
+                    size: 24,
                   ),
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/close.svg',
+                  HoverIcon(
+                    icon: AppIcon.close,
                     onTap: () async {
                       setState(() {
                         _isWebViewVisible = false;
@@ -541,8 +544,7 @@ class _BrowserPageState extends State<BrowserPage>
                       }
                     },
                     color: iconColor,
-                    width: 24,
-                    height: 24,
+                    size: 24,
                   ),
                 ],
               ),
@@ -570,9 +572,7 @@ class _BrowserPageState extends State<BrowserPage>
             hint: l10n.browserPageSearchHint(searchEngine.name),
             onSubmitted: _handleSearch,
             keyboardType: TextInputType.url,
-            rightIconPath: _searchController.text.isNotEmpty
-                ? 'assets/icons/close.svg'
-                : null,
+            rightIcon: _searchController.text.isNotEmpty ? AppIcon.close : null,
             onRightIconTap: () => _searchController.clear(),
           ),
         ),
@@ -632,10 +632,9 @@ class _BrowserPageState extends State<BrowserPage>
         width: 30,
         height: 30,
         fit: BoxFit.contain,
-        errorWidget: HoverSvgIcon(
-          assetName: 'assets/icons/warning.svg',
-          width: 30,
-          height: 30,
+        errorWidget: HoverIcon(
+          icon: AppIcon.warning,
+          size: 30,
           onTap: () {},
           color: theme.textPrimary,
         ),

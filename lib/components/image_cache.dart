@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/src/rust/api/cache.dart';
@@ -28,6 +29,9 @@ class AsyncImage extends StatefulWidget {
   State<AsyncImage> createState() => _AsyncImageState();
 }
 
+bool _isLocalSvgAsset(String url) =>
+    url.startsWith('assets/') && url.endsWith('.svg');
+
 class _AsyncImageState extends State<AsyncImage> {
   late final AppState _appState;
   Uint8List? _cachedImageBytes;
@@ -35,10 +39,14 @@ class _AsyncImageState extends State<AsyncImage> {
   bool _isLoading = false;
   bool _hasError = false;
 
+  bool get _isLocalAsset =>
+      widget.url != null && _isLocalSvgAsset(widget.url!);
+
   @override
   void initState() {
     super.initState();
     _appState = Provider.of<AppState>(context, listen: false);
+    if (_isLocalAsset) return;
     if (widget.url != null && widget.url!.isNotEmpty) {
       _loadImage();
     } else {
@@ -53,7 +61,14 @@ class _AsyncImageState extends State<AsyncImage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.url != oldWidget.url) {
-      if (widget.url != null && widget.url!.isNotEmpty) {
+      if (_isLocalAsset) {
+        setState(() {
+          _cachedImageBytes = null;
+          _cachedImageExt = null;
+          _isLoading = false;
+          _hasError = false;
+        });
+      } else if (widget.url != null && widget.url!.isNotEmpty) {
         _cachedImageBytes = null;
         _cachedImageExt = null;
         _loadImage();
@@ -115,13 +130,13 @@ class _AsyncImageState extends State<AsyncImage> {
                 width: widget.width ?? 24,
                 height: widget.height ?? 24,
                 decoration: BoxDecoration(
-                  color: theme.danger.withValues(alpha: 0.2),
+                  color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.broken_image,
+                child: AppIconView(
+                  icon: AppIcon.info,
                   size: (widget.width ?? 24) * 0.6,
-                  color: theme.danger,
+                  color: theme.warning,
                 ),
               ),
             ),
@@ -149,13 +164,13 @@ class _AsyncImageState extends State<AsyncImage> {
                 width: widget.width ?? 24,
                 height: widget.height ?? 24,
                 decoration: BoxDecoration(
-                  color: theme.danger.withValues(alpha: 0.2),
+                  color: theme.warning.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.broken_image,
+                child: AppIconView(
+                  icon: AppIcon.info,
                   size: (widget.width ?? 24) * 0.6,
-                  color: theme.danger,
+                  color: theme.warning,
                 ),
               ),
             );
@@ -167,6 +182,15 @@ class _AsyncImageState extends State<AsyncImage> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
+
+    if (_isLocalAsset) {
+      return SvgPicture.asset(
+        widget.url!,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit ?? BoxFit.cover,
+      );
+    }
 
     if (_isLoading) {
       return SizedBox(

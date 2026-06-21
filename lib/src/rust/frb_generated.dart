@@ -10,6 +10,8 @@ import 'api/btc_ledger.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/exchange.dart';
+import 'api/exchange/bootstrap.dart';
+import 'api/exchange/ledger.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
 import 'api/local_storage.dart';
@@ -33,6 +35,10 @@ import 'models/book.dart';
 import 'models/btc_chain.dart';
 import 'models/connection.dart';
 import 'models/exchange.dart';
+import 'models/exchange/pancakeswap.dart';
+import 'models/exchange/plunderswap.dart';
+import 'models/exchange/relay.dart';
+import 'models/exchange/sunswap.dart';
 import 'models/exchange/uniswap.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
@@ -50,6 +56,7 @@ import 'models/transactions/history.dart';
 import 'models/transactions/request.dart';
 import 'models/transactions/scilla.dart';
 import 'models/transactions/transaction_metadata.dart';
+import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -110,7 +117,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -789022785;
+  int get rustContentHash => -2102224516;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -187,7 +194,8 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsBitcoinAddressTypeFromAddress(
       {required String addr});
 
-  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders();
+  List<ExchangeAsset> crateApiExchangeBootstrapBootstrapExchangeProviders(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
       {required TransactionBitcoin tx, required List<TxOutInfo> witnessUtxos});
@@ -238,22 +246,6 @@ abstract class RustLibApi extends BaseApi {
   Future<TransactionRequestInfo> crateApiStakeBuildClaimScillaStakingRewardsTx(
       {required BigInt walletIndex, required FinalOutputInfo stake});
 
-  Future<TransactionRequestInfo> crateApiExchangeBuildExchangeTx(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
-      required String amountIn,
-      required String amountOut,
-      required int feeTier,
-      required int slippageBps,
-      required BigInt deadline,
-      required bool isNativeIn,
-      BigInt? permitNonce,
-      String? password,
-      String? passphrase});
-
   Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
@@ -298,13 +290,11 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiWalletChangeWalletName(
       {required BigInt walletIndex, required String newName});
 
-  Future<TransactionRequestInfo?> crateApiExchangeCheckExchangeApproval(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required ExchangeProvider provider,
-      required String tokenIn,
-      required String amountIn,
-      required bool isNativeIn});
+  Future<TransactionRequestInfo?> crateApiExchangeLedgerCheckExchangeApproval(
+      {required SwapAuth auth,
+      required SwapParams params,
+      required BigInt nonce,
+      required String approveTitle});
 
   Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words(
       {required List<String> words, required String lang});
@@ -336,21 +326,30 @@ abstract class RustLibApi extends BaseApi {
       required TransactionRequestInfo tx,
       required int slip44});
 
-  Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
+  Future<BigInt> crateApiExchangeLedgerEstimateSwapBaseNonce(
       {required BigInt walletIndex, required BigInt accountIndex});
 
-  Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeAsset asset,
-      required String fromAsset,
-      required String toAsset,
-      required String amount,
-      required String destination});
+  Stream<String> crateApiExchangeExecuteExchangeSwap(
+      {required SwapAuth auth,
+      required SwapParams params,
+      required ExchangeTxDisplay display});
+
+  Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<List<FinalOutputInfo>> crateApiStakeFetchScillaStake(
       {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<FTokenInfo> crateApiTokenFetchTokenMeta(
       {required String addr, required BigInt walletIndex});
+
+  Future<TransactionRequestInfo> crateApiExchangeLedgerFinalizeExchangeSwap(
+      {required SwapAuth auth,
+      required ExchangeProvider provider,
+      required String quoteBlob,
+      String? permitSignature,
+      required BigInt nonce,
+      required ExchangeTxDisplay display});
 
   String crateApiUtilsFromWei({required String value, required int decimals});
 
@@ -364,9 +363,22 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiQrcodeGenSvgQrcode(
       {required String data, required QrConfigInfo config});
 
+  Future<String> crateApiWalletGetAccountAddressForChain(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required BigInt chainHash});
+
   Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList();
 
+  Future<List<Category>> crateApiBookGetAddressesForChain(
+      {required BigInt chainHash});
+
   Future<List<String>> crateApiAuthGetBiometricType();
+
+  Future<Map<int, AddressChainInfo>> crateApiWalletGetBtcAddresses(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required BigInt chainHash});
 
   Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson(
       {required String jsonStr});
@@ -457,8 +469,14 @@ abstract class RustLibApi extends BaseApi {
   Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr(
       {required String data});
 
+  TransactionRequestTron crateApiTransactionParseTronTransaction(
+      {required String json});
+
   Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
       {required String typedDataJson});
+
+  Future<PreparedSwapInfo> crateApiExchangeLedgerPrepareExchangeSwap(
+      {required SwapParams params});
 
   Future<Uint8List> crateApiTransactionPrepareMessage(
       {required BigInt walletIndex,
@@ -467,6 +485,11 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String> crateApiProviderProviderReqProxy(
       {required String payload, required BigInt chainHash});
+
+  Future<ExchangeAsset> crateApiExchangeBootstrapRefreshExchangeQuotes(
+      {required ExchangeAsset from,
+      required ExchangeAsset to,
+      required String amount});
 
   Future<void> crateApiConnectionsRemoveConnections(
       {required BigInt walletIndex, required String domain});
@@ -512,7 +535,7 @@ abstract class RustLibApi extends BaseApi {
       required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig,
-      String? bip86Xpub});
+      String? btcRotateXpub});
 
   Future<void> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
@@ -597,6 +620,9 @@ abstract class RustLibApi extends BaseApi {
   (String, int) crateApiUtilsToWei(
       {required String value, required int decimals});
 
+  String crateApiTransactionTronTransactionToJson(
+      {required TransactionRequestTron tx});
+
   Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
@@ -611,6 +637,10 @@ abstract class RustLibApi extends BaseApi {
       required RequiredTxParamsInfo params,
       required String balance,
       required BigInt chainHash});
+
+  Future<(List<ExchangeAsset>, bool)>
+      crateApiExchangeBootstrapValidateExchangeProviders(
+          {required List<ExchangeAsset> assets});
 
   Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -1133,28 +1163,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<ExchangeAsset>> crateApiExchangeBootstrapExchangeProviders() {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  List<ExchangeAsset> crateApiExchangeBootstrapBootstrapExchangeProviders(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_exchange_asset,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeBootstrapExchangeProvidersConstMeta,
-      argValues: [],
+      constMeta: kCrateApiExchangeBootstrapBootstrapExchangeProvidersConstMeta,
+      argValues: [walletIndex, accountIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeBootstrapExchangeProvidersConstMeta =>
-      const TaskConstMeta(
-        debugName: "bootstrap_exchange_providers",
-        argNames: [],
-      );
+  TaskConstMeta
+      get kCrateApiExchangeBootstrapBootstrapExchangeProvidersConstMeta =>
+          const TaskConstMeta(
+            debugName: "bootstrap_exchange_providers",
+            argNames: ["walletIndex", "accountIndex"],
+          );
 
   @override
   Future<Uint8List> crateApiBtcLedgerBtcLedgerBuildPsbtFromStruct(
@@ -1527,88 +1560,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<TransactionRequestInfo> crateApiExchangeBuildExchangeTx(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required ExchangeProvider provider,
-      required String tokenIn,
-      required String tokenOut,
-      required String amountIn,
-      required String amountOut,
-      required int feeTier,
-      required int slippageBps,
-      required BigInt deadline,
-      required bool isNativeIn,
-      BigInt? permitNonce,
-      String? password,
-      String? passphrase}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
-        sse_encode_box_autoadd_exchange_provider(provider, serializer);
-        sse_encode_String(tokenIn, serializer);
-        sse_encode_String(tokenOut, serializer);
-        sse_encode_String(amountIn, serializer);
-        sse_encode_String(amountOut, serializer);
-        sse_encode_u_32(feeTier, serializer);
-        sse_encode_u_32(slippageBps, serializer);
-        sse_encode_u_64(deadline, serializer);
-        sse_encode_bool(isNativeIn, serializer);
-        sse_encode_opt_box_autoadd_u_64(permitNonce, serializer);
-        sse_encode_opt_String(password, serializer);
-        sse_encode_opt_String(passphrase, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_transaction_request_info,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiExchangeBuildExchangeTxConstMeta,
-      argValues: [
-        walletIndex,
-        accountIndex,
-        provider,
-        tokenIn,
-        tokenOut,
-        amountIn,
-        amountOut,
-        feeTier,
-        slippageBps,
-        deadline,
-        isNativeIn,
-        permitNonce,
-        password,
-        passphrase
-      ],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiExchangeBuildExchangeTxConstMeta =>
-      const TaskConstMeta(
-        debugName: "build_exchange_tx",
-        argNames: [
-          "walletIndex",
-          "accountIndex",
-          "provider",
-          "tokenIn",
-          "tokenOut",
-          "amountIn",
-          "amountOut",
-          "feeTier",
-          "slippageBps",
-          "deadline",
-          "isNativeIn",
-          "permitNonce",
-          "password",
-          "passphrase"
-        ],
-      );
-
-  @override
   Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
@@ -1620,7 +1571,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1650,7 +1601,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 37, port: port_);
+            funcId: 36, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1682,7 +1633,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         sse_encode_String(amount, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 38, port: port_);
+            funcId: 37, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1714,7 +1665,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         sse_encode_String(amountToUnstake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 39, port: port_);
+            funcId: 38, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1741,7 +1692,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 40, port: port_);
+            funcId: 39, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1768,7 +1719,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 41, port: port_);
+            funcId: 40, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1795,7 +1746,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 42, port: port_);
+            funcId: 41, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -1825,7 +1776,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(params, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 43, port: port_);
+            funcId: 42, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_required_tx_params_info,
@@ -1855,7 +1806,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_String(newName, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 44, port: port_);
+            funcId: 43, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1882,7 +1833,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(newName, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 45, port: port_);
+            funcId: 44, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1901,53 +1852,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<TransactionRequestInfo?> crateApiExchangeCheckExchangeApproval(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required ExchangeProvider provider,
-      required String tokenIn,
-      required String amountIn,
-      required bool isNativeIn}) {
+  Future<TransactionRequestInfo?> crateApiExchangeLedgerCheckExchangeApproval(
+      {required SwapAuth auth,
+      required SwapParams params,
+      required BigInt nonce,
+      required String approveTitle}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
-        sse_encode_box_autoadd_exchange_provider(provider, serializer);
-        sse_encode_String(tokenIn, serializer);
-        sse_encode_String(amountIn, serializer);
-        sse_encode_bool(isNativeIn, serializer);
+        sse_encode_box_autoadd_swap_auth(auth, serializer);
+        sse_encode_box_autoadd_swap_params(params, serializer);
+        sse_encode_u_64(nonce, serializer);
+        sse_encode_String(approveTitle, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 46, port: port_);
+            funcId: 45, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiExchangeCheckExchangeApprovalConstMeta,
-      argValues: [
-        walletIndex,
-        accountIndex,
-        provider,
-        tokenIn,
-        amountIn,
-        isNativeIn
-      ],
+      constMeta: kCrateApiExchangeLedgerCheckExchangeApprovalConstMeta,
+      argValues: [auth, params, nonce, approveTitle],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiExchangeCheckExchangeApprovalConstMeta =>
+  TaskConstMeta get kCrateApiExchangeLedgerCheckExchangeApprovalConstMeta =>
       const TaskConstMeta(
         debugName: "check_exchange_approval",
-        argNames: [
-          "walletIndex",
-          "accountIndex",
-          "provider",
-          "tokenIn",
-          "amountIn",
-          "isNativeIn"
-        ],
+        argNames: ["auth", "params", "nonce", "approveTitle"],
       );
 
   @override
@@ -1959,7 +1892,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_String(words, serializer);
         sse_encode_String(lang, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 47, port: port_);
+            funcId: 46, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_usize_strict,
@@ -1986,7 +1919,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 48, port: port_);
+            funcId: 47, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_historical_transaction_info,
@@ -2011,7 +1944,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 49, port: port_);
+            funcId: 48, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2037,7 +1970,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 50, port: port_);
+            funcId: 49, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2063,7 +1996,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_token_transfer_params_info(params, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 51, port: port_);
+            funcId: 50, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -2090,7 +2023,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_box_autoadd_connection_info(conn, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 52, port: port_);
+            funcId: 51, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2117,7 +2050,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 53, port: port_);
+            funcId: 52, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2144,7 +2077,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_opt_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 54, port: port_);
+            funcId: 53, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2175,7 +2108,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         sse_encode_u_32(slip44, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 55, port: port_);
+            funcId: 54, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_encoded_rlp_tx,
@@ -2194,6 +2127,66 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<BigInt> crateApiExchangeLedgerEstimateSwapBaseNonce(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 55, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_64,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeLedgerEstimateSwapBaseNonceConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeLedgerEstimateSwapBaseNonceConstMeta =>
+      const TaskConstMeta(
+        debugName: "estimate_swap_base_nonce",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Stream<String> crateApiExchangeExecuteExchangeSwap(
+      {required SwapAuth auth,
+      required SwapParams params,
+      required ExchangeTxDisplay display}) {
+    final sink = RustStreamSink<String>();
+    unawaited(handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_swap_auth(auth, serializer);
+        sse_encode_box_autoadd_swap_params(params, serializer);
+        sse_encode_box_autoadd_exchange_tx_display(display, serializer);
+        sse_encode_StreamSink_String_Sse(sink, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 56, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_historical_transaction_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeExecuteExchangeSwapConstMeta,
+      argValues: [auth, params, display, sink],
+      apiImpl: this,
+    )));
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiExchangeExecuteExchangeSwapConstMeta =>
+      const TaskConstMeta(
+        debugName: "execute_exchange_swap",
+        argNames: ["auth", "params", "display", "sink"],
+      );
+
+  @override
   Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
@@ -2202,7 +2195,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 56, port: port_);
+            funcId: 57, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_final_output_info,
@@ -2217,40 +2210,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeFetchEvmStakeConstMeta => const TaskConstMeta(
         debugName: "fetch_evm_stake",
         argNames: ["walletIndex", "accountIndex"],
-      );
-
-  @override
-  Future<List<ExchangeQuoteInfo>> crateApiExchangeFetchExchangeQuote(
-      {required ExchangeAsset asset,
-      required String fromAsset,
-      required String toAsset,
-      required String amount,
-      required String destination}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_exchange_asset(asset, serializer);
-        sse_encode_String(fromAsset, serializer);
-        sse_encode_String(toAsset, serializer);
-        sse_encode_String(amount, serializer);
-        sse_encode_String(destination, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 57, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_exchange_quote_info,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiExchangeFetchExchangeQuoteConstMeta,
-      argValues: [asset, fromAsset, toAsset, amount, destination],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiExchangeFetchExchangeQuoteConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_exchange_quote",
-        argNames: ["asset", "fromAsset", "toAsset", "amount", "destination"],
       );
 
   @override
@@ -2308,13 +2267,56 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<TransactionRequestInfo> crateApiExchangeLedgerFinalizeExchangeSwap(
+      {required SwapAuth auth,
+      required ExchangeProvider provider,
+      required String quoteBlob,
+      String? permitSignature,
+      required BigInt nonce,
+      required ExchangeTxDisplay display}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_swap_auth(auth, serializer);
+        sse_encode_box_autoadd_exchange_provider(provider, serializer);
+        sse_encode_String(quoteBlob, serializer);
+        sse_encode_opt_String(permitSignature, serializer);
+        sse_encode_u_64(nonce, serializer);
+        sse_encode_box_autoadd_exchange_tx_display(display, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 60, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeLedgerFinalizeExchangeSwapConstMeta,
+      argValues: [auth, provider, quoteBlob, permitSignature, nonce, display],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeLedgerFinalizeExchangeSwapConstMeta =>
+      const TaskConstMeta(
+        debugName: "finalize_exchange_swap",
+        argNames: [
+          "auth",
+          "provider",
+          "quoteBlob",
+          "permitSignature",
+          "nonce",
+          "display"
+        ],
+      );
+
+  @override
   String crateApiUtilsFromWei({required String value, required int decimals}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(value, serializer);
         sse_encode_u_8(decimals, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2338,7 +2340,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8(count, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 61, port: port_);
+            funcId: 62, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2362,7 +2364,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 62, port: port_);
+            funcId: 63, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_key_pair_info,
@@ -2388,7 +2390,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(data, serializer);
         sse_encode_box_autoadd_qr_config_info(config, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 63, port: port_);
+            funcId: 64, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -2414,7 +2416,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(data, serializer);
         sse_encode_box_autoadd_qr_config_info(config, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 64, port: port_);
+            funcId: 65, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2432,12 +2434,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<String> crateApiWalletGetAccountAddressForChain(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 66, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletGetAccountAddressForChainConstMeta,
+      argValues: [walletIndex, accountIndex, chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletGetAccountAddressForChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_account_address_for_chain",
+        argNames: ["walletIndex", "accountIndex", "chainHash"],
+      );
+
+  @override
   Future<List<AddressBookEntryInfo>> crateApiBookGetAddressBookList() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 65, port: port_);
+            funcId: 67, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_address_book_entry_info,
@@ -2456,12 +2488,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Category>> crateApiBookGetAddressesForChain(
+      {required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 68, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_category,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBookGetAddressesForChainConstMeta,
+      argValues: [chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBookGetAddressesForChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_addresses_for_chain",
+        argNames: ["chainHash"],
+      );
+
+  @override
   Future<List<String>> crateApiAuthGetBiometricType() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 66, port: port_);
+            funcId: 69, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
@@ -2480,6 +2538,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Map<int, AddressChainInfo>> crateApiWalletGetBtcAddresses(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required BigInt chainHash}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        sse_encode_u_64(chainHash, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 70, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_Map_u_8_address_chain_info_None,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletGetBtcAddressesConstMeta,
+      argValues: [walletIndex, accountIndex, chainHash],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletGetBtcAddressesConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_btc_addresses",
+        argNames: ["walletIndex", "accountIndex", "chainHash"],
+      );
+
+  @override
   Future<List<NetworkConfigInfo>> crateApiProviderGetChainsProvidersFromJson(
       {required String jsonStr}) {
     return handler.executeNormal(NormalTask(
@@ -2487,7 +2575,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(jsonStr, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 67, port: port_);
+            funcId: 71, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_network_config_info,
@@ -2513,7 +2601,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 68, port: port_);
+            funcId: 72, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_category,
@@ -2539,7 +2627,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 69, port: port_);
+            funcId: 73, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_connection_info,
@@ -2563,7 +2651,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 70, port: port_);
+            funcId: 74, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_record_string_string,
@@ -2587,7 +2675,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 71, port: port_);
+            funcId: 75, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_background_state,
@@ -2612,7 +2700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 72, port: port_);
+            funcId: 76, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_historical_transaction_info,
@@ -2639,7 +2727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(dir, serializer);
         sse_encode_String(url, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 73, port: port_);
+            funcId: 77, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_list_prim_u_8_strict_string,
@@ -2665,7 +2753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(dir, serializer);
         sse_encode_String(url, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 74, port: port_);
+            funcId: 78, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2692,7 +2780,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(mainnetJson, serializer);
         sse_encode_String(testnetJson, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 75, port: port_);
+            funcId: 79, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -2719,7 +2807,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 76, port: port_);
+            funcId: 80, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_network_config_info,
@@ -2743,7 +2831,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 77, port: port_);
+            funcId: 81, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_network_config_info,
@@ -2767,7 +2855,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 78, port: port_);
+            funcId: 82, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_wallet_info,
@@ -2792,7 +2880,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 79, port: port_);
+            funcId: 83, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
@@ -2818,7 +2906,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 80, port: port_);
+            funcId: 84, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_String,
@@ -2842,7 +2930,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 81, port: port_);
+            funcId: 85, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2880,7 +2968,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_f_64(threshold, serializer);
         sse_encode_bool(compact, serializer);
         sse_encode_f_64(converted, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -2922,7 +3010,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 83, port: port_);
+            funcId: 87, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2947,7 +3035,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(addr, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 84, port: port_);
+            funcId: 88, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -2972,7 +3060,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(sk, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 85, port: port_);
+            funcId: 89, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_key_pair_info,
@@ -2998,7 +3086,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(connectionId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 86, port: port_);
+            funcId: 90, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3025,7 +3113,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(connectionId, serializer);
         sse_encode_list_prim_u_8_loose(apdu, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 87, port: port_);
+            funcId: 91, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -3051,7 +3139,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(deviceId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 88, port: port_);
+            funcId: 92, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -3075,7 +3163,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 89, port: port_);
+            funcId: 93, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_rust_ledger_ble_device,
@@ -3101,7 +3189,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(connectionId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 90, port: port_);
+            funcId: 94, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3128,7 +3216,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(connectionId, serializer);
         sse_encode_list_prim_u_8_loose(apdu, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 91, port: port_);
+            funcId: 95, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -3152,7 +3240,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 92, port: port_);
+            funcId: 96, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_rust_ledger_hid_device,
@@ -3178,7 +3266,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(deviceId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 93, port: port_);
+            funcId: 97, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -3203,7 +3291,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 94, port: port_);
+            funcId: 98, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_32_strict,
@@ -3228,7 +3316,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 95, port: port_);
+            funcId: 99, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_background_state,
@@ -3254,7 +3342,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 96, port: port_);
+            funcId: 100, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -3280,7 +3368,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(data, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 97, port: port_);
+            funcId: 101, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_q_rcode_scan_result_info,
@@ -3299,6 +3387,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  TransactionRequestTron crateApiTransactionParseTronTransaction(
+      {required String json}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(json, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 102)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_transaction_request_tron,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionParseTronTransactionConstMeta,
+      argValues: [json],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionParseTronTransactionConstMeta =>
+      const TaskConstMeta(
+        debugName: "parse_tron_transaction",
+        argNames: ["json"],
+      );
+
+  @override
   Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
       {required String typedDataJson}) {
     return handler.executeNormal(NormalTask(
@@ -3306,7 +3419,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(typedDataJson, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 98, port: port_);
+            funcId: 103, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_eip_712_hashes,
@@ -3325,6 +3438,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<PreparedSwapInfo> crateApiExchangeLedgerPrepareExchangeSwap(
+      {required SwapParams params}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_swap_params(params, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 104, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_prepared_swap_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeLedgerPrepareExchangeSwapConstMeta,
+      argValues: [params],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeLedgerPrepareExchangeSwapConstMeta =>
+      const TaskConstMeta(
+        debugName: "prepare_exchange_swap",
+        argNames: ["params"],
+      );
+
+  @override
   Future<Uint8List> crateApiTransactionPrepareMessage(
       {required BigInt walletIndex,
       required BigInt accountIndex,
@@ -3336,7 +3475,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         sse_encode_String(message, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 99, port: port_);
+            funcId: 105, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -3363,7 +3502,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(payload, serializer);
         sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 100, port: port_);
+            funcId: 106, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -3382,6 +3521,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ExchangeAsset> crateApiExchangeBootstrapRefreshExchangeQuotes(
+      {required ExchangeAsset from,
+      required ExchangeAsset to,
+      required String amount}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_exchange_asset(from, serializer);
+        sse_encode_box_autoadd_exchange_asset(to, serializer);
+        sse_encode_String(amount, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 107, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_exchange_asset,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeBootstrapRefreshExchangeQuotesConstMeta,
+      argValues: [from, to, amount],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeBootstrapRefreshExchangeQuotesConstMeta =>
+      const TaskConstMeta(
+        debugName: "refresh_exchange_quotes",
+        argNames: ["from", "to", "amount"],
+      );
+
+  @override
   Future<void> crateApiConnectionsRemoveConnections(
       {required BigInt walletIndex, required String domain}) {
     return handler.executeNormal(NormalTask(
@@ -3390,7 +3559,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(domain, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 101, port: port_);
+            funcId: 108, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3415,7 +3584,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(addr, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 102, port: port_);
+            funcId: 109, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3440,7 +3609,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 103, port: port_);
+            funcId: 110, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3470,7 +3639,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(password, serializer);
         sse_encode_String(biometricType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 104, port: port_);
+            funcId: 111, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -3500,7 +3669,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 105, port: port_);
+            funcId: 112, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -3532,7 +3701,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(password, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 106, port: port_);
+            funcId: 113, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_key_pair_info,
@@ -3559,7 +3728,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(tokenAddress, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 107, port: port_);
+            funcId: 114, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3588,7 +3757,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_8(ledgerIndex, serializer);
         sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 108, port: port_);
+            funcId: 115, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_Map_u_8_address_chain_info_None,
@@ -3615,7 +3784,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 109, port: port_);
+            funcId: 116, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3645,7 +3814,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_64(chainHash, serializer);
         sse_encode_opt_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 110, port: port_);
+            funcId: 117, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3669,7 +3838,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig,
-      String? bip86Xpub}) {
+      String? btcRotateXpub}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -3677,16 +3846,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_8(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         sse_encode_list_prim_u_8_loose(sig, serializer);
-        sse_encode_opt_String(bip86Xpub, serializer);
+        sse_encode_opt_String(btcRotateXpub, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 111, port: port_);
+            funcId: 118, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_historical_transaction_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionSendSignedTransactionsConstMeta,
-      argValues: [walletIndex, accountIndex, tx, sig, bip86Xpub],
+      argValues: [walletIndex, accountIndex, tx, sig, btcRotateXpub],
       apiImpl: this,
     ));
   }
@@ -3694,7 +3863,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTransactionSendSignedTransactionsConstMeta =>
       const TaskConstMeta(
         debugName: "send_signed_transactions",
-        argNames: ["walletIndex", "accountIndex", "tx", "sig", "bip86Xpub"],
+        argNames: ["walletIndex", "accountIndex", "tx", "sig", "btcRotateXpub"],
       );
 
   @override
@@ -3709,7 +3878,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(password, serializer);
         sse_encode_String(newBiometricType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 112, port: port_);
+            funcId: 119, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3735,7 +3904,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_browser_settings_info(
             browserSettings, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 113, port: port_);
+            funcId: 120, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3760,7 +3929,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_opt_String(locale, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 114, port: port_);
+            funcId: 121, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3786,7 +3955,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_bool(globalEnabled, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 115, port: port_);
+            funcId: 122, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3813,7 +3982,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_u_8(engineCode, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 116, port: port_);
+            funcId: 123, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3840,7 +4009,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(currency, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 117, port: port_);
+            funcId: 124, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3867,7 +4036,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_8(appearancesCode, serializer);
         sse_encode_bool(compactNumbers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 118, port: port_);
+            funcId: 125, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3893,7 +4062,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_bool(enabled, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 119, port: port_);
+            funcId: 126, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3920,7 +4089,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_bool(ensEnabled, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 120, port: port_);
+            funcId: 127, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3947,7 +4116,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_opt_String(node, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 121, port: port_);
+            funcId: 128, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -3974,7 +4143,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_bool(enabled, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 122, port: port_);
+            funcId: 129, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4008,7 +4177,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_bool(security, serializer);
         sse_encode_bool(balance, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 123, port: port_);
+            funcId: 130, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4052,7 +4221,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(title, serializer);
         sse_encode_opt_String(icon, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 124, port: port_);
+            funcId: 131, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -4102,7 +4271,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(passphrase, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 125, port: port_);
+            funcId: 132, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_historical_transaction_info,
@@ -4146,7 +4315,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(title, serializer);
         sse_encode_opt_String(icon, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 126, port: port_);
+            funcId: 133, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -4190,7 +4359,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_StreamSink_block_event_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 127, port: port_);
+            funcId: 134, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4219,7 +4388,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_StreamSink_String_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 128, port: port_);
+            funcId: 135, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4244,7 +4413,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 129, port: port_);
+            funcId: 136, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4268,7 +4437,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 130, port: port_);
+            funcId: 137, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4292,7 +4461,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 131, port: port_);
+            funcId: 138, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4316,7 +4485,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 132, port: port_);
+            funcId: 139, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4341,7 +4510,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(value, serializer);
         sse_encode_u_8(decimals, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 133)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 140)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_u_8,
@@ -4359,6 +4528,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  String crateApiTransactionTronTransactionToJson(
+      {required TransactionRequestTron tx}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_transaction_request_tron(tx, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 141)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiTransactionTronTransactionToJsonConstMeta,
+      argValues: [tx],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTransactionTronTransactionToJsonConstMeta =>
+      const TaskConstMeta(
+        debugName: "tron_transaction_to_json",
+        argNames: ["tx"],
+      );
+
+  @override
   Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
@@ -4370,7 +4564,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_opt_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 134, port: port_);
+            funcId: 142, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -4395,7 +4589,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 135, port: port_);
+            funcId: 143, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -4420,7 +4614,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 136, port: port_);
+            funcId: 144, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4451,7 +4645,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(balance, serializer);
         sse_encode_u_64(chainHash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 137, port: port_);
+            funcId: 145, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_transaction_request_info,
@@ -4470,6 +4664,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<(List<ExchangeAsset>, bool)>
+      crateApiExchangeBootstrapValidateExchangeProviders(
+          {required List<ExchangeAsset> assets}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_exchange_asset(assets, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 146, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_list_exchange_asset_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeBootstrapValidateExchangeProvidersConstMeta,
+      argValues: [assets],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiExchangeBootstrapValidateExchangeProvidersConstMeta =>
+          const TaskConstMeta(
+            debugName: "validate_exchange_providers",
+            argNames: ["assets"],
+          );
+
+  @override
   Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
@@ -4478,7 +4700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 138, port: port_);
+            funcId: 147, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -4505,7 +4727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 139, port: port_);
+            funcId: 148, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4531,7 +4753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(base16, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 140, port: port_);
+            funcId: 149, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4558,7 +4780,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 141, port: port_);
+            funcId: 150, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4952,6 +5174,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeTxDisplay dco_decode_box_autoadd_exchange_tx_display(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_exchange_tx_display(raw);
+  }
+
+  @protected
   double dco_decode_box_autoadd_f_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as double;
@@ -4976,6 +5204,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_i_64(raw);
+  }
+
+  @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_ledger_params_input(raw);
@@ -4985,6 +5219,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_network_config_info(raw);
+  }
+
+  @protected
+  PancakeMeta dco_decode_box_autoadd_pancake_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_pancake_meta(raw);
+  }
+
+  @protected
+  PlunderMeta dco_decode_box_autoadd_plunder_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_plunder_meta(raw);
+  }
+
+  @protected
+  ProviderQuote dco_decode_box_autoadd_provider_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_provider_quote(raw);
   }
 
   @protected
@@ -5002,10 +5254,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RelayMeta dco_decode_box_autoadd_relay_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_relay_meta(raw);
+  }
+
+  @protected
   RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_required_tx_params_info(raw);
+  }
+
+  @protected
+  SunSwapMeta dco_decode_box_autoadd_sun_swap_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_sun_swap_meta(raw);
+  }
+
+  @protected
+  SwapAuth dco_decode_box_autoadd_swap_auth(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_swap_auth(raw);
+  }
+
+  @protected
+  SwapParams dco_decode_box_autoadd_swap_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_swap_params(raw);
   }
 
   @protected
@@ -5043,6 +5319,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron dco_decode_box_autoadd_transaction_request_tron(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_request_tron(raw);
+  }
+
+  @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_u_64(raw);
@@ -5058,6 +5341,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_wallet_settings_info(raw);
+  }
+
+  @protected
+  ZilSwapMeta dco_decode_box_autoadd_zil_swap_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_zil_swap_meta(raw);
   }
 
   @protected
@@ -5212,20 +5501,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ExchangeProvider_Thorchain(
-          dco_decode_u_64(raw[1]),
+        return ExchangeProvider_Relay(
+          dco_decode_box_autoadd_relay_meta(raw[1]),
         );
       case 1:
         return ExchangeProvider_Uniswap(
           dco_decode_box_autoadd_uniswap_meta(raw[1]),
         );
       case 2:
-        return ExchangeProvider_ZIlSwap(
-          dco_decode_u_64(raw[1]),
+        return ExchangeProvider_PancakeSwap(
+          dco_decode_box_autoadd_pancake_meta(raw[1]),
         );
       case 3:
+        return ExchangeProvider_PlunderSwap(
+          dco_decode_box_autoadd_plunder_meta(raw[1]),
+        );
+      case 4:
+        return ExchangeProvider_ZilSwap(
+          dco_decode_box_autoadd_zil_swap_meta(raw[1]),
+        );
+      case 5:
         return ExchangeProvider_SunSwap(
-          dco_decode_u_64(raw[1]),
+          dco_decode_box_autoadd_sun_swap_meta(raw[1]),
         );
       default:
         throw Exception("unreachable");
@@ -5233,15 +5530,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ExchangeQuoteInfo dco_decode_exchange_quote_info(dynamic raw) {
+  ExchangeTxDisplay dco_decode_exchange_tx_display(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return ExchangeQuoteInfo(
-      provider: dco_decode_exchange_provider(arr[0]),
-      amountOut: dco_decode_String(arr[1]),
-      permitTypedDataJson: dco_decode_opt_String(arr[2]),
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ExchangeTxDisplay(
+      swapTitle: dco_decode_String(arr[0]),
+      swapInfo: dco_decode_String(arr[1]),
+      approveTitle: dco_decode_String(arr[2]),
+      permitTitle: dco_decode_String(arr[3]),
+      outToken: dco_decode_opt_box_autoadd_base_token_info(arr[4]),
     );
   }
 
@@ -5498,12 +5797,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ExchangeQuoteInfo> dco_decode_list_exchange_quote_info(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_exchange_quote_info).toList();
-  }
-
-  @protected
   List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_explorer_info).toList();
@@ -5692,6 +5985,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TronContractInfo> dco_decode_list_tron_contract_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tron_contract_info).toList();
+  }
+
+  @protected
+  List<TronVoteInfo> dco_decode_list_tron_vote_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_tron_vote_info).toList();
+  }
+
+  @protected
   List<TxInInfo> dco_decode_list_tx_in_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_tx_in_info).toList();
@@ -5835,6 +6140,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
+  }
+
+  @protected
+  ProviderQuote? dco_decode_opt_box_autoadd_provider_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_provider_quote(raw);
+  }
+
+  @protected
   (
     TransactionBitcoin,
     BitcoinMetadataInfo
@@ -5882,6 +6199,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron? dco_decode_opt_box_autoadd_transaction_request_tron(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_request_tron(raw);
+  }
+
+  @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
@@ -5918,6 +6244,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PancakeCfg dco_decode_pancake_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return PancakeCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  PancakeMeta dco_decode_pancake_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PancakeMeta(
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_pancake_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
+    );
+  }
+
+  @protected
   PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5927,6 +6278,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       amount: dco_decode_String(arr[0]),
       withdrawalBlock: dco_decode_u_64(arr[1]),
       claimable: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
+  PlunderCfg dco_decode_plunder_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return PlunderCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  PlunderMeta dco_decode_plunder_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PlunderMeta(
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_plunder_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
+    );
+  }
+
+  @protected
+  PreparedSwapInfo dco_decode_prepared_swap_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return PreparedSwapInfo(
+      permitTypedDataJson: dco_decode_opt_String(arr[0]),
+      quoteBlob: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  ProviderCommon dco_decode_provider_common(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return ProviderCommon(
+      chainHash: dco_decode_u_64(arr[0]),
+      chainId: dco_decode_u_64(arr[1]),
+      slip44: dco_decode_u_32(arr[2]),
+      accountAddr: dco_decode_String(arr[3]),
+      iconAsset: dco_decode_String(arr[4]),
+      displayName: dco_decode_String(arr[5]),
+    );
+  }
+
+  @protected
+  ProviderQuote dco_decode_provider_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ProviderQuote(
+      amountOut: dco_decode_String(arr[0]),
+      permitTypedDataJson: dco_decode_opt_String(arr[1]),
+      isWrapUnwrap: dco_decode_bool(arr[2]),
     );
   }
 
@@ -5956,6 +6373,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       color: dco_decode_u_32(arr[2]),
       eyeShape: dco_decode_u_8(arr[3]),
       dataModuleShape: dco_decode_u_8(arr[4]),
+    );
+  }
+
+  @protected
+  (List<ExchangeAsset>, bool) dco_decode_record_list_exchange_asset_bool(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_list_exchange_asset(arr[0]),
+      dco_decode_bool(arr[1]),
     );
   }
 
@@ -6125,6 +6556,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RelayCfg dco_decode_relay_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RelayCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  RelayMeta dco_decode_relay_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return RelayMeta(
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_relay_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
+    );
+  }
+
+  @protected
   RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -6171,6 +6627,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       productId: dco_decode_u_16(arr[2]),
       productName: dco_decode_String(arr[3]),
       modelId: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  SunSwapCfg dco_decode_sun_swap_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SunSwapCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  SunSwapMeta dco_decode_sun_swap_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return SunSwapMeta(
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_sun_swap_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
+    );
+  }
+
+  @protected
+  SwapAuth dco_decode_swap_auth(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return SwapAuth(
+      walletIndex: dco_decode_usize(arr[0]),
+      accountIndex: dco_decode_usize(arr[1]),
+      password: dco_decode_opt_String(arr[2]),
+      passphrase: dco_decode_opt_String(arr[3]),
+    );
+  }
+
+  @protected
+  SwapParams dco_decode_swap_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return SwapParams(
+      provider: dco_decode_exchange_provider(arr[0]),
+      from: dco_decode_exchange_asset(arr[1]),
+      to: dco_decode_exchange_asset(arr[2]),
+      amountIn: dco_decode_String(arr[3]),
+      slippageBps: dco_decode_u_32(arr[4]),
     );
   }
 
@@ -6259,7 +6769,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       btc:
           dco_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
               arr[3]),
-      tron: dco_decode_opt_String(arr[4]),
+      tron: dco_decode_opt_box_autoadd_transaction_request_tron(arr[4]),
       solana: dco_decode_opt_list_prim_u_8_strict(arr[5]),
     );
   }
@@ -6283,9 +6793,160 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron dco_decode_transaction_request_tron(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return TransactionRequestTron(
+      visible: dco_decode_opt_box_autoadd_bool(arr[0]),
+      txId: dco_decode_opt_String(arr[1]),
+      rawData: dco_decode_tron_raw_data_info(arr[2]),
+      rawDataHex: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
   TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TransactionStatusInfo.values[raw as int];
+  }
+
+  @protected
+  TronContractInfo dco_decode_tron_contract_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return TronContractInfo(
+      contractType: dco_decode_String(arr[0]),
+      typeUrl: dco_decode_String(arr[1]),
+      value: dco_decode_tron_contract_value(arr[2]),
+    );
+  }
+
+  @protected
+  TronContractValue dco_decode_tron_contract_value(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return TronContractValue_TransferContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          toAddress: dco_decode_String(raw[2]),
+          amount: dco_decode_i_64(raw[3]),
+        );
+      case 1:
+        return TronContractValue_TriggerSmartContract(
+          ownerAddress: dco_decode_opt_String(raw[1]),
+          contractAddress: dco_decode_opt_String(raw[2]),
+          callValue: dco_decode_opt_box_autoadd_i_64(raw[3]),
+          data: dco_decode_opt_String(raw[4]),
+          callTokenValue: dco_decode_opt_box_autoadd_i_64(raw[5]),
+          tokenId: dco_decode_opt_box_autoadd_i_64(raw[6]),
+        );
+      case 2:
+        return TronContractValue_FreezeBalanceV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+          frozenBalance: dco_decode_i_64(raw[2]),
+          resource: dco_decode_i_32(raw[3]),
+        );
+      case 3:
+        return TronContractValue_WithdrawBalanceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 4:
+        return TronContractValue_UnfreezeBalanceV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+          unfreezeBalance: dco_decode_i_64(raw[2]),
+          resource: dco_decode_i_32(raw[3]),
+        );
+      case 5:
+        return TronContractValue_WithdrawExpireUnfreezeContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 6:
+        return TronContractValue_DelegateResourceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          resource: dco_decode_i_32(raw[2]),
+          balance: dco_decode_i_64(raw[3]),
+          receiverAddress: dco_decode_String(raw[4]),
+          lock: dco_decode_bool(raw[5]),
+          lockPeriod: dco_decode_i_64(raw[6]),
+        );
+      case 7:
+        return TronContractValue_UnDelegateResourceContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          resource: dco_decode_i_32(raw[2]),
+          balance: dco_decode_i_64(raw[3]),
+          receiverAddress: dco_decode_String(raw[4]),
+        );
+      case 8:
+        return TronContractValue_CancelAllUnfreezeV2Contract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 9:
+        return TronContractValue_TransferAssetContract(
+          assetName: dco_decode_String(raw[1]),
+          ownerAddress: dco_decode_String(raw[2]),
+          toAddress: dco_decode_String(raw[3]),
+          amount: dco_decode_i_64(raw[4]),
+        );
+      case 10:
+        return TronContractValue_VoteWitnessContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          votes: dco_decode_list_tron_vote_info(raw[2]),
+          support: dco_decode_bool(raw[3]),
+        );
+      case 11:
+        return TronContractValue_AccountCreateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          accountAddress: dco_decode_String(raw[2]),
+        );
+      case 12:
+        return TronContractValue_AccountUpdateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+          accountName: dco_decode_String(raw[2]),
+        );
+      case 13:
+        return TronContractValue_AccountPermissionUpdateContract(
+          ownerAddress: dco_decode_String(raw[1]),
+        );
+      case 14:
+        return TronContractValue_Unknown(
+          typeUrl: dco_decode_String(raw[1]),
+          valueJson: dco_decode_String(raw[2]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  TronRawDataInfo dco_decode_tron_raw_data_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return TronRawDataInfo(
+      contract: dco_decode_list_tron_contract_info(arr[0]),
+      refBlockBytes: dco_decode_String(arr[1]),
+      refBlockHash: dco_decode_String(arr[2]),
+      expiration: dco_decode_i_64(arr[3]),
+      feeLimit: dco_decode_opt_box_autoadd_i_64(arr[4]),
+      timestamp: dco_decode_i_64(arr[5]),
+    );
+  }
+
+  @protected
+  TronVoteInfo dco_decode_tron_vote_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return TronVoteInfo(
+      voteAddress: dco_decode_String(arr[0]),
+      voteCount: dco_decode_i_64(arr[1]),
+    );
   }
 
   @protected
@@ -6341,13 +7002,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UniswapCfg dco_decode_uniswap_cfg(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return UniswapCfg(
+      defaultSlippageBps: dco_decode_u_32(arr[0]),
+      supportsPriceProtection: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
   UniswapMeta dco_decode_uniswap_meta(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return UniswapMeta(
-      chainId: dco_decode_u_64(arr[0]),
+      common: dco_decode_provider_common(arr[0]),
+      cfg: dco_decode_uniswap_cfg(arr[1]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[2]),
     );
   }
 
@@ -6445,6 +7120,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       maxConnections: dco_decode_u_8(arr[7]),
       requestTimeoutSecs: dco_decode_u_32(arr[8]),
       ratesApiOptions: dco_decode_u_8(arr[9]),
+    );
+  }
+
+  @protected
+  ZilSwapMeta dco_decode_zil_swap_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ZilSwapMeta(
+      common: dco_decode_provider_common(arr[0]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[1]),
     );
   }
 
@@ -6824,6 +7511,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ExchangeTxDisplay sse_decode_box_autoadd_exchange_tx_display(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_exchange_tx_display(deserializer));
+  }
+
+  @protected
   double sse_decode_box_autoadd_f_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_f_32(deserializer));
@@ -6849,6 +7543,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_i_64(deserializer));
+  }
+
+  @protected
   LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -6860,6 +7560,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_network_config_info(deserializer));
+  }
+
+  @protected
+  PancakeMeta sse_decode_box_autoadd_pancake_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_pancake_meta(deserializer));
+  }
+
+  @protected
+  PlunderMeta sse_decode_box_autoadd_plunder_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_plunder_meta(deserializer));
+  }
+
+  @protected
+  ProviderQuote sse_decode_box_autoadd_provider_quote(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_provider_quote(deserializer));
   }
 
   @protected
@@ -6879,10 +7600,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RelayMeta sse_decode_box_autoadd_relay_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_relay_meta(deserializer));
+  }
+
+  @protected
   RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_required_tx_params_info(deserializer));
+  }
+
+  @protected
+  SunSwapMeta sse_decode_box_autoadd_sun_swap_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_sun_swap_meta(deserializer));
+  }
+
+  @protected
+  SwapAuth sse_decode_box_autoadd_swap_auth(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_swap_auth(deserializer));
+  }
+
+  @protected
+  SwapParams sse_decode_box_autoadd_swap_params(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_swap_params(deserializer));
   }
 
   @protected
@@ -6921,6 +7667,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron sse_decode_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_request_tron(deserializer));
+  }
+
+  @protected
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_64(deserializer));
@@ -6938,6 +7691,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_wallet_settings_info(deserializer));
+  }
+
+  @protected
+  ZilSwapMeta sse_decode_box_autoadd_zil_swap_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_zil_swap_meta(deserializer));
   }
 
   @protected
@@ -7093,16 +7853,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var tag_ = sse_decode_i_32(deserializer);
     switch (tag_) {
       case 0:
-        var var_field0 = sse_decode_u_64(deserializer);
-        return ExchangeProvider_Thorchain(var_field0);
+        var var_field0 = sse_decode_box_autoadd_relay_meta(deserializer);
+        return ExchangeProvider_Relay(var_field0);
       case 1:
         var var_field0 = sse_decode_box_autoadd_uniswap_meta(deserializer);
         return ExchangeProvider_Uniswap(var_field0);
       case 2:
-        var var_field0 = sse_decode_u_64(deserializer);
-        return ExchangeProvider_ZIlSwap(var_field0);
+        var var_field0 = sse_decode_box_autoadd_pancake_meta(deserializer);
+        return ExchangeProvider_PancakeSwap(var_field0);
       case 3:
-        var var_field0 = sse_decode_u_64(deserializer);
+        var var_field0 = sse_decode_box_autoadd_plunder_meta(deserializer);
+        return ExchangeProvider_PlunderSwap(var_field0);
+      case 4:
+        var var_field0 = sse_decode_box_autoadd_zil_swap_meta(deserializer);
+        return ExchangeProvider_ZilSwap(var_field0);
+      case 5:
+        var var_field0 = sse_decode_box_autoadd_sun_swap_meta(deserializer);
         return ExchangeProvider_SunSwap(var_field0);
       default:
         throw UnimplementedError('');
@@ -7110,16 +7876,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  ExchangeQuoteInfo sse_decode_exchange_quote_info(
+  ExchangeTxDisplay sse_decode_exchange_tx_display(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_provider = sse_decode_exchange_provider(deserializer);
-    var var_amountOut = sse_decode_String(deserializer);
-    var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
-    return ExchangeQuoteInfo(
-        provider: var_provider,
-        amountOut: var_amountOut,
-        permitTypedDataJson: var_permitTypedDataJson);
+    var var_swapTitle = sse_decode_String(deserializer);
+    var var_swapInfo = sse_decode_String(deserializer);
+    var var_approveTitle = sse_decode_String(deserializer);
+    var var_permitTitle = sse_decode_String(deserializer);
+    var var_outToken = sse_decode_opt_box_autoadd_base_token_info(deserializer);
+    return ExchangeTxDisplay(
+        swapTitle: var_swapTitle,
+        swapInfo: var_swapInfo,
+        approveTitle: var_approveTitle,
+        permitTitle: var_permitTitle,
+        outToken: var_outToken);
   }
 
   @protected
@@ -7451,19 +8221,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ExchangeQuoteInfo> sse_decode_list_exchange_quote_info(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ExchangeQuoteInfo>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_exchange_quote_info(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<ExplorerInfo> sse_decode_list_explorer_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7771,6 +8528,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TronContractInfo> sse_decode_list_tron_contract_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TronContractInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tron_contract_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<TronVoteInfo> sse_decode_list_tron_vote_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TronVoteInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_tron_vote_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<TxInInfo> sse_decode_list_tx_in_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -8015,6 +8798,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_i_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ProviderQuote? sse_decode_opt_box_autoadd_provider_quote(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_provider_quote(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   (
     TransactionBitcoin,
     BitcoinMetadataInfo
@@ -8080,6 +8886,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron? sse_decode_opt_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_request_tron(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -8133,6 +8951,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PancakeCfg sse_decode_pancake_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return PancakeCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
+  PancakeMeta sse_decode_pancake_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_pancake_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return PancakeMeta(common: var_common, cfg: var_cfg, quote: var_quote);
+  }
+
+  @protected
   PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8143,6 +8980,64 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         amount: var_amount,
         withdrawalBlock: var_withdrawalBlock,
         claimable: var_claimable);
+  }
+
+  @protected
+  PlunderCfg sse_decode_plunder_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return PlunderCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
+  PlunderMeta sse_decode_plunder_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_plunder_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return PlunderMeta(common: var_common, cfg: var_cfg, quote: var_quote);
+  }
+
+  @protected
+  PreparedSwapInfo sse_decode_prepared_swap_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
+    var var_quoteBlob = sse_decode_String(deserializer);
+    return PreparedSwapInfo(
+        permitTypedDataJson: var_permitTypedDataJson, quoteBlob: var_quoteBlob);
+  }
+
+  @protected
+  ProviderCommon sse_decode_provider_common(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_chainHash = sse_decode_u_64(deserializer);
+    var var_chainId = sse_decode_u_64(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
+    var var_accountAddr = sse_decode_String(deserializer);
+    var var_iconAsset = sse_decode_String(deserializer);
+    var var_displayName = sse_decode_String(deserializer);
+    return ProviderCommon(
+        chainHash: var_chainHash,
+        chainId: var_chainId,
+        slip44: var_slip44,
+        accountAddr: var_accountAddr,
+        iconAsset: var_iconAsset,
+        displayName: var_displayName);
+  }
+
+  @protected
+  ProviderQuote sse_decode_provider_quote(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_amountOut = sse_decode_String(deserializer);
+    var var_permitTypedDataJson = sse_decode_opt_String(deserializer);
+    var var_isWrapUnwrap = sse_decode_bool(deserializer);
+    return ProviderQuote(
+        amountOut: var_amountOut,
+        permitTypedDataJson: var_permitTypedDataJson,
+        isWrapUnwrap: var_isWrapUnwrap);
   }
 
   @protected
@@ -8174,6 +9069,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         color: var_color,
         eyeShape: var_eyeShape,
         dataModuleShape: var_dataModuleShape);
+  }
+
+  @protected
+  (List<ExchangeAsset>, bool) sse_decode_record_list_exchange_asset_bool(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_exchange_asset(deserializer);
+    var var_field1 = sse_decode_bool(deserializer);
+    return (var_field0, var_field1);
   }
 
   @protected
@@ -8288,6 +9192,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RelayCfg sse_decode_relay_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return RelayCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
+  RelayMeta sse_decode_relay_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_relay_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return RelayMeta(common: var_common, cfg: var_cfg, quote: var_quote);
+  }
+
+  @protected
   RequiredTxParamsInfo sse_decode_required_tx_params_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8346,6 +9269,55 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         productId: var_productId,
         productName: var_productName,
         modelId: var_modelId);
+  }
+
+  @protected
+  SunSwapCfg sse_decode_sun_swap_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return SunSwapCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
+  SunSwapMeta sse_decode_sun_swap_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_sun_swap_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return SunSwapMeta(common: var_common, cfg: var_cfg, quote: var_quote);
+  }
+
+  @protected
+  SwapAuth sse_decode_swap_auth(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_walletIndex = sse_decode_usize(deserializer);
+    var var_accountIndex = sse_decode_usize(deserializer);
+    var var_password = sse_decode_opt_String(deserializer);
+    var var_passphrase = sse_decode_opt_String(deserializer);
+    return SwapAuth(
+        walletIndex: var_walletIndex,
+        accountIndex: var_accountIndex,
+        password: var_password,
+        passphrase: var_passphrase);
+  }
+
+  @protected
+  SwapParams sse_decode_swap_params(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_provider = sse_decode_exchange_provider(deserializer);
+    var var_from = sse_decode_exchange_asset(deserializer);
+    var var_to = sse_decode_exchange_asset(deserializer);
+    var var_amountIn = sse_decode_String(deserializer);
+    var var_slippageBps = sse_decode_u_32(deserializer);
+    return SwapParams(
+        provider: var_provider,
+        from: var_from,
+        to: var_to,
+        amountIn: var_amountIn,
+        slippageBps: var_slippageBps);
   }
 
   @protected
@@ -8453,7 +9425,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_btc =
         sse_decode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
             deserializer);
-    var var_tron = sse_decode_opt_String(deserializer);
+    var var_tron =
+        sse_decode_opt_box_autoadd_transaction_request_tron(deserializer);
     var var_solana = sse_decode_opt_list_prim_u_8_strict(deserializer);
     return TransactionRequestInfo(
         metadata: var_metadata,
@@ -8488,11 +9461,185 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionRequestTron sse_decode_transaction_request_tron(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_visible = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_txId = sse_decode_opt_String(deserializer);
+    var var_rawData = sse_decode_tron_raw_data_info(deserializer);
+    var var_rawDataHex = sse_decode_String(deserializer);
+    return TransactionRequestTron(
+        visible: var_visible,
+        txId: var_txId,
+        rawData: var_rawData,
+        rawDataHex: var_rawDataHex);
+  }
+
+  @protected
   TransactionStatusInfo sse_decode_transaction_status_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return TransactionStatusInfo.values[inner];
+  }
+
+  @protected
+  TronContractInfo sse_decode_tron_contract_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_contractType = sse_decode_String(deserializer);
+    var var_typeUrl = sse_decode_String(deserializer);
+    var var_value = sse_decode_tron_contract_value(deserializer);
+    return TronContractInfo(
+        contractType: var_contractType, typeUrl: var_typeUrl, value: var_value);
+  }
+
+  @protected
+  TronContractValue sse_decode_tron_contract_value(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_toAddress = sse_decode_String(deserializer);
+        var var_amount = sse_decode_i_64(deserializer);
+        return TronContractValue_TransferContract(
+            ownerAddress: var_ownerAddress,
+            toAddress: var_toAddress,
+            amount: var_amount);
+      case 1:
+        var var_ownerAddress = sse_decode_opt_String(deserializer);
+        var var_contractAddress = sse_decode_opt_String(deserializer);
+        var var_callValue = sse_decode_opt_box_autoadd_i_64(deserializer);
+        var var_data = sse_decode_opt_String(deserializer);
+        var var_callTokenValue = sse_decode_opt_box_autoadd_i_64(deserializer);
+        var var_tokenId = sse_decode_opt_box_autoadd_i_64(deserializer);
+        return TronContractValue_TriggerSmartContract(
+            ownerAddress: var_ownerAddress,
+            contractAddress: var_contractAddress,
+            callValue: var_callValue,
+            data: var_data,
+            callTokenValue: var_callTokenValue,
+            tokenId: var_tokenId);
+      case 2:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_frozenBalance = sse_decode_i_64(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        return TronContractValue_FreezeBalanceV2Contract(
+            ownerAddress: var_ownerAddress,
+            frozenBalance: var_frozenBalance,
+            resource: var_resource);
+      case 3:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_WithdrawBalanceContract(
+            ownerAddress: var_ownerAddress);
+      case 4:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_unfreezeBalance = sse_decode_i_64(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        return TronContractValue_UnfreezeBalanceV2Contract(
+            ownerAddress: var_ownerAddress,
+            unfreezeBalance: var_unfreezeBalance,
+            resource: var_resource);
+      case 5:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_WithdrawExpireUnfreezeContract(
+            ownerAddress: var_ownerAddress);
+      case 6:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        var var_balance = sse_decode_i_64(deserializer);
+        var var_receiverAddress = sse_decode_String(deserializer);
+        var var_lock = sse_decode_bool(deserializer);
+        var var_lockPeriod = sse_decode_i_64(deserializer);
+        return TronContractValue_DelegateResourceContract(
+            ownerAddress: var_ownerAddress,
+            resource: var_resource,
+            balance: var_balance,
+            receiverAddress: var_receiverAddress,
+            lock: var_lock,
+            lockPeriod: var_lockPeriod);
+      case 7:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_resource = sse_decode_i_32(deserializer);
+        var var_balance = sse_decode_i_64(deserializer);
+        var var_receiverAddress = sse_decode_String(deserializer);
+        return TronContractValue_UnDelegateResourceContract(
+            ownerAddress: var_ownerAddress,
+            resource: var_resource,
+            balance: var_balance,
+            receiverAddress: var_receiverAddress);
+      case 8:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_CancelAllUnfreezeV2Contract(
+            ownerAddress: var_ownerAddress);
+      case 9:
+        var var_assetName = sse_decode_String(deserializer);
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_toAddress = sse_decode_String(deserializer);
+        var var_amount = sse_decode_i_64(deserializer);
+        return TronContractValue_TransferAssetContract(
+            assetName: var_assetName,
+            ownerAddress: var_ownerAddress,
+            toAddress: var_toAddress,
+            amount: var_amount);
+      case 10:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_votes = sse_decode_list_tron_vote_info(deserializer);
+        var var_support = sse_decode_bool(deserializer);
+        return TronContractValue_VoteWitnessContract(
+            ownerAddress: var_ownerAddress,
+            votes: var_votes,
+            support: var_support);
+      case 11:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_accountAddress = sse_decode_String(deserializer);
+        return TronContractValue_AccountCreateContract(
+            ownerAddress: var_ownerAddress, accountAddress: var_accountAddress);
+      case 12:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        var var_accountName = sse_decode_String(deserializer);
+        return TronContractValue_AccountUpdateContract(
+            ownerAddress: var_ownerAddress, accountName: var_accountName);
+      case 13:
+        var var_ownerAddress = sse_decode_String(deserializer);
+        return TronContractValue_AccountPermissionUpdateContract(
+            ownerAddress: var_ownerAddress);
+      case 14:
+        var var_typeUrl = sse_decode_String(deserializer);
+        var var_valueJson = sse_decode_String(deserializer);
+        return TronContractValue_Unknown(
+            typeUrl: var_typeUrl, valueJson: var_valueJson);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  TronRawDataInfo sse_decode_tron_raw_data_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_contract = sse_decode_list_tron_contract_info(deserializer);
+    var var_refBlockBytes = sse_decode_String(deserializer);
+    var var_refBlockHash = sse_decode_String(deserializer);
+    var var_expiration = sse_decode_i_64(deserializer);
+    var var_feeLimit = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_timestamp = sse_decode_i_64(deserializer);
+    return TronRawDataInfo(
+        contract: var_contract,
+        refBlockBytes: var_refBlockBytes,
+        refBlockHash: var_refBlockHash,
+        expiration: var_expiration,
+        feeLimit: var_feeLimit,
+        timestamp: var_timestamp);
+  }
+
+  @protected
+  TronVoteInfo sse_decode_tron_vote_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_voteAddress = sse_decode_String(deserializer);
+    var var_voteCount = sse_decode_i_64(deserializer);
+    return TronVoteInfo(voteAddress: var_voteAddress, voteCount: var_voteCount);
   }
 
   @protected
@@ -8546,10 +9693,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UniswapCfg sse_decode_uniswap_cfg(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_defaultSlippageBps = sse_decode_u_32(deserializer);
+    var var_supportsPriceProtection = sse_decode_bool(deserializer);
+    return UniswapCfg(
+        defaultSlippageBps: var_defaultSlippageBps,
+        supportsPriceProtection: var_supportsPriceProtection);
+  }
+
+  @protected
   UniswapMeta sse_decode_uniswap_meta(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_chainId = sse_decode_u_64(deserializer);
-    return UniswapMeta(chainId: var_chainId);
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_cfg = sse_decode_uniswap_cfg(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return UniswapMeta(common: var_common, cfg: var_cfg, quote: var_quote);
   }
 
   @protected
@@ -8659,6 +9818,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         maxConnections: var_maxConnections,
         requestTimeoutSecs: var_requestTimeoutSecs,
         ratesApiOptions: var_ratesApiOptions);
+  }
+
+  @protected
+  ZilSwapMeta sse_decode_zil_swap_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    return ZilSwapMeta(common: var_common, quote: var_quote);
   }
 
   @protected
@@ -8996,6 +10163,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_exchange_tx_display(
+      ExchangeTxDisplay self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_exchange_tx_display(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_f_32(self, serializer);
@@ -9022,6 +10196,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_i_64(
+      PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9033,6 +10214,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_network_config_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_pancake_meta(
+      PancakeMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_pancake_meta(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_plunder_meta(
+      PlunderMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_plunder_meta(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_provider_quote(
+      ProviderQuote self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_quote(self, serializer);
   }
 
   @protected
@@ -9052,10 +10254,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_relay_meta(
+      RelayMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_relay_meta(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_required_tx_params_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_sun_swap_meta(
+      SunSwapMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_sun_swap_meta(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_swap_auth(
+      SwapAuth self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_swap_auth(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_swap_params(
+      SwapParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_swap_params(self, serializer);
   }
 
   @protected
@@ -9094,6 +10324,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_request_tron(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self, serializer);
@@ -9111,6 +10348,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       WalletSettingsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_wallet_settings_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_zil_swap_meta(
+      ZilSwapMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_zil_swap_meta(self, serializer);
   }
 
   @protected
@@ -9218,28 +10462,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ExchangeProvider self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case ExchangeProvider_Thorchain(field0: final field0):
+      case ExchangeProvider_Relay(field0: final field0):
         sse_encode_i_32(0, serializer);
-        sse_encode_u_64(field0, serializer);
+        sse_encode_box_autoadd_relay_meta(field0, serializer);
       case ExchangeProvider_Uniswap(field0: final field0):
         sse_encode_i_32(1, serializer);
         sse_encode_box_autoadd_uniswap_meta(field0, serializer);
-      case ExchangeProvider_ZIlSwap(field0: final field0):
+      case ExchangeProvider_PancakeSwap(field0: final field0):
         sse_encode_i_32(2, serializer);
-        sse_encode_u_64(field0, serializer);
-      case ExchangeProvider_SunSwap(field0: final field0):
+        sse_encode_box_autoadd_pancake_meta(field0, serializer);
+      case ExchangeProvider_PlunderSwap(field0: final field0):
         sse_encode_i_32(3, serializer);
-        sse_encode_u_64(field0, serializer);
+        sse_encode_box_autoadd_plunder_meta(field0, serializer);
+      case ExchangeProvider_ZilSwap(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_box_autoadd_zil_swap_meta(field0, serializer);
+      case ExchangeProvider_SunSwap(field0: final field0):
+        sse_encode_i_32(5, serializer);
+        sse_encode_box_autoadd_sun_swap_meta(field0, serializer);
     }
   }
 
   @protected
-  void sse_encode_exchange_quote_info(
-      ExchangeQuoteInfo self, SseSerializer serializer) {
+  void sse_encode_exchange_tx_display(
+      ExchangeTxDisplay self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_exchange_provider(self.provider, serializer);
-    sse_encode_String(self.amountOut, serializer);
-    sse_encode_opt_String(self.permitTypedDataJson, serializer);
+    sse_encode_String(self.swapTitle, serializer);
+    sse_encode_String(self.swapInfo, serializer);
+    sse_encode_String(self.approveTitle, serializer);
+    sse_encode_String(self.permitTitle, serializer);
+    sse_encode_opt_box_autoadd_base_token_info(self.outToken, serializer);
   }
 
   @protected
@@ -9479,16 +10731,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_exchange_provider(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_exchange_quote_info(
-      List<ExchangeQuoteInfo> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_exchange_quote_info(item, serializer);
     }
   }
 
@@ -9743,6 +10985,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_tron_contract_info(
+      List<TronContractInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tron_contract_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_tron_vote_info(
+      List<TronVoteInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_tron_vote_info(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_tx_in_info(
       List<TxInInfo> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -9933,6 +11195,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_i_64(
+      PlatformInt64? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_i_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_provider_quote(
+      ProviderQuote? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_provider_quote(self, serializer);
+    }
+  }
+
+  @protected
   void
       sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
           (TransactionBitcoin, BitcoinMetadataInfo)? self,
@@ -9991,6 +11275,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_transaction_request_tron(
+      TransactionRequestTron? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_request_tron(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -10041,12 +11336,70 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_pancake_cfg(PancakeCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
+  void sse_encode_pancake_meta(PancakeMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_pancake_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
+  }
+
+  @protected
   void sse_encode_pending_withdrawal_info(
       PendingWithdrawalInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.amount, serializer);
     sse_encode_u_64(self.withdrawalBlock, serializer);
     sse_encode_bool(self.claimable, serializer);
+  }
+
+  @protected
+  void sse_encode_plunder_cfg(PlunderCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
+  void sse_encode_plunder_meta(PlunderMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_plunder_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
+  }
+
+  @protected
+  void sse_encode_prepared_swap_info(
+      PreparedSwapInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.permitTypedDataJson, serializer);
+    sse_encode_String(self.quoteBlob, serializer);
+  }
+
+  @protected
+  void sse_encode_provider_common(
+      ProviderCommon self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_64(self.chainId, serializer);
+    sse_encode_u_32(self.slip44, serializer);
+    sse_encode_String(self.accountAddr, serializer);
+    sse_encode_String(self.iconAsset, serializer);
+    sse_encode_String(self.displayName, serializer);
+  }
+
+  @protected
+  void sse_encode_provider_quote(ProviderQuote self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.amountOut, serializer);
+    sse_encode_opt_String(self.permitTypedDataJson, serializer);
+    sse_encode_bool(self.isWrapUnwrap, serializer);
   }
 
   @protected
@@ -10067,6 +11420,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_32(self.color, serializer);
     sse_encode_u_8(self.eyeShape, serializer);
     sse_encode_u_8(self.dataModuleShape, serializer);
+  }
+
+  @protected
+  void sse_encode_record_list_exchange_asset_bool(
+      (List<ExchangeAsset>, bool) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_exchange_asset(self.$1, serializer);
+    sse_encode_bool(self.$2, serializer);
   }
 
   @protected
@@ -10168,6 +11529,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_relay_cfg(RelayCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
+  void sse_encode_relay_meta(RelayMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_relay_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
+  }
+
+  @protected
   void sse_encode_required_tx_params_info(
       RequiredTxParamsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -10203,6 +11579,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_16(self.productId, serializer);
     sse_encode_String(self.productName, serializer);
     sse_encode_String(self.modelId, serializer);
+  }
+
+  @protected
+  void sse_encode_sun_swap_cfg(SunSwapCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
+  void sse_encode_sun_swap_meta(SunSwapMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_sun_swap_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
+  }
+
+  @protected
+  void sse_encode_swap_auth(SwapAuth self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.walletIndex, serializer);
+    sse_encode_usize(self.accountIndex, serializer);
+    sse_encode_opt_String(self.password, serializer);
+    sse_encode_opt_String(self.passphrase, serializer);
+  }
+
+  @protected
+  void sse_encode_swap_params(SwapParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_exchange_provider(self.provider, serializer);
+    sse_encode_exchange_asset(self.from, serializer);
+    sse_encode_exchange_asset(self.to, serializer);
+    sse_encode_String(self.amountIn, serializer);
+    sse_encode_u_32(self.slippageBps, serializer);
   }
 
   @protected
@@ -10271,7 +11681,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
     sse_encode_opt_box_autoadd_record_transaction_bitcoin_bitcoin_metadata_info(
         self.btc, serializer);
-    sse_encode_opt_String(self.tron, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_tron(self.tron, serializer);
     sse_encode_opt_list_prim_u_8_strict(self.solana, serializer);
   }
 
@@ -10290,10 +11700,185 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_transaction_request_tron(
+      TransactionRequestTron self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_bool(self.visible, serializer);
+    sse_encode_opt_String(self.txId, serializer);
+    sse_encode_tron_raw_data_info(self.rawData, serializer);
+    sse_encode_String(self.rawDataHex, serializer);
+  }
+
+  @protected
   void sse_encode_transaction_status_info(
       TransactionStatusInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_contract_info(
+      TronContractInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.contractType, serializer);
+    sse_encode_String(self.typeUrl, serializer);
+    sse_encode_tron_contract_value(self.value, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_contract_value(
+      TronContractValue self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case TronContractValue_TransferContract(
+          ownerAddress: final ownerAddress,
+          toAddress: final toAddress,
+          amount: final amount
+        ):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(toAddress, serializer);
+        sse_encode_i_64(amount, serializer);
+      case TronContractValue_TriggerSmartContract(
+          ownerAddress: final ownerAddress,
+          contractAddress: final contractAddress,
+          callValue: final callValue,
+          data: final data,
+          callTokenValue: final callTokenValue,
+          tokenId: final tokenId
+        ):
+        sse_encode_i_32(1, serializer);
+        sse_encode_opt_String(ownerAddress, serializer);
+        sse_encode_opt_String(contractAddress, serializer);
+        sse_encode_opt_box_autoadd_i_64(callValue, serializer);
+        sse_encode_opt_String(data, serializer);
+        sse_encode_opt_box_autoadd_i_64(callTokenValue, serializer);
+        sse_encode_opt_box_autoadd_i_64(tokenId, serializer);
+      case TronContractValue_FreezeBalanceV2Contract(
+          ownerAddress: final ownerAddress,
+          frozenBalance: final frozenBalance,
+          resource: final resource
+        ):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_64(frozenBalance, serializer);
+        sse_encode_i_32(resource, serializer);
+      case TronContractValue_WithdrawBalanceContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_UnfreezeBalanceV2Contract(
+          ownerAddress: final ownerAddress,
+          unfreezeBalance: final unfreezeBalance,
+          resource: final resource
+        ):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_64(unfreezeBalance, serializer);
+        sse_encode_i_32(resource, serializer);
+      case TronContractValue_WithdrawExpireUnfreezeContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(5, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_DelegateResourceContract(
+          ownerAddress: final ownerAddress,
+          resource: final resource,
+          balance: final balance,
+          receiverAddress: final receiverAddress,
+          lock: final lock,
+          lockPeriod: final lockPeriod
+        ):
+        sse_encode_i_32(6, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_32(resource, serializer);
+        sse_encode_i_64(balance, serializer);
+        sse_encode_String(receiverAddress, serializer);
+        sse_encode_bool(lock, serializer);
+        sse_encode_i_64(lockPeriod, serializer);
+      case TronContractValue_UnDelegateResourceContract(
+          ownerAddress: final ownerAddress,
+          resource: final resource,
+          balance: final balance,
+          receiverAddress: final receiverAddress
+        ):
+        sse_encode_i_32(7, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_i_32(resource, serializer);
+        sse_encode_i_64(balance, serializer);
+        sse_encode_String(receiverAddress, serializer);
+      case TronContractValue_CancelAllUnfreezeV2Contract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(8, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_TransferAssetContract(
+          assetName: final assetName,
+          ownerAddress: final ownerAddress,
+          toAddress: final toAddress,
+          amount: final amount
+        ):
+        sse_encode_i_32(9, serializer);
+        sse_encode_String(assetName, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(toAddress, serializer);
+        sse_encode_i_64(amount, serializer);
+      case TronContractValue_VoteWitnessContract(
+          ownerAddress: final ownerAddress,
+          votes: final votes,
+          support: final support
+        ):
+        sse_encode_i_32(10, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_list_tron_vote_info(votes, serializer);
+        sse_encode_bool(support, serializer);
+      case TronContractValue_AccountCreateContract(
+          ownerAddress: final ownerAddress,
+          accountAddress: final accountAddress
+        ):
+        sse_encode_i_32(11, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(accountAddress, serializer);
+      case TronContractValue_AccountUpdateContract(
+          ownerAddress: final ownerAddress,
+          accountName: final accountName
+        ):
+        sse_encode_i_32(12, serializer);
+        sse_encode_String(ownerAddress, serializer);
+        sse_encode_String(accountName, serializer);
+      case TronContractValue_AccountPermissionUpdateContract(
+          ownerAddress: final ownerAddress
+        ):
+        sse_encode_i_32(13, serializer);
+        sse_encode_String(ownerAddress, serializer);
+      case TronContractValue_Unknown(
+          typeUrl: final typeUrl,
+          valueJson: final valueJson
+        ):
+        sse_encode_i_32(14, serializer);
+        sse_encode_String(typeUrl, serializer);
+        sse_encode_String(valueJson, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_tron_raw_data_info(
+      TronRawDataInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_tron_contract_info(self.contract, serializer);
+    sse_encode_String(self.refBlockBytes, serializer);
+    sse_encode_String(self.refBlockHash, serializer);
+    sse_encode_i_64(self.expiration, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.feeLimit, serializer);
+    sse_encode_i_64(self.timestamp, serializer);
+  }
+
+  @protected
+  void sse_encode_tron_vote_info(TronVoteInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.voteAddress, serializer);
+    sse_encode_i_64(self.voteCount, serializer);
   }
 
   @protected
@@ -10339,9 +11924,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_uniswap_cfg(UniswapCfg self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.defaultSlippageBps, serializer);
+    sse_encode_bool(self.supportsPriceProtection, serializer);
+  }
+
+  @protected
   void sse_encode_uniswap_meta(UniswapMeta self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_u_64(self.chainId, serializer);
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_uniswap_cfg(self.cfg, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
   }
 
   @protected
@@ -10415,6 +12009,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
     sse_encode_u_8(self.ratesApiOptions, serializer);
+  }
+
+  @protected
+  void sse_encode_zil_swap_meta(ZilSwapMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
   }
 }
 

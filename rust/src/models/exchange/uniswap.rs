@@ -1,533 +1,123 @@
-//! Internal Uniswap layer backed by the Uniswap **Trading API**
-//! (`https://trade-api.gateway.uniswap.org/v1`). Nothing here crosses the
-//! flutter_rust_bridge boundary: every item is `#[frb(ignore)]`. The API gives full
-//! v2/v3/v4 routing on every Uniswap-supported chain plus cross-chain `BRIDGE` routing.
-//!
-//! Flow: `/quote` (routing + optional Permit2 `permitData`) → sign the permit EIP-712
-//! internally → `/swap` (unsigned router/bridge calldata) → lift into the FFI tx, which
-//! the UI signs and broadcasts via the existing `sign_send_transactions`.
+//! Uniswap deployment table. The actual quoting/swap-building logic lives in the shared
+//! [`super::univ_router`] engine; this module only maps a source `chain_id` to Uniswap's
+//! Universal Router + QuoterV2 + Permit2 + WETH addresses and its V3 fee tiers.
 
-use std::borrow::Cow;
-use std::collections::HashSet;
 use std::str::FromStr;
 
 use flutter_rust_bridge::frb;
-use zilpay::alloy::hex;
-use zilpay::alloy::primitives::{Address, U256};
-use zilpay::background::bg_provider::ProvidersManagement;
-use zilpay::background::bg_wallet::WalletManagement;
-use zilpay::proto::tx::{ETHTransactionRequest, TransactionMetadata, TransactionRequest};
-use zilpay::proto::AlloyTxKind;
-use zilpay::reqwest::Client;
-use zilpay::serde_json::{json, Map, Value};
-use zilpay::wallet::wallet_storage::StorageOperations;
+use zilpay::alloy::primitives::Address;
 
-use super::{ExchangeAsset, ExchangeProvider, ExchangeQuoteInfo};
-use crate::models::transactions::request::TransactionRequestInfo;
-use crate::service::background::BACKGROUND_SERVICE;
-use crate::utils::errors::ServiceError;
+use super::univ_router::{RouterAddrs, RouterConfig};
+use super::{ProviderCommon, ProviderQuote};
 
-const TRADING_API_BASE: &str = "https://trade-api.gateway.uniswap.org/v1";
-// Temporary shared test key — to be replaced by our hosted backend so the key is never
-// shipped in the binary (the backend injects it and can also enable the platform fee).
-const TRADING_API_KEY: &str = "UnUgzBC9Jsu3ulMJGnIn_enFSPKRj-VReeNCf9HlV-U";
-const ROUTER_VERSION: &str = "2.0";
+/// Uniswap V3 fee tiers (bips * 100): 0.01% / 0.05% / 0.30% / 1.00%.
+pub const UNISWAP_FEE_TIERS: &[u32] = &[100, 500, 3000, 10000];
 
-/// Native-input sentinel: the API recommends the zero address for native ETH input — it
-/// returns `permitData: null` (no Permit2 signing) and carries the amount as `swap.value`.
-const NATIVE_SENTINEL: &str = "0x0000000000000000000000000000000000000000";
+/// Canonical Permit2, identical on every Uniswap chain.
+const PERMIT2: &str = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 
-/// Chains the Trading API can route on. Source of truth is the API itself (it 400s on
-/// anything else); this only gates whether the UI offers a Uniswap provider for an asset.
-/// IDs verified against the gateway's `tokenOutChainId` enum.
-const SUPPORTED_CHAINS: &[u64] = &[
-    // mainnets
-    1, 10, 56, 130, 137, 143, 196, 324, 480, 1868, 4217, 4326, 8453,
-    42161, 42220, 43114, 59144, 81457, 7777777,
-    // testnets
-    1301,     // Unichain Sepolia
-    11155111, // Sepolia
-    84532,    // Base Sepolia
-];
+/// Chains the Universal Router is deployed on.
+const SUPPORTED_CHAINS: &[u64] = &[1, 10, 56, 137, 8453, 42161];
 
 #[frb(ignore)]
 pub fn is_supported_chain(chain_id: u64) -> bool {
     SUPPORTED_CHAINS.contains(&chain_id)
 }
 
-/// FFI-safe Uniswap marker. Only the source chain id is needed — the Trading API resolves
-/// routers, pools and routing itself. Carried inside [`ExchangeProvider::Uniswap`].
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy)]
+pub struct UniswapCfg {
+    pub default_slippage_bps: u32,
+    pub supports_price_protection: bool,
+}
+
+impl UniswapCfg {
+    pub const fn default() -> Self {
+        Self {
+            default_slippage_bps: 50,
+            supports_price_protection: true,
+        }
+    }
+}
+
+/// FFI-safe Uniswap metadata. Quote data is mutable route state and is excluded from identity.
+#[derive(Debug, Clone)]
 pub struct UniswapMeta {
-    pub chain_id: u64,
+    pub common: ProviderCommon,
+    pub cfg: UniswapCfg,
+    pub quote: Option<ProviderQuote>,
 }
 
 impl UniswapMeta {
-    /// `Some` iff the Trading API supports `chain_id`. Gates `ExchangeProvider::is_support`.
+    /// `Some` iff `chain_id` has Universal Router + QuoterV2 deployments.
     #[frb(ignore)]
-    pub fn for_chain(chain_id: u64) -> Option<Self> {
-        is_supported_chain(chain_id).then_some(Self { chain_id })
-    }
-}
-
-/// Single POST against the Trading API — the one place request headers/error handling live.
-#[frb(ignore)]
-async fn trading_api_post(client: &Client, path: &str, body: &Value) -> Result<Value, String> {
-    let url = format!("{TRADING_API_BASE}{path}");
-    dbg!("trading_api_post: REQUEST", &url, body);
-
-    let resp = client
-        .post(&url)
-        .header("Content-Type", "application/json")
-        .header("x-api-key", TRADING_API_KEY)
-        .header("x-universal-router-version", ROUTER_VERSION)
-        .json(body)
-        .send()
-        .await
-        .map_err(|e| {
-            dbg!("trading_api_post: HTTP error", &e.to_string());
-            e.to_string()
-        })?;
-
-    let status = resp.status();
-    let text = resp.text().await.map_err(|e| e.to_string())?;
-    dbg!("trading_api_post: RESPONSE", status.as_u16(), &text);
-
-    if !status.is_success() {
-        return Err(format!("trading-api {path} {status}: {text}"));
-    }
-    zilpay::serde_json::from_str(&text).map_err(|e| e.to_string())
-}
-
-/// Parse the output side of a quote: `"<chainId>:0xaddr"` carries a bridge target chain,
-/// plain `"0xaddr"` stays on the source chain. Borrowed → no extra allocation.
-#[frb(ignore)]
-fn parse_out<'a>(to_asset: &'a str, source_chain: u64) -> (u64, Cow<'a, str>) {
-    match to_asset.split_once(':') {
-        Some((chain, addr)) if !chain.is_empty() && chain.bytes().all(|b| b.is_ascii_digit()) => {
-            (chain.parse().unwrap_or(source_chain), Cow::Borrowed(addr))
-        }
-        _ => (source_chain, Cow::Borrowed(to_asset)),
-    }
-}
-
-/// The input token as the API wants it: zero sentinel for native, else the ERC-20 address.
-#[frb(ignore)]
-fn input_token(is_native_in: bool, token: &str) -> Cow<'_, str> {
-    if is_native_in {
-        Cow::Borrowed(NATIVE_SENTINEL)
-    } else {
-        Cow::Borrowed(token)
-    }
-}
-
-/// `/quote` body. `protocols` (no `routingPreference`) keeps routing on-chain: `CLASSIC`
-/// same-chain, `BRIDGE` cross-chain — both return broadcastable calldata. Gasless UniswapX
-/// (DUTCH/PRIORITY) is intentionally excluded since it has no on-chain tx to broadcast.
-//
-// Platform fee: the documented `portionBips`/`portionRecipient` are silently ignored by the
-// shared test key, so no fee is taken here. The hosted backend will apply it server-side.
-#[frb(ignore)]
-fn quote_body(
-    swapper: &str,
-    token_in: &str,
-    token_out: &str,
-    in_chain: u64,
-    out_chain: u64,
-    amount: &str,
-    slippage_bps: u32,
-) -> Value {
-    json!({
-        "swapper": swapper,
-        "tokenIn": token_in,
-        "tokenOut": token_out,
-        "tokenInChainId": in_chain,
-        "tokenOutChainId": out_chain,
-        "amount": amount,
-        "type": "EXACT_INPUT",
-        "slippageTolerance": f64::from(slippage_bps) / 100.0,
-        "protocols": ["V2", "V3", "V4"],
-    })
-}
-
-/// `quote.output.amount` (present for CLASSIC and BRIDGE routings alike).
-#[frb(ignore)]
-fn output_amount(resp: &Value) -> Result<String, String> {
-    resp.get("quote")
-        .and_then(|q| q.get("output"))
-        .and_then(|o| o.get("amount"))
-        .and_then(Value::as_str)
-        .map(str::to_owned)
-        .ok_or_else(|| "quote.output.amount missing".to_string())
-}
-
-/// Borrow the non-null `permitData` from a quote response, if any.
-#[frb(ignore)]
-fn permit_value(resp: &Value) -> Option<&Value> {
-    resp.get("permitData").filter(|v| !v.is_null())
-}
-
-/// Convert the API `permitData` (`{domain, types, values}`) into the standard EIP-712
-/// typed-data JSON our signer consumes (`{types(+EIP712Domain), primaryType, domain,
-/// message}`). `primaryType` is inferred as the root struct (the one no field references),
-/// so this stays generic over the permit shape.
-#[frb(ignore)]
-fn permit_to_typed_data(permit: &Value) -> Result<String, String> {
-    let obj = permit.as_object().ok_or("permitData is not an object")?;
-    let domain = obj.get("domain").ok_or("permitData.domain missing")?;
-    let types = obj
-        .get("types")
-        .and_then(Value::as_object)
-        .ok_or("permitData.types missing")?;
-    let message = obj.get("values").ok_or("permitData.values missing")?;
-
-    let mut referenced: HashSet<&str> = HashSet::with_capacity(types.len());
-    for fields in types.values() {
-        let Some(arr) = fields.as_array() else { continue };
-        for f in arr {
-            if let Some(t) = f.get("type").and_then(Value::as_str) {
-                referenced.insert(t.trim_end_matches("[]"));
-            }
-        }
-    }
-    let primary = types
-        .keys()
-        .map(String::as_str)
-        .find(|k| *k != "EIP712Domain" && !referenced.contains(k))
-        .ok_or("cannot infer primaryType")?;
-
-    // Match the EIP-712 shape the signer already accepts: inject EIP712Domain in canonical
-    // field order from whichever domain keys are present.
-    let mut types_out = types.clone();
-    if !types_out.contains_key("EIP712Domain") {
-        if let Some(dom) = domain.as_object() {
-            let mut entries: Vec<Value> = Vec::with_capacity(dom.len());
-            for (key, ty) in [
-                ("name", "string"),
-                ("version", "string"),
-                ("chainId", "uint256"),
-                ("verifyingContract", "address"),
-                ("salt", "bytes32"),
-            ] {
-                if dom.contains_key(key) {
-                    entries.push(json!({ "name": key, "type": ty }));
-                }
-            }
-            types_out.insert("EIP712Domain".to_string(), Value::Array(entries));
-        }
-    }
-
-    Ok(json!({
-        "types": Value::Object(types_out),
-        "primaryType": primary,
-        "domain": domain,
-        "message": message,
-    })
-    .to_string())
-}
-
-/// Build the `/swap` body: spread the quote response, stripping `permitData`/
-/// `permitTransaction`, and (for routings that carry a Permit2 authorization) re-attach the
-/// **original** `permitData` together with its `signature` — both present or both absent.
-#[frb(ignore)]
-fn build_swap_body(quote_resp: &Value, signature: Option<&str>) -> Result<Value, String> {
-    let mut obj: Map<String, Value> = quote_resp
-        .as_object()
-        .ok_or("quote response is not an object")?
-        .clone();
-    let permit = obj.remove("permitData");
-    obj.remove("permitTransaction");
-    obj.remove("requestId");
-
-    if let (Some(sig), Some(pd)) = (signature, permit) {
-        if !pd.is_null() {
-            obj.insert("signature".to_string(), Value::String(sig.to_owned()));
-            obj.insert("permitData".to_string(), pd);
-        }
-    }
-    Ok(Value::Object(obj))
-}
-
-/// Decimal-or-hex u64 (`gasLimit` is a JSON number; tolerate a hex string too).
-#[frb(ignore)]
-fn as_u64(v: &Value) -> Option<u64> {
-    v.as_u64()
-        .or_else(|| v.as_str().and_then(|s| s.parse().ok()))
-        .or_else(|| {
-            v.as_str()
-                .and_then(|s| u64::from_str_radix(s.strip_prefix("0x")?, 16).ok())
+    pub fn for_chain(
+        chain_hash: u64,
+        chain_id: u64,
+        slip44: u32,
+        account_addr: &str,
+    ) -> Option<Self> {
+        is_supported_chain(chain_id).then(|| Self {
+            common: ProviderCommon {
+                chain_hash,
+                chain_id,
+                slip44,
+                account_addr: account_addr.to_owned(),
+                icon_asset: "assets/icons/uniswap.svg".to_owned(),
+                display_name: "Uniswap".to_owned(),
+            },
+            cfg: UniswapCfg::default(),
+            quote: None,
         })
-}
-
-/// `swap.value` arrives as a `0x` hex string; everything else is a decimal amount string.
-#[frb(ignore)]
-fn parse_hex_u256(s: &str) -> Result<U256, String> {
-    let t = s.strip_prefix("0x").unwrap_or(s);
-    if t.is_empty() {
-        return Ok(U256::ZERO);
-    }
-    U256::from_str_radix(t, 16).map_err(|e| e.to_string())
-}
-
-/// Lift a Trading-API tx object (`{to, data, value, chainId, gasLimit}` — the shape shared by
-/// `/swap` and `/check_approval`) into the FFI tx. `swapper`/`chain_hash` set the signer and
-/// the broadcasting network; `broadcast: true` matches the existing swap flow.
-#[frb(ignore)]
-fn json_obj_to_eth_tx(
-    obj: &Value,
-    swapper: Address,
-    chain_hash: u64,
-) -> Result<TransactionRequestInfo, String> {
-    let to = obj.get("to").and_then(Value::as_str).ok_or("tx.to missing")?;
-    let data = obj
-        .get("data")
-        .and_then(Value::as_str)
-        .ok_or("tx.data missing")?;
-    if data.is_empty() || data == "0x" {
-        return Err("tx.data empty — quote expired, refetch".to_string());
     }
 
-    let value = parse_hex_u256(obj.get("value").and_then(Value::as_str).unwrap_or("0x0"))?;
-    let input = hex::decode(data.strip_prefix("0x").unwrap_or(data)).map_err(|e| e.to_string())?;
+    /// Parse the deployment table into the engine's [`RouterConfig`].
+    #[frb(ignore)]
+    pub fn resolve(&self) -> Result<RouterConfig, String> {
+        let (universal_router, quoter_v2, weth) = match self.common.chain_id {
+            1 => (
+                "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            ),
+            10 => (
+                "0x851116D9223fabED8E56C0E6b8Ad0c31d98b3507",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            56 => (
+                "0x1906c1d672b88cd1b9ac7593301ca990f94eae07",
+                "0x78D78E420Da98ad378D7799bE8f4AF69033EB077",
+                "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            ),
+            137 => (
+                "0x1095692A6237d83C6a72F3F5eFEdb9A670C49223",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+            ),
+            8453 => (
+                "0x6fF5693b99212Da76ad316178A184AB56D299b43",
+                "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
+                "0x4200000000000000000000000000000000000006",
+            ),
+            42161 => (
+                "0xA51afAFe0263b40EdaEf0Df8781eA9aa03E381a3",
+                "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+                "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+            ),
+            _ => return Err("unsupported chain".to_string()),
+        };
 
-    let mut tx = ETHTransactionRequest {
-        to: Some(AlloyTxKind::Call(
-            Address::from_str(to).map_err(|e| e.to_string())?,
-        )),
-        from: Some(swapper),
-        value: Some(value),
-        input: input.into(),
-        gas: obj.get("gasLimit").and_then(as_u64),
-        ..Default::default()
-    };
-    tx.chain_id = obj.get("chainId").and_then(as_u64);
-
-    Ok(TransactionRequest::Ethereum((
-        tx,
-        TransactionMetadata {
-            chain_hash,
-            broadcast: true,
-            ..Default::default()
-        },
-    ))
-    .into())
-}
-
-/// Validate the `/swap` response and lift its `swap` object into the FFI tx.
-#[frb(ignore)]
-fn swap_response_to_tx(
-    resp: &Value,
-    swapper: Address,
-    chain_hash: u64,
-) -> Result<TransactionRequestInfo, String> {
-    let swap = resp.get("swap").ok_or("swap field missing")?;
-    json_obj_to_eth_tx(swap, swapper, chain_hash)
-}
-
-/// Resolve the signer address and the source chain_hash (the chain that broadcasts) under one
-/// short read guard. Shared by the build and approval paths — `chain_id` is the source chain.
-#[frb(ignore)]
-async fn resolve_signer(
-    wallet_index: usize,
-    account_index: usize,
-    chain_id: u64,
-) -> Result<(Address, u64), String> {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let chain_hash = service
-        .core
-        .get_providers()
-        .into_iter()
-        .find(|p| p.config.chain_id() == chain_id)
-        .map(|p| p.config.hash())
-        .ok_or_else(|| "source chain provider not found".to_string())?;
-    let wallet = service
-        .core
-        .get_wallet_by_index(wallet_index)
-        .map_err(ServiceError::BackgroundError)?;
-    let data = wallet
-        .get_wallet_data()
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    let account = data
-        .get_account(account_index)
-        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-    Ok((account.addr.to_alloy_addr(), chain_hash))
-}
-
-/// Quote orchestration for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::fetch_exchange_quote`: hit `/quote` and surface the output amount
-/// plus the Permit2 typed data to sign (for ERC-20 inputs on routings that use Permit2).
-#[frb(ignore)]
-pub async fn uniswap_quote_info(
-    meta: &UniswapMeta,
-    asset: &ExchangeAsset,
-    from_asset: &str,
-    to_asset: &str,
-    amount: &str,
-    destination: &str,
-) -> Result<ExchangeQuoteInfo, String> {
-    let in_chain = meta.chain_id;
-    let (out_chain, tout) = parse_out(to_asset, in_chain);
-    let tin = input_token(asset.token.native, from_asset);
-
-    dbg!("uniswap_quote_info: params",
-        in_chain,
-        out_chain,
-        &*tin,
-        &*tout,
-        amount,
-        destination,
-        asset.token.native,
-        from_asset,
-        to_asset,
-    );
-
-    let client = Client::new();
-    let body = quote_body(destination, &tin, &tout, in_chain, out_chain, amount, 50);
-    let resp = trading_api_post(&client, "/quote", &body).await?;
-
-    dbg!("uniswap_quote_info: got response", &resp.get("routing"), &resp.get("quote").and_then(|q| q.get("output").and_then(|o| o.get("amount"))));
-
-    let amount_out = output_amount(&resp)?;
-    let permit_typed_data_json = match permit_value(&resp) {
-        Some(pd) => {
-            dbg!("uniswap_quote_info: permitData present, converting to typed data");
-            Some(permit_to_typed_data(pd)?)
-        }
-        None => {
-            dbg!("uniswap_quote_info: no permitData (native input or routing without Permit2)");
-            None
-        }
-    };
-
-    dbg!("uniswap_quote_info: SUCCESS", &amount_out, permit_typed_data_json.is_some());
-
-    Ok(ExchangeQuoteInfo {
-        provider: ExchangeProvider::Uniswap(meta.clone()),
-        amount_out,
-        permit_typed_data_json,
-    })
-}
-
-/// Tx-build orchestration for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::build_exchange_tx`. Re-quotes for freshness (quotes expire in
-/// ~30-60s), signs the Permit2 EIP-712 internally when present, calls `/swap`, then returns
-/// the unsigned tx for the UI to sign+broadcast.
-#[frb(ignore)]
-#[allow(clippy::too_many_arguments)]
-pub async fn build_uniswap_tx_info(
-    wallet_index: usize,
-    account_index: usize,
-    meta: &UniswapMeta,
-    token_in: String,
-    token_out: String,
-    amount_in: String,
-    slippage_bps: u32,
-    is_native_in: bool,
-    password: Option<String>,
-    passphrase: Option<String>,
-) -> Result<TransactionRequestInfo, String> {
-    let in_chain = meta.chain_id;
-    let (out_chain, tout) = parse_out(&token_out, in_chain);
-    let tin = input_token(is_native_in, &token_in);
-
-    dbg!("build_uniswap_tx_info: START",
-        wallet_index,
-        account_index,
-        in_chain,
-        out_chain,
-        &*tin,
-        &*tout,
-        &amount_in,
-        slippage_bps,
-        is_native_in,
-    );
-
-    // Swapper address + the source chain that signs/broadcasts.
-    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, in_chain).await?;
-
-    dbg!("build_uniswap_tx_info: swapper", &swapper.to_string(), chain_hash);
-
-    let client = Client::new();
-    let quote = trading_api_post(
-        &client,
-        "/quote",
-        &quote_body(
-            &swapper.to_string(),
-            &tin,
-            &tout,
-            in_chain,
-            out_chain,
-            &amount_in,
-            slippage_bps,
-        ),
-    )
-    .await?;
-
-    dbg!("build_uniswap_tx_info: quote response", &quote.get("routing"), quote.get("permitData").is_some());
-
-    // Sign the Permit2 typed data internally when the routing requires it. The signed JSON
-    // is the transformed standard form; the /swap body re-attaches the original permitData.
-    let signature: Option<String> = match permit_value(&quote) {
-        Some(pd) => {
-            dbg!("build_uniswap_tx_info: signing Permit2 typed data");
-            let typed_data_json = permit_to_typed_data(pd)?;
-            let (_pubkey, sig) = crate::api::transaction::sign_typed_data_eip712(
-                wallet_index,
-                account_index,
-                password,
-                passphrase,
-                typed_data_json,
-                None,
-                None,
-            )
-            .await?;
-            dbg!("build_uniswap_tx_info: Permit2 signed OK");
-            Some(sig)
-        }
-        None => {
-            dbg!("build_uniswap_tx_info: no permitData, skipping Permit2 sign");
-            None
-        }
-    };
-
-    let swap_req = build_swap_body(&quote, signature.as_deref())?;
-    let swap_resp = trading_api_post(&client, "/swap", &swap_req).await?;
-
-    dbg!("build_uniswap_tx_info: /swap response received");
-
-    swap_response_to_tx(&swap_resp, swapper, chain_hash)
-}
-
-/// Approval pre-step for the `ExchangeProvider::Uniswap` arm of
-/// `crate::api::exchange::check_exchange_approval`. ERC-20 inputs need a one-time on-chain
-/// `approve` (to Permit2 for swaps, to the bridge spender for bridges) before the swap can
-/// pull tokens. Returns `Ok(None)` when the existing allowance already covers `amount` (the
-/// API replies `approval: null`); otherwise the unsigned approve tx for the UI to broadcast.
-#[frb(ignore)]
-pub async fn uniswap_check_approval(
-    wallet_index: usize,
-    account_index: usize,
-    meta: &UniswapMeta,
-    token: &str,
-    amount: &str,
-) -> Result<Option<TransactionRequestInfo>, String> {
-    let chain_id = meta.chain_id;
-    let (swapper, chain_hash) = resolve_signer(wallet_index, account_index, chain_id).await?;
-
-    let body = json!({
-        "walletAddress": swapper.to_string(),
-        "token": token,
-        "amount": amount,
-        "chainId": chain_id,
-    });
-    let resp = trading_api_post(&Client::new(), "/check_approval", &body).await?;
-
-    match resp.get("approval") {
-        Some(approval) if !approval.is_null() => {
-            json_obj_to_eth_tx(approval, swapper, chain_hash).map(Some)
-        }
-        _ => Ok(None),
+        let parse = |s: &str| Address::from_str(s).map_err(|e| e.to_string());
+        Ok(RouterConfig {
+            addrs: RouterAddrs {
+                chain_id: self.common.chain_id,
+                universal_router: parse(universal_router)?,
+                quoter_v2: parse(quoter_v2)?,
+                permit2: parse(PERMIT2)?,
+                weth: parse(weth)?,
+            },
+            fee_tiers: UNISWAP_FEE_TIERS,
+        })
     }
 }
 
@@ -535,87 +125,91 @@ pub async fn uniswap_check_approval(
 mod uniswap_tests {
     use super::*;
 
-    #[test]
-    fn parse_out_same_chain_plain_addr() {
-        let (chain, addr) = parse_out("0xabc", 8453);
-        assert_eq!(chain, 8453);
-        assert_eq!(addr.as_ref(), "0xabc");
+    fn meta(chain_id: u64) -> UniswapMeta {
+        UniswapMeta::for_chain(
+            42,
+            chain_id,
+            60,
+            "0x0000000000000000000000000000000000000001",
+        )
+        .unwrap()
     }
 
     #[test]
-    fn parse_out_cross_chain_prefix() {
-        let (chain, addr) = parse_out("42161:0xdef", 8453);
-        assert_eq!(chain, 42161);
-        assert_eq!(addr.as_ref(), "0xdef");
+    fn meta_for_chain_known_and_unknown() {
+        assert!(
+            UniswapMeta::for_chain(42, 1, 60, "0x0000000000000000000000000000000000000001")
+                .is_some()
+        );
+        assert!(
+            UniswapMeta::for_chain(42, 56, 60, "0x0000000000000000000000000000000000000001")
+                .is_some()
+        );
+        assert!(
+            UniswapMeta::for_chain(42, 8453, 60, "0x0000000000000000000000000000000000000001")
+                .is_some()
+        );
+        assert!(
+            UniswapMeta::for_chain(42, 999, 60, "0x0000000000000000000000000000000000000001")
+                .is_none()
+        );
     }
 
     #[test]
-    fn input_token_native_uses_sentinel() {
-        assert_eq!(input_token(true, "0xWETH").as_ref(), NATIVE_SENTINEL);
-        assert_eq!(input_token(false, "0xUSDC").as_ref(), "0xUSDC");
+    fn meta_resolve_bsc() {
+        let cfg = meta(56).resolve().unwrap();
+        assert_eq!(cfg.addrs.chain_id, 56);
+        assert_eq!(cfg.fee_tiers, UNISWAP_FEE_TIERS);
+        assert_eq!(
+            cfg.addrs.universal_router,
+            Address::from_str("0x1906c1d672b88cd1b9ac7593301ca990f94eae07").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.quoter_v2,
+            Address::from_str("0x78D78E420Da98ad378D7799bE8f4AF69033EB077").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.weth,
+            Address::from_str("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c").unwrap()
+        );
     }
 
     #[test]
-    fn permit_to_typed_data_infers_primary_and_message() {
-        // Permit2 PermitSingle shape as returned by the Trading API.
-        let permit = json!({
-            "domain": { "name": "Permit2", "chainId": 1, "verifyingContract": "0x000000000022D473030F116dDEE9F6B43aC78BA3" },
-            "types": {
-                "PermitSingle": [
-                    { "name": "details", "type": "PermitDetails" },
-                    { "name": "spender", "type": "address" },
-                    { "name": "sigDeadline", "type": "uint256" }
-                ],
-                "PermitDetails": [
-                    { "name": "token", "type": "address" },
-                    { "name": "amount", "type": "uint160" },
-                    { "name": "expiration", "type": "uint48" },
-                    { "name": "nonce", "type": "uint48" }
-                ]
+    fn meta_resolve_parses_addresses() {
+        let cfg = meta(1).resolve().unwrap();
+        assert_eq!(cfg.addrs.chain_id, 1);
+        assert_eq!(
+            cfg.addrs.universal_router,
+            Address::from_str("0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af").unwrap()
+        );
+        assert_eq!(
+            cfg.addrs.permit2,
+            Address::from_str("0x000000000022D473030F116dDEE9F6B43aC78BA3").unwrap()
+        );
+    }
+
+    #[test]
+    fn meta_resolve_unsupported_chain() {
+        let meta = UniswapMeta {
+            common: ProviderCommon {
+                chain_hash: 42,
+                chain_id: 999,
+                slip44: 60,
+                account_addr: String::new(),
+                icon_asset: String::new(),
+                display_name: String::new(),
             },
-            "values": { "spender": "0x66a9", "sigDeadline": "1", "details": {} }
-        });
-        let out: Value = zilpay::serde_json::from_str(&permit_to_typed_data(&permit).unwrap()).unwrap();
-        assert_eq!(out["primaryType"], "PermitSingle");
-        assert!(out["message"].is_object());
-        // EIP712Domain injected with only the present domain keys, in canonical order.
-        let dom = out["types"]["EIP712Domain"].as_array().unwrap();
-        let names: Vec<&str> = dom.iter().map(|e| e["name"].as_str().unwrap()).collect();
-        assert_eq!(names, ["name", "chainId", "verifyingContract"]);
+            cfg: UniswapCfg::default(),
+            quote: None,
+        };
+        assert!(meta.resolve().is_err());
     }
 
     #[test]
-    fn build_swap_body_strips_and_reattaches_permit() {
-        let quote = json!({
-            "requestId": "x", "routing": "CLASSIC",
-            "permitData": { "domain": {} }, "permitTransaction": null,
-            "quote": { "output": { "amount": "1" } }
-        });
-        // No signature → permit dropped, no signature field.
-        let no_sig = build_swap_body(&quote, None).unwrap();
-        assert!(no_sig.get("permitData").is_none());
-        assert!(no_sig.get("signature").is_none());
-        assert!(no_sig.get("requestId").is_none());
-        // With signature → both re-attached.
-        let with_sig = build_swap_body(&quote, Some("0xsig")).unwrap();
-        assert_eq!(with_sig["signature"], "0xsig");
-        assert!(with_sig.get("permitData").is_some());
-    }
-
-    #[test]
-    fn swap_response_to_tx_parses_fields() {
-        let resp = json!({ "swap": {
-            "to": "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af",
-            "data": "0x1234",
-            "value": "0x0de0b6b3a7640000",
-            "chainId": 1,
-            "gasLimit": 341542
-        }});
-        let tx = swap_response_to_tx(&resp, Address::ZERO, 42).unwrap();
-        let evm = tx.evm.unwrap();
-        assert_eq!(evm.chain_id, Some(1));
-        assert_eq!(evm.gas_limit, Some(341542));
-        assert_eq!(evm.value.as_deref(), Some("1000000000000000000"));
-        assert!(evm.data.is_some_and(|d| !d.is_empty()));
+    fn is_supported_chain_returns_true_for_deployed() {
+        assert!(is_supported_chain(1));
+        assert!(is_supported_chain(56));
+        assert!(is_supported_chain(42161));
+        assert!(!is_supported_chain(999));
     }
 }

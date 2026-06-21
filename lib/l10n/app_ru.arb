@@ -75,26 +75,36 @@
   "exchangePageTitle": "Обмен",
   "exchangePagePay": "Вы платите",
   "exchangePageGet": "Вы получаете",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "Подтвердить",
+  "exchangeConfirmBest": "ЛУЧШИЙ",
+  "exchangeConfirmGasNone": "—",
+  "exchangeConfirmAfterGas": "≈ {amount}",
+  "exchangeConfirmSlippage": "Проскальзывание",
+  "exchangeConfirmRecipient": "Получатель",
+  "exchangeConfirmSwipe": "Проведите для обмена",
+  "exchangeConfirmUnable": "Не удалось подтвердить",
+  "exchangeConfirmPassword": "Пароль",
+  "exchangeConfirmNoAccount": "Нет активного аккаунта",
+  "exchangeConfirmNoQuote": "No quote available",
+  "exchangeConfirmStepApprove": "Одобрить токен",
+  "exchangeConfirmStepPermit": "Подписать разрешение (EIP-712)",
+  "exchangeConfirmWrap": "Обернуть",
+  "exchangeConfirmUnwrap": "Развернуть",
+  "exchangeConfirmHintApprove": "Подтвердите одобрение на Ledger…",
+  "exchangeConfirmHintPermit": "Подтвердите разрешение на Ledger…",
+  "exchangeConfirmHintSwap": "Подтвердите обмен на Ledger…",
+  "exchangeConfirmHintPreparing": "Подготовка…",
+  "exchangeHistoryApprove": "Одобрить {symbol}",
+  "exchangeHistoryPermit": "Permit2 · {provider}",
   "exchangePageComingSoon": "Скоро",
   "exchangePageNoAssets": "В этой сети нет активов для обмена",
   "exchangePageTabSwap": "Обмен",
   "exchangePageTabLimit": "Лимит",
   "exchangePageTabBuySell": "Купить/Продать",
   "exchangeSettingsPriceProtection": "Защита цены",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "Количество под-обменов",
-  "exchangeSettingsTimeBetween": "Время между под-обменами",
   "exchangeSettingsReset": "Сбросить",
   "exchangeSettingsSave": "Сохранить",
-  "exchangeSettingsBlocks": "{count, plural, =1{1 блок} few{{count} блока} many{{count} блоков} other{{count} блока}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",
   "revealSecretKeyInvalidPassword": "неверный пароль, ошибка:",
@@ -201,8 +211,9 @@
   "settingsPageLanguage": "Язык",
   "settingsPageBrowser": "Браузер",
   "settingsPageTelegram": "Telegram",
-  "settingsPageTwitter": "Twitter",
+  "settingsPageTwitter": "X",
   "settingsPageGitHub": "GitHub",
+  "settingsPageEmail": "Почта",
   "settingsPageAbout": "О приложении",
   "passwordSetupPageSubtitle": "Создать пароль",
   "passwordSetupPageWalletNameHint": "Название кошелька",
@@ -268,8 +279,8 @@
   "currencyConversionEngineNoneSubtitle": "Источник не выбран",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Получать курсы из Coingecko",
-  "currencyConversionEngineCryptoCompare": "CryptoCompare",
-  "currencyConversionEngineCryptoCompareSubtitle": "Получать курсы из CryptoCompare",
+  "currencyConversionEngineBearbyRates": "Bearby Rates",
+  "currencyConversionEngineBearbyRatesSubtitle": "Получать курсы из Bearby",
   "restoreWalletOptionsTitle": "Восстановить кошелек",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "Восстановить с помощью мнемонической фразы",
@@ -465,8 +476,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, one{# вход} few{# входа} many{# входов} other{# входа}} · {outputCount, plural, one{# выход} few{# выхода} many{# выходов} other{# выхода}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "Перевод",
@@ -618,9 +633,59 @@
   "addNetworkPageSuccess": "Сеть успешно добавлена",
   "qrCodeUnrecognizedError": "QR-код не распознан. Используйте поддерживаемый формат.",
   "qrCodeScanError": "Не удалось прочитать QR-код. Попробуйте ещё раз.",
+  "homePageQrScanErrorTitle": "Ошибка",
+  "homePageQrScanOkButton": "ОК",
   "qrCodeEmptySeedError": "QR-код не содержит слов сид-фразы.",
   "qrCodeInvalidWordsError": "QR-код содержит недопустимые слова BIP39.",
   "qrCodeInvalidKeyError": "QR-код содержит недопустимый приватный ключ.",
   "deprecatedLabel": "(Устарело)",
-  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Устарело для Bitcoin. Используйте BIP39."
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Устарело для Bitcoin. Используйте BIP39.",
+  "btcAddressesModalTitle": "Адреса Bitcoin",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "Legacy (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "Вложенный SegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "Неизвестный ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "Текущий",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "Использован",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "Адресов пока нет",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, one{# транзакция} few{# транзакции} many{# транзакций} other{# транзакции}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

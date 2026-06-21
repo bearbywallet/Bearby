@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -85,14 +85,10 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                 CustomAppBar(
                   title: l10n.secretPhraseGeneratorPageTitle,
                   onBackPressed: () => context.pop(),
-                  actionIcon: SvgPicture.asset(
-                    'assets/icons/reload.svg',
-                    width: 30,
-                    height: 30,
-                    colorFilter: ColorFilter.mode(
-                      theme.textPrimary,
-                      BlendMode.srcIn,
-                    ),
+                  actionIcon: AppIconView(
+                    icon: AppIcon.reload,
+                    size: 30,
+                    color: theme.textPrimary,
                   ),
                   onActionPressed: _regenerateMnemonicWords,
                 ),
@@ -167,16 +163,12 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                               ),
                             ),
                             TileButton(
-                              icon: SvgPicture.asset(
-                                _isCopied
-                                    ? "assets/icons/check.svg"
-                                    : "assets/icons/copy.svg",
-                                width: 24,
-                                height: 24,
-                                colorFilter: ColorFilter.mode(
-                                  theme.primaryPurple,
-                                  BlendMode.srcIn,
-                                ),
+                              icon: AppIconView(
+                                icon: _isCopied
+                                    ? AppIcon.check
+                                    : AppIcon.copy,
+                                size: 24,
+                                color: theme.primaryPurple,
                               ),
                               disabled: false,
                               onPressed: () async {

@@ -709,6 +709,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
 
 [[package]]
+name = "arc-swap"
+version = "1.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a3a1fd6f75306b68087b831f025c712524bcb19aad54e557b1129cfa0a2b207"
+dependencies = [
+ "rustversion",
+]
+
+[[package]]
 name = "arg_enum_proc_macro"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4423,7 +4432,6 @@ dependencies = [
  "alloy",
  "async-trait",
  "base64 0.22.1",
- "bincode",
  "bitcoin",
  "bs58",
  "config",
@@ -4439,13 +4447,10 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
- "solana-hash",
+ "solana-address-lookup-table-interface",
  "solana-instruction",
  "solana-message",
  "solana-pubkey 4.2.0",
- "solana-system-interface 3.2.0",
- "spl-associated-token-account",
- "spl-token",
  "storage",
  "token",
  "tokio",
@@ -5291,11 +5296,18 @@ dependencies = [
  "rand 0.10.1",
  "rand_chacha 0.10.0",
  "ripemd",
+ "secp256k1 0.29.1",
  "secrecy",
  "serde",
  "serde_json",
  "sha2 0.11.0",
+ "solana-hash",
+ "solana-instruction",
+ "solana-message",
  "solana-pubkey 4.2.0",
+ "solana-system-interface 3.2.0",
+ "spl-associated-token-account",
+ "spl-token",
  "tokio",
  "zeroize",
 ]
@@ -5947,6 +5959,7 @@ dependencies = [
 name = "rust_lib_zilpay"
 version = "0.1.0"
 dependencies = [
+ "arc-swap",
  "btleplug",
  "flutter_rust_bridge",
  "futures",
@@ -6684,6 +6697,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "solana-address-lookup-table-interface"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "115b4f773acc4f3f3cb986b0d335e9845c0368c82b0940410935bc11ae065578"
+dependencies = [
+ "bincode",
+ "bytemuck",
+ "serde",
+ "serde_derive",
+ "solana-clock",
+ "solana-instruction",
+ "solana-instruction-error",
+ "solana-pubkey 4.2.0",
+ "solana-sdk-ids",
+ "solana-slot-hashes",
+]
+
+[[package]]
 name = "solana-atomic-u64"
 version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6831,6 +6862,7 @@ checksum = "37ebb0ffd19263051bc3f683fcc086134b8ff23af894dcb63f7563c7137b42f1"
 dependencies = [
  "bincode",
  "serde",
+ "serde_derive",
  "solana-define-syscall 5.1.0",
  "solana-instruction-error",
  "solana-pubkey 4.2.0",
@@ -8337,6 +8369,7 @@ dependencies = [
  "rand_chacha 0.10.0",
  "rmp-serde",
  "rpc",
+ "secp256k1 0.29.1",
  "secrecy",
  "serde",
  "settings",
@@ -9222,6 +9255,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "background",
+ "base64 0.22.1",
  "bitcoin",
  "cache",
  "cipher 0.1.0",
@@ -9245,6 +9279,13 @@ dependencies = [
  "session",
  "settings",
  "sha2 0.11.0",
+ "solana-hash",
+ "solana-instruction",
+ "solana-message",
+ "solana-pubkey 4.2.0",
+ "solana-system-interface 3.2.0",
+ "spl-associated-token-account",
+ "spl-token",
  "storage",
  "thiserror 2.0.18",
  "token",
@@ -9259,6 +9300,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "background",
+ "base64 0.22.1",
  "bitcoin",
  "cache",
  "cipher 0.1.0",
@@ -9282,6 +9324,13 @@ dependencies = [
  "session",
  "settings",
  "sha2 0.11.0",
+ "solana-hash",
+ "solana-instruction",
+ "solana-message",
+ "solana-pubkey 4.2.0",
+ "solana-system-interface 3.2.0",
+ "spl-associated-token-account",
+ "spl-token",
  "storage",
  "thiserror 2.0.18",
  "token",

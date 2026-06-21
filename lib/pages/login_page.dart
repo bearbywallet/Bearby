@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -250,14 +251,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
           const Spacer(),
           IconButton(
             onPressed: _navigateToNewWallet,
-            icon: SvgPicture.asset(
-              'assets/icons/plus.svg',
-              width: 32,
-              height: 32,
-              colorFilter: ColorFilter.mode(
-                theme.currentTheme.textPrimary,
-                BlendMode.srcIn,
-              ),
+            icon: const AppIconView(
+              icon: AppIcon.plus,
+              size: 32,
             ),
           ),
         ],
@@ -310,21 +306,21 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     );
   }
 
-  List<String> _getWalletIcons(WalletInfo wallet) {
+  List<AppIcon> _getWalletIcons(WalletInfo wallet) {
     return [
       if (wallet.walletType.contains(WalletType.ledger.name))
-        'assets/icons/ledger.svg',
+        AppIcon.ledger,
       if (wallet.walletType.contains(WalletType.SecretPhrase.name))
-        'assets/icons/document.svg',
+        AppIcon.document,
       if (wallet.walletType.contains(WalletType.SecretKey.name))
-        'assets/icons/bincode.svg',
-      if (wallet.authType == "faceId") 'assets/icons/face_id.svg',
-      if (wallet.authType == "opticId") 'assets/icons/face_id.svg',
-      if (wallet.authType == "fingerprint") 'assets/icons/fingerprint.svg',
-      if (wallet.authType == "touchId") 'assets/icons/fingerprint.svg',
-      if (wallet.authType == "biometric") 'assets/icons/biometric.svg',
-      if (wallet.authType == "pinCode") 'assets/icons/pin.svg',
-      if (wallet.authType == "password") 'assets/icons/pin.svg',
+        AppIcon.bincode,
+      if (wallet.authType == "faceId") AppIcon.faceId,
+      if (wallet.authType == "opticId") AppIcon.faceId,
+      if (wallet.authType == "fingerprint") AppIcon.fingerprint,
+      if (wallet.authType == "touchId") AppIcon.fingerprint,
+      if (wallet.authType == "biometric") AppIcon.biometric,
+      if (wallet.authType == "pinCode") AppIcon.pin,
+      if (wallet.authType == "password") AppIcon.pin,
     ];
   }
 
@@ -368,9 +364,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
               _obscureButton = !isFocused;
               if (isFocused) _errorMessage = null;
             }),
-            rightIconPath: _obscurePassword
-                ? "assets/icons/close_eye.svg"
-                : "assets/icons/open_eye.svg",
+            rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
             onRightIconTap: () =>
                 setState(() => _obscurePassword = !_obscurePassword),
           ),

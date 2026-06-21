@@ -42,7 +42,8 @@ impl TryFrom<AccessListItem> for AlloyAccessListItem {
                 .storage_keys
                 .into_iter()
                 .map(|key| {
-                    let bytes = zilpay::alloy::hex::decode(key).map_err(|_| TransactionErrors::InvalidHash)?;
+                    let bytes = zilpay::alloy::hex::decode(key)
+                        .map_err(|_| TransactionErrors::InvalidHash)?;
 
                     if bytes.len() != SHA256_SIZE {
                         return Err(TransactionErrors::InvalidHash);

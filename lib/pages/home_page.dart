@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/glass_message.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/linear_refresh_indicator.dart';
 import 'package:bearby/components/net_btn.dart';
 import 'package:bearby/components/tile_button.dart';
@@ -13,18 +14,20 @@ import 'package:bearby/components/token_card.dart';
 import 'package:bearby/components/wallet_header.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
-import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/router.dart';
 
-const double _ICON_SIZE_SMALL_BASE = 24.0;
-const double _ICON_SIZE_TILE_BUTTON_BASE = 25.0;
+const double _ICON_SIZE_SMALL_BASE = 20.0;
+const double _ICON_SIZE_TILE_BUTTON_BASE = 22.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,6 +40,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
   String? _errorMessage;
   bool _isRefreshing = false;
   bool _hasInitialSync = false;
+  bool _isHandlingScan = false;
 
   @override
   void didChangeDependencies() {
@@ -44,10 +48,16 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
 
     if (!_hasInitialSync) {
       _hasInitialSync = true;
-      final appState = Provider.of<AppState>(context, listen: false);
-      _refreshData(appState);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final appState = Provider.of<AppState>(context, listen: false);
+        _refreshData(appState);
+      });
     }
   }
+
+  bool _hasZilliqaExtras(AppState appState) =>
+      appState.account != null && appState.chain?.slip44 == kZilliqaSlip44;
 
   Future<void> _refreshData(AppState appState) async {
     if (_isRefreshing) return;
@@ -55,20 +65,146 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     _isRefreshing = true;
 
     try {
-      await syncBalances(walletIndex: appState.selectedWalletIndex);
+      try {
+        await appState.syncBalancesTracked(
+          walletIndex: appState.selectedWalletIndex,
+        );
 
-      if (_errorMessage != null) {
-        setState(() => _errorMessage = null);
+        if (_errorMessage != null && mounted) {
+          setState(() => _errorMessage = null);
+        }
+      } catch (e) {
+        debugPrint("refresh: $e");
+        if (mounted) {
+          setState(() => _errorMessage = e.toString());
+        }
       }
+
+      await appState.syncRates();
+      await appState.syncData();
     } catch (e) {
-      debugPrint("refresh: $e");
-      setState(() => _errorMessage = e.toString());
+      debugPrint("refresh data: $e");
+      if (mounted) {
+        setState(() => _errorMessage = e.toString());
+      }
+    } finally {
+      _isRefreshing = false;
     }
+  }
 
-    await appState.syncRates();
-    await appState.syncData();
+  void _goToSendPage({String? recipient, String? amount, String? tokenAddress}) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final wallet = appState.wallet;
+    if (wallet == null) return;
 
-    _isRefreshing = false;
+    final filteredTokens = wallet.tokens
+        .where((t) => t.addrType == appState.account?.addrType)
+        .toList();
+    if (filteredTokens.isEmpty) return;
+
+    final originalIndex = wallet.tokens.indexOf(filteredTokens.first);
+
+    final Map<String, Object> extra = <String, Object>{
+      'token_index': originalIndex,
+    };
+    if (recipient != null) extra['recipient'] = recipient;
+    if (amount != null) extra['amount'] = amount;
+    if (tokenAddress != null) extra['token_address'] = tokenAddress;
+
+    context.push(AppRoutes.send, extra: extra);
+  }
+
+  void _showScanError() {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext ctx) => AlertDialog(
+        backgroundColor: theme.cardBackground,
+        title: Text(
+          l10n.homePageQrScanErrorTitle,
+          style: theme.titleMedium.copyWith(color: theme.textPrimary),
+        ),
+        content: Text(
+          l10n.qrCodeUnrecognizedError,
+          style: theme.bodyLarge.copyWith(color: theme.danger),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              l10n.homePageQrScanOkButton,
+              style: theme.bodyLarge.copyWith(color: theme.primaryPurple),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleQrScanResult(String rawData) async {
+    if (_isHandlingScan) return;
+
+    final trimmed = rawData.trim();
+    if (trimmed.isEmpty) return;
+
+    _isHandlingScan = true;
+
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final activeChain = appState.chain;
+
+      // Chain-aware parse (EIP-681 style: "chain:address?amount=...&token=...").
+      // A plain address with no scheme yields an empty map; we then treat the
+      // whole payload as the recipient.
+      final parsed = parseCryptoUrl(trimmed);
+      final String? qrChain = parsed['chain'];
+      final String address = (parsed['address'] ?? trimmed);
+      final String? amount = parsed['amount'];
+      final String? tokenAddress = parsed['token'];
+
+      final bool wrongChain = qrChain != null &&
+          qrChain.isNotEmpty &&
+          activeChain != null &&
+          !chainMatches(activeChain, qrChain);
+
+      if (wrongChain) {
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showScanError();
+        return;
+      }
+
+      try {
+        final ok = await isValidAddress(addr: address);
+        if (!ok) {
+          if (!mounted) return;
+          Navigator.of(context).pop();
+          _showScanError();
+          return;
+        }
+      } catch (e) {
+        debugPrint('address validation error: $e');
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        _showScanError();
+        return;
+      }
+
+      if (!mounted) return;
+      Navigator.of(context).pop();
+
+      _goToSendPage(
+        recipient: address,
+        amount: amount,
+        tokenAddress: tokenAddress,
+      );
+    } finally {
+      _isHandlingScan = false;
+    }
   }
 
   @override
@@ -81,7 +217,6 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_SMALL_BASE);
     final iconSizeTileButton =
         AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_TILE_BUTTON_BASE);
-    final iconSizeManage = AdaptiveSize.getAdaptiveIconSize(context, 18);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final l10n = AppLocalizations.of(context)!;
@@ -135,8 +270,15 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 Expanded(
                   child: WalletHeader(
                     account: appState.account!,
+                    showCopyAddress: false,
                     onSettings: () {
                       context.push(AppRoutes.settings);
+                    },
+                    onScan: () {
+                      showQRScannerModal(
+                        context: context,
+                        onScanned: _handleQrScanResult,
+                      );
                     },
                   ),
                 ),
@@ -145,107 +287,101 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         ),
       ),
       SliverToBoxAdapter(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        child: Padding(
           padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/send.svg",
-                  width: iconSizeTileButton,
-                  height: iconSizeTileButton,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
+              Row(
+                children: [
+                  Expanded(
+                    child: TileButton(
+                      icon: AppIconView(
+                        icon: AppIcon.send,
+                        size: iconSizeTileButton,
+                        color: theme.primaryPurple,
+                      ),
+                      title: l10n.homePageSendButton,
+                      fillWidth: true,
+                      onPressed: () => _goToSendPage(),
+                      backgroundColor: theme.cardBackground,
+                      textColor: theme.primaryPurple,
+                    ),
                   ),
-                ),
-                title: l10n.homePageSendButton,
-                onPressed: () {
-                  if (filteredTokens.isNotEmpty) {
-                    final originalIndex =
-                        appState.wallet!.tokens.indexOf(filteredTokens[0]);
-                    context.push(AppRoutes.send,
-                        extra: {'token_index': originalIndex});
-                  }
-                },
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
+                  SizedBox(width: adaptivePaddingCard),
+                  Expanded(
+                    child: TileButton(
+                      icon: AppIconView(
+                        icon: AppIcon.receive,
+                        size: iconSizeTileButton,
+                        color: theme.primaryPurple,
+                      ),
+                      title: l10n.homePageReceiveButton,
+                      fillWidth: true,
+                      onPressed: () => context.push(AppRoutes.receive),
+                      backgroundColor: theme.cardBackground,
+                      textColor: theme.primaryPurple,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/receive.svg",
-                  width: iconSizeTileButton,
-                  height: iconSizeTileButton,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
+              if (_hasZilliqaExtras(appState)) ...[
+                SizedBox(height: adaptivePaddingCard),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      TileButton(
+                        icon: AppIconView(
+                          icon: AppIcon.anchorSimple,
+                          size: iconSizeTileButton,
+                          color: theme.primaryPurple,
+                        ),
+                        title: "Stake",
+                        onPressed: () => context.push(AppRoutes.zilStake),
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
+                      ),
+                      if (!appState.wallet!.walletType
+                          .contains(WalletType.ledger.name)) ...[
+                        SizedBox(width: adaptivePaddingCard),
+                        TileButton(
+                          icon: SvgPicture.asset(
+                            appState.account?.addrType == kScillaAddressType
+                                ? 'assets/icons/scilla.svg'
+                                : 'assets/icons/solidity.svg',
+                            width: iconSizeTileButton,
+                            height: iconSizeTileButton,
+                            colorFilter: ColorFilter.mode(
+                              theme.primaryPurple,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          title: appState.account?.addrType == kScillaAddressType
+                              ? "Scilla"
+                              : "EVM",
+                          onPressed: () async {
+                            final walletIndex = appState.selectedWalletIndex;
+                            await zilliqaSwapChain(
+                              walletIndex: walletIndex,
+                              accountIndex: appState.wallet!.selectedAccount,
+                            );
+                            await appState.syncData();
+                            try {
+                              await appState.syncBalancesTracked(
+                                walletIndex: walletIndex,
+                              );
+                              await appState.syncData();
+                            } catch (_) {}
+                          },
+                          backgroundColor: theme.cardBackground,
+                          textColor: theme.primaryPurple,
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-                title: l10n.homePageReceiveButton,
-                onPressed: () {
-                  context.push(AppRoutes.receive);
-                },
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              if (appState.account != null &&
-                  appState.chain?.slip44 == kZilliqaSlip44) ...[
-                SizedBox(width: adaptivePaddingCard),
-                TileButton(
-                  icon: SvgPicture.asset(
-                    "assets/icons/anchor.svg",
-                    width: iconSizeTileButton,
-                    height: iconSizeTileButton,
-                    colorFilter:
-                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
-                  ),
-                  title: "Stake",
-                  onPressed: () async {
-                    context.push(AppRoutes.zilStake);
-                  },
-                  backgroundColor: theme.cardBackground,
-                  textColor: theme.primaryPurple,
                 ),
               ],
-              if (appState.account != null &&
-                  appState.chain?.slip44 == kZilliqaSlip44 &&
-                  !appState.wallet!.walletType
-                      .contains(WalletType.ledger.name)) ...[
-                SizedBox(width: adaptivePaddingCard),
-                TileButton(
-                  icon: SvgPicture.asset(
-                    appState.account?.addrType == kScillaAddressType
-                        ? "assets/icons/scilla.svg"
-                        : "assets/icons/solidity.svg",
-                    width: iconSizeTileButton,
-                    height: iconSizeTileButton,
-                    colorFilter:
-                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
-                  ),
-                  title: appState.account?.addrType == kScillaAddressType
-                      ? "Scilla"
-                      : "EVM",
-                  onPressed: () async {
-                    BigInt walletIndex = appState.selectedWalletIndex;
-                    await zilliqaSwapChain(
-                      walletIndex: walletIndex,
-                      accountIndex: appState.wallet!.selectedAccount,
-                    );
-                    await appState.syncData();
-
-                    try {
-                      await syncBalances(
-                        walletIndex: walletIndex,
-                      );
-                      await appState.syncData();
-                    } catch (_) {}
-                  },
-                  backgroundColor: theme.cardBackground,
-                  textColor: theme.primaryPurple,
-                ),
-              ]
             ],
           ),
         ),
@@ -267,16 +403,23 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                     chain: appState.chain!,
                   ),
                   SizedBox(width: spacing),
-                  HoverSvgIcon(
-                    assetName: appState.hideBalance
-                        ? 'assets/icons/close_eye.svg'
-                        : 'assets/icons/open_eye.svg',
-                    width: iconSizeSmall,
-                    height: iconSizeSmall,
+                  HoverIcon(
+                    icon: AppIconState.balanceVisibility(hidden: appState.hideBalance),
+                    size: iconSizeSmall,
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
                       appState.setHideBalance(!appState.hideBalance);
+                    },
+                  ),
+                  SizedBox(width: spacing),
+                  HoverIcon(
+                    icon: AppIcon.lockWallet,
+                    size: iconSizeSmall,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.textSecondary.withValues(alpha: 0.5),
+                    onTap: () {
+                      appState.clearAuthentication();
                     },
                   ),
                 ],
@@ -285,25 +428,21 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 children: [
                   if (appState.wallet != null &&
                       appState.wallet!.tokens.length > 1)
-                    HoverSvgIcon(
-                      assetName: appState.isTileView
-                          ? 'assets/icons/tiles.svg'
-                          : 'assets/icons/lines.svg',
-                      width: iconSizeManage,
-                      height: iconSizeManage,
+                    HoverIcon(
+                      icon: AppIconState.tokenLayout(isTileView: appState.isTileView),
+                      size: iconSizeSmall,
                       padding: const EdgeInsets.all(0),
-                      color: theme.textSecondary,
+                      color: theme.textSecondary.withValues(alpha: 0.5),
                       onTap: () async {
                         await appState.updateIsTileView(!appState.isTileView);
                       },
                     ),
                   SizedBox(width: spacing),
-                  HoverSvgIcon(
-                    assetName: 'assets/icons/manage.svg',
-                    width: iconSizeManage,
-                    height: iconSizeManage,
+                  HoverIcon(
+                    icon: AppIcon.manage,
+                    size: iconSizeSmall,
                     padding: const EdgeInsets.all(0),
-                    color: theme.textSecondary,
+                    color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
                       context.push(AppRoutes.manageTokens);
                     },
@@ -322,7 +461,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 1.618,
+              childAspectRatio: 1.4,
               crossAxisSpacing: spacing,
               mainAxisSpacing: spacing,
             ),
@@ -337,6 +476,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   ftoken: token,
                   hideBalance: appState.hideBalance,
                   tokenAmount: tokenAmountValue,
+                  isAmountLoading: appState.isSyncingBalances,
+                  isRateLoading: appState.isSyncingRates,
                   showDivider: false,
                   isTileView: true,
                   onTap: () {
@@ -365,6 +506,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 ftoken: token,
                 hideBalance: appState.hideBalance,
                 tokenAmount: tokenAmountValue,
+                isAmountLoading: appState.isSyncingBalances,
+                isRateLoading: appState.isSyncingRates,
                 showDivider: !isLast,
                 onTap: () {
                   final originalIndex = appState.wallet!.tokens.indexOf(token);

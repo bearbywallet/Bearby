@@ -170,6 +170,45 @@ class AppLocalizationsJa extends AppLocalizations {
   String get receivePageAmountDialogConfirm => '確認';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoinアドレス';
+
+  @override
+  String get btcAddressFormatLegacy => 'レガシー (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => 'ネストSegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return '不明 ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => '現在';
+
+  @override
+  String get btcAddressesModalUsed => '使用済み';
+
+  @override
+  String get btcAddressesModalEmpty => 'アドレスはまだありません';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count件の取引',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => 'セキュリティ';
 
   @override
@@ -239,6 +278,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangePageGet => '受け取る';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '確認';
 
   @override
@@ -260,28 +302,75 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangeSettingsPriceProtection => '価格保護';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => 'サブスワップ数';
-
-  @override
-  String get exchangeSettingsTimeBetween => 'サブスワップ間隔';
-
-  @override
   String get exchangeSettingsReset => 'リセット';
 
   @override
   String get exchangeSettingsSave => '保存';
 
   @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countブロック',
-    );
-    return '$_temp0';
+  String get exchangeConfirmBest => '最適';
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmSlippage => 'スリッページ';
+
+  @override
+  String get exchangeConfirmRecipient => '受取人';
+
+  @override
+  String get exchangeConfirmSwipe => 'スワイプしてスワップ';
+
+  @override
+  String get exchangeConfirmUnable => '確認できません';
+
+  @override
+  String get exchangeConfirmPassword => 'パスワード';
+
+  @override
+  String get exchangeConfirmNoAccount => 'アクティブなアカウントがありません';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
+
+  @override
+  String get exchangeConfirmStepApprove => 'トークンを承認';
+
+  @override
+  String get exchangeConfirmStepPermit => 'パーミットに署名 (EIP-712)';
+
+  @override
+  String get exchangeConfirmWrap => 'ラップ';
+
+  @override
+  String get exchangeConfirmUnwrap => 'アンラップ';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Ledger で承認を確認してください…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Ledger でパーミットを確認してください…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Ledger でスワップを確認してください…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '準備中…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '$symbol を承認';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
   }
 
   @override
@@ -621,10 +710,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsPageTelegram => 'Telegram';
 
   @override
-  String get settingsPageTwitter => 'Twitter';
+  String get settingsPageTwitter => 'X';
 
   @override
   String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageEmail => 'メール';
 
   @override
   String get settingsPageAbout => 'アプリについて';
@@ -822,10 +914,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Coingeckoからレートを取得';
 
   @override
-  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+  String get currencyConversionEngineBearbyRates => 'Bearby Rates';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompareからレートを取得';
+  String get currencyConversionEngineBearbyRatesSubtitle => 'Bearbyからレートを取得';
 
   @override
   String get restoreWalletOptionsTitle => 'ウォレットを復元';
@@ -1852,6 +1944,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get qrCodeScanError => 'QRコードの読み取りに失敗しました。再試行してください。';
+
+  @override
+  String get homePageQrScanErrorTitle => 'エラー';
+
+  @override
+  String get homePageQrScanOkButton => 'OK';
 
   @override
   String get qrCodeEmptySeedError => 'QRコードにシードワードが含まれていません。';

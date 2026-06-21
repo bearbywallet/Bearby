@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -98,14 +98,10 @@ class GlassMessage extends StatelessWidget {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: onDismiss,
-                    child: SvgPicture.asset(
-                      'assets/icons/close.svg',
-                      width: 16,
-                      height: 16,
-                      colorFilter: ColorFilter.mode(
-                        _getTextColor(theme).withValues(alpha: 0.7),
-                        BlendMode.srcIn,
-                      ),
+                    child: AppIconView(
+                      icon: AppIcon.close,
+                      size: 16,
+                      color: _getTextColor(theme).withValues(alpha: 0.7),
                     ),
                   ),
                 ],

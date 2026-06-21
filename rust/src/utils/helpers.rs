@@ -15,7 +15,7 @@ pub use zilpay::{
 
 use crate::{
     models::{background::BackgroundState, wallet::WalletInfo},
-    service::background::BACKGROUND_SERVICE,
+    service::background::{CORE, MUTATION_MUTEX},
 };
 
 use super::errors::ServiceError;
@@ -31,7 +31,8 @@ pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
-    zilpay::alloy::hex::decode(session_cipher.unwrap_or_default()).map_err(|_| ServiceError::DecodeSession)
+    zilpay::alloy::hex::decode(session_cipher.unwrap_or_default())
+        .map_err(|_| ServiceError::DecodeSession)
 }
 
 pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError> {
@@ -49,7 +50,8 @@ pub fn pubkey_from_provider(
 ) -> Result<PubKey, ServiceError> {
     let pub_key = match chain_config.slip_44 {
         slip44::SOLANA => {
-            let bytes = zilpay::alloy::hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
+            let bytes =
+                zilpay::alloy::hex::decode(pub_key).map_err(|_| ServiceError::DecodePublicKey)?;
             let mut prefixed = vec![3u8];
             prefixed.extend_from_slice(&bytes);
             PubKey::try_from(prefixed.as_slice())?
@@ -73,7 +75,7 @@ pub fn pubkey_from_provider(
                         .iter()
                         .find(|t| t.native)
                         .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                        .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
+                        .unwrap_or(zilpay::bitcoin::AddressType::P2wpkh);
 
                     PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
                 }
@@ -104,7 +106,7 @@ pub fn secretkey_from_provider(
                 .iter()
                 .find(|t| t.native)
                 .and_then(|t| t.addr.get_bitcoin_address_type().ok())
-                .unwrap_or(zilpay::bitcoin::AddressType::P2tr);
+                .unwrap_or(zilpay::bitcoin::AddressType::P2wpkh);
             let network = chain_config
                 .bitcoin_network()
                 .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
@@ -164,56 +166,93 @@ pub fn get_last_wallet(service: &Background) -> Result<&Wallet, ServiceError> {
     service.wallets.last().ok_or(ServiceError::FailToSaveWallet)
 }
 
+/// Lock-free atomic read. A single `ArcSwapOption::load_full` — zero locks,
+/// zero `.await`, never contends with writers. Returns a shared
+/// `Arc<Background>` snapshot.
+pub fn handle() -> Result<Arc<Background>, ServiceError> {
+    CORE.load_full().ok_or(ServiceError::NotRunning)
+}
+
+/// Copy-on-write mutation. Loads the current `CORE` snapshot, clones it,
+/// applies `f` to the clone, then atomically publishes the result.
+/// Serialized by [`MUTATION_MUTEX`] to prevent lost-update races between
+/// concurrent mutations.
+pub async fn mutate_core<F, T>(f: F) -> Result<T, ServiceError>
+where
+    F: FnOnce(&mut Background) -> Result<T, ServiceError>,
+{
+    let _lock = MUTATION_MUTEX.lock().await;
+    let current = CORE.load_full().ok_or(ServiceError::NotRunning)?;
+    let mut next = (*current).clone();
+    let result = f(&mut next)?;
+
+    CORE.store(Some(Arc::new(next)));
+
+    Ok(result)
+}
+
+/// Copy-on-write mutation with an async closure.
+///
+/// **NB**: [`MUTATION_MUTEX`] is held across the `.await` in `f` — every
+/// concurrent `mutate_core` or `mutate_core_async` call blocks for the
+/// duration. Use only for fast structural changes (add/delete wallet,
+/// keystore restore); do **not** use for long network I/O. For network-heavy
+/// work, fetch data via [`handle`] first, then install results with the sync
+/// [`mutate_core`].
+///
+/// Readers ([`handle`]) are **never** blocked — they see the pre-mutation
+/// snapshot until `CORE.store` publishes the result.
+pub async fn mutate_core_async<F, T>(f: F) -> Result<T, ServiceError>
+where
+    F: for<'a> AsyncFnOnce(&'a mut Background) -> Result<T, ServiceError>,
+{
+    let _lock = MUTATION_MUTEX.lock().await;
+    let current = CORE.load_full().ok_or(ServiceError::NotRunning)?;
+    let mut next = (*current).clone();
+    let result = f(&mut next).await?;
+
+    CORE.store(Some(Arc::new(next)));
+
+    Ok(result)
+}
+
 pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>
 where
-    F: FnOnce(&zilpay::background::Background) -> Result<T, ServiceError>,
+    F: FnOnce(&Background) -> Result<T, ServiceError>,
 {
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    f(&service.core)
+    let core = handle()?;
+
+    f(&core)
 }
 
 pub async fn with_service_mut<F, T>(f: F) -> Result<T, ServiceError>
 where
-    F: FnOnce(&mut zilpay::background::Background) -> Result<T, ServiceError>,
+    F: FnOnce(&mut Background) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-
-        f(core)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    mutate_core(f).await
 }
 
 pub async fn with_wallet_mut<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut Wallet) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-
+    mutate_core(|core| {
         let wallet = core
             .wallets
             .get_mut(wallet_index)
             .ok_or(ServiceError::WalletAccess(wallet_index))?;
 
         f(wallet)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    })
+    .await
 }
 
 pub async fn with_wallet<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&Wallet) -> Result<T, ServiceError>,
 {
-    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let core = Arc::clone(&service.core);
-        let wallet = core.get_wallet_by_index(wallet_index)?;
+    let core = handle()?;
+    let wallet = core.get_wallet_by_index(wallet_index)?;
 
-        f(wallet)
-    } else {
-        Err(ServiceError::NotRunning)
-    }
+    f(wallet)
 }

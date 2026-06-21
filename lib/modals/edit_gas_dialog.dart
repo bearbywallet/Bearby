@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
-import 'package:bearby/components/hoverd_svg.dart';
+import 'package:bearby/components/hover_icon.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/src/rust/api/utils.dart';
@@ -221,11 +222,10 @@ class _EditGasDialogState extends State<EditGasDialog> {
             l10n.editGasDialogTitle,
             style: theme.headline2.copyWith(color: theme.textPrimary),
           ),
-          HoverSvgIcon(
-            assetName: 'assets/icons/close.svg',
+          HoverIcon(
+            icon: AppIcon.close,
             onTap: () => Navigator.of(context).pop(),
-            width: 20,
-            height: 20,
+            size: 20,
             color: theme.textSecondary,
           ),
         ],
@@ -319,13 +319,12 @@ class _EditGasDialogState extends State<EditGasDialog> {
 
   Widget _buildCopyButton(String textToCopy) {
     final theme = Provider.of<AppState>(context).currentTheme;
-    return HoverSvgIcon(
-      assetName: 'assets/icons/copy.svg',
+    return HoverIcon(
+      icon: AppIcon.copy,
       onTap: () {
         Clipboard.setData(ClipboardData(text: textToCopy));
       },
-      width: 18,
-      height: 18,
+      size: 18,
       color: theme.primaryPurple,
     );
   }

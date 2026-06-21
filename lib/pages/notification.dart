@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/switch_setting_item.dart';
@@ -78,7 +79,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SwitchSettingItem(
-                            iconPath: "assets/icons/manage.svg",
+                            icon: AppIcon.manage,
                             title: AppLocalizations.of(context)!
                                 .notificationsSettingsPagePushTitle,
                             backgroundColor: theme.cardBackground,

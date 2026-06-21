@@ -59,7 +59,11 @@ flutter:
         - asset: assets/fonts/Semibold.ttf   
           weight: 600                        
         - asset: assets/fonts/Ultralight.ttf
-          weight: 300    
+          weight: 300
+    - family: PhosphorRegular
+      fonts:
+        - asset: assets/fonts/Phosphor.ttf
+          weight: 400
 
 flutter_launcher_icons:
   android: true

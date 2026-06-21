@@ -1,35 +1,32 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/input_amount.dart';
-import 'package:bearby/components/jazzicon.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
-import 'package:bearby/components/skeleton_box.dart';
-import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/shimmer_text.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/modals/exchange_confirm.dart';
+import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/swap_settings.dart';
-import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
-import 'package:bearby/src/rust/api/exchange.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-enum _OrderType { swap, limit, buySell }
+enum _OrderType { swap, buySell }
 
 class ExchangePage extends StatefulWidget {
   const ExchangePage({super.key});
@@ -39,212 +36,132 @@ class ExchangePage extends StatefulWidget {
 }
 
 class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
-  static const int _slippageBps = 50; // 0.5%
-  static const int _deadlineSeconds = 1200; // 20 minutes
   static const Duration _quoteDebounce = Duration(milliseconds: 400);
 
   late final AppState _appState;
+  late final ExchangeState _exchangeState;
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
   Timer? _quoteTimer;
 
   _OrderType _orderType = _OrderType.swap;
-
-  bool _loadingAssets = true;
-  String? _assetsError;
-  // "You pay" — our tokens on the active network (source = active wallet chain).
-  List<ExchangeAsset> _assets = const [];
-  // "You get" — every Uniswap-supported token across all chains (bridge targets).
-  List<ExchangeAsset> _getAssets = const [];
-  ExchangeAsset? _fromAsset;
-  ExchangeAsset? _toAsset;
-
-  String _amount = "0";
+  String _amount = '0';
   bool _hasDecimalPoint = false;
-
-  bool _loadingQuote = false;
-  ExchangeQuoteInfo? _selectedQuote;
+  BigInt? _lastChainHash;
+  BigInt? _lastAccount;
+  String? _recipientOverride;
+  bool _firstFrameDone = false;
+  bool _wasVisible = false;
 
   @override
   void initState() {
     super.initState();
-    _appState = Provider.of<AppState>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+    _appState = context.read<AppState>();
+    _exchangeState = context.read<ExchangeState>();
+    _lastChainHash = _appState.wallet?.chainHash;
+    _lastAccount = _appState.wallet?.selectedAccount;
+    _appState.addListener(_onAppStateChanged);
+    _exchangeState.addListener(_onExchangeStateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _firstFrameDone = true;
+      _bootstrap();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // go_router keeps this branch alive in an IndexedStack and only toggles
+    // TickerMode when the tab becomes (in)active. Use that flip to re-fetch
+    // balances/assets on re-entry — initState runs only on the first visit.
+    final isVisible = TickerMode.valuesOf(context).enabled;
+    if (isVisible && !_wasVisible && _firstFrameDone) {
+      // Defer: didChangeDependencies runs during build, but _bootstrap calls
+      // notifyListeners() which would mark the provider dirty mid-build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _bootstrap(initialFrom: _exchangeState.fromAsset);
+      });
+    }
+    _wasVisible = isVisible;
   }
 
   @override
   void dispose() {
+    _appState.removeListener(_onAppStateChanged);
+    _exchangeState.removeListener(_onExchangeStateChanged);
     _quoteTimer?.cancel();
     _btnController.dispose();
     super.dispose();
   }
 
-  // --- data ---------------------------------------------------------------
+  void _onExchangeStateChanged() {}
 
-  Future<void> _bootstrap() async {
+  void _onAppStateChanged() {
+    final hash = _appState.wallet?.chainHash;
+    final account = _appState.wallet?.selectedAccount;
+    if (hash == _lastChainHash && account == _lastAccount) return;
+    _lastChainHash = hash;
+    _lastAccount = account;
+    _quoteTimer?.cancel();
     setState(() {
-      _loadingAssets = true;
-      _assetsError = null;
+      _amount = '0';
+      _hasDecimalPoint = false;
+      _recipientOverride = null;
     });
-
-    try {
-      final all = await bootstrapExchangeProviders();
-      final chainHash = _appState.wallet?.chainHash;
-
-      // Resolve the active (source) chain — getChain throws, so scan providers.
-      NetworkConfigInfo? active;
-      for (final p in _appState.state.providers) {
-        if (p.chainHash == chainHash) {
-          active = p;
-          break;
-        }
-      }
-      final sourceTestnet = active?.testnet ?? false;
-
-      // Destinations must share the source environment (mainnet↔mainnet / testnet↔testnet).
-      final sameEnvChains = <BigInt>{
-        for (final p in _appState.state.providers)
-          if ((p.testnet ?? false) == sourceTestnet) p.chainHash,
-      };
-
-      // Pay = our tokens on the active network. Get = same-environment Uniswap tokens.
-      final pay = all
-          .where((a) => a.token.chainHash == chainHash && _isUniswapEvm(a))
-          .toList();
-      final get = all
-          .where((a) =>
-              _isUniswapEvm(a) && sameEnvChains.contains(a.token.chainHash))
-          .toList();
-
-      ExchangeAsset? from;
-      ExchangeAsset? to;
-      if (pay.isNotEmpty) {
-        from = pay.firstWhere((a) => a.token.native, orElse: () => pay.first);
-      }
-      // Prefer a same-chain token (a plain swap, always routable); fall back to first same-env.
-      for (final a in get) {
-        if (a == from) continue;
-        to ??= a;
-        if (a.token.chainHash == chainHash) {
-          to = a;
-          break;
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _assets = pay;
-        _getAssets = get;
-        _fromAsset = from;
-        _toAsset = to;
-        _loadingAssets = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loadingAssets = false;
-        _assetsError = e.toString();
-      });
-    }
+    _bootstrap(initialFrom: _exchangeState.fromAsset);
   }
 
-  /// "You get" assets: every Uniswap token across all chains (bridge targets), excluding
-  /// whatever is selected on the "pay" side.
-  List<ExchangeAsset> get _outAssets =>
-      _getAssets.where((a) => a != _fromAsset).toList();
-
-  /// An EVM token that at least one Uniswap provider supports.
-  static bool _isUniswapEvm(ExchangeAsset a) =>
-      a.token.addrType == 1 &&
-      a.providers.any((p) => p.whenOrNull(uniswap: (_) => true) ?? false);
-
-  /// The Uniswap source/target chain id carried by an asset's provider, if any.
-  static BigInt? _uniChainId(ExchangeAsset a) {
-    for (final p in a.providers) {
-      final id = p.whenOrNull(uniswap: (m) => m.chainId);
-      if (id != null) return id;
-    }
-    return null;
+  ExchangeAsset? _nativeInitialAsset() {
+    final chainHash = _appState.wallet?.chainHash;
+    final token = _appState.wallet?.tokens
+        .where((t) => t.chainHash == chainHash && t.native)
+        .firstOrNull;
+    if (token == null) return null;
+    return ExchangeAsset(token: token, providers: const {}, halted: false);
   }
 
-  /// `tokenOut` for the Trading API. A different destination chain is prefixed
-  /// `"<chainId>:addr"` so the API returns a BRIDGE route; same-chain stays a bare address.
-  /// Native tokens already carry the zero address in the catalog, so no substitution.
-  String _outTokenParam(ExchangeAsset from, ExchangeAsset to) {
-    final addr = to.token.addr;
-    final fromId = _uniChainId(from);
-    final toId = _uniChainId(to);
-    return (fromId != null && toId != null && fromId != toId)
-        ? '$toId:$addr'
-        : addr;
+  Future<void> _bootstrap({ExchangeAsset? initialFrom}) {
+    final walletIndex = _appState.selectedWalletIndexOrNull;
+    if (walletIndex == null) return Future.value();
+    return _exchangeState.bootstrap(
+      walletIndex: walletIndex,
+      accountIndex: _appState.wallet?.selectedAccount ?? BigInt.zero,
+      activeChainHash: _appState.wallet?.chainHash,
+      initialFrom: initialFrom ?? _nativeInitialAsset(),
+    );
   }
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
-    _quoteTimer = Timer(_quoteDebounce, _fetchQuotes);
-  }
-
-  Future<void> _fetchQuotes() async {
-    final account = _appState.account;
-    final from = _fromAsset;
-    final to = _toAsset;
-    if (account == null || from == null || to == null) return;
-
-    final amountWei = toDecimalsWei(_amount, from.token.decimals);
-    if (amountWei <= BigInt.zero) {
-      setState(() => _selectedQuote = null);
-      return;
-    }
-
-    setState(() => _loadingQuote = true);
-
-    try {
-      final quotes = await fetchExchangeQuote(
-        asset: from,
-        fromAsset: from.token.addr,
-        toAsset: _outTokenParam(from, to),
-        amount: amountWei.toString(),
-        destination: account.addr,
+    _quoteTimer = Timer(_quoteDebounce, () {
+      final from = _exchangeState.fromAsset;
+      final to = _exchangeState.toAsset;
+      if (from == null || _amount.endsWith('.')) return;
+      final amountWei = toDecimalsWei(_amount, from.token.decimals);
+      debugPrint(
+        '[ExchangePage] scheduleQuote from=${from.token.symbol} '
+        'to=${to?.token.symbol} amount=$_amount amountWei=$amountWei '
+        'fromProviders=${from.providers.length}',
       );
-      // Keep the best (highest output) quote — it drives "You get" and the swap tx.
-      quotes.sort((a, b) => (BigInt.tryParse(b.amountOut) ?? BigInt.zero)
-          .compareTo(BigInt.tryParse(a.amountOut) ?? BigInt.zero));
-
-      if (!mounted) return;
-      setState(() {
-        _selectedQuote = quotes.isNotEmpty ? quotes.first : null;
-        _loadingQuote = false;
-      });
-    } catch (e) {
-      debugPrint("exchange quote failed: $e");
-      if (!mounted) return;
-      setState(() {
-        _selectedQuote = null;
-        _loadingQuote = false;
-      });
-    }
+      _exchangeState.setAmount(amountWei.toString());
+    });
   }
-
-  // --- input --------------------------------------------------------------
 
   void _onKeyPress(String value) {
-    if (value == ".") {
+    if (value == '.') {
       if (!_hasDecimalPoint) {
         setState(() {
           _hasDecimalPoint = true;
-          _amount = _amount == "0" ? "0." : "$_amount.";
+          _amount = _amount == '0' ? '0.' : '$_amount.';
         });
         _scheduleQuote();
       }
       return;
     }
-
     setState(() {
-      if (_hasDecimalPoint) {
-        _amount += value;
-      } else {
-        _amount = _amount == "0" ? value : "$_amount$value";
-      }
+      _amount = _hasDecimalPoint
+          ? '$_amount$value'
+          : (_amount == '0' ? value : '$_amount$value');
     });
     _scheduleQuote();
   }
@@ -255,7 +172,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         if (_amount.endsWith('.')) _hasDecimalPoint = false;
         _amount = _amount.substring(0, _amount.length - 1);
       } else {
-        _amount = "0";
+        _amount = '0';
         _hasDecimalPoint = false;
       }
     });
@@ -264,195 +181,79 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   void _selectFrom(ExchangeAsset asset) {
     setState(() {
-      _fromAsset = asset;
-      _amount = "0";
+      _amount = '0';
       _hasDecimalPoint = false;
-      _selectedQuote = null;
-      if (_toAsset == asset || _toAsset == null) {
-        final outs = _outAssets;
-        _toAsset = outs.isNotEmpty ? outs.first : null;
-      }
+      _recipientOverride = null;
     });
+    _exchangeState.selectFrom(asset);
+    final to = _exchangeState.toAsset;
+    if (to == null) return;
+
+    final outs = _exchangeState.outAssets;
+    if (to == asset || !outs.contains(to)) {
+      _exchangeState.clearTo();
+    }
   }
 
   void _selectTo(ExchangeAsset asset) {
-    setState(() {
-      _toAsset = asset;
-      _selectedQuote = null;
-    });
+    setState(() => _recipientOverride = null);
+    _exchangeState.selectTo(asset);
     _scheduleQuote();
   }
 
-  bool get _canSwap {
-    final from = _fromAsset;
-    if (from == null || _toAsset == null || _selectedQuote == null) return false;
+  bool _canSwap(ExchangeState state) {
+    final from = state.fromAsset;
+    if (from == null ||
+        state.toAsset == null ||
+        state.selectedProvider == null) {
+      return false;
+    }
     if (_amount.endsWith('.')) return false;
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) return false;
-    final balance =
-        BigInt.tryParse(from.token.balances[_appState.accountBalanceKey] ?? '') ??
-            BigInt.zero;
+    final balance = BigInt.tryParse(
+            from.token.balances[_appState.accountBalanceKey] ?? '') ??
+        BigInt.zero;
     return amountWei <= balance;
   }
 
-  // --- confirm ------------------------------------------------------------
+  void _handleSwap(ExchangeState state) {
+    if (!_canSwap(state)) return;
+    final from = state.fromAsset;
+    final to = state.toAsset;
+    final provider = state.selectedProvider;
+    if (from == null || to == null || provider == null) return;
 
-  Future<void> _handleSwap() async {
-    if (!_canSwap) return;
-
-    final appState = _appState;
-    final wallet = appState.wallet;
-    final account = appState.account;
-    final from = _fromAsset;
-    final to = _toAsset;
-    final quote = _selectedQuote;
-    if (wallet == null ||
-        account == null ||
-        from == null ||
-        to == null ||
-        quote == null) {
-      return;
-    }
-
-    final fromToken = from.token;
-    final isNativeIn = fromToken.native;
-    final isUniswap = quote.provider.whenOrNull(uniswap: (_) => true) ?? false;
-    if (!isUniswap) {
+    final supported = provider.whenOrNull(
+          relay: (_) => true,
+          uniswap: (_) => true,
+          pancakeSwap: (_) => true,
+          plunderSwap: (_) => true,
+          zilSwap: (_) => true,
+          sunSwap: (_) => true,
+        ) ??
+        false;
+    if (!supported) {
       _showError('Unsupported provider');
       return;
     }
-    // Native tokens already carry the zero address; Rust also overrides `tokenIn`
-    // internally when `isNativeIn`.
-    final tokenIn = fromToken.addr;
-    final isLedger = wallet.walletType.contains(WalletType.ledger.name);
-    if (!isNativeIn && isLedger) {
-      _showError('ERC20 swaps are not supported on Ledger yet');
-      return;
-    }
 
-    _btnController.start();
+    final defaultRecipient = provider.common.accountAddr;
+    final destination = _recipientOverride ?? defaultRecipient;
 
-    try {
-      final amountInWei = toDecimalsWei(_amount, fromToken.decimals);
-
-      // ERC-20 inputs need a one-time on-chain approve before the swap can pull tokens.
-      // Native inputs never do. When an approval is required we broadcast it first; the
-      // user re-taps Swap once it confirms.
-      if (!isNativeIn) {
-        final approval = await checkExchangeApproval(
-          walletIndex: appState.selectedWalletIndex,
-          accountIndex: wallet.selectedAccount,
-          provider: quote.provider,
-          tokenIn: tokenIn,
-          amountIn: amountInWei.toString(),
-          isNativeIn: isNativeIn,
-        );
-        if (approval != null) {
-          if (!mounted) {
-            _btnController.stop();
-            return;
-          }
-          _btnController.stop();
-          showConfirmTransactionModal(
-            context: context,
-            tx: approval,
-            to: tokenIn,
-            amount: '0',
-            token: fromToken,
-            onConfirm: (_) => context.go(AppRoutes.history),
-            onDismiss: () => _btnController.reset(),
-          );
-          return;
-        }
-      }
-
-      // Permit2 signing password for ERC-20 inputs (native needs none).
-      String? permitPassword;
-      if (!isNativeIn && wallet.authType == 'none') {
-        permitPassword = await _promptPassword();
-        if (permitPassword == null) {
-          _btnController.reset();
-          return;
-        }
-      }
-
-      final deadline = BigInt.from(
-          DateTime.now().millisecondsSinceEpoch ~/ 1000 + _deadlineSeconds);
-
-      final tx = await buildExchangeTx(
-        walletIndex: appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
-        provider: quote.provider,
-        tokenIn: tokenIn,
-        tokenOut: _outTokenParam(from, to),
-        amountIn: amountInWei.toString(),
-        amountOut: quote.amountOut,
-        feeTier: 0, // unused by the Trading API arm; kept for FFI stability
-        slippageBps: _slippageBps,
-        deadline: deadline,
-        isNativeIn: isNativeIn,
-        password: permitPassword,
-      );
-
-      if (!mounted) {
-        _btnController.stop();
-        return;
-      }
-      _btnController.stop();
-      showConfirmTransactionModal(
-        context: context,
-        tx: tx,
-        to: account.addr,
-        amount: _amount,
-        token: fromToken,
-        onConfirm: (_) => context.go(AppRoutes.history),
-        onDismiss: () => _btnController.reset(),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      _btnController.error();
-      _showError(e.toString());
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) _btnController.reset();
-      });
-    }
-  }
-
-  Future<String?> _promptPassword() async {
-    final controller = TextEditingController();
-    final theme = _appState.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
-
-    final result = await showDialog<String>(
+    showExchangeConfirmModal(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: theme.cardBackground,
-        title: Text(
-          l10n.exchangePageConfirm,
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        content: SmartInput(
-          controller: controller,
-          hint: 'Password',
-          obscureText: true,
-          autofocus: true,
-          borderColor: theme.textPrimary,
-          focusedBorderColor: theme.primaryPurple,
-          onSubmitted: (value) => Navigator.pop(ctx, value),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, controller.text),
-            child: Text(
-              l10n.exchangePageConfirm,
-              style: theme.button.copyWith(color: theme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
+      from: from,
+      to: to,
+      amountInWei: toDecimalsWei(_amount, from.token.decimals).toString(),
+      destination: destination,
+      slippageBps: state.slippageFor(provider),
+      onDone: () {
+        _btnController.reset();
+        if (mounted) context.go(AppRoutes.history);
+      },
+      onDismiss: () => _btnController.reset(),
     );
-    controller.dispose();
-    return (result != null && result.isNotEmpty) ? result : null;
   }
 
   void _showError(String message) {
@@ -461,28 +262,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: theme.cardBackground,
-        title: Text(
-          "Error",
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
-        content: Text(
-          message,
-          style: theme.bodyLarge.copyWith(color: theme.danger),
-        ),
+        title: Text('Error',
+            style: theme.titleMedium.copyWith(color: theme.textPrimary)),
+        content:
+            Text(message, style: theme.bodyLarge.copyWith(color: theme.danger)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              "OK",
-              style: theme.button.copyWith(color: theme.primaryPurple),
-            ),
+            child: Text('OK',
+                style: theme.button.copyWith(color: theme.primaryPurple)),
           ),
         ],
       ),
     );
   }
-
-  // --- build --------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -503,17 +296,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: padding),
-                  child: _buildTabs(theme, l10n),
-                ),
-                Expanded(
-                  child: _buildBody(theme, l10n, padding),
-                ),
-              ],
+            child: Consumer<ExchangeState>(
+              builder: (context, exchange, _) => Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: padding),
+                    child: _buildTabs(theme, l10n, exchange),
+                  ),
+                  Expanded(child: _buildBody(theme, l10n, padding, exchange)),
+                ],
+              ),
             ),
           ),
         ),
@@ -521,37 +314,25 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildBody(AppTheme theme, AppLocalizations l10n, double padding) {
-    final from = _fromAsset;
-    final to = _toAsset;
-
-    // Only show a message once bootstrap finished with nothing to swap.
-    if (!_loadingAssets && (_assetsError != null || from == null || to == null)) {
+  Widget _buildBody(AppTheme theme, AppLocalizations l10n, double padding,
+      ExchangeState state) {
+    final from = state.fromAsset;
+    final to = state.toAsset;
+    if (!state.loadingAssets && (state.assetsError != null || from == null)) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(padding),
           child: Text(
-            _assetsError ?? l10n.exchangePageNoAssets,
+            state.assetsError ?? l10n.exchangePageNoAssets,
             textAlign: TextAlign.center,
             style: theme.bodyLarge.copyWith(color: theme.textSecondary),
           ),
         ),
       );
     }
+    if (from == null) return const Center(child: CircularProgressIndicator());
 
-    // Bootstrap is fast — don't flash any loading state. Render nothing until the
-    // assets land, then show the real cards.
-    if (from == null || to == null) {
-      return const SizedBox.shrink();
-    }
-
-    final Widget cards = Column(
-      children: [
-        _buildPayCard(from),
-        _buildDirectionButton(theme, from),
-        _buildGetCard(theme, l10n, to),
-      ],
-    );
+    final canSwap = _canSwap(state);
 
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(
@@ -565,21 +346,41 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              cards,
+              _buildPayCard(from, state),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 40),
+                    _buildDirectionIcon(theme, from, state),
+                  ],
+                ),
+              ),
+              if (to == null)
+                _buildEmptyGetCard(theme, state)
+              else
+                _buildGetCard(theme, l10n, to, state),
               const SizedBox(height: 8),
               NumberKeyboard(
                 onKeyPressed: (value) => _onKeyPress(value.toString()),
                 onBackspace: _onBackspace,
-                onDotPress: () => _onKeyPress("."),
+                onDotPress: () => _onKeyPress('.'),
               ),
               RoundedLoadingButton(
                 controller: _btnController,
-                onPressed: !_canSwap ? null : _handleSwap,
-                color: theme.primaryPurple,
+                onPressed: canSwap ? () => _handleSwap(state) : null,
+                color: canSwap
+                    ? theme.primaryPurple
+                    : theme.textSecondary.withValues(alpha: 0.18),
                 valueColor: theme.buttonText,
                 child: Text(
                   l10n.exchangePageConfirm,
-                  style: theme.titleMedium.copyWith(color: theme.buttonText),
+                  style: theme.titleMedium.copyWith(
+                    color: canSwap
+                        ? theme.buttonText
+                        : theme.textSecondary.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -590,7 +391,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildTabs(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildTabs(
+      AppTheme theme, AppLocalizations l10n, ExchangeState state) {
     Widget tab(String label, _OrderType type, bool enabled) {
       final selected = _orderType == type;
       return GestureDetector(
@@ -617,20 +419,25 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           tab(l10n.exchangePageTabSwap, _OrderType.swap, true),
-          tab(l10n.exchangePageTabLimit, _OrderType.limit, false),
           tab(l10n.exchangePageTabBuySell, _OrderType.buySell, false),
           const Spacer(),
           GestureDetector(
-            onTap: () => showSwapSettingsModal(context: context),
+            onTap: () {
+              final provider = state.selectedProvider;
+              if (provider == null) return;
+              showSwapSettingsModal(
+                context: context,
+                activeProvider: provider,
+                exchangeState: state,
+              );
+            },
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: SvgPicture.asset(
-                "assets/icons/gear.svg",
-                width: 22,
-                height: 22,
-                colorFilter:
-                    ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+              child: AppIconView(
+                icon: AppIcon.settings,
+                size: 22,
+                color: theme.textSecondary,
               ),
             ),
           ),
@@ -639,12 +446,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildPayCard(ExchangeAsset from) {
+  Widget _buildPayCard(ExchangeAsset from, ExchangeState state) {
     final token = from.token;
     final balance =
         BigInt.tryParse(token.balances[_appState.accountBalanceKey] ?? '') ??
             BigInt.zero;
-
     return TokenAmountCard(
       amount: _amount,
       token: token,
@@ -658,124 +464,174 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       },
       onTokenTap: () => showExchangeTokenSelectModal(
         context: context,
-        assets: _assets,
+        assetSelector: (s) => s.payAssets,
         onSelected: _selectFrom,
       ),
     );
   }
 
-  Widget _buildDirectionButton(AppTheme theme, ExchangeAsset? from) {
-    // Flip is only valid when the current "pay" token can legally become an output
-    // (ERC20-out only). Native-out unwrap (e.g. WBTC -> BNB) is supported by Uniswap's
-    // Universal Router via UNWRAP_WETH but not yet wired in the Rust backend
-    // (build_execute_calldata); once that lands, this guard can drop the native check.
-    final canFlip = from != null && !from.token.native && _toAsset != null;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: GestureDetector(
-        onTap: canFlip
-            ? () {
-                final to = _toAsset;
-                if (to == null) return;
-                setState(() {
-                  _fromAsset = to;
-                  _toAsset = from;
-                  _amount = "0";
-                  _hasDecimalPoint = false;
-                  _selectedQuote = null;
-                });
-              }
-            : null,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: theme.cardBackground,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: theme.textSecondary.withValues(alpha: 0.2),
-              width: 1.5,
-            ),
-          ),
-          child: Center(
-            child: SvgPicture.asset(
-              "assets/icons/swap.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                canFlip
-                    ? theme.primaryPurple
-                    : theme.textSecondary.withValues(alpha: 0.4),
-                BlendMode.srcIn,
-              ),
-            ),
+  Widget _buildDirectionIcon(
+      AppTheme theme, ExchangeAsset? from, ExchangeState state) {
+    final canFlip = from != null && state.toAsset != null;
+    return GestureDetector(
+      onTap: canFlip
+          ? () {
+              final to = state.toAsset;
+              if (to == null) return;
+              setState(() {
+                _amount = '0';
+                _hasDecimalPoint = false;
+                _recipientOverride = null;
+              });
+              state.selectFrom(to);
+              state.selectTo(from);
+            }
+          : null,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: theme.cardBackground,
+          shape: BoxShape.circle,
+          border: Border.all(
+              color: theme.textSecondary.withValues(alpha: 0.2), width: 1.5),
+        ),
+        child: Center(
+          child: AppIconView(
+            icon: AppIcon.swap,
+            size: 20,
+            color: canFlip
+                ? theme.primaryPurple
+                : theme.textSecondary.withValues(alpha: 0.4),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to) {
-    final token = to.token;
-    final quote = _selectedQuote;
-    final (outAmount, _) = quote == null
-        ? ("0", "")
-        : formatingAmount(
-            amount: BigInt.tryParse(quote.amountOut) ?? BigInt.zero,
-            symbol: token.symbol,
-            decimals: token.decimals,
-            rate: token.rate,
-            appState: _appState,
-          );
+  String? _rateLabel(
+      ExchangeAsset from, ExchangeAsset to, ProviderQuote quote) {
+    final amountInWei = toDecimalsWei(_amount, from.token.decimals);
+    if (amountInWei <= BigInt.zero) return null;
+    final amountOutWei = BigInt.tryParse(quote.amountOut) ?? BigInt.zero;
+    if (amountOutWei == BigInt.zero) return null;
+    final oneFromWei = BigInt.from(10).pow(from.token.decimals);
+    final rateOutWei = (amountOutWei * oneFromWei) ~/ amountInWei;
+    final (rateAmount, _) = formatingAmount(
+      amount: rateOutWei,
+      symbol: '',
+      decimals: to.token.decimals,
+      rate: to.token.rate,
+      appState: _appState,
+    );
+    return '1 ${from.token.symbol} ≈ $rateAmount ${to.token.symbol}';
+  }
 
+  Widget _buildEmptyGetCard(AppTheme theme, ExchangeState state) {
+    final outs = state.outAssets;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
+            color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _buildEmptyTokenSelector(
+            theme,
+            outs.isNotEmpty
+                ? () => showExchangeTokenSelectModal(
+                      context: context,
+                      assetSelector: (s) => s.outAssets,
+                      onSelected: _selectTo,
+                    )
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGetCard(AppTheme theme, AppLocalizations l10n, ExchangeAsset to,
+      ExchangeState state) {
+    final token = to.token;
+    final selectedProvider = state.selectedProvider;
+    final quote = selectedProvider?.quote;
+    final from = state.fromAsset;
+    final rateLabel =
+        quote == null || from == null ? null : _rateLabel(from, to, quote);
+    final recipient = to.providers.firstOrNull?.common.accountAddr ?? '';
+    final effectiveRecipient = _recipientOverride ?? recipient;
+    final (outAmount, _) = quote == null
+        ? ('0', '')
+        : formatingAmount(
+            amount: BigInt.tryParse(quote.amountOut) ?? BigInt.zero,
+            symbol: '',
+            decimals: token.decimals,
+            rate: token.rate,
+            appState: _appState,
+          );
+    final status = state.quoteStatus;
+    final amountInWei = from == null
+        ? BigInt.zero
+        : toDecimalsWei(_amount, from.token.decimals);
+    final showAmountShimmer =
+        status == QuoteStatus.loading && amountInWei > BigInt.zero;
+    final outAmountStyle = theme.displayLarge.copyWith(
+      color: theme.textPrimary,
+      fontSize: 28,
+    );
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.exchangePageGet,
-            style: theme.bodyText2.copyWith(color: theme.textSecondary),
-          ),
+          _buildRecipientButton(theme, l10n, effectiveRecipient, to),
           const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  layoutBuilder: (currentChild, previousChildren) => Stack(
-                    alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      ...previousChildren,
-                      if (currentChild != null) currentChild,
-                    ],
+                child: SizedBox(
+                  height: 36,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    layoutBuilder: (currentChild, previousChildren) => Stack(
+                      alignment: AlignmentDirectional.centerStart,
+                      children: [
+                        ...previousChildren,
+                        if (currentChild != null) currentChild
+                      ],
+                    ),
+                    child: Align(
+                      key: showAmountShimmer
+                          ? const ValueKey<String>('get-shimmer')
+                          : const ValueKey<String>('get-value'),
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: showAmountShimmer
+                            ? ShimmerText(
+                                text: outAmount,
+                                style: outAmountStyle,
+                                baseColor:
+                                    theme.textPrimary.withValues(alpha: 0.35),
+                                highlightColor: theme.textPrimary,
+                              )
+                            : Text(
+                                outAmount,
+                                style: outAmountStyle,
+                              ),
+                      ),
+                    ),
                   ),
-                  child: (quote == null && _loadingQuote)
-                      ? SkeletonBox(
-                          key: const ValueKey('get-skeleton'),
-                          width: 150,
-                          height:
-                              AdaptiveSize.getAdaptiveFontSize(context, 28),
-                        )
-                      : Text(
-                          outAmount,
-                          key: const ValueKey('get-value'),
-                          style: theme.displayLarge.copyWith(
-                            color: theme.textPrimary,
-                            fontSize:
-                                AdaptiveSize.getAdaptiveFontSize(context, 28),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
                 ),
               ),
               _buildTokenSelector(
@@ -783,29 +639,62 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                 token,
                 () => showExchangeTokenSelectModal(
                   context: context,
-                  assets: _outAssets,
+                  assetSelector: (s) => s.outAssets,
                   onSelected: _selectTo,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            rateLabel ?? '-',
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTokenSelector(
+  Widget _buildRecipientButton(
     AppTheme theme,
-    FTokenInfo token,
-    VoidCallback onTap,
+    AppLocalizations l10n,
+    String address,
+    ExchangeAsset to,
   ) {
+    return GestureDetector(
+      onTap: () {
+        final chainHash = to.providers.firstOrNull?.common.chainHash;
+        showAddressSelectModal(
+          context: context,
+          chainHash: chainHash,
+          title: l10n.exchangePageRecipientTitle,
+          onAddressSelected: (info, _) {
+            setState(() => _recipientOverride = info.recipient);
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        shortenAddress(address),
+        style: theme.bodyText2.copyWith(
+          color: theme.primaryPurple,
+          decoration: TextDecoration.underline,
+          decorationColor: theme.primaryPurple,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyTokenSelector(AppTheme theme, VoidCallback? onTap) {
+    final enabled = onTap != null;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           border: Border.all(
-            color: theme.textPrimary.withValues(alpha: 0.2),
+            color: theme.textPrimary.withValues(alpha: enabled ? 0.2 : 0.08),
             width: 1.5,
           ),
           borderRadius: BorderRadius.circular(16),
@@ -813,19 +702,21 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTokenAvatar(theme, token),
-            const SizedBox(width: 8),
             Text(
-              token.symbol,
-              style: theme.bodyText1.copyWith(color: theme.textPrimary),
+              'Select',
+              style: theme.bodyText1.copyWith(
+                color: enabled
+                    ? theme.textPrimary
+                    : theme.textSecondary.withValues(alpha: 0.5),
+              ),
             ),
             const SizedBox(width: 4),
-            SvgPicture.asset(
-              "assets/icons/tiny_down_arrow.svg",
-              width: 12,
-              height: 12,
-              colorFilter:
-                  ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+            AppIconView(
+              icon: AppIcon.arrowDown,
+              size: 12,
+              color: enabled
+                  ? theme.textSecondary
+                  : theme.textSecondary.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -833,31 +724,31 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildTokenAvatar(AppTheme theme, FTokenInfo token) {
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.textPrimary.withValues(alpha: 0.2),
-          width: 1.5,
+  Widget _buildTokenSelector(
+      AppTheme theme, FTokenInfo token, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: theme.textPrimary.withValues(alpha: 0.2), width: 1.5),
+          borderRadius: BorderRadius.circular(16),
         ),
-        shape: BoxShape.circle,
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: processTokenLogo(
-            token: token,
-            shortName: _appState.chain?.shortName ?? "",
-            theme: theme.value,
-          ),
-          width: 24,
-          height: 24,
-          fit: BoxFit.cover,
-          errorWidget: Jazzicon(seed: token.addr, diameter: 24),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TokenAvatar(token: token, appState: _appState),
+            const SizedBox(width: 8),
+            Text(token.symbol,
+                style: theme.bodyText1.copyWith(color: theme.textPrimary)),
+            const SizedBox(width: 4),
+            AppIconView(
+              icon: AppIcon.arrowDown,
+              size: 12,
+              color: theme.textSecondary,
+            ),
+          ],
         ),
       ),
     );

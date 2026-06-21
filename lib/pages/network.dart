@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -357,7 +358,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   child: SmartInput(
                     controller: _searchController,
                     hint: l10n.networkPageSearchHint,
-                    leftIconPath: 'assets/icons/search.svg',
+                    leftIcon: AppIcon.search,
                     onChanged: (value) => setState(() => _searchQuery = value),
                     borderColor: theme.textPrimary,
                     focusedBorderColor: theme.primaryPurple,

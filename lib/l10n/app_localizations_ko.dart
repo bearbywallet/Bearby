@@ -170,6 +170,45 @@ class AppLocalizationsKo extends AppLocalizations {
   String get receivePageAmountDialogConfirm => '확인';
 
   @override
+  String get btcAddressesModalTitle => 'Bitcoin 주소';
+
+  @override
+  String get btcAddressFormatLegacy => 'Legacy (P2PKH)';
+
+  @override
+  String get btcAddressFormatNestedSegwit => '중첩 SegWit (P2SH)';
+
+  @override
+  String get btcAddressFormatSegwit => 'SegWit (P2WPKH)';
+
+  @override
+  String get btcAddressFormatTaproot => 'Taproot (P2TR)';
+
+  @override
+  String btcAddressFormatUnknown(Object formatByte) {
+    return '알 수 없음 ($formatByte)';
+  }
+
+  @override
+  String get btcAddressesModalCurrent => '현재';
+
+  @override
+  String get btcAddressesModalUsed => '사용됨';
+
+  @override
+  String get btcAddressesModalEmpty => '아직 주소가 없습니다';
+
+  @override
+  String btcAddressesModalTxCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '거래 $count건',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get securityPageTitle => '보안';
 
   @override
@@ -239,6 +278,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangePageGet => '받을 금액';
 
   @override
+  String get exchangePageRecipientTitle => 'Select recipient';
+
+  @override
   String get exchangePageConfirm => '확인';
 
   @override
@@ -260,28 +302,75 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangeSettingsPriceProtection => '가격 보호';
 
   @override
-  String get exchangeSettingsTwap => 'TWAP';
-
-  @override
-  String get exchangeSettingsSubSwaps => '하위 스왑 수';
-
-  @override
-  String get exchangeSettingsTimeBetween => '하위 스왑 간격';
-
-  @override
   String get exchangeSettingsReset => '초기화';
 
   @override
   String get exchangeSettingsSave => '저장';
 
   @override
-  String exchangeSettingsBlocks(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count개 블록',
-    );
-    return '$_temp0';
+  String get exchangeConfirmBest => '최적';
+
+  @override
+  String get exchangeConfirmGasNone => '—';
+
+  @override
+  String exchangeConfirmAfterGas(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get exchangeConfirmSlippage => '슬리피지';
+
+  @override
+  String get exchangeConfirmRecipient => '받는 사람';
+
+  @override
+  String get exchangeConfirmSwipe => '밀어서 스왑';
+
+  @override
+  String get exchangeConfirmUnable => '확인할 수 없습니다';
+
+  @override
+  String get exchangeConfirmPassword => '비밀번호';
+
+  @override
+  String get exchangeConfirmNoAccount => '활성 계정이 없습니다';
+
+  @override
+  String get exchangeConfirmNoQuote => 'No quote available';
+
+  @override
+  String get exchangeConfirmStepApprove => '토큰 승인';
+
+  @override
+  String get exchangeConfirmStepPermit => '퍼밋 서명 (EIP-712)';
+
+  @override
+  String get exchangeConfirmWrap => '랩';
+
+  @override
+  String get exchangeConfirmUnwrap => '언랩';
+
+  @override
+  String get exchangeConfirmHintApprove => 'Ledger에서 승인을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintPermit => 'Ledger에서 퍼밋을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintSwap => 'Ledger에서 스왑을 확인하세요…';
+
+  @override
+  String get exchangeConfirmHintPreparing => '준비 중…';
+
+  @override
+  String exchangeHistoryApprove(String symbol) {
+    return '$symbol 승인';
+  }
+
+  @override
+  String exchangeHistoryPermit(String provider) {
+    return 'Permit2 · $provider';
   }
 
   @override
@@ -621,10 +710,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsPageTelegram => 'Telegram';
 
   @override
-  String get settingsPageTwitter => 'Twitter';
+  String get settingsPageTwitter => 'X';
 
   @override
   String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageEmail => '이메일';
 
   @override
   String get settingsPageAbout => '정보';
@@ -822,10 +914,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currencyConversionEngineCoingeckoSubtitle => 'Coingecko에서 환율 가져오기';
 
   @override
-  String get currencyConversionEngineCryptoCompare => 'CryptoCompare';
+  String get currencyConversionEngineBearbyRates => 'Bearby Rates';
 
   @override
-  String get currencyConversionEngineCryptoCompareSubtitle => 'CryptoCompare에서 환율 가져오기';
+  String get currencyConversionEngineBearbyRatesSubtitle => 'Bearby에서 환율 가져오기';
 
   @override
   String get restoreWalletOptionsTitle => '지갑 복원';
@@ -1852,6 +1944,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get qrCodeScanError => 'QR 코드를 읽지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String get homePageQrScanErrorTitle => '오류';
+
+  @override
+  String get homePageQrScanOkButton => '확인';
 
   @override
   String get qrCodeEmptySeedError => 'QR 코드에 시드 단어가 없습니다.';

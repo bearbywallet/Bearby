@@ -215,6 +215,54 @@
   "@receivePageAmountDialogConfirm": {
     "description": "Confirm button text in amount dialog on ReceivePage"
   },
+  "btcAddressesModalTitle": "Bitcoin addresses",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "Legacy (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "Nested SegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "Unknown ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "Current",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "Used",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "No addresses yet",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, =1{1 tx} other{{count} txs}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "securityPageTitle": "Security",
   "@securityPageTitle": {
     "description": "Title for the SecurityPage"
@@ -289,6 +337,7 @@
   "exchangePageTitle": "Exchange",
   "exchangePagePay": "You pay",
   "exchangePageGet": "You get",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "Confirm",
   "exchangePageComingSoon": "Soon",
   "exchangePageNoAssets": "No swappable assets on this network",
@@ -296,16 +345,46 @@
   "exchangePageTabLimit": "Limit",
   "exchangePageTabBuySell": "Buy/Sell",
   "exchangeSettingsPriceProtection": "Price Protection",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "Number of sub-swaps",
-  "exchangeSettingsTimeBetween": "Time between sub-swaps",
   "exchangeSettingsReset": "Reset",
   "exchangeSettingsSave": "Save",
-  "exchangeSettingsBlocks": "{count, plural, =1{1 block} other{{count} blocks}}",
-  "@exchangeSettingsBlocks": {
+  "exchangeConfirmBest": "BEST",
+  "exchangeConfirmGasNone": "—",
+  "exchangeConfirmAfterGas": "≈ {amount}",
+  "@exchangeConfirmAfterGas": {
     "placeholders": {
-      "count": {
-        "type": "int"
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangeConfirmSlippage": "Slippage",
+  "exchangeConfirmRecipient": "Recipient",
+  "exchangeConfirmSwipe": "Swipe to swap",
+  "exchangeConfirmUnable": "Unable to confirm",
+  "exchangeConfirmPassword": "Password",
+  "exchangeConfirmNoAccount": "No active account",
+  "exchangeConfirmNoQuote": "No quote available",
+  "exchangeConfirmStepApprove": "Approve token",
+  "exchangeConfirmStepPermit": "Sign permit (EIP-712)",
+  "exchangeConfirmWrap": "Wrap",
+  "exchangeConfirmUnwrap": "Unwrap",
+  "exchangeConfirmHintApprove": "Confirm approval on your Ledger…",
+  "exchangeConfirmHintPermit": "Confirm permit on your Ledger…",
+  "exchangeConfirmHintSwap": "Confirm swap on your Ledger…",
+  "exchangeConfirmHintPreparing": "Preparing…",
+  "exchangeHistoryApprove": "Approve {symbol}",
+  "@exchangeHistoryApprove": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangeHistoryPermit": "Permit2 · {provider}",
+  "@exchangeHistoryPermit": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
       }
     }
   },
@@ -766,19 +845,22 @@
   "@settingsPageTelegram": {
     "description": "Label for the Telegram settings item in the SettingsPage component"
   },
-  "settingsPageTwitter": "Twitter",
+  "settingsPageTwitter": "X",
   "@settingsPageTwitter": {
-    "description": "Label for the Twitter settings item in the SettingsPage component"
+    "description": "Label for the X (formerly Twitter) settings item in the SettingsPage component"
   },
   "settingsPageGitHub": "GitHub",
   "@settingsPageGitHub": {
     "description": "Label for the GitHub settings item in the SettingsPage component"
   },
+  "settingsPageEmail": "Email",
+  "@settingsPageEmail": {
+    "description": "Label for the email support item in the SettingsPage component"
+  },
   "settingsPageAbout": "About",
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
   },
-
   "passwordSetupPageSubtitle": "Create Password",
   "@passwordSetupPageSubtitle": {
     "description": "Subtitle text displayed at the top of the PasswordSetupPage component"
@@ -1035,13 +1117,13 @@
   "@currencyConversionEngineCoingeckoSubtitle": {
     "description": "Subtitle for the 'Coingecko' engine option"
   },
-  "currencyConversionEngineCryptoCompare": "CryptoCompare",
-  "@currencyConversionEngineCryptoCompare": {
-    "description": "Title for the 'CryptoCompare' engine option"
+  "currencyConversionEngineBearbyRates": "Bearby Rates",
+  "@currencyConversionEngineBearbyRates": {
+    "description": "Title for the 'Bearby Rates' engine option"
   },
-  "currencyConversionEngineCryptoCompareSubtitle": "Fetch rates from CryptoCompare",
-  "@currencyConversionEngineCryptoCompareSubtitle": {
-    "description": "Subtitle for the 'CryptoCompare' engine option"
+  "currencyConversionEngineBearbyRatesSubtitle": "Fetch rates from Bearby",
+  "@currencyConversionEngineBearbyRatesSubtitle": {
+    "description": "Subtitle for the 'Bearby Rates' engine option"
   },
   "restoreWalletOptionsTitle": "Restore Wallet",
   "@restoreWalletOptionsTitle": {
@@ -1770,8 +1852,12 @@
   "@transactionDetailsModal_inputsOutputsSummary": {
     "description": "Subtitle showing input and output counts under the amount in BTC TransactionDetailsModal",
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "Transfer",
@@ -2404,6 +2490,14 @@
   "qrCodeScanError": "Failed to read QR code. Please try again.",
   "@qrCodeScanError": {
     "description": "Error when QR code scanning or parsing throws an exception"
+  },
+  "homePageQrScanErrorTitle": "Error",
+  "@homePageQrScanErrorTitle": {
+    "description": "Title of the error dialog shown when a scanned QR code cannot be used on the home page"
+  },
+  "homePageQrScanOkButton": "OK",
+  "@homePageQrScanOkButton": {
+    "description": "Dismiss button of the QR scan error dialog on the home page"
   },
   "qrCodeEmptySeedError": "QR code contains no seed words.",
   "@qrCodeEmptySeedError": {

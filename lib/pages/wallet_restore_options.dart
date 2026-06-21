@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/view_item.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
@@ -181,14 +181,10 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                         WalletListItem(
                           title: l10n.restoreWalletOptionsBIP39Title,
                           subtitle: l10n.restoreWalletOptionsBIP39Subtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/document.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.document,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => _handleBip39Restore(context),
                         ),
@@ -199,42 +195,30 @@ class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
                           subtitle: _chain!.slip44 == kBitcoinlip44
                               ? l10n.restoreWalletOptionsPrivateKeyDeprecatedSubtitle
                               : l10n.restoreWalletOptionsPrivateKeySubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/bincode.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.bincode,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => _handlePrivateKeyRestore(context),
                         ),
                         WalletListItem(
                           title: l10n.restoreWalletOptionsKeyStoreTitle,
                           subtitle: l10n.restoreWalletOptionsKeyStoreSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/file.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.file,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => _handleKeystoreResotre(context),
                         ),
                         WalletListItem(
                           title: l10n.restoreWalletOptionsQRCodeTitle,
                           subtitle: l10n.restoreWalletOptionsQRCodeSubtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/qrcode.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.scan,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => _handleQRCodeScanning(context),
                         ),

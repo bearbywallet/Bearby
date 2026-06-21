@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/jazzicon.dart';
@@ -17,6 +17,8 @@ import 'package:bearby/theme/app_theme.dart';
 void showAddressSelectModal({
   required BuildContext context,
   required Function(QRcodeScanResultInfo, String) onAddressSelected,
+  BigInt? chainHash,
+  String? title,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -29,15 +31,25 @@ void showAddressSelectModal({
     builder: (context) => Padding(
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: _AddressSelectModalContent(onAddressSelected: onAddressSelected),
+      child: _AddressSelectModalContent(
+        onAddressSelected: onAddressSelected,
+        chainHash: chainHash,
+        title: title,
+      ),
     ),
   );
 }
 
 class _AddressSelectModalContent extends StatefulWidget {
   final Function(QRcodeScanResultInfo, String) onAddressSelected;
+  final BigInt? chainHash;
+  final String? title;
 
-  const _AddressSelectModalContent({required this.onAddressSelected});
+  const _AddressSelectModalContent({
+    required this.onAddressSelected,
+    this.chainHash,
+    this.title,
+  });
 
   @override
   State<_AddressSelectModalContent> createState() =>
@@ -59,11 +71,14 @@ class _AddressSelectModalContentState
 
   Future<void> _loadAddresses() async {
     final appState = Provider.of<AppState>(context, listen: false);
+    final chainHash = widget.chainHash;
 
     try {
-      final categories = await getCombineSortAddresses(
-        walletIndex: appState.selectedWalletIndex,
-      );
+      final categories = chainHash == null
+          ? await getCombineSortAddresses(
+              walletIndex: appState.selectedWalletIndex,
+            )
+          : await getAddressesForChain(chainHash: chainHash);
 
       if (mounted) {
         setState(() {
@@ -165,7 +180,7 @@ class _AddressSelectModalContentState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Text(
-        l10n.addressSelectModalContentTitle,
+        widget.title ?? l10n.addressSelectModalContentTitle,
         style: theme.titleMedium.copyWith(
           color: theme.textPrimary,
           shadows: [
@@ -185,7 +200,7 @@ class _AddressSelectModalContentState
       child: SmartInput(
         controller: _searchController,
         hint: l10n.addressSelectModalContentSearchHint,
-        leftIconPath: 'assets/icons/qrcode.svg',
+        leftIcon: AppIcon.scan,
         onChanged: (value) async {
           try {
             bool isAddress = await isValidAddress(addr: value);
@@ -258,15 +273,11 @@ class _AddressSelectModalContentState
   Widget _buildCategoryHeader(CategoryInfo categoryInfo, AppTheme theme) {
     return Row(
       children: [
-        if (categoryInfo.iconPath != null) ...[
-          SvgPicture.asset(
-            categoryInfo.iconPath!,
-            width: 16,
-            height: 16,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple.withValues(alpha: 0.7),
-              BlendMode.srcIn,
-            ),
+        if (categoryInfo.icon != null) ...[
+          AppIconView(
+            icon: categoryInfo.icon!,
+            size: 16,
+            color: theme.primaryPurple.withValues(alpha: 0.7),
           ),
           const SizedBox(width: 8),
         ],
@@ -433,22 +444,22 @@ class _AddressSelectModalContentState
       case "my_accounts":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentMyAccounts,
-          iconPath: "assets/icons/wallet.svg",
+          icon: AppIcon.wallet,
         );
       case "book":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentAddressBook,
-          iconPath: "assets/icons/book.svg",
+          icon: AppIcon.book,
         );
       case "history":
         return CategoryInfo(
           displayName: l10n.addressSelectModalContentHistory,
-          iconPath: "assets/icons/history.svg",
+          icon: AppIcon.history,
         );
       default:
         return CategoryInfo(
           displayName: categoryName,
-          iconPath: "assets/icons/wallet.svg",
+          icon: AppIcon.wallet,
         );
     }
   }
@@ -497,10 +508,10 @@ class _AddressSelectModalContentState
 
 class CategoryInfo {
   final String displayName;
-  final String? iconPath;
+  final AppIcon? icon;
 
   CategoryInfo({
     required this.displayName,
-    this.iconPath,
+    this.icon,
   });
 }

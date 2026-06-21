@@ -75,26 +75,36 @@
   "exchangePageTitle": "交換",
   "exchangePagePay": "支払う",
   "exchangePageGet": "受け取る",
+  "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "確認",
+  "exchangeConfirmBest": "最適",
+  "exchangeConfirmGasNone": "—",
+  "exchangeConfirmAfterGas": "≈ {amount}",
+  "exchangeConfirmSlippage": "スリッページ",
+  "exchangeConfirmRecipient": "受取人",
+  "exchangeConfirmSwipe": "スワイプしてスワップ",
+  "exchangeConfirmUnable": "確認できません",
+  "exchangeConfirmPassword": "パスワード",
+  "exchangeConfirmNoAccount": "アクティブなアカウントがありません",
+  "exchangeConfirmNoQuote": "No quote available",
+  "exchangeConfirmStepApprove": "トークンを承認",
+  "exchangeConfirmStepPermit": "パーミットに署名 (EIP-712)",
+  "exchangeConfirmWrap": "ラップ",
+  "exchangeConfirmUnwrap": "アンラップ",
+  "exchangeConfirmHintApprove": "Ledger で承認を確認してください…",
+  "exchangeConfirmHintPermit": "Ledger でパーミットを確認してください…",
+  "exchangeConfirmHintSwap": "Ledger でスワップを確認してください…",
+  "exchangeConfirmHintPreparing": "準備中…",
+  "exchangeHistoryApprove": "{symbol} を承認",
+  "exchangeHistoryPermit": "Permit2 · {provider}",
   "exchangePageComingSoon": "近日",
   "exchangePageNoAssets": "このネットワークに交換可能な資産がありません",
   "exchangePageTabSwap": "スワップ",
   "exchangePageTabLimit": "指値",
   "exchangePageTabBuySell": "売買",
   "exchangeSettingsPriceProtection": "価格保護",
-  "exchangeSettingsTwap": "TWAP",
-  "exchangeSettingsSubSwaps": "サブスワップ数",
-  "exchangeSettingsTimeBetween": "サブスワップ間隔",
   "exchangeSettingsReset": "リセット",
   "exchangeSettingsSave": "保存",
-  "exchangeSettingsBlocks": "{count, plural, other{{count}ブロック}}",
-  "@exchangeSettingsBlocks": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",
@@ -201,8 +211,9 @@
   "settingsPageLanguage": "言語",
   "settingsPageBrowser": "ブラウザ",
   "settingsPageTelegram": "Telegram",
-  "settingsPageTwitter": "Twitter",
+  "settingsPageTwitter": "X",
   "settingsPageGitHub": "GitHub",
+  "settingsPageEmail": "メール",
   "settingsPageAbout": "アプリについて",
   "passwordSetupPageSubtitle": "パスワードを作成",
   "passwordSetupPageWalletNameHint": "ウォレット名",
@@ -268,8 +279,8 @@
   "currencyConversionEngineNoneSubtitle": "エンジンが選択されていません",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Coingeckoからレートを取得",
-  "currencyConversionEngineCryptoCompare": "CryptoCompare",
-  "currencyConversionEngineCryptoCompareSubtitle": "CryptoCompareからレートを取得",
+  "currencyConversionEngineBearbyRates": "Bearby Rates",
+  "currencyConversionEngineBearbyRatesSubtitle": "Bearbyからレートを取得",
   "restoreWalletOptionsTitle": "ウォレットを復元",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "ニーモニックフレーズで復元",
@@ -468,8 +479,12 @@
   "transactionDetailsModal_inputsOutputsSummary": "{inputCount, plural, other{{inputCount}件の入力}} · {outputCount, plural, other{{outputCount}件の出力}}",
   "@transactionDetailsModal_inputsOutputsSummary": {
     "placeholders": {
-      "inputCount": { "type": "int" },
-      "outputCount": { "type": "int" }
+      "inputCount": {
+        "type": "int"
+      },
+      "outputCount": {
+        "type": "int"
+      }
     }
   },
   "amountSection_transfer": "送金",
@@ -621,9 +636,59 @@
   "addNetworkPageSuccess": "ネットワークが追加されました",
   "qrCodeUnrecognizedError": "QRコードを認識できません。サポートされているフォーマットを使用してください。",
   "qrCodeScanError": "QRコードの読み取りに失敗しました。再試行してください。",
+  "homePageQrScanErrorTitle": "エラー",
+  "homePageQrScanOkButton": "OK",
   "qrCodeEmptySeedError": "QRコードにシードワードが含まれていません。",
   "qrCodeInvalidWordsError": "QRコードに無効なBIP39ワードが含まれています。",
   "qrCodeInvalidKeyError": "QRコードに無効な秘密鍵が含まれています。",
   "deprecatedLabel": "(非推奨)",
-  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoinでは非推奨です。BIP39を使用してください。"
+  "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Bitcoinでは非推奨です。BIP39を使用してください。",
+  "btcAddressesModalTitle": "Bitcoinアドレス",
+  "@btcAddressesModalTitle": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalTitle"
+  },
+  "btcAddressFormatLegacy": "レガシー (P2PKH)",
+  "@btcAddressFormatLegacy": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatLegacy"
+  },
+  "btcAddressFormatNestedSegwit": "ネストSegWit (P2SH)",
+  "@btcAddressFormatNestedSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatNestedSegwit"
+  },
+  "btcAddressFormatSegwit": "SegWit (P2WPKH)",
+  "@btcAddressFormatSegwit": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatSegwit"
+  },
+  "btcAddressFormatTaproot": "Taproot (P2TR)",
+  "@btcAddressFormatTaproot": {
+    "description": "Bitcoin receive addresses modal text: btcAddressFormatTaproot"
+  },
+  "btcAddressFormatUnknown": "不明 ({formatByte})",
+  "@btcAddressFormatUnknown": {
+    "description": "Fallback label for an unknown Bitcoin address format byte",
+    "placeholders": {
+      "formatByte": {}
+    }
+  },
+  "btcAddressesModalCurrent": "現在",
+  "@btcAddressesModalCurrent": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalCurrent"
+  },
+  "btcAddressesModalUsed": "使用済み",
+  "@btcAddressesModalUsed": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalUsed"
+  },
+  "btcAddressesModalEmpty": "アドレスはまだありません",
+  "@btcAddressesModalEmpty": {
+    "description": "Bitcoin receive addresses modal text: btcAddressesModalEmpty"
+  },
+  "btcAddressesModalTxCount": "{count, plural, other{{count}件の取引}}",
+  "@btcAddressesModalTxCount": {
+    "description": "Transaction count under each address in the Bitcoin addresses modal",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

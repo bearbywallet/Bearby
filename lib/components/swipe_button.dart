@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/state/app_state.dart';
 
@@ -72,9 +72,12 @@ class _SwipeButtonState extends State<SwipeButton>
       if (widget.onSwipeComplete != null) {
         await widget.onSwipeComplete!();
       }
+      if (!mounted) return;
       await _controller.reverse();
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
+    if (!mounted) return;
     setState(() {
       _isDragging = false;
       _dragExtent = 0.0;
@@ -157,14 +160,10 @@ class _SwipeButtonState extends State<SwipeButton>
                                 color: thumbColor,
                                 shape: BoxShape.circle,
                               ),
-                              child: SvgPicture.asset(
-                                "assets/icons/right_circle_arrow.svg",
-                                width: widget.height * 0.4,
-                                height: widget.height * 0.4,
-                                colorFilter: ColorFilter.mode(
-                                  theme.background,
-                                  BlendMode.srcIn,
-                                ),
+                              child: AppIconView(
+                                icon: AppIcon.arrowRight,
+                                size: widget.height * 0.4,
+                                color: theme.background,
                               ),
                             ),
                           ],

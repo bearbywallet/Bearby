@@ -42,9 +42,9 @@
         "standard": "none"
       },
       {
-        "name": "Blockchain.com",
-        "icon": "https://blockstream.info/favicon.ico",
-        "url": "https://www.blockchain.com/explorer",
+        "name": "Blockstream",
+        "icon": "https://blockstream.info/img/favicon.png",
+        "url": "https://blockstream.info",
         "standard": "none"
       }
     ]
@@ -109,6 +109,8 @@
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://api.trongrid.io",
+      "https://tron.api.pocket.network",
+      "https://tron.drpc.org",
       "https://tron-rpc.publicnode.com",
       "https://tron-mainnet.gateway.tatum.io"
     ],

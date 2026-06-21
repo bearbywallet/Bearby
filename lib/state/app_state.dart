@@ -40,6 +40,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   bool _hideBalance = false;
   bool _isTileView = false;
   bool _browserUrlBarTop = false;
+  bool _isSyncingBalances = false;
+  bool _isSyncingRates = false;
 
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
@@ -74,6 +76,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   GasFeeOption get selectedGasOption => _selectedGasOption;
   String get cahceDir => _cahceDir;
   bool get hideBalance => _hideBalance;
+  bool get isSyncingBalances => _isSyncingBalances;
+  bool get isSyncingRates => _isSyncingRates;
   List<WalletInfo> get wallets => _state.wallets;
   Locale? get locale => state.locale != null ? Locale(state.locale!) : null;
   List<ConnectionInfo> get connections => _connections;
@@ -204,6 +208,18 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
+  /// Wraps the Rust balance sync so token amount UI can react while it runs.
+  Future<void> syncBalancesTracked({required BigInt walletIndex}) async {
+    _isSyncingBalances = true;
+    notifyListeners();
+    try {
+      await syncBalances(walletIndex: walletIndex);
+    } finally {
+      _isSyncingBalances = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> syncRates({bool force = false}) async {
     if (chain?.testnet == true || wallet?.settings.ratesApiOptions == 0) return;
     final walletIndex = selectedWalletIndexOrNull;
@@ -219,14 +235,17 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
+    _isSyncingRates = true;
+    notifyListeners();
     try {
       await updateRates(walletIndex: walletIndex);
       _lastRateUpdateTime = now;
     } catch (e) {
       debugPrint("error sync rates: $e");
+    } finally {
+      _isSyncingRates = false;
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   Future<void> updateSelectedAccount(

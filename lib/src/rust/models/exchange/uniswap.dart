@@ -4,24 +4,52 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import '../exchange.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-/// FFI-safe Uniswap marker. Only the source chain id is needed — the Trading API resolves
-/// routers, pools and routing itself. Carried inside [`ExchangeProvider::Uniswap`].
-class UniswapMeta {
-  final BigInt chainId;
+class UniswapCfg {
+  final int defaultSlippageBps;
+  final bool supportsPriceProtection;
 
-  const UniswapMeta({
-    required this.chainId,
+  const UniswapCfg({
+    required this.defaultSlippageBps,
+    required this.supportsPriceProtection,
   });
 
   @override
-  int get hashCode => chainId.hashCode;
+  int get hashCode =>
+      defaultSlippageBps.hashCode ^ supportsPriceProtection.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UniswapCfg &&
+          runtimeType == other.runtimeType &&
+          defaultSlippageBps == other.defaultSlippageBps &&
+          supportsPriceProtection == other.supportsPriceProtection;
+}
+
+/// FFI-safe Uniswap metadata. Quote data is mutable route state and is excluded from identity.
+class UniswapMeta {
+  final ProviderCommon common;
+  final UniswapCfg cfg;
+  final ProviderQuote? quote;
+
+  const UniswapMeta({
+    required this.common,
+    required this.cfg,
+    this.quote,
+  });
+
+  @override
+  int get hashCode => common.hashCode ^ cfg.hashCode ^ quote.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UniswapMeta &&
           runtimeType == other.runtimeType &&
-          chainId == other.chainId;
+          common == other.common &&
+          cfg == other.cfg &&
+          quote == other.quote;
 }

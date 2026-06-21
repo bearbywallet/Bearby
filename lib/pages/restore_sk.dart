@@ -1,6 +1,7 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -132,14 +133,10 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                   title: l10n.secretKeyRestorePageTitle,
                   onBackPressed: () => context.pop(),
                   onActionPressed: _handlePaste,
-                  actionIcon: SvgPicture.asset(
-                    'assets/icons/copy.svg',
-                    width: 30,
-                    height: 30,
-                    colorFilter: ColorFilter.mode(
-                      theme.textPrimary,
-                      BlendMode.srcIn,
-                    ),
+                  actionIcon: AppIconView(
+                    icon: AppIcon.copy,
+                    size: 30,
+                    color: theme.textPrimary,
                   ),
                 ),
                 Expanded(
@@ -159,10 +156,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                                   onChanged: _validatePrivateKey,
                                   keyboardType: TextInputType.text,
                                   autofocus: true,
-                                  leftIconPath: 'assets/icons/key.svg',
-                                  rightIconPath: _isValidating
-                                      ? 'assets/icons/loading.svg'
-                                      : null,
+                                  leftIcon: AppIcon.key,
+                                  rightIcon: AppIconState.loading(isLoading: _isValidating),
                                   secondaryColor: theme.textSecondary,
                                   backgroundColor: theme.cardBackground,
                                   textColor: theme.textPrimary,

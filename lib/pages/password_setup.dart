@@ -1,3 +1,4 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -410,9 +411,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             focusedBorderColor: theme.primaryPurple,
                             disabled: _disabled,
                             obscureText: _obscurePassword,
-                            rightIconPath: _obscurePassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
+                            rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                             onChanged: (value) {
                               if (_errorMessage != null) {
                                 setState(() {
@@ -437,9 +436,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             disabled: _disabled,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             obscureText: _obscureConfirmPassword,
-                            rightIconPath: _obscureConfirmPassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
+                            rightIcon: AppIconState.passwordVisibility(obscured: _obscureConfirmPassword),
                             onRightIconTap: () {
                               setState(() {
                                 _obscureConfirmPassword =

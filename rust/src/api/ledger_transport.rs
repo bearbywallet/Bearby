@@ -67,9 +67,7 @@ pub fn ledger_hid_list() -> Result<Vec<RustLedgerHidDevice>, String> {
 pub fn ledger_hid_open(device_id: String) -> Result<String, String> {
     let transport = HidLedgerTransport::open(&device_id).map_err(|e| e.to_string())?;
     let conn_id = next_connection_id();
-    let mut registry = TRANSPORT_REGISTRY
-        .write()
-        .map_err(|e| e.to_string())?;
+    let mut registry = TRANSPORT_REGISTRY.write().map_err(|e| e.to_string())?;
     registry.insert(
         conn_id.clone(),
         Arc::new(TransportEntry::Hid(Mutex::new(transport))),
@@ -80,9 +78,7 @@ pub fn ledger_hid_open(device_id: String) -> Result<String, String> {
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn ledger_hid_exchange(connection_id: String, apdu: Vec<u8>) -> Result<Vec<u8>, String> {
     let entry = {
-        let registry = TRANSPORT_REGISTRY
-            .read()
-            .map_err(|e| e.to_string())?;
+        let registry = TRANSPORT_REGISTRY.read().map_err(|e| e.to_string())?;
         registry
             .get(&connection_id)
             .cloned()
@@ -100,9 +96,7 @@ pub fn ledger_hid_exchange(connection_id: String, apdu: Vec<u8>) -> Result<Vec<u
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn ledger_hid_close(connection_id: String) -> Result<(), String> {
-    let mut registry = TRANSPORT_REGISTRY
-        .write()
-        .map_err(|e| e.to_string())?;
+    let mut registry = TRANSPORT_REGISTRY.write().map_err(|e| e.to_string())?;
     registry.remove(&connection_id);
     Ok(())
 }
@@ -130,12 +124,12 @@ pub async fn ledger_ble_open(device_id: String) -> Result<String, String> {
         .await
         .map_err(|e| e.to_string())?;
     let conn_id = next_connection_id();
-    let mut registry = TRANSPORT_REGISTRY
-        .write()
-        .map_err(|e| e.to_string())?;
+    let mut registry = TRANSPORT_REGISTRY.write().map_err(|e| e.to_string())?;
     registry.insert(
         conn_id.clone(),
-        Arc::new(TransportEntry::Ble(Box::new(zilpay::tokio::sync::Mutex::new(transport)))),
+        Arc::new(TransportEntry::Ble(Box::new(
+            zilpay::tokio::sync::Mutex::new(transport),
+        ))),
     );
     Ok(conn_id)
 }
@@ -143,9 +137,7 @@ pub async fn ledger_ble_open(device_id: String) -> Result<String, String> {
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub async fn ledger_ble_exchange(connection_id: String, apdu: Vec<u8>) -> Result<Vec<u8>, String> {
     let entry = {
-        let registry = TRANSPORT_REGISTRY
-            .read()
-            .map_err(|e| e.to_string())?;
+        let registry = TRANSPORT_REGISTRY.read().map_err(|e| e.to_string())?;
         registry
             .get(&connection_id)
             .cloned()
@@ -164,9 +156,7 @@ pub async fn ledger_ble_exchange(connection_id: String, apdu: Vec<u8>) -> Result
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub async fn ledger_ble_close(connection_id: String) -> Result<(), String> {
     let entry = {
-        let mut registry = TRANSPORT_REGISTRY
-            .write()
-            .map_err(|e| e.to_string())?;
+        let mut registry = TRANSPORT_REGISTRY.write().map_err(|e| e.to_string())?;
         registry.remove(&connection_id)
     };
     if let Some(entry) = entry {
@@ -214,7 +204,10 @@ pub async fn ledger_ble_open(_device_id: String) -> Result<String, String> {
 }
 
 #[cfg(any(target_os = "android", target_os = "ios"))]
-pub async fn ledger_ble_exchange(_connection_id: String, _apdu: Vec<u8>) -> Result<Vec<u8>, String> {
+pub async fn ledger_ble_exchange(
+    _connection_id: String,
+    _apdu: Vec<u8>,
+) -> Result<Vec<u8>, String> {
     Err(NOT_SUPPORTED.to_string())
 }
 

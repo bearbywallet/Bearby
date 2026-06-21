@@ -1,6 +1,6 @@
+import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -22,7 +22,7 @@ import 'package:bearby/l10n/app_localizations.dart';
 
 class WalletPreferenceItem {
   final String title;
-  final String iconPath;
+  final AppIcon icon;
   final bool hasSwitch;
   final bool switchValue;
   final bool switchEnabled;
@@ -31,7 +31,7 @@ class WalletPreferenceItem {
 
   WalletPreferenceItem({
     required this.title,
-    required this.iconPath,
+    required this.icon,
     this.hasSwitch = false,
     this.switchValue = false,
     this.switchEnabled = true,
@@ -193,7 +193,7 @@ class _WalletPageState extends State<WalletPage> {
     items.add(
       WalletPreferenceItem(
         title: l10n.walletPageManageConnections,
-        iconPath: 'assets/icons/globe.svg',
+        icon: AppIcon.globe,
         onTap: () {
           if (appState.connections.isNotEmpty) {
             showConnectedDappsModal(
@@ -211,7 +211,7 @@ class _WalletPageState extends State<WalletPage> {
       items.add(
         WalletPreferenceItem(
           title: l10n.walletPageBackup,
-          iconPath: 'assets/icons/key.svg',
+          icon: AppIcon.key,
           onTap: () {
             if (!walletType.contains(WalletType.ledger.name)) {
               _handleBackup(appState.currentTheme);
@@ -331,14 +331,10 @@ class _WalletPageState extends State<WalletPage> {
               shape: BoxShape.circle,
               color: theme.background,
             ),
-            child: SvgPicture.asset(
-              'assets/icons/warning.svg',
-              width: 16,
-              height: 16,
-              colorFilter: ColorFilter.mode(
-                theme.textSecondary,
-                BlendMode.srcIn,
-              ),
+            child: AppIconView(
+              icon: AppIcon.warning,
+              size: 16,
+              color: theme.textSecondary,
             ),
           ),
           loadingWidget: const Center(
@@ -365,7 +361,7 @@ class _WalletPageState extends State<WalletPage> {
         }
       },
       height: 50,
-      rightIconPath: "assets/icons/edit.svg",
+      rightIcon: AppIcon.edit,
       borderColor: theme.cardBackground,
       focusedBorderColor: theme.primaryPurple,
       fontSize: _fontSize,
@@ -451,21 +447,10 @@ class _WalletPageState extends State<WalletPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SvgPicture.asset(
-                item.iconPath,
-                width: _iconSize * 0.7,
-                height: _iconSize * 0.7,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
+            AppIconView(
+              icon: item.icon,
+              size: _iconSize * 0.7,
+              color: theme.textPrimary,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -524,14 +509,10 @@ class _WalletPageState extends State<WalletPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/icons/logout.svg',
-              width: _iconSize,
-              height: _iconSize,
-              colorFilter: ColorFilter.mode(
-                theme.danger,
-                BlendMode.srcIn,
-              ),
+            AppIconView(
+              icon: AppIcon.logout,
+              size: _iconSize,
+              color: theme.danger,
             ),
             const SizedBox(width: 12),
             Text(

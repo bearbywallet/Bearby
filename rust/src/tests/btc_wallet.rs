@@ -21,7 +21,6 @@ mod btc_wallet_tests {
     };
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
-    use crate::service::background::BACKGROUND_SERVICE;
 
     const PASSWORD: &str = "test_password";
     const BTC_MNEMONIC_STR: &str = "test test test test test test test test test test test junk";
@@ -52,9 +51,8 @@ mod btc_wallet_tests {
             .collect();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
-            service.core.add_batch_providers(providers).unwrap();
+            let core = crate::service::background::CORE.load_full().unwrap();
+            core.add_batch_providers(providers).unwrap();
         }
 
         let global_data = get_data().await.unwrap();
@@ -101,9 +99,8 @@ mod btc_wallet_tests {
             .unwrap();
 
         let history = {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = crate::service::background::CORE.load_full().unwrap();
+            let wallet = core.get_wallet_by_index(0).unwrap();
             wallet.get_btc_addresses(0, btc_chain_hash).unwrap()
         };
 
@@ -117,31 +114,27 @@ mod btc_wallet_tests {
         assert_eq!(wallet.auth_type, "none");
         assert_eq!(wallet.chain_hash, btc_chain_hash);
         assert_eq!(wallet.slip44, BITCOIN);
-        assert_eq!(wallet.bip, DerivationPath::BIP86_PURPOSE);
+        assert_eq!(wallet.bip, DerivationPath::BIP84_PURPOSE);
 
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
 
         assert_eq!(btc_accounts.len(), 1);
 
         let account = &btc_accounts[0];
-        let taproot_history = history.get(&zilpay::bitcoin::AddressType::P2tr).unwrap();
+        let segwit_history = history.get(&zilpay::bitcoin::AddressType::P2wpkh).unwrap();
 
-        assert!(taproot_history.get_internal().unwrap().history.is_empty());
-        assert!(taproot_history.get_internal().unwrap().utxos.is_empty());
-        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
-        assert!(taproot_history.get_external().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_internal().unwrap().history.is_empty());
+        assert!(segwit_history.get_internal().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_external().unwrap().utxos.is_empty());
+        assert!(segwit_history.get_external().unwrap().utxos.is_empty());
 
         assert_eq!(
             account.addr,
-            taproot_history
-                .get_external()
-                .unwrap()
-                .address
-                .auto_format()
+            segwit_history.get_external().unwrap().address.auto_format()
         );
         assert_eq!(account.name, "A");
         assert_eq!(account.index, 0);
@@ -203,28 +196,23 @@ mod btc_wallet_tests {
         let wallet = wallets.first().unwrap();
         assert_eq!(wallet.chain_hash, btc_chain_hash);
         assert_eq!(wallet.slip44, BITCOIN);
-        assert_eq!(wallet.bip, DerivationPath::BIP86_PURPOSE);
+        assert_eq!(wallet.bip, DerivationPath::BIP84_PURPOSE);
 
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         assert_eq!(
             btc_accounts[0].addr,
-            taproot_history
-                .get_external()
-                .unwrap()
-                .address
-                .auto_format()
+            segwit_history.get_external().unwrap().address.auto_format()
         );
 
         sync_balances(0).await.unwrap();
 
         {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = crate::service::background::CORE.load_full().unwrap();
+            let wallet = core.get_wallet_by_index(0).unwrap();
             let _history = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
 
             // dbg!(&history);
@@ -235,7 +223,7 @@ mod btc_wallet_tests {
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         let token = &wallet.tokens[0];
 
@@ -243,9 +231,8 @@ mod btc_wallet_tests {
 
         let account = &btc_accounts[0];
         let expected_balance: u64 = {
-            let guard = BACKGROUND_SERVICE.read().await;
-            let service = guard.as_ref().unwrap();
-            let wallet = service.core.get_wallet_by_index(0).unwrap();
+            let core = crate::service::background::CORE.load_full().unwrap();
+            let wallet = core.get_wallet_by_index(0).unwrap();
             let chains = wallet.get_btc_addresses(0, btc_chain_hash).unwrap();
             chains
                 .values()
@@ -338,7 +325,7 @@ mod btc_wallet_tests {
         let btc_accounts = wallet
             .accounts
             .get(&BITCOIN)
-            .and_then(|m| m.get(&DerivationPath::BIP86_PURPOSE))
+            .and_then(|m| m.get(&DerivationPath::BIP84_PURPOSE))
             .unwrap();
         assert_eq!(btc_accounts[1].addr_type, 2);
         assert_eq!(btc_accounts[1].pub_key, None);

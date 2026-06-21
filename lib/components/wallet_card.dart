@@ -1,10 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/address_avatar.dart';
-import 'package:bearby/components/image_cache.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/account.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -129,8 +128,8 @@ class _WalletCardState extends State<WalletCard>
                     const SizedBox(height: 6),
                     _TokenIconStack(
                       tokens: nonZeroTokens,
-                      shortName: state.chain?.shortName ?? '',
                       theme: theme,
+                      appState: state,
                     ),
                   ],
                 ],
@@ -148,13 +147,13 @@ class _TokenIconStack extends StatelessWidget {
   static const double _overlap = 14;
 
   final List<FTokenInfo> tokens;
-  final String shortName;
   final AppTheme theme;
+  final AppState appState;
 
   const _TokenIconStack({
     required this.tokens,
-    required this.shortName,
     required this.theme,
+    required this.appState,
   });
 
   @override
@@ -178,30 +177,16 @@ class _TokenIconStack extends StatelessWidget {
   }
 
   Widget _buildIcon(FTokenInfo token) {
-    final url = processTokenLogo(
+    return TokenAvatar(
       token: token,
-      shortName: shortName,
-      theme: theme.value,
-    );
-
-    return Container(
-      width: _iconSize,
-      height: _iconSize,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.cardBackground,
-          width: 1.5,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: url,
-          width: _iconSize,
-          height: _iconSize,
-          fit: BoxFit.contain,
-        ),
-      ),
+      size: _iconSize,
+      appState: appState,
+      showNetworkBadge: false,
+      borderColor: theme.cardBackground,
+      borderWidth: 1.5,
+      fit: BoxFit.contain,
+      errorWidget: const SizedBox.shrink(),
+      loadingWidget: const SizedBox.shrink(),
     );
   }
 }

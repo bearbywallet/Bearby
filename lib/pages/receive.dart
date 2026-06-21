@@ -1,22 +1,23 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:io';
+
+import 'package:bearby/components/chunked_address_text.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/custom_app_bar.dart';
-import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
-import 'package:bearby/components/jazzicon.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/modals/btc_addresses_modal.dart';
 import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/src/rust/api/qrcode.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
@@ -39,7 +40,6 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   bool isPressedToken = false;
   int selectedToken = 0;
   String amount = "0";
-  Key _imageKey = UniqueKey();
   String? legacyAddress;
   bool useLegacyAddress = false;
 
@@ -50,16 +50,18 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   void initState() {
     super.initState();
     final appState = Provider.of<AppState>(context, listen: false);
-    final chain = appState.chain!;
+    final chain = appState.chain;
+    final wallet = appState.wallet;
 
     _amountController.text = amount;
     _accountNameController.text = appState.account?.name ?? "";
 
-    if (chain.slip44 == kZilliqaSlip44) {
+    if (chain?.slip44 == kZilliqaSlip44 && wallet != null) {
       zilliqaGetNFormat(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: wallet.selectedAccount,
       ).then((addr) {
+        if (!mounted) return;
         setState(() {
           legacyAddress = addr;
         });
@@ -75,14 +77,20 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   }
 
   Future<void> handleCopy(String address) async {
-    await Clipboard.setData(ClipboardData(text: address));
-    setState(() {
-      isCopied = true;
-    });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      isCopied = false;
-    });
+    try {
+      await Clipboard.setData(ClipboardData(text: address));
+      if (!mounted) return;
+      setState(() {
+        isCopied = true;
+      });
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+      setState(() {
+        isCopied = false;
+      });
+    } catch (e) {
+      debugPrint('error copying receive address: $e');
+    }
   }
 
   void handlePressedChanged(bool pressed) {
@@ -97,7 +105,6 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
       onTokenSelected: (index) {
         setState(() {
           selectedToken = index;
-          _imageKey = UniqueKey();
         });
       },
     );
@@ -146,12 +153,32 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final chain = appState.chain!;
-    final token = appState.wallet!.tokens[selectedToken];
-    final currentAddress = useLegacyAddress && legacyAddress != null
-        ? legacyAddress!
-        : appState.account!.addr;
-    final l10n = AppLocalizations.of(context)!;
+    final chain = appState.chain;
+    final wallet = appState.wallet;
+    final account = appState.account;
+    final token = wallet?.tokens.elementAtOrNull(selectedToken);
+    final currentAddress = useLegacyAddress
+        ? legacyAddress ?? account?.addr ?? ''
+        : account?.addr ?? '';
+    final l10n = AppLocalizations.of(context);
+
+    if (chain == null ||
+        wallet == null ||
+        account == null ||
+        token == null ||
+        l10n == null) {
+      return Scaffold(
+        backgroundColor: theme.background,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          toolbarHeight: 0,
+          systemOverlayStyle: getSystemUiOverlayStyle(context),
+        ),
+        body: const SafeArea(child: SizedBox.shrink()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -200,14 +227,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SvgPicture.asset(
-                                        "assets/icons/warning.svg",
-                                        width: 24,
-                                        height: 24,
-                                        colorFilter: ColorFilter.mode(
-                                          theme.warning,
-                                          BlendMode.srcIn,
-                                        ),
+                                      AppIconView(
+                                        icon: AppIcon.warning,
+                                        size: 24,
+                                        color: theme.warning,
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
@@ -238,28 +261,59 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                       _buildTokenSelector(appState, token),
                                       const SizedBox(height: 24),
                                       if (appState.account != null)
-                                        SizedBox(
-                                          width: 220,
-                                          height: 220,
-                                          child: AsyncQRcode(
-                                            data: generateCryptoUrl(
-                                              address: currentAddress,
-                                              chain: chain.shortName,
-                                              token: token.addr,
-                                              amount: amount,
+                                        GestureDetector(
+                                          onTap: () =>
+                                              handleCopy(currentAddress),
+                                          child: SizedBox(
+                                            width: 220,
+                                            height: 220,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                AsyncQRcode(
+                                                  data: generateCryptoUrl(
+                                                    address: currentAddress,
+                                                    chain: chain.shortName,
+                                                    token: token.addr,
+                                                    amount: amount,
+                                                  ),
+                                                  color: theme.primaryPurple,
+                                                  size: 220,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                                AnimatedOpacity(
+                                                  opacity: isCopied ? 1.0 : 0.0,
+                                                  duration: const Duration(
+                                                      milliseconds: 150),
+                                                  child: Container(
+                                                    width: 64,
+                                                    height: 64,
+                                                    decoration: BoxDecoration(
+                                                      color: theme.background
+                                                          .withValues(
+                                                              alpha: 0.9),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: AppIconView(
+                                                      icon: AppIcon.check,
+                                                      size: 36,
+                                                      color: theme.success,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            color: theme.primaryPurple,
-                                            size: 220,
-                                            fit: BoxFit.contain,
                                           ),
                                         ),
                                       const SizedBox(height: 16),
-                                      Text(
-                                        currentAddress,
-                                        style: theme.labelSmall.copyWith(
-                                          color: theme.textSecondary,
+                                      GestureDetector(
+                                        onTap: () => handleCopy(currentAddress),
+                                        child: ChunkedAddressText(
+                                          address: currentAddress,
+                                          primaryColor: theme.textPrimary,
+                                          secondaryColor: theme.textSecondary,
+                                          style: theme.labelSmall,
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
@@ -274,15 +328,14 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                       await changeAccountName(
                                         walletIndex: BigInt.from(
                                             appState.selectedWallet),
-                                        accountIndex:
-                                            appState.wallet!.selectedAccount,
+                                        accountIndex: wallet.selectedAccount,
                                         newName: _accountNameController.text,
                                       );
                                       await appState.syncData();
                                     }
                                   },
                                   height: 50,
-                                  rightIconPath: "assets/icons/edit.svg",
+                                  rightIcon: AppIcon.edit,
                                   borderColor: theme.cardBackground,
                                   focusedBorderColor: theme.primaryPurple,
                                   fontSize: 14,
@@ -326,25 +379,12 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               height: 32,
               decoration: const BoxDecoration(shape: BoxShape.circle),
               child: Center(
-                child: ClipOval(
-                  child: AsyncImage(
-                    key: _imageKey,
-                    url: processTokenLogo(
-                      token: token,
-                      shortName: appState.chain?.shortName ?? "",
-                      theme: theme.value,
-                    ),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                    errorWidget: Jazzicon(
-                      seed: token.addr,
-                      diameter: 32,
-                    ),
-                    loadingWidget: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
+                child: TokenAvatar(
+                  token: token,
+                  size: 32,
+                  appState: appState,
+                  showNetworkBadge: false,
+                  showBorder: false,
                 ),
               ),
             ),
@@ -378,18 +418,21 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
     String currentAddress,
   ) {
     final appState = Provider.of<AppState>(context, listen: false);
-    final token = appState.wallet!.tokens[selectedToken];
+    final token = appState.wallet?.tokens.elementAtOrNull(selectedToken);
     final account = appState.account;
+
+    if (token == null) {
+      return const SizedBox.shrink();
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         TileButton(
-          icon: SvgPicture.asset(
-            isCopied ? "assets/icons/check.svg" : "assets/icons/copy.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: isCopied ? AppIcon.check : AppIcon.copy,
+            size: 24,
+            color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: () async {
@@ -400,11 +443,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
         TileButton(
-          icon: SvgPicture.asset(
-            "assets/icons/hash.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: AppIcon.bitcoinAmount,
+            size: 24,
+            color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: _handleAmountDialog,
@@ -412,16 +454,25 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           textColor: theme.primaryPurple,
           defaultBorderSide: BorderSide(color: theme.modalBorder),
         ),
+        if (chain.slip44 == kBitcoinlip44)
+          TileButton(
+            icon: AppIconView(
+              icon: AppIcon.book,
+              size: 24,
+              color: theme.primaryPurple,
+            ),
+            disabled: false,
+            onPressed: () => showBtcAddressesModal(context: context),
+            backgroundColor: Colors.transparent,
+            textColor: theme.primaryPurple,
+            defaultBorderSide: BorderSide(color: theme.modalBorder),
+          ),
         if (account != null && chain.slip44 == kZilliqaSlip44)
           TileButton(
-            icon: SvgPicture.asset(
-              useLegacyAddress
-                  ? "assets/icons/scilla.svg"
-                  : "assets/icons/solidity.svg",
-              width: 24,
-              height: 24,
-              colorFilter:
-                  ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+            icon: AppIconView(
+              icon: AppIcon.bitcoinAddress,
+              size: 24,
+              color: theme.primaryPurple,
             ),
             disabled: legacyAddress == null || account.addrType == 0,
             onPressed: () {
@@ -436,11 +487,10 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
             defaultBorderSide: BorderSide(color: theme.modalBorder),
           ),
         TileButton(
-          icon: SvgPicture.asset(
-            "assets/icons/share.svg",
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          icon: AppIconView(
+            icon: AppIcon.share,
+            size: 24,
+            color: theme.primaryPurple,
           ),
           disabled: false,
           onPressed: () async {
@@ -456,7 +506,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
 
   Future<void> _handleAmountDialog() async {
     _amountController.text = amount;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
 
     final result = await showDialog<String>(
       context: context,

@@ -80,8 +80,7 @@ pub fn unwrap_hid_response(channel: u16, data: &[u8], packet_size: usize) -> Opt
     }
     offset += 2;
 
-    let response_length =
-        ((data[offset] as usize) << 8) | (data[offset + 1] as usize);
+    let response_length = ((data[offset] as usize) << 8) | (data[offset + 1] as usize);
     offset += 2;
 
     if response_length == 0 {
@@ -90,7 +89,9 @@ pub fn unwrap_hid_response(channel: u16, data: &[u8], packet_size: usize) -> Opt
 
     let mut response = Vec::with_capacity(response_length);
 
-    let block_size = (response_length).min(packet_size - 7).min(data.len() - offset);
+    let block_size = (response_length)
+        .min(packet_size - 7)
+        .min(data.len() - offset);
     response.extend_from_slice(&data[offset..offset + block_size]);
     offset += block_size;
 
@@ -213,7 +214,10 @@ impl BleReceiveState {
 }
 
 /// Process a single BLE notification chunk. Returns `Some(complete_apdu)` when all chunks received.
-pub fn unwrap_ble_chunk(chunk: &[u8], state: &mut BleReceiveState) -> Result<Option<Vec<u8>>, String> {
+pub fn unwrap_ble_chunk(
+    chunk: &[u8],
+    state: &mut BleReceiveState,
+) -> Result<Option<Vec<u8>>, String> {
     if chunk.is_empty() || chunk[0] != TAG_APDU {
         return Ok(None);
     }

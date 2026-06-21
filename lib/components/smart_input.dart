@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math' show pi, sin;
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/state/app_state.dart';
 
 class SmartInput extends StatefulWidget {
@@ -15,8 +15,8 @@ class SmartInput extends StatefulWidget {
   final Function()? onRightIconTap;
   final Function(String)? onSubmitted;
   final Function(bool)? onFocusChanged;
-  final String? leftIconPath;
-  final String? rightIconPath;
+  final AppIcon? leftIcon;
+  final AppIcon? rightIcon;
   final Color? borderColor;
   final Color? focusedBorderColor;
   final double? height;
@@ -41,8 +41,8 @@ class SmartInput extends StatefulWidget {
     this.onRightIconTap,
     this.onSubmitted,
     this.onFocusChanged,
-    this.leftIconPath,
-    this.rightIconPath,
+    this.leftIcon,
+    this.rightIcon,
     this.borderColor,
     this.focusedBorderColor,
     this.height = 48,
@@ -124,11 +124,11 @@ class SmartInputState extends State<SmartInput>
   }
 
   Widget? _buildIcon({
-    required String? iconPath,
+    required AppIcon? icon,
     required Color color,
     Function()? onTap,
   }) {
-    if (iconPath == null) return null;
+    if (icon == null) return null;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -142,14 +142,10 @@ class SmartInputState extends State<SmartInput>
             color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: SvgPicture.asset(
-            iconPath,
-            width: _iconSize * 0.7,
-            height: _iconSize * 0.7,
-            colorFilter: ColorFilter.mode(
-              color,
-              BlendMode.srcIn,
-            ),
+          child: AppIconView(
+            icon: icon,
+            size: _iconSize * 0.7,
+            color: color,
           ),
         ),
       ),
@@ -202,9 +198,9 @@ class SmartInputState extends State<SmartInput>
                 ),
                 child: Row(
                   children: [
-                    if (widget.leftIconPath != null)
+                    if (widget.leftIcon != null)
                       _buildIcon(
-                            iconPath: widget.leftIconPath,
+                            icon: widget.leftIcon,
                             color: iconColor,
                             onTap:
                                 widget.disabled ? null : widget.onLeftIconTap,
@@ -214,8 +210,8 @@ class SmartInputState extends State<SmartInput>
                       child: Padding(
                         padding: widget.padding ??
                             EdgeInsets.symmetric(
-                              horizontal: widget.leftIconPath == null &&
-                                      widget.rightIconPath == null
+                              horizontal: widget.leftIcon == null &&
+                                      widget.rightIcon == null
                                   ? 16
                                   : 8,
                             ),
@@ -254,9 +250,9 @@ class SmartInputState extends State<SmartInput>
                         ),
                       ),
                     ),
-                    if (widget.rightIconPath != null)
+                    if (widget.rightIcon != null)
                       _buildIcon(
-                            iconPath: widget.rightIconPath,
+                            icon: widget.rightIcon,
                             color: iconColor,
                             onTap:
                                 widget.disabled ? null : widget.onRightIconTap,

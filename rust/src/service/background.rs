@@ -1,43 +1,40 @@
-use crate::utils::errors::ServiceError;
-use std::sync::{Arc, LazyLock};
-use zilpay::tokio::sync::RwLock;
+use arc_swap::ArcSwapOption;
+use std::sync::LazyLock;
+use zilpay::background::Background;
+use zilpay::tokio::sync::{Mutex, RwLock};
 use zilpay::tokio::task::JoinHandle;
-use zilpay::background::{bg_storage::StorageManagement, Background};
+
+/// The active `Background` snapshot. Lock-free atomic read via
+/// [`ArcSwapOption::load_full`]; mutations clone → modify → [`ArcSwapOption::store`].
+///
+/// `Some`/`None` state is kept in lockstep with [`BACKGROUND_SERVICE`] by
+/// `load_service`/`stop_service` under its outer write lock — never `store(None)`
+/// from any other site.
+pub static CORE: ArcSwapOption<Background> = ArcSwapOption::const_empty();
+
+/// Serializes COW mutations so two concurrent `mutate_core` calls can't both
+/// fork the same `CORE` snapshot and drop the other's write.
+pub(crate) static MUTATION_MUTEX: LazyLock<Mutex<()>> = LazyLock::new(|| Mutex::new(()));
 
 pub struct ServiceBackground {
-    pub running: bool,
-    pub block_handle: Option<JoinHandle<()>>,
-    pub history_handle: Option<JoinHandle<()>>,
-    pub core: Arc<Background>,
+    pub block_handle: Mutex<Option<JoinHandle<()>>>,
+    pub history_handle: Mutex<Option<JoinHandle<()>>>,
+}
+
+impl Default for ServiceBackground {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub static BACKGROUND_SERVICE: LazyLock<RwLock<Option<ServiceBackground>>> =
     LazyLock::new(|| RwLock::new(None));
 
 impl ServiceBackground {
-    pub fn from_path(path: &str) -> Result<Self, ServiceError> {
-        let core = Background::from_storage_path(path).map_err(ServiceError::BackgroundError)?;
-
-        Ok(Self {
-            core: Arc::new(core),
-            running: true,
-            block_handle: None,
-            history_handle: None,
-        })
-    }
-
-    pub fn stop(&mut self) {
-        self.running = false;
-    }
-
-    pub fn get_wallet_mut(
-        &mut self,
-        wallet_index: usize,
-    ) -> Result<&mut zilpay::wallet::Wallet, ServiceError> {
-        Arc::get_mut(&mut self.core)
-            .ok_or(ServiceError::CoreAccess)?
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(ServiceError::WalletAccess(wallet_index))
+    pub fn new() -> Self {
+        Self {
+            block_handle: Mutex::new(None),
+            history_handle: Mutex::new(None),
+        }
     }
 }

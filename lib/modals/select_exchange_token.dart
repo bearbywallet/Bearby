@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/exchange_provider_icon.dart';
-import 'package:bearby/components/image_cache.dart';
-import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/state/exchange_state.dart';
+import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/components/token_select_item.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/components/token_select_sheet.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
-import 'package:bearby/src/rust/models/ftoken.dart';
-import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-/// Bottom-sheet picker over a list of [ExchangeAsset] (already filtered to the active
-/// chain by the caller). Mirrors `select_token.dart` but sources its rows from the
-/// exchange bootstrap list and returns the chosen asset.
+/// Bottom-sheet picker that reactively sources its token list from
+/// [ExchangeState] via [assetSelector] so it stays in sync across both
+/// bootstrap phases (candidate list → validated list after eager probing).
+///
+/// [ExchangeState] is route-scoped (provided in the exchange GoRoute builder),
+/// so we capture it from the caller's context and pass it directly — the
+/// bottom-sheet's own context lives outside that provider scope.
 void showExchangeTokenSelectModal({
   required BuildContext context,
-  required List<ExchangeAsset> assets,
+  required List<ExchangeAsset> Function(ExchangeState) assetSelector,
   required void Function(ExchangeAsset asset) onSelected,
 }) {
+  // Resolve ExchangeState from the *caller's* context while we're still inside
+  // the ChangeNotifierProvider<ExchangeState> scope.
+  final exchangeState = context.read<ExchangeState>();
+
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -28,13 +32,14 @@ void showExchangeTokenSelectModal({
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (BuildContext context) {
+    builder: (BuildContext sheetContext) {
       return Padding(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
         ),
         child: _ExchangeTokenSelectContent(
-          assets: assets,
+          exchangeState: exchangeState,
+          assetSelector: assetSelector,
           onSelected: onSelected,
         ),
       );
@@ -42,41 +47,14 @@ void showExchangeTokenSelectModal({
   );
 }
 
-/// Small chain icon for the token's `chainHash`, overlaid on the token avatar. Returns
-/// null when the chain can't be resolved so the avatar simply renders without a badge.
-Widget? _buildNetworkBadge(AppState appState, AppTheme theme, FTokenInfo token) {
-  final NetworkConfigInfo? chain;
-  try {
-    chain = appState.getChain(token.chainHash);
-  } catch (_) {
-    return null;
-  }
-  if (chain == null) return null;
-  return Container(
-    width: 16,
-    height: 16,
-    decoration: BoxDecoration(
-      color: theme.cardBackground,
-      shape: BoxShape.circle,
-      border: Border.all(color: theme.cardBackground, width: 1.5),
-    ),
-    child: ClipOval(
-      child: AsyncImage(
-        url: viewChain(network: chain, theme: theme.value),
-        width: 16,
-        height: 16,
-        fit: BoxFit.contain,
-      ),
-    ),
-  );
-}
-
 class _ExchangeTokenSelectContent extends StatefulWidget {
-  final List<ExchangeAsset> assets;
+  final ExchangeState exchangeState;
+  final List<ExchangeAsset> Function(ExchangeState) assetSelector;
   final void Function(ExchangeAsset asset) onSelected;
 
   const _ExchangeTokenSelectContent({
-    required this.assets,
+    required this.exchangeState,
+    required this.assetSelector,
     required this.onSelected,
   });
 
@@ -91,15 +69,26 @@ class _ExchangeTokenSelectContentState
   String _searchQuery = '';
 
   @override
+  void initState() {
+    super.initState();
+    widget.exchangeState.addListener(_onExchangeChanged);
+  }
+
+  @override
   void dispose() {
+    widget.exchangeState.removeListener(_onExchangeChanged);
     _searchController.dispose();
     super.dispose();
   }
 
-  List<ExchangeAsset> get _filtered {
-    if (_searchQuery.isEmpty) return widget.assets;
+  void _onExchangeChanged() {
+    if (mounted) setState(() {});
+  }
+
+  List<ExchangeAsset> _filtered(List<ExchangeAsset> assets) {
+    if (_searchQuery.isEmpty) return assets;
     final query = _searchQuery.toLowerCase();
-    return widget.assets
+    return assets
         .where((a) =>
             a.token.name.toLowerCase().contains(query) ||
             a.token.symbol.toLowerCase().contains(query))
@@ -109,86 +98,33 @@ class _ExchangeTokenSelectContentState
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
-    final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final assets = _filtered(widget.assetSelector(widget.exchangeState));
 
-    const headerHeight = 84.0;
-    const searchBarHeight = 80.0;
-    const tokenItemHeight = 72.0;
-    final assets = _filtered;
-
-    final totalContentHeight = headerHeight +
-        searchBarHeight +
-        (assets.length * tokenItemHeight) +
-        bottomPadding;
-    final maxHeight = MediaQuery.of(context).size.height * 0.7;
-    final containerHeight = totalContentHeight.clamp(0.0, maxHeight);
-
-    return Container(
-      height: containerHeight,
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 16),
-            decoration: BoxDecoration(
-              color: theme.modalBorder,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SmartInput(
-              controller: _searchController,
-              hint: l10n.tokenSelectModalContentSearchHint,
-              leftIconPath: 'assets/icons/search.svg',
-              onChanged: (value) => setState(() => _searchQuery = value),
-              borderColor: theme.textPrimary,
-              focusedBorderColor: theme.primaryPurple,
-              height: 48,
-              fontSize: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: assets.length,
-              separatorBuilder: (context, index) => Divider(
-                height: 1,
-                color: theme.textSecondary.withValues(alpha: 0.1),
-              ),
-              itemBuilder: (context, index) {
-                final asset = assets[index];
-                final balance = BigInt.tryParse(
-                        asset.token.balances[appState.accountBalanceKey] ??
-                            '') ??
-                    BigInt.zero;
-                return TokenSelectItem(
-                  ftoken: asset.token,
-                  balance: balance,
-                  networkBadge: _buildNetworkBadge(appState, theme, asset.token),
-                  providerIcons:
-                      asset.providers.map(exchangeProviderIconAsset).toList(),
-                  onTap: () {
-                    widget.onSelected(asset);
-                    Navigator.pop(context);
-                  },
-                );
-              },
-            ),
-          ),
-          SizedBox(height: bottomPadding),
-        ],
-      ),
+    return TokenSelectSheet(
+      searchController: _searchController,
+      searchHint: l10n.tokenSelectModalContentSearchHint,
+      onSearchChanged: (value) => setState(() => _searchQuery = value),
+      itemCount: assets.length,
+      itemBuilder: (context, index) {
+        final asset = assets[index];
+        final balance = BigInt.tryParse(
+                asset.token.balances[appState.accountBalanceKey] ?? '') ??
+            BigInt.zero;
+        return TokenSelectItem(
+          ftoken: asset.token,
+          balance: balance,
+          networkBadge: TokenAvatar.buildNetworkBadge(
+              appState, appState.currentTheme, asset.token,
+              badgeSize: TokenAvatar.defaultBadgeSize(40)),
+          providerIcons:
+              asset.providers.map((p) => p.common.iconAsset).toList(),
+          onTap: () {
+            widget.onSelected(asset);
+            Navigator.pop(context);
+          },
+        );
+      },
     );
   }
 }

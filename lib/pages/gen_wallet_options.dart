@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/view_item.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
@@ -82,14 +82,10 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                         WalletListItem(
                           title: l10n.genWalletOptionsBIP39Title,
                           subtitle: l10n.genWalletOptionsBIP39Subtitle,
-                          icon: SvgPicture.asset(
-                            'assets/icons/document.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.document,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => context.push(AppRoutes.genBip39, extra: {'chain': _chain}),
                         ),
@@ -97,14 +93,10 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
                           title: l10n.genWalletOptionsPrivateKeyTitle,
                           subtitle: l10n.genWalletOptionsPrivateKeySubtitle,
                           disabled: _chain!.slip44 == kBitcoinlip44,
-                          icon: SvgPicture.asset(
-                            'assets/icons/bincode.svg',
-                            width: 35,
-                            height: 35,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
-                            ),
+                          icon: AppIconView(
+                            icon: AppIcon.bincode,
+                            size: 35,
+                            color: theme.primaryPurple,
                           ),
                           onTap: () => context.push(AppRoutes.genSk, extra: {'chain': _chain}),
                         ),

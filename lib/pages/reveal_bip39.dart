@@ -1,14 +1,14 @@
+import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/async_qrcode.dart';
 import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/smart_input.dart';
-import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/load_button.dart';
+import 'package:bearby/config/settings.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
@@ -36,7 +36,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   bool _obscurePassword = true;
   String? seedPhrase;
   Timer? _countdownTimer;
-  int _remainingTime = 3600;
+  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -56,7 +56,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   void _startCountdown() {
     setState(() {
       isTimerActive = true;
-      _remainingTime = 3600;
+      _remainingTime = SecuritySettings.revealDelaySeconds;
     });
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -73,10 +73,9 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   }
 
   String _formatTime(int seconds) {
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
+    final minutes = seconds ~/ 60;
     final secs = seconds % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   void _onPasswordSubmit(BigInt walletIndex) async {
@@ -109,7 +108,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
             "${AppLocalizations.of(context)!.revealSecretPhraseInvalidPassword} $e";
       });
       _btnController.error();
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(SecuritySettings.errorResetDuration);
       _btnController.reset();
     }
   }
@@ -136,6 +135,16 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
               child: CustomAppBar(
                 title: AppLocalizations.of(context)!.revealSecretPhraseTitle,
                 onBackPressed: () => Navigator.pop(context),
+                actionIcon: (canShowPhrase && seedPhrase != null)
+                    ? AppIconView(
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
+                        size: 24,
+                        color: theme.textPrimary,
+                      )
+                    : null,
+                onActionPressed: (canShowPhrase && seedPhrase != null)
+                    ? () => _handleCopy(seedPhrase ?? "")
+                    : null,
               ),
             ),
             Expanded(
@@ -158,9 +167,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                         onSubmitted: (_) => _onPasswordSubmit(
                           state.selectedWalletIndex,
                         ),
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
+                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
                         onRightIconTap: () => setState(
                             () => _obscurePassword = !_obscurePassword),
                       ),
@@ -203,23 +210,6 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                       _buildQrCode(theme),
                       _buildPhraseDisplay(theme),
                       SizedBox(height: adaptivePadding),
-                      TileButton(
-                        icon: SvgPicture.asset(
-                          isCopied
-                              ? "assets/icons/check.svg"
-                              : "assets/icons/copy.svg",
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.primaryPurple,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        onPressed: () => _handleCopy(seedPhrase ?? ""),
-                        backgroundColor: theme.cardBackground,
-                        textColor: theme.primaryPurple,
-                      ),
-                      SizedBox(height: adaptivePadding),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: EdgeInsets.only(bottom: adaptivePadding),
@@ -255,14 +245,10 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
       ),
       child: Column(
         children: [
-          SvgPicture.asset(
-            "assets/icons/time.svg",
-            width: 48,
-            height: 48,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+          AppIconView(
+            icon: AppIcon.time,
+            size: 48,
+            color: theme.primaryPurple,
           ),
           const SizedBox(height: 16),
           Text(
@@ -290,7 +276,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(
-            value: 1 - (_remainingTime / 3600),
+            value: 1 - (_remainingTime / SecuritySettings.revealDelaySeconds),
             backgroundColor: theme.background,
             valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
             borderRadius: BorderRadius.circular(4),
@@ -313,14 +299,10 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
         children: [
           Row(
             children: [
-              SvgPicture.asset(
-                "assets/icons/warning.svg",
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.danger,
-                  BlendMode.srcIn,
-                ),
+              AppIconView(
+                icon: AppIcon.warning,
+                size: 24,
+                color: theme.danger,
               ),
               const SizedBox(width: 8),
               Text(
@@ -427,7 +409,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
       isCopied = true;
     });
 
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
 
     setState(() {
       isCopied = false;

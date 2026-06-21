@@ -90,7 +90,7 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: String) -> Result<(
             .save_ftokens(&ftokens)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -106,7 +106,7 @@ pub async fn set_rate_engine(wallet_index: usize, engine_code: u8) -> Result<(),
         data.settings.rates_api_options = TokenQuotesAPIOptions::from_code(engine_code);
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -122,7 +122,7 @@ pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<()
         data.settings.features.ens_enabled = ens_enabled;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -138,7 +138,7 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
         data.settings.features.ipfs_node = node;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -154,7 +154,7 @@ pub async fn set_tokens_list_fetcher(wallet_index: usize, enabled: bool) -> Resu
         data.settings.network.tokens_list_fetcher = enabled;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -170,7 +170,7 @@ pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Resu
         data.settings.network.node_ranking_enabled = enabled;
 
         wallet
-            .save_wallet_data(data)
+            .save_wallet_data(&data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
