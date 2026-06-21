@@ -1167,7 +1167,6 @@ async fn support_matrix() -> Option<Arc<SupportMatrix>> {
 }
 
 #[frb(ignore)]
-#[frb(ignore)]
 #[derive(Deserialize)]
 #[serde(crate = "zilpay::serde")]
 struct ChainsResponse {
@@ -1180,6 +1179,9 @@ struct ChainsResponse {
 struct ChainEntry {
     id: u64,
     token_support: Option<String>,
+    /// Relay VM family: "evm" | "svm" | "bvm" | "tvm" | "lvm". Source of address family —
+    /// never guess from chain id (unknown chains would be mis-canonicalized as EVM).
+    vm_type: Option<String>,
     currency: Option<ChainCurrency>,
     erc20_currencies: Option<Vec<ChainCurrency>>,
 }
@@ -1222,16 +1224,17 @@ async fn fetch_chains() -> Result<ChainsResponse, String> {
     Err(format!("relay /chains failed: {last_err}"))
 }
 
-/// Map a Relay chain id to an address family (1 EVM, 2 BTC, 3 SOL, 4 TRON). EVM is the default —
-/// uses the existing `RELAY_*_CHAIN_ID` consts, no magic numbers. Mirrors
-/// [`RelayOrigin::from_addr_type`] but keys on the Relay chain id (the matrix is indexed by it).
+/// Address family (matches our `addr_type`: 1 EVM, 2 BTC, 3 SOL, 4 TRON) from Relay's `vmType`.
+/// Returns `None` for VM families we don't support — those chains are skipped at matrix build,
+/// so their addresses are never (mis-)canonicalized. No chain-id guessing, no EVM default.
 #[frb(ignore)]
-const fn relay_addr_family(relay_chain_id: u64) -> u8 {
-    match relay_chain_id {
-        RELAY_BTC_CHAIN_ID => 2,
-        RELAY_SOL_CHAIN_ID => 3,
-        RELAY_TRON_CHAIN_ID => 4,
-        _ => 1,
+fn relay_addr_family(vm_type: Option<&str>) -> Option<u8> {
+    match vm_type? {
+        "evm" => Some(1),
+        "bvm" => Some(2),
+        "svm" => Some(3),
+        "tvm" => Some(4),
+        _ => None, // lvm / future families: not supported here
     }
 }
 
@@ -1256,8 +1259,14 @@ fn canonical_currency(family: u8, addr: &str) -> Option<Cow<'_, str>> {
 fn build_matrix(resp: ChainsResponse) -> SupportMatrix {
     let mut matrix = HashMap::with_capacity(resp.chains.len());
     for chain in resp.chains {
-        let supports_all = chain.token_support.as_deref() == Some("All");
-        let family = relay_addr_family(chain.id);
+        // Skip families we can't canonicalize — never queried, and guarantees no mis-lowercased
+        // base58 key leaks into the matrix.
+        let Some(family) = relay_addr_family(chain.vm_type.as_deref()) else {
+            continue;
+        };
+        // PERMISSIVE DEFAULT: only an explicit "Limited" enables pruning. A missing/renamed
+        // tokenSupport must never strip tokens (fail-open on schema drift).
+        let supports_all = chain.token_support.as_deref() != Some("Limited");
         let mut bridgeable = HashSet::new();
         if !supports_all {
             // Native + erc20 currencies flagged supportsBridging, canonicalized.
@@ -1291,6 +1300,11 @@ fn build_matrix(resp: ChainsResponse) -> SupportMatrix {
 pub(in crate::models::exchange) async fn evaluate_support_eager(
     assets: &[ExchangeAsset],
 ) -> Vec<usize> {
+    // The /chains matrix is mainnet-only (RELAY_BASE_URLS[0]); skip on testnet so a mainnet matrix
+    // is never applied to testnet assets. Kept inside the gate — the orchestrator stays generic.
+    if relay_assets_are_testnet(assets) {
+        return Vec::new();
+    }
     let Some(matrix) = support_matrix().await else {
         return Vec::new();
     };
@@ -1308,6 +1322,22 @@ pub(in crate::models::exchange) async fn evaluate_support_eager(
             (!chain.bridgeable.contains(key.as_ref())).then_some(idx)
         })
         .collect()
+}
+
+/// True when the (network-uniform) asset set is on testnet. Bootstrap filters by
+/// `current_is_testnet`, so the first Relay asset's chain decides for the whole set — one
+/// `handle()` + one provider lookup, not per-asset.
+#[frb(ignore)]
+fn relay_assets_are_testnet(assets: &[ExchangeAsset]) -> bool {
+    let Ok(core) = crate::utils::helpers::handle() else {
+        return false;
+    };
+    assets
+        .iter()
+        .find_map(|asset| asset.relay_meta())
+        .and_then(|meta| core.get_provider(meta.common.chain_hash).ok())
+        .map(|provider| provider.config.testnet.unwrap_or(false))
+        .unwrap_or(false)
 }
 
 #[cfg(test)]
@@ -1469,7 +1499,7 @@ mod tests {
         // TRON is tokenSupport "Limited": native TRX is supportsBridging:false, USDT is true.
         // Any unlisted token (e.g. A7A5) is pruned purely from data — no hardcoded branch.
         let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
-          {"id":728126428,"tokenSupport":"Limited",
+          {"id":728126428,"tokenSupport":"Limited","vmType":"tvm",
            "currency":{"address":"T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb","supportsBridging":false},
            "erc20Currencies":[{"address":"TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t","supportsBridging":true}]}
         ]}"#).unwrap();
@@ -1488,7 +1518,7 @@ mod tests {
         // On an "All" chain a currency with supportsBridging:false (WBTC on Optimism) is still
         // bridgeable — the bridgeable set is intentionally NOT built, so nothing is pruned.
         let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
-          {"id":10,"tokenSupport":"All",
+          {"id":10,"tokenSupport":"All","vmType":"evm",
            "currency":{"address":"0x0000000000000000000000000000000000000000","supportsBridging":true},
            "erc20Currencies":[{"address":"0x68f180fcce6836688e9084f035309e29bf0a2095","supportsBridging":false}]}
         ]}"#).unwrap();
@@ -1501,5 +1531,27 @@ mod tests {
     #[test]
     fn canonical_evm_lowercases() {
         assert_eq!(canonical_currency(1, "0xABCdef").unwrap(), "0xabcdef");
+    }
+
+    #[test]
+    fn matrix_missing_token_support_defaults_permissive() {
+        // A chain with no tokenSupport field must NOT prune (fail-open on schema drift).
+        let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
+          {"id":1,"vmType":"evm",
+           "currency":{"address":"0x0000000000000000000000000000000000000000","supportsBridging":true}}
+        ]}"#).unwrap();
+        let m = build_matrix(resp);
+        assert!(m.get(&1).unwrap().supports_all);
+    }
+
+    #[test]
+    fn matrix_skips_unknown_vm_family() {
+        // Unknown/absent vmType → chain skipped, so its addresses never enter the matrix and we
+        // never apply EVM lowercasing to a base58 address.
+        let resp = serde_json::from_str::<ChainsResponse>(r#"{"chains":[
+          {"id":1399811149,"tokenSupport":"Limited","vmType":"lvm",
+           "currency":{"address":"So11111111111111111111111111111111111111112","supportsBridging":true}}
+        ]}"#).unwrap();
+        assert!(build_matrix(resp).is_empty());
     }
 }
