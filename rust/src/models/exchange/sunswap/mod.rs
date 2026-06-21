@@ -33,6 +33,10 @@ const NILE_WTRX: &str = "TYsbWxNnyTgsZaTFaue9hqpxkU3Fkco94a";
 
 // Mainnet (deployed — dex-router/README.md "SunSwap mainnet deployment").
 const MAINNET_WTRX: &str = "TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR";
+
+/// WTRX precision (TRX native decimals). Scales the liquidity-gate probe amount — see
+/// [`crate::models::exchange::gate::probe_amount`].
+pub(crate) const WTRX_DECIMALS: u8 = 6;
 const MAINNET_FEE_ROUTER: Option<&str> = Some("TFRViCT6E8rqzpExaKw32w6FcVCaRS1rxM");
 const MAINNET_QUOTE_LENS: Option<&str> = Some("TSmHPMzhGmZZmjcCuWGAuDiG3BDJt9g4uh");
 

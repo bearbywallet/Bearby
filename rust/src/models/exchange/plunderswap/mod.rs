@@ -39,6 +39,10 @@ const FEE_ROUTER: &str = "0x90aEBCFFa38e1F0F29E50348ba29d6a6E120F815";
 const WZIL: &str = "0x94e18aE7dd5eE57B55f30c4B63E2760c09EFb192";
 const QUOTE_LENS: &str = "0x597d8653AE40073E660E95894eC33B3CDd12f267";
 
+/// WZIL precision (ZIL native decimals). Scales the liquidity-gate probe amount — see
+/// [`crate::models::exchange::gate::probe_amount`].
+pub(crate) const WZIL_DECIMALS: u8 = 18;
+
 #[frb(ignore)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct PlunderAddrs {

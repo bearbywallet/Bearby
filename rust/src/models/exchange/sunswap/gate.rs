@@ -95,7 +95,9 @@ pub(in crate::models::exchange) async fn evaluate_liquidity_eager(
         return Vec::new();
     }
 
-    let probe_amount = U256::from(crate::models::exchange::gate::PROBE_AMOUNT);
+    let probe_amount = U256::from(crate::models::exchange::gate::probe_amount(
+        crate::models::exchange::sunswap::WTRX_DECIMALS,
+    ));
     eprintln!(
         "[exchange-bootstrap] SunSwap liquidity gate candidates={} lens={} chain_hash={chain_hash}",
         candidates.len(),
