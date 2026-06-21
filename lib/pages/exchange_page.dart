@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:bearby/components/input_amount.dart';
 import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/number_keyboard.dart';
-import 'package:bearby/components/skeleton_box.dart';
+import 'package:bearby/components/shimmer_text.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
@@ -35,16 +35,13 @@ class ExchangePage extends StatefulWidget {
   State<ExchangePage> createState() => _ExchangePageState();
 }
 
-class _ExchangePageState extends State<ExchangePage>
-    with StatusBarMixin, TickerProviderStateMixin {
+class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   static const Duration _quoteDebounce = Duration(milliseconds: 400);
-  static const double _radialSize = 40;
 
   late final AppState _appState;
   late final ExchangeState _exchangeState;
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
-  late final AnimationController _countdownAnim;
   Timer? _quoteTimer;
 
   _OrderType _orderType = _OrderType.swap;
@@ -53,7 +50,6 @@ class _ExchangePageState extends State<ExchangePage>
   BigInt? _lastChainHash;
   BigInt? _lastAccount;
   String? _recipientOverride;
-  bool _wasLoadingQuote = false;
   bool _firstFrameDone = false;
   bool _wasVisible = false;
 
@@ -64,10 +60,6 @@ class _ExchangePageState extends State<ExchangePage>
     _exchangeState = context.read<ExchangeState>();
     _lastChainHash = _appState.wallet?.chainHash;
     _lastAccount = _appState.wallet?.selectedAccount;
-    _countdownAnim = AnimationController(
-      vsync: this,
-      duration: ExchangeState.pollInterval,
-    );
     _appState.addListener(_onAppStateChanged);
     _exchangeState.addListener(_onExchangeStateChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -98,18 +90,11 @@ class _ExchangePageState extends State<ExchangePage>
     _appState.removeListener(_onAppStateChanged);
     _exchangeState.removeListener(_onExchangeStateChanged);
     _quoteTimer?.cancel();
-    _countdownAnim.dispose();
     _btnController.dispose();
     super.dispose();
   }
 
-  void _onExchangeStateChanged() {
-    final loading = _exchangeState.loadingQuote;
-    if (_wasLoadingQuote && !loading) {
-      _countdownAnim.forward(from: 0.0);
-    }
-    _wasLoadingQuote = loading;
-  }
+  void _onExchangeStateChanged() {}
 
   void _onAppStateChanged() {
     final hash = _appState.wallet?.chainHash;
@@ -367,10 +352,7 @@ class _ExchangePageState extends State<ExchangePage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (state.selectedProvider != null)
-                      _buildCountdownRadial(theme)
-                    else
-                      const SizedBox(width: _radialSize),
+                    const SizedBox(width: 40),
                     _buildDirectionIcon(theme, from, state),
                   ],
                 ),
@@ -488,43 +470,6 @@ class _ExchangePageState extends State<ExchangePage>
     );
   }
 
-  Widget _buildCountdownRadial(AppTheme theme) {
-    return AnimatedBuilder(
-      animation: _countdownAnim,
-      builder: (_, __) {
-        final progress = 1.0 - _countdownAnim.value;
-        final seconds =
-            (progress * ExchangeState.pollInterval.inSeconds).ceil();
-        return SizedBox(
-          width: _radialSize,
-          height: _radialSize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: _radialSize,
-                height: _radialSize,
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 3,
-                  color: theme.primaryPurple,
-                  backgroundColor: theme.textSecondary.withValues(alpha: 0.2),
-                ),
-              ),
-              Text(
-                '$seconds',
-                style: theme.bodyText1.copyWith(
-                  color: theme.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildDirectionIcon(
       AppTheme theme, ExchangeAsset? from, ExchangeState state) {
     final canFlip = from != null && state.toAsset != null;
@@ -632,8 +577,12 @@ class _ExchangePageState extends State<ExchangePage>
     final amountInWei = from == null
         ? BigInt.zero
         : toDecimalsWei(_amount, from.token.decimals);
-    final showSkeleton =
+    final showAmountShimmer =
         status == QuoteStatus.loading && amountInWei > BigInt.zero;
+    final outAmountStyle = theme.displayLarge.copyWith(
+      color: theme.textPrimary,
+      fontSize: 28,
+    );
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -660,27 +609,28 @@ class _ExchangePageState extends State<ExchangePage>
                         if (currentChild != null) currentChild
                       ],
                     ),
-                    child: showSkeleton
-                        ? SkeletonBox(
-                            key: const ValueKey('get-skeleton'),
-                            width: 150,
-                            height: 28,
-                          )
-                        : Align(
-                            alignment: Alignment.centerLeft,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(
+                    child: Align(
+                      key: showAmountShimmer
+                          ? const ValueKey<String>('get-shimmer')
+                          : const ValueKey<String>('get-value'),
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: showAmountShimmer
+                            ? ShimmerText(
+                                text: outAmount,
+                                style: outAmountStyle,
+                                baseColor:
+                                    theme.textPrimary.withValues(alpha: 0.35),
+                                highlightColor: theme.textPrimary,
+                              )
+                            : Text(
                                 outAmount,
-                                key: const ValueKey('get-value'),
-                                style: theme.displayLarge.copyWith(
-                                  color: theme.textPrimary,
-                                  fontSize: 28,
-                                ),
+                                style: outAmountStyle,
                               ),
-                            ),
-                          ),
+                      ),
+                    ),
                   ),
                 ),
               ),

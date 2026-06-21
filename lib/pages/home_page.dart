@@ -17,7 +17,6 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
-import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/state/app_state.dart';
@@ -49,8 +48,11 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
 
     if (!_hasInitialSync) {
       _hasInitialSync = true;
-      final appState = Provider.of<AppState>(context, listen: false);
-      _refreshData(appState);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final appState = Provider.of<AppState>(context, listen: false);
+        _refreshData(appState);
+      });
     }
   }
 
@@ -63,20 +65,31 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     _isRefreshing = true;
 
     try {
-      await syncBalances(walletIndex: appState.selectedWalletIndex);
+      try {
+        await appState.syncBalancesTracked(
+          walletIndex: appState.selectedWalletIndex,
+        );
 
-      if (_errorMessage != null) {
-        setState(() => _errorMessage = null);
+        if (_errorMessage != null && mounted) {
+          setState(() => _errorMessage = null);
+        }
+      } catch (e) {
+        debugPrint("refresh: $e");
+        if (mounted) {
+          setState(() => _errorMessage = e.toString());
+        }
       }
+
+      await appState.syncRates();
+      await appState.syncData();
     } catch (e) {
-      debugPrint("refresh: $e");
-      setState(() => _errorMessage = e.toString());
+      debugPrint("refresh data: $e");
+      if (mounted) {
+        setState(() => _errorMessage = e.toString());
+      }
+    } finally {
+      _isRefreshing = false;
     }
-
-    await appState.syncRates();
-    await appState.syncData();
-
-    _isRefreshing = false;
   }
 
   void _goToSendPage({String? recipient, String? amount, String? tokenAddress}) {
@@ -355,7 +368,9 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                             );
                             await appState.syncData();
                             try {
-                              await syncBalances(walletIndex: walletIndex);
+                              await appState.syncBalancesTracked(
+                                walletIndex: walletIndex,
+                              );
                               await appState.syncData();
                             } catch (_) {}
                           },
@@ -461,6 +476,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   ftoken: token,
                   hideBalance: appState.hideBalance,
                   tokenAmount: tokenAmountValue,
+                  isAmountLoading: appState.isSyncingBalances,
+                  isRateLoading: appState.isSyncingRates,
                   showDivider: false,
                   isTileView: true,
                   onTap: () {
@@ -489,6 +506,8 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                 ftoken: token,
                 hideBalance: appState.hideBalance,
                 tokenAmount: tokenAmountValue,
+                isAmountLoading: appState.isSyncingBalances,
+                isRateLoading: appState.isSyncingRates,
                 showDivider: !isLast,
                 onTap: () {
                   final originalIndex = appState.wallet!.tokens.indexOf(token);
