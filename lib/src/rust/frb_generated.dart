@@ -526,9 +526,7 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<void> crateApiProviderSelectAccountsChain(
-      {required BigInt walletIndex,
-      required BigInt chainHash,
-      String? password});
+      {required BigInt walletIndex, required BigInt chainHash});
 
   Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions(
       {required int walletIndex,
@@ -3804,15 +3802,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiProviderSelectAccountsChain(
-      {required BigInt walletIndex,
-      required BigInt chainHash,
-      String? password}) {
+      {required BigInt walletIndex, required BigInt chainHash}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_u_64(chainHash, serializer);
-        sse_encode_opt_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 117, port: port_);
       },
@@ -3821,7 +3816,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiProviderSelectAccountsChainConstMeta,
-      argValues: [walletIndex, chainHash, password],
+      argValues: [walletIndex, chainHash],
       apiImpl: this,
     ));
   }
@@ -3829,7 +3824,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiProviderSelectAccountsChainConstMeta =>
       const TaskConstMeta(
         debugName: "select_accounts_chain",
-        argNames: ["walletIndex", "chainHash", "password"],
+        argNames: ["walletIndex", "chainHash"],
       );
 
   @override

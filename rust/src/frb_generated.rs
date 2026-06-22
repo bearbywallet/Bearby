@@ -4466,7 +4466,6 @@ fn wire__crate__api__provider__select_accounts_chain_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_chain_hash = <u64>::sse_decode(&mut deserializer);
-            let api_password = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -4474,7 +4473,6 @@ fn wire__crate__api__provider__select_accounts_chain_impl(
                         let output_ok = crate::api::provider::select_accounts_chain(
                             api_wallet_index,
                             api_chain_hash,
-                            api_password,
                         )
                         .await?;
                         Ok(output_ok)

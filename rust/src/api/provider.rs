@@ -5,7 +5,6 @@ use crate::{
         helpers::{handle, with_service},
     },
 };
-use zilpay::secrecy::SecretString;
 use zilpay::serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
@@ -153,15 +152,10 @@ pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Resul
     .map_err(Into::into)
 }
 
-pub async fn select_accounts_chain(
-    wallet_index: usize,
-    chain_hash: u64,
-    password: Option<String>,
-) -> Result<(), String> {
+pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Result<(), String> {
     let core = handle()?;
-    let password = password.map(|p| SecretString::new(p.into()));
 
-    core.select_accounts_chain(wallet_index, chain_hash, password.as_ref())
+    core.select_accounts_chain(wallet_index, chain_hash)
         .await
         .map_err(ServiceError::BackgroundError)
         .map_err(Into::into)

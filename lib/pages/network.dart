@@ -9,7 +9,6 @@ import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/chain_config_edit.dart';
-import 'package:bearby/modals/confirm_password.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
@@ -202,51 +201,20 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   void _handleNetworkSelect(NetworkItem networkItem) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final config = networkItem.configInfo;
-    final wallet = appState.wallet;
 
-    Future<String?> selectChainAndFinish({String? password}) async {
-      try {
-        await selectAccountsChain(
-          walletIndex: appState.selectedWalletIndex,
-          chainHash: config.chainHash,
-          password: password,
-        );
-      } catch (e) {
-        debugPrint("select net: $e");
-        return e.toString();
-      }
+    try {
+      await selectAccountsChain(
+        walletIndex: appState.selectedWalletIndex,
+        chainHash: config.chainHash,
+      );
 
       if (_popOnSelect && mounted) {
         context.go(AppRoutes.home);
       }
 
       await appState.syncData();
-
-      return null;
-    }
-
-    void promptPassword() {
-      showConfirmPasswordModal(
-        context: context,
-        theme: appState.currentTheme,
-        onConfirm: (password) => selectChainAndFinish(password: password),
-      );
-    }
-
-    final needsPassword =
-        wallet?.accounts[config.slip44] == null && wallet?.authType == "none";
-
-    if (needsPassword) {
-      promptPassword();
-      return;
-    }
-
-    final result = await selectChainAndFinish();
-
-    if (!mounted) return;
-
-    if (result != null) {
-      promptPassword();
+    } catch (e) {
+      debugPrint("select net: $e");
     }
   }
 
