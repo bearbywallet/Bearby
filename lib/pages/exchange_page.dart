@@ -81,6 +81,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _bootstrap(initialFrom: _exchangeState.fromAsset);
       });
+    } else if (!isVisible && _wasVisible) {
+      // Page is leaving the viewport: stop the 10s quote poll timer. The
+      // rising edge above re-bootstraps on re-entry, which restarts polling.
+      _exchangeState.pause();
     }
     _wasVisible = isVisible;
   }

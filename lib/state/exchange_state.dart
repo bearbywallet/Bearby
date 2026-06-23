@@ -272,6 +272,13 @@ class ExchangeState extends ChangeNotifier {
     _setQuoteStatus(QuoteStatus.idle);
   }
 
+  /// Stop the 10s quote poll timer. Use when the exchange page leaves the
+  /// viewport (tab switch, route push). The next time the page becomes
+  /// visible, _bootstrap will restart polling via _restartPollingIfReady.
+  void pause() {
+    _stopPolling();
+  }
+
   void _restartPollingIfReady() {
     _stopPolling();
     if (_fromAsset == null || _toAsset == null) {
