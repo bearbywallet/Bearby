@@ -21,6 +21,7 @@ import 'package:bearby/modals/btc_addresses_modal.dart';
 import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/src/rust/api/qrcode.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/models/btc_chain.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/qrcode.dart';
@@ -42,6 +43,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   String amount = "0";
   String? legacyAddress;
   bool useLegacyAddress = false;
+  String? btcCurrentAddress;
+  String? selectedBtcAddress;
 
   final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
@@ -67,6 +70,44 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
         });
       });
     }
+
+    if (chain?.slip44 == kBitcoinlip44 && wallet != null) {
+      _loadBtcCurrentAddress();
+    }
+  }
+
+  Future<void> _loadBtcCurrentAddress() async {
+    final appState = context.read<AppState>();
+    final wallet = appState.wallet;
+    final chain = appState.chain;
+    final walletIndex = appState.selectedWalletIndexOrNull;
+
+    if (wallet == null || chain == null || walletIndex == null) return;
+
+    try {
+      final Map<int, AddressChainInfo> chains = await getBtcAddresses(
+        walletIndex: walletIndex,
+        accountIndex: wallet.selectedAccount,
+        chainHash: chain.chainHash,
+      );
+      if (!mounted) return;
+      setState(() {
+        btcCurrentAddress = _firstUnusedSegwit(chains);
+      });
+    } catch (e) {
+      debugPrint('error loading btc current address: $e');
+      if (!mounted) return;
+      setState(() => btcCurrentAddress = null);
+    }
+  }
+
+  String? _firstUnusedSegwit(Map<int, AddressChainInfo> chains) {
+    final AddressChainInfo? segwit = chains[2];
+    if (segwit == null) return null;
+    for (final BtcAddressEntryInfo entry in segwit.external_) {
+      if (entry.history.isEmpty) return entry.address;
+    }
+    return null;
   }
 
   @override
@@ -159,7 +200,12 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
     final token = wallet?.tokens.elementAtOrNull(selectedToken);
     final currentAddress = useLegacyAddress
         ? legacyAddress ?? account?.addr ?? ''
-        : account?.addr ?? '';
+        : chain?.slip44 == kBitcoinlip44
+            ? selectedBtcAddress ??
+                btcCurrentAddress ??
+                account?.addr ??
+                ''
+            : account?.addr ?? '';
     final l10n = AppLocalizations.of(context);
 
     if (chain == null ||
@@ -467,7 +513,19 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               color: theme.primaryPurple,
             ),
             disabled: false,
-            onPressed: () => showBtcAddressesModal(context: context),
+            onPressed: () async {
+              await showBtcAddressesModal(
+                context: context,
+                onAddressSelected: (String address) {
+                  if (!mounted) return;
+                  setState(() {
+                    selectedBtcAddress = address;
+                  });
+                },
+              );
+              if (!mounted) return;
+              await _loadBtcCurrentAddress();
+            },
             backgroundColor: Colors.transparent,
             textColor: theme.primaryPurple,
             defaultBorderSide: BorderSide(color: theme.modalBorder),

@@ -14,8 +14,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-void showBtcAddressesModal({required BuildContext context}) {
-  showModalBottomSheet<void>(
+Future<void> showBtcAddressesModal({
+  required BuildContext context,
+  ValueChanged<String>? onAddressSelected,
+}) {
+  return showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -23,7 +26,9 @@ void showBtcAddressesModal({required BuildContext context}) {
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (context) => const _BtcAddressesModalContent(),
+    builder: (context) => _BtcAddressesModalContent(
+      onAddressSelected: onAddressSelected,
+    ),
   );
 }
 
@@ -148,7 +153,9 @@ class _BtcAddressModalData {
 }
 
 class _BtcAddressesModalContent extends StatefulWidget {
-  const _BtcAddressesModalContent();
+  final ValueChanged<String>? onAddressSelected;
+
+  const _BtcAddressesModalContent({this.onAddressSelected});
 
   @override
   State<_BtcAddressesModalContent> createState() =>
@@ -159,7 +166,6 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
   final Set<int> _expandedSections = <int>{_kSegwitAddrTypeByte};
   _BtcAddressModalData _data = _BtcAddressModalData.empty;
   bool _isLoading = true;
-  String? _copiedAddress;
 
   @override
   void initState() {
@@ -204,16 +210,18 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
   }
 
   Future<void> _copyAddress(String address) async {
-    try {
-      await Clipboard.setData(ClipboardData(text: address));
-      if (!mounted) return;
-      setState(() => _copiedAddress = address);
-      await Future<void>.delayed(const Duration(milliseconds: 1200));
-      if (!mounted || _copiedAddress != address) return;
-      setState(() => _copiedAddress = null);
-    } catch (e) {
-      debugPrint('error copying btc address: $e');
+    final ValueChanged<String>? callback = widget.onAddressSelected;
+    if (callback != null) {
+      callback(address);
+    } else {
+      try {
+        await Clipboard.setData(ClipboardData(text: address));
+      } catch (e) {
+        debugPrint('error copying btc address: $e');
+      }
     }
+    if (!mounted) return;
+    Navigator.of(context).pop();
   }
 
   @override
@@ -434,8 +442,6 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
     AppLocalizations l10n,
     _BtcAddressRow row,
   ) {
-    final isCopied = _copiedAddress == row.address;
-
     return InkWell(
       onTap: () => _copyAddress(row.address),
       child: Padding(
@@ -498,12 +504,6 @@ class _BtcAddressesModalContentState extends State<_BtcAddressesModalContent> {
                     ),
                 ],
               ),
-            const SizedBox(width: 8),
-            AppIconView(
-              icon: isCopied ? AppIcon.check : AppIcon.copy,
-              size: 18,
-              color: theme.textSecondary,
-            ),
           ],
         ),
       ),
