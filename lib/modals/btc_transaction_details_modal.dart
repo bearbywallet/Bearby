@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/copy_content.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
@@ -14,6 +15,7 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
+import 'package:bearby/mixins/transaction_share.dart';
 import 'package:bearby/mixins/transaction_token.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/btc.dart';
@@ -741,7 +743,43 @@ class _ExplorerFooter extends StatelessWidget {
         top: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: explorers.map((e) => _explorerBtn(e, theme)).toList(),
+          children: <Widget>[
+            ...explorers.map((ExplorerInfo e) => _explorerBtn(e, theme)),
+            const SizedBox(width: 4),
+            _buildShareButton(theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareButton(AppTheme theme) {
+    final ({String name, String url})? explorer = firstExplorer(
+      appState,
+      transaction.chainHash,
+      transaction.transactionHash,
+    );
+    if (explorer == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => shareTransactionQr(
+          url: explorer.url,
+          explorerName: explorer.name,
+          color: theme.primaryPurple,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: theme.primaryPurple.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: AppIconView(
+            icon: AppIcon.share,
+            size: 18,
+            color: theme.primaryPurple,
+          ),
         ),
       ),
     );

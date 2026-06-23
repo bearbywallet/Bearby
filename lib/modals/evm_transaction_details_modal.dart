@@ -2,12 +2,14 @@ import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/transaction_share.dart';
 
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/mixins/transaction_token.dart';
@@ -444,13 +446,50 @@ class EvmTransactionDetailsModal extends StatelessWidget {
         bottom: true,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: explorers.isEmpty
-              ? [
-                  _buildDefaultExplorerButton(theme),
-                ]
-              : explorers
-                  .map((explorer) => _buildExplorerButton(explorer, theme))
-                  .toList(),
+          children: <Widget>[
+            ...(explorers.isEmpty
+                ? <Widget>[_buildDefaultExplorerButton(theme)]
+                : explorers
+                    .map((ExplorerInfo e) => _buildExplorerButton(e, theme))
+                    .toList()),
+            const SizedBox(width: 4),
+            _buildShareButton(appState, theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareButton(AppState appState, AppTheme theme) {
+    final ({String name, String url})? explorer = firstExplorer(
+      appState,
+      transaction.chainHash,
+      transaction.transactionHash,
+    );
+    if (explorer == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: InkWell(
+        onTap: () => shareTransactionQr(
+          url: explorer.url,
+          explorerName: explorer.name,
+          color: theme.primaryPurple,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryPurple.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.primaryPurple.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: AppIconView(
+            icon: AppIcon.share,
+            size: 20,
+            color: theme.primaryPurple,
+          ),
         ),
       ),
     );
