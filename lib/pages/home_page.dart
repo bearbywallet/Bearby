@@ -65,25 +65,15 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     _isRefreshing = true;
 
     try {
-      try {
-        await appState.syncBalancesTracked(
-          walletIndex: appState.selectedWalletIndex,
-        );
+      await appState.refreshBalancesAndRates(
+        walletIndex: appState.selectedWalletIndex,
+      );
 
-        if (_errorMessage != null && mounted) {
-          setState(() => _errorMessage = null);
-        }
-      } catch (e) {
-        debugPrint("refresh: $e");
-        if (mounted) {
-          setState(() => _errorMessage = e.toString());
-        }
+      if (_errorMessage != null && mounted) {
+        setState(() => _errorMessage = null);
       }
-
-      await appState.syncRates();
-      await appState.syncData();
     } catch (e) {
-      debugPrint("refresh data: $e");
+      debugPrint("refresh: $e");
       if (mounted) {
         setState(() => _errorMessage = e.toString());
       }

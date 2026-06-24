@@ -36,8 +36,9 @@ class MainPageState extends State<MainPage> {
     final appState = Provider.of<AppState>(context, listen: false);
 
     try {
-      await appState.syncRates();
-      await appState.syncData();
+      await appState.refreshBalancesAndRates(
+        walletIndex: appState.selectedWalletIndex,
+      );
     } catch (e) {
       debugPrint('initial data load error: $e');
     }

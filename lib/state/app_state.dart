@@ -248,6 +248,21 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  /// Pulls token balances from the chain and pushes them to the UI (via
+  /// [syncData]) BEFORE fetching external rate quotes. The second
+  /// [syncData] repaints the token list with the new rates.
+  ///
+  /// Sequencing rationale: rate fetches hit external HTTP endpoints
+  /// (coingecko / zilstream / bearby-rates) and can take several seconds.
+  /// Users should see updated balances while rates are still loading,
+  /// not all at once at the end of the refresh.
+  Future<void> refreshBalancesAndRates({required BigInt walletIndex}) async {
+    await syncBalancesTracked(walletIndex: walletIndex);
+    await syncData();
+    await syncRates();
+    await syncData();
+  }
+
   Future<void> updateSelectedAccount(
       BigInt walletIndex, BigInt accountIndex) async {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
