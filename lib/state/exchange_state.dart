@@ -52,14 +52,18 @@ extension ExchangeProviderMeta on ExchangeProvider {
   /// PlunderSwap's router contract credits the output to `msg.sender` and
   /// the swap ABI does not accept a recipient, so the user has no way to
   /// override it from this UI. ZilSwap's ZRC-2 swap path likewise does not
-  /// surface a recipient parameter for the same reason.
+  /// surface a recipient parameter for the same reason. SunSwap's
+  /// SunFeeRouter wrapper on TRON owns the output leg for fee collection
+  /// and WTRX unwrapping, and its `swapExactInputSingle` / `swapExactInput`
+  /// signatures do not expose a recipient — the wrapper hardcodes
+  /// `address(this)` for native-out and `msg.sender` for token-out.
   bool get supportsCustomRecipient => map(
         relay: (_) => true,
         uniswap: (_) => true,
         pancakeSwap: (_) => true,
         plunderSwap: (_) => false,
         zilSwap: (_) => false,
-        sunSwap: (_) => true,
+        sunSwap: (_) => false,
       );
 }
 
