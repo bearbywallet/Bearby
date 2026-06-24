@@ -1,6 +1,6 @@
 name: bearby
 description: "Bearby wallet IOS, Android, Mac, Linux, Windows"
-version: 3.8.31+922
+version: 3.8.32+923
 
 environment:
   sdk: ^3.5.1
