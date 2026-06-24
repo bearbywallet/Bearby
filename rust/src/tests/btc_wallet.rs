@@ -168,7 +168,7 @@ mod btc_wallet_tests {
             let expected_bip = DerivationPath::default_bip(slip44);
             let expected_addr = EXPECTED_ADDRS.iter().find(|(s, _)| *s == slip44).unwrap().1;
 
-            select_accounts_chain(0, chain_hash, Some(PASSWORD.to_string()))
+            select_accounts_chain(0, chain_hash)
                 .await
                 .unwrap();
 
@@ -188,7 +188,7 @@ mod btc_wallet_tests {
             assert_eq!(accounts[0].addr, expected_addr);
         }
 
-        select_accounts_chain(0, btc_chain_hash, Some(PASSWORD.to_string()))
+        select_accounts_chain(0, btc_chain_hash)
             .await
             .unwrap();
 
@@ -258,7 +258,7 @@ mod btc_wallet_tests {
         let providers = get_providers().await.unwrap();
         let tron_chain = providers.iter().find(|p| p.slip_44 == TRON).unwrap();
 
-        select_accounts_chain(0, tron_chain.chain_hash, None)
+        select_accounts_chain(0, tron_chain.chain_hash)
             .await
             .unwrap();
 
