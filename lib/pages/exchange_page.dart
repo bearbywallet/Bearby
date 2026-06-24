@@ -243,7 +243,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
 
     final defaultRecipient = provider.common.accountAddr;
-    final destination = _recipientOverride ?? defaultRecipient;
+    final destination = (provider.supportsCustomRecipient && _recipientOverride != null)
+        ? _recipientOverride!
+        : defaultRecipient;
 
     showExchangeConfirmModal(
       context: context,
@@ -567,7 +569,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final rateLabel =
         quote == null || from == null ? null : _rateLabel(from, to, quote);
     final recipient = to.providers.firstOrNull?.common.accountAddr ?? '';
-    final effectiveRecipient = _recipientOverride ?? recipient;
+    // Use the selected (best-quoted) provider when available. If no quote has
+    // landed yet, fall back to inspecting every provider that can route this
+    // pair: if any of them disallows custom recipient (e.g. PlunderSwap /
+    // ZilSwap), disable the button so the user can't pick an address that
+    // would be silently ignored.
+    final allowCustomRecipient = selectedProvider != null
+        ? selectedProvider.supportsCustomRecipient
+        : to.providers.isNotEmpty &&
+            to.providers.every((p) => p.supportsCustomRecipient);
+    final effectiveRecipient =
+        allowCustomRecipient ? (_recipientOverride ?? recipient) : recipient;
     final (outAmount, _) = quote == null
         ? ('0', '')
         : formatingAmount(
@@ -597,7 +609,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildRecipientButton(theme, l10n, effectiveRecipient, to),
+          _buildRecipientButton(
+            theme,
+            l10n,
+            effectiveRecipient,
+            to,
+            allowCustomRecipient,
+          ),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -664,7 +682,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     AppLocalizations l10n,
     String address,
     ExchangeAsset to,
+    bool enabled,
   ) {
+    final text = Text(
+      shortenAddress(address),
+      style: theme.bodyText2.copyWith(
+        color: enabled
+            ? theme.primaryPurple
+            : theme.textSecondary.withValues(alpha: 0.7),
+        decoration:
+            enabled ? TextDecoration.underline : TextDecoration.none,
+        decorationColor: theme.primaryPurple,
+      ),
+    );
+    if (!enabled) return text;
     return GestureDetector(
       onTap: () {
         final chainHash = to.providers.firstOrNull?.common.chainHash;
@@ -678,14 +709,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         );
       },
       behavior: HitTestBehavior.opaque,
-      child: Text(
-        shortenAddress(address),
-        style: theme.bodyText2.copyWith(
-          color: theme.primaryPurple,
-          decoration: TextDecoration.underline,
-          decorationColor: theme.primaryPurple,
-        ),
-      ),
+      child: text,
     );
   }
 

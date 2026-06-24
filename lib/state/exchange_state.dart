@@ -47,6 +47,20 @@ extension ExchangeProviderMeta on ExchangeProvider {
         zilSwap: (_) => false,
         sunSwap: (_) => false,
       );
+
+  /// Whether the user can route the swap to an arbitrary recipient address.
+  /// PlunderSwap's router contract credits the output to `msg.sender` and
+  /// the swap ABI does not accept a recipient, so the user has no way to
+  /// override it from this UI. ZilSwap's ZRC-2 swap path likewise does not
+  /// surface a recipient parameter for the same reason.
+  bool get supportsCustomRecipient => map(
+        relay: (_) => true,
+        uniswap: (_) => true,
+        pancakeSwap: (_) => true,
+        plunderSwap: (_) => false,
+        zilSwap: (_) => false,
+        sunSwap: (_) => true,
+      );
 }
 
 /// Display lifecycle of the current quote, distinct from [loadingQuote] (which
