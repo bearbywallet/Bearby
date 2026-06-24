@@ -11,7 +11,6 @@ import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/router.dart';
-import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:flutter/material.dart';
@@ -161,12 +160,6 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
           accountIndex: BigInt.from(appState.accounts.length - 1),
         );
       }
-
-      try {
-        await syncBalances(walletIndex: appState.selectedWalletIndex);
-      } catch (_) {}
-
-      await appState.syncData();
 
       if (mounted) {
         context.go(AppRoutes.home);
