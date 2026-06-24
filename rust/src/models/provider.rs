@@ -10,9 +10,9 @@ pub use zilpay::{
     rpc::network_config::{ChainConfig, Explorer},
 };
 
-use crate::utils::errors::ServiceError;
-
 use super::ftoken::FTokenInfo;
+
+use crate::utils::errors::ServiceError;
 
 #[derive(Debug, Clone)]
 pub struct ExplorerInfo {
@@ -233,7 +233,18 @@ impl NetworkConfigInfo {
                                     .and_then(|v| v.as_bool())
                                     .unwrap_or(false);
 
-                                let addr_type = if addr.starts_with("zil") { 1 } else { 0 };
+                                let addr_type = match Address::from_str_hex(&addr) {
+                                    Ok(parsed) => parsed.prefix_type(),
+                                    Err(_) => {
+                                        if addr.starts_with("0x") {
+                                            1
+                                        } else if addr.starts_with("zil") {
+                                            0
+                                        } else {
+                                            1
+                                        }
+                                    }
+                                };
 
                                 Some(FTokenInfo {
                                     name,
@@ -311,5 +322,120 @@ impl NetworkConfigInfo {
                 "Expected JSON object".to_string(),
             )),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use zilpay::serde_json;
+
+    fn parse(json: &str) -> NetworkConfigInfo {
+        let v: serde_json::Value = serde_json::from_str(json).unwrap();
+        NetworkConfigInfo::from_json_value(&v).unwrap()
+    }
+
+    /// Regression: JSON parser must produce `addrType` that matches Rust
+    /// `Address::prefix_type()`. Previously the parser was inverted, so
+    /// ZIL's EVM native (0x000…) got addrType=0 instead of 1, causing
+    /// the home page filter to drop it after a chain switch.
+    #[test]
+    fn test_zil_testnet_native_addr_types_match_rust_prefix_type() {
+        let zil_testnet = r#"{
+            "name": "Zilliqa Test",
+            "chain": "ZIL",
+            "chainIds": [33101, 333],
+            "slip44": 313,
+            "testnet": true,
+            "ftokens": [
+                { "native": true,
+                  "addr": "0x0000000000000000000000000000000000000000",
+                  "name": "EVM", "symbol": "ZILt", "decimals": 18 },
+                { "native": true,
+                  "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+                  "name": "Scilla", "symbol": "ZILt", "decimals": 12 }
+            ]
+        }"#;
+        let info = parse(zil_testnet);
+        let evm = info.ftokens.iter().find(|t| t.name == "EVM").unwrap();
+        let scilla = info.ftokens.iter().find(|t| t.name == "Scilla").unwrap();
+
+        // EVM-native address (0x000…) parses to Secp256k1Keccak256 → prefix_type = 1
+        assert_eq!(
+            evm.addr_type, 1,
+            "EVM native must have addr_type=1 (Keccak256)"
+        );
+        // Scilla bech32 address parses to Secp256k1Sha256 → prefix_type = 0
+        assert_eq!(
+            scilla.addr_type, 0,
+            "Scilla native must have addr_type=0 (Sha256)"
+        );
+    }
+
+    #[test]
+    fn test_mainnet_chain_addr_types() {
+        // Bitcoin native (bech32) → Secp256k1Bitcoin → prefix_type = 2
+        let btc = parse(
+            r#"{
+                "name": "Bitcoin",
+                "chain": "BTC",
+                "chainIds": [0, 0],
+                "slip44": 0,
+                "ftokens": [
+                    { "native": true,
+                      "addr": "bc1pmfr3p9j00pfxjh0zmgp99y8zftmd3s5pmedqhyptwy6lm87hf5sspknck9",
+                      "name": "Bitcoin", "symbol": "BTC", "decimals": 8 }
+                ]
+            }"#,
+        );
+        assert_eq!(btc.ftokens[0].addr_type, 2, "BTC native = Bitcoin(2)");
+
+        // Ethereum native (0x000…) → Secp256k1Keccak256 → prefix_type = 1
+        let eth = parse(
+            r#"{
+                "name": "Ethereum",
+                "chain": "ETH",
+                "chainIds": [1, 0],
+                "slip44": 60,
+                "ftokens": [
+                    { "native": true,
+                      "addr": "0x0000000000000000000000000000000000000000",
+                      "name": "Ethereum", "symbol": "ETH", "decimals": 18 }
+                ]
+            }"#,
+        );
+        assert_eq!(eth.ftokens[0].addr_type, 1, "ETH native = EVM(1)");
+
+        // Tron native (base58check) → Secp256k1Tron → prefix_type = 4
+        let trx = parse(
+            r#"{
+                "name": "Tron",
+                "chain": "TRX",
+                "chainIds": [728126428, 0],
+                "slip44": 195,
+                "ftokens": [
+                    { "native": true,
+                      "addr": "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
+                      "name": "Tron", "symbol": "TRX", "decimals": 6 }
+                ]
+            }"#,
+        );
+        assert_eq!(trx.ftokens[0].addr_type, 4, "TRX native = Tron(4)");
+
+        // Solana native (base58 ed25519 pubkey) → Ed25519Solana → prefix_type = 3
+        let sol = parse(
+            r#"{
+                "name": "Solana",
+                "chain": "SOL",
+                "chainIds": [101, 0],
+                "slip44": 501,
+                "ftokens": [
+                    { "native": true,
+                      "addr": "11111111111111111111111111111111",
+                      "name": "Solana", "symbol": "SOL", "decimals": 9 }
+                ]
+            }"#,
+        );
+        assert_eq!(sol.ftokens[0].addr_type, 3, "SOL native = Solana(3)");
     }
 }
