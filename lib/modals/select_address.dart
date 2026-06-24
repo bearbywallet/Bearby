@@ -211,6 +211,7 @@ class _AddressSelectModalContentState
                 params,
                 l10n.addressSelectModalContentUnknown,
               );
+              Navigator.of(context).pop();
             } else {
               setState(() => _searchQuery = value.toLowerCase());
             }
@@ -321,6 +322,7 @@ class _AddressSelectModalContentState
         QRcodeScanResultInfo params =
             QRcodeScanResultInfo(recipient: entry.address);
         widget.onAddressSelected(params, entry.name);
+        Navigator.of(context).pop();
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
@@ -485,11 +487,10 @@ class _AddressSelectModalContentState
   Future<void> _parseQrcodRes(String data) async {
     try {
       QRcodeScanResultInfo parsed = await parseQrcodeStr(data: data);
-      if (mounted) {
-        widget.onAddressSelected(parsed,
-            AppLocalizations.of(context)!.addressSelectModalContentUnknown);
-        Navigator.pop(context);
-      }
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      widget.onAddressSelected(parsed,
+          AppLocalizations.of(context)!.addressSelectModalContentUnknown);
     } catch (e) {
       debugPrint("error parse qrcode: $e");
     }

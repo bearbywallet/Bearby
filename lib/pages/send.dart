@@ -518,7 +518,6 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
 
   void updateAddress(QRcodeScanResultInfo params, String name) {
     _applyQrcode(params, name);
-    context.pop();
   }
 
   void updateAmount(String value) {

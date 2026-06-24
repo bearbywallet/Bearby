@@ -674,7 +674,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           title: l10n.exchangePageRecipientTitle,
           onAddressSelected: (info, _) {
             setState(() => _recipientOverride = info.recipient);
-            Navigator.of(context, rootNavigator: true).pop();
           },
         );
       },
