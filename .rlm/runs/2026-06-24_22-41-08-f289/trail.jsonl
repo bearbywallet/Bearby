@@ -1,1 +1,0 @@
-{"kind":"header","v":1,"runId":"2026-06-24_22-41-08-f289","ts":"2026-06-24T13:41:08.586Z","rootPrompt":"hey","context":{"type":"str","chars":23288,"json":false,"projectMap":true},"workspaceRoot":"/Users/hicaru/projects/bearby/Bearby","models":{"smart":"glm-5.2","worker":"glm-4.5-air"},"meta":{"maxIterations":30,"maxDepth":2,"orchestrator":true,"editEnabled":false,"fsTools":true}}
