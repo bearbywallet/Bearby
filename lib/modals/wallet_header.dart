@@ -240,6 +240,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
         BigInt.from(index),
       );
       if (mounted) Navigator.pop(context);
+
+      await appState.refreshBalancesAndRates(
+        walletIndex: appState.selectedWalletIndex,
+      );
     } catch (e) {
       debugPrint("select wallet error: $e");
     }

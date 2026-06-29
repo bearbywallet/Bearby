@@ -81,6 +81,9 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   Future<void> _completeAuthentication(int walletIndex) async {
     _appState.setSelectedWallet(walletIndex);
     await _appState.syncData();
+    await _appState.refreshBalancesAndRates(
+      walletIndex: _appState.selectedWalletIndex,
+    );
   }
 
   Future<bool> _authenticateWithSession(
