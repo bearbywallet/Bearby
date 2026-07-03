@@ -2465,6 +2465,12 @@ abstract class AppLocalizations {
   /// **'Delete network'**
   String get chainInfoModalContentSwipeToDelete;
 
+  /// Text for the Advanced expand button on the chain config page
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get chainConfigPageAdvancedButton;
+
   /// Title text for the SwitchChainNetworkContent modal.
   ///
   /// In en, this message translates to:

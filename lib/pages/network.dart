@@ -8,7 +8,6 @@ import 'package:bearby/config/storage_keys.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/modals/chain_config_edit.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
@@ -239,14 +238,9 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
     if (!mounted) return;
 
-    showChainInfoModal(
-      context: context,
-      networkConfig: config,
-      onRemoved: () async {
-        context.pop();
-        await _loadNetworks();
-      },
-    );
+    await context.push(AppRoutes.chainConfig, extra: config);
+    if (!mounted) return;
+    await _loadNetworks();
   }
 
   Widget _buildNetworkList(List<NetworkItem> networks, AppTheme theme,

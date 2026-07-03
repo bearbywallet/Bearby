@@ -1231,6 +1231,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chainInfoModalContentSwipeToDelete => 'Удалить сеть';
 
   @override
+  String get chainConfigPageAdvancedButton => 'Дополнительно';
+
+  @override
   String get switchChainNetworkContentTitle => 'Выбрать сеть';
 
   @override

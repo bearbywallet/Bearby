@@ -1228,6 +1228,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chainInfoModalContentSwipeToDelete => '删除网络';
 
   @override
+  String get chainConfigPageAdvancedButton => '高级';
+
+  @override
   String get switchChainNetworkContentTitle => '选择网络';
 
   @override

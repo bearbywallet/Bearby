@@ -397,6 +397,7 @@
   "chainInfoModalContentExplorersTitle": "エクスプローラー",
   "chainInfoModalContentDeleteProviderTitle": "ネットワークを削除",
   "chainInfoModalContentSwipeToDelete": "削除",
+  "chainConfigPageAdvancedButton": "詳細設定",
   "switchChainNetworkContentTitle": "ネットワークを選択",
   "switchChainNetworkContentButton": "ネットワークを切り替え",
   "switchChainNetworkContentTestnetLabel": "テストネット",

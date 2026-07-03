@@ -1228,6 +1228,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chainInfoModalContentSwipeToDelete => '네트워크 삭제';
 
   @override
+  String get chainConfigPageAdvancedButton => '고급 설정';
+
+  @override
   String get switchChainNetworkContentTitle => '네트워크 선택';
 
   @override

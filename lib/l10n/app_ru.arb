@@ -394,6 +394,7 @@
   "chainInfoModalContentExplorersTitle": "Обозреватели",
   "chainInfoModalContentDeleteProviderTitle": "Удалить сеть",
   "chainInfoModalContentSwipeToDelete": "Удалить сеть",
+  "chainConfigPageAdvancedButton": "Дополнительно",
   "switchChainNetworkContentTitle": "Выбрать сеть",
   "switchChainNetworkContentButton": "Переключить сеть",
   "switchChainNetworkContentTestnetLabel": "Тестовая сеть",

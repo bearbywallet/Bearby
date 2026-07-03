@@ -15,6 +15,7 @@ import 'pages/about.dart';
 import 'pages/add_account.dart';
 import 'pages/add_ledger_account.dart';
 import 'pages/add_network.dart';
+import 'pages/chain_config.dart';
 import 'pages/address_book.dart';
 import 'pages/appearance.dart';
 import 'pages/browser_settings.dart';
@@ -27,6 +28,7 @@ import 'pages/ledger_connect.dart';
 import 'pages/locale.dart';
 import 'pages/manage_tokens.dart';
 import 'pages/network.dart';
+import 'src/rust/models/provider.dart';
 import 'pages/new_wallet_options.dart';
 import 'pages/notification.dart';
 import 'pages/password_setup.dart';
@@ -57,6 +59,7 @@ abstract class AppRoutes {
   static const receive            = '/receive';
   static const addAccount         = '/add_account';
   static const addNetwork         = '/add_network';
+  static const chainConfig        = '/chain_config';
   static const manageTokens       = '/manage_tokens';
   static const send               = '/send';
   static const revealSk           = '/reveal_sk';
@@ -212,6 +215,17 @@ GoRouter createRouter(AppState appState) {
         builder: (context, state) {
           final args = state.extra as Map<String, dynamic>?;
           return NetworkPage(popOnSelect: args?['popOnSelect'] as bool? ?? false);
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.chainConfig,
+        builder: (context, state) {
+          final NetworkConfigInfo? config = state.extra as NetworkConfigInfo?;
+          if (config == null) {
+            return const NetworkPage(popOnSelect: false);
+          }
+          return ChainConfigPage(networkConfig: config);
         },
       ),
 

@@ -1228,6 +1228,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chainInfoModalContentSwipeToDelete => '削除';
 
   @override
+  String get chainConfigPageAdvancedButton => '詳細設定';
+
+  @override
   String get switchChainNetworkContentTitle => 'ネットワークを選択';
 
   @override

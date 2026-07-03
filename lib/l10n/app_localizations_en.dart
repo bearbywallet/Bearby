@@ -1229,6 +1229,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chainInfoModalContentSwipeToDelete => 'Delete network';
 
   @override
+  String get chainConfigPageAdvancedButton => 'Advanced';
+
+  @override
   String get switchChainNetworkContentTitle => 'Select Network';
 
   @override

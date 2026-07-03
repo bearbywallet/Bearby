@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/detail_group_card.dart';
 import 'package:bearby/components/detail_item_group_card.dart';
@@ -7,9 +7,11 @@ import 'package:bearby/components/glass_message.dart';
 import 'package:bearby/components/hover_icon.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
-import 'package:bearby/components/modal_drag_handle.dart';
 import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/components/token_avatar.dart';
+import 'package:bearby/components/custom_app_bar.dart';
+import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -17,47 +19,21 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-void showChainInfoModal({
-  required BuildContext context,
-  required NetworkConfigInfo networkConfig,
-  VoidCallback? onRemoved,
-}) {
-  showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    enableDrag: true,
-    isDismissible: true,
-    useSafeArea: true,
-    barrierColor: Colors.black54,
-    builder: (context) => Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: _ChainInfoModalContent(
-        networkConfig: networkConfig,
-        onRemoved: onRemoved,
-      ),
-    ),
-  );
-}
-
-class _ChainInfoModalContent extends StatefulWidget {
+class ChainConfigPage extends StatefulWidget {
   final NetworkConfigInfo networkConfig;
-  final VoidCallback? onRemoved;
 
-  const _ChainInfoModalContent({
-    required this.networkConfig,
-    this.onRemoved,
-  });
+  const ChainConfigPage({super.key, required this.networkConfig});
 
   @override
-  State<_ChainInfoModalContent> createState() => _ChainInfoModalContentState();
+  State<ChainConfigPage> createState() => _ChainConfigPageState();
 }
 
-class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
+class _ChainConfigPageState extends State<ChainConfigPage>
+    with StatusBarMixin {
   late NetworkConfigInfo _config;
   bool _isDeleting = false;
   String? _errorText;
+  bool _advancedExpanded = false;
 
   @override
   void initState() {
@@ -110,11 +86,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
       await removeProvider(chainHash: hash);
       await appState.syncData();
       if (mounted) {
-        if (widget.onRemoved != null) {
-          widget.onRemoved!();
-        } else {
-          Navigator.of(context).pop();
-        }
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
@@ -130,193 +102,179 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     }
   }
 
+  Future<void> _toggleFallback(bool value) async {
+    setState(() {
+      _config = NetworkConfigInfo(
+        name: _config.name,
+        logo: _config.logo,
+        chain: _config.chain,
+        shortName: _config.shortName,
+        rpc: _config.rpc,
+        features: _config.features,
+        chainId: _config.chainId,
+        chainIds: _config.chainIds,
+        slip44: _config.slip44,
+        diffBlockTime: _config.diffBlockTime,
+        chainHash: _config.chainHash,
+        ens: _config.ens,
+        explorers: _config.explorers,
+        fallbackEnabled: value,
+        testnet: _config.testnet,
+        ftokens: _config.ftokens,
+      );
+    });
+    await createOrUpdateChain(providerConfig: _config);
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return const SizedBox.shrink();
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
+    return Scaffold(
+      backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
       ),
-      decoration: BoxDecoration(
-        color: theme.cardBackground.withValues(alpha: 0.85),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border:
-            Border.all(color: theme.modalBorder, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: theme.primaryPurple.withValues(alpha: 0.15),
-            blurRadius: 30,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: _config.chain.isNotEmpty
+                        ? _config.chain
+                        : l10n.chainInfoModalContentNetworkInfoTitle,
+                    onBackPressed: () => context.pop(),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding,
+                      vertical: 8,
+                    ),
+                    child: Column(
+                      children: [
+                        _BasicNetworkSection(
+                            config: _config, theme: theme, l10n: l10n),
+                        const SizedBox(height: 12),
+                        _AdvancedSectionButton(
+                          theme: theme,
+                          l10n: l10n,
+                          expanded: _advancedExpanded,
+                          onToggle: () {
+                            setState(() {
+                              _advancedExpanded = !_advancedExpanded;
+                            });
+                          },
+                        ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: _advancedExpanded
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    _AdvancedNetworkSection(
+                                      config: _config,
+                                      theme: theme,
+                                      l10n: l10n,
+                                      onFallbackChanged: _toggleFallback,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _ExplorersSection(
+                                        config: _config, theme: theme, l10n: l10n),
+                                    const SizedBox(height: 12),
+                                    _RpcSection(
+                                      config: _config,
+                                      theme: theme,
+                                      l10n: l10n,
+                                      onSelect: _selectRpc,
+                                      onRemove: _removeRpc,
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 12),
+                        _DeleteSection(
+                          appState: appState,
+                          theme: theme,
+                          l10n: l10n,
+                          canRemove: _canRemove(appState),
+                          isDeleting: _isDeleting,
+                          errorText: _errorText,
+                          onDelete: () => _deleteProvider(appState),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).padding.bottom + 16,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BasicNetworkSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+
+  const _BasicNetworkSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+  });
+
+  Widget _tokenItem(BuildContext context) {
+    final token = config.ftokens.first;
+    final appState = Provider.of<AppState>(context, listen: false);
+    return DetailItem(
+      label: l10n.chainInfoModalContentTokenTitle,
+      theme: theme,
+      valueWidget: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (token.logo != null)
+            TokenAvatar(
+              token: token,
+              size: 20,
+              appState: appState,
+              showNetworkBadge: false,
+              showBorder: false,
+              iconUrl: processTokenLogo(
+                  token: token,
+                  shortName: config.shortName,
+                  theme: theme.value),
+            ),
+          const SizedBox(width: 8),
+          Text(
+            '${token.symbol} (${token.decimals})',
+            style: theme.bodyText2.copyWith(color: theme.textPrimary),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(19)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ModalDragHandle(theme: theme),
-              if (_config.chain.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    _config.chain,
-                    style: theme.titleMedium.copyWith(color: theme.textPrimary),
-                  ),
-                ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Column(
-                    children: [
-                      if (_config.ftokens.isNotEmpty)
-                        _TokenSection(
-                            config: _config, theme: theme, l10n: l10n),
-                      if (_config.ftokens.isNotEmpty)
-                        const SizedBox(height: 12),
-                      _NetworkInfoSection(
-                          config: _config,
-                          theme: theme,
-                          l10n: l10n,
-                          onFallbackChanged: (value) async {
-                            setState(() {
-                              _config = NetworkConfigInfo(
-                                name: _config.name,
-                                logo: _config.logo,
-                                chain: _config.chain,
-                                shortName: _config.shortName,
-                                rpc: _config.rpc,
-                                features: _config.features,
-                                chainId: _config.chainId,
-                                chainIds: _config.chainIds,
-                                slip44: _config.slip44,
-                                diffBlockTime: _config.diffBlockTime,
-                                chainHash: _config.chainHash,
-                                ens: _config.ens,
-                                explorers: _config.explorers,
-                                fallbackEnabled: value,
-                                testnet: _config.testnet,
-                                ftokens: _config.ftokens,
-                              );
-                            });
-                            await createOrUpdateChain(providerConfig: _config);
-                          }),
-                      const SizedBox(height: 12),
-                      _ExplorersSection(
-                          config: _config, theme: theme, l10n: l10n),
-                      const SizedBox(height: 12),
-                      _RpcSection(
-                        config: _config,
-                        theme: theme,
-                        l10n: l10n,
-                        onSelect: _selectRpc,
-                        onRemove: _removeRpc,
-                      ),
-                      const SizedBox(height: 12),
-                      _DeleteSection(
-                        appState: appState,
-                        theme: theme,
-                        l10n: l10n,
-                        canRemove: _canRemove(appState),
-                        isDeleting: _isDeleting,
-                        errorText: _errorText,
-                        onDelete: () => _deleteProvider(appState),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
-            ],
-          ),
-        ),
-      ),
     );
   }
-}
-
-class _TokenSection extends StatelessWidget {
-  final NetworkConfigInfo config;
-  final AppTheme theme;
-  final AppLocalizations l10n;
-
-  const _TokenSection({
-    required this.config,
-    required this.theme,
-    required this.l10n,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final token = config.ftokens.first;
-    final appState = Provider.of<AppState>(context, listen: false);
-
-    return DetailGroupCard(
-      title: l10n.chainInfoModalContentTokenTitle,
-      theme: theme,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              if (token.logo != null)
-                TokenAvatar(
-                  token: token,
-                  size: 40,
-                  appState: appState,
-                  showNetworkBadge: false,
-                  showBorder: false,
-                  iconUrl: processTokenLogo(
-                      token: token,
-                      shortName: config.shortName,
-                      theme: theme.value),
-                ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(token.name,
-                        style:
-                            theme.labelLarge.copyWith(color: theme.textPrimary),
-                        overflow: TextOverflow.ellipsis),
-                    Text(token.symbol,
-                        style: theme.bodyText2
-                            .copyWith(color: theme.textSecondary)),
-                    Text(
-                        '${l10n.chainInfoModalContentDecimalsLabel} ${token.decimals}',
-                        style: theme.labelSmall
-                            .copyWith(color: theme.textSecondary)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NetworkInfoSection extends StatelessWidget {
-  final NetworkConfigInfo config;
-  final AppTheme theme;
-  final AppLocalizations l10n;
-  final void Function(bool value) onFallbackChanged;
-
-  const _NetworkInfoSection({
-    required this.config,
-    required this.theme,
-    required this.l10n,
-    required this.onFallbackChanged,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -324,6 +282,7 @@ class _NetworkInfoSection extends StatelessWidget {
       title: l10n.chainInfoModalContentNetworkInfoTitle,
       theme: theme,
       children: [
+        if (config.ftokens.isNotEmpty) _tokenItem(context),
         DetailItem(
             label: l10n.chainInfoModalContentChainLabel,
             value: config.chain,
@@ -336,38 +295,101 @@ class _NetworkInfoSection extends StatelessWidget {
             label: l10n.chainInfoModalContentChainIdLabel,
             value: config.chainId.toString(),
             theme: theme),
-        DetailItem(
-            label: l10n.chainInfoModalContentSlip44Label,
-            value: config.slip44.toString(),
-            theme: theme),
-        DetailItem(
-            label: l10n.chainInfoModalContentChainIdsLabel,
-            value: config.chainIds.map((id) => id.toString()).join(', '),
-            theme: theme),
-        if (config.testnet != null)
+      ],
+    );
+  }
+}
+
+class _AdvancedSectionButton extends StatelessWidget {
+  final AppTheme theme;
+  final AppLocalizations l10n;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  const _AdvancedSectionButton({
+    required this.theme,
+    required this.l10n,
+    required this.expanded,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: onToggle,
+        icon: AnimatedRotation(
+          turns: expanded ? 0.5 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: AppIconView(
+            icon: AppIcon.arrowDown,
+            color: theme.primaryPurple,
+            size: 20,
+          ),
+        ),
+        label: Text(
+          l10n.chainConfigPageAdvancedButton,
+          style: theme.labelMedium.copyWith(color: theme.primaryPurple),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdvancedNetworkSection extends StatelessWidget {
+  final NetworkConfigInfo config;
+  final AppTheme theme;
+  final AppLocalizations l10n;
+  final void Function(bool value) onFallbackChanged;
+
+  const _AdvancedNetworkSection({
+    required this.config,
+    required this.theme,
+    required this.l10n,
+    required this.onFallbackChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: DetailGroupCard(
+        title: l10n.chainConfigPageAdvancedButton,
+        theme: theme,
+        children: [
+          DetailItem(
+              label: l10n.chainInfoModalContentSlip44Label,
+              value: config.slip44.toString(),
+              theme: theme),
+          DetailItem(
+              label: l10n.chainInfoModalContentChainIdsLabel,
+              value: config.chainIds.map((id) => id.toString()).join(', '),
+              theme: theme),
           DetailItem(
             label: l10n.chainInfoModalContentTestnetLabel,
-            value: config.testnet!
+            value: (config.testnet ?? false)
                 ? l10n.chainInfoModalContentYes
                 : l10n.chainInfoModalContentNo,
             theme: theme,
           ),
-        if (config.diffBlockTime != BigInt.zero)
+          if (config.diffBlockTime != BigInt.zero)
+            DetailItem(
+                label: l10n.chainInfoModalContentDiffBlockTimeLabel,
+                value: config.diffBlockTime.toString(),
+                theme: theme),
           DetailItem(
-              label: l10n.chainInfoModalContentDiffBlockTimeLabel,
-              value: config.diffBlockTime.toString(),
-              theme: theme),
-        DetailItem(
-          label: l10n.chainInfoModalContentFallbackEnabledLabel,
-          theme: theme,
-          valueWidget: Switch(
-            value: config.fallbackEnabled,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            activeThumbColor: theme.primaryPurple,
-            onChanged: onFallbackChanged,
+            label: l10n.chainInfoModalContentFallbackEnabledLabel,
+            theme: theme,
+            valueWidget: Switch(
+              value: config.fallbackEnabled,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              activeThumbColor: theme.primaryPurple,
+              onChanged: onFallbackChanged,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -389,6 +411,7 @@ class _ExplorersSection extends StatelessWidget {
       title: l10n.chainInfoModalContentExplorersTitle,
       theme: theme,
       children: config.explorers.map((explorer) {
+        final String? explorerIcon = explorer.icon;
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 4),
           padding: const EdgeInsets.all(10),
@@ -398,9 +421,9 @@ class _ExplorersSection extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (explorer.icon != null)
+              if (explorerIcon != null)
                 AsyncImage(
-                  url: explorer.icon!,
+                  url: explorerIcon,
                   width: 20,
                   height: 20,
                   fit: BoxFit.cover,
@@ -552,7 +575,7 @@ class _DeleteSection extends StatelessWidget {
         ),
         if (errorText != null)
           GlassMessage(
-            message: errorText!,
+            message: errorText ?? '',
             type: GlassMessageType.error,
             margin: const EdgeInsets.only(top: 8, bottom: 8),
           ),

@@ -382,6 +382,7 @@
   "chainInfoModalContentExplorersTitle": "浏览器",
   "chainInfoModalContentDeleteProviderTitle": "删除网络",
   "chainInfoModalContentSwipeToDelete": "删除网络",
+  "chainConfigPageAdvancedButton": "高级",
   "switchChainNetworkContentTitle": "选择网络",
   "switchChainNetworkContentButton": "切换网络",
   "switchChainNetworkContentTestnetLabel": "测试网",

@@ -382,6 +382,7 @@
   "chainInfoModalContentExplorersTitle": "탐색기",
   "chainInfoModalContentDeleteProviderTitle": "네트워크 삭제",
   "chainInfoModalContentSwipeToDelete": "네트워크 삭제",
+  "chainConfigPageAdvancedButton": "고급 설정",
   "switchChainNetworkContentTitle": "네트워크 선택",
   "switchChainNetworkContentButton": "네트워크 전환",
   "switchChainNetworkContentTestnetLabel": "테스트넷",
