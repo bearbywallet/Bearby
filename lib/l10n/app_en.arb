@@ -346,7 +346,7 @@
   "exchangePagePay": "You pay",
   "exchangePageGet": "You get",
   "exchangePageRecipientTitle": "Select recipient",
-  "exchangePageConfirm": "Confirm",
+  "exchangePageConfirm": "Swap",
   "exchangePageComingSoon": "Soon",
   "exchangePageNoAssets": "No swappable assets on this network",
   "exchangePageTabSwap": "Swap",

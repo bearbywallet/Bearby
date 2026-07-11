@@ -288,7 +288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangePageRecipientTitle => 'Select recipient';
 
   @override
-  String get exchangePageConfirm => 'Confirm';
+  String get exchangePageConfirm => 'Swap';
 
   @override
   String get exchangePageComingSoon => 'Soon';
