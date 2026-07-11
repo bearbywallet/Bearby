@@ -76,7 +76,13 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
     setState(() => _busy = true);
     try {
       final next = await widget.onDismiss(order);
-      if (mounted) setState(() => _orders = next);
+      if (!mounted) return;
+      // Last order gone — nothing left to show.
+      if (next.isEmpty) {
+        Navigator.pop(context);
+        return;
+      }
+      setState(() => _orders = next);
     } catch (e) {
       debugPrint('[WhiteBirdOrders] dismiss failed: $e');
     } finally {

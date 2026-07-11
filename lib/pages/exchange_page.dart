@@ -487,6 +487,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   }
 
   void _showOrdersModal() {
+    if (_openOrders.isEmpty) return;
     showWhiteBirdOrdersModal(
       context: context,
       orders: _openOrders,
@@ -636,7 +637,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildOrdersButton(theme),
+          if (_openOrders.isNotEmpty) _buildOrdersButton(theme),
           const Spacer(),
           GestureDetector(
             onTap: () {
