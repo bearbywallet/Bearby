@@ -146,6 +146,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   bool get _isTestnet => _appState.chain?.testnet ?? true;
 
   /// Open PROCESSING WhiteBird orders — fetched only when a session exists.
+  /// Locally dismissed orders are hidden (no server cancel API exists).
   Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders() async {
     final session = WhiteBirdSession(_appState.storage);
     await session.ensureLoaded();
@@ -159,7 +160,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final learnedClientId =
         orders.where((o) => o.clientId.isNotEmpty).firstOrNull?.clientId;
     if (learnedClientId != null) await session.saveClientId(learnedClientId);
-    return orders;
+    final dismissed = session.dismissedOrderIds;
+    return orders
+        .where((o) => !dismissed.contains(o.orderId))
+        .toList(growable: false);
   }
 
   Future<void> _refreshOpenOrders() async {
@@ -333,6 +337,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       await session.ensureLoaded();
       final externalId = await session.ensureExternalClientId();
 
+      // A sell still waiting for its deposit blocks a new order — the SDK
+      // would resume it (without firing onOrderCreated) instead of creating
+      // a fresh one. Route the user to the open-orders modal to finish it.
+      final open = await _fetchOpenOrders();
+      if (mounted) setState(() => _openOrders = open);
+      final awaitingDeposit = open.any((o) =>
+          o.isSell &&
+          !o.cryptoReceived &&
+          (o.depositAddress?.isNotEmpty ?? false));
+      if (awaitingDeposit) {
+        if (mounted) _showOrdersModal();
+        return;
+      }
+
       final isSell = !fromMeta.isFiat;
       final cryptoMeta = isSell ? fromMeta : toMeta;
       final amountHuman = _amount;
@@ -457,16 +475,23 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
   }
 
+  /// Close an order card locally: WhiteBird has no cancel API, the order
+  /// simply expires server-side — we stop showing it.
+  Future<List<WhiteBirdOpenOrder>> _dismissOpenOrder(
+      WhiteBirdOpenOrder order) async {
+    final session = WhiteBirdSession(_appState.storage);
+    await session.dismissOrder(order.orderId);
+    final orders = await _fetchOpenOrders();
+    if (mounted) setState(() => _openOrders = orders);
+    return orders;
+  }
+
   void _showOrdersModal() {
     showWhiteBirdOrdersModal(
       context: context,
       orders: _openOrders,
-      onRefresh: () async {
-        final orders = await _fetchOpenOrders();
-        if (mounted) setState(() => _openOrders = orders);
-        return orders;
-      },
       onComplete: _completeOpenOrder,
+      onDismiss: _dismissOpenOrder,
     );
   }
 

@@ -13,11 +13,16 @@ import 'package:bearby/l10n/app_localizations.dart';
 /// deposit address; return `true` once the transaction is broadcast.
 typedef WhiteBirdOrderCompleter = Future<bool> Function(WhiteBirdOpenOrder order);
 
+/// Close an order locally (no server cancel API — WhiteBird expires it on its
+/// own); returns the updated open-order list.
+typedef WhiteBirdOrderDismisser = Future<List<WhiteBirdOpenOrder>> Function(
+    WhiteBirdOpenOrder order);
+
 void showWhiteBirdOrdersModal({
   required BuildContext context,
   required List<WhiteBirdOpenOrder> orders,
-  required Future<List<WhiteBirdOpenOrder>> Function() onRefresh,
   required WhiteBirdOrderCompleter onComplete,
+  required WhiteBirdOrderDismisser onDismiss,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -29,21 +34,21 @@ void showWhiteBirdOrdersModal({
     barrierColor: Colors.black54,
     builder: (_) => _WhiteBirdOrdersContent(
       orders: orders,
-      onRefresh: onRefresh,
       onComplete: onComplete,
+      onDismiss: onDismiss,
     ),
   );
 }
 
 class _WhiteBirdOrdersContent extends StatefulWidget {
   final List<WhiteBirdOpenOrder> orders;
-  final Future<List<WhiteBirdOpenOrder>> Function() onRefresh;
   final WhiteBirdOrderCompleter onComplete;
+  final WhiteBirdOrderDismisser onDismiss;
 
   const _WhiteBirdOrdersContent({
     required this.orders,
-    required this.onRefresh,
     required this.onComplete,
+    required this.onDismiss,
   });
 
   @override
@@ -55,21 +60,25 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
   late List<WhiteBirdOpenOrder> _orders = widget.orders;
   bool _busy = false;
 
-  Future<void> _refresh() async {
-    try {
-      final next = await widget.onRefresh();
-      if (mounted) setState(() => _orders = next);
-    } catch (e) {
-      debugPrint('[WhiteBirdOrders] refresh failed: $e');
-    }
-  }
-
   Future<void> _complete(WhiteBirdOpenOrder order) async {
     if (_busy) return;
     setState(() => _busy = true);
     try {
       final done = await widget.onComplete(order);
       if (done && mounted) Navigator.pop(context);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _dismiss(WhiteBirdOpenOrder order) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final next = await widget.onDismiss(order);
+      if (mounted) setState(() => _orders = next);
+    } catch (e) {
+      debugPrint('[WhiteBirdOrders] dismiss failed: $e');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -113,27 +122,6 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildHandle(theme),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                  child: Row(
-                    children: [
-                      Text(
-                        l10n.whitebirdOrdersTitle,
-                        style: theme.titleMedium
-                            .copyWith(color: theme.textPrimary),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        icon: AppIconView(
-                          icon: AppIcon.reload,
-                          size: 20,
-                          color: theme.textSecondary,
-                        ),
-                        onPressed: _refresh,
-                      ),
-                    ],
-                  ),
-                ),
                 Flexible(
                   child: _orders.isEmpty
                       ? Padding(
@@ -149,7 +137,7 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
                       : ListView.separated(
                           shrinkWrap: true,
                           padding: EdgeInsets.fromLTRB(
-                              24, 8, 24, 16 + bottomPadding),
+                              24, 16, 24, 16 + bottomPadding),
                           itemCount: _orders.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 12),
@@ -198,15 +186,17 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
         children: [
           Row(
             children: [
-              Text(
-                '${order.fromAmount} ${order.fromAsset} → '
-                '${order.toAmount} ${order.toAsset}',
-                style: theme.bodyText1.copyWith(
-                  color: theme.textPrimary,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  '${order.fromAmount} ${order.fromAsset} → '
+                  '${order.toAmount} ${order.toAsset}',
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.bodyText1.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const Spacer(),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -217,6 +207,19 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
                 child: Text(
                   order.status,
                   style: theme.caption.copyWith(color: theme.warning),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: _busy ? null : () => _dismiss(order),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: AppIconView(
+                    icon: AppIcon.close,
+                    size: 16,
+                    color: theme.textSecondary,
+                  ),
                 ),
               ),
             ],

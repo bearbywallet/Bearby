@@ -123,9 +123,10 @@ fn parse_order(item: &Value) -> Option<WhiteBirdOpenOrder> {
     let input_type = str_field(input, "type").unwrap_or_default();
     let input_status = str_field(input, "status").unwrap_or_default();
     let is_sell = input_type == "CRYPTO_TRANSFER";
+    // A sell input sits in PROCESSING while *waiting* for the deposit — only a
+    // transaction hash or a terminal status proves the crypto actually arrived.
     let crypto_received = is_sell
-        && (str_field(input, "hash").is_some()
-            || matches!(input_status.as_str(), "PROCESSING" | "COMPLETED"));
+        && (str_field(input, "hash").is_some() || input_status == "COMPLETED");
     Some(WhiteBirdOpenOrder {
         number: str_field(item, "number"),
         from_asset: str_field(conditions, "fromAsset").unwrap_or_default(),

@@ -12,6 +12,7 @@ class StorageKeys {
   static const whitebirdTokensSavedAt = 'whitebird_tokens_saved_at';
   static const whitebirdClientId = 'whitebird_client_id';
   static const whitebirdEmail = 'whitebird_email';
+  static const whitebirdDismissedOrders = 'whitebird_dismissed_orders';
 
   static String gasOptionKey(int walletIndex) => '$gasOption:$walletIndex';
   static String tokensCardStyleKey(int walletIndex) =>

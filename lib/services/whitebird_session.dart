@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -15,10 +16,13 @@ class WhiteBirdSession {
 
   final LocalStorageImpl _storage;
 
+  static const int _maxDismissedOrders = 50;
+
   String? _externalClientId;
   String? _accessToken;
   String? _refreshToken;
   String? _clientId;
+  Set<String> _dismissedOrderIds = const {};
   bool _loaded = false;
 
   String? get accessToken => _accessToken;
@@ -26,6 +30,10 @@ class WhiteBirdSession {
 
   /// WhiteBird client uuid, learned from order history responses.
   String? get clientId => _clientId;
+
+  /// Orders the user closed locally (no server cancel API exists — WhiteBird
+  /// expires them on its own; we just stop showing them).
+  Set<String> get dismissedOrderIds => _dismissedOrderIds;
 
   bool get hasSession =>
       (_accessToken?.isNotEmpty ?? false) && (_refreshToken?.isNotEmpty ?? false);
@@ -37,6 +45,8 @@ class WhiteBirdSession {
     _accessToken = await _storage.get_(key: StorageKeys.whitebirdAccessToken);
     _refreshToken = await _storage.get_(key: StorageKeys.whitebirdRefreshToken);
     _clientId = await _storage.get_(key: StorageKeys.whitebirdClientId);
+    _dismissedOrderIds = _decodeDismissed(
+        await _storage.get_(key: StorageKeys.whitebirdDismissedOrders));
     final savedAtRaw =
         await _storage.get_(key: StorageKeys.whitebirdTokensSavedAt);
     _loaded = true;
@@ -99,6 +109,34 @@ class WhiteBirdSession {
     if (id.isEmpty || id == _clientId) return;
     _clientId = id;
     await _storage.set_(key: StorageKeys.whitebirdClientId, value: id);
+  }
+
+  static Set<String> _decodeDismissed(String? raw) {
+    if (raw == null || raw.isEmpty) return const {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded.map((e) => e.toString()).toSet();
+      }
+    } catch (e) {
+      debugPrint('[WhiteBirdSession] dismissed orders decode failed: $e');
+    }
+    return const {};
+  }
+
+  Future<void> dismissOrder(String orderId) async {
+    if (orderId.isEmpty) return;
+    await ensureLoaded();
+    final next = {..._dismissedOrderIds, orderId};
+    // Keep the list bounded — old entries expire server-side anyway.
+    final trimmed = next.length > _maxDismissedOrders
+        ? next.skip(next.length - _maxDismissedOrders).toSet()
+        : next;
+    _dismissedOrderIds = trimmed;
+    await _storage.set_(
+      key: StorageKeys.whitebirdDismissedOrders,
+      value: jsonEncode(trimmed.toList(growable: false)),
+    );
   }
 
   Future<void> clearTokens() async {

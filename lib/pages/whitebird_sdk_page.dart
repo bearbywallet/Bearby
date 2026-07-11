@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:bearby/config/whitebird.dart';
 import 'package:bearby/mixins/colors.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/services/whitebird_session.dart';
+import 'package:bearby/src/rust/api/exchange/whitebird.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -83,15 +85,72 @@ class WhiteBirdSdkPage extends StatefulWidget {
 }
 
 class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin {
+  static const Duration _depositPollInterval = Duration(seconds: 6);
+
   InAppWebViewController? _controller;
   bool _loading = true;
   bool _handledOrder = false;
   bool _popped = false;
 
+  /// Safety net for missed `onOrderCreated` callbacks (sell mode): orders that
+  /// already existed when the page opened, and a poll that watches for a new
+  /// awaiting-deposit sell beyond that snapshot.
+  Set<String> _ordersAtOpen = const {};
+  Timer? _depositPollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.onDepositReady != null) {
+      unawaited(_startDepositPoll());
+    }
+  }
+
   @override
   void dispose() {
+    _depositPollTimer?.cancel();
     _cleanupSdk();
     super.dispose();
+  }
+
+  Future<void> _startDepositPoll() async {
+    try {
+      final existing = await whitebirdOpenOrders(
+        isTestnet: widget.isTestnet,
+        externalClientId: widget.externalClientId,
+      );
+      _ordersAtOpen = existing.map((o) => o.orderId).toSet();
+    } catch (e) {
+      debugPrint('[WhiteBird] order snapshot failed: $e');
+    }
+    if (!mounted || _popped) return;
+    _depositPollTimer = Timer.periodic(
+      _depositPollInterval,
+      (_) => unawaited(_pollForDeposit()),
+    );
+  }
+
+  Future<void> _pollForDeposit() async {
+    if (_handledOrder || _popped || !mounted) return;
+    try {
+      final orders = await whitebirdOpenOrders(
+        isTestnet: widget.isTestnet,
+        externalClientId: widget.externalClientId,
+      );
+      final fresh = orders
+          .where((o) =>
+              o.isSell &&
+              !o.cryptoReceived &&
+              (o.depositAddress?.isNotEmpty ?? false) &&
+              !_ordersAtOpen.contains(o.orderId))
+          .firstOrNull;
+      if (fresh == null) return;
+      debugPrint(
+          '[WhiteBird] poll detected new deposit order=${fresh.orderId}');
+      await _handleDeposit(fresh.orderId, fresh.depositAddress ?? '');
+    } catch (e) {
+      debugPrint('[WhiteBird] deposit poll failed: $e');
+    }
   }
 
   String _buildHostHtml(AppTheme theme) {
@@ -180,6 +239,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   void _pop(bool result) {
     if (_popped || !mounted) return;
     _popped = true;
+    _depositPollTimer?.cancel();
     // The transfer confirm sheet never pops itself after onConfirm, so close
     // everything sitting above this page's own route first — otherwise this
     // pop would remove the sheet instead of the page.
@@ -221,26 +281,75 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
 
   Future<void> _onOrderCreated(List<dynamic> args) async {
     final map = _payload(args);
-    final deposit = _stringField(
+    var deposit = _stringField(
         map, const ['internalCryptoAddress', 'depositCryptoAddress']);
     final orderId = _stringField(map, const ['orderId', 'id']);
     debugPrint('[WhiteBird] order created id=$orderId deposit=$deposit');
 
     final handler = widget.onDepositReady;
-    if (handler == null || deposit == null || _handledOrder || _popped) return;
+    if (handler == null || _handledOrder || _popped) return;
+
+    // Some SDK payloads omit the deposit address — resolve it via the proxy.
+    deposit ??= await _resolveDepositAddress(orderId);
+    if (deposit == null || deposit.isEmpty) {
+      debugPrint('[WhiteBird] no deposit address for order=$orderId');
+      return;
+    }
+    await _handleDeposit(orderId ?? '', deposit);
+  }
+
+  /// Shared deposit handling for the SDK callback and the poll fallback:
+  /// run the wallet transfer confirm, then close the SDK on success.
+  Future<void> _handleDeposit(String orderId, String deposit) async {
+    final handler = widget.onDepositReady;
+    if (handler == null || deposit.isEmpty || _handledOrder || _popped) return;
     _handledOrder = true;
 
-    final confirmed = await handler(
-      WhiteBirdDeposit(orderId: orderId ?? '', depositAddress: deposit),
-    );
-    debugPrint('[WhiteBird] deposit transfer confirmed=$confirmed');
-    if (confirmed) {
-      await _cleanupSdk();
-      _pop(true);
-    } else {
-      // User dismissed the confirm modal — the SDK deposit screen stays up so
-      // they can still pay manually or exit; the order remains PROCESSING.
+    try {
+      final confirmed = await handler(
+        WhiteBirdDeposit(orderId: orderId, depositAddress: deposit),
+      );
+      debugPrint('[WhiteBird] deposit transfer confirmed=$confirmed');
+      if (confirmed) {
+        await _cleanupSdk();
+        _pop(true);
+      } else {
+        // User dismissed the confirm modal — the SDK deposit screen stays up
+        // so they can still pay manually or exit; the order stays PROCESSING.
+        _handledOrder = false;
+      }
+    } catch (e, st) {
+      // The JS-bridge swallows exceptions — surface the failure explicitly
+      // (e.g. createTokenTransfer rejecting on balance/fee estimation).
+      debugPrint('[WhiteBird] deposit handler failed: $e\n$st');
       _handledOrder = false;
+      if (mounted) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text('$e'), duration: const Duration(seconds: 8)),
+        );
+      }
+    }
+  }
+
+  /// Fallback lookup of the sell deposit address from the proxy order list.
+  Future<String?> _resolveDepositAddress(String? orderId) async {
+    try {
+      final orders = await whitebirdOpenOrders(
+        isTestnet: widget.isTestnet,
+        externalClientId: widget.externalClientId,
+      );
+      final awaiting = orders.where((o) =>
+          o.isSell &&
+          !o.cryptoReceived &&
+          (o.depositAddress?.isNotEmpty ?? false));
+      final match = orderId == null
+          ? awaiting.firstOrNull
+          : awaiting.where((o) => o.orderId == orderId).firstOrNull ??
+              awaiting.firstOrNull;
+      return match?.depositAddress;
+    } catch (e) {
+      debugPrint('[WhiteBird] deposit address lookup failed: $e');
+      return null;
     }
   }
 
