@@ -19,13 +19,28 @@ import 'package:bearby/theme/app_theme.dart';
 /// screen; return `true` once the transaction is signed and broadcast.
 typedef WhiteBirdDepositHandler = Future<bool> Function(WhiteBirdDeposit deposit);
 
-/// Deposit details from the SDK `onOrderCreated` callback.
+/// Deposit details from the SDK `onOrderCreated` callback or the order poll.
+///
+/// WhiteBird keeps one active order per client and resumes it on every SDK
+/// open, so the order's own asset/amount are authoritative — they can differ
+/// from what the user just typed on the exchange page.
 @immutable
 class WhiteBirdDeposit {
-  const WhiteBirdDeposit({required this.orderId, required this.depositAddress});
+  const WhiteBirdDeposit({
+    required this.orderId,
+    required this.depositAddress,
+    this.fromAsset = '',
+    this.amountHuman = '',
+  });
 
   final String orderId;
   final String depositAddress;
+
+  /// WhiteBird asset id of the crypto leg ("TRX", …); empty when unknown.
+  final String fromAsset;
+
+  /// Human decimal amount the order expects; empty when unknown.
+  final String amountHuman;
 
   @override
   bool operator ==(Object other) =>
@@ -33,14 +48,18 @@ class WhiteBirdDeposit {
       other is WhiteBirdDeposit &&
           runtimeType == other.runtimeType &&
           orderId == other.orderId &&
-          depositAddress == other.depositAddress;
+          depositAddress == other.depositAddress &&
+          fromAsset == other.fromAsset &&
+          amountHuman == other.amountHuman;
 
   @override
-  int get hashCode => Object.hash(orderId, depositAddress);
+  int get hashCode =>
+      Object.hash(orderId, depositAddress, fromAsset, amountHuman);
 
   @override
   String toString() =>
-      'WhiteBirdDeposit(orderId: $orderId, depositAddress: $depositAddress)';
+      'WhiteBirdDeposit(orderId: $orderId, depositAddress: $depositAddress, '
+      'fromAsset: $fromAsset, amountHuman: $amountHuman)';
 }
 
 /// WhiteBird SDK WebView host for a session exchange flow.
@@ -99,10 +118,10 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   bool _handledOrder = false;
   bool _popped = false;
 
-  /// Safety net for missed `onOrderCreated` callbacks (sell mode): orders that
-  /// already existed when the page opened, and a poll that watches for a new
-  /// awaiting-deposit sell beyond that snapshot.
-  Set<String> _ordersAtOpen = const {};
+  /// Safety net for the sell flow: WhiteBird keeps one active order per
+  /// client and resumes it on SDK open (often without firing
+  /// `onOrderCreated`), so any awaiting-deposit PROCESSING sell while this
+  /// page is up is the order shown on screen — poll for it.
   Timer? _depositPollTimer;
   late String? _clientId = widget.clientId;
 
@@ -110,7 +129,10 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   void initState() {
     super.initState();
     if (widget.onDepositReady != null) {
-      unawaited(_startDepositPoll());
+      _depositPollTimer = Timer.periodic(
+        _depositPollInterval,
+        (_) => unawaited(_pollForDeposit()),
+      );
     }
   }
 
@@ -127,35 +149,26 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     super.dispose();
   }
 
-  Future<void> _startDepositPoll() async {
-    try {
-      final existing = await _fetchOrders();
-      _ordersAtOpen = existing.map((o) => o.orderId).toSet();
-    } catch (e) {
-      debugPrint('[WhiteBird] order snapshot failed: $e');
-    }
-    if (!mounted || _popped) return;
-    _depositPollTimer = Timer.periodic(
-      _depositPollInterval,
-      (_) => unawaited(_pollForDeposit()),
-    );
-  }
-
   Future<void> _pollForDeposit() async {
     if (_handledOrder || _popped || !mounted) return;
     try {
       final orders = await _fetchOrders();
-      final fresh = orders
+      final awaiting = orders
           .where((o) =>
               o.isSell &&
               !o.cryptoReceived &&
-              (o.depositAddress?.isNotEmpty ?? false) &&
-              !_ordersAtOpen.contains(o.orderId))
+              (o.depositAddress?.isNotEmpty ?? false))
           .firstOrNull;
-      if (fresh == null) return;
+      if (awaiting == null) return;
       debugPrint(
-          '[WhiteBird] poll detected new deposit order=${fresh.orderId}');
-      await _handleDeposit(fresh.orderId, fresh.depositAddress ?? '');
+          '[WhiteBird] poll detected deposit order=${awaiting.orderId} '
+          'amount=${awaiting.fromAmount} ${awaiting.fromAsset}');
+      await _handleDeposit(WhiteBirdDeposit(
+        orderId: awaiting.orderId,
+        depositAddress: awaiting.depositAddress ?? '',
+        fromAsset: awaiting.fromAsset,
+        amountHuman: awaiting.fromAmount,
+      ));
     } catch (e) {
       debugPrint('[WhiteBird] deposit poll failed: $e');
     }
@@ -306,20 +319,28 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
       debugPrint('[WhiteBird] no deposit address for order=$orderId');
       return;
     }
-    await _handleDeposit(orderId ?? '', deposit);
+    await _handleDeposit(WhiteBirdDeposit(
+      orderId: orderId ?? '',
+      depositAddress: deposit,
+      amountHuman:
+          _stringField(map, const ['amount', 'fromGrossAmount']) ?? '',
+    ));
   }
 
   /// Shared deposit handling for the SDK callback and the poll fallback:
   /// run the wallet transfer confirm, then close the SDK on success.
-  Future<void> _handleDeposit(String orderId, String deposit) async {
+  Future<void> _handleDeposit(WhiteBirdDeposit deposit) async {
     final handler = widget.onDepositReady;
-    if (handler == null || deposit.isEmpty || _handledOrder || _popped) return;
+    if (handler == null ||
+        deposit.depositAddress.isEmpty ||
+        _handledOrder ||
+        _popped) {
+      return;
+    }
     _handledOrder = true;
 
     try {
-      final confirmed = await handler(
-        WhiteBirdDeposit(orderId: orderId, depositAddress: deposit),
-      );
+      final confirmed = await handler(deposit);
       debugPrint('[WhiteBird] deposit transfer confirmed=$confirmed');
       if (confirmed) {
         await _cleanupSdk();

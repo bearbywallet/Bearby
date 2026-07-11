@@ -146,8 +146,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   bool get _isTestnet => _appState.chain?.testnet ?? true;
 
   /// Open PROCESSING WhiteBird orders — fetched only when a session exists.
-  /// Locally dismissed orders are hidden (no server cancel API exists).
-  Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders() async {
+  /// Locally dismissed orders are hidden from the badge/modal unless
+  /// [includeDismissed] — WhiteBird still counts them as the active order.
+  Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders(
+      {bool includeDismissed = false}) async {
     final session = WhiteBirdSession(_appState.storage);
     await session.ensureLoaded();
     if (!session.hasSession) return const [];
@@ -160,6 +162,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final learnedClientId =
         orders.where((o) => o.clientId.isNotEmpty).firstOrNull?.clientId;
     if (learnedClientId != null) await session.saveClientId(learnedClientId);
+    if (includeDismissed) return orders;
     final dismissed = session.dismissedOrderIds;
     return orders
         .where((o) => !dismissed.contains(o.orderId))
@@ -337,17 +340,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       await session.ensureLoaded();
       final externalId = await session.ensureExternalClientId();
 
-      // A sell still waiting for its deposit blocks a new order — the SDK
-      // would resume it (without firing onOrderCreated) instead of creating
-      // a fresh one. Route the user to the open-orders modal to finish it.
-      final open = await _fetchOpenOrders();
-      if (mounted) setState(() => _openOrders = open);
-      final awaitingDeposit = open.any((o) =>
-          o.isSell &&
-          !o.cryptoReceived &&
-          (o.depositAddress?.isNotEmpty ?? false));
-      if (awaitingDeposit) {
-        if (mounted) _showOrdersModal();
+      // A sell still waiting for its deposit blocks a new order — WhiteBird
+      // keeps one active order per client and the SDK resumes it (without
+      // firing onOrderCreated) instead of creating a fresh one. Route the
+      // user to the open-orders modal to finish it; local dismissal cannot
+      // unblock this, so check the unfiltered list.
+      final open = await _fetchOpenOrders(includeDismissed: true);
+      final awaitingDeposit = open
+          .where((o) =>
+              o.isSell &&
+              !o.cryptoReceived &&
+              (o.depositAddress?.isNotEmpty ?? false))
+          .toList(growable: false);
+      if (awaitingDeposit.isNotEmpty) {
+        if (mounted) _showOrdersModal(awaitingDeposit);
         return;
       }
 
@@ -377,10 +383,17 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
             currencyTo: toMeta.assetCode,
             currencyAmount: amountHuman,
             cryptoWallet: isSell ? null : cryptoMeta.common.accountAddr,
+            // The order's own asset/amount win: WhiteBird may have resumed an
+            // older active order whose values differ from the typed ones.
             onDepositReady: isSell
                 ? (deposit) => _confirmDepositTransfer(
-                      from,
-                      amountHuman,
+                      (deposit.fromAsset.isNotEmpty
+                              ? _assetForWbCode(deposit.fromAsset)
+                              : null) ??
+                          from,
+                      deposit.amountHuman.isNotEmpty
+                          ? deposit.amountHuman
+                          : amountHuman,
                       deposit.depositAddress,
                     )
                 : null,
@@ -487,11 +500,12 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return orders;
   }
 
-  void _showOrdersModal() {
-    if (_openOrders.isEmpty) return;
+  void _showOrdersModal([List<WhiteBirdOpenOrder>? orders]) {
+    final items = orders ?? _openOrders;
+    if (items.isEmpty) return;
     showWhiteBirdOrdersModal(
       context: context,
-      orders: _openOrders,
+      orders: items,
       onComplete: _completeOpenOrder,
       onDismiss: _dismissOpenOrder,
     );
