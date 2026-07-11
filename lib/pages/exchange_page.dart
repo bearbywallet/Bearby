@@ -464,6 +464,20 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return null;
   }
 
+  /// Order amounts arrive as human decimals — normalize with a fixed display
+  /// precision and render through the standard formatter.
+  String _formatWbAmount(String amountHuman, String code) {
+    const displayDecimals = 6;
+    final (formatted, _) = formatingAmount(
+      amount: toDecimalsWei(amountHuman, displayDecimals),
+      symbol: code,
+      decimals: displayDecimals,
+      rate: 0,
+      appState: _appState,
+    );
+    return formatted;
+  }
+
   /// "Complete" action from the open-orders modal: send the crypto the order
   /// is still waiting for, then jump to history.
   Future<bool> _completeOpenOrder(WhiteBirdOpenOrder order) async {
@@ -501,6 +515,31 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return orders;
   }
 
+  /// Cancel the order server-side with the user's WhiteBird JWT — the same
+  /// call the SDK's own cancel button makes. Returns the refreshed list.
+  Future<List<WhiteBirdOpenOrder>> _cancelOpenOrder(
+      WhiteBirdOpenOrder order) async {
+    final session = WhiteBirdSession(_appState.storage);
+    await session.ensureLoaded();
+    final token = session.accessToken;
+    if (token == null || token.isEmpty) {
+      return _openOrders;
+    }
+    try {
+      await whitebirdRejectOrder(
+        isTestnet: _isTestnet,
+        orderId: order.orderId,
+        accessToken: token,
+      );
+    } catch (e) {
+      debugPrint('[ExchangePage] order reject failed: $e');
+      if (mounted) _showError(e.toString());
+    }
+    final orders = await _fetchOpenOrders();
+    if (mounted) setState(() => _openOrders = orders);
+    return orders;
+  }
+
   void _showOrdersModal([List<WhiteBirdOpenOrder>? orders]) {
     final items = orders ?? _openOrders;
     if (items.isEmpty) return;
@@ -509,6 +548,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       orders: items,
       onComplete: _completeOpenOrder,
       onDismiss: _dismissOpenOrder,
+      onCancel: _cancelOpenOrder,
+      formatAmount: _formatWbAmount,
     );
   }
 

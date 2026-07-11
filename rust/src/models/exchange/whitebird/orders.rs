@@ -144,6 +144,24 @@ fn parse_order(item: &Value) -> Option<WhiteBirdOpenOrder> {
     })
 }
 
+/// Cancel an active order with the user's client JWT
+/// (`POST /api/v3/exchange/client/order/{id}/reject` on the WhiteBird API —
+/// the same call the SDK's "cancel order" button makes; there is no
+/// merchant-key equivalent).
+#[frb(ignore)]
+pub async fn reject_order(
+    is_testnet: bool,
+    order_id: &str,
+    access_token: &str,
+) -> Result<(), String> {
+    let path = format!("/api/v3/exchange/client/order/{order_id}/reject");
+    eprintln!("[whitebird] reject order {order_id}");
+    let body = json!({ "requestBody": {} });
+    client::post_bearer(is_testnet, path.as_str(), access_token, &body)
+        .await
+        .map(|_| ())
+}
+
 /// List open PROCESSING orders (`POST /api/orders/history`).
 ///
 /// Prefers `clientIds: [uuid]` (stage often 401s on `externalClientId`);

@@ -36,3 +36,12 @@ Future<List<WhiteBirdOpenOrder>> whitebirdOpenOrders(
         isTestnet: isTestnet,
         externalClientId: externalClientId,
         clientId: clientId);
+
+/// Cancel an active order with the user's client JWT — the same call the
+/// SDK's "cancel order" button makes.
+Future<void> whitebirdRejectOrder(
+        {required bool isTestnet,
+        required String orderId,
+        required String accessToken}) =>
+    RustLib.instance.api.crateApiExchangeWhitebirdWhitebirdRejectOrder(
+        isTestnet: isTestnet, orderId: orderId, accessToken: accessToken);

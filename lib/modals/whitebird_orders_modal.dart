@@ -19,11 +19,23 @@ typedef WhiteBirdOrderCompleter = Future<bool> Function(WhiteBirdOpenOrder order
 typedef WhiteBirdOrderDismisser = Future<List<WhiteBirdOpenOrder>> Function(
     WhiteBirdOpenOrder order);
 
+/// Cancel the order server-side (WhiteBird `client/order/{id}/reject`);
+/// returns the refreshed open-order list.
+typedef WhiteBirdOrderCanceller = Future<List<WhiteBirdOpenOrder>> Function(
+    WhiteBirdOpenOrder order);
+
+/// Renders a human decimal amount + WhiteBird asset code with the app's
+/// standard amount formatting.
+typedef WhiteBirdAmountFormatter = String Function(
+    String amountHuman, String assetCode);
+
 void showWhiteBirdOrdersModal({
   required BuildContext context,
   required List<WhiteBirdOpenOrder> orders,
   required WhiteBirdOrderCompleter onComplete,
   required WhiteBirdOrderDismisser onDismiss,
+  required WhiteBirdOrderCanceller onCancel,
+  required WhiteBirdAmountFormatter formatAmount,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -37,6 +49,8 @@ void showWhiteBirdOrdersModal({
       orders: orders,
       onComplete: onComplete,
       onDismiss: onDismiss,
+      onCancel: onCancel,
+      formatAmount: formatAmount,
     ),
   );
 }
@@ -45,11 +59,15 @@ class _WhiteBirdOrdersContent extends StatefulWidget {
   final List<WhiteBirdOpenOrder> orders;
   final WhiteBirdOrderCompleter onComplete;
   final WhiteBirdOrderDismisser onDismiss;
+  final WhiteBirdOrderCanceller onCancel;
+  final WhiteBirdAmountFormatter formatAmount;
 
   const _WhiteBirdOrdersContent({
     required this.orders,
     required this.onComplete,
     required this.onDismiss,
+    required this.onCancel,
+    required this.formatAmount,
   });
 
   @override
@@ -67,6 +85,24 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
     try {
       final done = await widget.onComplete(order);
       if (done && mounted) Navigator.pop(context);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _cancel(WhiteBirdOpenOrder order) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final next = await widget.onCancel(order);
+      if (!mounted) return;
+      if (next.isEmpty) {
+        Navigator.pop(context);
+        return;
+      }
+      setState(() => _orders = next);
+    } catch (e) {
+      debugPrint('[WhiteBirdOrders] cancel failed: $e');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -175,94 +211,69 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
     return tIndex > 0 ? iso.substring(0, tIndex) : iso;
   }
 
+  /// Minimal card: tap continues an awaiting-deposit order (wallet transfer
+  /// confirm), the ✕ icon cancels it server-side (or locally dismisses
+  /// non-actionable orders).
   Widget _buildOrderCard(
       AppTheme theme, AppLocalizations l10n, WhiteBirdOpenOrder order) {
     final needsDeposit = order.awaitingDeposit;
     final expires = order.expiresAt;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${order.fromAmount} ${order.fromAsset} → '
-                  '${order.toAmount} ${order.toAsset}',
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.bodyText1.copyWith(
-                    color: theme.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: theme.warning.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  order.status,
-                  style: theme.caption.copyWith(color: theme.warning),
-                ),
-              ),
-              // The active awaiting-deposit order blocks new swaps and cannot
-              // be closed locally — only completed or left to expire.
-              if (!needsDeposit) ...[
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _busy ? null : () => _dismiss(order),
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
-                    child: AppIconView(
-                      icon: AppIcon.close,
-                      size: 16,
-                      color: theme.textSecondary,
+    return GestureDetector(
+      onTap: needsDeposit && !_busy ? () => _complete(order) : null,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: theme.textSecondary.withValues(alpha: 0.15), width: 1.5),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${widget.formatAmount(order.fromAmount, order.fromAsset)}'
+                    ' → '
+                    '${widget.formatAmount(order.toAmount, order.toAsset)}',
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.bodyText1.copyWith(
+                      color: theme.textPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            [
-              if (order.number != null) '#${order.number}',
-              _shortDate(order.createdAt),
-              if (expires != null)
-                '${l10n.whitebirdOrdersExpires} ${_shortDate(expires)}',
-            ].join('  ·  '),
-            style: theme.bodyText2.copyWith(color: theme.textSecondary),
-          ),
-          if (needsDeposit) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: _busy ? null : () => _complete(order),
-                style: TextButton.styleFrom(
-                  backgroundColor: theme.primaryPurple,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 4),
+                  Text(
+                    [
+                      if (order.number != null) '#${order.number}',
+                      if (expires != null)
+                        '${l10n.whitebirdOrdersExpires} ${_shortDate(expires)}',
+                    ].join('  ·  '),
+                    style:
+                        theme.bodyText2.copyWith(color: theme.textSecondary),
                   ),
-                ),
-                child: Text(
-                  l10n.whitebirdOrdersComplete,
-                  style: theme.button.copyWith(color: theme.buttonText),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            GestureDetector(
+              onTap: _busy
+                  ? null
+                  : () => needsDeposit ? _cancel(order) : _dismiss(order),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: AppIconView(
+                  icon: AppIcon.close,
+                  size: 18,
+                  color: theme.textSecondary,
                 ),
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }

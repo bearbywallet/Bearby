@@ -45,3 +45,13 @@ pub async fn whitebird_open_orders(
     )
     .await
 }
+
+/// Cancel an active order with the user's client JWT — the same call the
+/// SDK's "cancel order" button makes.
+pub async fn whitebird_reject_order(
+    is_testnet: bool,
+    order_id: String,
+    access_token: String,
+) -> Result<(), String> {
+    orders::reject_order(is_testnet, order_id.as_str(), access_token.as_str()).await
+}
