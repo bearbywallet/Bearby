@@ -369,6 +369,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           builder: (_) => WhiteBirdSdkPage(
             isTestnet: _isTestnet,
             externalClientId: externalId,
+            clientId: session.clientId,
             accessToken: session.accessToken,
             refreshToken: session.refreshToken,
             sessionId: info.sessionId,

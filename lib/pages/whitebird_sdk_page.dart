@@ -11,6 +11,7 @@ import 'package:bearby/mixins/colors.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/services/whitebird_session.dart';
 import 'package:bearby/src/rust/api/exchange/whitebird.dart';
+import 'package:bearby/src/rust/models/exchange/whitebird/orders.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
@@ -55,6 +56,7 @@ class WhiteBirdSdkPage extends StatefulWidget {
     required this.isTestnet,
     required this.externalClientId,
     required this.sessionId,
+    this.clientId,
     this.accessToken,
     this.refreshToken,
     this.currencyFrom,
@@ -68,6 +70,11 @@ class WhiteBirdSdkPage extends StatefulWidget {
 
   /// Links the WhiteBird user with this install (`ensureExternalClientId`).
   final String externalClientId;
+
+  /// WhiteBird client uuid when known — order lookups by `externalClientId`
+  /// return nothing for accounts registered before the id was linked, so the
+  /// uuid is the reliable key.
+  final String? clientId;
 
   /// Stored WhiteBird JWTs — lets the SDK skip its login screen.
   final String? accessToken;
@@ -97,6 +104,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   /// awaiting-deposit sell beyond that snapshot.
   Set<String> _ordersAtOpen = const {};
   Timer? _depositPollTimer;
+  late String? _clientId = widget.clientId;
 
   @override
   void initState() {
@@ -105,6 +113,12 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
       unawaited(_startDepositPoll());
     }
   }
+
+  Future<List<WhiteBirdOpenOrder>> _fetchOrders() => whitebirdOpenOrders(
+        isTestnet: widget.isTestnet,
+        externalClientId: widget.externalClientId,
+        clientId: _clientId,
+      );
 
   @override
   void dispose() {
@@ -115,10 +129,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
 
   Future<void> _startDepositPoll() async {
     try {
-      final existing = await whitebirdOpenOrders(
-        isTestnet: widget.isTestnet,
-        externalClientId: widget.externalClientId,
-      );
+      final existing = await _fetchOrders();
       _ordersAtOpen = existing.map((o) => o.orderId).toSet();
     } catch (e) {
       debugPrint('[WhiteBird] order snapshot failed: $e');
@@ -133,10 +144,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   Future<void> _pollForDeposit() async {
     if (_handledOrder || _popped || !mounted) return;
     try {
-      final orders = await whitebirdOpenOrders(
-        isTestnet: widget.isTestnet,
-        externalClientId: widget.externalClientId,
-      );
+      final orders = await _fetchOrders();
       final fresh = orders
           .where((o) =>
               o.isSell &&
@@ -275,8 +283,11 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
       email: _stringField(map, const ['email']),
     );
     final clientId = _stringField(map, const ['clientId', 'id']);
-    if (clientId != null) await session.saveClientId(clientId);
-    debugPrint('[WhiteBird] tokens saved');
+    if (clientId != null) {
+      _clientId = clientId;
+      await session.saveClientId(clientId);
+    }
+    debugPrint('[WhiteBird] tokens saved (clientId=$_clientId)');
   }
 
   Future<void> _onOrderCreated(List<dynamic> args) async {
@@ -334,10 +345,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   /// Fallback lookup of the sell deposit address from the proxy order list.
   Future<String?> _resolveDepositAddress(String? orderId) async {
     try {
-      final orders = await whitebirdOpenOrders(
-        isTestnet: widget.isTestnet,
-        externalClientId: widget.externalClientId,
-      );
+      final orders = await _fetchOrders();
       final awaiting = orders.where((o) =>
           o.isSell &&
           !o.cryptoReceived &&
