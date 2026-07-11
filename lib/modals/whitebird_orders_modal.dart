@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bearby/components/app_icon.dart';
+import 'package:bearby/services/whitebird_orders.dart';
 import 'package:bearby/src/rust/models/exchange/whitebird/orders.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -176,9 +177,7 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
 
   Widget _buildOrderCard(
       AppTheme theme, AppLocalizations l10n, WhiteBirdOpenOrder order) {
-    final needsDeposit = order.isSell &&
-        !order.cryptoReceived &&
-        (order.depositAddress?.isNotEmpty ?? false);
+    final needsDeposit = order.awaitingDeposit;
     final expires = order.expiresAt;
     return Container(
       padding: const EdgeInsets.all(14),
@@ -215,19 +214,23 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
                   style: theme.caption.copyWith(color: theme.warning),
                 ),
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: _busy ? null : () => _dismiss(order),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: AppIconView(
-                    icon: AppIcon.close,
-                    size: 16,
-                    color: theme.textSecondary,
+              // The active awaiting-deposit order blocks new swaps and cannot
+              // be closed locally — only completed or left to expire.
+              if (!needsDeposit) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _busy ? null : () => _dismiss(order),
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: AppIconView(
+                      icon: AppIcon.close,
+                      size: 16,
+                      color: theme.textSecondary,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
           const SizedBox(height: 6),

@@ -23,6 +23,7 @@ import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/modals/whitebird_orders_modal.dart';
 import 'package:bearby/pages/whitebird_sdk_page.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/services/whitebird_orders.dart';
 import 'package:bearby/services/whitebird_session.dart';
 import 'package:bearby/src/rust/api/exchange/whitebird.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -147,10 +148,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   bool get _isTestnet => _appState.chain?.testnet ?? true;
 
   /// Open PROCESSING WhiteBird orders — fetched only when a session exists.
-  /// Locally dismissed orders are hidden from the badge/modal unless
-  /// [includeDismissed] — WhiteBird still counts them as the active order.
-  Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders(
-      {bool includeDismissed = false}) async {
+  /// Local dismissal hides only non-actionable orders; a sell awaiting its
+  /// deposit is WhiteBird's single active order and always stays visible.
+  Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders() async {
     final session = WhiteBirdSession(_appState.storage);
     await session.ensureLoaded();
     if (!session.hasSession) return const [];
@@ -163,10 +163,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final learnedClientId =
         orders.where((o) => o.clientId.isNotEmpty).firstOrNull?.clientId;
     if (learnedClientId != null) await session.saveClientId(learnedClientId);
-    if (includeDismissed) return orders;
     final dismissed = session.dismissedOrderIds;
     return orders
-        .where((o) => !dismissed.contains(o.orderId))
+        .where((o) => o.awaitingDeposit || !dismissed.contains(o.orderId))
         .toList(growable: false);
   }
 
@@ -348,17 +347,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       // A sell still waiting for its deposit blocks a new order — WhiteBird
       // keeps one active order per client and the SDK resumes it (without
       // firing onOrderCreated) instead of creating a fresh one. Route the
-      // user to the open-orders modal to finish it; local dismissal cannot
-      // unblock this, so check the unfiltered list.
-      final open = await _fetchOpenOrders(includeDismissed: true);
-      final awaitingDeposit = open
-          .where((o) =>
-              o.isSell &&
-              !o.cryptoReceived &&
-              (o.depositAddress?.isNotEmpty ?? false))
-          .toList(growable: false);
-      if (awaitingDeposit.isNotEmpty) {
-        if (mounted) _showOrdersModal(awaitingDeposit);
+      // user to the open-orders modal to finish it.
+      final open = await _fetchOpenOrders();
+      if (mounted) setState(() => _openOrders = open);
+      final awaiting =
+          open.where((o) => o.awaitingDeposit).toList(growable: false);
+      if (awaiting.isNotEmpty) {
+        if (mounted) _showOrdersModal(awaiting);
         return;
       }
 

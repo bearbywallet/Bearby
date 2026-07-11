@@ -9,6 +9,7 @@ import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/config/whitebird.dart';
 import 'package:bearby/mixins/colors.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/services/whitebird_orders.dart';
 import 'package:bearby/services/whitebird_session.dart';
 import 'package:bearby/src/rust/api/exchange/whitebird.dart';
 import 'package:bearby/src/rust/models/exchange/whitebird/orders.dart';
@@ -156,12 +157,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     if (ModalRoute.of(context)?.isCurrent != true) return;
     try {
       final orders = await _fetchOrders();
-      final awaiting = orders
-          .where((o) =>
-              o.isSell &&
-              !o.cryptoReceived &&
-              (o.depositAddress?.isNotEmpty ?? false))
-          .firstOrNull;
+      final awaiting = orders.where((o) => o.awaitingDeposit).firstOrNull;
       if (awaiting == null) return;
       debugPrint(
           '[WhiteBird] poll detected deposit order=${awaiting.orderId} '
@@ -374,10 +370,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   Future<String?> _resolveDepositAddress(String? orderId) async {
     try {
       final orders = await _fetchOrders();
-      final awaiting = orders.where((o) =>
-          o.isSell &&
-          !o.cryptoReceived &&
-          (o.depositAddress?.isNotEmpty ?? false));
+      final awaiting = orders.where((o) => o.awaitingDeposit);
       final match = orderId == null
           ? awaiting.firstOrNull
           : awaiting.where((o) => o.orderId == orderId).firstOrNull ??
