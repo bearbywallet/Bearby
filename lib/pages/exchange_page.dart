@@ -447,6 +447,9 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       token: token,
       onConfirm: (_) {
         if (!completer.isCompleted) completer.complete(true);
+        // The confirm sheet never pops itself — close it so the SDK behind
+        // it resurfaces and the user can watch the order progress.
+        Navigator.of(context).pop();
       },
       onDismiss: () {
         if (!completer.isCompleted) completer.complete(false);
