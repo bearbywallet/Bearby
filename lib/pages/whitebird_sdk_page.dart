@@ -426,10 +426,6 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
           ),
           onPressed: () => _pop(false),
         ),
-        title: Text(
-          'WhiteBird',
-          style: theme.titleMedium.copyWith(color: theme.textPrimary),
-        ),
       ),
       body: SafeArea(
         child: Stack(
