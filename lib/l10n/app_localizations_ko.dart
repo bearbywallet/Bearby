@@ -314,6 +314,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get whitebirdOrdersComplete => '결제 완료하기';
 
   @override
+  String get whitebirdOrdersCancel => '주문 취소';
+
+  @override
   String get whitebirdOrdersExpires => '만료';
 
   @override

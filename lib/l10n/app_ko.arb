@@ -106,6 +106,7 @@
   "whitebirdOrdersTitle": "미결 주문",
   "whitebirdOrdersEmpty": "미결 WhiteBird 주문이 없습니다",
   "whitebirdOrdersComplete": "결제 완료하기",
+  "whitebirdOrdersCancel": "주문 취소",
   "whitebirdOrdersExpires": "만료",
   "whitebirdOrdersWrongNetwork": "결제를 완료하려면 주문의 네트워크로 전환하세요",
   "exchangeSettingsPriceProtection": "가격 보호",

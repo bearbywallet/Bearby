@@ -106,6 +106,7 @@
   "whitebirdOrdersTitle": "未完了の注文",
   "whitebirdOrdersEmpty": "未完了のWhiteBird注文はありません",
   "whitebirdOrdersComplete": "支払いを完了",
+  "whitebirdOrdersCancel": "注文をキャンセル",
   "whitebirdOrdersExpires": "期限",
   "whitebirdOrdersWrongNetwork": "支払いを完了するには注文のネットワークに切り替えてください",
   "exchangeSettingsPriceProtection": "価格保護",

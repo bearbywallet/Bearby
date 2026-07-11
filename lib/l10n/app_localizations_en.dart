@@ -315,6 +315,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whitebirdOrdersComplete => 'Complete payment';
 
   @override
+  String get whitebirdOrdersCancel => 'Cancel order';
+
+  @override
   String get whitebirdOrdersExpires => 'expires';
 
   @override

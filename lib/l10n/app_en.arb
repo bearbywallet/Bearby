@@ -355,6 +355,7 @@
   "whitebirdOrdersTitle": "Open orders",
   "whitebirdOrdersEmpty": "No open WhiteBird orders",
   "whitebirdOrdersComplete": "Complete payment",
+  "whitebirdOrdersCancel": "Cancel order",
   "whitebirdOrdersExpires": "expires",
   "whitebirdOrdersWrongNetwork": "Switch to the order's network to complete this payment",
   "exchangeSettingsPriceProtection": "Price Protection",

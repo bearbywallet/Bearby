@@ -317,6 +317,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get whitebirdOrdersComplete => 'Завершить оплату';
 
   @override
+  String get whitebirdOrdersCancel => 'Отменить ордер';
+
+  @override
   String get whitebirdOrdersExpires => 'истекает';
 
   @override

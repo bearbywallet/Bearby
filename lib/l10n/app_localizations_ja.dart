@@ -314,6 +314,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get whitebirdOrdersComplete => '支払いを完了';
 
   @override
+  String get whitebirdOrdersCancel => '注文をキャンセル';
+
+  @override
   String get whitebirdOrdersExpires => '期限';
 
   @override

@@ -689,6 +689,12 @@ abstract class AppLocalizations {
   /// **'Complete payment'**
   String get whitebirdOrdersComplete;
 
+  /// No description provided for @whitebirdOrdersCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel order'**
+  String get whitebirdOrdersCancel;
+
   /// No description provided for @whitebirdOrdersExpires.
   ///
   /// In en, this message translates to:

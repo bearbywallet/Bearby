@@ -314,6 +314,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get whitebirdOrdersComplete => '完成支付';
 
   @override
+  String get whitebirdOrdersCancel => '取消订单';
+
+  @override
   String get whitebirdOrdersExpires => '到期';
 
   @override

@@ -106,6 +106,7 @@
   "whitebirdOrdersTitle": "Открытые ордера",
   "whitebirdOrdersEmpty": "Нет открытых ордеров WhiteBird",
   "whitebirdOrdersComplete": "Завершить оплату",
+  "whitebirdOrdersCancel": "Отменить ордер",
   "whitebirdOrdersExpires": "истекает",
   "whitebirdOrdersWrongNetwork": "Переключитесь на сеть ордера, чтобы завершить оплату",
   "exchangeSettingsPriceProtection": "Защита цены",
