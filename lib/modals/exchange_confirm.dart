@@ -790,6 +790,7 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
                 provider.common.iconAsset,
                 width: 28,
                 height: 28,
+                fit: BoxFit.contain,
               ),
             const SizedBox(width: 12),
             // Pay → Get amounts + gas.

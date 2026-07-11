@@ -1,5 +1,5 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="16" fill="#111827"/>
-  <path d="M18 22h19.5c6.35 0 10.5 3.68 10.5 9.33 0 4.02-2.13 7.06-5.78 8.48L49 52H38.9l-5.82-10.8H27V52h-9V22Zm9 7.6v4.4h9.42c1.55 0 2.58-.88 2.58-2.2 0-1.33-1.03-2.2-2.58-2.2H27Z" fill="#FFFFFF"/>
-  <path d="M16 13h32v6H16v-6Zm0 32h16v6H16v-6Z" fill="#7C3AED"/>
+  <!-- Logo mark only — no solid badge square -->
+  <path d="M18 22h19.5c6.35 0 10.5 3.68 10.5 9.33 0 4.02-2.13 7.06-5.78 8.48L49 52H38.9l-5.82-10.8H27V52h-9V22Zm9 7.6v4.4h9.42c1.55 0 2.58-.88 2.58-2.2 0-1.33-1.03-2.2-2.58-2.2H27Z" fill="#7C3AED"/>
+  <path d="M16 13h32v6H16v-6Zm0 32h16v6H16v-6Z" fill="#7C3AED" opacity="0.45"/>
 </svg>

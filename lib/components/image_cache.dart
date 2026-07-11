@@ -32,6 +32,15 @@ class AsyncImage extends StatefulWidget {
 bool _isLocalSvgAsset(String url) =>
     url.startsWith('assets/') && url.endsWith('.svg');
 
+/// Monochrome currency glyphs (hard-coded black fills) that must follow
+/// [AppTheme.textPrimary] in light/dark themes.
+const _themeTintedLocalSvgs = {
+  'assets/icons/usd.svg',
+  'assets/icons/rub.svg',
+  'assets/icons/euro.svg',
+  'assets/icons/byn.svg',
+};
+
 class _AsyncImageState extends State<AsyncImage> {
   late final AppState _appState;
   Uint8List? _cachedImageBytes;
@@ -180,15 +189,21 @@ class _AsyncImageState extends State<AsyncImage> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
+    final needsThemeTint =
+        _isLocalAsset && _themeTintedLocalSvgs.contains(widget.url);
+    final appState = Provider.of<AppState>(context, listen: needsThemeTint);
     final theme = appState.currentTheme;
 
     if (_isLocalAsset) {
+      final tint = needsThemeTint
+          ? ColorFilter.mode(theme.textPrimary, BlendMode.srcIn)
+          : null;
       return SvgPicture.asset(
         widget.url!,
         width: widget.width,
         height: widget.height,
         fit: widget.fit ?? BoxFit.cover,
+        colorFilter: tint,
       );
     }
 
