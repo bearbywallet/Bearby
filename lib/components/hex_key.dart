@@ -10,7 +10,7 @@ class HexKeyDisplay extends StatefulWidget {
   const HexKeyDisplay({
     super.key,
     required this.hexKey,
-    required this.title,
+    this.title = '',
   });
 
   @override
@@ -119,15 +119,16 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: adaptivePadding),
-            child: Text(
-              widget.title,
-              style: theme.titleSmall.copyWith(
-                color: theme.textSecondary,
+          if (widget.title.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(bottom: adaptivePadding),
+              child: Text(
+                widget.title,
+                style: theme.titleSmall.copyWith(
+                  color: theme.textSecondary,
+                ),
               ),
             ),
-          ),
           LayoutBuilder(
             builder: (context, constraints) {
               final chunkSize = _getChunkSize(constraints.maxWidth);

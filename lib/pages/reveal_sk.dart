@@ -1,20 +1,24 @@
-import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/async_qrcode.dart';
-import 'package:bearby/components/button.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/hex_key.dart';
-import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/components/load_button.dart';
+import 'package:bearby/components/reveal_password_form.dart';
+import 'package:bearby/components/reveal_scam_alert.dart';
+import 'package:bearby/components/reveal_security_timer.dart';
+import 'package:bearby/components/wallet_card.dart';
 import 'package:bearby/config/settings.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/models/account.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -28,98 +32,177 @@ class RevealSecretKey extends StatefulWidget {
 }
 
 class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
-  bool isCopied = false;
-  bool isAuthenticated = false;
-  bool hasError = false;
-  bool isTimerActive = false;
-  bool canShowKey = false;
-  String? errorMessage;
+  bool _isCopied = false;
+  bool _isAuthenticated = false;
+  bool _isTimerActive = false;
+  bool _canShowKey = false;
+  bool _isLoadingKey = false;
   bool _obscurePassword = true;
-  KeyPairInfo? keys;
+  bool _hasError = false;
+  String? _errorMessage;
+  String? _password;
+  KeyPairInfo? _keys;
+
+  /// List index into [AppState.accounts] — same convention as [WalletInfo.selectedAccount].
+  int? _selectedListIndex;
+
   Timer? _countdownTimer;
   int _remainingTime = SecuritySettings.revealDelaySeconds;
 
-  final _passwordController = TextEditingController();
-  final _passwordInputKey = GlobalKey<SmartInputState>();
-  final _btnController = RoundedLoadingButtonController();
+  /// Cached keys keyed by list index — avoids re-fetching on switch.
+  final Map<int, KeyPairInfo> _keyCache = <int, KeyPairInfo>{};
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  final _passwordController = TextEditingController();
+  final _btnController = RoundedLoadingButtonController();
 
   @override
   void dispose() {
     _countdownTimer?.cancel();
+    _passwordController.dispose();
+    _password = null;
+    _keyCache.clear();
     super.dispose();
   }
 
   void _startCountdown() {
     setState(() {
-      isTimerActive = true;
+      _isTimerActive = true;
       _remainingTime = SecuritySettings.revealDelaySeconds;
     });
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_remainingTime > 0) {
+        setState(() => _remainingTime--);
+        return;
+      }
+      timer.cancel();
       setState(() {
-        if (_remainingTime > 0) {
-          _remainingTime--;
-        } else {
-          canShowKey = true;
-          isTimerActive = false;
-          timer.cancel();
-        }
+        _canShowKey = true;
+        _isTimerActive = false;
       });
+      _loadKeyForSelected();
     });
   }
 
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
+  Future<void> _onPasswordSubmit(BigInt walletIndex) async {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
 
-  void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
-    final l10n = AppLocalizations.of(context)!;
-
+    final password = _passwordController.text;
     _btnController.start();
     try {
       await tryUnlockWithPassword(
-        password: _passwordController.text,
+        password: password,
         walletIndex: walletIndex,
-      );
-      KeyPairInfo keypair = await revealKeypair(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        password: _passwordController.text,
       );
 
+      if (!mounted) return;
+
+      final state = context.read<AppState>();
+      final defaultIndex = (state.wallet?.selectedAccount ?? BigInt.zero).toInt();
+
       setState(() {
-        keys = keypair;
-        isAuthenticated = true;
-        hasError = false;
-        errorMessage = null;
+        _password = password;
+        _selectedListIndex = defaultIndex;
+        _isAuthenticated = true;
+        _hasError = false;
+        _errorMessage = null;
       });
+      _passwordController.clear();
       _btnController.success();
       _startCountdown();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        isAuthenticated = false;
-        hasError = true;
-        errorMessage = "${l10n.revealSecretKeyInvalidPassword} $e";
+        _isAuthenticated = false;
+        _hasError = true;
+        _errorMessage = '${l10n.revealSecretKeyInvalidPassword} $e';
       });
       _btnController.error();
-      await Future.delayed(SecuritySettings.errorResetDuration);
-      _btnController.reset();
+      await Future<void>.delayed(SecuritySettings.errorResetDuration);
+      if (mounted) _btnController.reset();
     }
+  }
+
+  Future<void> _selectAccount(int listIndex) async {
+    if (_selectedListIndex == listIndex && _keys != null) return;
+
+    setState(() {
+      _selectedListIndex = listIndex;
+      _isCopied = false;
+      _keys = _keyCache[listIndex];
+      _hasError = false;
+      _errorMessage = null;
+    });
+
+    if (!_canShowKey) return;
+    await _loadKeyForSelected();
+  }
+
+  Future<void> _loadKeyForSelected() async {
+    final listIndex = _selectedListIndex;
+    final password = _password;
+    if (listIndex == null || password == null || !_canShowKey) return;
+
+    final cached = _keyCache[listIndex];
+    if (cached != null) {
+      if (mounted) setState(() => _keys = cached);
+      return;
+    }
+
+    final state = context.read<AppState>();
+    final walletIndex = state.selectedWalletIndexOrNull;
+    if (walletIndex == null) return;
+
+    setState(() {
+      _isLoadingKey = true;
+      _hasError = false;
+      _errorMessage = null;
+    });
+    try {
+      final keypair = await revealKeypair(
+        walletIndex: walletIndex,
+        accountIndex: BigInt.from(listIndex),
+        password: password,
+      );
+      if (!mounted) return;
+      _keyCache[listIndex] = keypair;
+      setState(() {
+        _keys = keypair;
+        _isLoadingKey = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingKey = false;
+        _hasError = true;
+        _errorMessage = e.toString();
+      });
+    }
+  }
+
+  Future<void> _handleCopy(String key) async {
+    if (key.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: key));
+    if (!mounted) return;
+    setState(() => _isCopied = true);
+    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
+    if (mounted) setState(() => _isCopied = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context, listen: false);
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final state = context.watch<AppState>();
     final theme = state.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final accounts = state.accounts;
+    final sk = _keys?.sk;
+    final canCopy = _canShowKey && sk != null && sk.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -135,99 +218,68 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
               child: CustomAppBar(
-                title: l10n.revealSecretKeyTitle,
+                title: l10n?.revealSecretKeyTitle ?? '',
                 onBackPressed: () => Navigator.pop(context),
-                actionIcon: (canShowKey && keys != null)
+                actionIcon: canCopy
                     ? AppIconView(
-                        icon: isCopied ? AppIcon.check : AppIcon.copy,
+                        icon: _isCopied ? AppIcon.check : AppIcon.copy,
                         size: 24,
                         color: theme.textPrimary,
                       )
                     : null,
-                onActionPressed: (canShowKey && keys != null)
-                    ? () => _handleCopy(keys?.sk ?? "")
-                    : null,
+                onActionPressed: canCopy ? () => _handleCopy(sk) : null,
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: Column(
-                  children: [
-                    _buildScamAlert(theme),
-                    if (!isAuthenticated) ...[
-                      SmartInput(
-                        key: _passwordInputKey,
-                        controller: _passwordController,
-                        hint: l10n.revealSecretKeyPasswordHint,
-                        fontSize: 18,
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        focusedBorderColor: theme.primaryPurple,
-                        obscureText: _obscurePassword,
-                        onSubmitted: (_) => _onPasswordSubmit(
-                          state.selectedWalletIndex,
-                          state.wallet!.selectedAccount,
-                        ),
-                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
-                        onRightIconTap: () => setState(
-                            () => _obscurePassword = !_obscurePassword),
+                children: [
+                  RevealScamAlert(
+                    theme: theme,
+                    message: l10n?.revealSecretKeyScamAlertMessage ?? '',
+                  ),
+                  if (!_isAuthenticated)
+                    RevealPasswordForm(
+                      controller: _passwordController,
+                      btnController: _btnController,
+                      theme: theme,
+                      passwordHint: l10n?.revealSecretKeyPasswordHint ?? '',
+                      submitLabel: l10n?.revealSecretKeySubmitButton ?? '',
+                      obscurePassword: _obscurePassword,
+                      hasError: _hasError,
+                      errorMessage: _errorMessage,
+                      onToggleObscure: () => setState(
+                        () => _obscurePassword = !_obscurePassword,
                       ),
-                      if (hasError && errorMessage != null)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            errorMessage!,
-                            style: theme.bodyText2.copyWith(
-                              color: theme.danger,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: RoundedLoadingButton(
-                          color: theme.primaryPurple,
-                          valueColor: theme.buttonText,
-                          controller: _btnController,
-                          onPressed: () => _onPasswordSubmit(
-                            state.selectedWalletIndex,
-                            state.wallet!.selectedAccount,
-                          ),
-                          child: Text(
-                            l10n.revealSecretKeySubmitButton,
-                            style: theme.titleSmall.copyWith(
-                              color: theme.buttonText,
-                            ),
-                          ),
-                        ),
+                      onSubmit: () {
+                        final walletIndex = state.selectedWalletIndexOrNull;
+                        if (walletIndex == null) return;
+                        _onPasswordSubmit(walletIndex);
+                      },
+                    ),
+                  if (_isAuthenticated) ...[
+                    _AccountList(
+                      accounts: accounts,
+                      selectedIndex: _selectedListIndex,
+                      onSelect: _selectAccount,
+                    ),
+                    if (_isTimerActive && !_canShowKey)
+                      RevealSecurityTimer(
+                        theme: theme,
+                        remainingSeconds: _remainingTime,
                       ),
-                    ],
-                    if (isAuthenticated && isTimerActive && !canShowKey) ...[
-                      _buildTimerDisplay(theme),
-                    ],
-                    if (isAuthenticated && canShowKey && keys != null) ...[
-                      _buildQrCode(theme),
-                      HexKeyDisplay(
-                        hexKey: keys!.sk,
-                        title: "",
+                    if (_canShowKey)
+                      _KeySection(
+                        theme: theme,
+                        state: state,
+                        keys: _keys,
+                        isLoading: _isLoadingKey,
+                        hasError: _hasError,
+                        errorMessage: _errorMessage,
+                        adaptivePadding: adaptivePadding,
                       ),
-                      SizedBox(height: adaptivePadding),
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        padding: EdgeInsets.only(bottom: adaptivePadding),
-                        child: CustomButton(
-                          textColor: theme.buttonText,
-                          backgroundColor: theme.primaryPurple,
-                          text: l10n.revealSecretKeyDoneButton,
-                          onPressed: () => Navigator.pop(context),
-                          borderRadius: 30.0,
-                          height: 56.0,
-                        ),
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
           ],
@@ -235,138 +287,115 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
       ),
     );
   }
+}
 
-  Widget _buildTimerDisplay(AppTheme theme) {
-    final l10n = AppLocalizations.of(context)!;
-    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 48);
+/// Reuses [WalletCard] — same card users already know from the wallet switcher.
+class _AccountList extends StatelessWidget {
+  final List<AccountInfo> accounts;
+  final int? selectedIndex;
+  final ValueChanged<int> onSelect;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 32),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.secondaryPurple),
+  const _AccountList({
+    required this.accounts,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (accounts.isEmpty) return const SizedBox.shrink();
+
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.32;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
+        itemCount: accounts.length,
+        itemBuilder: (context, index) {
+          return WalletCard(
+            account: accounts[index],
+            isSelected: selectedIndex == index,
+            onTap: () => onSelect(index),
+          );
+        },
       ),
-      child: Column(
-        children: [
-          AppIconView(
-            icon: AppIcon.time,
-            size: iconSize,
-            color: theme.primaryPurple,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.revealSecretKeySecurityTimer,
-            style: theme.subtitle1.copyWith(
-              color: theme.textPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.revealSecretKeyRevealAfter,
-            style: theme.bodyText2.copyWith(
-              color: theme.textSecondary,
-            ),
+    );
+  }
+}
+
+/// QR + hex key for the selected account.
+class _KeySection extends StatelessWidget {
+  final AppTheme theme;
+  final AppState state;
+  final KeyPairInfo? keys;
+  final bool isLoading;
+  final bool hasError;
+  final String? errorMessage;
+  final double adaptivePadding;
+
+  const _KeySection({
+    required this.theme,
+    required this.state,
+    required this.keys,
+    required this.isLoading,
+    required this.hasError,
+    required this.errorMessage,
+    required this.adaptivePadding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: adaptivePadding * 2),
+        child: Center(
+          child: CircularProgressIndicator(color: theme.primaryPurple),
+        ),
+      );
+    }
+
+    final sk = keys?.sk;
+    if (sk == null || sk.isEmpty) {
+      if (hasError && errorMessage != null) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            errorMessage ?? '',
+            style: theme.bodyText2.copyWith(color: theme.danger),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          Text(
-            _formatTime(_remainingTime),
-            style: theme.displayLarge.copyWith(
-              color: theme.primaryPurple,
-              fontFamily: 'monospace',
-            ),
-          ),
-          const SizedBox(height: 16),
-          LinearProgressIndicator(
-            value: 1 - (_remainingTime / SecuritySettings.revealDelaySeconds),
-            backgroundColor: theme.background,
-            valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      ),
-    );
-  }
+        );
+      }
+      return const SizedBox.shrink();
+    }
 
-  Widget _buildScamAlert(AppTheme theme) {
-    final l10n = AppLocalizations.of(context)!;
+    final chain = state.chain;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.danger),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              AppIconView(
-                icon: AppIcon.warning,
-                size: 30,
-                color: theme.danger,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.revealSecretKeyScamAlertTitle,
-                style: theme.labelLarge.copyWith(
-                  color: theme.danger,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (chain != null)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: adaptivePadding),
+            child: Center(
+              child: AsyncQRcode(
+                data: generateQRSecretData(
+                  chain: chain.shortName,
+                  privateKey: sk,
                 ),
+                size: 140,
+                color: theme.danger,
+                eyeShape: EyeShape.circle,
+                dataModuleShape: DataModuleShape.circle,
+                loadingWidget: CircularProgressIndicator(color: theme.danger),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.revealSecretKeyScamAlertMessage,
-            style: theme.bodyText2.copyWith(
-              color: theme.danger,
             ),
           ),
-        ],
-      ),
+        HexKeyDisplay(hexKey: sk),
+        SizedBox(height: adaptivePadding),
+      ],
     );
-  }
-
-  Widget _buildQrCode(AppTheme theme) {
-    final state = Provider.of<AppState>(context, listen: false);
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final chain = state.chain!;
-
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: adaptivePadding),
-      child: Center(
-        child: AsyncQRcode(
-          data: generateQRSecretData(
-            chain: chain.shortName,
-            privateKey: keys?.sk,
-          ),
-          size: 160,
-          color: theme.danger,
-          eyeShape: EyeShape.circle,
-          dataModuleShape: DataModuleShape.circle,
-          loadingWidget: CircularProgressIndicator(
-            color: theme.danger,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _handleCopy(String key) async {
-    await Clipboard.setData(ClipboardData(text: key));
-    setState(() {
-      isCopied = true;
-    });
-
-    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
-
-    setState(() {
-      isCopied = false;
-    });
   }
 }
