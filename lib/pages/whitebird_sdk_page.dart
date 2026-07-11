@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/config/whitebird.dart';
+import 'package:bearby/mixins/colors.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/services/whitebird_session.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/theme/app_theme.dart';
 
 /// Sell handoff: show the wallet transfer confirm over the SDK's deposit
 /// screen; return `true` once the transaction is signed and broadcast.
@@ -37,21 +40,21 @@ class WhiteBirdDeposit {
       'WhiteBirdDeposit(orderId: $orderId, depositAddress: $depositAddress)';
 }
 
-/// WhiteBird SDK WebView host.
+/// WhiteBird SDK WebView host for a session exchange flow.
 ///
-/// - `sessionId == null` → auth-only (login / signup / KYC); pops `true` once
-///   the SDK returns tokens via `onUserData`.
-/// - `sessionId != null` → exchange flow with a locked pair/amount; sells pass
-///   [onDepositReady] to intercept the deposit for the wallet confirm modal,
-///   buys complete fully inside the SDK (`onOrderCompleted`).
+/// One webview covers the whole journey: with no stored tokens the SDK shows
+/// login / signup / KYC first, then continues straight into the [sessionId]
+/// exchange with a locked pair/amount. Sells pass [onDepositReady] to
+/// intercept the deposit for the wallet confirm modal; buys complete fully
+/// inside the SDK (`onOrderCompleted`).
 class WhiteBirdSdkPage extends StatefulWidget {
   const WhiteBirdSdkPage({
     super.key,
     required this.isTestnet,
     required this.externalClientId,
+    required this.sessionId,
     this.accessToken,
     this.refreshToken,
-    this.sessionId,
     this.currencyFrom,
     this.currencyTo,
     this.currencyAmount,
@@ -68,14 +71,12 @@ class WhiteBirdSdkPage extends StatefulWidget {
   final String? accessToken;
   final String? refreshToken;
 
-  final String? sessionId;
+  final String sessionId;
   final String? currencyFrom;
   final String? currencyTo;
   final String? currencyAmount;
   final String? cryptoWallet;
   final WhiteBirdDepositHandler? onDepositReady;
-
-  bool get authOnly => sessionId == null;
 
   @override
   State<WhiteBirdSdkPage> createState() => _WhiteBirdSdkPageState();
@@ -93,19 +94,20 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     super.dispose();
   }
 
-  String _buildHostHtml() {
+  String _buildHostHtml(AppTheme theme) {
     // jsonEncode gives safely quoted JS string/null literals.
     final params = <String, String>{
       'merchantId': jsonEncode(WhiteBirdConfig.merchantId),
       'merchantPass': jsonEncode(WhiteBirdConfig.merchantPass),
     };
+    final background = hexStrToColor(theme.background);
     return '''
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <style>html,body{margin:0;padding:0;height:100%;background:transparent}</style>
+  <style>html,body{margin:0;padding:0;height:100%;background:$background}</style>
 </head>
 <body>
   <div id="wb" style="position:fixed;inset:0"></div>
@@ -119,7 +121,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
       mode: wbExchangeSdk.mode.LoginMode,
       merchantId: ${params['merchantId']},
       merchantPass: ${params['merchantPass']},
-      ${_setupExtras()}
+      ${_setupExtras(theme)}
       showBackButtonOnHomePage: true,
       onExit: function() { send('wbExit'); },
       onUserData: function(p) { send('wbUserData', p); },
@@ -132,8 +134,8 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
 ''';
   }
 
-  /// Session/token lines of the `wbExchangeSdk.setup` object.
-  String _setupExtras() {
+  /// Session/token/theme lines of the `wbExchangeSdk.setup` object.
+  String _setupExtras(AppTheme theme) {
     final buffer = StringBuffer();
     void line(String key, Object? value) {
       if (value == null) return;
@@ -143,17 +145,17 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     line('externalClientId', widget.externalClientId);
     line('accessToken', widget.accessToken);
     line('refreshToken', widget.refreshToken);
-    if (!widget.authOnly) {
-      line('sessionId', widget.sessionId);
-      line('currencyFrom', widget.currencyFrom);
-      line('currencyTo', widget.currencyTo);
-      final amount = double.tryParse(widget.currencyAmount ?? '');
-      if (amount != null) buffer.writeln('currencyAmount: $amount,');
-      line('cryptoWallet', widget.cryptoWallet);
-      buffer.writeln('disableCurrencyFrom: true,');
-      buffer.writeln('disableCurrencyTo: true,');
-      buffer.writeln('disableAmount: true,');
-    }
+    line('themeMode', theme.value == 'Dark' ? 'dark' : 'light');
+    line('color', hexStrToColor(theme.primaryPurple));
+    line('sessionId', widget.sessionId);
+    line('currencyFrom', widget.currencyFrom);
+    line('currencyTo', widget.currencyTo);
+    final amount = double.tryParse(widget.currencyAmount ?? '');
+    if (amount != null) buffer.writeln('currencyAmount: $amount,');
+    line('cryptoWallet', widget.cryptoWallet);
+    buffer.writeln('disableCurrencyFrom: true,');
+    buffer.writeln('disableCurrencyTo: true,');
+    buffer.writeln('disableAmount: true,');
     return buffer.toString();
   }
 
@@ -178,7 +180,15 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
   void _pop(bool result) {
     if (_popped || !mounted) return;
     _popped = true;
-    Navigator.of(context).pop(result);
+    // The transfer confirm sheet never pops itself after onConfirm, so close
+    // everything sitting above this page's own route first — otherwise this
+    // pop would remove the sheet instead of the page.
+    final navigator = Navigator.of(context);
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      navigator.popUntil((r) => identical(r, route));
+    }
+    navigator.pop(result);
   }
 
   Future<void> _cleanupSdk() async {
@@ -206,11 +216,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     );
     final clientId = _stringField(map, const ['clientId', 'id']);
     if (clientId != null) await session.saveClientId(clientId);
-    debugPrint('[WhiteBird] tokens saved (authOnly=${widget.authOnly})');
-    if (widget.authOnly) {
-      await _cleanupSdk();
-      _pop(true);
-    }
+    debugPrint('[WhiteBird] tokens saved');
   }
 
   Future<void> _onOrderCreated(List<dynamic> args) async {
@@ -244,7 +250,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
         'id=${_stringField(map, const ['orderId'])} '
         'status=${_stringField(map, const ['status'])}');
     // Buy flow finishes here; sells already popped after the transfer confirm.
-    if (widget.onDepositReady == null && !widget.authOnly) {
+    if (widget.onDepositReady == null) {
       await _cleanupSdk();
       _pop(true);
     }
@@ -279,7 +285,11 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
         backgroundColor: theme.background,
         systemOverlayStyle: getSystemUiOverlayStyle(context),
         leading: IconButton(
-          icon: Icon(Icons.close, color: theme.textPrimary),
+          icon: AppIconView(
+            icon: AppIcon.close,
+            size: 22,
+            color: theme.textPrimary,
+          ),
           onPressed: () => _pop(false),
         ),
         title: Text(
@@ -292,7 +302,7 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
           children: [
             InAppWebView(
               initialData: InAppWebViewInitialData(
-                data: _buildHostHtml(),
+                data: _buildHostHtml(theme),
                 baseUrl: WebUri('https://bearby.io'),
               ),
               initialSettings: InAppWebViewSettings(
@@ -322,7 +332,10 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
                 debugPrint('[WhiteBird] webview error ${error.description}');
               },
             ),
-            if (_loading) const Center(child: CircularProgressIndicator()),
+            if (_loading)
+              Center(
+                child: CircularProgressIndicator(color: theme.primaryPurple),
+              ),
           ],
         ),
       ),

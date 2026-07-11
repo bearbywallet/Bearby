@@ -311,9 +311,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
 
   /// Fiat↔crypto order via the WhiteBird SDK.
   ///
-  /// Auth gate → session on the Bearby proxy → SDK exchange screen. Sells
-  /// intercept `onOrderCreated` to run the wallet transfer confirm on top of
-  /// the SDK's deposit screen; buys complete fully inside the SDK.
+  /// One webview covers everything: the session is created on the Bearby
+  /// proxy first (no user tokens needed), then the SDK handles login/KYC if
+  /// required and continues straight into the exchange. Sells intercept
+  /// `onOrderCreated` to run the wallet transfer confirm on top of the SDK's
+  /// deposit screen; buys complete fully inside the SDK.
   Future<void> _handleWhiteBirdSwap(
     ExchangeAsset from,
     ExchangeAsset to,
@@ -330,20 +332,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       final session = WhiteBirdSession(_appState.storage);
       await session.ensureLoaded();
       final externalId = await session.ensureExternalClientId();
-
-      if (!session.hasSession) {
-        if (!mounted) return;
-        final authed = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(
-            builder: (_) => WhiteBirdSdkPage(
-              isTestnet: _isTestnet,
-              externalClientId: externalId,
-            ),
-          ),
-        );
-        await session.ensureLoaded();
-        if (authed != true || !session.hasSession) return;
-      }
 
       final isSell = !fromMeta.isFiat;
       final cryptoMeta = isSell ? fromMeta : toMeta;

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/src/rust/models/exchange/whitebird/orders.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -123,8 +124,11 @@ class _WhiteBirdOrdersContentState extends State<_WhiteBirdOrdersContent> {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: Icon(Icons.refresh,
-                            size: 20, color: theme.textSecondary),
+                        icon: AppIconView(
+                          icon: AppIcon.reload,
+                          size: 20,
+                          color: theme.textSecondary,
+                        ),
                         onPressed: _refresh,
                       ),
                     ],
