@@ -306,6 +306,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangePageTabBuySell => 'Buy/Sell';
 
   @override
+  String get whitebirdOrdersTitle => 'Open orders';
+
+  @override
+  String get whitebirdOrdersEmpty => 'No open WhiteBird orders';
+
+  @override
+  String get whitebirdOrdersComplete => 'Complete payment';
+
+  @override
+  String get whitebirdOrdersExpires => 'expires';
+
+  @override
+  String get whitebirdOrdersWrongNetwork => 'Switch to the order\'s network to complete this payment';
+
+  @override
   String get exchangeSettingsPriceProtection => 'Price Protection';
 
   @override

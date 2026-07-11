@@ -4,9 +4,11 @@ mod evm;
 pub mod ledger;
 mod svm;
 pub(crate) mod tron;
+pub mod whitebird;
 mod zil;
 
 pub use bootstrap::{bootstrap_exchange_providers, validate_exchange_providers, refresh_exchange_quotes};
+pub use whitebird::{whitebird_create_session, whitebird_open_orders};
 pub use ledger::{
     check_exchange_approval, estimate_swap_base_nonce, finalize_exchange_swap,
     prepare_exchange_swap, PreparedSwapInfo,

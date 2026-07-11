@@ -10,8 +10,8 @@ use zilpay::wallet::bitcoin_wallet::BitcoinWallet;
 use zilpay::wallet::wallet_storage::StorageOperations;
 
 use crate::models::exchange::{
-    ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote, RelayMeta,
-    SunSwapMeta, UniswapMeta, ZilSwapMeta,
+    whitebird, ExchangeAsset, ExchangeProvider, PancakeMeta, PlunderMeta, ProviderQuote,
+    RelayMeta, SunSwapMeta, UniswapMeta, WhiteBirdMeta, ZilSwapMeta,
 };
 use crate::utils::{
     errors::{BackgroundError, ServiceError},
@@ -44,6 +44,7 @@ fn provider_names(providers: &HashSet<ExchangeProvider>) -> String {
             ExchangeProvider::PlunderSwap(_) => "PlunderSwap",
             ExchangeProvider::ZilSwap(_) => "ZilSwap",
             ExchangeProvider::SunSwap(_) => "SunSwap",
+            ExchangeProvider::WhiteBird(_) => "WhiteBird",
         })
         .collect();
     names.sort_unstable();
@@ -158,7 +159,9 @@ pub fn bootstrap_exchange_providers(
     let make_providers = |addr_prefix: u8,
                           slip_44: u32,
                           chain_id: u64,
-                          chain_hash: u64|
+                          chain_hash: u64,
+                          symbol: &str,
+                          native: bool|
      -> HashSet<ExchangeProvider> {
         let account_addr = relay_accounts.get(&slip_44);
         let mut providers = HashSet::with_capacity(6);
@@ -221,6 +224,21 @@ pub fn bootstrap_exchange_providers(
                     providers.insert(ExchangeProvider::SunSwap(meta));
                 }
             }
+
+            if current_is_testnet || whitebird::MAINNET_ENABLED {
+                if let Some(code) =
+                    whitebird::assets::map_token(addr_prefix, chain_id, symbol, native)
+                {
+                    providers.insert(ExchangeProvider::WhiteBird(WhiteBirdMeta::crypto(
+                        chain_hash,
+                        chain_id,
+                        slip_44,
+                        account_addr,
+                        code,
+                        current_is_testnet,
+                    )));
+                }
+            }
         }
 
         providers
@@ -259,8 +277,14 @@ pub fn bootstrap_exchange_providers(
                 continue;
             }
             let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
-            let mut providers =
-                make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
+            let mut providers = make_providers(
+                addr_prefix,
+                slip_44,
+                chain_id,
+                token.chain_hash,
+                token.symbol.as_str(),
+                token.native,
+            );
             scope_providers(&mut providers, token.chain_hash);
             let halted = resolve_halted(&providers, slip_44, chain_id);
             let names = provider_names(&providers);
@@ -311,8 +335,14 @@ pub fn bootstrap_exchange_providers(
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let mut providers =
-                        make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
+                    let mut providers = make_providers(
+                        addr_prefix,
+                        slip_44,
+                        chain_id,
+                        token.chain_hash,
+                        token.symbol.as_str(),
+                        token.native,
+                    );
                     scope_providers(&mut providers, token.chain_hash);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     let names = provider_names(&providers);
@@ -333,6 +363,39 @@ pub fn bootstrap_exchange_providers(
                         },
                     );
                 }
+            }
+        }
+    }
+
+    // Synthetic fiat assets (BYN/RUB/USD/EUR) — only when at least one real
+    // token got a WhiteBird route, so every fiat entry has a valid counterparty.
+    let has_whitebird = assets.values().any(|asset| {
+        asset
+            .providers
+            .iter()
+            .any(|p| matches!(p, ExchangeProvider::WhiteBird(_)))
+    });
+    if has_whitebird {
+        if let Some(&(slip_44, chain_id)) = chain_meta.get(&active_chain_hash) {
+            let account_addr = relay_accounts
+                .get(&slip_44)
+                .map_or("", String::as_str);
+            let fiat_assets = whitebird::assets::fiat_exchange_assets(
+                active_chain_hash,
+                chain_id,
+                slip_44,
+                account_addr,
+                current_is_testnet,
+            );
+            for (index, fiat) in fiat_assets.into_iter().enumerate() {
+                eprintln!(
+                    "[exchange-bootstrap] add fiat_token symbol={} chain_hash={active_chain_hash}",
+                    fiat.token.symbol
+                );
+                assets.insert(
+                    (active_chain_hash, index, whitebird::assets::FIAT_ADDR_TYPE),
+                    fiat,
+                );
             }
         }
     }

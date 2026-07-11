@@ -15,6 +15,7 @@ import 'api/connections.dart';
 import 'api/exchange.dart';
 import 'api/exchange/bootstrap.dart';
 import 'api/exchange/ledger.dart';
+import 'api/exchange/whitebird.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
 import 'api/local_storage.dart';
@@ -41,6 +42,8 @@ import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
 import 'models/exchange/sunswap.dart';
 import 'models/exchange/uniswap.dart';
+import 'models/exchange/whitebird.dart';
+import 'models/exchange/whitebird/orders.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -299,6 +302,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
 
   @protected
+  WhiteBirdMeta dco_decode_box_autoadd_white_bird_meta(dynamic raw);
+
+  @protected
   ZilSwapMeta dco_decode_box_autoadd_zil_swap_meta(dynamic raw);
 
   @protected
@@ -513,6 +519,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+
+  @protected
+  List<WhiteBirdOpenOrder> dco_decode_list_white_bird_open_order(dynamic raw);
 
   @protected
   MerkelizedPsbt dco_decode_merkelized_psbt(dynamic raw);
@@ -786,6 +795,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
 
   @protected
+  WhiteBirdMeta dco_decode_white_bird_meta(dynamic raw);
+
+  @protected
+  WhiteBirdOpenOrder dco_decode_white_bird_open_order(dynamic raw);
+
+  @protected
+  WhiteBirdSessionInfo dco_decode_white_bird_session_info(dynamic raw);
+
+  @protected
   ZilSwapMeta dco_decode_zil_swap_meta(dynamic raw);
 
   @protected
@@ -1038,6 +1056,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  WhiteBirdMeta sse_decode_box_autoadd_white_bird_meta(
+      SseDeserializer deserializer);
+
+  @protected
   ZilSwapMeta sse_decode_box_autoadd_zil_swap_meta(
       SseDeserializer deserializer);
 
@@ -1282,6 +1304,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  List<WhiteBirdOpenOrder> sse_decode_list_white_bird_open_order(
+      SseDeserializer deserializer);
 
   @protected
   MerkelizedPsbt sse_decode_merkelized_psbt(SseDeserializer deserializer);
@@ -1584,6 +1610,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  WhiteBirdMeta sse_decode_white_bird_meta(SseDeserializer deserializer);
+
+  @protected
+  WhiteBirdOpenOrder sse_decode_white_bird_open_order(
+      SseDeserializer deserializer);
+
+  @protected
+  WhiteBirdSessionInfo sse_decode_white_bird_session_info(
+      SseDeserializer deserializer);
+
+  @protected
   ZilSwapMeta sse_decode_zil_swap_meta(SseDeserializer deserializer);
 
   @protected
@@ -1844,6 +1881,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       WalletSettingsInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_white_bird_meta(
+      WhiteBirdMeta self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_zil_swap_meta(
       ZilSwapMeta self, SseSerializer serializer);
 
@@ -2100,6 +2141,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_white_bird_open_order(
+      List<WhiteBirdOpenOrder> self, SseSerializer serializer);
 
   @protected
   void sse_encode_merkelized_psbt(
@@ -2404,6 +2449,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_white_bird_meta(WhiteBirdMeta self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_white_bird_open_order(
+      WhiteBirdOpenOrder self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_white_bird_session_info(
+      WhiteBirdSessionInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_zil_swap_meta(ZilSwapMeta self, SseSerializer serializer);

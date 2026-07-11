@@ -10,6 +10,7 @@ import '../../models/exchange/plunderswap.dart';
 import '../../models/exchange/relay.dart';
 import '../../models/exchange/sunswap.dart';
 import '../../models/exchange/uniswap.dart';
+import '../../models/exchange/whitebird.dart';
 import '../../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 

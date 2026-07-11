@@ -305,6 +305,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangePageTabBuySell => '구매/판매';
 
   @override
+  String get whitebirdOrdersTitle => '미결 주문';
+
+  @override
+  String get whitebirdOrdersEmpty => '미결 WhiteBird 주문이 없습니다';
+
+  @override
+  String get whitebirdOrdersComplete => '결제 완료하기';
+
+  @override
+  String get whitebirdOrdersExpires => '만료';
+
+  @override
+  String get whitebirdOrdersWrongNetwork => '결제를 완료하려면 주문의 네트워크로 전환하세요';
+
+  @override
   String get exchangeSettingsPriceProtection => '가격 보호';
 
   @override

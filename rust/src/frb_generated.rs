@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -2102224516;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 322956590;
 
 // Section: executor
 
@@ -5663,6 +5663,98 @@ fn wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
         },
     )
 }
+fn wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "whitebird_create_session",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_is_testnet = <bool>::sse_decode(&mut deserializer);
+            let api_from_code = <String>::sse_decode(&mut deserializer);
+            let api_to_code = <String>::sse_decode(&mut deserializer);
+            let api_from_amount = <String>::sse_decode(&mut deserializer);
+            let api_destination_crypto_address = <String>::sse_decode(&mut deserializer);
+            let api_external_client_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::exchange::whitebird::whitebird_create_session(
+                            api_is_testnet,
+                            api_from_code,
+                            api_to_code,
+                            api_from_amount,
+                            api_destination_crypto_address,
+                            api_external_client_id,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "whitebird_open_orders",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_is_testnet = <bool>::sse_decode(&mut deserializer);
+            let api_external_client_id = <String>::sse_decode(&mut deserializer);
+            let api_client_id = <Option<String>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::exchange::whitebird::whitebird_open_orders(
+                            api_is_testnet,
+                            api_external_client_id,
+                            api_client_id,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -6393,6 +6485,11 @@ impl SseDecode for crate::models::exchange::ExchangeProvider {
                 let mut var_field0 =
                     <crate::models::exchange::sunswap::SunSwapMeta>::sse_decode(deserializer);
                 return crate::models::exchange::ExchangeProvider::SunSwap(var_field0);
+            }
+            6 => {
+                let mut var_field0 =
+                    <crate::models::exchange::whitebird::WhiteBirdMeta>::sse_decode(deserializer);
+                return crate::models::exchange::ExchangeProvider::WhiteBird(var_field0);
             }
             _ => {
                 unimplemented!("");
@@ -7215,6 +7312,22 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
             ans_.push(<crate::models::wallet::WalletInfo>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder>::sse_decode(
+                    deserializer,
+                ),
+            );
         }
         return ans_;
     }
@@ -8615,6 +8728,79 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
     }
 }
 
+impl SseDecode for crate::models::exchange::whitebird::WhiteBirdMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_common = <crate::models::exchange::ProviderCommon>::sse_decode(deserializer);
+        let mut var_quote =
+            <Option<crate::models::exchange::ProviderQuote>>::sse_decode(deserializer);
+        let mut var_assetCode = <String>::sse_decode(deserializer);
+        let mut var_isFiat = <bool>::sse_decode(deserializer);
+        let mut var_isTestnet = <bool>::sse_decode(deserializer);
+        return crate::models::exchange::whitebird::WhiteBirdMeta {
+            common: var_common,
+            quote: var_quote,
+            asset_code: var_assetCode,
+            is_fiat: var_isFiat,
+            is_testnet: var_isTestnet,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_orderId = <String>::sse_decode(deserializer);
+        let mut var_number = <Option<String>>::sse_decode(deserializer);
+        let mut var_fromAsset = <String>::sse_decode(deserializer);
+        let mut var_toAsset = <String>::sse_decode(deserializer);
+        let mut var_fromAmount = <String>::sse_decode(deserializer);
+        let mut var_toAmount = <String>::sse_decode(deserializer);
+        let mut var_status = <String>::sse_decode(deserializer);
+        let mut var_isSell = <bool>::sse_decode(deserializer);
+        let mut var_depositAddress = <Option<String>>::sse_decode(deserializer);
+        let mut var_cryptoReceived = <bool>::sse_decode(deserializer);
+        let mut var_createdAt = <String>::sse_decode(deserializer);
+        let mut var_expiresAt = <Option<String>>::sse_decode(deserializer);
+        let mut var_clientId = <String>::sse_decode(deserializer);
+        return crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder {
+            order_id: var_orderId,
+            number: var_number,
+            from_asset: var_fromAsset,
+            to_asset: var_toAsset,
+            from_amount: var_fromAmount,
+            to_amount: var_toAmount,
+            status: var_status,
+            is_sell: var_isSell,
+            deposit_address: var_depositAddress,
+            crypto_received: var_cryptoReceived,
+            created_at: var_createdAt,
+            expires_at: var_expiresAt,
+            client_id: var_clientId,
+        };
+    }
+}
+
+impl SseDecode for crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_sessionId = <String>::sse_decode(deserializer);
+        let mut var_sdkUrl = <String>::sse_decode(deserializer);
+        let mut var_fromNetAmount = <String>::sse_decode(deserializer);
+        let mut var_toNetAmount = <String>::sse_decode(deserializer);
+        let mut var_limitMin = <String>::sse_decode(deserializer);
+        let mut var_limitMax = <String>::sse_decode(deserializer);
+        return crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo {
+            session_id: var_sessionId,
+            sdk_url: var_sdkUrl,
+            from_net_amount: var_fromNetAmount,
+            to_net_amount: var_toNetAmount,
+            limit_min: var_limitMin,
+            limit_max: var_limitMax,
+        };
+    }
+}
+
 impl SseDecode for crate::models::exchange::ZilSwapMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9125,22 +9311,34 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        147 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        147 => wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        148 => {
+        148 => wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        149 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        150 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        149 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        151 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        150 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        152 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -9721,6 +9919,9 @@ impl flutter_rust_bridge::IntoDart for crate::models::exchange::ExchangeProvider
             }
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
                 [5.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::exchange::ExchangeProvider::WhiteBird(field0) => {
+                [6.into_dart(), field0.into_into_dart().into_dart()].into_dart()
             }
             _ => {
                 unimplemented!("");
@@ -11139,6 +11340,95 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletSettingsIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::exchange::whitebird::WhiteBirdMeta {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.common.into_into_dart().into_dart(),
+            self.quote.into_into_dart().into_dart(),
+            self.asset_code.into_into_dart().into_dart(),
+            self.is_fiat.into_into_dart().into_dart(),
+            self.is_testnet.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::whitebird::WhiteBirdMeta
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::exchange::whitebird::WhiteBirdMeta>
+    for crate::models::exchange::whitebird::WhiteBirdMeta
+{
+    fn into_into_dart(self) -> crate::models::exchange::whitebird::WhiteBirdMeta {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.order_id.into_into_dart().into_dart(),
+            self.number.into_into_dart().into_dart(),
+            self.from_asset.into_into_dart().into_dart(),
+            self.to_asset.into_into_dart().into_dart(),
+            self.from_amount.into_into_dart().into_dart(),
+            self.to_amount.into_into_dart().into_dart(),
+            self.status.into_into_dart().into_dart(),
+            self.is_sell.into_into_dart().into_dart(),
+            self.deposit_address.into_into_dart().into_dart(),
+            self.crypto_received.into_into_dart().into_dart(),
+            self.created_at.into_into_dart().into_dart(),
+            self.expires_at.into_into_dart().into_dart(),
+            self.client_id.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder,
+    > for crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder
+{
+    fn into_into_dart(self) -> crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.session_id.into_into_dart().into_dart(),
+            self.sdk_url.into_into_dart().into_dart(),
+            self.from_net_amount.into_into_dart().into_dart(),
+            self.to_net_amount.into_into_dart().into_dart(),
+            self.limit_min.into_into_dart().into_dart(),
+            self.limit_max.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo,
+    > for crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo
+{
+    fn into_into_dart(self) -> crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::ZilSwapMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -11569,6 +11859,10 @@ impl SseEncode for crate::models::exchange::ExchangeProvider {
             crate::models::exchange::ExchangeProvider::SunSwap(field0) => {
                 <i32>::sse_encode(5, serializer);
                 <crate::models::exchange::sunswap::SunSwapMeta>::sse_encode(field0, serializer);
+            }
+            crate::models::exchange::ExchangeProvider::WhiteBird(field0) => {
+                <i32>::sse_encode(6, serializer);
+                <crate::models::exchange::whitebird::WhiteBirdMeta>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -12187,6 +12481,18 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder>::sse_encode(
+                item, serializer,
+            );
         }
     }
 }
@@ -13173,6 +13479,48 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);
         <u8>::sse_encode(self.rates_api_options, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::whitebird::WhiteBirdMeta {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::exchange::ProviderCommon>::sse_encode(self.common, serializer);
+        <Option<crate::models::exchange::ProviderQuote>>::sse_encode(self.quote, serializer);
+        <String>::sse_encode(self.asset_code, serializer);
+        <bool>::sse_encode(self.is_fiat, serializer);
+        <bool>::sse_encode(self.is_testnet, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::whitebird::orders::WhiteBirdOpenOrder {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.order_id, serializer);
+        <Option<String>>::sse_encode(self.number, serializer);
+        <String>::sse_encode(self.from_asset, serializer);
+        <String>::sse_encode(self.to_asset, serializer);
+        <String>::sse_encode(self.from_amount, serializer);
+        <String>::sse_encode(self.to_amount, serializer);
+        <String>::sse_encode(self.status, serializer);
+        <bool>::sse_encode(self.is_sell, serializer);
+        <Option<String>>::sse_encode(self.deposit_address, serializer);
+        <bool>::sse_encode(self.crypto_received, serializer);
+        <String>::sse_encode(self.created_at, serializer);
+        <Option<String>>::sse_encode(self.expires_at, serializer);
+        <String>::sse_encode(self.client_id, serializer);
+    }
+}
+
+impl SseEncode for crate::models::exchange::whitebird::orders::WhiteBirdSessionInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.session_id, serializer);
+        <String>::sse_encode(self.sdk_url, serializer);
+        <String>::sse_encode(self.from_net_amount, serializer);
+        <String>::sse_encode(self.to_net_amount, serializer);
+        <String>::sse_encode(self.limit_min, serializer);
+        <String>::sse_encode(self.limit_max, serializer);
     }
 }
 

@@ -12,6 +12,7 @@ import 'api/connections.dart';
 import 'api/exchange.dart';
 import 'api/exchange/bootstrap.dart';
 import 'api/exchange/ledger.dart';
+import 'api/exchange/whitebird.dart';
 import 'api/ledger.dart';
 import 'api/ledger_transport.dart';
 import 'api/local_storage.dart';
@@ -40,6 +41,8 @@ import 'models/exchange/plunderswap.dart';
 import 'models/exchange/relay.dart';
 import 'models/exchange/sunswap.dart';
 import 'models/exchange/uniswap.dart';
+import 'models/exchange/whitebird.dart';
+import 'models/exchange/whitebird/orders.dart';
 import 'models/ftoken.dart';
 import 'models/gas.dart';
 import 'models/keypair.dart';
@@ -117,7 +120,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -2102224516;
+  int get rustContentHash => 322956590;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -639,6 +642,19 @@ abstract class RustLibApi extends BaseApi {
   Future<(List<ExchangeAsset>, bool)>
       crateApiExchangeBootstrapValidateExchangeProviders(
           {required List<ExchangeAsset> assets});
+
+  Future<WhiteBirdSessionInfo> crateApiExchangeWhitebirdWhitebirdCreateSession(
+      {required bool isTestnet,
+      required String fromCode,
+      required String toCode,
+      required String fromAmount,
+      required String destinationCryptoAddress,
+      required String externalClientId});
+
+  Future<List<WhiteBirdOpenOrder>> crateApiExchangeWhitebirdWhitebirdOpenOrders(
+      {required bool isTestnet,
+      required String externalClientId,
+      String? clientId});
 
   Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -4687,6 +4703,86 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  Future<WhiteBirdSessionInfo> crateApiExchangeWhitebirdWhitebirdCreateSession(
+      {required bool isTestnet,
+      required String fromCode,
+      required String toCode,
+      required String fromAmount,
+      required String destinationCryptoAddress,
+      required String externalClientId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_bool(isTestnet, serializer);
+        sse_encode_String(fromCode, serializer);
+        sse_encode_String(toCode, serializer);
+        sse_encode_String(fromAmount, serializer);
+        sse_encode_String(destinationCryptoAddress, serializer);
+        sse_encode_String(externalClientId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 147, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_white_bird_session_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeWhitebirdWhitebirdCreateSessionConstMeta,
+      argValues: [
+        isTestnet,
+        fromCode,
+        toCode,
+        fromAmount,
+        destinationCryptoAddress,
+        externalClientId
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeWhitebirdWhitebirdCreateSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "whitebird_create_session",
+        argNames: [
+          "isTestnet",
+          "fromCode",
+          "toCode",
+          "fromAmount",
+          "destinationCryptoAddress",
+          "externalClientId"
+        ],
+      );
+
+  @override
+  Future<List<WhiteBirdOpenOrder>> crateApiExchangeWhitebirdWhitebirdOpenOrders(
+      {required bool isTestnet,
+      required String externalClientId,
+      String? clientId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_bool(isTestnet, serializer);
+        sse_encode_String(externalClientId, serializer);
+        sse_encode_opt_String(clientId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 148, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_white_bird_open_order,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiExchangeWhitebirdWhitebirdOpenOrdersConstMeta,
+      argValues: [isTestnet, externalClientId, clientId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExchangeWhitebirdWhitebirdOpenOrdersConstMeta =>
+      const TaskConstMeta(
+        debugName: "whitebird_open_orders",
+        argNames: ["isTestnet", "externalClientId", "clientId"],
+      );
+
+  @override
   Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
@@ -4695,7 +4791,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 147, port: port_);
+            funcId: 149, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -4722,7 +4818,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 148, port: port_);
+            funcId: 150, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4748,7 +4844,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(base16, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 149, port: port_);
+            funcId: 151, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4775,7 +4871,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 150, port: port_);
+            funcId: 152, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -5339,6 +5435,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WhiteBirdMeta dco_decode_box_autoadd_white_bird_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_white_bird_meta(raw);
+  }
+
+  @protected
   ZilSwapMeta dco_decode_box_autoadd_zil_swap_meta(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_zil_swap_meta(raw);
@@ -5518,6 +5620,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 5:
         return ExchangeProvider_SunSwap(
           dco_decode_box_autoadd_sun_swap_meta(raw[1]),
+        );
+      case 6:
+        return ExchangeProvider_WhiteBird(
+          dco_decode_box_autoadd_white_bird_meta(raw[1]),
         );
       default:
         throw Exception("unreachable");
@@ -6013,6 +6119,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_wallet_info).toList();
+  }
+
+  @protected
+  List<WhiteBirdOpenOrder> dco_decode_list_white_bird_open_order(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_white_bird_open_order)
+        .toList();
   }
 
   @protected
@@ -7119,6 +7233,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WhiteBirdMeta dco_decode_white_bird_meta(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return WhiteBirdMeta(
+      common: dco_decode_provider_common(arr[0]),
+      quote: dco_decode_opt_box_autoadd_provider_quote(arr[1]),
+      assetCode: dco_decode_String(arr[2]),
+      isFiat: dco_decode_bool(arr[3]),
+      isTestnet: dco_decode_bool(arr[4]),
+    );
+  }
+
+  @protected
+  WhiteBirdOpenOrder dco_decode_white_bird_open_order(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    return WhiteBirdOpenOrder(
+      orderId: dco_decode_String(arr[0]),
+      number: dco_decode_opt_String(arr[1]),
+      fromAsset: dco_decode_String(arr[2]),
+      toAsset: dco_decode_String(arr[3]),
+      fromAmount: dco_decode_String(arr[4]),
+      toAmount: dco_decode_String(arr[5]),
+      status: dco_decode_String(arr[6]),
+      isSell: dco_decode_bool(arr[7]),
+      depositAddress: dco_decode_opt_String(arr[8]),
+      cryptoReceived: dco_decode_bool(arr[9]),
+      createdAt: dco_decode_String(arr[10]),
+      expiresAt: dco_decode_opt_String(arr[11]),
+      clientId: dco_decode_String(arr[12]),
+    );
+  }
+
+  @protected
+  WhiteBirdSessionInfo dco_decode_white_bird_session_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return WhiteBirdSessionInfo(
+      sessionId: dco_decode_String(arr[0]),
+      sdkUrl: dco_decode_String(arr[1]),
+      fromNetAmount: dco_decode_String(arr[2]),
+      toNetAmount: dco_decode_String(arr[3]),
+      limitMin: dco_decode_String(arr[4]),
+      limitMax: dco_decode_String(arr[5]),
+    );
+  }
+
+  @protected
   ZilSwapMeta dco_decode_zil_swap_meta(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -7689,6 +7857,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WhiteBirdMeta sse_decode_box_autoadd_white_bird_meta(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_white_bird_meta(deserializer));
+  }
+
+  @protected
   ZilSwapMeta sse_decode_box_autoadd_zil_swap_meta(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7865,6 +8040,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 5:
         var var_field0 = sse_decode_box_autoadd_sun_swap_meta(deserializer);
         return ExchangeProvider_SunSwap(var_field0);
+      case 6:
+        var var_field0 = sse_decode_box_autoadd_white_bird_meta(deserializer);
+        return ExchangeProvider_WhiteBird(var_field0);
       default:
         throw UnimplementedError('');
     }
@@ -8592,6 +8770,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <WalletInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_wallet_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<WhiteBirdOpenOrder> sse_decode_list_white_bird_open_order(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WhiteBirdOpenOrder>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_white_bird_open_order(deserializer));
     }
     return ans_;
   }
@@ -9816,6 +10007,74 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WhiteBirdMeta sse_decode_white_bird_meta(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_common = sse_decode_provider_common(deserializer);
+    var var_quote = sse_decode_opt_box_autoadd_provider_quote(deserializer);
+    var var_assetCode = sse_decode_String(deserializer);
+    var var_isFiat = sse_decode_bool(deserializer);
+    var var_isTestnet = sse_decode_bool(deserializer);
+    return WhiteBirdMeta(
+        common: var_common,
+        quote: var_quote,
+        assetCode: var_assetCode,
+        isFiat: var_isFiat,
+        isTestnet: var_isTestnet);
+  }
+
+  @protected
+  WhiteBirdOpenOrder sse_decode_white_bird_open_order(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_orderId = sse_decode_String(deserializer);
+    var var_number = sse_decode_opt_String(deserializer);
+    var var_fromAsset = sse_decode_String(deserializer);
+    var var_toAsset = sse_decode_String(deserializer);
+    var var_fromAmount = sse_decode_String(deserializer);
+    var var_toAmount = sse_decode_String(deserializer);
+    var var_status = sse_decode_String(deserializer);
+    var var_isSell = sse_decode_bool(deserializer);
+    var var_depositAddress = sse_decode_opt_String(deserializer);
+    var var_cryptoReceived = sse_decode_bool(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_expiresAt = sse_decode_opt_String(deserializer);
+    var var_clientId = sse_decode_String(deserializer);
+    return WhiteBirdOpenOrder(
+        orderId: var_orderId,
+        number: var_number,
+        fromAsset: var_fromAsset,
+        toAsset: var_toAsset,
+        fromAmount: var_fromAmount,
+        toAmount: var_toAmount,
+        status: var_status,
+        isSell: var_isSell,
+        depositAddress: var_depositAddress,
+        cryptoReceived: var_cryptoReceived,
+        createdAt: var_createdAt,
+        expiresAt: var_expiresAt,
+        clientId: var_clientId);
+  }
+
+  @protected
+  WhiteBirdSessionInfo sse_decode_white_bird_session_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sessionId = sse_decode_String(deserializer);
+    var var_sdkUrl = sse_decode_String(deserializer);
+    var var_fromNetAmount = sse_decode_String(deserializer);
+    var var_toNetAmount = sse_decode_String(deserializer);
+    var var_limitMin = sse_decode_String(deserializer);
+    var var_limitMax = sse_decode_String(deserializer);
+    return WhiteBirdSessionInfo(
+        sessionId: var_sessionId,
+        sdkUrl: var_sdkUrl,
+        fromNetAmount: var_fromNetAmount,
+        toNetAmount: var_toNetAmount,
+        limitMin: var_limitMin,
+        limitMax: var_limitMax);
+  }
+
+  @protected
   ZilSwapMeta sse_decode_zil_swap_meta(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_common = sse_decode_provider_common(deserializer);
@@ -10346,6 +10605,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_white_bird_meta(
+      WhiteBirdMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_white_bird_meta(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_zil_swap_meta(
       ZilSwapMeta self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -10475,6 +10741,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case ExchangeProvider_SunSwap(field0: final field0):
         sse_encode_i_32(5, serializer);
         sse_encode_box_autoadd_sun_swap_meta(field0, serializer);
+      case ExchangeProvider_WhiteBird(field0: final field0):
+        sse_encode_i_32(6, serializer);
+        sse_encode_box_autoadd_white_bird_meta(field0, serializer);
     }
   }
 
@@ -11036,6 +11305,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_wallet_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_white_bird_open_order(
+      List<WhiteBirdOpenOrder> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_white_bird_open_order(item, serializer);
     }
   }
 
@@ -12004,6 +12283,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
     sse_encode_u_8(self.ratesApiOptions, serializer);
+  }
+
+  @protected
+  void sse_encode_white_bird_meta(
+      WhiteBirdMeta self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_provider_common(self.common, serializer);
+    sse_encode_opt_box_autoadd_provider_quote(self.quote, serializer);
+    sse_encode_String(self.assetCode, serializer);
+    sse_encode_bool(self.isFiat, serializer);
+    sse_encode_bool(self.isTestnet, serializer);
+  }
+
+  @protected
+  void sse_encode_white_bird_open_order(
+      WhiteBirdOpenOrder self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.orderId, serializer);
+    sse_encode_opt_String(self.number, serializer);
+    sse_encode_String(self.fromAsset, serializer);
+    sse_encode_String(self.toAsset, serializer);
+    sse_encode_String(self.fromAmount, serializer);
+    sse_encode_String(self.toAmount, serializer);
+    sse_encode_String(self.status, serializer);
+    sse_encode_bool(self.isSell, serializer);
+    sse_encode_opt_String(self.depositAddress, serializer);
+    sse_encode_bool(self.cryptoReceived, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_opt_String(self.expiresAt, serializer);
+    sse_encode_String(self.clientId, serializer);
+  }
+
+  @protected
+  void sse_encode_white_bird_session_info(
+      WhiteBirdSessionInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sessionId, serializer);
+    sse_encode_String(self.sdkUrl, serializer);
+    sse_encode_String(self.fromNetAmount, serializer);
+    sse_encode_String(self.toNetAmount, serializer);
+    sse_encode_String(self.limitMin, serializer);
+    sse_encode_String(self.limitMax, serializer);
   }
 
   @protected

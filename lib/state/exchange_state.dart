@@ -10,6 +10,7 @@ import 'package:bearby/src/rust/models/exchange/plunderswap.dart';
 import 'package:bearby/src/rust/models/exchange/relay.dart';
 import 'package:bearby/src/rust/models/exchange/sunswap.dart';
 import 'package:bearby/src/rust/models/exchange/uniswap.dart';
+import 'package:bearby/src/rust/models/exchange/whitebird.dart';
 
 extension ExchangeProviderMeta on ExchangeProvider {
   ProviderCommon get common => map(
@@ -19,6 +20,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         plunderSwap: (v) => v.field0.common,
         zilSwap: (v) => v.field0.common,
         sunSwap: (v) => v.field0.common,
+        whiteBird: (v) => v.field0.common,
       );
 
   ProviderQuote? get quote => map(
@@ -28,6 +30,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         plunderSwap: (v) => v.field0.quote,
         zilSwap: (v) => v.field0.quote,
         sunSwap: (v) => v.field0.quote,
+        whiteBird: (v) => v.field0.quote,
       );
 
   int get defaultSlippageBps => map(
@@ -37,6 +40,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         plunderSwap: (v) => v.field0.cfg.defaultSlippageBps,
         zilSwap: (_) => 50,
         sunSwap: (_) => 50,
+        whiteBird: (_) => 0,
       );
 
   bool get supportsPriceProtection => map(
@@ -46,6 +50,7 @@ extension ExchangeProviderMeta on ExchangeProvider {
         plunderSwap: (v) => v.field0.cfg.supportsPriceProtection,
         zilSwap: (_) => false,
         sunSwap: (_) => false,
+        whiteBird: (_) => false,
       );
 
   /// Whether the user can route the swap to an arbitrary recipient address.
@@ -60,7 +65,11 @@ extension ExchangeProviderMeta on ExchangeProvider {
         plunderSwap: (_) => false,
         zilSwap: (_) => false,
         sunSwap: (_) => false,
+        whiteBird: (_) => false,
       );
+
+  /// WhiteBird meta when this provider is the fiat↔crypto ramp.
+  WhiteBirdMeta? get whiteBirdMeta => whenOrNull(whiteBird: (v) => v);
 }
 
 /// Display lifecycle of the current quote, distinct from [loadingQuote] (which
@@ -124,6 +133,15 @@ class ExchangeState extends ChangeNotifier {
     return _getAssets.where((asset) {
       if (fromKey != null && _tokenKey(asset.token) == fromKey) return false;
       if (from == null) return true;
+      // Fiat pairs only cross fiat↔crypto through WhiteBird — never fiat↔fiat
+      // and never fiat via a DEX/bridge route.
+      final fromFiat = _isFiat(from);
+      final assetFiat = _isFiat(asset);
+      if (fromFiat || assetFiat) {
+        return fromFiat != assetFiat &&
+            _hasWhiteBird(from) &&
+            _hasWhiteBird(asset);
+      }
       if (asset.token.chainHash == from.token.chainHash) return true;
       return _hasRelay(from) && _hasRelay(asset);
     }).toList();
@@ -131,6 +149,12 @@ class ExchangeState extends ChangeNotifier {
 
   static bool _hasRelay(ExchangeAsset asset) =>
       asset.providers.any((p) => p.whenOrNull(relay: (_) => true) ?? false);
+
+  static bool _hasWhiteBird(ExchangeAsset asset) =>
+      asset.providers.any((p) => p.whiteBirdMeta != null);
+
+  static bool _isFiat(ExchangeAsset asset) =>
+      asset.providers.any((p) => p.whiteBirdMeta?.isFiat ?? false);
 
   Future<void> bootstrap({
     required BigInt walletIndex,
@@ -404,6 +428,13 @@ class ExchangeState extends ChangeNotifier {
       sunSwap: (v) => ExchangeProvider.sunSwap(SunSwapMeta(
         common: v.field0.common,
         cfg: v.field0.cfg,
+        quote: null,
+      )),
+      whiteBird: (v) => ExchangeProvider.whiteBird(WhiteBirdMeta(
+        common: v.field0.common,
+        assetCode: v.field0.assetCode,
+        isFiat: v.field0.isFiat,
+        isTestnet: v.field0.isTestnet,
         quote: null,
       )),
     );

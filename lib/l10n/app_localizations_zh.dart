@@ -305,6 +305,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangePageTabBuySell => '买卖';
 
   @override
+  String get whitebirdOrdersTitle => '未完成订单';
+
+  @override
+  String get whitebirdOrdersEmpty => '没有未完成的WhiteBird订单';
+
+  @override
+  String get whitebirdOrdersComplete => '完成支付';
+
+  @override
+  String get whitebirdOrdersExpires => '到期';
+
+  @override
+  String get whitebirdOrdersWrongNetwork => '请切换到订单所在网络以完成支付';
+
+  @override
   String get exchangeSettingsPriceProtection => '价格保护';
 
   @override

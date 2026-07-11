@@ -5,6 +5,7 @@ pub mod relay;
 pub mod sunswap;
 pub mod uniswap;
 pub mod univ_router;
+pub mod whitebird;
 pub mod zilswap;
 
 use std::borrow::Cow;
@@ -25,6 +26,7 @@ pub use relay::RelayMeta;
 pub use sunswap::SunSwapMeta;
 pub use uniswap::UniswapMeta;
 pub use univ_router::{PreparedSwap, RouterConfig};
+pub use whitebird::WhiteBirdMeta;
 
 /// Unified chain + account context shared by every provider variant.
 /// Participates in Hash/Eq/Ord and forms the provider identity key.
@@ -107,6 +109,7 @@ identity_from_common!(PancakeMeta);
 identity_from_common!(PlunderMeta);
 identity_from_common!(ZilSwapMeta);
 identity_from_common!(SunSwapMeta);
+identity_from_common!(WhiteBirdMeta);
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Hash, Clone)]
 pub enum ExchangeProvider {
@@ -116,6 +119,7 @@ pub enum ExchangeProvider {
     PlunderSwap(PlunderMeta),
     ZilSwap(ZilSwapMeta),
     SunSwap(SunSwapMeta),
+    WhiteBird(WhiteBirdMeta),
 }
 
 impl ExchangeProvider {
@@ -135,6 +139,7 @@ impl ExchangeProvider {
             Self::PlunderSwap(m) => &m.common,
             Self::ZilSwap(m) => &m.common,
             Self::SunSwap(m) => &m.common,
+            Self::WhiteBird(m) => &m.common,
         }
     }
 
@@ -147,6 +152,7 @@ impl ExchangeProvider {
             Self::PlunderSwap(m) => m.quote.as_ref(),
             Self::ZilSwap(m) => m.quote.as_ref(),
             Self::SunSwap(m) => m.quote.as_ref(),
+            Self::WhiteBird(m) => m.quote.as_ref(),
         }
     }
 
@@ -177,6 +183,10 @@ impl ExchangeProvider {
                 m.quote = quote;
                 Self::SunSwap(m)
             }
+            Self::WhiteBird(mut m) => {
+                m.quote = quote;
+                Self::WhiteBird(m)
+            }
         }
     }
 
@@ -199,6 +209,7 @@ impl ExchangeProvider {
             Self::SunSwap(m) => m.cfg.default_slippage_bps,
             Self::Relay(m) => m.cfg.default_slippage_bps,
             Self::ZilSwap(_) => 50,
+            Self::WhiteBird(_) => 0,
         }
     }
 
@@ -211,6 +222,7 @@ impl ExchangeProvider {
             Self::SunSwap(m) => m.cfg.supports_price_protection,
             Self::Relay(m) => m.cfg.supports_price_protection,
             Self::ZilSwap(_) => false,
+            Self::WhiteBird(_) => false,
         }
     }
 
@@ -233,6 +245,8 @@ impl ExchangeProvider {
                 addr_type == 0 && slip44 == ZILLIQA && zilswap::is_supported_chain(chain_id)
             }
             Self::SunSwap(_) => addr_type == 4 && slip44 == TRON,
+            // Attachment is decided at bootstrap via whitebird::assets::map_token.
+            Self::WhiteBird(_) => true,
         }
     }
 
@@ -290,7 +304,8 @@ impl ExchangeProvider {
             | Self::PancakeSwap(_)
             | Self::PlunderSwap(_)
             | Self::ZilSwap(_)
-            | Self::SunSwap(_) => Cow::Borrowed(self.common().account_addr.as_str()),
+            | Self::SunSwap(_)
+            | Self::WhiteBird(_) => Cow::Borrowed(self.common().account_addr.as_str()),
         };
 
         match self {
@@ -322,6 +337,7 @@ impl ExchangeProvider {
             Self::SunSwap(meta) => {
                 sunswap::sunswap_quote_info(meta, from, to, from_asset, to_asset, amount).await
             }
+            Self::WhiteBird(meta) => whitebird::quote::quote_pair(meta, from, to, amount).await,
         }
     }
 
@@ -383,6 +399,8 @@ impl ExchangeProvider {
             Self::SunSwap(meta) => {
                 sunswap::sunswap_check_approval(meta, from, to, amount, approve_title, icon).await
             }
+            // Fiat ramp: nothing to approve on-chain.
+            Self::WhiteBird(_) => Ok(None),
         }
     }
 
@@ -427,6 +445,8 @@ impl ExchangeProvider {
             Self::SunSwap(meta) => {
                 sunswap::sunswap_prepare_swap(meta, from, to, amount, slippage_bps).await
             }
+            // Orders are created inside the WhiteBird SDK; Dart branches before this.
+            Self::WhiteBird(_) => Err("WhiteBird orders are executed via the SDK flow".to_owned()),
         }
     }
 
@@ -490,6 +510,8 @@ impl ExchangeProvider {
                 )
                 .await
             }
+            // Orders are created inside the WhiteBird SDK; Dart branches before this.
+            Self::WhiteBird(_) => Err("WhiteBird orders are executed via the SDK flow".to_owned()),
         }
     }
 
@@ -498,7 +520,11 @@ impl ExchangeProvider {
         match self {
             Self::Uniswap(m) => Some(m.resolve()),
             Self::PancakeSwap(m) => Some(m.resolve()),
-            Self::Relay(_) | Self::PlunderSwap(_) | Self::ZilSwap(_) | Self::SunSwap(_) => None,
+            Self::Relay(_)
+            | Self::PlunderSwap(_)
+            | Self::ZilSwap(_)
+            | Self::SunSwap(_)
+            | Self::WhiteBird(_) => None,
         }
     }
 
@@ -512,7 +538,9 @@ impl ExchangeProvider {
             Self::PlunderSwap(_) => Some(EagerGate::Plunder),
             Self::SunSwap(_) => Some(EagerGate::Sun),
             Self::Relay(_) => Some(EagerGate::Relay),
-            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) => None,
+            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) | Self::WhiteBird(_) => {
+                None
+            }
         }
     }
 }
@@ -544,7 +572,8 @@ impl ExchangeAsset {
             | ExchangeProvider::PancakeSwap(_)
             | ExchangeProvider::PlunderSwap(_)
             | ExchangeProvider::ZilSwap(_)
-            | ExchangeProvider::SunSwap(_) => None,
+            | ExchangeProvider::SunSwap(_)
+            | ExchangeProvider::WhiteBird(_) => None,
         })
     }
 }

@@ -671,6 +671,36 @@ abstract class AppLocalizations {
   /// **'Buy/Sell'**
   String get exchangePageTabBuySell;
 
+  /// No description provided for @whitebirdOrdersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open orders'**
+  String get whitebirdOrdersTitle;
+
+  /// No description provided for @whitebirdOrdersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No open WhiteBird orders'**
+  String get whitebirdOrdersEmpty;
+
+  /// No description provided for @whitebirdOrdersComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment'**
+  String get whitebirdOrdersComplete;
+
+  /// No description provided for @whitebirdOrdersExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'expires'**
+  String get whitebirdOrdersExpires;
+
+  /// No description provided for @whitebirdOrdersWrongNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to the order\'s network to complete this payment'**
+  String get whitebirdOrdersWrongNetwork;
+
   /// No description provided for @exchangeSettingsPriceProtection.
   ///
   /// In en, this message translates to:

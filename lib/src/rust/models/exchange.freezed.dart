@@ -62,6 +62,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult Function(ExchangeProvider_PlunderSwap value)? plunderSwap,
     TResult Function(ExchangeProvider_ZilSwap value)? zilSwap,
     TResult Function(ExchangeProvider_SunSwap value)? sunSwap,
+    TResult Function(ExchangeProvider_WhiteBird value)? whiteBird,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -78,6 +79,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that);
+      case ExchangeProvider_WhiteBird() when whiteBird != null:
+        return whiteBird(_that);
       case _:
         return orElse();
     }
@@ -104,6 +107,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     required TResult Function(ExchangeProvider_PlunderSwap value) plunderSwap,
     required TResult Function(ExchangeProvider_ZilSwap value) zilSwap,
     required TResult Function(ExchangeProvider_SunSwap value) sunSwap,
+    required TResult Function(ExchangeProvider_WhiteBird value) whiteBird,
   }) {
     final _that = this;
     switch (_that) {
@@ -119,6 +123,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that);
       case ExchangeProvider_SunSwap():
         return sunSwap(_that);
+      case ExchangeProvider_WhiteBird():
+        return whiteBird(_that);
     }
   }
 
@@ -142,6 +148,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult? Function(ExchangeProvider_PlunderSwap value)? plunderSwap,
     TResult? Function(ExchangeProvider_ZilSwap value)? zilSwap,
     TResult? Function(ExchangeProvider_SunSwap value)? sunSwap,
+    TResult? Function(ExchangeProvider_WhiteBird value)? whiteBird,
   }) {
     final _that = this;
     switch (_that) {
@@ -157,6 +164,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that);
+      case ExchangeProvider_WhiteBird() when whiteBird != null:
+        return whiteBird(_that);
       case _:
         return null;
     }
@@ -182,6 +191,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult Function(PlunderMeta field0)? plunderSwap,
     TResult Function(ZilSwapMeta field0)? zilSwap,
     TResult Function(SunSwapMeta field0)? sunSwap,
+    TResult Function(WhiteBirdMeta field0)? whiteBird,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -198,6 +208,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that.field0);
+      case ExchangeProvider_WhiteBird() when whiteBird != null:
+        return whiteBird(_that.field0);
       case _:
         return orElse();
     }
@@ -224,6 +236,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     required TResult Function(PlunderMeta field0) plunderSwap,
     required TResult Function(ZilSwapMeta field0) zilSwap,
     required TResult Function(SunSwapMeta field0) sunSwap,
+    required TResult Function(WhiteBirdMeta field0) whiteBird,
   }) {
     final _that = this;
     switch (_that) {
@@ -239,6 +252,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap():
         return sunSwap(_that.field0);
+      case ExchangeProvider_WhiteBird():
+        return whiteBird(_that.field0);
     }
   }
 
@@ -262,6 +277,7 @@ extension ExchangeProviderPatterns on ExchangeProvider {
     TResult? Function(PlunderMeta field0)? plunderSwap,
     TResult? Function(ZilSwapMeta field0)? zilSwap,
     TResult? Function(SunSwapMeta field0)? sunSwap,
+    TResult? Function(WhiteBirdMeta field0)? whiteBird,
   }) {
     final _that = this;
     switch (_that) {
@@ -277,6 +293,8 @@ extension ExchangeProviderPatterns on ExchangeProvider {
         return zilSwap(_that.field0);
       case ExchangeProvider_SunSwap() when sunSwap != null:
         return sunSwap(_that.field0);
+      case ExchangeProvider_WhiteBird() when whiteBird != null:
+        return whiteBird(_that.field0);
       case _:
         return null;
     }
@@ -677,6 +695,73 @@ class _$ExchangeProvider_SunSwapCopyWithImpl<$Res>
           ? _self.field0
           : field0 // ignore: cast_nullable_to_non_nullable
               as SunSwapMeta,
+    ));
+  }
+}
+
+/// @nodoc
+
+class ExchangeProvider_WhiteBird extends ExchangeProvider {
+  const ExchangeProvider_WhiteBird(this.field0) : super._();
+
+  @override
+  final WhiteBirdMeta field0;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ExchangeProvider_WhiteBirdCopyWith<ExchangeProvider_WhiteBird>
+      get copyWith =>
+          _$ExchangeProvider_WhiteBirdCopyWithImpl<ExchangeProvider_WhiteBird>(
+              this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ExchangeProvider_WhiteBird &&
+            (identical(other.field0, field0) || other.field0 == field0));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, field0);
+
+  @override
+  String toString() {
+    return 'ExchangeProvider.whiteBird(field0: $field0)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ExchangeProvider_WhiteBirdCopyWith<$Res>
+    implements $ExchangeProviderCopyWith<$Res> {
+  factory $ExchangeProvider_WhiteBirdCopyWith(ExchangeProvider_WhiteBird value,
+          $Res Function(ExchangeProvider_WhiteBird) _then) =
+      _$ExchangeProvider_WhiteBirdCopyWithImpl;
+  @useResult
+  $Res call({WhiteBirdMeta field0});
+}
+
+/// @nodoc
+class _$ExchangeProvider_WhiteBirdCopyWithImpl<$Res>
+    implements $ExchangeProvider_WhiteBirdCopyWith<$Res> {
+  _$ExchangeProvider_WhiteBirdCopyWithImpl(this._self, this._then);
+
+  final ExchangeProvider_WhiteBird _self;
+  final $Res Function(ExchangeProvider_WhiteBird) _then;
+
+  /// Create a copy of ExchangeProvider
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? field0 = null,
+  }) {
+    return _then(ExchangeProvider_WhiteBird(
+      null == field0
+          ? _self.field0
+          : field0 // ignore: cast_nullable_to_non_nullable
+              as WhiteBirdMeta,
     ));
   }
 }
