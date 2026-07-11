@@ -345,14 +345,11 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     try {
       final confirmed = await handler(deposit);
       debugPrint('[WhiteBird] deposit transfer confirmed=$confirmed');
-      if (confirmed) {
-        await _cleanupSdk();
-        _pop(true);
-      } else {
-        // User dismissed the confirm modal — the SDK deposit screen stays up
-        // so they can still pay manually or exit; the order stays PROCESSING.
-        _handledOrder = false;
-      }
+      // The SDK stays open either way: it tracks the deposit and shows the
+      // order progress live; `onOrderCompleted` closes the page when
+      // WhiteBird finishes. The offer is one-shot — a dismissed confirm is
+      // not re-popped by the poll (the user can still pay via the QR).
+      _depositPollTimer?.cancel();
     } catch (e, st) {
       // The JS-bridge swallows exceptions — surface the failure explicitly
       // (e.g. createTokenTransfer rejecting on balance/fee estimation).
@@ -387,11 +384,10 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
     debugPrint('[WhiteBird] order completed '
         'id=${_stringField(map, const ['orderId'])} '
         'status=${_stringField(map, const ['status'])}');
-    // Buy flow finishes here; sells already popped after the transfer confirm.
-    if (widget.onDepositReady == null) {
-      await _cleanupSdk();
-      _pop(true);
-    }
+    // Both flows finish here: buys after the card payment, sells after
+    // WhiteBird confirms the deposit the user watched inside the SDK.
+    await _cleanupSdk();
+    _pop(true);
   }
 
   void _registerHandlers(InAppWebViewController controller) {
