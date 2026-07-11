@@ -59,6 +59,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   bool _firstFrameDone = false;
   bool _wasVisible = false;
   List<WhiteBirdOpenOrder> _openOrders = const [];
+  bool _whiteBirdFlowActive = false;
 
   @override
   void initState() {
@@ -328,6 +329,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     ExchangeAsset to,
     WhiteBirdMeta fromMeta,
   ) async {
+    // The flow awaits network before any UI blocks taps — a second press
+    // would push a second SDK page (and a second transfer confirm).
+    if (_whiteBirdFlowActive) return;
+    _whiteBirdFlowActive = true;
     try {
       final toMeta =
           to.providers.map((p) => p.whiteBirdMeta).nonNulls.firstOrNull;
@@ -407,6 +412,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       debugPrint('[ExchangePage] whitebird swap failed: $e');
       if (mounted) _showError(e.toString());
     } finally {
+      _whiteBirdFlowActive = false;
       _btnController.reset();
     }
   }

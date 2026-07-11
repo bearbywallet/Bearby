@@ -151,6 +151,9 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
 
   Future<void> _pollForDeposit() async {
     if (_handledOrder || _popped || !mounted) return;
+    // Only the page the user actually sees may claim the deposit — a buried
+    // duplicate route must never open a second transfer confirm.
+    if (ModalRoute.of(context)?.isCurrent != true) return;
     try {
       final orders = await _fetchOrders();
       final awaiting = orders
@@ -337,6 +340,10 @@ class _WhiteBirdSdkPageState extends State<WhiteBirdSdkPage> with StatusBarMixin
         _popped) {
       return;
     }
+    // A buried duplicate route must never claim the deposit; on the visible
+    // page this is always true (the _handledOrder flag is set before the
+    // confirm sheet covers the route).
+    if (ModalRoute.of(context)?.isCurrent != true) return;
     _handledOrder = true;
 
     try {
