@@ -587,10 +587,6 @@
   "@addAccountPageBip39Index": {
     "description": "Label for the BIP39 index counter on the Add Account page"
   },
-  "addAccountPageUseBiometrics": "Use Biometrics",
-  "@addAccountPageUseBiometrics": {
-    "description": "Label for the biometrics option on the Add Account page"
-  },
   "addAccountPagePasswordHint": "Password",
   "@addAccountPagePasswordHint": {
     "description": "Hint text for the password input field on the Add Account page"
@@ -627,6 +623,14 @@
     "placeholders": {
       "error": {}
     }
+  },
+  "addAccountPageTitle": "Add Account",
+  "@addAccountPageTitle": {
+    "description": "Title for the Add Account page"
+  },
+  "addAccountPageCreateButton": "Create",
+  "@addAccountPageCreateButton": {
+    "description": "Text for the create button on the Add Account page"
   },
   "addressBookPageTitle": "Address Book",
   "@addressBookPageTitle": {

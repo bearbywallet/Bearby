@@ -1,9 +1,10 @@
-import 'package:bearby/components/app_icon.dart';
 import 'dart:async';
 
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/counter.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/glass_message.dart';
+import 'package:bearby/components/load_button.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -31,6 +32,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _accountNameInputKey = GlobalKey<SmartInputState>();
+  final _btnController = RoundedLoadingButtonController();
 
   bool _isCreating = false;
   bool _zilliqaLegacy = false;
@@ -106,6 +108,14 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
         appState.chain?.slip44 == appState.wallet?.slip44;
   }
 
+  void _clearError() {
+    if (_errorMessage != null) {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
+  }
+
   Future<void> _createAccount(AppState appState) async {
     final l10n = AppLocalizations.of(context)!;
     BigInt walletIndex = appState.selectedWalletIndex;
@@ -129,6 +139,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       return;
     }
 
+    _btnController.start();
     setState(() {
       _isCreating = true;
       _errorMessage = null;
@@ -165,6 +176,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
             '[add-account] sync_missing_account index=$_bip39Index',
           );
         }
+        _btnController.reset();
         setState(() {
           _errorMessage = l10n.addAccountPageCreateFailed(
               'account $_bip39Index not visible after sync');
@@ -190,6 +202,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
           'bip39Index=$_bip39Index error=$e\n$st',
         );
       }
+      _btnController.reset();
       setState(() {
         _errorMessage = l10n.addAccountPageCreateFailed(e);
         _isCreating = false;
@@ -203,6 +216,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
+    final showPassword = appState.wallet?.authType == "none";
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -217,228 +231,174 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: CustomAppBar(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: l10n.addAccountPageTitle,
                     onBackPressed: () => context.pop(),
-                    actionIcon: _isCreating
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.textPrimary,
-                              ),
-                            ),
-                          )
-                        : AppIconView(
-                            icon: AppIcon.plus,
-                            size: 24,
-                            color: theme.textPrimary,
-                          ),
-                    onActionPressed: () => _createAccount(appState),
                   ),
-                ),
-                Expanded(
-                  child: ScrollConfiguration(
-                    behavior: const ScrollBehavior().copyWith(
+                  Expanded(
+                    child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      overscroll: true,
-                    ),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: adaptivePadding),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight,
-                              ),
-                              child: Center(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SmartInput(
-                                      key: _accountNameInputKey,
-                                      controller: _accountNameController,
-                                      hint: l10n.addAccountPageNameHint,
-                                      fontSize: 18,
-                                      height: 56,
-                                      disabled: _isCreating,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
-                                      focusedBorderColor: theme.primaryPurple,
-                                    ),
-                                    SizedBox(height: adaptivePadding),
-                                    Container(
-                                      padding: EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: theme.cardBackground,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                            color: theme.secondaryPurple),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            l10n.addAccountPageBip39Index,
-                                            style: theme.bodyLarge.copyWith(
-                                              color: theme.textPrimary,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8),
-                                          Counter(
-                                            initialValue: _bip39Index,
-                                            minValue: 0,
-                                            maxValue: 2147483647,
-                                            disabled: _isCreating,
-                                            iconColor: theme.primaryPurple,
-                                            numberStyle:
-                                                theme.bodyLarge.copyWith(
-                                              color: theme.textPrimary,
-                                            ),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _bip39Index = value;
-                                              });
-                                              _setAutoAccountName(appState);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    if (_useBiometrics) ...[
-                                      SizedBox(height: adaptivePadding),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 12),
-                                        decoration: BoxDecoration(
-                                          color: theme.cardBackground,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          border: Border.all(
-                                              color: theme.secondaryPurple),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            AppIconView(
-                                              icon: AppIcon.biometric,
-                                              size: 24,
-                                              color: theme.textPrimary,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: Text(
-                                                l10n.addAccountPageUseBiometrics,
-                                                style: theme.bodyLarge.copyWith(
-                                                  color: theme.textPrimary,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                    if (appState.wallet!.authType ==
-                                        "none") ...[
-                                      SizedBox(height: adaptivePadding),
-                                      SmartInput(
-                                        key: _passwordInputKey,
-                                        controller: _passwordController,
-                                        hint: l10n.addAccountPagePasswordHint,
-                                        fontSize: 18,
-                                        height: 56,
-                                        disabled: _isCreating,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        focusedBorderColor: theme.primaryPurple,
-                                        obscureText: _obscurePassword,
-                                        rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
-                                        onRightIconTap: () {
-                                          setState(() {
-                                            _obscurePassword =
-                                                !_obscurePassword;
-                                          });
-                                        },
-                                        onSubmitted: (_) =>
-                                            _createAccount(appState),
-                                      ),
-                                    ],
-                                    SizedBox(height: adaptivePadding),
-                                    if (_isZIL(appState))
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 4),
-                                        child: Row(
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/scilla.svg',
-                                              width: 24,
-                                              height: 24,
-                                              colorFilter: ColorFilter.mode(
-                                                theme.textPrimary,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: Text(
-                                                l10n.addAccountPageZilliqaLegacy,
-                                                style: theme.bodyLarge.copyWith(
-                                                  color: theme.textPrimary,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                            Switch(
-                                              value: _zilliqaLegacy,
-                                              onChanged: _isCreating
-                                                  ? null
-                                                  : (bool value) async {
-                                                      setState(() {
-                                                        _zilliqaLegacy = value;
-                                                      });
-                                                    },
-                                              activeThumbColor:
-                                                  theme.primaryPurple,
-                                              activeTrackColor: theme
-                                                  .primaryPurple
-                                                  .withValues(alpha: 0.5),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    if (_errorMessage != null) ...[
-                                      SizedBox(height: adaptivePadding),
-                                      GlassMessage(
-                                        message: _errorMessage!,
-                                        type: GlassMessageType.error,
-                                        onDismiss: () =>
-                                            setState(() => _errorMessage = null),
-                                      ),
-                                    ],
-                                    SizedBox(height: adaptivePadding),
-                                  ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            key: _accountNameInputKey,
+                            controller: _accountNameController,
+                            hint: l10n.addAccountPageNameHint,
+                            fontSize: 18,
+                            height: 56,
+                            disabled: _isCreating,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            onChanged: (_) => _clearError(),
+                          ),
+                          if (showPassword) ...[
+                            SizedBox(height: adaptivePadding),
+                            SmartInput(
+                              key: _passwordInputKey,
+                              controller: _passwordController,
+                              hint: l10n.addAccountPagePasswordHint,
+                              fontSize: 18,
+                              height: 56,
+                              disabled: _isCreating,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              focusedBorderColor: theme.primaryPurple,
+                              obscureText: _obscurePassword,
+                              rightIcon: AppIconState.passwordVisibility(
+                                  obscured: _obscurePassword),
+                              onRightIconTap: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                              onChanged: (_) => _clearError(),
+                              onSubmitted: (_) => _createAccount(appState),
+                            ),
+                          ],
+                          SizedBox(height: adaptivePadding),
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: theme.secondaryPurple),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.addAccountPageBip39Index,
+                                  style: theme.bodyLarge.copyWith(
+                                    color: theme.textPrimary,
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: 8),
+                                Counter(
+                                  initialValue: _bip39Index,
+                                  minValue: 0,
+                                  maxValue: 2147483647,
+                                  disabled: _isCreating,
+                                  iconColor: theme.primaryPurple,
+                                  numberStyle: theme.bodyLarge.copyWith(
+                                    color: theme.textPrimary,
+                                  ),
+                                  errorText: _exists(appState)
+                                      ? l10n.addAccountPageIndexExists(
+                                          _bip39Index)
+                                      : null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _bip39Index = value;
+                                      _errorMessage = null;
+                                    });
+                                    _setAutoAccountName(appState);
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
+                          if (_isZIL(appState)) ...[
+                            SizedBox(height: adaptivePadding),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/scilla.svg',
+                                    width: 24,
+                                    height: 24,
+                                    colorFilter: ColorFilter.mode(
+                                      theme.textPrimary,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.addAccountPageZilliqaLegacy,
+                                      style: theme.bodyLarge.copyWith(
+                                        color: theme.textPrimary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _zilliqaLegacy,
+                                    onChanged: _isCreating
+                                        ? null
+                                        : (bool value) async {
+                                            setState(() {
+                                              _zilliqaLegacy = value;
+                                            });
+                                          },
+                                    activeThumbColor: theme.primaryPurple,
+                                    activeTrackColor: theme.primaryPurple
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (_errorMessage != null) ...[
+                            SizedBox(height: adaptivePadding),
+                            GlassMessage(
+                              message: _errorMessage!,
+                              type: GlassMessageType.error,
+                              onDismiss: () =>
+                                  setState(() => _errorMessage = null),
+                            ),
+                          ],
+                          SizedBox(height: adaptivePadding),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(bottom: adaptivePadding),
+                    child: RoundedLoadingButton(
+                      color: theme.primaryPurple,
+                      valueColor: theme.buttonText,
+                      controller: _btnController,
+                      onPressed:
+                          _isCreating ? null : () => _createAccount(appState),
+                      child: Text(
+                        l10n.addAccountPageCreateButton,
+                        style: theme.titleSmall.copyWith(
+                          color: theme.buttonText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

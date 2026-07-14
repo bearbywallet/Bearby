@@ -536,9 +536,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39インデックス';
 
   @override
-  String get addAccountPageUseBiometrics => '生体認証を使用';
-
-  @override
   String get addAccountPagePasswordHint => 'パスワード';
 
   @override
@@ -564,6 +561,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'アカウントの作成に失敗: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'アカウント追加';
+
+  @override
+  String get addAccountPageCreateButton => '作成';
 
   @override
   String get addressBookPageTitle => 'アドレス帳';

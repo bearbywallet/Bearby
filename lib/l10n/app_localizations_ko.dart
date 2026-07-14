@@ -536,9 +536,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 인덱스';
 
   @override
-  String get addAccountPageUseBiometrics => '생체 인식 사용';
-
-  @override
   String get addAccountPagePasswordHint => '비밀번호';
 
   @override
@@ -564,6 +561,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return '계정 생성 실패: $error';
   }
+
+  @override
+  String get addAccountPageTitle => '계정 추가';
+
+  @override
+  String get addAccountPageCreateButton => '생성';
 
   @override
   String get addressBookPageTitle => '주소록';

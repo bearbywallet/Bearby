@@ -1109,12 +1109,6 @@ abstract class AppLocalizations {
   /// **'BIP39 Index'**
   String get addAccountPageBip39Index;
 
-  /// Label for the biometrics option on the Add Account page
-  ///
-  /// In en, this message translates to:
-  /// **'Use Biometrics'**
-  String get addAccountPageUseBiometrics;
-
   /// Hint text for the password input field on the Add Account page
   ///
   /// In en, this message translates to:
@@ -1156,6 +1150,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to create account: {error}'**
   String addAccountPageCreateFailed(Object error);
+
+  /// Title for the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Add Account'**
+  String get addAccountPageTitle;
+
+  /// Text for the create button on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get addAccountPageCreateButton;
 
   /// Title for the Address Book page
   ///

@@ -536,9 +536,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 索引';
 
   @override
-  String get addAccountPageUseBiometrics => '使用生物识别';
-
-  @override
   String get addAccountPagePasswordHint => '密码';
 
   @override
@@ -564,6 +561,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return '创建账户失败：$error';
   }
+
+  @override
+  String get addAccountPageTitle => '添加账户';
+
+  @override
+  String get addAccountPageCreateButton => '创建';
 
   @override
   String get addressBookPageTitle => '地址簿';

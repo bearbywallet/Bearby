@@ -539,9 +539,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 индекс';
 
   @override
-  String get addAccountPageUseBiometrics => 'Использовать биометрию';
-
-  @override
   String get addAccountPagePasswordHint => 'Пароль';
 
   @override
@@ -567,6 +564,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'Не удалось создать аккаунт: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'Новый аккаунт';
+
+  @override
+  String get addAccountPageCreateButton => 'Создать';
 
   @override
   String get addressBookPageTitle => 'Адресная книга';

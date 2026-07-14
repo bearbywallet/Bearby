@@ -537,9 +537,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 Index';
 
   @override
-  String get addAccountPageUseBiometrics => 'Use Biometrics';
-
-  @override
   String get addAccountPagePasswordHint => 'Password';
 
   @override
@@ -565,6 +562,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'Failed to create account: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'Add Account';
+
+  @override
+  String get addAccountPageCreateButton => 'Create';
 
   @override
   String get addressBookPageTitle => 'Address Book';
