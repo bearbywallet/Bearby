@@ -195,6 +195,9 @@ class _SwitchChainNetworkContentState
                           chainHash: _selectedNetwork!.chainHash,
                         );
                         await appState.syncData();
+                        await appState.refreshBalancesAndRates(
+                          walletIndex: appState.selectedWalletIndex,
+                        );
                       } catch (e) {
                         debugPrint("selectAccountsChain: $e");
                       }
