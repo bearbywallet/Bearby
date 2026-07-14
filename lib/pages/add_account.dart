@@ -13,6 +13,7 @@ import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -135,8 +136,10 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
 
     try {
       final wallet = appState.wallet!;
+      final isSecretPhrase =
+          wallet.walletType.contains(WalletType.SecretPhrase.name);
 
-      if (wallet.walletType.contains(WalletType.SecretPhrase.name)) {
+      if (isSecretPhrase) {
         AddNextBip39AccountParams params = AddNextBip39AccountParams(
           walletIndex: walletIndex,
           accountIndex: BigInt.from(_bip39Index),
@@ -153,6 +156,22 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       }
 
       await appState.syncData();
+      final afterIndexes =
+          appState.accounts.map((a) => a.index.toInt()).toList();
+
+      if (isSecretPhrase && !afterIndexes.contains(_bip39Index)) {
+        if (kDebugMode) {
+          debugPrint(
+            '[add-account] sync_missing_account index=$_bip39Index',
+          );
+        }
+        setState(() {
+          _errorMessage = l10n.addAccountPageCreateFailed(
+              'account $_bip39Index not visible after sync');
+          _isCreating = false;
+        });
+        return;
+      }
 
       if (_zilliqaLegacy && _isZIL(appState) && appState.wallet != null) {
         await zilliqaSwapChain(
@@ -164,9 +183,13 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       if (mounted) {
         context.go(AppRoutes.home);
       }
-    } catch (e) {
-      debugPrint(
-          "walletIndex: $walletIndex, bip39Index: $_bip39Index, error: $e");
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint(
+          'add account failed walletIndex=$walletIndex '
+          'bip39Index=$_bip39Index error=$e\n$st',
+        );
+      }
       setState(() {
         _errorMessage = l10n.addAccountPageCreateFailed(e);
         _isCreating = false;
