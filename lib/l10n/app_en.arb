@@ -43,13 +43,21 @@
   "@accountItemBalanceLabel": {
     "description": "Label for balance display in AccountItem widget"
   },
-  "sendTokenPageTitle": "",
+  "sendTokenPageTitle": "Send",
   "@sendTokenPageTitle": {
-    "description": "Title for the SendTokenPage (currently empty as per original code)"
+    "description": "Title for the SendTokenPage app bar"
   },
-  "sendTokenPageSubmitButton": "Submit",
+  "sendTokenPageSubmitButton": "Send",
   "@sendTokenPageSubmitButton": {
     "description": "Text for the submit button on SendTokenPage"
+  },
+  "amountChipClear": "Clear",
+  "@amountChipClear": {
+    "description": "Short label (max ~5 chars) for the chip that clears the amount in TokenAmountCard (was 0%)"
+  },
+  "amountChipMax": "MAX",
+  "@amountChipMax": {
+    "description": "Short label (max ~5 chars) for the chip that fills the full balance in TokenAmountCard (100%)"
   },
   "aboutPageTitle": "About",
   "@aboutPageTitle": {
@@ -1375,7 +1383,7 @@
   "@deleteWalletModalSubmit": {
     "description": "Text on the button to confirm wallet deletion in the DeleteWalletModal modal."
   },
-  "addressSelectModalContentTitle": "Select Address",
+  "addressSelectModalContentTitle": "Select recipient",
   "@addressSelectModalContentTitle": {
     "description": "Title text for the AddressSelectModalContent modal."
   },
@@ -1386,6 +1394,14 @@
   "addressSelectModalContentUnknown": "Unknown",
   "@addressSelectModalContentUnknown": {
     "description": "Default name used for an unknown address or QR code result in the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentEmpty": "No saved contacts yet — paste an address or scan a QR code",
+  "@addressSelectModalContentEmpty": {
+    "description": "Shown in the recipient modal when there are no accounts, contacts, or wallets to list."
+  },
+  "walletCardPasteOrScan": "Paste address or scan QR",
+  "@walletCardPasteOrScan": {
+    "description": "Placeholder subtitle on the recipient card in SendTokenPage before an address is chosen."
   },
   "addressSelectModalContentMyAccounts": "My Accounts",
   "@addressSelectModalContentMyAccounts": {

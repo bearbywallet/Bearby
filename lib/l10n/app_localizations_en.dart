@@ -42,10 +42,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountItemBalanceLabel => 'Balance:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => 'Send';
 
   @override
-  String get sendTokenPageSubmitButton => 'Submit';
+  String get sendTokenPageSubmitButton => 'Send';
+
+  @override
+  String get amountChipClear => 'Clear';
+
+  @override
+  String get amountChipMax => 'MAX';
 
   @override
   String get aboutPageTitle => 'About';
@@ -1124,13 +1130,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteWalletModalSubmit => 'Destroy';
 
   @override
-  String get addressSelectModalContentTitle => 'Select Address';
+  String get addressSelectModalContentTitle => 'Select recipient';
 
   @override
   String get addressSelectModalContentSearchHint => 'Search / Address / ENS';
 
   @override
   String get addressSelectModalContentUnknown => 'Unknown';
+
+  @override
+  String get addressSelectModalContentEmpty => 'No saved contacts yet — paste an address or scan a QR code';
+
+  @override
+  String get walletCardPasteOrScan => 'Paste address or scan QR';
 
   @override
   String get addressSelectModalContentMyAccounts => 'My Accounts';

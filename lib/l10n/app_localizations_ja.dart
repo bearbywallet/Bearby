@@ -42,10 +42,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountItemBalanceLabel => '残高:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => '送信';
 
   @override
   String get sendTokenPageSubmitButton => '送信';
+
+  @override
+  String get amountChipClear => 'クリア';
+
+  @override
+  String get amountChipMax => '最大';
 
   @override
   String get aboutPageTitle => 'アプリについて';
@@ -1123,13 +1129,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteWalletModalSubmit => '送信';
 
   @override
-  String get addressSelectModalContentTitle => 'アドレスを選択';
+  String get addressSelectModalContentTitle => '受取人を選択';
 
   @override
   String get addressSelectModalContentSearchHint => '検索 / アドレス / ENS';
 
   @override
   String get addressSelectModalContentUnknown => '不明';
+
+  @override
+  String get addressSelectModalContentEmpty => '連絡先がありません — アドレスを貼り付けるかQRコードをスキャンしてください';
+
+  @override
+  String get walletCardPasteOrScan => 'アドレスを貼り付けるかQRをスキャン';
 
   @override
   String get addressSelectModalContentMyAccounts => 'マイアカウント';

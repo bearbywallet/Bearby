@@ -6,6 +6,7 @@ import 'package:bearby/components/button.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/stake.dart';
@@ -98,9 +99,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
       _balanceDecimals = token.decimals;
 
       if (_isStaking) {
-        _availableBalance =
-            BigInt.tryParse(token.balances[appState.accountBalanceKey] ?? '-') ??
-                BigInt.zero;
+        _availableBalance = BigInt.tryParse(
+                token.balances[appState.accountBalanceKey] ?? '-') ??
+            BigInt.zero;
       } else {
         _availableBalance =
             (BigInt.tryParse(widget.stake.delegAmt) ?? BigInt.zero).abs();
@@ -116,9 +117,10 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   void _setPercentageAmount(double percentage) {
-    BigInt amount =
-        (_availableBalance * BigInt.from((percentage * 100).round())) ~/
-            BigInt.from(100);
+    BigInt amount = percentOfBalance(
+      balance: _availableBalance,
+      percent: (percentage * 100).round(),
+    );
 
     if (percentage >= 1.0 && _isStaking) {
       final (value, _) = toWei(value: '50', decimals: _balanceDecimals);
@@ -192,7 +194,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
                         const SizedBox(height: 20),
                         _buildAmountInput(theme, l10n),
                         const SizedBox(height: 16),
-                        _buildPercentageButtons(theme),
+                        _buildPercentageButtons(theme, l10n),
                         const SizedBox(height: 24),
                         _buildActionButton(appState, l10n),
                       ],
@@ -442,9 +444,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
   }
 
-  Widget _buildPercentageButtons(AppTheme theme) {
+  Widget _buildPercentageButtons(AppTheme theme, AppLocalizations l10n) {
     final percentages = [0.25, 0.50, 0.75, 1.0];
-    final labels = ['25%', '50%', '75%', 'MAX'];
+    final labels = ['25%', '50%', '75%', l10n.amountChipMax];
 
     return Row(
       children: percentages.asMap().entries.map((entry) {

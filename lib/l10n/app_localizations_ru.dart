@@ -42,10 +42,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountItemBalanceLabel => 'Баланс:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => 'Отправить';
 
   @override
   String get sendTokenPageSubmitButton => 'Отправить';
+
+  @override
+  String get amountChipClear => 'Сброс';
+
+  @override
+  String get amountChipMax => 'Макс';
 
   @override
   String get aboutPageTitle => 'О приложении';
@@ -1126,13 +1132,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteWalletModalSubmit => 'Удалить';
 
   @override
-  String get addressSelectModalContentTitle => 'Выберите адрес';
+  String get addressSelectModalContentTitle => 'Выберите получателя';
 
   @override
   String get addressSelectModalContentSearchHint => 'Поиск / Адрес / ENS';
 
   @override
   String get addressSelectModalContentUnknown => 'Неизвестно';
+
+  @override
+  String get addressSelectModalContentEmpty => 'Пока нет сохранённых контактов — вставьте адрес или отсканируйте QR-код';
+
+  @override
+  String get walletCardPasteOrScan => 'Вставьте адрес или отсканируйте QR';
 
   @override
   String get addressSelectModalContentMyAccounts => 'Мои аккаунты';

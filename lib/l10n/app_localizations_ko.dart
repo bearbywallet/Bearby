@@ -42,10 +42,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get accountItemBalanceLabel => '잔액:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => '보내기';
 
   @override
-  String get sendTokenPageSubmitButton => '제출';
+  String get sendTokenPageSubmitButton => '보내기';
+
+  @override
+  String get amountChipClear => '지움';
+
+  @override
+  String get amountChipMax => '최대';
 
   @override
   String get aboutPageTitle => '정보';
@@ -1123,13 +1129,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteWalletModalSubmit => '파괴';
 
   @override
-  String get addressSelectModalContentTitle => '주소 선택';
+  String get addressSelectModalContentTitle => '받는 사람 선택';
 
   @override
   String get addressSelectModalContentSearchHint => '검색 / 주소 / ENS';
 
   @override
   String get addressSelectModalContentUnknown => '알 수 없음';
+
+  @override
+  String get addressSelectModalContentEmpty => '저장된 연락처가 없습니다 — 주소를 붙여넣거나 QR 코드를 스캔하세요';
+
+  @override
+  String get walletCardPasteOrScan => '주소를 붙여넣거나 QR을 스캔하세요';
 
   @override
   String get addressSelectModalContentMyAccounts => '내 계정';

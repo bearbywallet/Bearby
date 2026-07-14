@@ -42,10 +42,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountItemBalanceLabel => '余额：';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => '发送';
 
   @override
-  String get sendTokenPageSubmitButton => '提交';
+  String get sendTokenPageSubmitButton => '发送';
+
+  @override
+  String get amountChipClear => '清除';
+
+  @override
+  String get amountChipMax => '最大';
 
   @override
   String get aboutPageTitle => '关于';
@@ -1123,13 +1129,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteWalletModalSubmit => '提交';
 
   @override
-  String get addressSelectModalContentTitle => '选择地址';
+  String get addressSelectModalContentTitle => '选择收款人';
 
   @override
   String get addressSelectModalContentSearchHint => '搜索 / 地址 / ENS';
 
   @override
   String get addressSelectModalContentUnknown => '未知';
+
+  @override
+  String get addressSelectModalContentEmpty => '暂无联系人 — 粘贴地址或扫描二维码';
+
+  @override
+  String get walletCardPasteOrScan => '粘贴地址或扫描二维码';
 
   @override
   String get addressSelectModalContentMyAccounts => '我的账户';

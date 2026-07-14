@@ -23,6 +23,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final String? title = this.title;
+    final Widget? actionWidget = this.actionWidget;
+    final Widget? actionIcon = this.actionIcon;
+    final VoidCallback? onActionPressed = this.onActionPressed;
 
     return SafeArea(
       child: Padding(
@@ -31,6 +35,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
               icon: AppIconView(
                 icon: AppIcon.arrowLeft,
                 size: 24,
@@ -41,7 +47,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             if (title != null)
               Expanded(
                 child: Text(
-                  title!,
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.headline2.copyWith(
                     color: theme.textPrimary,
                   ),
@@ -51,11 +59,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             if (actionWidget != null)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: actionWidget!,
+                child: actionWidget,
               )
             else if (actionIcon != null && onActionPressed != null)
               IconButton(
-                icon: actionIcon!,
+                icon: actionIcon,
                 onPressed: onActionPressed,
               )
             else

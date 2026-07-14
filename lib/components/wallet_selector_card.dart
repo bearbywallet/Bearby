@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/src/rust/models/qrcode.dart';
 import 'package:bearby/state/app_state.dart';
@@ -25,19 +27,10 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
   bool isPressed = false;
 
   @override
-  void initState() {
-    super.initState();
-
-    if (widget.address == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showAccountsModal();
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context);
+    final String? address = widget.address;
 
     return MouseRegion(
       onEnter: (_) => setState(() => isPressed = true),
@@ -71,15 +64,21 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                     width: 1,
                   ),
                 ),
-                child: ClipOval(
-                  child: widget.address != null
-                      ? Jazzicon(
+                child: address != null
+                    ? ClipOval(
+                        child: Jazzicon(
                           diameter: 30,
-                          seed: widget.address!,
+                          seed: address,
                           shapeCount: 4,
-                        )
-                      : null,
-                ),
+                        ),
+                      )
+                    : Center(
+                        child: AppIconView(
+                          icon: AppIcon.wallet,
+                          size: 20,
+                          color: theme.textSecondary,
+                        ),
+                      ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -87,7 +86,9 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.walletName ?? "",
+                      address != null
+                          ? (widget.walletName ?? '')
+                          : (l10n?.addressSelectModalContentTitle ?? ''),
                       style: theme.subtitle1.copyWith(
                         color: theme.textPrimary,
                         fontSize: 18,
@@ -96,13 +97,18 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      widget.address ?? "",
+                      address ?? (l10n?.walletCardPasteOrScan ?? ''),
                       style: theme.caption.copyWith(
                         color: theme.textSecondary,
                       ),
                     ),
                   ],
                 ),
+              ),
+              AppIconView(
+                icon: AppIcon.arrowDown,
+                size: 16,
+                color: theme.textSecondary,
               ),
             ],
           ),

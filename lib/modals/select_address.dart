@@ -1,9 +1,12 @@
-import 'package:bearby/components/app_icon.dart';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/jazzicon.dart';
+import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/src/rust/api/book.dart';
@@ -11,7 +14,6 @@ import 'package:bearby/src/rust/api/qrcode.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/qrcode.dart';
 import 'package:bearby/state/app_state.dart';
-import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/theme/app_theme.dart';
 
 void showAddressSelectModal({
@@ -146,6 +148,8 @@ class _AddressSelectModalContentState
                 _buildSearchBar(l10n, theme),
                 if (_isLoading)
                   _buildLoadingIndicator(theme)
+                else if (!_hasEntries)
+                  _buildEmptyState(l10n, theme)
                 else
                   Expanded(
                     child: SingleChildScrollView(
@@ -160,6 +164,20 @@ class _AddressSelectModalContentState
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  bool get _hasEntries =>
+      _categories.any((category) => category.entries.isNotEmpty);
+
+  Widget _buildEmptyState(AppLocalizations l10n, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Text(
+        l10n.addressSelectModalContentEmpty,
+        textAlign: TextAlign.center,
+        style: theme.bodyText2.copyWith(color: theme.textSecondary),
       ),
     );
   }
@@ -194,6 +212,38 @@ class _AddressSelectModalContentState
     );
   }
 
+  Future<void> _trySelectAddress(String value) async {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      if (mounted) setState(() => _searchQuery = '');
+      return;
+    }
+    try {
+      final bool isAddress = await isValidAddress(addr: trimmed);
+      if (!mounted) return;
+      if (isAddress) {
+        final l10n = AppLocalizations.of(context);
+        widget.onAddressSelected(
+          QRcodeScanResultInfo(recipient: trimmed),
+          l10n?.addressSelectModalContentUnknown ?? '',
+        );
+        Navigator.of(context).pop();
+      } else {
+        setState(() => _searchQuery = value.toLowerCase());
+      }
+    } catch (e) {
+      debugPrint("address validation failed: $e");
+    }
+  }
+
+  Future<void> _handlePaste() async {
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    final String? text = clipboardData?.text;
+    if (text == null || text.isEmpty) return;
+    _searchController.text = text;
+    await _trySelectAddress(text);
+  }
+
   Widget _buildSearchBar(AppLocalizations l10n, AppTheme theme) {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -201,22 +251,9 @@ class _AddressSelectModalContentState
         controller: _searchController,
         hint: l10n.addressSelectModalContentSearchHint,
         leftIcon: AppIcon.scan,
-        onChanged: (value) async {
-          try {
-            bool isAddress = await isValidAddress(addr: value);
-            if (isAddress && mounted) {
-              QRcodeScanResultInfo params =
-                  QRcodeScanResultInfo(recipient: value);
-              widget.onAddressSelected(
-                params,
-                l10n.addressSelectModalContentUnknown,
-              );
-              Navigator.of(context).pop();
-            } else {
-              setState(() => _searchQuery = value.toLowerCase());
-            }
-          } catch (_) {}
-        },
+        rightIcon: AppIcon.copy,
+        onRightIconTap: _handlePaste,
+        onChanged: _trySelectAddress,
         onLeftIconTap: () =>
             showQRScannerModal(context: context, onScanned: _parseQrcodRes),
         borderColor: theme.textPrimary,
