@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
 
       if (wrongChain) {
         if (!mounted) return;
-        Navigator.of(context).pop();
+        // Scanner already closed itself on detect/paste.
         _showScanError();
         return;
       }
@@ -172,20 +172,17 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
         final ok = await isValidAddress(addr: address);
         if (!ok) {
           if (!mounted) return;
-          Navigator.of(context).pop();
           _showScanError();
           return;
         }
       } catch (e) {
         debugPrint('address validation error: $e');
         if (!mounted) return;
-        Navigator.of(context).pop();
         _showScanError();
         return;
       }
 
       if (!mounted) return;
-      Navigator.of(context).pop();
 
       _goToSendPage(
         recipient: address,
