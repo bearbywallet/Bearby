@@ -176,6 +176,8 @@
   "historyPageTitle": "История транзакций",
   "historyPageNoTransactions": "Пока нет транзакций",
   "historyPageSearchHint": "Поиск транзакций...",
+  "historyItemReceived": "Получено",
+  "historyItemSent": "Отправлено",
   "notificationsSettingsPageTitle": "Уведомления",
   "notificationsSettingsPagePushTitle": "Push-уведомления",
   "notificationsSettingsPagePushDescription": "Получать уведомления о отправке и подтверждении транзакций, уведомления от подключенных приложений.",

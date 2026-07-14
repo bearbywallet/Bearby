@@ -176,6 +176,8 @@
   "historyPageTitle": "交易历史",
   "historyPageNoTransactions": "暂无交易",
   "historyPageSearchHint": "搜索交易...",
+  "historyItemReceived": "收到",
+  "historyItemSent": "发送",
   "notificationsSettingsPageTitle": "通知",
   "notificationsSettingsPagePushTitle": "推送通知",
   "notificationsSettingsPagePushDescription": "在交易发送和确认时获取通知，以及来自已连接应用的通知。",

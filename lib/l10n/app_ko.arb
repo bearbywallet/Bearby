@@ -176,6 +176,8 @@
   "historyPageTitle": "거래 내역",
   "historyPageNoTransactions": "거래 없음",
   "historyPageSearchHint": "거래 검색...",
+  "historyItemReceived": "받음",
+  "historyItemSent": "보냄",
   "notificationsSettingsPageTitle": "알림",
   "notificationsSettingsPagePushTitle": "푸시 알림",
   "notificationsSettingsPagePushDescription": "거래 전송 및 확인 시 알림, 연결된 앱 알림.",

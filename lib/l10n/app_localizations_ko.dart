@@ -608,6 +608,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get historyPageSearchHint => '거래 검색...';
 
   @override
+  String get historyItemReceived => '받음';
+
+  @override
+  String get historyItemSent => '보냄';
+
+  @override
   String get notificationsSettingsPageTitle => '알림';
 
   @override

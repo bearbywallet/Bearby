@@ -691,6 +691,14 @@
   "@historyPageSearchHint": {
     "description": "Hint text displayed in the search input field on the HistoryPage"
   },
+  "historyItemReceived": "Received",
+  "@historyItemReceived": {
+    "description": "History card title for an incoming transfer"
+  },
+  "historyItemSent": "Sent",
+  "@historyItemSent": {
+    "description": "History card title for an outgoing transfer"
+  },
   "notificationsSettingsPageTitle": "Notifications",
   "@notificationsSettingsPageTitle": {
     "description": "Title displayed in the app bar of the NotificationsSettingsPage component"

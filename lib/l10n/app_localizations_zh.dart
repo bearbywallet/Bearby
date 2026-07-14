@@ -608,6 +608,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyPageSearchHint => '搜索交易...';
 
   @override
+  String get historyItemReceived => '收到';
+
+  @override
+  String get historyItemSent => '发送';
+
+  @override
   String get notificationsSettingsPageTitle => '通知';
 
   @override

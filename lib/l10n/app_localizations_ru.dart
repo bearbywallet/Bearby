@@ -611,6 +611,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyPageSearchHint => 'Поиск транзакций...';
 
   @override
+  String get historyItemReceived => 'Получено';
+
+  @override
+  String get historyItemSent => 'Отправлено';
+
+  @override
   String get notificationsSettingsPageTitle => 'Уведомления';
 
   @override

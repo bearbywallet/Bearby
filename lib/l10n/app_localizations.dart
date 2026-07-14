@@ -1229,6 +1229,18 @@ abstract class AppLocalizations {
   /// **'Search transactions...'**
   String get historyPageSearchHint;
 
+  /// History card title for an incoming transfer
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get historyItemReceived;
+
+  /// History card title for an outgoing transfer
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get historyItemSent;
+
   /// Title displayed in the app bar of the NotificationsSettingsPage component
   ///
   /// In en, this message translates to:

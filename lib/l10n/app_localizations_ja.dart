@@ -608,6 +608,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get historyPageSearchHint => 'トランザクションを検索...';
 
   @override
+  String get historyItemReceived => '受取';
+
+  @override
+  String get historyItemSent => '送金';
+
+  @override
   String get notificationsSettingsPageTitle => '通知';
 
   @override

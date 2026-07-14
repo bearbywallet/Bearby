@@ -609,6 +609,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyPageSearchHint => 'Search transactions...';
 
   @override
+  String get historyItemReceived => 'Received';
+
+  @override
+  String get historyItemSent => 'Sent';
+
+  @override
   String get notificationsSettingsPageTitle => 'Notifications';
 
   @override

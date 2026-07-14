@@ -176,6 +176,8 @@
   "historyPageTitle": "トランザクション履歴",
   "historyPageNoTransactions": "トランザクションがありません",
   "historyPageSearchHint": "トランザクションを検索...",
+  "historyItemReceived": "受取",
+  "historyItemSent": "送金",
   "notificationsSettingsPageTitle": "通知",
   "notificationsSettingsPagePushTitle": "プッシュ通知",
   "notificationsSettingsPagePushDescription": "トランザクションの送信と確認、接続されたアプリからの通知を受け取ります。",
