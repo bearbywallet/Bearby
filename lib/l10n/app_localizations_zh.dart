@@ -1324,6 +1324,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wcPairFailed => 'WalletConnect 配对失败';
 
   @override
+  String get wcApproveFailed => 'WalletConnect 会话批准失败';
+
+  @override
+  String get wcConnecting => '正在连接 WalletConnect…';
+
+  @override
   String dappListItemConnected(Object time) {
     return '已连接 $time';
   }

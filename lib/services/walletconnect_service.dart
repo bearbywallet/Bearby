@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reown_walletkit/reown_walletkit.dart';
+import 'package:walletconnect_pay/walletconnect_pay_platform_interface.dart';
 import 'package:bearby/config/walletconnect.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
@@ -35,6 +37,10 @@ typedef _WcHandler = Future<void> Function(String topic, Object? params);
 typedef _Selection = ({BigInt wallet, BigInt account});
 
 /// Shared modal completion plumbing: single-shot ok/reject + selection restore.
+///
+/// [context] is captured when the request modal is shown and is only used for
+/// [Navigator.pop] after a response. Callers must not assume it stays mounted
+/// across awaits — always check [BuildContext.mounted] before pop (done here).
 class _RequestResponder {
   final WalletConnectService _service;
   final String topic;
@@ -67,6 +73,20 @@ class _RequestResponder {
     responded = true;
     await _service._restoreSelection(previous);
     await _service._respondError(topic, Errors.USER_REJECTED, id: id);
+  }
+
+  /// Malformed signed payload after the user already confirmed — restore
+  /// selection, error the dapp, and dismiss the modal so it cannot stick open.
+  Future<void> failMalformed() async {
+    if (responded) return;
+    responded = true;
+    await _service._restoreSelection(previous);
+    await _service._respondError(
+      topic,
+      Errors.MALFORMED_REQUEST_PARAMS,
+      id: id,
+    );
+    if (context.mounted) Navigator.pop(context);
   }
 }
 
@@ -105,10 +125,21 @@ class WalletConnectService extends ChangeNotifier {
 
   // ────────────────────────── lifecycle ──────────────────────────
 
+  /// WalletConnect Pay only ships native plugins for Android/iOS. On other
+  /// platforms [kit.init] would throw MissingPluginException after sign is
+  /// already set up. Install a no-op platform impl so WalletKit 1.4+ can
+  /// finish init (Pay APIs remain unavailable off-mobile).
+  void _ensureWalletConnectPayPlatform() {
+    if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS)) {
+      WalletconnectPayPlatform.instance = _NoopWalletconnectPayPlatform();
+    }
+  }
+
   Future<void> init() async {
     if (_walletKit != null) return;
-    if (_initCompleter != null) {
-      await _initCompleter!.future;
+    final pending = _initCompleter;
+    if (pending != null) {
+      await pending.future;
       return;
     }
 
@@ -117,6 +148,7 @@ class WalletConnectService extends ChangeNotifier {
     _initError = null;
 
     try {
+      _ensureWalletConnectPayPlatform();
       final kit = ReownWalletKit(
         core: ReownCore(projectId: kWalletConnectProjectId),
         metadata: kBearbyWalletMetadata,
@@ -138,6 +170,8 @@ class WalletConnectService extends ChangeNotifier {
       _initError = e;
       debugPrint('WalletConnect init failed: $e');
       if (!completer.isCompleted) completer.complete();
+      // Allow waitUntilReady()/pair() to retry after connectivity returns.
+      _initCompleter = null;
     }
   }
 
@@ -180,7 +214,8 @@ class WalletConnectService extends ChangeNotifier {
 
     final trimmed = uri.trim();
     if (!trimmed.startsWith('wc:')) {
-      throw FormatException('Not a WalletConnect URI: $trimmed');
+      // Do not embed the payload — it may be a full clipboard dump.
+      throw const FormatException('Not a WalletConnect URI');
     }
 
     try {
@@ -585,8 +620,48 @@ class WalletConnectService extends ChangeNotifier {
     _emitToSessions(kit, kAccountsChangedEvent, <String>[addr]);
   }
 
+  /// True if [address] is among session-approved accounts for [caip2]'s namespace.
+  bool _isSessionAccount(String topic, String caip2, String address) {
+    final colon = caip2.indexOf(':');
+    if (colon <= 0) return false;
+    final namespace = caip2.substring(0, colon);
+    for (final approved in _sessionAccountsFor(topic, namespace)) {
+      if (_addressesEqual(approved, address)) return true;
+    }
+    return false;
+  }
+
+  /// Session-scope signer gate + select. Only addresses the session approved
+  /// may be switched to / used for signing. Restores [previous] if the switch
+  /// fails mid-way. When [addressOptional] is true and [address] is empty,
+  /// authorizes the currently selected account against the session.
+  Future<bool> _ensureAuthorizedSigner({
+    required String topic,
+    required String caip2,
+    required String? address,
+    required _Selection? previous,
+    bool addressOptional = false,
+  }) async {
+    final String? target;
+    if (address != null && address.isNotEmpty) {
+      target = address;
+    } else if (addressOptional) {
+      target = appState.account?.addr;
+    } else {
+      return false;
+    }
+    if (target == null || target.isEmpty) return false;
+    if (!_isSessionAccount(topic, caip2, target)) return false;
+    if (!await _ensureSigner(target)) {
+      await _restoreSelection(previous);
+      return false;
+    }
+    return true;
+  }
+
   /// Finds the wallet/account owning [address], selects it, returns true.
   /// Does not emit accountsChanged (caller handles on confirm/reject).
+  /// On mid-switch failure, restores the pre-switch selection (M1).
   Future<bool> _ensureSigner(String? address) async {
     if (address == null || address.isEmpty) return false;
 
@@ -595,6 +670,7 @@ class WalletConnectService extends ChangeNotifier {
       return true;
     }
 
+    final before = _selectionSnapshot();
     for (var w = 0; w < appState.wallets.length; w++) {
       final wallet = appState.wallets[w];
       final accounts = wallet.accounts[wallet.slip44]?[wallet.bip] ?? const [];
@@ -616,6 +692,7 @@ class WalletConnectService extends ChangeNotifier {
           return true;
         } catch (e) {
           debugPrint('WC ensureSigner failed: $e');
+          await _restoreSelection(before);
           return false;
         } finally {
           _suppressAppStateEvents--;
@@ -709,7 +786,12 @@ class WalletConnectService extends ChangeNotifier {
 
     final previous = _selectionSnapshot();
     final address = list[addressIndex]?.toString();
-    if (!await _ensureSigner(address)) {
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: address,
+      previous: previous,
+    )) {
       return _respondError(
         topic,
         Errors.UNAUTHORIZED_METHOD,
@@ -720,7 +802,10 @@ class WalletConnectService extends ChangeNotifier {
     final dataToSign = list[messageIndex]?.toString() ?? '';
     final message = decodePersonalSignMessage(dataToSign);
 
-    if (!context.mounted) return;
+    if (!context.mounted) {
+      await _restoreSelection(previous);
+      return;
+    }
     final peer = _peerOf(topic);
     final responder = _RequestResponder(
       service: this,
@@ -755,7 +840,12 @@ class WalletConnectService extends ChangeNotifier {
 
     final previous = _selectionSnapshot();
     final address = list[0]?.toString();
-    if (!await _ensureSigner(address)) {
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: address,
+      previous: previous,
+    )) {
       return _respondError(
         topic,
         Errors.UNAUTHORIZED_METHOD,
@@ -822,7 +912,12 @@ class WalletConnectService extends ChangeNotifier {
 
     final previous = _selectionSnapshot();
     final from = txParams[kParamFrom]?.toString();
-    if (!await _ensureSigner(from)) {
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: from,
+      previous: previous,
+    )) {
       return _respondError(
         topic,
         Errors.UNAUTHORIZED_METHOD,
@@ -959,14 +1054,18 @@ class WalletConnectService extends ChangeNotifier {
     }
 
     final previous = _selectionSnapshot();
-    if (pubkey != null && pubkey.isNotEmpty) {
-      if (!await _ensureSigner(pubkey)) {
-        return _respondError(
-          topic,
-          Errors.UNAUTHORIZED_METHOD,
-          id: pending.id,
-        );
-      }
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: pubkey,
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(
+        topic,
+        Errors.UNAUTHORIZED_METHOD,
+        id: pending.id,
+      );
     }
 
     final String decoded;
@@ -1033,14 +1132,18 @@ class WalletConnectService extends ChangeNotifier {
     final feePayer = map?['pubkey']?.toString() ??
         map?['feePayer']?.toString() ??
         map?['publicKey']?.toString();
-    if (feePayer != null && feePayer.isNotEmpty) {
-      if (!await _ensureSigner(feePayer)) {
-        return _respondError(
-          topic,
-          Errors.UNAUTHORIZED_METHOD,
-          id: pending.id,
-        );
-      }
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: feePayer,
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(
+        topic,
+        Errors.UNAUTHORIZED_METHOD,
+        id: pending.id,
+      );
     }
 
     final Uint8List messageBytes;
@@ -1112,14 +1215,7 @@ class WalletConnectService extends ChangeNotifier {
         } else {
           final signedSolana = signed.solana;
           if (signedSolana == null) {
-            if (responder.responded) return;
-            responder.responded = true;
-            await _restoreSelection(previous);
-            await _respondError(
-              topic,
-              Errors.MALFORMED_REQUEST_PARAMS,
-              id: pending.id,
-            );
+            await responder.failMalformed();
           } else {
             await responder.ok({
               'signature': signed.transactionHash,
@@ -1151,14 +1247,18 @@ class WalletConnectService extends ChangeNotifier {
 
     final previous = _selectionSnapshot();
     final address = map?['address']?.toString();
-    if (address != null && address.isNotEmpty) {
-      if (!await _ensureSigner(address)) {
-        return _respondError(
-          topic,
-          Errors.UNAUTHORIZED_METHOD,
-          id: pending.id,
-        );
-      }
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: address,
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(
+        topic,
+        Errors.UNAUTHORIZED_METHOD,
+        id: pending.id,
+      );
     }
 
     if (!context.mounted) {
@@ -1206,14 +1306,7 @@ class WalletConnectService extends ChangeNotifier {
       onConfirm: (signed) async {
         final signedTron = signed.tron;
         if (signedTron == null) {
-          if (responder.responded) return;
-          responder.responded = true;
-          await _restoreSelection(previous);
-          await _respondError(
-            topic,
-            Errors.MALFORMED_REQUEST_PARAMS,
-            id: pending.id,
-          );
+          await responder.failMalformed();
           return;
         }
         // Typed signed payload → TronWeb JSON string for the WC response.
@@ -1246,14 +1339,18 @@ class WalletConnectService extends ChangeNotifier {
 
     final previous = _selectionSnapshot();
     final address = map?['address']?.toString();
-    if (address != null && address.isNotEmpty) {
-      if (!await _ensureSigner(address)) {
-        return _respondError(
-          topic,
-          Errors.UNAUTHORIZED_METHOD,
-          id: pending.id,
-        );
-      }
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: address,
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(
+        topic,
+        Errors.UNAUTHORIZED_METHOD,
+        id: pending.id,
+      );
     }
 
     if (!context.mounted) {
@@ -1301,7 +1398,11 @@ class WalletConnectService extends ChangeNotifier {
     }
     final metadata = event.params.proposer.metadata;
     final icons = metadata.icons;
-    final pairErrorMsg = _pairErrorMessage(context);
+    final l10n = AppLocalizations.of(context);
+    final pairErrorMsg =
+        l10n?.wcPairFailed ?? 'WalletConnect pairing failed';
+    final approveErrorMsg =
+        l10n?.wcApproveFailed ?? 'WalletConnect session approval failed';
     showAppConnectModal(
       context: context,
       title: metadata.name,
@@ -1358,16 +1459,11 @@ class WalletConnectService extends ChangeNotifier {
         } catch (e) {
           debugPrint('WC approve failed: $e');
           await _rejectProposal(event.id);
-          _notifyUserError(pairErrorMsg);
+          _notifyUserError(approveErrorMsg);
         }
       },
       onReject: () => unawaited(_rejectProposal(event.id)),
     );
-  }
-
-  String _pairErrorMessage(BuildContext context) {
-    return AppLocalizations.of(context)?.wcPairFailed ??
-        'WalletConnect pairing failed';
   }
 
   /// Every key in [required] must have non-empty accounts in [filtered].
@@ -1553,6 +1649,35 @@ class WcSessionView {
   @override
   String toString() =>
       'WcSessionView(topic: $topic, name: $name, url: $url, icon: $icon)';
+}
+
+/// No-op WalletConnect Pay channel for platforms without the native plugin.
+class _NoopWalletconnectPayPlatform extends WalletconnectPayPlatform {
+  @override
+  Future<bool> initialize({
+    String? apiKey,
+    String? appId,
+    String? clientId,
+    String? baseUrl,
+  }) async =>
+      false;
+
+  @override
+  Future<String> confirmPayment({required String requestJson}) async {
+    throw UnsupportedError('WalletConnect Pay is not available on this platform');
+  }
+
+  @override
+  Future<String> getPaymentOptions({required String requestJson}) async {
+    throw UnsupportedError('WalletConnect Pay is not available on this platform');
+  }
+
+  @override
+  Future<String> getRequiredPaymentActions({
+    required String requestJson,
+  }) async {
+    throw UnsupportedError('WalletConnect Pay is not available on this platform');
+  }
 }
 
 // ── Isolate entry points (top-level only — must not close over service) ──

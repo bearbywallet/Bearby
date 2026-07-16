@@ -414,6 +414,8 @@
   "wcPasteUri": "粘贴 wc: URI",
   "wcDisconnect": "断开连接",
   "wcPairFailed": "WalletConnect 配对失败",
+  "wcApproveFailed": "WalletConnect 会话批准失败",
+  "wcConnecting": "正在连接 WalletConnect…",
   "dappListItemConnected": "已连接 {time}",
   "dappListItemJustNow": "刚刚",
   "secretRecoveryModalRevealPhraseTitle": "显示助记词",

@@ -2657,6 +2657,18 @@ abstract class AppLocalizations {
   /// **'WalletConnect pairing failed'**
   String get wcPairFailed;
 
+  /// Error shown when approving a WalletConnect session fails
+  ///
+  /// In en, this message translates to:
+  /// **'WalletConnect session approval failed'**
+  String get wcApproveFailed;
+
+  /// Status shown while WalletConnect SDK is not ready yet
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to WalletConnect…'**
+  String get wcConnecting;
+
   /// Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time
   ///
   /// In en, this message translates to:

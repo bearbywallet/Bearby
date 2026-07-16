@@ -414,6 +414,8 @@
   "wcPasteUri": "wc: URI 붙여넣기",
   "wcDisconnect": "연결 해제",
   "wcPairFailed": "WalletConnect 페어링 실패",
+  "wcApproveFailed": "WalletConnect 세션 승인 실패",
+  "wcConnecting": "WalletConnect 연결 중…",
   "dappListItemConnected": "{time} 연결됨",
   "dappListItemJustNow": "방금",
   "secretRecoveryModalRevealPhraseTitle": "비밀 복구 구문 공개",

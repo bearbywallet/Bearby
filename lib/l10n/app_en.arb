@@ -1641,6 +1641,14 @@
   "@wcPairFailed": {
     "description": "Error shown when WalletConnect pairing fails"
   },
+  "wcApproveFailed": "WalletConnect session approval failed",
+  "@wcApproveFailed": {
+    "description": "Error shown when approving a WalletConnect session fails"
+  },
+  "wcConnecting": "Connecting to WalletConnect…",
+  "@wcConnecting": {
+    "description": "Status shown while WalletConnect SDK is not ready yet"
+  },
   "dappListItemConnected": "Connected {time}",
   "@dappListItemConnected": {
     "description": "Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time",

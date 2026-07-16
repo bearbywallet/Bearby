@@ -1324,6 +1324,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get wcPairFailed => 'WalletConnect 페어링 실패';
 
   @override
+  String get wcApproveFailed => 'WalletConnect 세션 승인 실패';
+
+  @override
+  String get wcConnecting => 'WalletConnect 연결 중…';
+
+  @override
   String dappListItemConnected(Object time) {
     return '$time 연결됨';
   }

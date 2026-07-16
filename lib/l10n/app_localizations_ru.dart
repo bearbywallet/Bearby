@@ -1327,6 +1327,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get wcPairFailed => 'Не удалось выполнить pairing WalletConnect';
 
   @override
+  String get wcApproveFailed => 'Не удалось подтвердить сессию WalletConnect';
+
+  @override
+  String get wcConnecting => 'Подключение к WalletConnect…';
+
+  @override
   String dappListItemConnected(Object time) {
     return 'Подключено $time';
   }

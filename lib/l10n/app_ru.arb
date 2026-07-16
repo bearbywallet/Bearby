@@ -426,6 +426,8 @@
   "wcPasteUri": "Вставьте wc: URI",
   "wcDisconnect": "Отключить",
   "wcPairFailed": "Не удалось выполнить pairing WalletConnect",
+  "wcApproveFailed": "Не удалось подтвердить сессию WalletConnect",
+  "wcConnecting": "Подключение к WalletConnect…",
   "dappListItemConnected": "Подключено {time}",
   "dappListItemJustNow": "только что",
   "secretRecoveryModalRevealPhraseTitle": "Показать фразу восстановления",

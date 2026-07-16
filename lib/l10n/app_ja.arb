@@ -429,6 +429,8 @@
   "wcPasteUri": "wc: URIを貼り付け",
   "wcDisconnect": "切断",
   "wcPairFailed": "WalletConnectのペアリングに失敗しました",
+  "wcApproveFailed": "WalletConnectセッションの承認に失敗しました",
+  "wcConnecting": "WalletConnectに接続中…",
   "dappListItemConnected": "{time}に接続",
   "dappListItemJustNow": "たった今",
   "secretRecoveryModalRevealPhraseTitle": "秘密回復フレーズを表示",

@@ -222,6 +222,13 @@ class _ConnectedDappsModalContentState
                   l10n?.wcNewConnection ?? 'New connection',
                   style: theme.titleMedium.copyWith(color: theme.textPrimary),
                 ),
+                if (!wcService.isReady) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n?.wcConnecting ?? 'Connecting to WalletConnect…',
+                    style: theme.bodySmall.copyWith(color: theme.textSecondary),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -239,6 +246,7 @@ class _ConnectedDappsModalContentState
                     ),
                     const SizedBox(width: 8),
                     IconButton(
+                      // Pair always allowed: waitUntilReady retries init (M2).
                       onPressed: _isPairing
                           ? null
                           : () {

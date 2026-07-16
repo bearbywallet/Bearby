@@ -1324,6 +1324,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get wcPairFailed => 'WalletConnectのペアリングに失敗しました';
 
   @override
+  String get wcApproveFailed => 'WalletConnectセッションの承認に失敗しました';
+
+  @override
+  String get wcConnecting => 'WalletConnectに接続中…';
+
+  @override
   String dappListItemConnected(Object time) {
     return '$timeに接続';
   }
