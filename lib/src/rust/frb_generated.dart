@@ -58,6 +58,7 @@ import 'models/transactions/evm.dart';
 import 'models/transactions/history.dart';
 import 'models/transactions/request.dart';
 import 'models/transactions/scilla.dart';
+import 'models/transactions/solana.dart';
 import 'models/transactions/transaction_metadata.dart';
 import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
@@ -5452,6 +5453,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionSolana dco_decode_box_autoadd_transaction_solana(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_solana(raw);
+  }
+
+  @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_u_64(raw);
@@ -5791,7 +5798,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       scilla: dco_decode_opt_String(arr[3]),
       btc: dco_decode_opt_box_autoadd_transaction_bitcoin(arr[4]),
       tron: dco_decode_opt_box_autoadd_transaction_request_tron(arr[5]),
-      solana: dco_decode_opt_String(arr[6]),
+      solana: dco_decode_opt_box_autoadd_transaction_solana(arr[6]),
       signedMessage: dco_decode_opt_String(arr[7]),
       timestamp: dco_decode_u_64(arr[8]),
     );
@@ -6349,6 +6356,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_transaction_request_tron(raw);
+  }
+
+  @protected
+  TransactionSolana? dco_decode_opt_box_autoadd_transaction_solana(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_transaction_solana(raw);
   }
 
   @protected
@@ -6948,6 +6962,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       rawData: dco_decode_tron_raw_data_info(arr[2]),
       rawDataHex: dco_decode_String(arr[3]),
       signature: dco_decode_opt_String(arr[4]),
+    );
+  }
+
+  @protected
+  TransactionSolana dco_decode_transaction_solana(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return TransactionSolana(
+      message: dco_decode_list_prim_u_8_strict(arr[0]),
+      signature: dco_decode_list_prim_u_8_strict(arr[1]),
+      transactionHash: dco_decode_String(arr[2]),
+      fee: dco_decode_opt_box_autoadd_u_64(arr[3]),
+      slot: dco_decode_opt_box_autoadd_u_64(arr[4]),
     );
   }
 
@@ -7873,6 +7902,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionSolana sse_decode_box_autoadd_transaction_solana(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_solana(deserializer));
+  }
+
+  @protected
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_64(deserializer));
@@ -8221,7 +8257,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_btc = sse_decode_opt_box_autoadd_transaction_bitcoin(deserializer);
     var var_tron =
         sse_decode_opt_box_autoadd_transaction_request_tron(deserializer);
-    var var_solana = sse_decode_opt_String(deserializer);
+    var var_solana =
+        sse_decode_opt_box_autoadd_transaction_solana(deserializer);
     var var_signedMessage = sse_decode_opt_String(deserializer);
     var var_timestamp = sse_decode_u_64(deserializer);
     return HistoricalTransactionInfo(
@@ -9121,6 +9158,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TransactionSolana? sse_decode_opt_box_autoadd_transaction_solana(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_solana(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -9698,6 +9747,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         rawData: var_rawData,
         rawDataHex: var_rawDataHex,
         signature: var_signature);
+  }
+
+  @protected
+  TransactionSolana sse_decode_transaction_solana(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_message = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_signature = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_transactionHash = sse_decode_String(deserializer);
+    var var_fee = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_slot = sse_decode_opt_box_autoadd_u_64(deserializer);
+    return TransactionSolana(
+        message: var_message,
+        signature: var_signature,
+        transactionHash: var_transactionHash,
+        fee: var_fee,
+        slot: var_slot);
   }
 
   @protected
@@ -10624,6 +10690,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_transaction_solana(
+      TransactionSolana self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_solana(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self, serializer);
@@ -10883,7 +10956,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.scilla, serializer);
     sse_encode_opt_box_autoadd_transaction_bitcoin(self.btc, serializer);
     sse_encode_opt_box_autoadd_transaction_request_tron(self.tron, serializer);
-    sse_encode_opt_String(self.solana, serializer);
+    sse_encode_opt_box_autoadd_transaction_solana(self.solana, serializer);
     sse_encode_opt_String(self.signedMessage, serializer);
     sse_encode_u_64(self.timestamp, serializer);
   }
@@ -11599,6 +11672,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_transaction_solana(
+      TransactionSolana? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_solana(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -12021,6 +12105,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_tron_raw_data_info(self.rawData, serializer);
     sse_encode_String(self.rawDataHex, serializer);
     sse_encode_opt_String(self.signature, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_solana(
+      TransactionSolana self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.message, serializer);
+    sse_encode_list_prim_u_8_strict(self.signature, serializer);
+    sse_encode_String(self.transactionHash, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.fee, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.slot, serializer);
   }
 
   @protected

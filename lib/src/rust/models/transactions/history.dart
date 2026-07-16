@@ -7,6 +7,7 @@ import '../../frb_generated.dart';
 import 'base_token.dart';
 import 'btc.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'solana.dart';
 import 'transaction_metadata.dart';
 import 'tron.dart';
 
@@ -17,7 +18,7 @@ class HistoricalTransactionInfo {
   final String? scilla;
   final TransactionBitcoin? btc;
   final TransactionRequestTron? tron;
-  final String? solana;
+  final TransactionSolana? solana;
   final String? signedMessage;
   final BigInt timestamp;
 

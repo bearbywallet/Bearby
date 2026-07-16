@@ -59,6 +59,7 @@ import 'models/transactions/evm.dart';
 import 'models/transactions/history.dart';
 import 'models/transactions/request.dart';
 import 'models/transactions/scilla.dart';
+import 'models/transactions/solana.dart';
 import 'models/transactions/transaction_metadata.dart';
 import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
@@ -291,6 +292,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   TransactionRequestTron dco_decode_box_autoadd_transaction_request_tron(
       dynamic raw);
+
+  @protected
+  TransactionSolana dco_decode_box_autoadd_transaction_solana(dynamic raw);
 
   @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw);
@@ -594,6 +598,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  TransactionSolana? dco_decode_opt_box_autoadd_transaction_solana(dynamic raw);
+
+  @protected
   BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
 
   @protected
@@ -733,6 +740,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionRequestTron dco_decode_transaction_request_tron(dynamic raw);
+
+  @protected
+  TransactionSolana dco_decode_transaction_solana(dynamic raw);
 
   @protected
   TransactionStatusInfo dco_decode_transaction_status_info(dynamic raw);
@@ -1043,6 +1053,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionRequestTron sse_decode_box_autoadd_transaction_request_tron(
+      SseDeserializer deserializer);
+
+  @protected
+  TransactionSolana sse_decode_box_autoadd_transaction_solana(
       SseDeserializer deserializer);
 
   @protected
@@ -1386,6 +1400,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  TransactionSolana? sse_decode_opt_box_autoadd_transaction_solana(
+      SseDeserializer deserializer);
+
+  @protected
   BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
 
   @protected
@@ -1544,6 +1562,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   TransactionRequestTron sse_decode_transaction_request_tron(
       SseDeserializer deserializer);
+
+  @protected
+  TransactionSolana sse_decode_transaction_solana(SseDeserializer deserializer);
 
   @protected
   TransactionStatusInfo sse_decode_transaction_status_info(
@@ -1868,6 +1889,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_transaction_request_tron(
       TransactionRequestTron self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_transaction_solana(
+      TransactionSolana self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
@@ -2223,6 +2248,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       TransactionRequestTron? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_transaction_solana(
+      TransactionSolana? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
 
   @protected
@@ -2383,6 +2412,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_transaction_request_tron(
       TransactionRequestTron self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_transaction_solana(
+      TransactionSolana self, SseSerializer serializer);
 
   @protected
   void sse_encode_transaction_status_info(

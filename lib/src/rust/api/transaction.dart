@@ -13,6 +13,7 @@ import '../models/transactions/evm.dart';
 import '../models/transactions/history.dart';
 import '../models/transactions/request.dart';
 import '../models/transactions/scilla.dart';
+import '../models/transactions/solana.dart';
 import '../models/transactions/transaction_metadata.dart';
 import '../models/transactions/tron.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';

@@ -1,4 +1,5 @@
 use super::btc::{BitcoinMetadataInfo, TransactionBitcoin};
+use super::solana::TransactionSolana;
 use super::tron::TransactionRequestTron;
 pub use super::transaction_metadata::TransactionMetadataInfo;
 use zilpay::history::status::TransactionStatus;
@@ -30,7 +31,7 @@ pub struct HistoricalTransactionInfo {
     pub scilla: Option<String>,
     pub btc: Option<TransactionBitcoin>,
     pub tron: Option<TransactionRequestTron>,
-    pub solana: Option<String>,
+    pub solana: Option<TransactionSolana>,
     pub signed_message: Option<String>,
     pub timestamp: u64,
 }
@@ -51,6 +52,8 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 TransactionRequestTron::try_from(receipt).ok()
             });
 
+        let solana = value.solana.as_ref().map(TransactionSolana::from);
+
         Self {
             status: value.status.into(),
             metadata: value.metadata.into(),
@@ -59,7 +62,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 TransactionBitcoin::from_tx_with_utxos(tx, &meta.witness_utxos, network)
             }),
             tron,
-            solana: value.solana,
+            solana,
             evm: value.evm,
             scilla: value.scilla,
             signed_message: value.signed_message,

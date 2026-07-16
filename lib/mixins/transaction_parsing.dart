@@ -3,6 +3,7 @@ import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/transactions/btc.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/solana.dart';
 import 'package:bearby/src/rust/models/transactions/tron.dart';
 
 class ParsedEvmReceipt {
@@ -227,6 +228,8 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   TransactionRequestTron? get tronReceipt => tron;
 
+  TransactionSolana? get solanaReceipt => solana;
+
   TronContractValue? get _tronFirstContractValue {
     final contracts = tron?.rawData.contract;
     if (contracts == null || contracts.isEmpty) return null;
@@ -248,11 +251,13 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   bool get isScillaTransaction => scilla != null;
   bool get isBtcTransaction => btc != null;
   bool get isTronTransaction => tron != null;
+  bool get isSolanaTransaction => solana != null;
 
   String get chainType {
     // Prefer chain-native blob: tron may still carry a polluted `evm` from older
     // receipt-update paths.
     if (tron != null) return 'Tron';
+    if (solana != null) return 'Solana';
     if (evm != null) return 'EVM';
     if (scilla != null) return 'Scilla';
     if (btc != null) return 'BTC';
@@ -261,6 +266,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String get transactionHash {
     return metadata.hash ??
+        solana?.transactionHash ??
         tron?.txId ??
         evmReceipt?.transactionHash ??
         scillaReceipt?.transactionHash ??
@@ -339,6 +345,10 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   BigInt get fee {
     if (btc != null) {
       return btc?.fee ?? BigInt.zero;
+    }
+
+    if (solana != null) {
+      return solana!.fee ?? BigInt.zero;
     }
 
     if (tron != null) {
