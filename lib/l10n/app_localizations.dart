@@ -2621,6 +2621,42 @@ abstract class AppLocalizations {
   /// **'No connected DApps'**
   String get connectedDappsModalNoDapps;
 
+  /// Section title for WalletConnect sessions in the connected dapps modal
+  ///
+  /// In en, this message translates to:
+  /// **'WalletConnect'**
+  String get wcSectionTitle;
+
+  /// Section title for in-app browser connections in the connected dapps modal
+  ///
+  /// In en, this message translates to:
+  /// **'Browser'**
+  String get wcBrowserSectionTitle;
+
+  /// Label above paste/scan controls for a new WalletConnect pairing
+  ///
+  /// In en, this message translates to:
+  /// **'New connection'**
+  String get wcNewConnection;
+
+  /// Hint for pasting a WalletConnect pairing URI
+  ///
+  /// In en, this message translates to:
+  /// **'Paste wc: URI'**
+  String get wcPasteUri;
+
+  /// Tooltip/action to disconnect a WalletConnect session
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get wcDisconnect;
+
+  /// Error shown when WalletConnect pairing fails
+  ///
+  /// In en, this message translates to:
+  /// **'WalletConnect pairing failed'**
+  String get wcPairFailed;
+
   /// Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time
   ///
   /// In en, this message translates to:

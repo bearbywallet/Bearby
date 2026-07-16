@@ -1307,6 +1307,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectedDappsModalNoDapps => 'No connected DApps';
 
   @override
+  String get wcSectionTitle => 'WalletConnect';
+
+  @override
+  String get wcBrowserSectionTitle => 'Browser';
+
+  @override
+  String get wcNewConnection => 'New connection';
+
+  @override
+  String get wcPasteUri => 'Paste wc: URI';
+
+  @override
+  String get wcDisconnect => 'Disconnect';
+
+  @override
+  String get wcPairFailed => 'WalletConnect pairing failed';
+
+  @override
   String dappListItemConnected(Object time) {
     return 'Connected $time';
   }

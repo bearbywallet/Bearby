@@ -1309,6 +1309,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get connectedDappsModalNoDapps => 'Нет подключенных DApps';
 
   @override
+  String get wcSectionTitle => 'WalletConnect';
+
+  @override
+  String get wcBrowserSectionTitle => 'Браузер';
+
+  @override
+  String get wcNewConnection => 'Новое подключение';
+
+  @override
+  String get wcPasteUri => 'Вставьте wc: URI';
+
+  @override
+  String get wcDisconnect => 'Отключить';
+
+  @override
+  String get wcPairFailed => 'Не удалось выполнить pairing WalletConnect';
+
+  @override
   String dappListItemConnected(Object time) {
     return 'Подключено $time';
   }

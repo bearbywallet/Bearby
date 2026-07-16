@@ -1617,6 +1617,30 @@
   "@connectedDappsModalNoDapps": {
     "description": "Text displayed when no DApps are connected in the ConnectedDappsModalContent component"
   },
+  "wcSectionTitle": "WalletConnect",
+  "@wcSectionTitle": {
+    "description": "Section title for WalletConnect sessions in the connected dapps modal"
+  },
+  "wcBrowserSectionTitle": "Browser",
+  "@wcBrowserSectionTitle": {
+    "description": "Section title for in-app browser connections in the connected dapps modal"
+  },
+  "wcNewConnection": "New connection",
+  "@wcNewConnection": {
+    "description": "Label above paste/scan controls for a new WalletConnect pairing"
+  },
+  "wcPasteUri": "Paste wc: URI",
+  "@wcPasteUri": {
+    "description": "Hint for pasting a WalletConnect pairing URI"
+  },
+  "wcDisconnect": "Disconnect",
+  "@wcDisconnect": {
+    "description": "Tooltip/action to disconnect a WalletConnect session"
+  },
+  "wcPairFailed": "WalletConnect pairing failed",
+  "@wcPairFailed": {
+    "description": "Error shown when WalletConnect pairing fails"
+  },
   "dappListItemConnected": "Connected {time}",
   "@dappListItemConnected": {
     "description": "Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time",

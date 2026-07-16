@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/modals/qr_scanner_modal.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
@@ -46,25 +48,64 @@ class _ConnectedDappsModalContent extends StatefulWidget {
 class _ConnectedDappsModalContentState
     extends State<_ConnectedDappsModalContent> {
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _wcUriController = TextEditingController();
   String _searchQuery = '';
+  bool _isPairing = false;
 
   @override
   void dispose() {
     _searchController.dispose();
+    _wcUriController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pairUri(String raw) async {
+    final uri = raw.trim();
+    if (uri.isEmpty || _isPairing) return;
+    setState(() => _isPairing = true);
+    try {
+      await context.read<WalletConnectService>().pair(uri);
+      _wcUriController.clear();
+    } catch (e) {
+      if (!mounted) return;
+      final theme = context.read<AppState>().currentTheme;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n?.wcPairFailed ?? 'WalletConnect pair failed',
+            style: theme.bodyLarge.copyWith(color: theme.buttonText),
+          ),
+          backgroundColor: theme.danger,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isPairing = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
-    final appState = Provider.of<AppState>(context, listen: false);
-    final connectedDapps = appState.connections;
+    final appState = context.watch<AppState>();
+    final theme = appState.currentTheme;
+    final wcService = context.watch<WalletConnectService>();
+    final l10n = AppLocalizations.of(context);
+    final query = _searchQuery.toLowerCase();
 
+    final connectedDapps = appState.connections;
     final filteredDapps = connectedDapps
         .where((dapp) =>
-            dapp.domain.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            dapp.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+            dapp.domain.toLowerCase().contains(query) ||
+            dapp.title.toLowerCase().contains(query))
+        .toList(growable: false);
+
+    final wcSessions = wcService.sessionViews
+        .where((s) =>
+            s.name.toLowerCase().contains(query) ||
+            s.url.toLowerCase().contains(query))
+        .toList(growable: false);
+
+    final isEmpty = filteredDapps.isEmpty && wcSessions.isEmpty;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -86,63 +127,157 @@ class _ConnectedDappsModalContentState
           Container(
             width: 36,
             height: 4,
-            margin: EdgeInsets.symmetric(vertical: 16),
+            margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               color: theme.modalBorder,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
-              hint: AppLocalizations.of(context)!.connectedDappsModalSearchHint,
+              hint: l10n?.connectedDappsModalSearchHint ?? 'Search DApps',
               onChanged: (value) => setState(() => _searchQuery = value),
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,
               height: 48,
               fontSize: 16,
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               leftIcon: AppIcon.search,
               rightIcon: AppIcon.close,
               onRightIconTap: () {
-                _searchController.text = "";
+                _searchController.text = '';
+                setState(() => _searchQuery = '');
               },
             ),
           ),
           Expanded(
-            child: filteredDapps.isEmpty
+            child: isEmpty
                 ? Center(
                     child: Text(
-                      AppLocalizations.of(context)!.connectedDappsModalNoDapps,
+                      l10n?.connectedDappsModalNoDapps ?? 'No connected DApps',
                       style:
                           theme.bodyLarge.copyWith(color: theme.textSecondary),
                     ),
                   )
-                : ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: filteredDapps.length,
-                    itemBuilder: (context, index) {
-                      final dapp = filteredDapps[index];
-                      return Column(
-                        children: [
+                : ListView(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    children: [
+                      if (wcSessions.isNotEmpty) ...[
+                        _SectionHeader(
+                          title: l10n?.wcSectionTitle ?? 'WalletConnect',
+                        ),
+                        for (var i = 0; i < wcSessions.length; i++) ...[
                           _DappListItem(
-                            name: dapp.title,
-                            url: dapp.domain,
-                            iconUrl: dapp.favicon ?? "",
-                            lastConnected: fromLargeBigInt(dapp.lastConnected),
-                            onDisconnect: () =>
-                                widget.onDappDisconnect?.call(dapp.domain),
+                            name: wcSessions[i].name,
+                            url: wcSessions[i].url,
+                            iconUrl: wcSessions[i].icon,
+                            lastConnected: null,
+                            disconnectLabel: l10n?.wcDisconnect ?? 'Disconnect',
+                            onDisconnect: () {
+                              wcService.disconnectSession(wcSessions[i].topic);
+                            },
                           ),
-                          if (index < filteredDapps.length - 1)
+                          if (i < wcSessions.length - 1)
                             Divider(
                               height: 1,
                               color: theme.textSecondary.withValues(alpha: 0.1),
                             ),
                         ],
-                      );
-                    },
+                        const SizedBox(height: 16),
+                      ],
+                      if (filteredDapps.isNotEmpty) ...[
+                        _SectionHeader(
+                          title: l10n?.wcBrowserSectionTitle ?? 'Browser',
+                        ),
+                        for (var i = 0; i < filteredDapps.length; i++) ...[
+                          _DappListItem(
+                            name: filteredDapps[i].title,
+                            url: filteredDapps[i].domain,
+                            iconUrl: filteredDapps[i].favicon ?? '',
+                            lastConnected: fromLargeBigInt(
+                              filteredDapps[i].lastConnected,
+                            ),
+                            onDisconnect: () => widget.onDappDisconnect
+                                ?.call(filteredDapps[i].domain),
+                          ),
+                          if (i < filteredDapps.length - 1)
+                            Divider(
+                              height: 1,
+                              color: theme.textSecondary.withValues(alpha: 0.1),
+                            ),
+                        ],
+                      ],
+                    ],
                   ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n?.wcNewConnection ?? 'New connection',
+                  style: theme.titleMedium.copyWith(color: theme.textPrimary),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SmartInput(
+                        controller: _wcUriController,
+                        hint: l10n?.wcPasteUri ?? 'Paste wc: URI',
+                        borderColor: theme.textPrimary,
+                        focusedBorderColor: theme.primaryPurple,
+                        height: 48,
+                        fontSize: 14,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        onSubmitted: _pairUri,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: _isPairing
+                          ? null
+                          : () {
+                              showQRScannerModal(
+                                context: context,
+                                onScanned: (code) {
+                                  _pairUri(code);
+                                },
+                              );
+                            },
+                      icon: AppIconView(
+                        icon: AppIcon.scan,
+                        size: 24,
+                        color: theme.primaryPurple,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _isPairing
+                          ? null
+                          : () => _pairUri(_wcUriController.text),
+                      icon: _isPairing
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.primaryPurple,
+                              ),
+                            )
+                          : AppIconView(
+                              icon: AppIcon.plus,
+                              size: 24,
+                              color: theme.primaryPurple,
+                            ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
@@ -155,29 +290,52 @@ class _ConnectedDappsModalContentState
   }
 }
 
+class _SectionHeader extends StatelessWidget {
+  final String title;
+
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.read<AppState>().currentTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8, top: 4),
+      child: Text(
+        title,
+        style: theme.bodyLarge.copyWith(
+          color: theme.textSecondary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
 class _DappListItem extends StatelessWidget {
   final String name;
   final String url;
   final String iconUrl;
-  final DateTime lastConnected;
+  final DateTime? lastConnected;
+  final String? disconnectLabel;
   final VoidCallback? onDisconnect;
 
   const _DappListItem({
     required this.name,
     required this.url,
     required this.iconUrl,
-    required this.lastConnected,
+    this.lastConnected,
+    this.disconnectLabel,
     this.onDisconnect,
   });
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<AppState>(context).currentTheme;
+    final appTheme = context.watch<AppState>().currentTheme;
     const double iconSize = 40.0;
 
     return Container(
       margin: EdgeInsets.zero,
-      padding: EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -220,7 +378,7 @@ class _DappListItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -231,23 +389,28 @@ class _DappListItem extends StatelessWidget {
                   style:
                       appTheme.bodyLarge.copyWith(color: appTheme.textPrimary),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   url,
                   style: appTheme.bodyText2
                       .copyWith(color: appTheme.textSecondary),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.dappListItemConnected(
-                      _formatLastConnected(context, lastConnected)),
-                  style: appTheme.labelSmall
-                      .copyWith(color: appTheme.textSecondary),
-                ),
+                if (lastConnected != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    AppLocalizations.of(context)?.dappListItemConnected(
+                          _formatLastConnected(context, lastConnected),
+                        ) ??
+                        'Connected ${_formatLastConnected(context, lastConnected)}',
+                    style: appTheme.labelSmall
+                        .copyWith(color: appTheme.textSecondary),
+                  ),
+                ],
               ],
             ),
           ),
           IconButton(
+            tooltip: disconnectLabel,
             onPressed: onDisconnect,
             icon: AppIconView(
               icon: AppIcon.disconnect,
@@ -260,7 +423,8 @@ class _DappListItem extends StatelessWidget {
     );
   }
 
-  String _formatLastConnected(BuildContext context, DateTime date) {
+  String _formatLastConnected(BuildContext context, DateTime? date) {
+    if (date == null) return '';
     final now = DateTime.now();
     final difference = now.difference(date);
 
@@ -271,7 +435,7 @@ class _DappListItem extends StatelessWidget {
     } else if (difference.inMinutes > 0) {
       return '${difference.inMinutes}m ago';
     } else {
-      return AppLocalizations.of(context)!.dappListItemJustNow;
+      return AppLocalizations.of(context)?.dappListItemJustNow ?? 'just now';
     }
   }
 }

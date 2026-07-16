@@ -1306,6 +1306,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get connectedDappsModalNoDapps => '无已连接的 DApps';
 
   @override
+  String get wcSectionTitle => 'WalletConnect';
+
+  @override
+  String get wcBrowserSectionTitle => '浏览器';
+
+  @override
+  String get wcNewConnection => '新建连接';
+
+  @override
+  String get wcPasteUri => '粘贴 wc: URI';
+
+  @override
+  String get wcDisconnect => '断开连接';
+
+  @override
+  String get wcPairFailed => 'WalletConnect 配对失败';
+
+  @override
   String dappListItemConnected(Object time) {
     return '已连接 $time';
   }

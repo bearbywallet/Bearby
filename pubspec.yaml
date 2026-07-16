@@ -29,6 +29,7 @@ dependencies:
   go_router: ^17.2.1
   intl: ^0.20.2
   freezed_annotation: ^3.1.0
+  reown_walletkit: ^1.3.9 # pulls flutter_secure_storage 9; see dependency_overrides
 
 dev_dependencies:
   flutter_test:
@@ -71,3 +72,10 @@ flutter_launcher_icons:
   adaptive_icon_background: "#E8176A"
   adaptive_icon_foreground: "assets/icon_light.png"
   min_sdk_android: 21
+
+# reown_walletkit pins flutter_secure_storage ^9 / package_info_plus <10, which
+# conflicts with device_info_plus 13 + file_picker (win32 ^6). Force compatible set.
+dependency_overrides:
+  package_info_plus: ^10.1.0
+  flutter_secure_storage: ^10.3.1
+  flutter_secure_storage_windows: ^4.2.2

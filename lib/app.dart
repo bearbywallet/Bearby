@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'router.dart';
 import 'services/deep_link_service.dart';
 import 'state/app_state.dart';
@@ -19,26 +22,40 @@ class BearbyApp extends StatefulWidget {
 
 class _BearbyAppState extends State<BearbyApp> {
   late final GoRouter _router;
+  late final WalletConnectService _walletConnectService;
   final _deepLinkService = DeepLinkService();
 
   @override
   void initState() {
     super.initState();
     _router = createRouter(widget.appState);
-    _deepLinkService.initialize(_router, widget.appState);
+    _walletConnectService = WalletConnectService(
+      appState: widget.appState,
+      router: _router,
+    );
+    unawaited(_walletConnectService.init());
+    _deepLinkService.initialize(
+      _router,
+      widget.appState,
+      _walletConnectService,
+    );
   }
 
   @override
   void dispose() {
     _deepLinkService.dispose();
+    _walletConnectService.dispose();
     _router.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: widget.appState,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: widget.appState),
+        ChangeNotifierProvider.value(value: _walletConnectService),
+      ],
       child: Builder(
         builder: (context) {
           return Consumer<AppState>(

@@ -25,6 +25,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 
 const double _ICON_SIZE_SMALL_BASE = 20.0;
 const double _ICON_SIZE_TILE_BUTTON_BASE = 22.0;
@@ -144,6 +145,17 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     _isHandlingScan = true;
 
     try {
+      if (trimmed.startsWith('wc:')) {
+        final wcService = context.read<WalletConnectService>();
+        try {
+          await wcService.pair(trimmed);
+        } catch (e) {
+          debugPrint('WC pair from QR failed: $e');
+          if (mounted) _showScanError();
+        }
+        return;
+      }
+
       final appState = Provider.of<AppState>(context, listen: false);
       final activeChain = appState.chain;
 

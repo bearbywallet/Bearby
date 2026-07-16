@@ -1306,6 +1306,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get connectedDappsModalNoDapps => '연결된 DApps 없음';
 
   @override
+  String get wcSectionTitle => 'WalletConnect';
+
+  @override
+  String get wcBrowserSectionTitle => '브라우저';
+
+  @override
+  String get wcNewConnection => '새 연결';
+
+  @override
+  String get wcPasteUri => 'wc: URI 붙여넣기';
+
+  @override
+  String get wcDisconnect => '연결 해제';
+
+  @override
+  String get wcPairFailed => 'WalletConnect 페어링 실패';
+
+  @override
   String dappListItemConnected(Object time) {
     return '$time 연결됨';
   }

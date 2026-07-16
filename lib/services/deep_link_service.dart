@@ -3,14 +3,21 @@ import 'package:app_links/app_links.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/state/app_state.dart';
 
 class DeepLinkService {
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<Uri>? _linkSubscription;
   String? _lastProcessedUri;
+  WalletConnectService? _walletConnect;
 
-  Future<void> initialize(GoRouter router, AppState appState) async {
+  Future<void> initialize(
+    GoRouter router,
+    AppState appState,
+    WalletConnectService walletConnect,
+  ) async {
+    _walletConnect = walletConnect;
     try {
       final initialUri = await _appLinks.getInitialLink();
 
@@ -37,6 +44,17 @@ class DeepLinkService {
     }
 
     _lastProcessedUri = uriString;
+
+    final wcUri = _extractWcUri(uri);
+    if (wcUri != null) {
+      final service = _walletConnect;
+      if (service != null) {
+        unawaited(service.pair(wcUri).catchError((Object e) {
+          // Pairing failures are non-fatal for deep-link entry.
+        }));
+      }
+      return;
+    }
 
     try {
       final parsed = parseCryptoUrl(uri.toString());
@@ -75,6 +93,15 @@ class DeepLinkService {
     } catch (e) {
       //
     }
+  }
+
+  /// `wc:...` directly, or `bearby://wc?uri=<url-encoded wc uri>`.
+  String? _extractWcUri(Uri uri) {
+    if (uri.scheme == 'wc') return uri.toString();
+    if (uri.scheme == 'bearby' && uri.host == 'wc') {
+      return uri.queryParameters['uri'];
+    }
+    return null;
   }
 
   int _findWalletByChainName(AppState appState, String chainName) {

@@ -13,9 +13,12 @@ const int kTronSlip44 = 195;
 const int kSolanaSlip44 = 501;
 final BigInt kZilliqaChainId = BigInt.one;
 
-// Address types
+// Address types (matches Address::prefix_type in core)
 const int kScillaAddressType = 0;
 const int kEvmAddressType = 1;
+const int kBtcAddressType = 2;
+const int kSolanaAddressType = 3;
+const int kTronAddressType = 4;
 
 // JSON-RPC
 const String kJsonRpcVersion = '2.0';

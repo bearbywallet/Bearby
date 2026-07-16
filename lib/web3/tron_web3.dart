@@ -11,10 +11,6 @@ import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
-import 'package:bearby/src/rust/models/transactions/base_token.dart';
-import 'package:bearby/src/rust/models/transactions/request.dart';
-import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
-import 'package:bearby/src/rust/api/transaction.dart' as rust_api;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -24,6 +20,7 @@ import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/web3/message.dart';
+import 'package:bearby/web3/request_builders.dart';
 import 'package:bearby/web3/web3_utils.dart';
 
 class TronWeb3Handler {
@@ -296,13 +293,10 @@ class TronWeb3Handler {
       }
 
       final Map<String, dynamic> transaction = params['transaction'];
-      final txParams = transaction['raw_data'] as Map<String, dynamic>;
-
-      final Map<String, dynamic> contract = txParams['contract'][0];
-      final Map<String, dynamic> value = contract['parameter']['value'];
-      final String to = value['to_address'] ?? "";
-      final int? amount = value['amount'];
-      final BigInt valueAmount = BigInt.from(amount ?? 0);
+      final typedTransaction = Map<String, Object?>.from(transaction);
+      final String to = tronTransferTo(typedTransaction);
+      final valueAmount =
+          BigInt.tryParse(tronTransferAmount(typedTransaction)) ?? BigInt.zero;
       final FTokenInfo? mbToken = appState.wallet?.tokens.first;
       String? title = await webViewController.getTitle();
 
@@ -315,26 +309,15 @@ class TronWeb3Handler {
         );
       }
 
-      final tokenInfo = BaseTokenInfo(
-        value: valueAmount.toString(),
-        symbol: mbToken.symbol,
-        decimals: mbToken.decimals,
-      );
-      final metadata = TransactionMetadataInfo(
+      final transactionRequest = buildTronTransactionRequest(
+        transaction: typedTransaction,
+        nativeToken: mbToken,
         chainHash: appState.chain?.chainHash ?? BigInt.zero,
-        hash: null,
-        info: null,
+        signerAddr: appState.account?.addr,
+        title: title ?? '',
         icon: message.icon,
-        title: title ?? "",
-        signer: appState.account?.addr,
-        tokenInfo: tokenInfo,
         broadcast: false,
-      );
-      final transactionRequest = TransactionRequestInfo(
-        metadata: metadata,
-        scilla: null,
-        evm: null,
-        tron: rust_api.parseTronTransaction(json: jsonEncode(transaction)),
+        tokenValue: valueAmount.toString(),
       );
 
       if (!context.mounted) {
@@ -919,12 +902,10 @@ class TronWeb3Handler {
 
       final Map<String, dynamic> transaction =
           params['transaction'] as Map<String, dynamic>;
-      final txParams = transaction['raw_data'] as Map<String, dynamic>;
-      final Map<String, dynamic> contract = txParams['contract'][0];
-      final Map<String, dynamic> value = contract['parameter']['value'];
-      final String to = value['to_address'] ?? '';
-      final int? amount = value['amount'];
-      final BigInt valueAmount = BigInt.from(amount ?? 0);
+      final typedTransaction = Map<String, Object?>.from(transaction);
+      final String to = tronTransferTo(typedTransaction);
+      final valueAmount =
+          BigInt.tryParse(tronTransferAmount(typedTransaction)) ?? BigInt.zero;
       final FTokenInfo? mbToken = appState.wallet?.tokens.first;
       String? title = await webViewController.getTitle();
 
@@ -937,26 +918,15 @@ class TronWeb3Handler {
         );
       }
 
-      final tokenInfo = BaseTokenInfo(
-        value: valueAmount.toString(),
-        symbol: mbToken.symbol,
-        decimals: mbToken.decimals,
-      );
-      final metadata = TransactionMetadataInfo(
+      final transactionRequest = buildTronTransactionRequest(
+        transaction: typedTransaction,
+        nativeToken: mbToken,
         chainHash: appState.chain?.chainHash ?? BigInt.zero,
-        hash: null,
-        info: null,
-        icon: message.icon,
+        signerAddr: appState.account?.addr,
         title: title ?? '',
-        signer: appState.account?.addr,
-        tokenInfo: tokenInfo,
+        icon: message.icon,
         broadcast: false,
-      );
-      final transactionRequest = TransactionRequestInfo(
-        metadata: metadata,
-        scilla: null,
-        evm: null,
-        tron: rust_api.parseTronTransaction(json: jsonEncode(transaction)),
+        tokenValue: valueAmount.toString(),
       );
 
       if (!context.mounted) {

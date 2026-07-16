@@ -151,8 +151,13 @@ String? _globalRedirect(
   return null;
 }
 
+/// Root navigator key — used by WalletConnect modals / deep-link routing.
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+
 GoRouter createRouter(AppState appState) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.home,
     refreshListenable: appState,
     redirect: (context, state) => _globalRedirect(context, state, appState),
