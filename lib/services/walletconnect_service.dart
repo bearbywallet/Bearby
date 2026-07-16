@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -79,11 +78,15 @@ class WalletConnectService extends ChangeNotifier {
   BigInt? _lastChainId;
   String _registrationFingerprint = '';
   List<WcSessionView> _cachedSessionViews = const <WcSessionView>[];
+  Completer<void>? _initCompleter;
+  Object? _initError;
 
   /// >0 suppresses accountsChanged/chainChanged emission (temporary switches).
   int _suppressAppStateEvents = 0;
 
   WalletConnectService({required this.appState, required this.router});
+
+  bool get isReady => _walletKit != null;
 
   List<SessionData> get sessions {
     final kit = _walletKit;
@@ -102,6 +105,16 @@ class WalletConnectService extends ChangeNotifier {
   // ────────────────────────── lifecycle ──────────────────────────
 
   Future<void> init() async {
+    if (_walletKit != null) return;
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+      return;
+    }
+
+    final completer = Completer<void>();
+    _initCompleter = completer;
+    _initError = null;
+
     try {
       final kit = ReownWalletKit(
         core: ReownCore(projectId: kWalletConnectProjectId),
@@ -118,9 +131,23 @@ class WalletConnectService extends ChangeNotifier {
       appState.addListener(_onAppStateChanged);
       _refreshSessionViews();
       notifyListeners();
+      if (!completer.isCompleted) completer.complete();
     } catch (e) {
       // Relay/init failure must never break app startup.
+      _initError = e;
       debugPrint('WalletConnect init failed: $e');
+      if (!completer.isCompleted) completer.complete();
+    }
+  }
+
+  /// Wait until [init] finishes (success or failure).
+  Future<void> waitUntilReady() async {
+    if (_walletKit != null) return;
+    final pending = _initCompleter;
+    if (pending != null) {
+      await pending.future;
+    } else {
+      await init();
     }
   }
 
@@ -139,12 +166,24 @@ class WalletConnectService extends ChangeNotifier {
   // ────────────────────────── pairing ──────────────────────────
 
   Future<void> pair(String uri) async {
+    await waitUntilReady();
     final kit = _walletKit;
     if (kit == null) {
-      throw StateError('WalletConnect is not initialized');
+      final detail = _initError;
+      throw StateError(
+        detail == null
+            ? 'WalletConnect is not initialized'
+            : 'WalletConnect failed to start: $detail',
+      );
     }
+
+    final trimmed = uri.trim();
+    if (!trimmed.startsWith('wc:')) {
+      throw FormatException('Not a WalletConnect URI: $trimmed');
+    }
+
     try {
-      await kit.pair(uri: Uri.parse(uri));
+      await kit.pair(uri: Uri.parse(trimmed));
     } catch (e) {
       debugPrint('WC pair failed: $e');
       rethrow;
@@ -727,9 +766,11 @@ class WalletConnectService extends ChangeNotifier {
 
     final TypedDataEip712 typedData;
     try {
-      typedData = await Isolate.run(
-        () => TypedDataEip712.fromJsonString(rawTypedData),
-      );
+      // Top-level [compute] only — nested Isolate.run closures capture `this`
+      // (Completers, listeners) and crash with "unsendable" errors.
+      typedData = rawTypedData.length > kWcIsolatePayloadThreshold
+          ? await compute(_wcParseTypedData, rawTypedData)
+          : _wcParseTypedData(rawTypedData);
     } catch (e) {
       await _restoreSelection(previous);
       return _respondError(
@@ -1003,11 +1044,9 @@ class WalletConnectService extends ChangeNotifier {
 
     final Uint8List messageBytes;
     try {
-      if (txBase64.length > kWcIsolatePayloadThreshold) {
-        messageBytes = await Isolate.run(() => base64Decode(txBase64));
-      } else {
-        messageBytes = base64Decode(txBase64);
-      }
+      messageBytes = txBase64.length > kWcIsolatePayloadThreshold
+          ? await compute(_wcBase64Decode, txBase64)
+          : _wcBase64Decode(txBase64);
     } catch (_) {
       await _restoreSelection(previous);
       return _respondError(
@@ -1176,13 +1215,11 @@ class WalletConnectService extends ChangeNotifier {
           );
           return;
         }
-        final decoded = await Isolate.run(() {
-          final parsed = jsonDecode(signedTron);
-          if (parsed is Map) {
-            return Map<String, Object?>.from(parsed);
-          }
-          return <String, Object?>{};
-        });
+        // Must use top-level [compute]/ a nested Isolate.run closure
+        // captures WalletConnectService (Completer, AppState listeners).
+        final decoded = signedTron.length > kWcIsolatePayloadThreshold
+            ? await compute(_wcDecodeJsonMap, signedTron)
+            : _wcDecodeJsonMap(signedTron);
         await responder.ok(decoded);
       },
       onDismiss: () => unawaited(responder.rejected()),
@@ -1513,6 +1550,21 @@ class WcSessionView {
   @override
   String toString() =>
       'WcSessionView(topic: $topic, name: $name, url: $url, icon: $icon)';
+}
+
+// ── Isolate entry points (top-level only — must not close over service) ──
+
+TypedDataEip712 _wcParseTypedData(String raw) =>
+    TypedDataEip712.fromJsonString(raw);
+
+Uint8List _wcBase64Decode(String raw) => base64Decode(raw);
+
+Map<String, Object?> _wcDecodeJsonMap(String raw) {
+  final parsed = jsonDecode(raw);
+  if (parsed is Map) {
+    return Map<String, Object?>.from(parsed);
+  }
+  return <String, Object?>{};
 }
 
 /// Bitcoin-style Base58 decode for Solana WC message payloads.

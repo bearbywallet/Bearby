@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     context.push(AppRoutes.send, extra: extra);
   }
 
-  void _showScanError() {
+  void _showScanError({String? message}) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context);
@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
           style: theme.titleMedium.copyWith(color: theme.textPrimary),
         ),
         content: Text(
-          l10n.qrCodeUnrecognizedError,
+          message ?? l10n.qrCodeUnrecognizedError,
           style: theme.bodyLarge.copyWith(color: theme.danger),
         ),
         actions: [
@@ -147,11 +147,16 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     try {
       if (trimmed.startsWith('wc:')) {
         final wcService = context.read<WalletConnectService>();
+        final l10n = AppLocalizations.of(context);
         try {
           await wcService.pair(trimmed);
         } catch (e) {
           debugPrint('WC pair from QR failed: $e');
-          if (mounted) _showScanError();
+          if (mounted) {
+            _showScanError(
+              message: l10n?.wcPairFailed ?? 'WalletConnect pairing failed',
+            );
+          }
         }
         return;
       }

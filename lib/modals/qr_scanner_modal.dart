@@ -66,6 +66,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    if (_completed) return;
 
     switch (state) {
       case AppLifecycleState.resumed:
@@ -73,11 +74,11 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           unawaited(controller.start());
         }
         break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
         unawaited(controller.stop());
-        break;
-      default:
         break;
     }
   }
@@ -114,7 +115,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
 
     _lastScannedCode = code;
     _lastScanTime = now;
-    _finish(code);
+    unawaited(_finish(code));
   }
 
   Future<void> _onPaste() async {
@@ -122,22 +123,50 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     final text = data?.text?.trim();
     if (text == null || text.isEmpty || !mounted) return;
-    _finish(text);
+    await _finish(text);
   }
 
-  /// Detect and paste share one path: close scanner, then deliver payload.
-  void _finish(String code) {
+  /// Release the camera hardware. Must complete before pop/dispose so the
+  /// native preview does not keep running after the modal is gone.
+  Future<void> _stopCamera() async {
+    try {
+      await controller.stop();
+    } catch (_) {
+      // Best-effort; [dispose] still frees the controller.
+    }
+  }
+
+  /// Detect and paste share one path: stop camera, close scanner, deliver payload.
+  Future<void> _finish(String code) async {
     if (!mounted || _completed) return;
     _completed = true;
     HapticFeedback.selectionClick();
+    await _stopCamera();
+    if (!mounted) return;
     Navigator.pop(context);
     widget.onScanned(code);
+  }
+
+  Future<void> _closeWithoutScan() async {
+    // Another path (scan/paste) is already shutting down — do not double-pop.
+    if (_completed) return;
+    _completed = true;
+    await _stopCamera();
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    controller.dispose();
+    // dispose() is async in mobile_scanner 7.x and cannot be awaited from
+    // State.dispose. Prefer stop-then-dispose so the camera is released even
+    // if the route was torn down without going through [_finish].
+    unawaited(() async {
+      try {
+        await controller.stop();
+      } catch (_) {}
+      await controller.dispose();
+    }());
     super.dispose();
   }
 
@@ -147,72 +176,84 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return Material(
-      color: Colors.black,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (_permissionError)
-            _buildErrorView(null, theme, l10n)
-          else
-            MobileScanner(
-              controller: controller,
-              onDetect: _onBarcodeDetected,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error) =>
-                  _buildErrorView(error, theme, l10n),
-            ),
-          if (!_permissionError) ...[
-            IgnorePointer(
-              child: CustomPaint(
-                painter: _ViewfinderPainter(color: theme.primaryPurple),
+    // Block barrier/system back until the camera has been stopped so the
+    // hardware is released before the route is removed.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) return;
+        unawaited(_closeWithoutScan());
+      },
+      child: Material(
+        color: Colors.black,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (_permissionError)
+              _buildErrorView(null, theme, l10n)
+            else
+              MobileScanner(
+                controller: controller,
+                onDetect: _onBarcodeDetected,
+                fit: BoxFit.cover,
+                // Parent owns lifecycle + stop-before-pop; avoid a second
+                // observer that can restart the camera after we shut it down.
+                useAppLifecycleState: false,
+                errorBuilder: (context, error) =>
+                    _buildErrorView(error, theme, l10n),
               ),
-            ),
-            const IgnorePointer(child: _ScanLine()),
-          ],
-          SafeArea(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: _GlassButton(
-                    theme: theme,
-                    onPressed: () => Navigator.pop(context),
-                    child: AppIconView(
-                      icon: AppIcon.close,
-                      size: 22,
-                      color: Colors.white,
-                    ),
-                  ),
+            if (!_permissionError) ...[
+              IgnorePointer(
+                child: CustomPaint(
+                  painter: _ViewfinderPainter(color: theme.primaryPurple),
                 ),
-                if (!_permissionError) ...[
+              ),
+              const IgnorePointer(child: _ScanLine()),
+            ],
+            SafeArea(
+              child: Stack(
+                children: [
                   Positioned(
-                    bottom: 24,
-                    left: 16,
+                    top: 16,
+                    right: 16,
                     child: _GlassButton(
                       theme: theme,
-                      onPressed: _onPaste,
+                      onPressed: () => unawaited(_closeWithoutScan()),
                       child: AppIconView(
-                        icon: AppIcon.copy,
+                        icon: AppIcon.close,
                         size: 22,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 24,
-                    right: 16,
-                    child: _TorchButton(
-                      controller: controller,
-                      theme: theme,
+                  if (!_permissionError) ...[
+                    Positioned(
+                      bottom: 24,
+                      left: 16,
+                      child: _GlassButton(
+                        theme: theme,
+                        onPressed: _onPaste,
+                        child: AppIconView(
+                          icon: AppIcon.copy,
+                          size: 22,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
+                    Positioned(
+                      bottom: 24,
+                      right: 16,
+                      child: _TorchButton(
+                        controller: controller,
+                        theme: theme,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
