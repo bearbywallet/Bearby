@@ -15,6 +15,7 @@ import 'package:bearby/modals/sign_message.dart';
 import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
@@ -1215,11 +1216,13 @@ class WalletConnectService extends ChangeNotifier {
           );
           return;
         }
-        // Must use top-level [compute]/ a nested Isolate.run closure
+        // Typed signed payload → TronWeb JSON string for the WC response.
+        final jsonStr = tronTransactionToJson(tx: signedTron);
+        // Must use top-level [compute]; a nested Isolate.run closure
         // captures WalletConnectService (Completer, AppState listeners).
-        final decoded = signedTron.length > kWcIsolatePayloadThreshold
-            ? await compute(_wcDecodeJsonMap, signedTron)
-            : _wcDecodeJsonMap(signedTron);
+        final decoded = jsonStr.length > kWcIsolatePayloadThreshold
+            ? await compute(_wcDecodeJsonMap, jsonStr)
+            : _wcDecodeJsonMap(jsonStr);
         await responder.ok(decoded);
       },
       onDismiss: () => unawaited(responder.rejected()),

@@ -650,13 +650,25 @@ pub fn parse_tron_transaction(json: String) -> Result<TransactionRequestTron, St
     Ok(TransactionRequestTron::from(tron_web))
 }
 
-/// Serialize a TransactionRequestTron back to JSON for dApp response.
+/// Serialize a TransactionRequestTron back to JSON for dApp / WC response.
+/// When [TransactionRequestTron::signature] is set, emits TronWeb `signature: [hex]`.
 #[frb(sync)]
 pub fn tron_transaction_to_json(tx: TransactionRequestTron) -> Result<String, String> {
+    let signature = tx.signature.clone();
     let tron_web: TronWebTransaction = tx
         .try_into()
         .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?;
-    zilpay::serde_json::to_string(&tron_web)
+    let mut value = zilpay::serde_json::to_value(&tron_web)
+        .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))?;
+    if let Some(sig) = signature {
+        if let Some(obj) = value.as_object_mut() {
+            obj.insert(
+                String::from("signature"),
+                zilpay::serde_json::json!([sig]),
+            );
+        }
+    }
+    zilpay::serde_json::to_string(&value)
         .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))
 }
 

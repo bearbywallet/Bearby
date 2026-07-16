@@ -1,7 +1,9 @@
 use super::btc::{BitcoinMetadataInfo, TransactionBitcoin};
+use super::tron::TransactionRequestTron;
 pub use super::transaction_metadata::TransactionMetadataInfo;
 use zilpay::history::status::TransactionStatus;
 pub use zilpay::history::transaction::HistoricalTransaction;
+use zilpay::proto::tron_tx::TronTransactionReceipt;
 
 #[derive(Debug)]
 pub enum TransactionStatusInfo {
@@ -27,7 +29,7 @@ pub struct HistoricalTransactionInfo {
     pub evm: Option<String>,
     pub scilla: Option<String>,
     pub btc: Option<TransactionBitcoin>,
-    pub tron: Option<String>,
+    pub tron: Option<TransactionRequestTron>,
     pub solana: Option<String>,
     pub signed_message: Option<String>,
     pub timestamp: u64,
@@ -42,6 +44,13 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
             .and_then(|s| s.get_bitcoin_network().ok())
             .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
 
+        let tron = value
+            .tron
+            .as_ref()
+            .and_then(|receipt: &TronTransactionReceipt| {
+                TransactionRequestTron::try_from(receipt).ok()
+            });
+
         Self {
             status: value.status.into(),
             metadata: value.metadata.into(),
@@ -49,7 +58,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 let meta = BitcoinMetadataInfo::from(meta);
                 TransactionBitcoin::from_tx_with_utxos(tx, &meta.witness_utxos, network)
             }),
-            tron: value.tron,
+            tron,
             solana: value.solana,
             evm: value.evm,
             scilla: value.scilla,

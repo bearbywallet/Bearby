@@ -3,6 +3,7 @@ import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/transactions/btc.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/tron.dart';
 
 class ParsedEvmReceipt {
   final String? transactionHash;
@@ -224,6 +225,14 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   TransactionBitcoin? get btcReceipt => btc;
 
+  TransactionRequestTron? get tronReceipt => tron;
+
+  TronContractValue? get _tronFirstContractValue {
+    final contracts = tron?.rawData.contract;
+    if (contracts == null || contracts.isEmpty) return null;
+    return contracts.first.value;
+  }
+
   ParsedSignedMessage? get parsedSignedMessage {
     if (signedMessage == null) return null;
     try {
@@ -235,11 +244,15 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   bool get isSignedMessage => signedMessage != null;
-  bool get isEvmTransaction => evm != null;
+  bool get isEvmTransaction => evm != null && tron == null;
   bool get isScillaTransaction => scilla != null;
   bool get isBtcTransaction => btc != null;
+  bool get isTronTransaction => tron != null;
 
   String get chainType {
+    // Prefer chain-native blob: tron may still carry a polluted `evm` from older
+    // receipt-update paths.
+    if (tron != null) return 'Tron';
     if (evm != null) return 'EVM';
     if (scilla != null) return 'Scilla';
     if (btc != null) return 'BTC';
@@ -248,6 +261,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String get transactionHash {
     return metadata.hash ??
+        tron?.txId ??
         evmReceipt?.transactionHash ??
         scillaReceipt?.transactionHash ??
         '';
@@ -262,6 +276,8 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
     if (btc != null) {
       return btc?.input.firstOrNull?.previousOutput.txid ?? '';
     }
+    final tronSender = _tronSender;
+    if (tronSender != null && tronSender.isNotEmpty) return tronSender;
     return evmReceipt?.sender ?? scillaReceipt?.sender ?? '';
   }
 
@@ -269,10 +285,16 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
     if (btc != null) {
       return '';
     }
+    final tronTo = _tronRecipient;
+    if (tronTo != null && tronTo.isNotEmpty) return tronTo;
     return evmReceipt?.recipient ?? scillaReceipt?.recipient ?? '';
   }
 
   String? get contractAddress {
+    final value = _tronFirstContractValue;
+    if (value is TronContractValue_TriggerSmartContract) {
+      return value.contractAddress;
+    }
     return evmReceipt?.contractAddress;
   }
 
@@ -281,7 +303,12 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   BigInt? get gasUsed => evmReceipt?.gasUsed;
-  BigInt? get gasLimit => evmReceipt?.gasLimit ?? scillaReceipt?.gasLimit;
+  BigInt? get gasLimit {
+    final feeLimit = tron?.rawData.feeLimit;
+    if (feeLimit != null) return BigInt.from(feeLimit.toInt());
+    return evmReceipt?.gasLimit ?? scillaReceipt?.gasLimit;
+  }
+
   BigInt? get gasPrice => evmReceipt?.gasPrice ?? scillaReceipt?.gasPrice;
   BigInt? get effectiveGasPrice => evmReceipt?.effectiveGasPrice;
   BigInt? get blobGasUsed => evmReceipt?.blobGasUsed;
@@ -298,15 +325,25 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
       );
       return total.toString();
     }
-    return metadata.tokenInfo?.value ??
-        evmReceipt?.amount ??
-        scillaReceipt?.amount ??
-        '0';
+    final tokenValue = metadata.tokenInfo?.value;
+    if (tokenValue != null && tokenValue.isNotEmpty) {
+      return tokenValue;
+    }
+    final tronAmount = _tronAmount;
+    if (tronAmount != null && tronAmount.isNotEmpty) {
+      return tronAmount;
+    }
+    return evmReceipt?.amount ?? scillaReceipt?.amount ?? '0';
   }
 
   BigInt get fee {
     if (btc != null) {
       return btc?.fee ?? BigInt.zero;
+    }
+
+    if (tron != null) {
+      // fee_limit is a max budget, not actual fee.
+      return BigInt.zero;
     }
 
     if (evm != null) {
@@ -342,5 +379,81 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String? get error {
     return evmReceipt?.error ?? scillaReceipt?.error;
+  }
+
+  String? get _tronSender {
+    final value = _tronFirstContractValue;
+    if (value == null) return null;
+    return switch (value) {
+      TronContractValue_TransferContract(:final ownerAddress) => ownerAddress,
+      TronContractValue_TriggerSmartContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_FreezeBalanceV2Contract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_WithdrawBalanceContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_UnfreezeBalanceV2Contract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_WithdrawExpireUnfreezeContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_DelegateResourceContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_UnDelegateResourceContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_CancelAllUnfreezeV2Contract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_TransferAssetContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_VoteWitnessContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_AccountCreateContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_AccountUpdateContract(:final ownerAddress) =>
+        ownerAddress,
+      TronContractValue_AccountPermissionUpdateContract(
+        :final ownerAddress
+      ) =>
+        ownerAddress,
+      TronContractValue_Unknown() => null,
+    };
+  }
+
+  String? get _tronRecipient {
+    final value = _tronFirstContractValue;
+    if (value == null) return null;
+    return switch (value) {
+      TronContractValue_TransferContract(:final toAddress) => toAddress,
+      TronContractValue_TriggerSmartContract(:final contractAddress) =>
+        contractAddress,
+      TronContractValue_DelegateResourceContract(:final receiverAddress) =>
+        receiverAddress,
+      TronContractValue_UnDelegateResourceContract(:final receiverAddress) =>
+        receiverAddress,
+      TronContractValue_TransferAssetContract(:final toAddress) => toAddress,
+      TronContractValue_AccountCreateContract(:final accountAddress) =>
+        accountAddress,
+      _ => null,
+    };
+  }
+
+  String? get _tronAmount {
+    final value = _tronFirstContractValue;
+    if (value == null) return null;
+    return switch (value) {
+      TronContractValue_TransferContract(:final amount) => amount.toString(),
+      TronContractValue_TriggerSmartContract(:final callValue) =>
+        callValue?.toString(),
+      TronContractValue_TransferAssetContract(:final amount) =>
+        amount.toString(),
+      TronContractValue_FreezeBalanceV2Contract(:final frozenBalance) =>
+        frozenBalance.toString(),
+      TronContractValue_UnfreezeBalanceV2Contract(:final unfreezeBalance) =>
+        unfreezeBalance.toString(),
+      TronContractValue_DelegateResourceContract(:final balance) =>
+        balance.toString(),
+      TronContractValue_UnDelegateResourceContract(:final balance) =>
+        balance.toString(),
+      _ => null,
+    };
   }
 }

@@ -5790,7 +5790,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       evm: dco_decode_opt_String(arr[2]),
       scilla: dco_decode_opt_String(arr[3]),
       btc: dco_decode_opt_box_autoadd_transaction_bitcoin(arr[4]),
-      tron: dco_decode_opt_String(arr[5]),
+      tron: dco_decode_opt_box_autoadd_transaction_request_tron(arr[5]),
       solana: dco_decode_opt_String(arr[6]),
       signedMessage: dco_decode_opt_String(arr[7]),
       timestamp: dco_decode_u_64(arr[8]),
@@ -6940,13 +6940,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TransactionRequestTron dco_decode_transaction_request_tron(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return TransactionRequestTron(
       visible: dco_decode_opt_box_autoadd_bool(arr[0]),
       txId: dco_decode_opt_String(arr[1]),
       rawData: dco_decode_tron_raw_data_info(arr[2]),
       rawDataHex: dco_decode_String(arr[3]),
+      signature: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -8218,7 +8219,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_evm = sse_decode_opt_String(deserializer);
     var var_scilla = sse_decode_opt_String(deserializer);
     var var_btc = sse_decode_opt_box_autoadd_transaction_bitcoin(deserializer);
-    var var_tron = sse_decode_opt_String(deserializer);
+    var var_tron =
+        sse_decode_opt_box_autoadd_transaction_request_tron(deserializer);
     var var_solana = sse_decode_opt_String(deserializer);
     var var_signedMessage = sse_decode_opt_String(deserializer);
     var var_timestamp = sse_decode_u_64(deserializer);
@@ -9689,11 +9691,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_txId = sse_decode_opt_String(deserializer);
     var var_rawData = sse_decode_tron_raw_data_info(deserializer);
     var var_rawDataHex = sse_decode_String(deserializer);
+    var var_signature = sse_decode_opt_String(deserializer);
     return TransactionRequestTron(
         visible: var_visible,
         txId: var_txId,
         rawData: var_rawData,
-        rawDataHex: var_rawDataHex);
+        rawDataHex: var_rawDataHex,
+        signature: var_signature);
   }
 
   @protected
@@ -10878,7 +10882,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.evm, serializer);
     sse_encode_opt_String(self.scilla, serializer);
     sse_encode_opt_box_autoadd_transaction_bitcoin(self.btc, serializer);
-    sse_encode_opt_String(self.tron, serializer);
+    sse_encode_opt_box_autoadd_transaction_request_tron(self.tron, serializer);
     sse_encode_opt_String(self.solana, serializer);
     sse_encode_opt_String(self.signedMessage, serializer);
     sse_encode_u_64(self.timestamp, serializer);
@@ -12016,6 +12020,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.txId, serializer);
     sse_encode_tron_raw_data_info(self.rawData, serializer);
     sse_encode_String(self.rawDataHex, serializer);
+    sse_encode_opt_String(self.signature, serializer);
   }
 
   @protected

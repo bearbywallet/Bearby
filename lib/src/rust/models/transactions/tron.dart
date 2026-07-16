@@ -14,16 +14,25 @@ class TransactionRequestTron {
   final TronRawDataInfo rawData;
   final String rawDataHex;
 
+  /// Hex signature when present (signed history / WC-dApp response). Unsigned
+  /// request payloads leave this as `None`.
+  final String? signature;
+
   const TransactionRequestTron({
     this.visible,
     this.txId,
     required this.rawData,
     required this.rawDataHex,
+    this.signature,
   });
 
   @override
   int get hashCode =>
-      visible.hashCode ^ txId.hashCode ^ rawData.hashCode ^ rawDataHex.hashCode;
+      visible.hashCode ^
+      txId.hashCode ^
+      rawData.hashCode ^
+      rawDataHex.hashCode ^
+      signature.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -33,7 +42,8 @@ class TransactionRequestTron {
           visible == other.visible &&
           txId == other.txId &&
           rawData == other.rawData &&
-          rawDataHex == other.rawDataHex;
+          rawDataHex == other.rawDataHex &&
+          signature == other.signature;
 }
 
 class TronContractInfo {

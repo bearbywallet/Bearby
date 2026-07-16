@@ -1,7 +1,8 @@
 use flutter_rust_bridge::frb;
 pub use zilpay::errors::tx::TransactionErrors;
+use zilpay::proto::address::Address;
 pub use zilpay::proto::tron_tx::{
-    TronWebContract, TronWebParameter, TronWebRawData, TronWebTransaction,
+    TronTransactionReceipt, TronWebContract, TronWebParameter, TronWebRawData, TronWebTransaction,
 };
 use zilpay::serde_json;
 
@@ -110,6 +111,9 @@ pub struct TransactionRequestTron {
     pub tx_id: Option<String>,
     pub raw_data: TronRawDataInfo,
     pub raw_data_hex: String,
+    /// Hex signature when present (signed history / WC-dApp response). Unsigned
+    /// request payloads leave this as `None`.
+    pub signature: Option<String>,
 }
 
 fn extract_str_from(value: &serde_json::Value, key: &str) -> Result<String, TransactionErrors> {
@@ -479,7 +483,205 @@ impl From<TronWebTransaction> for TransactionRequestTron {
                 timestamp,
             },
             raw_data_hex,
+            signature: None,
         }
+    }
+}
+
+/// Format a Tron address field for UI (base58 `T…` preferred).
+/// Accepts base58, hex with optional `0x`, or 21-byte hex starting with `41`.
+fn tron_addr_for_ui(addr: &str) -> String {
+    if addr.is_empty() {
+        return String::new();
+    }
+    if let Ok(parsed) = Address::from_tron_address(addr) {
+        return parsed.auto_format();
+    }
+    let hex_str = addr.strip_prefix("0x").unwrap_or(addr);
+    if let Ok(bytes) = alloy_hex_decode(hex_str) {
+        if let Ok(parsed) = Address::from_tron_bytes(&bytes) {
+            return parsed.auto_format();
+        }
+    }
+    String::from(addr)
+}
+
+fn alloy_hex_decode(hex_str: &str) -> Result<Vec<u8>, ()> {
+    zilpay::alloy::hex::decode(hex_str).map_err(|_| ())
+}
+
+fn map_opt_addr(addr: Option<String>) -> Option<String> {
+    addr.map(|a| tron_addr_for_ui(&a))
+}
+
+fn reformat_contract_value_base58(value: TronContractValue) -> TronContractValue {
+    match value {
+        TronContractValue::TransferContract {
+            owner_address,
+            to_address,
+            amount,
+        } => TronContractValue::TransferContract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            to_address: tron_addr_for_ui(&to_address),
+            amount,
+        },
+        TronContractValue::TriggerSmartContract {
+            owner_address,
+            contract_address,
+            call_value,
+            data,
+            call_token_value,
+            token_id,
+        } => TronContractValue::TriggerSmartContract {
+            owner_address: map_opt_addr(owner_address),
+            contract_address: map_opt_addr(contract_address),
+            call_value,
+            data,
+            call_token_value,
+            token_id,
+        },
+        TronContractValue::FreezeBalanceV2Contract {
+            owner_address,
+            frozen_balance,
+            resource,
+        } => TronContractValue::FreezeBalanceV2Contract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            frozen_balance,
+            resource,
+        },
+        TronContractValue::WithdrawBalanceContract { owner_address } => {
+            TronContractValue::WithdrawBalanceContract {
+                owner_address: tron_addr_for_ui(&owner_address),
+            }
+        }
+        TronContractValue::UnfreezeBalanceV2Contract {
+            owner_address,
+            unfreeze_balance,
+            resource,
+        } => TronContractValue::UnfreezeBalanceV2Contract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            unfreeze_balance,
+            resource,
+        },
+        TronContractValue::WithdrawExpireUnfreezeContract { owner_address } => {
+            TronContractValue::WithdrawExpireUnfreezeContract {
+                owner_address: tron_addr_for_ui(&owner_address),
+            }
+        }
+        TronContractValue::DelegateResourceContract {
+            owner_address,
+            resource,
+            balance,
+            receiver_address,
+            lock,
+            lock_period,
+        } => TronContractValue::DelegateResourceContract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            resource,
+            balance,
+            receiver_address: tron_addr_for_ui(&receiver_address),
+            lock,
+            lock_period,
+        },
+        TronContractValue::UnDelegateResourceContract {
+            owner_address,
+            resource,
+            balance,
+            receiver_address,
+        } => TronContractValue::UnDelegateResourceContract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            resource,
+            balance,
+            receiver_address: tron_addr_for_ui(&receiver_address),
+        },
+        TronContractValue::CancelAllUnfreezeV2Contract { owner_address } => {
+            TronContractValue::CancelAllUnfreezeV2Contract {
+                owner_address: tron_addr_for_ui(&owner_address),
+            }
+        }
+        TronContractValue::TransferAssetContract {
+            asset_name,
+            owner_address,
+            to_address,
+            amount,
+        } => TronContractValue::TransferAssetContract {
+            asset_name,
+            owner_address: tron_addr_for_ui(&owner_address),
+            to_address: tron_addr_for_ui(&to_address),
+            amount,
+        },
+        TronContractValue::VoteWitnessContract {
+            owner_address,
+            votes,
+            support,
+        } => {
+            let vote_count = votes.len();
+            let votes = votes.into_iter().fold(
+                Vec::with_capacity(vote_count),
+                |mut acc, mut vote| {
+                    vote.vote_address = tron_addr_for_ui(&vote.vote_address);
+                    acc.push(vote);
+                    acc
+                },
+            );
+            TronContractValue::VoteWitnessContract {
+                owner_address: tron_addr_for_ui(&owner_address),
+                votes,
+                support,
+            }
+        }
+        TronContractValue::AccountCreateContract {
+            owner_address,
+            account_address,
+        } => TronContractValue::AccountCreateContract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            account_address: tron_addr_for_ui(&account_address),
+        },
+        TronContractValue::AccountUpdateContract {
+            owner_address,
+            account_name,
+        } => TronContractValue::AccountUpdateContract {
+            owner_address: tron_addr_for_ui(&owner_address),
+            account_name,
+        },
+        TronContractValue::AccountPermissionUpdateContract { owner_address } => {
+            TronContractValue::AccountPermissionUpdateContract {
+                owner_address: tron_addr_for_ui(&owner_address),
+            }
+        }
+        other @ TronContractValue::Unknown { .. } => other,
+    }
+}
+
+impl TryFrom<&TronTransactionReceipt> for TransactionRequestTron {
+    type Error = TransactionErrors;
+
+    fn try_from(receipt: &TronTransactionReceipt) -> Result<Self, Self::Error> {
+        let value = receipt.to_tron_web_json()?;
+        let web: TronWebTransaction = serde_json::from_value(value)
+            .map_err(|e| TransactionErrors::ConvertTxError(e.to_string()))?;
+        let mut info = TransactionRequestTron::from(web);
+        let contract_count = info.raw_data.contract.len();
+        info.raw_data.contract = info.raw_data.contract.into_iter().fold(
+            Vec::with_capacity(contract_count),
+            |mut acc, mut contract| {
+                contract.value = reformat_contract_value_base58(contract.value);
+                acc.push(contract);
+                acc
+            },
+        );
+        if !receipt.signature.is_empty() {
+            info.signature = Some(zilpay::alloy::hex::encode(&receipt.signature));
+        }
+        Ok(info)
+    }
+}
+
+impl TryFrom<TronTransactionReceipt> for TransactionRequestTron {
+    type Error = TransactionErrors;
+
+    fn try_from(receipt: TronTransactionReceipt) -> Result<Self, Self::Error> {
+        Self::try_from(&receipt)
     }
 }
 
@@ -492,6 +694,7 @@ impl TryFrom<TransactionRequestTron> for TronWebTransaction {
             tx_id,
             raw_data,
             raw_data_hex,
+            signature: _,
         } = info;
         let TronRawDataInfo {
             contract,
@@ -560,6 +763,7 @@ mod tests {
                 },
             }]),
             raw_data_hex: String::from("deadbeef"),
+            signature: None,
         };
 
         let tx = TronWebTransaction::try_from(request)?;
@@ -591,6 +795,7 @@ mod tests {
                 },
             }]),
             raw_data_hex: String::from("00"),
+            signature: None,
         };
 
         assert!(TronWebTransaction::try_from(request).is_err());

@@ -146,7 +146,8 @@ Future<TransactionRequestInfo> updateTxWithParams(
 TransactionRequestTron parseTronTransaction({required String json}) =>
     RustLib.instance.api.crateApiTransactionParseTronTransaction(json: json);
 
-/// Serialize a TransactionRequestTron back to JSON for dApp response.
+/// Serialize a TransactionRequestTron back to JSON for dApp / WC response.
+/// When [TransactionRequestTron::signature] is set, emits TronWeb `signature: [hex]`.
 String tronTransactionToJson({required TransactionRequestTron tx}) =>
     RustLib.instance.api.crateApiTransactionTronTransactionToJson(tx: tx);
 

@@ -6699,7 +6699,10 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
             <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_decode(
                 deserializer,
             );
-        let mut var_tron = <Option<String>>::sse_decode(deserializer);
+        let mut var_tron =
+            <Option<crate::models::transactions::tron::TransactionRequestTron>>::sse_decode(
+                deserializer,
+            );
         let mut var_solana = <Option<String>>::sse_decode(deserializer);
         let mut var_signedMessage = <Option<String>>::sse_decode(deserializer);
         let mut var_timestamp = <u64>::sse_decode(deserializer);
@@ -8375,11 +8378,13 @@ impl SseDecode for crate::models::transactions::tron::TransactionRequestTron {
         let mut var_rawData =
             <crate::models::transactions::tron::TronRawDataInfo>::sse_decode(deserializer);
         let mut var_rawDataHex = <String>::sse_decode(deserializer);
+        let mut var_signature = <Option<String>>::sse_decode(deserializer);
         return crate::models::transactions::tron::TransactionRequestTron {
             visible: var_visible,
             tx_id: var_txId,
             raw_data: var_rawData,
             raw_data_hex: var_rawDataHex,
+            signature: var_signature,
         };
     }
 }
@@ -10991,6 +10996,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::Transa
             self.tx_id.into_into_dart().into_dart(),
             self.raw_data.into_into_dart().into_dart(),
             self.raw_data_hex.into_into_dart().into_dart(),
+            self.signature.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -12032,7 +12038,9 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_encode(
             self.btc, serializer,
         );
-        <Option<String>>::sse_encode(self.tron, serializer);
+        <Option<crate::models::transactions::tron::TransactionRequestTron>>::sse_encode(
+            self.tron, serializer,
+        );
         <Option<String>>::sse_encode(self.solana, serializer);
         <Option<String>>::sse_encode(self.signed_message, serializer);
         <u64>::sse_encode(self.timestamp, serializer);
@@ -13265,6 +13273,7 @@ impl SseEncode for crate::models::transactions::tron::TransactionRequestTron {
         <Option<String>>::sse_encode(self.tx_id, serializer);
         <crate::models::transactions::tron::TronRawDataInfo>::sse_encode(self.raw_data, serializer);
         <String>::sse_encode(self.raw_data_hex, serializer);
+        <Option<String>>::sse_encode(self.signature, serializer);
     }
 }
 

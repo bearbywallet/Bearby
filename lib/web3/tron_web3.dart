@@ -7,6 +7,7 @@ import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/connections.dart';
 import 'package:bearby/src/rust/api/provider.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -336,10 +337,13 @@ class TronWeb3Handler {
           decimals: mbToken.decimals,
         ).toString(),
         onConfirm: (tx) {
+          final signed = tx.tron;
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
-            result: tx.tron,
+            result: signed == null
+                ? null
+                : jsonDecode(tronTransactionToJson(tx: signed)),
           );
           if (context.mounted) {
             Navigator.pop(context);
@@ -945,10 +949,13 @@ class TronWeb3Handler {
           decimals: mbToken.decimals,
         ).toString(),
         onConfirm: (tx) {
+          final signed = tx.tron;
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
-            result: tx.tron,
+            result: signed == null
+                ? null
+                : jsonDecode(tronTransactionToJson(tx: signed)),
           );
           if (context.mounted) Navigator.pop(context);
           _removeActiveRequest(method);
