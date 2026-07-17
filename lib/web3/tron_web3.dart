@@ -356,7 +356,7 @@ class TronWeb3Handler {
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
-            result: tx.tron,
+            result: tx.tron?.txId ?? tx.metadata.hash,
           );
           if (context.mounted) {
             Navigator.pop(context);
@@ -978,7 +978,7 @@ class TronWeb3Handler {
           _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
-            result: tx.tron,
+            result: tx.tron?.txId ?? tx.metadata.hash,
           );
           if (context.mounted) Navigator.pop(context);
           _removeActiveRequest(method);

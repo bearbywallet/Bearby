@@ -36,6 +36,39 @@ class TransactionRequestTron {
           rawDataHex == other.rawDataHex;
 }
 
+/// FFI mirror of core `TronTransactionReceipt` (history path).
+/// Byte fields are hex-encoded strings for FRB/Dart.
+class TransactionTron {
+  final String rawDataBytes;
+  final String txId;
+  final String signature;
+  final String ownerAddress;
+
+  const TransactionTron({
+    required this.rawDataBytes,
+    required this.txId,
+    required this.signature,
+    required this.ownerAddress,
+  });
+
+  @override
+  int get hashCode =>
+      rawDataBytes.hashCode ^
+      txId.hashCode ^
+      signature.hashCode ^
+      ownerAddress.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransactionTron &&
+          runtimeType == other.runtimeType &&
+          rawDataBytes == other.rawDataBytes &&
+          txId == other.txId &&
+          signature == other.signature &&
+          ownerAddress == other.ownerAddress;
+}
+
 class TronContractInfo {
   final String contractType;
   final String typeUrl;

@@ -15,7 +15,9 @@ import '../models/ftoken.dart';
 import '../models/transactions/base_token.dart';
 import '../models/transactions/btc.dart';
 import '../models/transactions/history.dart';
+import '../models/transactions/solana.dart';
 import '../models/transactions/transaction_metadata.dart';
+import '../models/transactions/tron.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Stream<String> executeExchangeSwap(

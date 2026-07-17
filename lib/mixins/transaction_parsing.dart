@@ -3,6 +3,8 @@ import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/transactions/btc.dart';
 import 'package:bearby/src/rust/models/transactions/history.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/solana.dart';
+import 'package:bearby/src/rust/models/transactions/tron.dart';
 
 class ParsedEvmReceipt {
   final String? transactionHash;
@@ -223,6 +225,8 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   TransactionBitcoin? get btcReceipt => btc;
+  TransactionTron? get tronReceipt => tron;
+  TransactionSolana? get solanaReceipt => solana;
 
   ParsedSignedMessage? get parsedSignedMessage {
     if (signedMessage == null) return null;
@@ -238,16 +242,22 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   bool get isEvmTransaction => evm != null;
   bool get isScillaTransaction => scilla != null;
   bool get isBtcTransaction => btc != null;
+  bool get isTronTransaction => tron != null;
+  bool get isSolanaTransaction => solana != null;
 
   String get chainType {
     if (evm != null) return 'EVM';
     if (scilla != null) return 'Scilla';
     if (btc != null) return 'BTC';
+    if (tron != null) return 'Tron';
+    if (solana != null) return 'Solana';
     return 'Unknown';
   }
 
   String get transactionHash {
     return metadata.hash ??
+        tron?.txId ??
+        solana?.txId ??
         evmReceipt?.transactionHash ??
         scillaReceipt?.transactionHash ??
         '';
@@ -262,11 +272,14 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
     if (btc != null) {
       return btc?.input.firstOrNull?.previousOutput.txid ?? '';
     }
+    if (tron != null) {
+      return tron?.ownerAddress ?? '';
+    }
     return evmReceipt?.sender ?? scillaReceipt?.sender ?? '';
   }
 
   String get recipient {
-    if (btc != null) {
+    if (btc != null || tron != null || solana != null) {
       return '';
     }
     return evmReceipt?.recipient ?? scillaReceipt?.recipient ?? '';
@@ -307,6 +320,10 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   BigInt get fee {
     if (btc != null) {
       return btc?.fee ?? BigInt.zero;
+    }
+
+    if (solana != null) {
+      return solana?.fee ?? BigInt.zero;
     }
 
     if (evm != null) {

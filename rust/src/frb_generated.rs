@@ -6699,8 +6699,12 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
             <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_decode(
                 deserializer,
             );
-        let mut var_tron = <Option<String>>::sse_decode(deserializer);
-        let mut var_solana = <Option<String>>::sse_decode(deserializer);
+        let mut var_tron =
+            <Option<crate::models::transactions::tron::TransactionTron>>::sse_decode(deserializer);
+        let mut var_solana =
+            <Option<crate::models::transactions::solana::TransactionSolana>>::sse_decode(
+                deserializer,
+            );
         let mut var_signedMessage = <Option<String>>::sse_decode(deserializer);
         let mut var_timestamp = <u64>::sse_decode(deserializer);
         return crate::models::transactions::history::HistoricalTransactionInfo {
@@ -7693,6 +7697,32 @@ impl SseDecode for Option<crate::models::transactions::tron::TransactionRequestT
     }
 }
 
+impl SseDecode for Option<crate::models::transactions::solana::TransactionSolana> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::models::transactions::solana::TransactionSolana>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::transactions::tron::TransactionTron> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::models::transactions::tron::TransactionTron>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<u64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -8384,6 +8414,24 @@ impl SseDecode for crate::models::transactions::tron::TransactionRequestTron {
     }
 }
 
+impl SseDecode for crate::models::transactions::solana::TransactionSolana {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_message = <String>::sse_decode(deserializer);
+        let mut var_signature = <String>::sse_decode(deserializer);
+        let mut var_fee = <Option<u64>>::sse_decode(deserializer);
+        let mut var_slot = <Option<u64>>::sse_decode(deserializer);
+        let mut var_txId = <String>::sse_decode(deserializer);
+        return crate::models::transactions::solana::TransactionSolana {
+            message: var_message,
+            signature: var_signature,
+            fee: var_fee,
+            slot: var_slot,
+            tx_id: var_txId,
+        };
+    }
+}
+
 impl SseDecode for crate::models::transactions::history::TransactionStatusInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -8393,6 +8441,22 @@ impl SseDecode for crate::models::transactions::history::TransactionStatusInfo {
             1 => crate::models::transactions::history::TransactionStatusInfo::Success,
             2 => crate::models::transactions::history::TransactionStatusInfo::Failed,
             _ => unreachable!("Invalid variant for TransactionStatusInfo: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::models::transactions::tron::TransactionTron {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_rawDataBytes = <String>::sse_decode(deserializer);
+        let mut var_txId = <String>::sse_decode(deserializer);
+        let mut var_signature = <String>::sse_decode(deserializer);
+        let mut var_ownerAddress = <String>::sse_decode(deserializer);
+        return crate::models::transactions::tron::TransactionTron {
+            raw_data_bytes: var_rawDataBytes,
+            tx_id: var_txId,
+            signature: var_signature,
+            owner_address: var_ownerAddress,
         };
     }
 }
@@ -11007,6 +11071,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::Transa
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::solana::TransactionSolana {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.message.into_into_dart().into_dart(),
+            self.signature.into_into_dart().into_dart(),
+            self.fee.into_into_dart().into_dart(),
+            self.slot.into_into_dart().into_dart(),
+            self.tx_id.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::solana::TransactionSolana
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::solana::TransactionSolana>
+    for crate::models::transactions::solana::TransactionSolana
+{
+    fn into_into_dart(self) -> crate::models::transactions::solana::TransactionSolana {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::transactions::history::TransactionStatusInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -11025,6 +11113,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::history::Tra
     for crate::models::transactions::history::TransactionStatusInfo
 {
     fn into_into_dart(self) -> crate::models::transactions::history::TransactionStatusInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transactions::tron::TransactionTron {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.raw_data_bytes.into_into_dart().into_dart(),
+            self.tx_id.into_into_dart().into_dart(),
+            self.signature.into_into_dart().into_dart(),
+            self.owner_address.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transactions::tron::TransactionTron
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::tron::TransactionTron>
+    for crate::models::transactions::tron::TransactionTron
+{
+    fn into_into_dart(self) -> crate::models::transactions::tron::TransactionTron {
         self
     }
 }
@@ -12032,8 +12143,13 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         <Option<crate::models::transactions::btc::TransactionBitcoin>>::sse_encode(
             self.btc, serializer,
         );
-        <Option<String>>::sse_encode(self.tron, serializer);
-        <Option<String>>::sse_encode(self.solana, serializer);
+        <Option<crate::models::transactions::tron::TransactionTron>>::sse_encode(
+            self.tron, serializer,
+        );
+        <Option<crate::models::transactions::solana::TransactionSolana>>::sse_encode(
+            self.solana,
+            serializer,
+        );
         <Option<String>>::sse_encode(self.signed_message, serializer);
         <u64>::sse_encode(self.timestamp, serializer);
     }
@@ -12788,6 +12904,26 @@ impl SseEncode for Option<crate::models::transactions::tron::TransactionRequestT
     }
 }
 
+impl SseEncode for Option<crate::models::transactions::solana::TransactionSolana> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transactions::solana::TransactionSolana>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::transactions::tron::TransactionTron> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transactions::tron::TransactionTron>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<u64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -13268,6 +13404,17 @@ impl SseEncode for crate::models::transactions::tron::TransactionRequestTron {
     }
 }
 
+impl SseEncode for crate::models::transactions::solana::TransactionSolana {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.message, serializer);
+        <String>::sse_encode(self.signature, serializer);
+        <Option<u64>>::sse_encode(self.fee, serializer);
+        <Option<u64>>::sse_encode(self.slot, serializer);
+        <String>::sse_encode(self.tx_id, serializer);
+    }
+}
+
 impl SseEncode for crate::models::transactions::history::TransactionStatusInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -13282,6 +13429,16 @@ impl SseEncode for crate::models::transactions::history::TransactionStatusInfo {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::models::transactions::tron::TransactionTron {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.raw_data_bytes, serializer);
+        <String>::sse_encode(self.tx_id, serializer);
+        <String>::sse_encode(self.signature, serializer);
+        <String>::sse_encode(self.owner_address, serializer);
     }
 }
 
