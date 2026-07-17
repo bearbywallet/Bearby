@@ -9,6 +9,7 @@
 import 'api/auth.dart';
 import 'api/backend.dart';
 import 'api/book.dart';
+import 'api/btc.dart';
 import 'api/btc_ledger.dart';
 import 'api/cache.dart';
 import 'api/connections.dart';
@@ -321,6 +322,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BtcAddressEntryInfo dco_decode_btc_address_entry_info(dynamic raw);
 
   @protected
+  BtcSignedMessageInfo dco_decode_btc_signed_message_info(dynamic raw);
+
+  @protected
   Category dco_decode_category(dynamic raw);
 
   @protected
@@ -525,6 +529,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
   @protected
+  List<WcSignInputInfo> dco_decode_list_wc_sign_input_info(dynamic raw);
+
+  @protected
   List<WhiteBirdOpenOrder> dco_decode_list_white_bird_open_order(dynamic raw);
 
   @protected
@@ -608,6 +615,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AccessListItem>? dco_decode_opt_list_access_list_item(dynamic raw);
+
+  @protected
+  Uint32List? dco_decode_opt_list_prim_u_32_strict(dynamic raw);
 
   @protected
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
@@ -803,6 +813,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
+
+  @protected
+  WcSignInputInfo dco_decode_wc_sign_input_info(dynamic raw);
 
   @protected
   WhiteBirdMeta dco_decode_white_bird_meta(dynamic raw);
@@ -1090,6 +1103,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  BtcSignedMessageInfo sse_decode_btc_signed_message_info(
+      SseDeserializer deserializer);
+
+  @protected
   Category sse_decode_category(SseDeserializer deserializer);
 
   @protected
@@ -1320,6 +1337,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
 
   @protected
+  List<WcSignInputInfo> sse_decode_list_wc_sign_input_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<WhiteBirdOpenOrder> sse_decode_list_white_bird_open_order(
       SseDeserializer deserializer);
 
@@ -1411,6 +1432,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AccessListItem>? sse_decode_opt_list_access_list_item(
+      SseDeserializer deserializer);
+
+  @protected
+  Uint32List? sse_decode_opt_list_prim_u_32_strict(
       SseDeserializer deserializer);
 
   @protected
@@ -1629,6 +1654,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   WalletSettingsInfo sse_decode_wallet_settings_info(
       SseDeserializer deserializer);
+
+  @protected
+  WcSignInputInfo sse_decode_wc_sign_input_info(SseDeserializer deserializer);
 
   @protected
   WhiteBirdMeta sse_decode_white_bird_meta(SseDeserializer deserializer);
@@ -1926,6 +1954,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       BtcAddressEntryInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_btc_signed_message_info(
+      BtcSignedMessageInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_category(Category self, SseSerializer serializer);
 
   @protected
@@ -2168,6 +2200,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<WalletInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_wc_sign_input_info(
+      List<WcSignInputInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_white_bird_open_order(
       List<WhiteBirdOpenOrder> self, SseSerializer serializer);
 
@@ -2260,6 +2296,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_list_access_list_item(
       List<AccessListItem>? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_list_prim_u_32_strict(
+      Uint32List? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_list_prim_u_8_strict(
@@ -2482,6 +2522,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_sign_input_info(
+      WcSignInputInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_white_bird_meta(WhiteBirdMeta self, SseSerializer serializer);

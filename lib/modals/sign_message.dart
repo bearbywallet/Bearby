@@ -10,6 +10,8 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/eip712.dart';
 import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/src/rust/api/btc.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/state/app_state.dart';
@@ -23,7 +25,11 @@ void showSignMessageModal({
   required String appTitle,
   required String appIcon,
   ColorsInfo? colors,
-  required Function(String, String) onMessageSigned,
+  /// Optional BTC sub-address to sign with (WalletConnect bip122 `address` param).
+  String? btcSignAddress,
+  required void Function(String, String) onMessageSigned,
+  /// When set, BTC BIP-137 results include [BtcSignedMessageInfo.messageHashHex].
+  void Function(BtcSignedMessageInfo)? onBtcMessageSigned,
   VoidCallback? onDismiss,
 }) {
   showModalBottomSheet<void>(
@@ -40,7 +46,9 @@ void showSignMessageModal({
       appTitle: appTitle,
       appIcon: appIcon,
       colors: colors,
+      btcSignAddress: btcSignAddress,
       onMessageSigned: onMessageSigned,
+      onBtcMessageSigned: onBtcMessageSigned,
       onDismiss: onDismiss,
     ),
   ).then((_) => onDismiss?.call());
@@ -52,7 +60,9 @@ class _SignMessageModalContent extends StatefulWidget {
   final String appTitle;
   final String appIcon;
   final ColorsInfo? colors;
-  final Function(String, String) onMessageSigned;
+  final String? btcSignAddress;
+  final void Function(String, String) onMessageSigned;
+  final void Function(BtcSignedMessageInfo)? onBtcMessageSigned;
   final VoidCallback? onDismiss;
 
   const _SignMessageModalContent({
@@ -61,7 +71,9 @@ class _SignMessageModalContent extends StatefulWidget {
     this.message,
     this.typedData,
     this.colors,
+    this.btcSignAddress,
     required this.onMessageSigned,
+    this.onBtcMessageSigned,
     this.onDismiss,
   });
 
@@ -116,42 +128,74 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   Future<void> _signMessageNative(AppState appState) async {
     try {
-      final wallet = appState.wallet!;
+      final wallet = appState.wallet;
+      if (wallet == null) {
+        throw StateError('No wallet selected');
+      }
       final walletIndex = appState.selectedWalletIndex;
       final accountIndex = wallet.selectedAccount;
+      final password = _passwordController.text.isNotEmpty
+          ? _passwordController.text
+          : null;
+      final title = widget.appTitle.isNotEmpty ? widget.appTitle : null;
+      final icon = widget.appIcon.isNotEmpty ? widget.appIcon : null;
 
       if (widget.typedData != null) {
-        final typedDataJson = jsonEncode(widget.typedData!.toJson());
+        final typedData = widget.typedData;
+        if (typedData == null) return;
+        final typedDataJson = jsonEncode(typedData.toJson());
         final (pubkey, sig) = await signTypedDataEip712(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           typedDataJson: typedDataJson,
-          password: _passwordController.text.isNotEmpty
-              ? _passwordController.text
-              : null,
-          passphrase: "",
-          title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
-          icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,
+          password: password,
+          passphrase: '',
+          title: title,
+          icon: icon,
         );
         widget.onMessageSigned(pubkey, sig);
       } else if (widget.message != null) {
-        final (pubkey, sig) = await signMessage(
-          walletIndex: walletIndex,
-          accountIndex: accountIndex,
-          message: widget.message!,
-          password: _passwordController.text.isNotEmpty
-              ? _passwordController.text
-              : null,
-          passphrase: "",
-          title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
-          icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,
-        );
-        widget.onMessageSigned(pubkey, sig);
+        final message = widget.message;
+        if (message == null) return;
+        final account = appState.account;
+        if (account != null && account.addrType == kBtcAddressType) {
+          // Prefer the dApp-requested sub-address when provided (bip122).
+          final signAddress = widget.btcSignAddress ?? account.addr;
+          final signed = await btcSignMessageBip137(
+            walletIndex: walletIndex,
+            accountIndex: accountIndex,
+            password: password,
+            passphrase: '',
+            address: signAddress,
+            message: message,
+          );
+          final btcCb = widget.onBtcMessageSigned;
+          if (btcCb != null) {
+            btcCb(signed);
+          } else {
+            widget.onMessageSigned(signed.address, signed.signatureBase64);
+          }
+        } else {
+          final (pubkey, sig) = await signMessage(
+            walletIndex: walletIndex,
+            accountIndex: accountIndex,
+            message: message,
+            password: password,
+            passphrase: '',
+            title: title,
+            icon: icon,
+          );
+          widget.onMessageSigned(pubkey, sig);
+        }
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _error = AppLocalizations.of(context)!
-            .signMessageModalContentFailedToSign(e.toString()));
+        final l10n = AppLocalizations.of(context);
+        setState(() {
+          _error = l10n == null
+              ? e.toString()
+              : l10n.signMessageModalContentFailedToSign(e.toString());
+        });
       }
     }
   }

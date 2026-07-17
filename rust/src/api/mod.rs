@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod backend;
 pub mod book;
+pub mod btc;
 pub mod btc_ledger;
 pub mod cache;
 pub mod connections;

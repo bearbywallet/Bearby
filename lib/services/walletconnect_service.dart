@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,11 @@ import 'package:bearby/modals/sign_message.dart';
 import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/src/rust/api/btc.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/src/rust/api/wallet.dart';
+import 'package:bearby/src/rust/models/btc_chain.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
@@ -245,7 +249,7 @@ class WalletConnectService extends ChangeNotifier {
   // ────────────────────── chain / account registry ──────────────────────
 
   /// NetworkConfigInfo → CAIP-2. Derivable for eip155/tron; const map for
-  /// solana; null for unsupported (BTC, Scilla-only).
+  /// solana/btc; null for unsupported (Scilla-only, zilpay-BTC).
   static String? caip2ForProvider(NetworkConfigInfo provider) {
     if (provider.chainIds.isEmpty) return null;
     final chainId = provider.chainIds.first;
@@ -257,6 +261,8 @@ class WalletConnectService extends ChangeNotifier {
         return 'tron:0x${chainId.toRadixString(16)}';
       case kSolanaSlip44:
         return kSolanaCaip2ByChainId[chainId.toInt()];
+      case kBitcoinlip44:
+        return kBtcCaip2ByChainId[chainId.toInt()];
       default:
         return null;
     }
@@ -331,13 +337,12 @@ class WalletConnectService extends ChangeNotifier {
           debugPrint('WC registerRequestHandler $caip2/${entry.key}: $e');
         }
       }
-      if (namespace == 'eip155') {
-        for (final event in kWcEvmEvents) {
-          try {
-            kit.registerEventEmitter(chainId: caip2, event: event);
-          } catch (e) {
-            debugPrint('WC registerEventEmitter $caip2/$event: $e');
-          }
+      final events = kWcEventsByNamespace[namespace] ?? const <String>[];
+      for (final event in events) {
+        try {
+          kit.registerEventEmitter(chainId: caip2, event: event);
+        } catch (e) {
+          debugPrint('WC registerEventEmitter $caip2/$event: $e');
         }
       }
     }
@@ -367,7 +372,7 @@ class WalletConnectService extends ChangeNotifier {
     final ns = session?.namespaces[namespace];
     if (ns == null) return const <String>[];
     final seen = <String>{
-      for (final caip10 in ns.accounts) caip10.split(':').last,
+      for (final caip10 in ns.accounts) _bareWcAddress(caip10),
     };
     return List<String>.from(seen, growable: false);
   }
@@ -388,6 +393,11 @@ class WalletConnectService extends ChangeNotifier {
         return {
           for (final method in kWcTronMethods)
             if (_tronHandler(method) case final handler?) method: handler,
+        };
+      case 'bip122':
+        return {
+          for (final method in kWcBtcMethods)
+            if (_btcHandler(method) case final handler?) method: handler,
         };
       default:
         return const {};
@@ -433,6 +443,21 @@ class WalletConnectService extends ChangeNotifier {
         return _tronSignMessage;
       case 'tron_signTransaction':
         return _tronSignTransaction;
+      default:
+        return null;
+    }
+  }
+
+  _WcHandler? _btcHandler(String method) {
+    switch (method) {
+      case 'sendTransfer':
+        return _btcSendTransfer;
+      case 'getAccountAddresses':
+        return _btcGetAccountAddresses;
+      case 'signPsbt':
+        return _btcSignPsbt;
+      case 'signMessage':
+        return _btcSignMessage;
       default:
         return null;
     }
@@ -607,8 +632,9 @@ class WalletConnectService extends ChangeNotifier {
   void _emitAccountsChangedIfNeeded(_Selection? previous) {
     final kit = _walletKit;
     if (kit == null) return;
-    final addr = appState.account?.addr;
-    if (addr == null) return;
+    final account = appState.account;
+    final addr = account?.addr;
+    if (account == null || addr == null) return;
     if (previous != null) {
       final currentW = appState.selectedWalletIndexOrNull;
       final currentA = appState.wallet?.selectedAccount;
@@ -617,7 +643,60 @@ class WalletConnectService extends ChangeNotifier {
       }
     }
     _lastAddress = addr;
-    _emitToSessions(kit, kAccountsChangedEvent, <String>[addr]);
+    if (account.addrType == kBtcAddressType) {
+      unawaited(_emitBtcAddressesChanged());
+      return;
+    }
+    final namespace = _namespaceForAddrType(account.addrType);
+    if (namespace == null) return;
+    _emitToNamespaceSessions(
+      kit,
+      namespace,
+      kAccountsChangedEvent,
+      (session) => _sessionHasBareAddress(session, namespace, addr)
+          ? <String>[addr]
+          : null,
+    );
+  }
+
+  /// WC namespace for an account address family (null if unregistered).
+  static String? _namespaceForAddrType(int addrType) {
+    switch (addrType) {
+      case kEvmAddressType:
+        return 'eip155';
+      case kSolanaAddressType:
+        return 'solana';
+      case kTronAddressType:
+        return 'tron';
+      case kBtcAddressType:
+        return 'bip122';
+      default:
+        return null;
+    }
+  }
+
+  /// True if [address] is among [session]'s approved bare addresses for [namespace].
+  bool _sessionHasBareAddress(
+    SessionData session,
+    String namespace,
+    String address,
+  ) {
+    final ns = session.namespaces[namespace];
+    if (ns == null) return false;
+    for (final caip10 in ns.accounts) {
+      if (_addressesEqual(_bareWcAddress(caip10), address)) return true;
+    }
+    return false;
+  }
+
+  /// CAIP-2 ids approved on a namespace (derived from CAIP-10 accounts).
+  static Set<String> _namespaceChains(Namespace ns) {
+    final chains = <String>{};
+    for (final caip10 in ns.accounts) {
+      final i = caip10.lastIndexOf(':');
+      if (i > 0) chains.add(caip10.substring(0, i));
+    }
+    return chains;
   }
 
   /// True if [address] is among session-approved accounts for [caip2]'s namespace.
@@ -711,6 +790,49 @@ class WalletConnectService extends ChangeNotifier {
     }
     if (caip2.startsWith('solana:')) {
       return const [kSolanaSlip44];
+    }
+    if (caip2.startsWith('bip122:')) {
+      return const [kBitcoinlip44];
+    }
+    return null;
+  }
+
+  /// CAIP-10 → bare address (`namespace:ref:addr` → `addr`).
+  static String _bareWcAddress(String address) {
+    final parts = address.split(':');
+    if (parts.length >= 3) return parts.last;
+    return address;
+  }
+
+  /// Bare address from a request param map key (handles CAIP-10).
+  static String? _bareParam(Map<String, Object?>? map, String key) {
+    final raw = map?[key]?.toString();
+    if (raw == null || raw.isEmpty) return null;
+    return _bareWcAddress(raw);
+  }
+
+  /// Provider whose CAIP-2 matches [caip2] (no modal / no active-chain switch).
+  NetworkConfigInfo? _providerForCaip2(String caip2) {
+    for (final p in appState.state.providers) {
+      if (caip2ForProvider(p) == caip2) return p;
+    }
+    return null;
+  }
+
+  /// First bip122 CAIP-2 from a namespace (`chains` or account CAIP-10).
+  static String? _firstBip122Caip2(Namespace? ns) {
+    if (ns == null) return null;
+    final chains = ns.chains;
+    if (chains != null) {
+      for (final c in chains) {
+        if (c.startsWith('bip122:')) return c;
+      }
+    }
+    for (final a in ns.accounts) {
+      final parts = a.split(':');
+      if (parts.length >= 2 && parts[0] == 'bip122') {
+        return '${parts[0]}:${parts[1]}';
+      }
     }
     return null;
   }
@@ -1392,6 +1514,460 @@ class WalletConnectService extends ChangeNotifier {
     return Map<String, Object?>.from(raw);
   }
 
+  // ──────────────────── bip122 (Bitcoin) handlers ────────────────────
+
+  /// bip122 addresses payload per spec: first external address of the active
+  /// purpose, every UTXO-bearing address, plus ≤2 unused receive and ≤2 unused
+  /// change addresses (gap-limit rule: never >20 unused).
+  ///
+  /// [caip2] selects the BTC provider/chainHash — never the active UI chain —
+  /// so a testnet session stays correct while mainnet is selected (and vice versa).
+  /// **v1:** `intentions` filter is ignored (superset returned — spec-tolerable).
+  Future<List<Map<String, String>>?> _btcAccountAddressesPayload(
+    String caip2,
+  ) async {
+    final walletIndex = appState.selectedWalletIndexOrNull;
+    final wallet = appState.wallet;
+    final provider = _providerForCaip2(caip2);
+    if (walletIndex == null || wallet == null || provider == null) return null;
+
+    final Map<int, AddressChainInfo> chains;
+    try {
+      chains = await getBtcAddresses(
+        walletIndex: walletIndex,
+        accountIndex: wallet.selectedAccount,
+        chainHash: provider.chainHash,
+      );
+    } catch (e) {
+      debugPrint('WC getBtcAddresses failed: $e');
+      return null;
+    }
+
+    final activeType = kBtcAddrTypeByBip[wallet.bip.toInt()];
+    if (activeType == null) return null;
+    final active = chains[activeType];
+    if (active == null) return null;
+
+    final result = <Map<String, String>>[];
+    final seen = <String>{};
+    void add(BtcAddressEntryInfo entry) {
+      if (seen.add(entry.address)) {
+        result.add({'address': entry.address, 'path': entry.path});
+      }
+    }
+
+    if (active.external_.isNotEmpty) add(active.external_.first);
+    for (final chainInfo in chains.values) {
+      for (final entry in chainInfo.external_) {
+        if (entry.utxos.isNotEmpty) add(entry);
+      }
+      for (final entry in chainInfo.internal) {
+        if (entry.utxos.isNotEmpty) add(entry);
+      }
+    }
+    for (final list in [active.external_, active.internal]) {
+      var unused = 0;
+      for (final entry in list) {
+        if (entry.history.isEmpty && entry.utxos.isEmpty) {
+          add(entry);
+          if (++unused >= 2) break;
+        }
+      }
+    }
+    return List<Map<String, String>>.from(result, growable: false);
+  }
+
+  Future<void> _btcGetAccountAddresses(String topic, Object? params) async {
+    final pending = _pendingRequest(topic);
+    if (pending == null) return;
+
+    final map = params is Map ? Map<String, Object?>.from(params) : null;
+    final previous = _selectionSnapshot();
+    // Read-only: authorize the connected account, never pop a network switch.
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: _bareParam(map, 'account'),
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(topic, Errors.UNAUTHORIZED_METHOD, id: pending.id);
+    }
+
+    final payload = await _btcAccountAddressesPayload(pending.chainId);
+    if (payload == null) {
+      await _restoreSelection(previous);
+      return _respondError(topic, Errors.USER_REJECTED, id: pending.id);
+    }
+    await _respond(topic, pending.id, payload);
+    await _restoreSelection(previous); // read-only: never keep a silent switch
+  }
+
+  Future<void> _btcSendTransfer(String topic, Object? params) async {
+    final pending = _pendingRequest(topic);
+    final context = _context;
+    if (pending == null || context == null || !context.mounted) return;
+
+    final map = params is Map ? Map<String, Object?>.from(params) : null;
+    final recipient = map?['recipientAddress']?.toString();
+    final amount = map?['amount']?.toString();
+    if (map == null ||
+        recipient == null ||
+        recipient.isEmpty ||
+        amount == null ||
+        BigInt.tryParse(amount) == null) {
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+    if (map['memo'] != null) {
+      // OP_RETURN not supported in v1 — explicit error, never a silent drop.
+      return _respondError(
+        topic,
+        Errors.UNSUPPORTED_METHODS,
+        id: pending.id,
+      );
+    }
+
+    final previous = _selectionSnapshot();
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: _bareParam(map, 'account'),
+      previous: previous,
+    )) {
+      return _respondError(topic, Errors.UNAUTHORIZED_METHOD, id: pending.id);
+    }
+
+    if (!context.mounted) {
+      await _restoreSelection(previous);
+      return;
+    }
+    final provider = await _ensureChain(context, pending.chainId);
+    final nativeToken = _nativeTokenFor(kBtcAddressType);
+    final walletIndex = appState.selectedWalletIndexOrNull;
+    final accountIndex = appState.wallet?.selectedAccount;
+    if (provider == null ||
+        nativeToken == null ||
+        walletIndex == null ||
+        accountIndex == null) {
+      await _restoreSelection(previous);
+      return _respondError(topic, Errors.USER_REJECTED, id: pending.id);
+    }
+
+    final peer = _peerOf(topic);
+    final TransactionRequestInfo tx;
+    try {
+      tx = await createTokenTransfer(
+        params: TokenTransferParamsInfo(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          token: nativeToken,
+          amount: amount,
+          recipient: recipient,
+          icon: peer.icon,
+        ),
+      );
+    } catch (e) {
+      debugPrint('WC btc sendTransfer build failed: $e');
+      await _restoreSelection(previous);
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+
+    if (!context.mounted) {
+      await _restoreSelection(previous);
+      return;
+    }
+    final responder = _RequestResponder(
+      service: this,
+      topic: topic,
+      id: pending.id,
+      context: context,
+      previous: previous,
+    );
+    showConfirmTransactionModal(
+      context: context,
+      tx: tx,
+      to: recipient,
+      token: nativeToken,
+      amount: fromWei(value: amount, decimals: nativeToken.decimals).toString(),
+      onConfirm: (signed) async {
+        await responder.ok({'txid': signed.transactionHash});
+        // Cached chain state; post-sync re-emit is future work.
+        unawaited(_emitBtcAddressesChanged());
+      },
+      onDismiss: () => unawaited(responder.rejected()),
+    );
+  }
+
+  Future<void> _btcSignPsbt(String topic, Object? params) async {
+    final pending = _pendingRequest(topic);
+    final context = _context;
+    if (pending == null || context == null || !context.mounted) return;
+
+    final map = params is Map ? Map<String, Object?>.from(params) : null;
+    final psbtBase64 = map?['psbt']?.toString();
+    final rawInputs = map?['signInputs'];
+    if (psbtBase64 == null || psbtBase64.isEmpty || rawInputs is! List) {
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+    final broadcast = map?['broadcast'] == true;
+
+    final previous = _selectionSnapshot();
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: _bareParam(map, 'account'),
+      previous: previous,
+    )) {
+      return _respondError(topic, Errors.UNAUTHORIZED_METHOD, id: pending.id);
+    }
+
+    if (!context.mounted) {
+      await _restoreSelection(previous);
+      return;
+    }
+    final provider = await _ensureChain(context, pending.chainId);
+    final nativeToken = _nativeTokenFor(kBtcAddressType);
+    final walletIndex = appState.selectedWalletIndexOrNull;
+    final accountIndex = appState.wallet?.selectedAccount;
+    if (provider == null ||
+        nativeToken == null ||
+        walletIndex == null ||
+        accountIndex == null) {
+      await _restoreSelection(previous);
+      return _respondError(topic, Errors.USER_REJECTED, id: pending.id);
+    }
+
+    final peer = _peerOf(topic);
+    final TransactionRequestInfo tx;
+    try {
+      final signInputs = _parseWcSignInputs(rawInputs);
+      tx = await btcPsbtToRequest(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        psbtBase64: psbtBase64,
+        signInputs: signInputs,
+        broadcast: broadcast,
+        title: peer.name,
+        icon: peer.icon,
+      );
+    } catch (e) {
+      debugPrint('WC btc signPsbt build failed: $e');
+      await _restoreSelection(previous);
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+
+    final btcPayload = tx.btc;
+    final tokenInfo = tx.metadata.tokenInfo;
+    if (btcPayload == null || tokenInfo == null || !context.mounted) {
+      await _restoreSelection(previous);
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+    final responder = _RequestResponder(
+      service: this,
+      topic: topic,
+      id: pending.id,
+      context: context,
+      previous: previous,
+    );
+    final firstOut = btcPayload.$1.output.isNotEmpty
+        ? btcPayload.$1.output.first
+        : null;
+    showConfirmTransactionModal(
+      context: context,
+      tx: tx,
+      to: firstOut?.address ?? '',
+      token: nativeToken,
+      amount: fromWei(
+        value: tokenInfo.value,
+        decimals: nativeToken.decimals,
+      ).toString(),
+      onConfirm: (signed) async {
+        final signedBtc = signed.btc;
+        if (signedBtc == null) {
+          await responder.failMalformed();
+          return;
+        }
+        try {
+          final psbt = btcFinalizedPsbtFromSigned(
+            tx: signedBtc,
+            witnessUtxos: btcPayload.$2.witnessUtxos,
+          );
+          await responder.ok({
+            'psbt': psbt,
+            if (broadcast) 'txid': signed.transactionHash,
+          });
+          // Cached chain state; post-sync re-emit is future work.
+          if (broadcast) unawaited(_emitBtcAddressesChanged());
+        } catch (e) {
+          debugPrint('WC btc finalize PSBT failed: $e');
+          await responder.failMalformed();
+        }
+      },
+      onDismiss: () => unawaited(responder.rejected()),
+    );
+  }
+
+  /// bip122 `signMessage` — BIP-137 ecdsa only; `protocol: "bip322"` is unsupported (v1).
+  Future<void> _btcSignMessage(String topic, Object? params) async {
+    final pending = _pendingRequest(topic);
+    final context = _context;
+    if (pending == null || context == null || !context.mounted) return;
+
+    final map = params is Map ? Map<String, Object?>.from(params) : null;
+    final message = map?['message']?.toString();
+    if (message == null || message.isEmpty) {
+      return _respondError(
+        topic,
+        Errors.MALFORMED_REQUEST_PARAMS,
+        id: pending.id,
+      );
+    }
+    final protocol = map?['protocol']?.toString();
+    if (protocol != null && protocol != 'ecdsa') {
+      return _respondError(
+        topic,
+        Errors.UNSUPPORTED_METHODS,
+        id: pending.id,
+      );
+    }
+
+    final previous = _selectionSnapshot();
+    // Authorize the connected *account*; sub-address ownership is checked in Rust.
+    final accountParam = _bareParam(map, 'account');
+    final signAddress = _bareParam(map, 'address') ?? accountParam;
+    if (!await _ensureAuthorizedSigner(
+      topic: topic,
+      caip2: pending.chainId,
+      address: accountParam,
+      previous: previous,
+      addressOptional: true,
+    )) {
+      return _respondError(topic, Errors.UNAUTHORIZED_METHOD, id: pending.id);
+    }
+
+    if (!context.mounted) {
+      await _restoreSelection(previous);
+      return;
+    }
+    final peer = _peerOf(topic);
+    final responder = _RequestResponder(
+      service: this,
+      topic: topic,
+      id: pending.id,
+      context: context,
+      previous: previous,
+    );
+    showSignMessageModal(
+      context: context,
+      message: message,
+      appTitle: peer.name,
+      appIcon: peer.icon,
+      btcSignAddress: signAddress,
+      onMessageSigned: (address, sig) =>
+          responder.ok({'address': address, 'signature': sig}),
+      onBtcMessageSigned: (signed) => responder.ok({
+        'address': signed.address,
+        'signature': signed.signatureBase64,
+        'messageHash': signed.messageHashHex,
+      }),
+      onDismiss: () => unawaited(responder.rejected()),
+    );
+  }
+
+  /// Spec: emit after approval and whenever a UTXO is spent/created.
+  ///
+  /// Independent of the active UI chain — each bip122 session chain gets its
+  /// own address payload (mainnet session while testnet is selected still works).
+  Future<void> _emitBtcAddressesChanged() async {
+    final kit = _walletKit;
+    if (kit == null) return;
+
+    final payloadCache = <String, List<Map<String, String>>?>{};
+    Future<List<Map<String, String>>?> payloadFor(String caip2) async {
+      if (payloadCache.containsKey(caip2)) return payloadCache[caip2];
+      final payload = await _btcAccountAddressesPayload(caip2);
+      payloadCache[caip2] = payload;
+      return payload;
+    }
+
+    for (final session in kit.sessions.getAll()) {
+      final ns = session.namespaces['bip122'];
+      if (ns == null || !ns.events.contains(kWcBtcAddressesChangedEvent)) {
+        continue;
+      }
+      for (final caip2 in _namespaceChains(ns)) {
+        final payload = await payloadFor(caip2);
+        if (payload == null) continue;
+        unawaited(
+          _emitSessionEvent(
+            kit,
+            topic: session.topic,
+            caip2: caip2,
+            event: kWcBtcAddressesChangedEvent,
+            data: payload,
+          ),
+        );
+      }
+    }
+  }
+
+  List<WcSignInputInfo> _parseWcSignInputs(List<Object?> raw) {
+    return List<WcSignInputInfo>.generate(raw.length, (i) {
+      final item = raw[i];
+      if (item is! Map) {
+        throw const FormatException('signInputs entry must be an object');
+      }
+      final map = Map<String, Object?>.from(item);
+      final address = map['address']?.toString();
+      final indexRaw = map['index'];
+      final index = indexRaw is int
+          ? indexRaw
+          : int.tryParse(indexRaw?.toString() ?? '');
+      if (address == null || address.isEmpty || index == null) {
+        throw const FormatException('signInputs requires address and index');
+      }
+      final sighashRaw = map['sighashTypes'];
+      Uint32List? sighashTypes;
+      if (sighashRaw is List) {
+        final values = List<int>.generate(sighashRaw.length, (j) {
+          final v = sighashRaw[j];
+          if (v is int) return v;
+          final parsed = int.tryParse(v?.toString() ?? '');
+          if (parsed == null) {
+            throw const FormatException('invalid sighashTypes entry');
+          }
+          return parsed;
+        });
+        sighashTypes = Uint32List.fromList(values);
+      }
+      return WcSignInputInfo(
+        address: address,
+        index: index,
+        sighashTypes: sighashTypes,
+      );
+    }, growable: false);
+  }
+
   // ──────────────── session proposal & lifecycle events ────────────────
 
   void _onSessionProposal(SessionProposalEvent? event) {
@@ -1451,16 +2027,30 @@ class WalletConnectService extends ChangeNotifier {
           }
 
           final hasTron = filtered.containsKey('tron');
+          final bip122Ns = filtered['bip122'];
+          final btcCaip2 = _firstBip122Caip2(bip122Ns);
+          final btcAddresses = btcCaip2 == null
+              ? null
+              : await _btcAccountAddressesPayload(btcCaip2);
+          final sessionProperties = <String, String>{
+            if (hasTron) ...kWcTronSessionProperties,
+            if (btcAddresses != null)
+              kWcBtcAddressesProperty: jsonEncode(btcAddresses),
+          };
           final response = await kit.approveSession(
             id: event.id,
             namespaces: filtered,
-            sessionProperties: hasTron ? kWcTronSessionProperties : null,
+            sessionProperties:
+                sessionProperties.isEmpty ? null : sessionProperties,
           );
           _refreshSessionViews();
           notifyListeners();
           final topic = response.session?.topic ?? response.topic;
           if (topic.isNotEmpty) {
             await _redirectToDapp(topic);
+          }
+          if (btcCaip2 != null && btcAddresses != null) {
+            unawaited(_emitBtcAddressesChanged());
           }
         } catch (e) {
           debugPrint('WC approve failed: $e');
@@ -1502,7 +2092,7 @@ class WalletConnectService extends ChangeNotifier {
     for (final entry in generated.entries) {
       final accounts = <String>[];
       for (final caip10 in entry.value.accounts) {
-        final bare = caip10.split(':').last;
+        final bare = _bareWcAddress(caip10);
         var ok = false;
         for (final allowed in allowedAddrs) {
           if (_addressesEqual(allowed, bare)) {
@@ -1565,41 +2155,76 @@ class WalletConnectService extends ChangeNotifier {
 
     if (account != null && account.addr != _lastAddress) {
       _lastAddress = account.addr;
-      _emitToSessions(kit, kAccountsChangedEvent, <String>[account.addr]);
+      if (account.addrType == kBtcAddressType) {
+        unawaited(_emitBtcAddressesChanged());
+      } else {
+        final namespace = _namespaceForAddrType(account.addrType);
+        if (namespace != null) {
+          _emitToNamespaceSessions(
+            kit,
+            namespace,
+            kAccountsChangedEvent,
+            (session) => _sessionHasBareAddress(session, namespace, account.addr)
+                ? <String>[account.addr]
+                : null,
+          );
+        }
+      }
     }
     if (chain != null && chain.chainId != _lastChainId) {
       _lastChainId = chain.chainId;
-      _emitToSessions(kit, kChainChangedEvent, chain.chainId.toInt());
+      // Every eip155 session gets chainChanged on *its* approved chains.
+      _emitToNamespaceSessions(
+        kit,
+        'eip155',
+        kChainChangedEvent,
+        (_) => chain.chainId.toInt(),
+      );
     }
   }
 
-  bool _sessionHasChain(SessionData session, String caip2) {
-    final prefix = '$caip2:';
-    for (final ns in session.namespaces.values) {
-      for (final account in ns.accounts) {
-        if (account.startsWith(prefix)) return true;
+  /// Emit [event] to every session that approved it, once per approved
+  /// [namespace] chain of that session — independent of the active UI chain.
+  void _emitToNamespaceSessions(
+    ReownWalletKit kit,
+    String namespace,
+    String event,
+    Object? Function(SessionData session) dataFor,
+  ) {
+    for (final session in kit.sessions.getAll()) {
+      final ns = session.namespaces[namespace];
+      if (ns == null || !ns.events.contains(event)) continue;
+      final data = dataFor(session);
+      if (data == null) continue;
+      for (final caip2 in _namespaceChains(ns)) {
+        unawaited(
+          _emitSessionEvent(
+            kit,
+            topic: session.topic,
+            caip2: caip2,
+            event: event,
+            data: data,
+          ),
+        );
       }
     }
-    return false;
   }
 
-  void _emitToSessions(ReownWalletKit kit, String event, Object data) {
-    final chain = appState.chain;
-    final caip2 = chain == null ? null : caip2ForProvider(chain);
-    if (caip2 == null) return;
-    for (final session in kit.sessions.getAll()) {
-      if (!_sessionHasChain(session, caip2)) continue;
-      unawaited(() async {
-        try {
-          await kit.emitSessionEvent(
-            topic: session.topic,
-            chainId: caip2,
-            event: SessionEventParams(name: event, data: data),
-          );
-        } catch (e) {
-          debugPrint('WC emit $event failed: $e');
-        }
-      }());
+  Future<void> _emitSessionEvent(
+    ReownWalletKit kit, {
+    required String topic,
+    required String caip2,
+    required String event,
+    required Object data,
+  }) async {
+    try {
+      await kit.emitSessionEvent(
+        topic: topic,
+        chainId: caip2,
+        event: SessionEventParams(name: event, data: data),
+      );
+    } catch (e) {
+      debugPrint('WC emit $event/$caip2 failed: $e');
     }
   }
 
