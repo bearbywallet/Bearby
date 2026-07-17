@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,6 +53,16 @@ class _ConnectedDappsModalContentState
   final TextEditingController _wcUriController = TextEditingController();
   String _searchQuery = '';
   bool _isPairing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Warm WC only when the user opens this sheet (not at app startup).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<WalletConnectService>().waitUntilReady());
+    });
+  }
 
   @override
   void dispose() {

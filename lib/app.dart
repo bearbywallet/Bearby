@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,11 +27,12 @@ class _BearbyAppState extends State<BearbyApp> {
   void initState() {
     super.initState();
     _router = createRouter(widget.appState);
+    // Construct only — no kit.init()/relay work on cold start (lazy via
+    // waitUntilReady on first pair / deep-link / Manage Connections).
     _walletConnectService = WalletConnectService(
       appState: widget.appState,
       router: _router,
     );
-    unawaited(_walletConnectService.init());
     _deepLinkService.initialize(
       _router,
       widget.appState,

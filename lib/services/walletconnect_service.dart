@@ -139,6 +139,8 @@ class WalletConnectService extends ChangeNotifier {
     }
   }
 
+  /// Lazy entry: kit + relay + registrations. Call only from [waitUntilReady]
+  /// / first WC use — never from app cold start.
   Future<void> init() async {
     if (_walletKit != null) return;
     final pending = _initCompleter;
@@ -222,6 +224,9 @@ class WalletConnectService extends ChangeNotifier {
       throw const FormatException('Not a WalletConnect URI');
     }
 
+    // Re-sync so bip122 accounts exist before the proposal arrives.
+    _syncRegistrations();
+
     try {
       await kit.pair(uri: Uri.parse(trimmed));
     } catch (e) {
@@ -262,7 +267,9 @@ class WalletConnectService extends ChangeNotifier {
       case kSolanaSlip44:
         return kSolanaCaip2ByChainId[chainId.toInt()];
       case kBitcoinlip44:
-        return kBtcCaip2ByChainId[chainId.toInt()];
+        final caip2 = kBtcCaip2ByChainId[chainId.toInt()];
+        // chainIds.first == 2 (zilpay) has no public genesis CAIP-2.
+        return caip2;
       default:
         return null;
     }
@@ -318,8 +325,9 @@ class WalletConnectService extends ChangeNotifier {
       final colon = caip2.indexOf(':');
       if (colon <= 0) continue;
       final namespace = caip2.substring(0, colon);
+      final addresses = _addressesForNamespace(namespace);
 
-      for (final address in _addressesForNamespace(namespace)) {
+      for (final address in addresses) {
         try {
           kit.registerAccount(chainId: caip2, accountAddress: address);
         } catch (e) {
@@ -349,6 +357,9 @@ class WalletConnectService extends ChangeNotifier {
   }
 
   /// Active-wallet addresses matching [namespace] address-family (v1 contract).
+  ///
+  /// Scans every slip44/bip map on the **active wallet** (not only the current
+  /// chain's slip44) so multi-chain HD wallets register eip155 + bip122, etc.
   List<String> _addressesForNamespace(String namespace) {
     final addrType = kWcAddrTypeByNamespace[namespace];
     if (addrType == null) return const <String>[];
@@ -356,11 +367,14 @@ class WalletConnectService extends ChangeNotifier {
     final wallet = appState.wallet;
     if (wallet == null) return const <String>[];
 
-    final accounts = wallet.accounts[wallet.slip44]?[wallet.bip] ?? const [];
     final seen = <String>{};
-    for (final account in accounts) {
-      if (account.addrType == addrType) {
-        seen.add(account.addr);
+    for (final bipMap in wallet.accounts.values) {
+      for (final accountList in bipMap.values) {
+        for (final account in accountList) {
+          if (account.addrType == addrType) {
+            seen.add(account.addr);
+          }
+        }
       }
     }
     return List<String>.from(seen, growable: false);
@@ -1974,6 +1988,8 @@ class WalletConnectService extends ChangeNotifier {
     if (event == null) return;
     final kit = _walletKit;
     final context = _context;
+    final generated =
+        event.params.generatedNamespaces ?? <String, Namespace>{};
     if (kit == null || context == null || !context.mounted) {
       unawaited(_rejectProposal(event.id));
       return;
@@ -1992,8 +2008,6 @@ class WalletConnectService extends ChangeNotifier {
       iconUrl: icons.isNotEmpty ? icons.first : '',
       onConfirm: (selectedIndices) async {
         try {
-          final generated =
-              event.params.generatedNamespaces ?? <String, Namespace>{};
           final allowed = _allowedAddressesFromSelection(selectedIndices);
           if (allowed.isEmpty) {
             await _rejectProposal(
@@ -2003,13 +2017,36 @@ class WalletConnectService extends ChangeNotifier {
             _notifyUserError(pairErrorMsg);
             return;
           }
-          final filtered = _filterNamespaces(generated, allowed);
+          // SDK leaves generated empty when no registered accounts match the
+          // proposal (e.g. dApp eip155-only + wallet BTC-only). Rebuild from
+          // proposal + our registered handlers so optional namespaces that we
+          // *can* support still settle.
+          final namespacesToFilter = generated.isNotEmpty
+              ? generated
+              : _namespacesFromProposal(
+                  required: event.params.requiredNamespaces,
+                  optional: event.params.optionalNamespaces,
+                  allowedAddrs: allowed,
+                );
+          final filtered = _filterNamespaces(namespacesToFilter, allowed);
           if (filtered.isEmpty) {
+            final dappNs = <String>{
+              ...event.params.requiredNamespaces.keys,
+              ...event.params.optionalNamespaces.keys,
+            };
+            final walletNs = <String>[
+              for (final ns in kWcAddrTypeByNamespace.keys)
+                if (_addressesForNamespace(ns).isNotEmpty) ns,
+            ];
+            final reason =
+                'No shared chains: dApp asked $dappNs, wallet has $walletNs. '
+                'For Bitcoin open the bip122 / Bitcoin network on the dApp '
+                '(this QR is often Ethereum-only AppKit).';
             await _rejectProposal(
               event.id,
               reasonKey: Errors.UNSUPPORTED_ACCOUNTS,
             );
-            _notifyUserError(pairErrorMsg);
+            _notifyUserError(reason);
             return;
           }
 
@@ -2060,6 +2097,101 @@ class WalletConnectService extends ChangeNotifier {
       },
       onReject: () => unawaited(_rejectProposal(event.id)),
     );
+  }
+
+  /// Build approve namespaces when SDK `generatedNamespaces` is empty.
+  ///
+  /// Intersects proposal chains/methods/events with wallet-registered handlers
+  /// and [allowedAddrs] of the matching address family. Keys may be bare
+  /// namespaces (`eip155`) or CAIP-2 (`eip155:1`).
+  Map<String, Namespace> _namespacesFromProposal({
+    required Map<String, RequiredNamespace> required,
+    required Map<String, RequiredNamespace> optional,
+    required Set<String> allowedAddrs,
+  }) {
+    final merged = <String, RequiredNamespace>{
+      ...optional,
+      ...required, // required wins on key clash
+    };
+    final result = <String, Namespace>{};
+
+    for (final entry in merged.entries) {
+      final key = entry.key;
+      final req = entry.value;
+      final namespace = key.contains(':') ? key.split(':').first : key;
+      final addrType = kWcAddrTypeByNamespace[namespace];
+      if (addrType == null) continue;
+
+      final walletAddrs = _addressesForNamespace(namespace);
+      final matching = <String>[
+        for (final a in walletAddrs)
+          if (allowedAddrs.any((allowed) => _addressesEqual(allowed, a))) a,
+      ];
+      if (matching.isEmpty) continue;
+
+      // Chains: explicit list, or single CAIP-2 key, or all registered providers.
+      final chainSet = <String>{};
+      final listed = req.chains;
+      if (listed != null && listed.isNotEmpty) {
+        chainSet.addAll(listed);
+      } else if (key.contains(':')) {
+        chainSet.add(key);
+      } else {
+        for (final p in appState.state.providers) {
+          final caip2 = caip2ForProvider(p);
+          if (caip2 != null && caip2.startsWith('$namespace:')) {
+            chainSet.add(caip2);
+          }
+        }
+      }
+      if (chainSet.isEmpty) continue;
+
+      // Methods: only those we registered handlers for.
+      final handlers = _handlersFor(namespace).keys.toSet();
+      final methods = <String>[
+        for (final m in req.methods)
+          if (handlers.contains(m)) m,
+      ];
+      // Events we emit for this namespace, intersected with dApp request.
+      final ourEvents = kWcEventsByNamespace[namespace] ?? const <String>[];
+      final events = <String>[
+        for (final e in req.events)
+          if (ourEvents.contains(e)) e,
+      ];
+
+      final accounts = <String>[
+        for (final chain in chainSet)
+          for (final addr in matching) '$chain:$addr',
+      ];
+      if (accounts.isEmpty) continue;
+
+      // Merge if same namespace key already present (e.g. eip155 + eip155:1).
+      final nsKey = namespace;
+      final existing = result[nsKey];
+      if (existing != null) {
+        final acc = <String>{...existing.accounts, ...accounts};
+        final meth = <String>{...existing.methods, ...methods};
+        final ev = <String>{...existing.events, ...events};
+        final ch = <String>{
+          ...?existing.chains,
+          ...chainSet,
+        };
+        result[nsKey] = Namespace(
+          chains: List<String>.from(ch, growable: false),
+          accounts: List<String>.from(acc, growable: false),
+          methods: List<String>.from(meth, growable: false),
+          events: List<String>.from(ev, growable: false),
+        );
+      } else {
+        result[nsKey] = Namespace(
+          chains: List<String>.from(chainSet, growable: false),
+          accounts: List<String>.from(accounts, growable: false),
+          methods: List<String>.from(methods, growable: false),
+          events: List<String>.from(events, growable: false),
+        );
+      }
+    }
+    return result;
   }
 
   /// Every key in [required] must have non-empty accounts in [filtered].
