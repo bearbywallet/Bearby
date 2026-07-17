@@ -1217,9 +1217,15 @@ class WalletConnectService extends ChangeNotifier {
           if (signedSolana == null) {
             await responder.failMalformed();
           } else {
+            final signature = signedSolana.signature;
+            final message = signedSolana.message;
+            final wire = Uint8List(1 + signature.length + message.length)
+              ..[0] = 0x01
+              ..setAll(1, signature)
+              ..setAll(1 + signature.length, message);
             await responder.ok({
-              'signature': signed.transactionHash,
-              'transaction': signedSolana,
+              'signature': signed.transactionHash, // base58, what wallet-adapter reads
+              'transaction': base64Encode(wire), // full signed tx for dapps that use it
             });
           }
         }
