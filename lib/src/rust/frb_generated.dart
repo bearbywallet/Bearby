@@ -25,6 +25,7 @@ import 'api/token.dart';
 import 'api/transaction.dart';
 import 'api/utils.dart';
 import 'api/wallet.dart';
+import 'api/walletconnect.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -62,6 +63,7 @@ import 'models/transactions/solana.dart';
 import 'models/transactions/transaction_metadata.dart';
 import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
+import 'models/walletconnect/ffi.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API
@@ -121,7 +123,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1232375376;
+  int get rustContentHash => 531472875;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -643,6 +645,41 @@ abstract class RustLibApi extends BaseApi {
   Future<(List<ExchangeAsset>, bool)>
       crateApiExchangeBootstrapValidateExchangeProviders(
           {required List<ExchangeAsset> assets});
+
+  Future<String> crateApiWalletconnectWcApproveSession(
+      {required BigInt proposalId,
+      required List<WcNamespaceApproval> namespaces});
+
+  Future<void> crateApiWalletconnectWcDisconnect({required String topic});
+
+  Stream<WcEventInfo> crateApiWalletconnectWcEvents();
+
+  Future<void> crateApiWalletconnectWcInit(
+      {required String projectId,
+      required String appName,
+      required String appDescription,
+      required String appUrl,
+      required String appIcon,
+      required String packageName,
+      required String platform});
+
+  Future<void> crateApiWalletconnectWcPair({required String uri});
+
+  Future<void> crateApiWalletconnectWcRejectSession(
+      {required BigInt proposalId});
+
+  Future<void> crateApiWalletconnectWcRespondErr(
+      {required String topic,
+      required BigInt id,
+      required PlatformInt64 code,
+      required String message});
+
+  Future<void> crateApiWalletconnectWcRespondOk(
+      {required String topic, required BigInt id, required String resultJson});
+
+  Future<List<WcSessionInfo>> crateApiWalletconnectWcSessions();
+
+  Future<void> crateApiWalletconnectWcShutdown();
 
   Future<WhiteBirdSessionInfo> crateApiExchangeWhitebirdWhitebirdCreateSession(
       {required bool isTestnet,
@@ -4709,6 +4746,299 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  Future<String> crateApiWalletconnectWcApproveSession(
+      {required BigInt proposalId,
+      required List<WcNamespaceApproval> namespaces}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(proposalId, serializer);
+        sse_encode_list_wc_namespace_approval(namespaces, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 147, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcApproveSessionConstMeta,
+      argValues: [proposalId, namespaces],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcApproveSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_approve_session",
+        argNames: ["proposalId", "namespaces"],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcDisconnect({required String topic}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(topic, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 148, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcDisconnectConstMeta,
+      argValues: [topic],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcDisconnectConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_disconnect",
+        argNames: ["topic"],
+      );
+
+  @override
+  Stream<WcEventInfo> crateApiWalletconnectWcEvents() {
+    final sink = RustStreamSink<WcEventInfo>();
+    unawaited(handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_StreamSink_wc_event_info_Sse(sink, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 149, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcEventsConstMeta,
+      argValues: [sink],
+      apiImpl: this,
+    )));
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcEventsConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_events",
+        argNames: ["sink"],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcInit(
+      {required String projectId,
+      required String appName,
+      required String appDescription,
+      required String appUrl,
+      required String appIcon,
+      required String packageName,
+      required String platform}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(projectId, serializer);
+        sse_encode_String(appName, serializer);
+        sse_encode_String(appDescription, serializer);
+        sse_encode_String(appUrl, serializer);
+        sse_encode_String(appIcon, serializer);
+        sse_encode_String(packageName, serializer);
+        sse_encode_String(platform, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 150, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcInitConstMeta,
+      argValues: [
+        projectId,
+        appName,
+        appDescription,
+        appUrl,
+        appIcon,
+        packageName,
+        platform
+      ],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcInitConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_init",
+        argNames: [
+          "projectId",
+          "appName",
+          "appDescription",
+          "appUrl",
+          "appIcon",
+          "packageName",
+          "platform"
+        ],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcPair({required String uri}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(uri, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 151, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcPairConstMeta,
+      argValues: [uri],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcPairConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_pair",
+        argNames: ["uri"],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcRejectSession(
+      {required BigInt proposalId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(proposalId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 152, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcRejectSessionConstMeta,
+      argValues: [proposalId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcRejectSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_reject_session",
+        argNames: ["proposalId"],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcRespondErr(
+      {required String topic,
+      required BigInt id,
+      required PlatformInt64 code,
+      required String message}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(topic, serializer);
+        sse_encode_u_64(id, serializer);
+        sse_encode_i_64(code, serializer);
+        sse_encode_String(message, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 153, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcRespondErrConstMeta,
+      argValues: [topic, id, code, message],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcRespondErrConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_respond_err",
+        argNames: ["topic", "id", "code", "message"],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcRespondOk(
+      {required String topic, required BigInt id, required String resultJson}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(topic, serializer);
+        sse_encode_u_64(id, serializer);
+        sse_encode_String(resultJson, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 154, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcRespondOkConstMeta,
+      argValues: [topic, id, resultJson],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcRespondOkConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_respond_ok",
+        argNames: ["topic", "id", "resultJson"],
+      );
+
+  @override
+  Future<List<WcSessionInfo>> crateApiWalletconnectWcSessions() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 155, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_wc_session_info,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcSessionsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcSessionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_sessions",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiWalletconnectWcShutdown() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 156, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletconnectWcShutdownConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletconnectWcShutdownConstMeta =>
+      const TaskConstMeta(
+        debugName: "wc_shutdown",
+        argNames: [],
+      );
+
+  @override
   Future<WhiteBirdSessionInfo> crateApiExchangeWhitebirdWhitebirdCreateSession(
       {required bool isTestnet,
       required String fromCode,
@@ -4726,7 +5056,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(destinationCryptoAddress, serializer);
         sse_encode_String(externalClientId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 147, port: port_);
+            funcId: 157, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_white_bird_session_info,
@@ -4770,7 +5100,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(externalClientId, serializer);
         sse_encode_opt_String(clientId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 148, port: port_);
+            funcId: 158, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_white_bird_open_order,
@@ -4800,7 +5130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(orderId, serializer);
         sse_encode_String(accessToken, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 149, port: port_);
+            funcId: 159, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -4827,7 +5157,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 150, port: port_);
+            funcId: 160, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -4854,7 +5184,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 151, port: port_);
+            funcId: 161, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4880,7 +5210,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(base16, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 152, port: port_);
+            funcId: 162, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -4907,7 +5237,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 153, port: port_);
+            funcId: 163, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -5027,6 +5357,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<WcEventInfo> dco_decode_StreamSink_wc_event_info_Sse(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
@@ -5480,6 +5817,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_wallet_settings_info(raw);
+  }
+
+  @protected
+  WcProposalInfo dco_decode_box_autoadd_wc_proposal_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_wc_proposal_info(raw);
+  }
+
+  @protected
+  WcRequestInfo dco_decode_box_autoadd_wc_request_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_wc_request_info(raw);
   }
 
   @protected
@@ -6167,6 +6516,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_wallet_info).toList();
+  }
+
+  @protected
+  List<WcNamespaceApproval> dco_decode_list_wc_namespace_approval(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_wc_namespace_approval)
+        .toList();
+  }
+
+  @protected
+  List<WcNamespaceInfo> dco_decode_list_wc_namespace_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_wc_namespace_info).toList();
+  }
+
+  @protected
+  List<WcSessionInfo> dco_decode_list_wc_session_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_wc_session_info).toList();
   }
 
   @protected
@@ -7323,6 +7692,129 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WcEventInfo dco_decode_wc_event_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return WcEventInfo_Proposal(
+          dco_decode_box_autoadd_wc_proposal_info(raw[1]),
+        );
+      case 1:
+        return WcEventInfo_Request(
+          dco_decode_box_autoadd_wc_request_info(raw[1]),
+        );
+      case 2:
+        return WcEventInfo_SessionSettled(
+          topic: dco_decode_String(raw[1]),
+        );
+      case 3:
+        return WcEventInfo_SessionDeleted(
+          topic: dco_decode_String(raw[1]),
+          message: dco_decode_String(raw[2]),
+        );
+      case 4:
+        return WcEventInfo_SessionEvent(
+          topic: dco_decode_String(raw[1]),
+          chainId: dco_decode_String(raw[2]),
+          name: dco_decode_String(raw[3]),
+          data: dco_decode_String(raw[4]),
+        );
+      case 5:
+        return WcEventInfo_RelayConnected();
+      case 6:
+        return WcEventInfo_RelayDisconnected();
+      case 7:
+        return WcEventInfo_Error(
+          message: dco_decode_String(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  WcNamespaceApproval dco_decode_wc_namespace_approval(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return WcNamespaceApproval(
+      key: dco_decode_String(arr[0]),
+      accounts: dco_decode_list_String(arr[1]),
+      methods: dco_decode_list_String(arr[2]),
+      events: dco_decode_list_String(arr[3]),
+    );
+  }
+
+  @protected
+  WcNamespaceInfo dco_decode_wc_namespace_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return WcNamespaceInfo(
+      key: dco_decode_String(arr[0]),
+      chains: dco_decode_list_String(arr[1]),
+      methods: dco_decode_list_String(arr[2]),
+      events: dco_decode_list_String(arr[3]),
+    );
+  }
+
+  @protected
+  WcProposalInfo dco_decode_wc_proposal_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return WcProposalInfo(
+      id: dco_decode_u_64(arr[0]),
+      pairingTopic: dco_decode_String(arr[1]),
+      peerName: dco_decode_String(arr[2]),
+      peerDescription: dco_decode_String(arr[3]),
+      peerUrl: dco_decode_String(arr[4]),
+      peerIcon: dco_decode_opt_String(arr[5]),
+      required_: dco_decode_list_wc_namespace_info(arr[6]),
+      optional: dco_decode_list_wc_namespace_info(arr[7]),
+    );
+  }
+
+  @protected
+  WcRequestInfo dco_decode_wc_request_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return WcRequestInfo(
+      topic: dco_decode_String(arr[0]),
+      id: dco_decode_u_64(arr[1]),
+      chainId: dco_decode_String(arr[2]),
+      method: dco_decode_String(arr[3]),
+      paramsJson: dco_decode_String(arr[4]),
+      peerName: dco_decode_String(arr[5]),
+      peerIcon: dco_decode_opt_String(arr[6]),
+    );
+  }
+
+  @protected
+  WcSessionInfo dco_decode_wc_session_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return WcSessionInfo(
+      topic: dco_decode_String(arr[0]),
+      peerName: dco_decode_String(arr[1]),
+      peerDescription: dco_decode_String(arr[2]),
+      peerUrl: dco_decode_String(arr[3]),
+      peerIcon: dco_decode_opt_String(arr[4]),
+      accounts: dco_decode_list_String(arr[5]),
+      methods: dco_decode_list_String(arr[6]),
+      events: dco_decode_list_String(arr[7]),
+      expiry: dco_decode_u_64(arr[8]),
+    );
+  }
+
+  @protected
   WhiteBirdMeta dco_decode_white_bird_meta(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -7493,6 +7985,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<WcEventInfo> sse_decode_StreamSink_wc_event_info_Sse(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     throw UnimplementedError('Unreachable ()');
@@ -7958,6 +8457,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_wallet_settings_info(deserializer));
+  }
+
+  @protected
+  WcProposalInfo sse_decode_box_autoadd_wc_proposal_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_wc_proposal_info(deserializer));
+  }
+
+  @protected
+  WcRequestInfo sse_decode_box_autoadd_wc_request_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_wc_request_info(deserializer));
   }
 
   @protected
@@ -8875,6 +9388,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <WalletInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_wallet_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<WcNamespaceApproval> sse_decode_list_wc_namespace_approval(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WcNamespaceApproval>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_wc_namespace_approval(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<WcNamespaceInfo> sse_decode_list_wc_namespace_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WcNamespaceInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_wc_namespace_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<WcSessionInfo> sse_decode_list_wc_session_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <WcSessionInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_wc_session_info(deserializer));
     }
     return ans_;
   }
@@ -10167,6 +10719,143 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  WcEventInfo sse_decode_wc_event_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_box_autoadd_wc_proposal_info(deserializer);
+        return WcEventInfo_Proposal(var_field0);
+      case 1:
+        var var_field0 = sse_decode_box_autoadd_wc_request_info(deserializer);
+        return WcEventInfo_Request(var_field0);
+      case 2:
+        var var_topic = sse_decode_String(deserializer);
+        return WcEventInfo_SessionSettled(topic: var_topic);
+      case 3:
+        var var_topic = sse_decode_String(deserializer);
+        var var_message = sse_decode_String(deserializer);
+        return WcEventInfo_SessionDeleted(
+            topic: var_topic, message: var_message);
+      case 4:
+        var var_topic = sse_decode_String(deserializer);
+        var var_chainId = sse_decode_String(deserializer);
+        var var_name = sse_decode_String(deserializer);
+        var var_data = sse_decode_String(deserializer);
+        return WcEventInfo_SessionEvent(
+            topic: var_topic,
+            chainId: var_chainId,
+            name: var_name,
+            data: var_data);
+      case 5:
+        return WcEventInfo_RelayConnected();
+      case 6:
+        return WcEventInfo_RelayDisconnected();
+      case 7:
+        var var_message = sse_decode_String(deserializer);
+        return WcEventInfo_Error(message: var_message);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  WcNamespaceApproval sse_decode_wc_namespace_approval(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_key = sse_decode_String(deserializer);
+    var var_accounts = sse_decode_list_String(deserializer);
+    var var_methods = sse_decode_list_String(deserializer);
+    var var_events = sse_decode_list_String(deserializer);
+    return WcNamespaceApproval(
+        key: var_key,
+        accounts: var_accounts,
+        methods: var_methods,
+        events: var_events);
+  }
+
+  @protected
+  WcNamespaceInfo sse_decode_wc_namespace_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_key = sse_decode_String(deserializer);
+    var var_chains = sse_decode_list_String(deserializer);
+    var var_methods = sse_decode_list_String(deserializer);
+    var var_events = sse_decode_list_String(deserializer);
+    return WcNamespaceInfo(
+        key: var_key,
+        chains: var_chains,
+        methods: var_methods,
+        events: var_events);
+  }
+
+  @protected
+  WcProposalInfo sse_decode_wc_proposal_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_u_64(deserializer);
+    var var_pairingTopic = sse_decode_String(deserializer);
+    var var_peerName = sse_decode_String(deserializer);
+    var var_peerDescription = sse_decode_String(deserializer);
+    var var_peerUrl = sse_decode_String(deserializer);
+    var var_peerIcon = sse_decode_opt_String(deserializer);
+    var var_required_ = sse_decode_list_wc_namespace_info(deserializer);
+    var var_optional = sse_decode_list_wc_namespace_info(deserializer);
+    return WcProposalInfo(
+        id: var_id,
+        pairingTopic: var_pairingTopic,
+        peerName: var_peerName,
+        peerDescription: var_peerDescription,
+        peerUrl: var_peerUrl,
+        peerIcon: var_peerIcon,
+        required_: var_required_,
+        optional: var_optional);
+  }
+
+  @protected
+  WcRequestInfo sse_decode_wc_request_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_topic = sse_decode_String(deserializer);
+    var var_id = sse_decode_u_64(deserializer);
+    var var_chainId = sse_decode_String(deserializer);
+    var var_method = sse_decode_String(deserializer);
+    var var_paramsJson = sse_decode_String(deserializer);
+    var var_peerName = sse_decode_String(deserializer);
+    var var_peerIcon = sse_decode_opt_String(deserializer);
+    return WcRequestInfo(
+        topic: var_topic,
+        id: var_id,
+        chainId: var_chainId,
+        method: var_method,
+        paramsJson: var_paramsJson,
+        peerName: var_peerName,
+        peerIcon: var_peerIcon);
+  }
+
+  @protected
+  WcSessionInfo sse_decode_wc_session_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_topic = sse_decode_String(deserializer);
+    var var_peerName = sse_decode_String(deserializer);
+    var var_peerDescription = sse_decode_String(deserializer);
+    var var_peerUrl = sse_decode_String(deserializer);
+    var var_peerIcon = sse_decode_opt_String(deserializer);
+    var var_accounts = sse_decode_list_String(deserializer);
+    var var_methods = sse_decode_list_String(deserializer);
+    var var_events = sse_decode_list_String(deserializer);
+    var var_expiry = sse_decode_u_64(deserializer);
+    return WcSessionInfo(
+        topic: var_topic,
+        peerName: var_peerName,
+        peerDescription: var_peerDescription,
+        peerUrl: var_peerUrl,
+        peerIcon: var_peerIcon,
+        accounts: var_accounts,
+        methods: var_methods,
+        events: var_events,
+        expiry: var_expiry);
+  }
+
+  @protected
   WhiteBirdMeta sse_decode_white_bird_meta(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_common = sse_decode_provider_common(deserializer);
@@ -10355,6 +11044,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         self.setupAndSerialize(
             codec: SseCodec(
           decodeSuccessData: sse_decode_block_event,
+          decodeErrorData: sse_decode_AnyhowException,
+        )),
+        serializer);
+  }
+
+  @protected
+  void sse_encode_StreamSink_wc_event_info_Sse(
+      RustStreamSink<WcEventInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+        self.setupAndSerialize(
+            codec: SseCodec(
+          decodeSuccessData: sse_decode_wc_event_info,
           decodeErrorData: sse_decode_AnyhowException,
         )),
         serializer);
@@ -10776,6 +11478,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       WalletSettingsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_wallet_settings_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_wc_proposal_info(
+      WcProposalInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_wc_proposal_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_wc_request_info(
+      WcRequestInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_wc_request_info(self, serializer);
   }
 
   @protected
@@ -11479,6 +12195,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_wallet_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_wc_namespace_approval(
+      List<WcNamespaceApproval> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_wc_namespace_approval(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_wc_namespace_info(
+      List<WcNamespaceInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_wc_namespace_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_wc_session_info(
+      List<WcSessionInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_wc_session_info(item, serializer);
     }
   }
 
@@ -12500,6 +13246,109 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
     sse_encode_u_8(self.ratesApiOptions, serializer);
+  }
+
+  @protected
+  void sse_encode_wc_event_info(WcEventInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case WcEventInfo_Proposal(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_wc_proposal_info(field0, serializer);
+      case WcEventInfo_Request(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_box_autoadd_wc_request_info(field0, serializer);
+      case WcEventInfo_SessionSettled(topic: final topic):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(topic, serializer);
+      case WcEventInfo_SessionDeleted(
+          topic: final topic,
+          message: final message
+        ):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(topic, serializer);
+        sse_encode_String(message, serializer);
+      case WcEventInfo_SessionEvent(
+          topic: final topic,
+          chainId: final chainId,
+          name: final name,
+          data: final data
+        ):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(topic, serializer);
+        sse_encode_String(chainId, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_String(data, serializer);
+      case WcEventInfo_RelayConnected():
+        sse_encode_i_32(5, serializer);
+      case WcEventInfo_RelayDisconnected():
+        sse_encode_i_32(6, serializer);
+      case WcEventInfo_Error(message: final message):
+        sse_encode_i_32(7, serializer);
+        sse_encode_String(message, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_wc_namespace_approval(
+      WcNamespaceApproval self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.key, serializer);
+    sse_encode_list_String(self.accounts, serializer);
+    sse_encode_list_String(self.methods, serializer);
+    sse_encode_list_String(self.events, serializer);
+  }
+
+  @protected
+  void sse_encode_wc_namespace_info(
+      WcNamespaceInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.key, serializer);
+    sse_encode_list_String(self.chains, serializer);
+    sse_encode_list_String(self.methods, serializer);
+    sse_encode_list_String(self.events, serializer);
+  }
+
+  @protected
+  void sse_encode_wc_proposal_info(
+      WcProposalInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.pairingTopic, serializer);
+    sse_encode_String(self.peerName, serializer);
+    sse_encode_String(self.peerDescription, serializer);
+    sse_encode_String(self.peerUrl, serializer);
+    sse_encode_opt_String(self.peerIcon, serializer);
+    sse_encode_list_wc_namespace_info(self.required_, serializer);
+    sse_encode_list_wc_namespace_info(self.optional, serializer);
+  }
+
+  @protected
+  void sse_encode_wc_request_info(
+      WcRequestInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.topic, serializer);
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.chainId, serializer);
+    sse_encode_String(self.method, serializer);
+    sse_encode_String(self.paramsJson, serializer);
+    sse_encode_String(self.peerName, serializer);
+    sse_encode_opt_String(self.peerIcon, serializer);
+  }
+
+  @protected
+  void sse_encode_wc_session_info(
+      WcSessionInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.topic, serializer);
+    sse_encode_String(self.peerName, serializer);
+    sse_encode_String(self.peerDescription, serializer);
+    sse_encode_String(self.peerUrl, serializer);
+    sse_encode_opt_String(self.peerIcon, serializer);
+    sse_encode_list_String(self.accounts, serializer);
+    sse_encode_list_String(self.methods, serializer);
+    sse_encode_list_String(self.events, serializer);
+    sse_encode_u_64(self.expiry, serializer);
   }
 
   @protected

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/components/smart_input.dart';
+import 'package:bearby/src/rust/api/walletconnect.dart';
+import 'package:bearby/src/rust/models/walletconnect/ffi.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
@@ -47,6 +49,31 @@ class _ConnectedDappsModalContentState
     extends State<_ConnectedDappsModalContent> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  List<WcSessionInfo> _wcSessions = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWcSessions();
+  }
+
+  Future<void> _loadWcSessions() async {
+    try {
+      final sessions = await wcSessions();
+      if (mounted) setState(() => _wcSessions = sessions);
+    } catch (_) {
+      // Engine may not be started yet.
+    }
+  }
+
+  Future<void> _disconnectWc(String topic) async {
+    try {
+      await wcDisconnect(topic: topic);
+      await _loadWcSessions();
+    } catch (e) {
+      debugPrint('wc disconnect: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -59,12 +86,21 @@ class _ConnectedDappsModalContentState
     final theme = Provider.of<AppState>(context, listen: false).currentTheme;
     final appState = Provider.of<AppState>(context, listen: false);
     final connectedDapps = appState.connections;
+    final q = _searchQuery.toLowerCase();
 
     final filteredDapps = connectedDapps
         .where((dapp) =>
-            dapp.domain.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            dapp.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+            dapp.domain.toLowerCase().contains(q) ||
+            dapp.title.toLowerCase().contains(q))
         .toList();
+    final filteredWc = _wcSessions
+        .where((s) =>
+            s.peerName.toLowerCase().contains(q) ||
+            s.peerUrl.toLowerCase().contains(q) ||
+            s.topic.toLowerCase().contains(q))
+        .toList();
+
+    final total = filteredDapps.length + filteredWc.length;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -111,7 +147,7 @@ class _ConnectedDappsModalContentState
             ),
           ),
           Expanded(
-            child: filteredDapps.isEmpty
+            child: total == 0
                 ? Center(
                     child: Text(
                       AppLocalizations.of(context)!.connectedDappsModalNoDapps,
@@ -121,23 +157,48 @@ class _ConnectedDappsModalContentState
                   )
                 : ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: filteredDapps.length,
+                    itemCount: total,
                     itemBuilder: (context, index) {
-                      final dapp = filteredDapps[index];
+                      if (index < filteredDapps.length) {
+                        final dapp = filteredDapps[index];
+                        return Column(
+                          children: [
+                            _DappListItem(
+                              name: dapp.title,
+                              url: dapp.domain,
+                              iconUrl: dapp.favicon ?? "",
+                              lastConnected:
+                                  fromLargeBigInt(dapp.lastConnected),
+                              onDisconnect: () =>
+                                  widget.onDappDisconnect?.call(dapp.domain),
+                            ),
+                            if (index < total - 1)
+                              Divider(
+                                height: 1,
+                                color:
+                                    theme.textSecondary.withValues(alpha: 0.1),
+                              ),
+                          ],
+                        );
+                      }
+                      final s = filteredWc[index - filteredDapps.length];
                       return Column(
                         children: [
                           _DappListItem(
-                            name: dapp.title,
-                            url: dapp.domain,
-                            iconUrl: dapp.favicon ?? "",
-                            lastConnected: fromLargeBigInt(dapp.lastConnected),
-                            onDisconnect: () =>
-                                widget.onDappDisconnect?.call(dapp.domain),
+                            name: s.peerName.isEmpty ? 'WalletConnect' : s.peerName,
+                            url: s.peerUrl.isEmpty ? s.topic : s.peerUrl,
+                            iconUrl: s.peerIcon ?? '',
+                            lastConnected: DateTime.fromMillisecondsSinceEpoch(
+                              s.expiry.toInt() * 1000,
+                              isUtc: true,
+                            ),
+                            onDisconnect: () => _disconnectWc(s.topic),
                           ),
-                          if (index < filteredDapps.length - 1)
+                          if (index < total - 1)
                             Divider(
                               height: 1,
-                              color: theme.textSecondary.withValues(alpha: 0.1),
+                              color:
+                                  theme.textSecondary.withValues(alpha: 0.1),
                             ),
                         ],
                       );

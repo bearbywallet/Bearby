@@ -28,6 +28,7 @@ import 'api/token.dart';
 import 'api/transaction.dart';
 import 'api/utils.dart';
 import 'api/wallet.dart';
+import 'api/walletconnect.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -63,6 +64,7 @@ import 'models/transactions/solana.dart';
 import 'models/transactions/transaction_metadata.dart';
 import 'models/transactions/tron.dart';
 import 'models/wallet.dart';
+import 'models/walletconnect/ffi.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
@@ -126,6 +128,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<WcEventInfo> dco_decode_StreamSink_wc_event_info_Sse(
+      dynamic raw);
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -307,6 +313,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
+
+  @protected
+  WcProposalInfo dco_decode_box_autoadd_wc_proposal_info(dynamic raw);
+
+  @protected
+  WcRequestInfo dco_decode_box_autoadd_wc_request_info(dynamic raw);
 
   @protected
   WhiteBirdMeta dco_decode_box_autoadd_white_bird_meta(dynamic raw);
@@ -526,6 +538,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+
+  @protected
+  List<WcNamespaceApproval> dco_decode_list_wc_namespace_approval(dynamic raw);
+
+  @protected
+  List<WcNamespaceInfo> dco_decode_list_wc_namespace_info(dynamic raw);
+
+  @protected
+  List<WcSessionInfo> dco_decode_list_wc_session_info(dynamic raw);
 
   @protected
   List<WhiteBirdOpenOrder> dco_decode_list_white_bird_open_order(dynamic raw);
@@ -814,6 +835,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
 
   @protected
+  WcEventInfo dco_decode_wc_event_info(dynamic raw);
+
+  @protected
+  WcNamespaceApproval dco_decode_wc_namespace_approval(dynamic raw);
+
+  @protected
+  WcNamespaceInfo dco_decode_wc_namespace_info(dynamic raw);
+
+  @protected
+  WcProposalInfo dco_decode_wc_proposal_info(dynamic raw);
+
+  @protected
+  WcRequestInfo dco_decode_wc_request_info(dynamic raw);
+
+  @protected
+  WcSessionInfo dco_decode_wc_session_info(dynamic raw);
+
+  @protected
   WhiteBirdMeta dco_decode_white_bird_meta(dynamic raw);
 
   @protected
@@ -880,6 +919,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(
+      SseDeserializer deserializer);
+
+  @protected
+  RustStreamSink<WcEventInfo> sse_decode_StreamSink_wc_event_info_Sse(
       SseDeserializer deserializer);
 
   @protected
@@ -1080,6 +1123,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer);
+
+  @protected
+  WcProposalInfo sse_decode_box_autoadd_wc_proposal_info(
+      SseDeserializer deserializer);
+
+  @protected
+  WcRequestInfo sse_decode_box_autoadd_wc_request_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1331,6 +1382,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  List<WcNamespaceApproval> sse_decode_list_wc_namespace_approval(
+      SseDeserializer deserializer);
+
+  @protected
+  List<WcNamespaceInfo> sse_decode_list_wc_namespace_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<WcSessionInfo> sse_decode_list_wc_session_info(
+      SseDeserializer deserializer);
 
   @protected
   List<WhiteBirdOpenOrder> sse_decode_list_white_bird_open_order(
@@ -1651,6 +1714,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  WcEventInfo sse_decode_wc_event_info(SseDeserializer deserializer);
+
+  @protected
+  WcNamespaceApproval sse_decode_wc_namespace_approval(
+      SseDeserializer deserializer);
+
+  @protected
+  WcNamespaceInfo sse_decode_wc_namespace_info(SseDeserializer deserializer);
+
+  @protected
+  WcProposalInfo sse_decode_wc_proposal_info(SseDeserializer deserializer);
+
+  @protected
+  WcRequestInfo sse_decode_wc_request_info(SseDeserializer deserializer);
+
+  @protected
+  WcSessionInfo sse_decode_wc_session_info(SseDeserializer deserializer);
+
+  @protected
   WhiteBirdMeta sse_decode_white_bird_meta(SseDeserializer deserializer);
 
   @protected
@@ -1718,6 +1800,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_block_event_Sse(
       RustStreamSink<BlockEvent> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_StreamSink_wc_event_info_Sse(
+      RustStreamSink<WcEventInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
@@ -1928,6 +2014,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_wc_proposal_info(
+      WcProposalInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_wc_request_info(
+      WcRequestInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_white_bird_meta(
@@ -2190,6 +2284,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_wc_namespace_approval(
+      List<WcNamespaceApproval> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_wc_namespace_info(
+      List<WcNamespaceInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_wc_session_info(
+      List<WcSessionInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_white_bird_open_order(
@@ -2514,6 +2620,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_event_info(WcEventInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_namespace_approval(
+      WcNamespaceApproval self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_namespace_info(
+      WcNamespaceInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_proposal_info(
+      WcProposalInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_request_info(WcRequestInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_wc_session_info(WcSessionInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_white_bird_meta(WhiteBirdMeta self, SseSerializer serializer);

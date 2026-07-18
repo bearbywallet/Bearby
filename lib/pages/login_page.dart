@@ -16,6 +16,7 @@ import '../components/wallet_option.dart';
 import '../mixins/adaptive_size.dart';
 import '../mixins/wallet_type.dart';
 import '../services/device.dart';
+import '../services/walletconnect_service.dart';
 import '../state/app_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
@@ -84,6 +85,12 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
     await _appState.refreshBalancesAndRates(
       walletIndex: _appState.selectedWalletIndex,
     );
+    // Start WalletConnect after unlock so the relay has a live session identity.
+    try {
+      await WalletConnectService.instance.start();
+    } catch (e) {
+      debugPrint('walletconnect start: $e');
+    }
   }
 
   Future<bool> _authenticateWithSession(

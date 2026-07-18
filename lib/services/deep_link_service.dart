@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/router.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/state/app_state.dart';
 
 class DeepLinkService {
@@ -39,6 +41,21 @@ class DeepLinkService {
     _lastProcessedUri = uriString;
 
     try {
+      // WalletConnect pairing (wc:… or custom scheme → wc:…)
+      final raw = uriString;
+      if (WalletConnectService.isWalletConnectUri(raw) ||
+          uri.scheme == 'wc' ||
+          (uri.queryParameters.containsKey('uri') &&
+              WalletConnectService.isWalletConnectUri(
+                  uri.queryParameters['uri']!))) {
+        final wcUri = uri.queryParameters['uri'] ??
+            (raw.startsWith('wc:') ? raw : uri.toString());
+        WalletConnectService.instance.pair(wcUri).catchError((Object e) {
+          debugPrint('wc deep link pair: $e');
+        });
+        return;
+      }
+
       final parsed = parseCryptoUrl(uri.toString());
 
       if (parsed.isEmpty || parsed['address'] == null) {

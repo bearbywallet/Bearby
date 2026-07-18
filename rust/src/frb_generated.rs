@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1232375376;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 531472875;
 
 // Section: executor
 
@@ -5663,6 +5663,407 @@ fn wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
         },
     )
 }
+fn wire__crate__api__walletconnect__wc_approve_session_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_approve_session",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_proposal_id = <u64>::sse_decode(&mut deserializer);
+            let api_namespaces =
+                <Vec<crate::models::walletconnect::ffi::WcNamespaceApproval>>::sse_decode(
+                    &mut deserializer,
+                );
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_approve_session(
+                            api_proposal_id,
+                            api_namespaces,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_disconnect_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_disconnect",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_topic = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_disconnect(api_topic).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_events_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_events",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_sink = <StreamSink<
+                crate::models::walletconnect::ffi::WcEventInfo,
+                flutter_rust_bridge::for_generated::SseCodec,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_events(api_sink).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_init_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_init",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_project_id = <String>::sse_decode(&mut deserializer);
+            let api_app_name = <String>::sse_decode(&mut deserializer);
+            let api_app_description = <String>::sse_decode(&mut deserializer);
+            let api_app_url = <String>::sse_decode(&mut deserializer);
+            let api_app_icon = <String>::sse_decode(&mut deserializer);
+            let api_package_name = <String>::sse_decode(&mut deserializer);
+            let api_platform = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_init(
+                            api_project_id,
+                            api_app_name,
+                            api_app_description,
+                            api_app_url,
+                            api_app_icon,
+                            api_package_name,
+                            api_platform,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_pair_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_pair",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_uri = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_pair(api_uri).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_reject_session_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_reject_session",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_proposal_id = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::walletconnect::wc_reject_session(api_proposal_id).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_respond_err_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_respond_err",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_topic = <String>::sse_decode(&mut deserializer);
+            let api_id = <u64>::sse_decode(&mut deserializer);
+            let api_code = <i64>::sse_decode(&mut deserializer);
+            let api_message = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_respond_err(
+                            api_topic,
+                            api_id,
+                            api_code,
+                            api_message,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_respond_ok_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_respond_ok",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_topic = <String>::sse_decode(&mut deserializer);
+            let api_id = <u64>::sse_decode(&mut deserializer);
+            let api_result_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_respond_ok(
+                            api_topic,
+                            api_id,
+                            api_result_json,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_sessions_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_sessions",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_sessions().await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_shutdown_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_shutdown",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::walletconnect::wc_shutdown().await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -6081,6 +6482,19 @@ impl SseDecode for StreamSink<String, flutter_rust_bridge::for_generated::SseCod
 
 impl SseDecode
     for StreamSink<crate::api::backend::BlockEvent, flutter_rust_bridge::for_generated::SseCodec>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return StreamSink::deserialize(inner);
+    }
+}
+
+impl SseDecode
+    for StreamSink<
+        crate::models::walletconnect::ffi::WcEventInfo,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7359,6 +7773,46 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
             ans_.push(<crate::models::wallet::WalletInfo>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::walletconnect::ffi::WcNamespaceApproval> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::models::walletconnect::ffi::WcNamespaceApproval>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::walletconnect::ffi::WcNamespaceInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::models::walletconnect::ffi::WcNamespaceInfo>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::walletconnect::ffi::WcSessionInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::walletconnect::ffi::WcSessionInfo>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -8835,6 +9289,172 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
     }
 }
 
+impl SseDecode for crate::models::walletconnect::ffi::WcEventInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 =
+                    <crate::models::walletconnect::ffi::WcProposalInfo>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::Proposal(var_field0);
+            }
+            1 => {
+                let mut var_field0 =
+                    <crate::models::walletconnect::ffi::WcRequestInfo>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::Request(var_field0);
+            }
+            2 => {
+                let mut var_topic = <String>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::SessionSettled {
+                    topic: var_topic,
+                };
+            }
+            3 => {
+                let mut var_topic = <String>::sse_decode(deserializer);
+                let mut var_message = <String>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::SessionDeleted {
+                    topic: var_topic,
+                    message: var_message,
+                };
+            }
+            4 => {
+                let mut var_topic = <String>::sse_decode(deserializer);
+                let mut var_chainId = <String>::sse_decode(deserializer);
+                let mut var_name = <String>::sse_decode(deserializer);
+                let mut var_data = <String>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::SessionEvent {
+                    topic: var_topic,
+                    chain_id: var_chainId,
+                    name: var_name,
+                    data: var_data,
+                };
+            }
+            5 => {
+                return crate::models::walletconnect::ffi::WcEventInfo::RelayConnected;
+            }
+            6 => {
+                return crate::models::walletconnect::ffi::WcEventInfo::RelayDisconnected;
+            }
+            7 => {
+                let mut var_message = <String>::sse_decode(deserializer);
+                return crate::models::walletconnect::ffi::WcEventInfo::Error {
+                    message: var_message,
+                };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseDecode for crate::models::walletconnect::ffi::WcNamespaceApproval {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_key = <String>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<String>>::sse_decode(deserializer);
+        let mut var_methods = <Vec<String>>::sse_decode(deserializer);
+        let mut var_events = <Vec<String>>::sse_decode(deserializer);
+        return crate::models::walletconnect::ffi::WcNamespaceApproval {
+            key: var_key,
+            accounts: var_accounts,
+            methods: var_methods,
+            events: var_events,
+        };
+    }
+}
+
+impl SseDecode for crate::models::walletconnect::ffi::WcNamespaceInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_key = <String>::sse_decode(deserializer);
+        let mut var_chains = <Vec<String>>::sse_decode(deserializer);
+        let mut var_methods = <Vec<String>>::sse_decode(deserializer);
+        let mut var_events = <Vec<String>>::sse_decode(deserializer);
+        return crate::models::walletconnect::ffi::WcNamespaceInfo {
+            key: var_key,
+            chains: var_chains,
+            methods: var_methods,
+            events: var_events,
+        };
+    }
+}
+
+impl SseDecode for crate::models::walletconnect::ffi::WcProposalInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <u64>::sse_decode(deserializer);
+        let mut var_pairingTopic = <String>::sse_decode(deserializer);
+        let mut var_peerName = <String>::sse_decode(deserializer);
+        let mut var_peerDescription = <String>::sse_decode(deserializer);
+        let mut var_peerUrl = <String>::sse_decode(deserializer);
+        let mut var_peerIcon = <Option<String>>::sse_decode(deserializer);
+        let mut var_required_ =
+            <Vec<crate::models::walletconnect::ffi::WcNamespaceInfo>>::sse_decode(deserializer);
+        let mut var_optional =
+            <Vec<crate::models::walletconnect::ffi::WcNamespaceInfo>>::sse_decode(deserializer);
+        return crate::models::walletconnect::ffi::WcProposalInfo {
+            id: var_id,
+            pairing_topic: var_pairingTopic,
+            peer_name: var_peerName,
+            peer_description: var_peerDescription,
+            peer_url: var_peerUrl,
+            peer_icon: var_peerIcon,
+            required: var_required_,
+            optional: var_optional,
+        };
+    }
+}
+
+impl SseDecode for crate::models::walletconnect::ffi::WcRequestInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_topic = <String>::sse_decode(deserializer);
+        let mut var_id = <u64>::sse_decode(deserializer);
+        let mut var_chainId = <String>::sse_decode(deserializer);
+        let mut var_method = <String>::sse_decode(deserializer);
+        let mut var_paramsJson = <String>::sse_decode(deserializer);
+        let mut var_peerName = <String>::sse_decode(deserializer);
+        let mut var_peerIcon = <Option<String>>::sse_decode(deserializer);
+        return crate::models::walletconnect::ffi::WcRequestInfo {
+            topic: var_topic,
+            id: var_id,
+            chain_id: var_chainId,
+            method: var_method,
+            params_json: var_paramsJson,
+            peer_name: var_peerName,
+            peer_icon: var_peerIcon,
+        };
+    }
+}
+
+impl SseDecode for crate::models::walletconnect::ffi::WcSessionInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_topic = <String>::sse_decode(deserializer);
+        let mut var_peerName = <String>::sse_decode(deserializer);
+        let mut var_peerDescription = <String>::sse_decode(deserializer);
+        let mut var_peerUrl = <String>::sse_decode(deserializer);
+        let mut var_peerIcon = <Option<String>>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<String>>::sse_decode(deserializer);
+        let mut var_methods = <Vec<String>>::sse_decode(deserializer);
+        let mut var_events = <Vec<String>>::sse_decode(deserializer);
+        let mut var_expiry = <u64>::sse_decode(deserializer);
+        return crate::models::walletconnect::ffi::WcSessionInfo {
+            topic: var_topic,
+            peer_name: var_peerName,
+            peer_description: var_peerDescription,
+            peer_url: var_peerUrl,
+            peer_icon: var_peerIcon,
+            accounts: var_accounts,
+            methods: var_methods,
+            events: var_events,
+            expiry: var_expiry,
+        };
+    }
+}
+
 impl SseDecode for crate::models::exchange::whitebird::WhiteBirdMeta {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9418,40 +10038,66 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        147 => wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
+        147 => wire__crate__api__walletconnect__wc_approve_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        148 => wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
+        148 => {
+            wire__crate__api__walletconnect__wc_disconnect_impl(port, ptr, rust_vec_len, data_len)
+        }
+        149 => wire__crate__api__walletconnect__wc_events_impl(port, ptr, rust_vec_len, data_len),
+        150 => wire__crate__api__walletconnect__wc_init_impl(port, ptr, rust_vec_len, data_len),
+        151 => wire__crate__api__walletconnect__wc_pair_impl(port, ptr, rust_vec_len, data_len),
+        152 => wire__crate__api__walletconnect__wc_reject_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        149 => wire__crate__api__exchange__whitebird__whitebird_reject_order_impl(
+        153 => {
+            wire__crate__api__walletconnect__wc_respond_err_impl(port, ptr, rust_vec_len, data_len)
+        }
+        154 => {
+            wire__crate__api__walletconnect__wc_respond_ok_impl(port, ptr, rust_vec_len, data_len)
+        }
+        155 => wire__crate__api__walletconnect__wc_sessions_impl(port, ptr, rust_vec_len, data_len),
+        156 => wire__crate__api__walletconnect__wc_shutdown_impl(port, ptr, rust_vec_len, data_len),
+        157 => wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        150 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        158 => wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        151 => {
+        159 => wire__crate__api__exchange__whitebird__whitebird_reject_order_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        160 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        161 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        152 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        162 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        153 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        163 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -11500,6 +12146,191 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletSettingsIn
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcEventInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::models::walletconnect::ffi::WcEventInfo::Proposal(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::Request(field0) => {
+                [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::SessionSettled { topic } => {
+                [2.into_dart(), topic.into_into_dart().into_dart()].into_dart()
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::SessionDeleted { topic, message } => [
+                3.into_dart(),
+                topic.into_into_dart().into_dart(),
+                message.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::models::walletconnect::ffi::WcEventInfo::SessionEvent {
+                topic,
+                chain_id,
+                name,
+                data,
+            } => [
+                4.into_dart(),
+                topic.into_into_dart().into_dart(),
+                chain_id.into_into_dart().into_dart(),
+                name.into_into_dart().into_dart(),
+                data.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::models::walletconnect::ffi::WcEventInfo::RelayConnected => {
+                [5.into_dart()].into_dart()
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::RelayDisconnected => {
+                [6.into_dart()].into_dart()
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::Error { message } => {
+                [7.into_dart(), message.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcEventInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcEventInfo>
+    for crate::models::walletconnect::ffi::WcEventInfo
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcEventInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcNamespaceApproval {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.key.into_into_dart().into_dart(),
+            self.accounts.into_into_dart().into_dart(),
+            self.methods.into_into_dart().into_dart(),
+            self.events.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcNamespaceApproval
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcNamespaceApproval>
+    for crate::models::walletconnect::ffi::WcNamespaceApproval
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcNamespaceApproval {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcNamespaceInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.key.into_into_dart().into_dart(),
+            self.chains.into_into_dart().into_dart(),
+            self.methods.into_into_dart().into_dart(),
+            self.events.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcNamespaceInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcNamespaceInfo>
+    for crate::models::walletconnect::ffi::WcNamespaceInfo
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcNamespaceInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcProposalInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.pairing_topic.into_into_dart().into_dart(),
+            self.peer_name.into_into_dart().into_dart(),
+            self.peer_description.into_into_dart().into_dart(),
+            self.peer_url.into_into_dart().into_dart(),
+            self.peer_icon.into_into_dart().into_dart(),
+            self.required.into_into_dart().into_dart(),
+            self.optional.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcProposalInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcProposalInfo>
+    for crate::models::walletconnect::ffi::WcProposalInfo
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcProposalInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcRequestInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.topic.into_into_dart().into_dart(),
+            self.id.into_into_dart().into_dart(),
+            self.chain_id.into_into_dart().into_dart(),
+            self.method.into_into_dart().into_dart(),
+            self.params_json.into_into_dart().into_dart(),
+            self.peer_name.into_into_dart().into_dart(),
+            self.peer_icon.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcRequestInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcRequestInfo>
+    for crate::models::walletconnect::ffi::WcRequestInfo
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcRequestInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::walletconnect::ffi::WcSessionInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.topic.into_into_dart().into_dart(),
+            self.peer_name.into_into_dart().into_dart(),
+            self.peer_description.into_into_dart().into_dart(),
+            self.peer_url.into_into_dart().into_dart(),
+            self.peer_icon.into_into_dart().into_dart(),
+            self.accounts.into_into_dart().into_dart(),
+            self.methods.into_into_dart().into_dart(),
+            self.events.into_into_dart().into_dart(),
+            self.expiry.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::walletconnect::ffi::WcSessionInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::walletconnect::ffi::WcSessionInfo>
+    for crate::models::walletconnect::ffi::WcSessionInfo
+{
+    fn into_into_dart(self) -> crate::models::walletconnect::ffi::WcSessionInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::exchange::whitebird::WhiteBirdMeta {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -11723,6 +12554,18 @@ impl SseEncode for StreamSink<String, flutter_rust_bridge::for_generated::SseCod
 
 impl SseEncode
     for StreamSink<crate::api::backend::BlockEvent, flutter_rust_bridge::for_generated::SseCodec>
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        unimplemented!("")
+    }
+}
+
+impl SseEncode
+    for StreamSink<
+        crate::models::walletconnect::ffi::WcEventInfo,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -12646,6 +13489,36 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::walletconnect::ffi::WcNamespaceApproval> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::walletconnect::ffi::WcNamespaceApproval>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::walletconnect::ffi::WcNamespaceInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::walletconnect::ffi::WcNamespaceInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::walletconnect::ffi::WcSessionInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::walletconnect::ffi::WcSessionInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -13685,6 +14558,124 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);
         <u8>::sse_encode(self.rates_api_options, serializer);
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcEventInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::models::walletconnect::ffi::WcEventInfo::Proposal(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <crate::models::walletconnect::ffi::WcProposalInfo>::sse_encode(field0, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::Request(field0) => {
+                <i32>::sse_encode(1, serializer);
+                <crate::models::walletconnect::ffi::WcRequestInfo>::sse_encode(field0, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::SessionSettled { topic } => {
+                <i32>::sse_encode(2, serializer);
+                <String>::sse_encode(topic, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::SessionDeleted { topic, message } => {
+                <i32>::sse_encode(3, serializer);
+                <String>::sse_encode(topic, serializer);
+                <String>::sse_encode(message, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::SessionEvent {
+                topic,
+                chain_id,
+                name,
+                data,
+            } => {
+                <i32>::sse_encode(4, serializer);
+                <String>::sse_encode(topic, serializer);
+                <String>::sse_encode(chain_id, serializer);
+                <String>::sse_encode(name, serializer);
+                <String>::sse_encode(data, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::RelayConnected => {
+                <i32>::sse_encode(5, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::RelayDisconnected => {
+                <i32>::sse_encode(6, serializer);
+            }
+            crate::models::walletconnect::ffi::WcEventInfo::Error { message } => {
+                <i32>::sse_encode(7, serializer);
+                <String>::sse_encode(message, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcNamespaceApproval {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.key, serializer);
+        <Vec<String>>::sse_encode(self.accounts, serializer);
+        <Vec<String>>::sse_encode(self.methods, serializer);
+        <Vec<String>>::sse_encode(self.events, serializer);
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcNamespaceInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.key, serializer);
+        <Vec<String>>::sse_encode(self.chains, serializer);
+        <Vec<String>>::sse_encode(self.methods, serializer);
+        <Vec<String>>::sse_encode(self.events, serializer);
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcProposalInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u64>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.pairing_topic, serializer);
+        <String>::sse_encode(self.peer_name, serializer);
+        <String>::sse_encode(self.peer_description, serializer);
+        <String>::sse_encode(self.peer_url, serializer);
+        <Option<String>>::sse_encode(self.peer_icon, serializer);
+        <Vec<crate::models::walletconnect::ffi::WcNamespaceInfo>>::sse_encode(
+            self.required,
+            serializer,
+        );
+        <Vec<crate::models::walletconnect::ffi::WcNamespaceInfo>>::sse_encode(
+            self.optional,
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcRequestInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.topic, serializer);
+        <u64>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.chain_id, serializer);
+        <String>::sse_encode(self.method, serializer);
+        <String>::sse_encode(self.params_json, serializer);
+        <String>::sse_encode(self.peer_name, serializer);
+        <Option<String>>::sse_encode(self.peer_icon, serializer);
+    }
+}
+
+impl SseEncode for crate::models::walletconnect::ffi::WcSessionInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.topic, serializer);
+        <String>::sse_encode(self.peer_name, serializer);
+        <String>::sse_encode(self.peer_description, serializer);
+        <String>::sse_encode(self.peer_url, serializer);
+        <Option<String>>::sse_encode(self.peer_icon, serializer);
+        <Vec<String>>::sse_encode(self.accounts, serializer);
+        <Vec<String>>::sse_encode(self.methods, serializer);
+        <Vec<String>>::sse_encode(self.events, serializer);
+        <u64>::sse_encode(self.expiry, serializer);
     }
 }
 
