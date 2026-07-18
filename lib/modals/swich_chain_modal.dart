@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/swipe_button.dart';
+import 'package:bearby/config/walletconnect.dart';
 import 'package:bearby/config/web3_constants.dart';
-import 'package:bearby/modals/confirm_password.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/services/walletconnect_service.dart';
@@ -211,9 +211,20 @@ class _SwitchChainNetworkContentState
                                   ? 'solana'
                                   : ch.slip44 == kTronSlip44
                                       ? 'tron'
-                                      : null;
+                                      : ch.slip44 == kBitcoinlip44
+                                          ? 'bip122'
+                                          : null;
                           if (ns != null) {
-                            final caip2 = '$ns:${ch.chainId}';
+                            final id = ch.chainId.toInt();
+                            final caip2 = ns == 'bip122'
+                                ? (kBtcCaip2ByChainId[id] ??
+                                    kBtcCaip2ByChainId[0]!)
+                                : ns == 'solana'
+                                    ? (kSolanaCaip2ByChainId[id] ??
+                                        'solana:${ch.chainId}')
+                                    : ns == 'eip155'
+                                        ? 'eip155:$id'
+                                        : '$ns:${ch.chainId}';
                             await WalletConnectService.instance
                                 .onChainChanged(caip2: caip2);
                             await WalletConnectService.instance

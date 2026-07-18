@@ -577,7 +577,9 @@ impl WcEngine {
             // Wallet-originated CAIP standard events are always allowed (reown
             // samples emit accountsChanged even when the approved event set is
             // sparse). Other event names still require session advertising.
-            let standard = name == "accountsChanged" || name == "chainChanged";
+            let standard = name == "accountsChanged"
+                || name == "chainChanged"
+                || name == "bip122_addressesChanged";
             if !standard {
                 let session = state.sessions.get(topic);
                 let any = session.is_some_and(|s| {

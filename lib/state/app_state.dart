@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
 import 'package:bearby/config/storage_keys.dart';
+import 'package:bearby/config/walletconnect.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/local_storage.dart';
@@ -282,13 +283,29 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       if (acc == null || ch == null) return;
       final ns = _wcNamespaceForSlip44(ch.slip44);
       if (ns == null) return;
-      final caip2 = '$ns:${ch.chainId}';
+      final caip2 = _wcCaip2(ns, ch);
       await WalletConnectService.instance.onAccountsChanged(
         address: acc.addr,
         caip2: caip2,
       );
     } catch (e) {
       debugPrint('[wc] account-change notify: $e');
+    }
+  }
+
+  static String _wcCaip2(String ns, NetworkConfigInfo ch) {
+    final id = ch.chainId.toInt();
+    switch (ns) {
+      case 'bip122':
+        return kBtcCaip2ByChainId[id] ?? kBtcCaip2ByChainId[0]!;
+      case 'solana':
+        return kSolanaCaip2ByChainId[id] ?? 'solana:${ch.chainId}';
+      case 'eip155':
+        return 'eip155:$id';
+      case 'tron':
+        return 'tron:${ch.chainId}';
+      default:
+        return '$ns:${ch.chainId}';
     }
   }
 
@@ -301,6 +318,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
         return 'solana';
       case kTronSlip44:
         return 'tron';
+      case kBitcoinlip44:
+        return 'bip122';
       default:
         return null;
     }

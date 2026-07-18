@@ -20,6 +20,7 @@ import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/api/walletconnect.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/src/rust/models/transactions/evm.dart';
 import 'package:bearby/src/rust/models/transactions/request.dart';
@@ -27,25 +28,6 @@ import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/src/rust/models/walletconnect/ffi.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/utils/utils.dart';
-
-/// Methods this wallet can actually fulfill for WalletConnect sessions.
-///
-/// Approvals **intersect** dApp-requested methods with this list so we never
-/// advertise capabilities we auto-reject (see review H3).
-const List<String> kWcSupportedEip155Methods = [
-  'personal_sign',
-  'eth_sign',
-  'eth_signTypedData',
-  'eth_signTypedData_v3',
-  'eth_signTypedData_v4',
-  'eth_sendTransaction',
-  'eth_signTransaction',
-];
-
-const List<String> kWcSupportedEip155Events = [
-  'chainChanged',
-  'accountsChanged',
-];
 
 /// Thin Flutter facade over the Rust WalletConnect engine.
 ///
@@ -133,6 +115,10 @@ class WalletConnectService {
       return;
     }
     final nsKey = parts[0];
+    // bip122 uses a dedicated event name in AppKit; also send accountsChanged.
+    final eventNames = nsKey == 'bip122'
+        ? <String>[kWcBip122AddressesChanged, 'accountsChanged']
+        : <String>['accountsChanged'];
     final dataJson = jsonEncode([address]);
 
     List<WcSessionInfo> sessions;
@@ -145,7 +131,8 @@ class WalletConnectService {
 
     for (final s in sessions) {
       final touchesNs = s.accounts.any((a) => a.startsWith('$nsKey:')) ||
-          s.events.contains('accountsChanged');
+          s.events.contains('accountsChanged') ||
+          s.events.contains(kWcBip122AddressesChanged);
       if (!touchesNs) continue;
 
       // Prefer a chainId already present in the session for this namespace.
@@ -171,19 +158,21 @@ class WalletConnectService {
         _log('update accounts ${s.topic}: $e');
       }
 
-      try {
-        await wcEmitSessionEvent(
-          topic: s.topic,
-          chainId: chainId,
-          name: 'accountsChanged',
-          dataJson: dataJson,
-        );
-        _log(
-          'accountsChanged topic=${s.topic.substring(0, 12)}… '
-          'chain=$chainId addr=$address',
-        );
-      } catch (e) {
-        _log('emit accountsChanged ${s.topic}: $e');
+      for (final name in eventNames) {
+        try {
+          await wcEmitSessionEvent(
+            topic: s.topic,
+            chainId: chainId,
+            name: name,
+            dataJson: dataJson,
+          );
+          _log(
+            '$name topic=${s.topic.substring(0, 12)}… '
+            'chain=$chainId addr=$address',
+          );
+        } catch (e) {
+          _log('emit $name ${s.topic}: $e');
+        }
       }
     }
   }
@@ -350,16 +339,10 @@ class WalletConnectService {
     WcProposalInfo proposal,
     List<int> selectedIndexes,
   ) {
-    final accounts = appState.accounts;
-    final selectedAddrs = <String>[];
-    for (final i in selectedIndexes) {
-      if (i >= 0 && i < accounts.length) {
-        selectedAddrs.add(accounts[i].addr);
-      }
-    }
-    if (selectedAddrs.isEmpty && appState.account != null) {
-      selectedAddrs.add(appState.account!.addr);
-    }
+    _log(
+      'proposal required=${proposal.required_.map((n) => '${n.key}[${n.chains.join(",")}] m=${n.methods}').join('; ')} '
+      'optional=${proposal.optional.map((n) => '${n.key}[${n.chains.join(",")}] m=${n.methods}').join('; ')}',
+    );
 
     final out = <WcNamespaceApproval>[];
     final seen = <String>{};
@@ -367,37 +350,45 @@ class WalletConnectService {
     void addNs(WcNamespaceInfo ns, {required bool required}) {
       if (!seen.add(ns.key)) return;
 
-      // Only attach accounts for namespaces that match the wallet's current chain
-      // family — never put an EVM address under solana: (etc.).
-      if (!_namespaceMatchesWallet(ns.key, appState)) {
-        // Drop optional mismatches; required ones left empty → conforms rejects.
-        if (!required) return;
-      }
-
-      final chains = ns.chains.isNotEmpty
-          ? ns.chains.where((c) => _chainMatchesWallet(c, appState)).toList()
-          : _defaultChainsForKey(ns.key, appState);
-
-      if (chains.isEmpty) {
-        // Prefer dropping over fabricating fake accounts.
+      final slip44 = _slip44ForNamespace(ns.key);
+      if (slip44 == null) {
+        _log('skip ns=${ns.key}: unsupported namespace');
         return;
       }
 
-      final methods = _intersectMethods(ns.key, ns.methods);
-      final events = _intersectEvents(ns.key, ns.events);
-      if (methods.isEmpty && required) {
-        // Cannot honestly approve a required namespace with zero methods.
+      // Addresses from *any* wallet that holds this slip44 — not only the
+      // currently selected chain (multi-network WC sessions).
+      final addrs = _addressesForSlip44(appState, slip44, selectedIndexes);
+      if (addrs.isEmpty) {
+        _log('skip ns=${ns.key}: no wallet accounts for slip44=$slip44');
+        return;
+      }
+
+      final chains = _resolveChains(ns, appState, slip44);
+      if (chains.isEmpty) {
+        _log('skip ns=${ns.key}: no resolvable chains');
+        return;
+      }
+
+      final methods = _methodsFor(ns.key, ns.methods);
+      final events = _eventsFor(ns.key, ns.events);
+      if (methods.isEmpty) {
+        _log('skip ns=${ns.key}: no supported methods (req=${ns.methods})');
         return;
       }
 
       final caip10 = <String>[];
       for (final chain in chains) {
-        for (final addr in selectedAddrs) {
+        for (final addr in addrs) {
           caip10.add('$chain:${_formatAccountAddr(addr, ns.key)}');
         }
       }
       if (caip10.isEmpty) return;
 
+      _log(
+        'approve ns=${ns.key} chains=${chains.length} accounts=${caip10.length} '
+        'methods=$methods events=$events required=$required',
+      );
       out.add(WcNamespaceApproval(
         key: ns.key,
         accounts: caip10,
@@ -415,48 +406,152 @@ class WalletConnectService {
     return out;
   }
 
-  bool _namespaceMatchesWallet(String key, AppState appState) {
-    final chain = appState.chain;
-    if (chain == null) return false;
-    switch (key) {
+  int? _slip44ForNamespace(String ns) {
+    switch (ns) {
       case 'eip155':
-        return chain.slip44 == kEthereumSlip44 ||
-            chain.slip44 == kZilliqaSlip44;
+        return kEthereumSlip44;
       case 'solana':
-        return chain.slip44 == kSolanaSlip44;
+        return kSolanaSlip44;
       case 'tron':
-        return chain.slip44 == kTronSlip44;
+        return kTronSlip44;
+      case 'bip122':
+        return kBitcoinlip44;
       default:
-        return false;
+        return null;
     }
   }
 
-  bool _chainMatchesWallet(String caip2, AppState appState) {
-    final chain = appState.chain;
-    if (chain == null) return false;
-    final parts = caip2.split(':');
-    if (parts.length < 2) return false;
-    final ns = parts[0];
-    if (!_namespaceMatchesWallet(ns, appState)) return false;
-    // Accept any chain ref under a matching namespace family (multi-chain wallets).
-    // Prefer exact match when possible.
-    final ref = parts[1];
-    return ref == chain.chainId.toString() || ns == 'eip155' || ns == 'solana';
+  /// Collect addresses for [slip44] across all wallets.
+  ///
+  /// [selectedIndexes] only applies when the active wallet matches [slip44]
+  /// (approval UI selects accounts for the current wallet).
+  List<String> _addressesForSlip44(
+    AppState appState,
+    int slip44,
+    List<int> selectedIndexes,
+  ) {
+    final out = <String>[];
+    final seen = <String>{};
+
+    void addAddr(String addr) {
+      if (addr.isEmpty) return;
+      if (seen.add(addr)) out.add(addr);
+    }
+
+    final active = appState.wallet;
+    if (active != null && active.slip44 == slip44) {
+      final accounts = appState.accounts;
+      if (selectedIndexes.isNotEmpty) {
+        for (final i in selectedIndexes) {
+          if (i >= 0 && i < accounts.length) addAddr(accounts[i].addr);
+        }
+      }
+      if (out.isEmpty && appState.account != null) {
+        addAddr(appState.account!.addr);
+      }
+      if (out.isEmpty) {
+        for (final a in accounts) {
+          addAddr(a.addr);
+        }
+      }
+    }
+
+    // Other wallets (e.g. BTC while UI is on Solana).
+    for (final w in appState.wallets) {
+      if (w.slip44 != slip44) continue;
+      final byBip = w.accounts[slip44];
+      if (byBip == null) continue;
+      final list = byBip[w.bip] ??
+          byBip.values.expand((e) => e).toList();
+      if (list.isEmpty) continue;
+      final idx = w.selectedAccount.toInt();
+      if (idx >= 0 && idx < list.length) {
+        addAddr(list[idx].addr);
+      } else {
+        addAddr(list.first.addr);
+      }
+    }
+    return out;
   }
 
-  List<String> _intersectMethods(String nsKey, List<String> requested) {
+  List<String> _resolveChains(
+    WcNamespaceInfo ns,
+    AppState appState,
+    int slip44,
+  ) {
+    if (ns.chains.isNotEmpty) {
+      // Keep dApp-requested CAIP-2 chains as-is (filter only obviously wrong).
+      return List<String>.from(ns.chains);
+    }
+    // No chains in proposal → use every provider we know for this slip44,
+    // mapped to CAIP-2.
+    final caip = <String>{};
+    for (final p in appState.state.providers) {
+      if (p.slip44 != slip44) continue;
+      final id = _caip2ForProvider(ns.key, p);
+      if (id != null) caip.add(id);
+    }
+    if (caip.isEmpty) {
+      final fallback = _defaultCaip2(ns.key, appState);
+      if (fallback != null) caip.add(fallback);
+    }
+    return caip.toList();
+  }
+
+  String? _caip2ForProvider(String nsKey, NetworkConfigInfo p) {
+    final id = p.chainId.toInt();
+    switch (nsKey) {
+      case 'eip155':
+        return 'eip155:$id';
+      case 'solana':
+        return kSolanaCaip2ByChainId[id] ?? 'solana:${p.chainId}';
+      case 'tron':
+        return 'tron:${p.chainId}';
+      case 'bip122':
+        return kBtcCaip2ByChainId[id] ??
+            kBtcCaip2ByChainId[0]; // default mainnet genesis
+      default:
+        return null;
+    }
+  }
+
+  String? _defaultCaip2(String nsKey, AppState appState) {
+    final ch = appState.chain;
+    if (ch != null && _slip44ForNamespace(nsKey) == ch.slip44) {
+      return _caip2ForProvider(nsKey, ch);
+    }
+    switch (nsKey) {
+      case 'bip122':
+        return kBtcCaip2ByChainId[0];
+      case 'solana':
+        return kSolanaCaip2ByChainId[101];
+      case 'eip155':
+        return 'eip155:1';
+      default:
+        return null;
+    }
+  }
+
+  List<String> _methodsFor(String nsKey, List<String> requested) {
     final supported = switch (nsKey) {
-      'eip155' => kWcSupportedEip155Methods,
+      'eip155' => kWcEip155Methods,
+      'solana' => kWcSolanaMethods,
+      'tron' => kWcTronMethods,
+      'bip122' => kWcBip122Methods,
       _ => const <String>[],
     };
-    return requested.where(supported.contains).toList();
+    if (supported.isEmpty) return const [];
+    if (requested.isEmpty) return List<String>.from(supported);
+    final hit = requested.where(supported.contains).toList();
+    // If the dApp names methods we don't implement, still settle with our
+    // supported set so multi-chain AppKit proposals can connect (optional ns).
+    return hit.isEmpty ? List<String>.from(supported) : hit;
   }
 
-  List<String> _intersectEvents(String nsKey, List<String> requested) {
+  List<String> _eventsFor(String nsKey, List<String> requested) {
     final supported = switch (nsKey) {
-      'eip155' => kWcSupportedEip155Events,
-      'solana' || 'tron' => kWcSupportedEip155Events, // same CAIP event names
-      _ => const <String>[],
+      'bip122' => kWcBip122Events,
+      _ => kWcStandardEvents,
     };
     final out = <String>[];
     if (requested.isEmpty) {
@@ -464,22 +559,15 @@ class WalletConnectService {
     } else {
       out.addAll(requested.where(supported.contains));
     }
-    // Always advertise standard events so wallet can push account/chain updates.
-    for (final e in kWcSupportedEip155Events) {
+    for (final e in supported) {
       if (!out.contains(e)) out.add(e);
     }
     return out;
   }
 
-  List<String> _defaultChainsForKey(String key, AppState appState) {
-    final chain = appState.chain;
-    if (chain == null) return <String>[];
-    if (!_namespaceMatchesWallet(key, appState)) return <String>[];
-    return <String>['$key:${chain.chainId}'];
-  }
-
   String _formatAccountAddr(String addr, String ns) {
     if (ns == 'eip155') return addr;
+    // bip122 / solana / tron: no 0x prefix
     return addr.startsWith('0x') ? addr.substring(2) : addr;
   }
 
