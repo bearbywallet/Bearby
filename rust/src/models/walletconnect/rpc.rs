@@ -303,7 +303,7 @@ pub struct SessionUpdateParams {
 }
 
 #[frb(ignore)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(crate = "zilpay::serde")]
 pub struct SessionEventParams {
     #[serde(rename = "chainId")]
@@ -312,10 +312,11 @@ pub struct SessionEventParams {
 }
 
 #[frb(ignore)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(crate = "zilpay::serde")]
 pub struct SessionEventBody {
     pub name: String,
+    /// Opaque JSON (array of addresses for `accountsChanged`, chain id for `chainChanged`, …).
     pub data: Box<RawValue>,
 }
 

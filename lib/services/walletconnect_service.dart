@@ -57,7 +57,10 @@ class WalletConnectService {
 
   StreamSubscription<WcEventInfo>? _sub;
   bool _started = false;
+  bool _approving = false;
   GlobalKey<NavigatorState>? navigatorKey;
+
+  void _log(String msg) => debugPrint('[wc] $msg');
 
   /// Call after wallet unlock. Safe to call multiple times.
   Future<void> start({GlobalKey<NavigatorState>? navKey}) async {
@@ -77,13 +80,15 @@ class WalletConnectService {
       platform: platform,
     );
 
+    _log('init ok platform=$platform');
     _sub = wcEvents().listen(
       _onEvent,
       onError: (Object e) {
-        debugPrint('wc events error: $e');
+        _log('events error: $e');
       },
       onDone: () {
         // Stream closed (e.g. after sink re-attach path); allow restart.
+        _log('events stream done');
         _sub = null;
         _started = false;
       },
@@ -104,7 +109,122 @@ class WalletConnectService {
   Future<void> pair(String uri) async {
     if (!_started) await start();
     final normalized = _normalizeUri(uri);
+    final short = normalized.length > 48
+        ? '${normalized.substring(0, 48)}…'
+        : normalized;
+    _log('pair $short');
     await wcPair(uri: normalized);
+    _log('pair subscribed');
+  }
+
+  /// Notify all WC sessions that the active account changed (reown
+  /// `emitSessionEvent` / `accountsChanged`).
+  ///
+  /// [address] is the chain-native address (0x… for EVM, base58 for Solana, …).
+  /// [caip2] is the active chain, e.g. `eip155:1` or `solana:5eykt…`.
+  Future<void> onAccountsChanged({
+    required String address,
+    required String caip2,
+  }) async {
+    if (!_started) return;
+    final parts = caip2.split(':');
+    if (parts.length < 2) {
+      _log('onAccountsChanged bad caip2=$caip2');
+      return;
+    }
+    final nsKey = parts[0];
+    final dataJson = jsonEncode([address]);
+
+    List<WcSessionInfo> sessions;
+    try {
+      sessions = await wcSessions();
+    } catch (e) {
+      _log('onAccountsChanged sessions: $e');
+      return;
+    }
+
+    for (final s in sessions) {
+      final touchesNs = s.accounts.any((a) => a.startsWith('$nsKey:')) ||
+          s.events.contains('accountsChanged');
+      if (!touchesNs) continue;
+
+      // Prefer a chainId already present in the session for this namespace.
+      String chainId = caip2;
+      for (final acc in s.accounts) {
+        if (acc.startsWith('$nsKey:')) {
+          final segs = acc.split(':');
+          if (segs.length >= 2) {
+            chainId = '${segs[0]}:${segs[1]}';
+            break;
+          }
+        }
+      }
+
+      final caip10 = '$chainId:$address';
+      try {
+        await wcUpdateSessionAccounts(
+          topic: s.topic,
+          nsKey: nsKey,
+          accounts: [caip10],
+        );
+      } catch (e) {
+        _log('update accounts ${s.topic}: $e');
+      }
+
+      try {
+        await wcEmitSessionEvent(
+          topic: s.topic,
+          chainId: chainId,
+          name: 'accountsChanged',
+          dataJson: dataJson,
+        );
+        _log(
+          'accountsChanged topic=${s.topic.substring(0, 12)}… '
+          'chain=$chainId addr=$address',
+        );
+      } catch (e) {
+        _log('emit accountsChanged ${s.topic}: $e');
+      }
+    }
+  }
+
+  /// Notify sessions of an EIP-155 / CAIP chain switch (`chainChanged`).
+  Future<void> onChainChanged({required String caip2}) async {
+    if (!_started) return;
+    final parts = caip2.split(':');
+    if (parts.length < 2) return;
+    final nsKey = parts[0];
+    final chainRef = parts[1];
+    // EIP-1193 chainChanged data is typically a hex chain id or number.
+    final dynamic data = nsKey == 'eip155'
+        ? (int.tryParse(chainRef) ?? chainRef)
+        : caip2;
+    final dataJson = jsonEncode(data);
+
+    List<WcSessionInfo> sessions;
+    try {
+      sessions = await wcSessions();
+    } catch (_) {
+      return;
+    }
+
+    for (final s in sessions) {
+      if (!s.accounts.any((a) => a.startsWith('$nsKey:')) &&
+          !s.events.contains('chainChanged')) {
+        continue;
+      }
+      try {
+        await wcEmitSessionEvent(
+          topic: s.topic,
+          chainId: caip2,
+          name: 'chainChanged',
+          dataJson: dataJson,
+        );
+        _log('chainChanged topic=${s.topic.substring(0, 12)}… chain=$caip2');
+      } catch (e) {
+        _log('emit chainChanged: $e');
+      }
+    }
   }
 
   static bool isWalletConnectUri(String raw) {
@@ -123,17 +243,29 @@ class WalletConnectService {
   void _onEvent(WcEventInfo e) {
     switch (e) {
       case WcEventInfo_Proposal(:final field0):
+        _log(
+          'event Proposal id=${field0.id} pairing=${field0.pairingTopic} '
+          'peer=${field0.peerName}',
+        );
         _showApprovalModal(field0);
       case WcEventInfo_Request(:final field0):
+        _log(
+          'event Request id=${field0.id} topic=${field0.topic} '
+          'method=${field0.method} chain=${field0.chainId}',
+        );
         _routeRequest(field0);
-      case WcEventInfo_SessionDeleted():
-      case WcEventInfo_SessionSettled():
-      case WcEventInfo_SessionEvent():
+      case WcEventInfo_SessionDeleted(:final topic, :final message):
+        _log('event SessionDeleted topic=$topic msg=$message');
+      case WcEventInfo_SessionSettled(:final topic):
+        _log('event SessionSettled topic=$topic');
+      case WcEventInfo_SessionEvent(:final topic, :final name):
+        _log('event SessionEvent topic=$topic name=$name');
       case WcEventInfo_RelayConnected():
+        _log('event RelayConnected');
       case WcEventInfo_RelayDisconnected():
-        break;
+        _log('event RelayDisconnected');
       case WcEventInfo_Error(:final message):
-        debugPrint('wc error: $message');
+        _log('event Error: $message');
     }
   }
 
@@ -142,12 +274,21 @@ class WalletConnectService {
   Future<void> _showApprovalModal(WcProposalInfo proposal) async {
     final context = _ctx;
     if (context == null || !context.mounted) {
-      await wcRejectSession(proposalId: proposal.id);
+      _log('approval UI unavailable; rejecting ${proposal.id}');
+      try {
+        await wcRejectSession(proposalId: proposal.id);
+      } catch (e) {
+        _log('reject (no UI) ignored: $e');
+      }
       return;
     }
 
     final appState = Provider.of<AppState>(context, listen: false);
     final icon = proposal.peerIcon ?? '';
+    _log(
+      'show approval id=${proposal.id} pairing=${proposal.pairingTopic} '
+      'peer=${proposal.peerName}',
+    );
 
     showAppConnectModal(
       context: context,
@@ -155,24 +296,51 @@ class WalletConnectService {
       uuid: proposal.pairingTopic,
       iconUrl: icon,
       onConfirm: (selectedIndexes) async {
+        if (_approving) {
+          _log('approve ignored (already in flight)');
+          return;
+        }
+        _approving = true;
         try {
           final namespaces =
               _buildApprovals(appState, proposal, selectedIndexes);
+          _log(
+            'approve namespaces=${namespaces.map((n) => '${n.key}:${n.methods.length}m').join(',')}',
+          );
           if (namespaces.isEmpty) {
-            await wcRejectSession(proposalId: proposal.id);
+            _log('approve empty namespaces → reject');
+            try {
+              await wcRejectSession(proposalId: proposal.id);
+            } catch (e) {
+              _log('reject after empty ns ignored: $e');
+            }
             return;
           }
-          await wcApproveSession(
+          final topic = await wcApproveSession(
             proposalId: proposal.id,
             namespaces: namespaces,
           );
+          _log('approve ok session=$topic');
         } catch (e) {
-          debugPrint('wc approve failed: $e');
-          await wcRejectSession(proposalId: proposal.id);
+          _log('approve failed: $e');
+          // Proposal is already consumed on the Rust side after take();
+          // reject is best-effort and must not crash the UI.
+          try {
+            await wcRejectSession(proposalId: proposal.id);
+          } catch (re) {
+            _log('reject after approve failure (ignored): $re');
+          }
+        } finally {
+          _approving = false;
         }
       },
       onReject: () async {
-        await wcRejectSession(proposalId: proposal.id);
+        _log('user reject proposal=${proposal.id}');
+        try {
+          await wcRejectSession(proposalId: proposal.id);
+        } catch (e) {
+          _log('reject ignored: $e');
+        }
       },
     );
   }
@@ -287,10 +455,20 @@ class WalletConnectService {
   List<String> _intersectEvents(String nsKey, List<String> requested) {
     final supported = switch (nsKey) {
       'eip155' => kWcSupportedEip155Events,
+      'solana' || 'tron' => kWcSupportedEip155Events, // same CAIP event names
       _ => const <String>[],
     };
-    if (requested.isEmpty) return List<String>.from(supported);
-    return requested.where(supported.contains).toList();
+    final out = <String>[];
+    if (requested.isEmpty) {
+      out.addAll(supported);
+    } else {
+      out.addAll(requested.where(supported.contains));
+    }
+    // Always advertise standard events so wallet can push account/chain updates.
+    for (final e in kWcSupportedEip155Events) {
+      if (!out.contains(e)) out.add(e);
+    }
+    return out;
   }
 
   List<String> _defaultChainsForKey(String key, AppState appState) {

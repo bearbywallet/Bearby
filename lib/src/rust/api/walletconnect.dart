@@ -30,7 +30,10 @@ Future<void> wcInit(
         packageName: packageName,
         platform: platform);
 
-/// Stream engine events into Flutter. Call once after [`wc_init`].
+/// Stream engine events into Flutter. Call after [`wc_init`].
+///
+/// When the Dart sink closes (hot-restart, cancel), the receiver is put back
+/// so a subsequent `wc_events()` call can re-attach without full re-init.
 Stream<WcEventInfo> wcEvents() =>
     RustLib.instance.api.crateApiWalletconnectWcEvents();
 
@@ -74,6 +77,25 @@ Future<void> wcDisconnect({required String topic}) =>
 /// List active sessions.
 Future<List<WcSessionInfo>> wcSessions() =>
     RustLib.instance.api.crateApiWalletconnectWcSessions();
+
+/// Emit a wallet-originated `wc_sessionEvent` (e.g. `accountsChanged`).
+///
+/// `data_json` is opaque JSON (typically `["0x…"]` for accountsChanged).
+Future<void> wcEmitSessionEvent(
+        {required String topic,
+        required String chainId,
+        required String name,
+        required String dataJson}) =>
+    RustLib.instance.api.crateApiWalletconnectWcEmitSessionEvent(
+        topic: topic, chainId: chainId, name: name, dataJson: dataJson);
+
+/// Replace CAIP-10 accounts for one namespace key on a session (local state).
+Future<void> wcUpdateSessionAccounts(
+        {required String topic,
+        required String nsKey,
+        required List<String> accounts}) =>
+    RustLib.instance.api.crateApiWalletconnectWcUpdateSessionAccounts(
+        topic: topic, nsKey: nsKey, accounts: accounts);
 
 /// Shut down the relay and clear the engine singleton.
 Future<void> wcShutdown() =>

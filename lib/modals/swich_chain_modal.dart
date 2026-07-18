@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/swipe_button.dart';
+import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/modals/confirm_password.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -198,6 +200,29 @@ class _SwitchChainNetworkContentState
                         await appState.refreshBalancesAndRates(
                           walletIndex: appState.selectedWalletIndex,
                         );
+                        // WalletConnect dApps need chainChanged + accounts on the new chain.
+                        final ch = appState.chain;
+                        final acc = appState.account;
+                        if (ch != null && acc != null) {
+                          final ns = ch.slip44 == kEthereumSlip44 ||
+                                  ch.slip44 == kZilliqaSlip44
+                              ? 'eip155'
+                              : ch.slip44 == kSolanaSlip44
+                                  ? 'solana'
+                                  : ch.slip44 == kTronSlip44
+                                      ? 'tron'
+                                      : null;
+                          if (ns != null) {
+                            final caip2 = '$ns:${ch.chainId}';
+                            await WalletConnectService.instance
+                                .onChainChanged(caip2: caip2);
+                            await WalletConnectService.instance
+                                .onAccountsChanged(
+                              address: acc.addr,
+                              caip2: caip2,
+                            );
+                          }
+                        }
                       } catch (e) {
                         debugPrint("selectAccountsChain: $e");
                       }

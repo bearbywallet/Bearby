@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:bearby/src/rust/api/utils.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
 import 'package:bearby/config/storage_keys.dart';
+import 'package:bearby/config/web3_constants.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/local_storage.dart';
 import 'package:bearby/src/rust/api/backend.dart';
 import 'package:bearby/src/rust/api/book.dart';
@@ -268,6 +271,39 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
     await syncData();
     notifyListeners();
+    // Notify WalletConnect dApps (accountsChanged) — fire-and-forget.
+    unawaited(_notifyWalletConnectAccountChanged());
+  }
+
+  Future<void> _notifyWalletConnectAccountChanged() async {
+    try {
+      final acc = account;
+      final ch = chain;
+      if (acc == null || ch == null) return;
+      final ns = _wcNamespaceForSlip44(ch.slip44);
+      if (ns == null) return;
+      final caip2 = '$ns:${ch.chainId}';
+      await WalletConnectService.instance.onAccountsChanged(
+        address: acc.addr,
+        caip2: caip2,
+      );
+    } catch (e) {
+      debugPrint('[wc] account-change notify: $e');
+    }
+  }
+
+  static String? _wcNamespaceForSlip44(int slip44) {
+    switch (slip44) {
+      case kEthereumSlip44:
+      case kZilliqaSlip44:
+        return 'eip155';
+      case kSolanaSlip44:
+        return 'solana';
+      case kTronSlip44:
+        return 'tron';
+      default:
+        return null;
+    }
   }
 
   Future<void> setAppearancesCode(int code, bool compactNumbers) async {

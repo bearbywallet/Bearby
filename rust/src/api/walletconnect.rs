@@ -171,6 +171,33 @@ pub async fn wc_sessions() -> Result<Vec<WcSessionInfo>, String> {
     Ok(sessions.iter().map(WcSessionInfo::from).collect())
 }
 
+/// Emit a wallet-originated `wc_sessionEvent` (e.g. `accountsChanged`).
+///
+/// `data_json` is opaque JSON (typically `["0x…"]` for accountsChanged).
+pub async fn wc_emit_session_event(
+    topic: String,
+    chain_id: String,
+    name: String,
+    data_json: String,
+) -> Result<(), String> {
+    let eng = with_wc()?;
+    eng.emit_session_event(&topic, &chain_id, &name, &data_json)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Replace CAIP-10 accounts for one namespace key on a session (local state).
+pub async fn wc_update_session_accounts(
+    topic: String,
+    ns_key: String,
+    accounts: Vec<String>,
+) -> Result<(), String> {
+    let eng = with_wc()?;
+    eng.update_session_accounts(&topic, &ns_key, accounts)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 /// Shut down the relay and clear the engine singleton.
 pub async fn wc_shutdown() -> Result<(), String> {
     let _guard = INIT_LOCK.lock().await;
