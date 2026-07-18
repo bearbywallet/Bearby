@@ -4,7 +4,7 @@ import 'dart:io' show Platform;
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+    show defaultTargetPlatform, kDebugMode, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart'
     show PlatformInt64Util;
@@ -42,7 +42,10 @@ class WalletConnectService {
   bool _approving = false;
   GlobalKey<NavigatorState>? navigatorKey;
 
-  void _log(String msg) => debugPrint('[wc] $msg');
+  /// Debug builds only — avoids WC metadata noise in release/profile.
+  void _log(String msg) {
+    if (kDebugMode) debugPrint('[wc] $msg');
+  }
 
   /// Call after wallet unlock. Safe to call multiple times.
   Future<void> start({GlobalKey<NavigatorState>? navKey}) async {
@@ -339,6 +342,12 @@ class WalletConnectService {
     WcProposalInfo proposal,
     List<int> selectedIndexes,
   ) {
+    final w = appState.wallet;
+    _log(
+      'approve wallet="${w?.walletName}" selectedAccount=${w?.selectedAccount} '
+      'uiSlip44=${w?.slip44} uiBip=${w?.bip} '
+      'mapSlip44s=${w?.accounts.keys.toList()}',
+    );
     _log(
       'proposal required=${proposal.required_.map((n) => '${n.key}[${n.chains.join(",")}] m=${n.methods}').join('; ')} '
       'optional=${proposal.optional.map((n) => '${n.key}[${n.chains.join(",")}] m=${n.methods}').join('; ')}',
@@ -356,11 +365,14 @@ class WalletConnectService {
         return;
       }
 
-      // Addresses from *any* wallet that holds this slip44 — not only the
-      // currently selected chain (multi-network WC sessions).
+      // Selected wallet only: accounts[slip44][bip][accountIndex] — same
+      // account index across chains (see WalletDataV2.slip44_accounts).
       final addrs = _addressesForSlip44(appState, slip44, selectedIndexes);
       if (addrs.isEmpty) {
-        _log('skip ns=${ns.key}: no wallet accounts for slip44=$slip44');
+        _log(
+          'skip ns=${ns.key}: selected wallet has no accounts[$slip44] '
+          'at idx=${selectedIndexes.isEmpty ? appState.wallet?.selectedAccount : selectedIndexes}',
+        );
         return;
       }
 
@@ -421,56 +433,68 @@ class WalletConnectService {
     }
   }
 
-  /// Collect addresses for [slip44] across all wallets.
+  /// BIP purpose used when accounts were created for [slip44]
+  /// (`DerivationPath::default_bip` in bearby-core).
+  int _defaultBip(int slip44) {
+    if (slip44 == kBitcoinlip44) return 84; // BIP84 P2WPKH
+    return 44;
+  }
+
+  /// Addresses for [slip44] from the **selected wallet only**.
   ///
-  /// [selectedIndexes] only applies when the active wallet matches [slip44]
-  /// (approval UI selects accounts for the current wallet).
+  /// Structure: `wallet.accounts[slip44][bip][accountIndex]`.
+  /// The same [selectedIndexes] / `selectedAccount` apply to every slip44
+  /// (acc 0 Solana ↔ acc 0 Bitcoin on the same seed). Never reads other wallets.
   List<String> _addressesForSlip44(
     AppState appState,
     int slip44,
     List<int> selectedIndexes,
   ) {
+    final w = appState.wallet;
+    if (w == null) return const [];
+
+    final byBip = w.accounts[slip44];
+    if (byBip == null || byBip.isEmpty) return const [];
+
+    final preferredBip = _defaultBip(slip44);
+    final bip = byBip.containsKey(preferredBip)
+        ? preferredBip
+        : (byBip.containsKey(w.bip) ? w.bip : byBip.keys.first);
+    final list = byBip[bip];
+    if (list == null || list.isEmpty) return const [];
+
+    // Connect modal indices == account index; same across slip44 maps.
+    final indexes = selectedIndexes.isNotEmpty
+        ? selectedIndexes
+        : <int>[w.selectedAccount.toInt()];
+
     final out = <String>[];
     final seen = <String>{};
-
-    void addAddr(String addr) {
-      if (addr.isEmpty) return;
-      if (seen.add(addr)) out.add(addr);
+    for (final i in indexes) {
+      if (i < 0 || i >= list.length) continue;
+      final a = list[i].addr;
+      if (a.isEmpty) continue;
+      if (seen.add(a)) out.add(a);
     }
 
-    final active = appState.wallet;
-    if (active != null && active.slip44 == slip44) {
-      final accounts = appState.accounts;
-      if (selectedIndexes.isNotEmpty) {
-        for (final i in selectedIndexes) {
-          if (i >= 0 && i < accounts.length) addAddr(accounts[i].addr);
+    // If preferred bip missed (e.g. only BIP44 BTC stored), try any bip with
+    // enough accounts for the same indexes.
+    if (out.isEmpty) {
+      for (final entry in byBip.entries) {
+        final alt = entry.value;
+        for (final i in indexes) {
+          if (i < 0 || i >= alt.length) continue;
+          final a = alt[i].addr;
+          if (a.isNotEmpty && seen.add(a)) out.add(a);
         }
-      }
-      if (out.isEmpty && appState.account != null) {
-        addAddr(appState.account!.addr);
-      }
-      if (out.isEmpty) {
-        for (final a in accounts) {
-          addAddr(a.addr);
-        }
+        if (out.isNotEmpty) break;
       }
     }
 
-    // Other wallets (e.g. BTC while UI is on Solana).
-    for (final w in appState.wallets) {
-      if (w.slip44 != slip44) continue;
-      final byBip = w.accounts[slip44];
-      if (byBip == null) continue;
-      final list = byBip[w.bip] ??
-          byBip.values.expand((e) => e).toList();
-      if (list.isEmpty) continue;
-      final idx = w.selectedAccount.toInt();
-      if (idx >= 0 && idx < list.length) {
-        addAddr(list[idx].addr);
-      } else {
-        addAddr(list.first.addr);
-      }
-    }
+    _log(
+      'addrs slip44=$slip44 bip=$bip idx=$indexes '
+      'wallet="${w.walletName}" → $out',
+    );
     return out;
   }
 

@@ -24,10 +24,13 @@ use super::rpc::{
 use super::session::{self, Proposal, Session};
 use super::store::{self, now_ms, now_secs, WcState};
 
-/// Prefix logs so they show up clearly in `flutter run` / logcat.
+/// Debug-only WC tracing. No-op in release (no format work, no stderr).
 macro_rules! wc_log {
     ($($arg:tt)*) => {{
-        eprintln!("[wc] {}", format!($($arg)*));
+        #[cfg(debug_assertions)]
+        {
+            eprintln!("[wc] {}", format!($($arg)*));
+        }
     }};
 }
 
