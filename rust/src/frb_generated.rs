@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1228447762;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1028300347;
 
 // Section: executor
 
@@ -5426,6 +5426,42 @@ fn wire__crate__api__utils__to_wei_impl(
         },
     )
 }
+fn wire__crate__api__transaction__tron_signed_tx_to_wc_json_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "tron_signed_tx_to_wc_json",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_raw_data_hex = <String>::sse_decode(&mut deserializer);
+            let api_tx_id = <String>::sse_decode(&mut deserializer);
+            let api_signature = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let output_ok = crate::api::transaction::tron_signed_tx_to_wc_json(
+                    api_raw_data_hex,
+                    api_tx_id,
+                    api_signature,
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__transaction__tron_transaction_to_json_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -5911,6 +5947,35 @@ fn wire__crate__api__walletconnect__wc_pair_impl(
                     .await,
                 )
             }
+        },
+    )
+}
+fn wire__crate__api__walletconnect__wc_persisted_sessions_count_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "wc_persisted_sessions_count",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let output_ok = crate::api::walletconnect::wc_persisted_sessions_count()?;
+                Ok(output_ok)
+            })())
         },
     )
 }
@@ -10107,97 +10172,97 @@ fn pde_ffi_dispatcher_primary_impl(
         ),
         138 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
         139 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        142 => {
+        143 => {
             wire__crate__api__auth__try_unlock_with_password_impl(port, ptr, rust_vec_len, data_len)
         }
-        143 => {
+        144 => {
             wire__crate__api__auth__try_unlock_with_session_impl(port, ptr, rust_vec_len, data_len)
         }
-        144 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
-        145 => wire__crate__api__transaction__update_tx_with_params_impl(
+        145 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
+        146 => wire__crate__api__transaction__update_tx_with_params_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        146 => wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
+        147 => wire__crate__api__exchange__bootstrap__validate_exchange_providers_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        147 => wire__crate__api__walletconnect__wc_approve_session_impl(
+        148 => wire__crate__api__walletconnect__wc_approve_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        148 => {
+        149 => {
             wire__crate__api__walletconnect__wc_disconnect_impl(port, ptr, rust_vec_len, data_len)
         }
-        149 => wire__crate__api__walletconnect__wc_emit_session_event_impl(
+        150 => wire__crate__api__walletconnect__wc_emit_session_event_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        150 => wire__crate__api__walletconnect__wc_events_impl(port, ptr, rust_vec_len, data_len),
-        151 => wire__crate__api__walletconnect__wc_init_impl(port, ptr, rust_vec_len, data_len),
-        152 => wire__crate__api__walletconnect__wc_pair_impl(port, ptr, rust_vec_len, data_len),
-        153 => wire__crate__api__walletconnect__wc_reject_session_impl(
+        151 => wire__crate__api__walletconnect__wc_events_impl(port, ptr, rust_vec_len, data_len),
+        152 => wire__crate__api__walletconnect__wc_init_impl(port, ptr, rust_vec_len, data_len),
+        153 => wire__crate__api__walletconnect__wc_pair_impl(port, ptr, rust_vec_len, data_len),
+        155 => wire__crate__api__walletconnect__wc_reject_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        154 => {
+        156 => {
             wire__crate__api__walletconnect__wc_respond_err_impl(port, ptr, rust_vec_len, data_len)
         }
-        155 => {
+        157 => {
             wire__crate__api__walletconnect__wc_respond_ok_impl(port, ptr, rust_vec_len, data_len)
         }
-        156 => wire__crate__api__walletconnect__wc_sessions_impl(port, ptr, rust_vec_len, data_len),
-        157 => wire__crate__api__walletconnect__wc_shutdown_impl(port, ptr, rust_vec_len, data_len),
-        158 => wire__crate__api__walletconnect__wc_update_session_accounts_impl(
+        158 => wire__crate__api__walletconnect__wc_sessions_impl(port, ptr, rust_vec_len, data_len),
+        159 => wire__crate__api__walletconnect__wc_shutdown_impl(port, ptr, rust_vec_len, data_len),
+        160 => wire__crate__api__walletconnect__wc_update_session_accounts_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        159 => wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
+        161 => wire__crate__api__exchange__whitebird__whitebird_create_session_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        160 => wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
+        162 => wire__crate__api__exchange__whitebird__whitebird_open_orders_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        161 => wire__crate__api__exchange__whitebird__whitebird_reject_order_impl(
+        163 => wire__crate__api__exchange__whitebird__whitebird_reject_order_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        162 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        164 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        163 => {
+        165 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        164 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        166 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        165 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        167 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -10222,7 +10287,17 @@ fn pde_ffi_dispatcher_sync_impl(
             wire__crate__api__transaction__parse_tron_transaction_impl(ptr, rust_vec_len, data_len)
         }
         140 => wire__crate__api__utils__to_wei_impl(ptr, rust_vec_len, data_len),
-        141 => wire__crate__api__transaction__tron_transaction_to_json_impl(
+        141 => wire__crate__api__transaction__tron_signed_tx_to_wc_json_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        142 => wire__crate__api__transaction__tron_transaction_to_json_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        154 => wire__crate__api__walletconnect__wc_persisted_sessions_count_impl(
             ptr,
             rust_vec_len,
             data_len,

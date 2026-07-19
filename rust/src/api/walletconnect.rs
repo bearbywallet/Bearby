@@ -57,16 +57,9 @@ pub async fn wc_init(
         },
     };
     let (event_tx, event_rx) = mpsc::channel::<WcEvent>(64);
-    let engine = WcEngine::start(
-        project_id,
-        package_name,
-        platform,
-        meta,
-        storage,
-        event_tx,
-    )
-    .await
-    .map_err(|e| e.to_string())?;
+    let engine = WcEngine::start(project_id, package_name, platform, meta, storage, event_tx)
+        .await
+        .map_err(|e| e.to_string())?;
     *EVENT_RX.lock().await = Some(event_rx);
     WC_ENGINE.store(Some(engine));
     Ok(())
@@ -134,11 +127,7 @@ pub async fn wc_reject_session(proposal_id: u64) -> Result<(), String> {
 }
 
 /// Respond to a `wc_sessionRequest` with a JSON result (opaque to the SDK).
-pub async fn wc_respond_ok(
-    topic: String,
-    id: u64,
-    result_json: String,
-) -> Result<(), String> {
+pub async fn wc_respond_ok(topic: String, id: u64, result_json: String) -> Result<(), String> {
     let eng = with_wc()?;
     eng.respond_result(&topic, id, &result_json)
         .await
@@ -169,6 +158,20 @@ pub async fn wc_sessions() -> Result<Vec<WcSessionInfo>, String> {
     let eng = with_wc()?;
     let sessions = eng.sessions().await;
     Ok(sessions.iter().map(WcSessionInfo::from).collect())
+}
+
+/// Number of non-expired persisted sessions, read directly from storage.
+///
+/// Does NOT start the engine or open the relay connection — lets the app
+/// skip WalletConnect entirely at launch when there is nothing to restore.
+#[flutter_rust_bridge::frb(sync)]
+pub fn wc_persisted_sessions_count() -> Result<u32, String> {
+    use crate::models::walletconnect::store::{load_from_core, now_secs};
+
+    let core = handle().map_err(|e| e.to_string())?;
+    let mut state = load_from_core(&core.storage()).map_err(|e| e.to_string())?;
+    state.prune_expired(now_secs());
+    Ok(state.sessions.len() as u32)
 }
 
 /// Emit a wallet-originated `wc_sessionEvent` (e.g. `accountsChanged`).

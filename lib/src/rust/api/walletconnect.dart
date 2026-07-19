@@ -78,6 +78,13 @@ Future<void> wcDisconnect({required String topic}) =>
 Future<List<WcSessionInfo>> wcSessions() =>
     RustLib.instance.api.crateApiWalletconnectWcSessions();
 
+/// Number of non-expired persisted sessions, read directly from storage.
+///
+/// Does NOT start the engine or open the relay connection — lets the app
+/// skip WalletConnect entirely at launch when there is nothing to restore.
+int wcPersistedSessionsCount() =>
+    RustLib.instance.api.crateApiWalletconnectWcPersistedSessionsCount();
+
 /// Emit a wallet-originated `wc_sessionEvent` (e.g. `accountsChanged`).
 ///
 /// `data_json` is opaque JSON (typically `["0x…"]` for accountsChanged).

@@ -31,7 +31,7 @@ pub use zilpay::proto::address::Address;
 use zilpay::proto::btc_utils::BtcAccountXpubsInput;
 use zilpay::proto::pubkey::PubKey;
 use zilpay::proto::signature::Signature;
-use zilpay::proto::tron_tx::TronWebTransaction;
+use zilpay::proto::tron_tx::{TronTransaction, TronTransactionReceipt, TronWebTransaction};
 pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 use zilpay::proto::utils::safe_chunk_transaction;
@@ -629,15 +629,19 @@ pub async fn update_tx_with_params(
     let params: RequiredTxParams = params.into();
     let balance: U256 = balance.parse().unwrap_or_default();
 
-    if let TransactionRequest::Tron((ref mut tron_tx, _)) = tx {
-        let core = handle()?;
-        let provider = core
-            .get_provider(chain_hash)
-            .map_err(ServiceError::BackgroundError)?;
-        provider
-            .tron_fill_block_ref(tron_tx)
-            .await
-            .map_err(ServiceError::NetworkErrors)?;
+    if let TransactionRequest::Tron((ref mut tron_tx, ref metadata)) = tx {
+        // Refresh block ref only for wallet-built txs; WC sign-only requests
+        // (broadcast=false) must keep the dApp's exact raw_data bytes.
+        if metadata.broadcast {
+            let core = handle()?;
+            let provider = core
+                .get_provider(chain_hash)
+                .map_err(ServiceError::BackgroundError)?;
+            provider
+                .tron_fill_block_ref(tron_tx)
+                .await
+                .map_err(ServiceError::NetworkErrors)?;
+        }
     }
 
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
@@ -662,6 +666,34 @@ pub fn tron_transaction_to_json(tx: TransactionRequestTron) -> Result<String, St
         .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?;
     zilpay::serde_json::to_string(&tron_web)
         .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))
+}
+
+/// WalletConnect `tron_signTransaction` result built from the receipt of the
+/// transaction that was actually signed (raw_data may differ from the dApp's
+/// original if block ref was refreshed).
+#[frb(sync)]
+pub fn tron_signed_tx_to_wc_json(
+    raw_data_hex: String,
+    tx_id: String,
+    signature: String,
+) -> Result<String, String> {
+    let raw_data_bytes = zilpay::alloy::hex::decode(&raw_data_hex).map_err(|e| e.to_string())?;
+    let tx_id: [u8; 32] = zilpay::alloy::hex::decode(&tx_id)
+        .map_err(|e| e.to_string())?
+        .try_into()
+        .map_err(|_| "txID must be 32 bytes".to_string())?;
+    let signature = zilpay::alloy::hex::decode(&signature).map_err(|e| e.to_string())?;
+    let owner_address = TronTransaction::from_hex(&raw_data_hex)
+        .and_then(|tx| tx.owner_address())
+        .map_err(|e| e.to_string())?;
+    let receipt = TronTransactionReceipt {
+        raw_data_bytes,
+        tx_id,
+        signature,
+        owner_address,
+    };
+    let value = receipt.to_tron_web_json().map_err(|e| e.to_string())?;
+    zilpay::serde_json::to_string(&value).map_err(|e| e.to_string())
 }
 
 #[cfg(test)]

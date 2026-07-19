@@ -22,8 +22,13 @@ import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/api/utils.dart';
+import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/api/walletconnect.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
+import 'package:bearby/src/rust/models/transactions/base_token.dart';
+import 'package:bearby/src/rust/models/transactions/request.dart';
+import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
+import 'package:bearby/src/rust/models/transactions/tron.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/walletconnect/ffi.dart';
 import 'package:bearby/state/app_state.dart';
@@ -49,9 +54,28 @@ class WalletConnectService {
   }
 
   /// Call after wallet unlock. Safe to call multiple times.
-  Future<void> start({GlobalKey<NavigatorState>? navKey}) async {
+  ///
+  /// By default the engine (and its relay websocket) is only started when
+  /// persisted sessions exist — a wallet that never used WalletConnect makes
+  /// no network connection. [force] starts unconditionally (new pairing).
+  Future<void> start(
+      {GlobalKey<NavigatorState>? navKey, bool force = false}) async {
     if (navKey != null) navigatorKey = navKey;
     if (_started) return;
+
+    if (!force) {
+      try {
+        final count = wcPersistedSessionsCount();
+        if (count == 0) {
+          _log('start skipped: no persisted sessions');
+          return;
+        }
+        _log('start restoring sessions=$count');
+      } catch (e) {
+        _log('start session check failed: $e');
+        return;
+      }
+    }
 
     final platform = _platformName();
     final packageName = _packageName();
@@ -93,11 +117,10 @@ class WalletConnectService {
 
   /// Pair from a scanned/opened WalletConnect URI.
   Future<void> pair(String uri) async {
-    if (!_started) await start();
+    if (!_started) await start(force: true);
     final normalized = _normalizeUri(uri);
-    final short = normalized.length > 48
-        ? '${normalized.substring(0, 48)}…'
-        : normalized;
+    final short =
+        normalized.length > 48 ? '${normalized.substring(0, 48)}…' : normalized;
     _log('pair $short');
     await wcPair(uri: normalized);
     _log('pair subscribed');
@@ -189,9 +212,8 @@ class WalletConnectService {
     final nsKey = parts[0];
     final chainRef = parts[1];
     // EIP-1193 chainChanged data is typically a hex chain id or number.
-    final dynamic data = nsKey == 'eip155'
-        ? (int.tryParse(chainRef) ?? chainRef)
-        : caip2;
+    final dynamic data =
+        nsKey == 'eip155' ? (int.tryParse(chainRef) ?? chainRef) : caip2;
     final dataJson = jsonEncode(data);
 
     List<WcSessionInfo> sessions;
@@ -518,7 +540,7 @@ class WalletConnectService {
     final caip = <String>{};
     for (final p in appState.state.providers) {
       if (p.slip44 != slip44) continue;
-      final id = _caip2ForProvider(ns.key, p);
+      final id = caip2ForProvider(ns.key, p);
       if (id != null) caip.add(id);
     }
     if (caip.isEmpty) {
@@ -528,7 +550,8 @@ class WalletConnectService {
     return caip.toList();
   }
 
-  String? _caip2ForProvider(String nsKey, NetworkConfigInfo p) {
+  /// Single source of truth for provider → WC CAIP-2 mapping.
+  String? caip2ForProvider(String nsKey, NetworkConfigInfo p) {
     final id = p.chainId.toInt();
     switch (nsKey) {
       case 'eip155':
@@ -536,7 +559,9 @@ class WalletConnectService {
       case 'solana':
         return kSolanaCaip2ByChainId[id] ?? 'solana:${p.chainId}';
       case 'tron':
-        return 'tron:${p.chainId}';
+        // WC Tron CAIP-2 uses the hex form: tron:0x2b6653dc (mainnet),
+        // tron:0xcd8690dc (nile) — never the decimal chain id.
+        return 'tron:0x${p.chainId.toRadixString(16)}';
       case 'bip122':
         return kBtcCaip2ByChainId[id] ??
             kBtcCaip2ByChainId[0]; // default mainnet genesis
@@ -545,10 +570,42 @@ class WalletConnectService {
     }
   }
 
+  /// Resolve the provider matching a CAIP-2 chain id within the given namespace.
+  NetworkConfigInfo? _providerForCaip2(
+    AppState appState,
+    String nsKey,
+    String caip2,
+  ) {
+    for (final p in appState.state.providers) {
+      if (caip2ForProvider(nsKey, p) == caip2) return p;
+    }
+    return null;
+  }
+
+  /// One-shot WC responder: first call wins, later calls are logged and dropped.
+  Future<void> Function(Future<void> Function()) _respondOnce(
+    String tag,
+    WcRequestInfo req,
+  ) {
+    var responded = false;
+    return (fn) async {
+      if (responded) {
+        _log('$tag respondOnce skip id=${req.id}');
+        return;
+      }
+      responded = true;
+      try {
+        await fn();
+      } catch (e) {
+        _log('$tag respondOnce error id=${req.id}: $e');
+      }
+    };
+  }
+
   String? _defaultCaip2(String nsKey, AppState appState) {
     final ch = appState.chain;
     if (ch != null && _slip44ForNamespace(nsKey) == ch.slip44) {
-      return _caip2ForProvider(nsKey, ch);
+      return caip2ForProvider(nsKey, ch);
     }
     switch (nsKey) {
       case 'bip122':
@@ -603,8 +660,12 @@ class WalletConnectService {
 
   /// True if [address] appears as the address segment of any CAIP-10 account
   /// on the session (eip155:1:0xabc → 0xabc), case-insensitive.
-  Future<bool> _sessionOwnsAddress(String topic, String address) async {
-    final needle = address.toLowerCase();
+  Future<bool> _sessionOwnsAddress(
+    String topic,
+    String address, {
+    bool caseSensitive = false,
+  }) async {
+    final needle = caseSensitive ? address : address.toLowerCase();
     if (needle.isEmpty) return false;
     List<WcSessionInfo> sessions;
     try {
@@ -618,7 +679,8 @@ class WalletConnectService {
       for (final acc in s.accounts) {
         final parts = acc.split(':');
         final addr = parts.isNotEmpty ? parts.last : acc;
-        if (addr.toLowerCase() == needle) return true;
+        final cmp = caseSensitive ? addr : addr.toLowerCase();
+        if (cmp == needle) return true;
       }
       final preview = s.accounts.length > 6
           ? '${s.accounts.take(6).join(', ')}…(+${s.accounts.length - 6})'
@@ -659,8 +721,6 @@ class WalletConnectService {
   BigInt? _evmAccountIndexForAddress(AppState appState, String address) {
     final w = appState.wallet;
     if (w == null) return null;
-    final needle = address.toLowerCase();
-    if (needle.isEmpty) return null;
 
     final slipOrder = <int>[
       if (w.slip44 == kEthereumSlip44 || w.slip44 == kZilliqaSlip44) w.slip44,
@@ -670,16 +730,37 @@ class WalletConnectService {
     final seen = <int>{};
     for (final slip in slipOrder) {
       if (!seen.add(slip)) continue;
-      final byBip = w.accounts[slip];
-      if (byBip == null || byBip.isEmpty) continue;
-      final list = byBip[44] ?? byBip.values.first;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].addr.toLowerCase() == needle) {
-          return BigInt.from(i);
-        }
-      }
+      final idx = _accountIndexForSlip44(
+        appState,
+        slip,
+        address,
+        caseSensitive: false,
+      );
+      if (idx != null) return idx;
     }
     return null;
+  }
+
+  BigInt? _accountIndexForSlip44(
+    AppState appState,
+    int slip44,
+    String address, {
+    bool caseSensitive = true,
+  }) {
+    final w = appState.wallet;
+    if (w == null || address.isEmpty) return null;
+    final byBip = w.accounts[slip44];
+    if (byBip == null || byBip.isEmpty) return null;
+    final preferredBip = _defaultBip(slip44);
+    final bip = byBip.containsKey(preferredBip)
+        ? preferredBip
+        : (byBip.containsKey(w.bip) ? w.bip : byBip.keys.first);
+    final list = byBip[bip] ?? const [];
+    final needle = caseSensitive ? address : address.toLowerCase();
+    final idx = list.indexWhere(
+      (a) => (caseSensitive ? a.addr : a.addr.toLowerCase()) == needle,
+    );
+    return idx < 0 ? null : BigInt.from(idx);
   }
 
   Future<void> notifyActiveNetwork(AppState appState) async {
@@ -719,6 +800,7 @@ class WalletConnectService {
   Future<bool> _rejectIfUnauthorized({
     required WcRequestInfo req,
     required String? address,
+    bool caseSensitive = false,
   }) async {
     if (address == null || address.isEmpty) {
       _log('auth missing address method=${req.method}');
@@ -730,7 +812,11 @@ class WalletConnectService {
       );
       return true;
     }
-    final ok = await _sessionOwnsAddress(req.topic, address);
+    final ok = await _sessionOwnsAddress(
+      req.topic,
+      address,
+      caseSensitive: caseSensitive,
+    );
     if (ok) return false;
     _log(
       'auth reject method=${req.method} addr=$address '
@@ -780,6 +866,10 @@ class WalletConnectService {
         await _handleSwitchEthereumChain(context, req);
       case 'wallet_addEthereumChain':
         await _handleAddEthereumChain(context, req);
+      case 'tron_signMessage':
+        await _handleTronSignMessage(context, req);
+      case 'tron_signTransaction':
+        await _handleTronSignTransaction(context, req);
       default:
         _log('route unsupported id=${req.id} method=$method');
         await wcRespondErr(
@@ -844,9 +934,8 @@ class WalletConnectService {
 
     final appState = context.read<AppState>();
     final w = appState.wallet;
-    final signAccountIndex = address == null
-        ? null
-        : _evmAccountIndexForAddress(appState, address);
+    final signAccountIndex =
+        address == null ? null : _evmAccountIndexForAddress(appState, address);
     if (signAccountIndex == null) {
       _log(
         'signMessage no local account for addr=$address '
@@ -869,19 +958,7 @@ class WalletConnectService {
       'uiAccount=${w?.selectedAccount} uiAddr=${appState.account?.addr}',
     );
 
-    var responded = false;
-    Future<void> respondOnce(Future<void> Function() fn) async {
-      if (responded) {
-        _log('signMessage respondOnce skip (already responded) id=${req.id}');
-        return;
-      }
-      responded = true;
-      try {
-        await fn();
-      } catch (e) {
-        _log('signMessage respondOnce error id=${req.id}: $e');
-      }
-    }
+    final respondOnce = _respondOnce('signMessage', req);
 
     showSignMessageModal(
       context: context,
@@ -908,6 +985,350 @@ class WalletConnectService {
       onDismiss: () async {
         await respondOnce(() async {
           _log('signMessage reject/dismiss method=${req.method} id=${req.id}');
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
+      },
+    );
+  }
+
+  Future<void> _handleTronSignMessage(
+    BuildContext context,
+    WcRequestInfo req,
+  ) async {
+    _log(
+      'tronSignMessage enter method=${req.method} id=${req.id} '
+      'chain=${req.chainId}',
+    );
+    Object? params;
+    String? message;
+    String? signerAddress;
+    try {
+      params = jsonDecode(req.paramsJson);
+      if (params is List && params.isNotEmpty) {
+        final first = params[0];
+        if (first is Map) {
+          message = first['message']?.toString();
+          signerAddress = first['address']?.toString();
+        }
+      } else if (params is Map) {
+        message = params['message']?.toString();
+        signerAddress = params['address']?.toString();
+      }
+      _log(
+        'tronSignMessage params kind=${params.runtimeType} '
+        'raw=${_preview(req.paramsJson)}',
+      );
+    } catch (e) {
+      _log('tronSignMessage params jsonDecode failed: $e');
+    }
+
+    if (await _rejectIfUnauthorized(
+      req: req,
+      address: signerAddress,
+      caseSensitive: true,
+    )) {
+      return;
+    }
+
+    if (!context.mounted) {
+      _log('tronSignMessage abort unmounted id=${req.id}');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5000),
+        message: 'Wallet UI unavailable',
+      );
+      return;
+    }
+
+    final appState = context.read<AppState>();
+    final signAccountIndex = signerAddress == null
+        ? null
+        : _accountIndexForSlip44(appState, kTronSlip44, signerAddress);
+    if (signAccountIndex == null) {
+      _log(
+        'tronSignMessage no local account for addr=$signerAddress '
+        'uiSlip44=${appState.wallet?.slip44}',
+      );
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4100),
+        message: 'Requested address not in wallet',
+      );
+      return;
+    }
+
+    _log(
+      'tronSignMessage show modal method=${req.method} '
+      'msgLen=${message?.length ?? 0} addr=$signerAddress '
+      'signAccount=$signAccountIndex',
+    );
+
+    final respondOnce = _respondOnce('tronSignMessage', req);
+
+    showSignMessageModal(
+      context: context,
+      message: message,
+      appTitle: req.peerName,
+      appIcon: req.peerIcon ?? '',
+      accountIndex: signAccountIndex,
+      onMessageSigned: (pubkey, sig) async {
+        await respondOnce(() async {
+          _log(
+            'tronSignMessage ok method=${req.method} id=${req.id} '
+            'sigLen=${sig.length} sig=${_preview(sig, 22)}',
+          );
+          await wcRespondOk(
+            topic: req.topic,
+            id: req.id,
+            resultJson: jsonEncode({'signature': sig}),
+          );
+          _log('tronSignMessage wcRespondOk done id=${req.id}');
+        });
+        if (context.mounted) Navigator.of(context).pop();
+      },
+      onDismiss: () async {
+        await respondOnce(() async {
+          _log(
+              'tronSignMessage reject/dismiss method=${req.method} id=${req.id}');
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
+      },
+    );
+  }
+
+  Future<void> _handleTronSignTransaction(
+    BuildContext context,
+    WcRequestInfo req,
+  ) async {
+    _log(
+      'tronSignTransaction enter method=${req.method} id=${req.id} '
+      'chain=${req.chainId}',
+    );
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    Object? params;
+    Map<String, dynamic>? transaction;
+    String? signerAddress;
+    try {
+      params = jsonDecode(req.paramsJson);
+      Object? outer;
+      if (params is List && params.isNotEmpty) {
+        outer = params[0];
+      } else if (params is Map) {
+        outer = params;
+      }
+      if (outer is Map) {
+        signerAddress = outer['address']?.toString();
+        final txObj = outer['transaction'];
+        if (txObj is Map) {
+          final inner = txObj['transaction'];
+          transaction = inner is Map
+              ? Map<String, dynamic>.from(inner)
+              : Map<String, dynamic>.from(txObj);
+        }
+      }
+      _log(
+        'tronSignTransaction params kind=${params.runtimeType} '
+        'hasTx=${transaction != null} addr=$signerAddress',
+      );
+    } catch (e) {
+      _log('tronSignTransaction params jsonDecode failed: $e');
+    }
+
+    if (transaction == null) {
+      _log('tronSignTransaction missing transaction');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Missing transaction in params',
+      );
+      return;
+    }
+
+    if (await _rejectIfUnauthorized(
+      req: req,
+      address: signerAddress,
+      caseSensitive: true,
+    )) {
+      return;
+    }
+
+    final signAccountIndex = signerAddress == null
+        ? null
+        : _accountIndexForSlip44(appState, kTronSlip44, signerAddress);
+    if (signAccountIndex == null) {
+      _log(
+        'tronSignTransaction no local account for addr=$signerAddress '
+        'uiSlip44=${appState.wallet?.slip44}',
+      );
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4100),
+        message: 'Requested address not in wallet',
+      );
+      return;
+    }
+
+    // Parse transaction via Rust FFI.
+    TransactionRequestTron tronTx;
+    try {
+      tronTx = parseTronTransaction(json: jsonEncode(transaction));
+    } catch (e) {
+      _log('tronSignTransaction parseTronTransaction failed: $e');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Invalid Tron transaction: $e',
+      );
+      return;
+    }
+
+    // Extract to/amount for modal display from raw_data.contract.
+    String toAddr = '';
+    BigInt valueAmount = BigInt.zero;
+    try {
+      final rawData = transaction['raw_data'] as Map<String, dynamic>?;
+      if (rawData != null) {
+        final contracts = rawData['contract'] as List?;
+        if (contracts != null && contracts.isNotEmpty) {
+          final value = (contracts[0] as Map)['parameter']?['value']
+              as Map<String, dynamic>?;
+          if (value != null) {
+            final contractType =
+                (contracts[0] as Map)['type']?.toString() ?? '';
+            toAddr = value['to_address']?.toString() ?? '';
+            if (toAddr.isEmpty) {
+              toAddr = value['contract_address']?.toString() ?? '';
+            }
+            final amount = value['amount'];
+            if (amount is int) {
+              valueAmount = BigInt.from(amount);
+            }
+            _log(
+              'tronSignTransaction contract=$contractType '
+              'to=$toAddr amount=$valueAmount',
+            );
+          }
+        }
+      }
+    } catch (e) {
+      _log('tronSignTransaction extract to/amount failed: $e');
+    }
+
+    final mbToken = nativeTronToken(appState);
+    if (mbToken == null) {
+      _log('tronSignTransaction no native token');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5003),
+        message: 'No native token configured',
+      );
+      return;
+    }
+
+    final amountStr = fromWei(
+      value: valueAmount.toString(),
+      decimals: mbToken.decimals,
+    ).toString();
+
+    final chain =
+        _providerForCaip2(appState, 'tron', req.chainId) ?? appState.chain;
+
+    final transactionRequest = TransactionRequestInfo(
+      metadata: TransactionMetadataInfo(
+        chainHash: chain?.chainHash ?? BigInt.zero,
+        hash: null,
+        info: null,
+        icon: req.peerIcon,
+        title: req.peerName.isEmpty ? '' : req.peerName,
+        signer: signerAddress,
+        tokenInfo: BaseTokenInfo(
+          value: valueAmount.toString(),
+          symbol: mbToken.symbol,
+          decimals: mbToken.decimals,
+        ),
+        broadcast: false,
+      ),
+      scilla: null,
+      evm: null,
+      tron: tronTx,
+    );
+
+    _log(
+      'tronSignTransaction show modal method=${req.method} '
+      'to=$toAddr amount=$valueAmount signAccount=$signAccountIndex',
+    );
+
+    final respondOnce = _respondOnce('tronSignTransaction', req);
+
+    if (!context.mounted) {
+      _log('tronSignTransaction abort unmounted id=${req.id}');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5000),
+        message: 'Wallet UI unavailable',
+      );
+      return;
+    }
+
+    showConfirmTransactionModal(
+      context: context,
+      tx: transactionRequest,
+      to: toAddr,
+      token: mbToken,
+      amount: amountStr,
+      accountIndex: signAccountIndex,
+      onConfirm: (result) async {
+        await respondOnce(() async {
+          final receipt = result.tron;
+          if (receipt == null || receipt.signature.isEmpty) {
+            _log('tronSignTransaction missing signature');
+            await wcRespondErr(
+              topic: req.topic,
+              id: req.id,
+              code: PlatformInt64Util.from(5004),
+              message: 'Missing transaction signature',
+            );
+            return;
+          }
+          final resultJson = tronSignedTxToWcJson(
+            rawDataHex: receipt.rawDataBytes,
+            txId: receipt.txId,
+            signature: receipt.signature,
+          );
+          _log(
+            'tronSignTransaction ok id=${req.id} '
+            'sig=${_preview(receipt.signature, 22)}',
+          );
+          await wcRespondOk(
+            topic: req.topic,
+            id: req.id,
+            resultJson: resultJson,
+          );
+          _log('tronSignTransaction wcRespondOk done id=${req.id}');
+        });
+        if (context.mounted) Navigator.of(context).pop();
+      },
+      onDismiss: () async {
+        await respondOnce(() async {
+          _log('tronSignTransaction reject/dismiss id=${req.id}');
           await wcRespondErr(
             topic: req.topic,
             id: req.id,
@@ -968,9 +1389,8 @@ class WalletConnectService {
     if (!context.mounted) return;
 
     final appState = context.read<AppState>();
-    final signAccountIndex = address == null
-        ? null
-        : _evmAccountIndexForAddress(appState, address);
+    final signAccountIndex =
+        address == null ? null : _evmAccountIndexForAddress(appState, address);
     if (signAccountIndex == null) {
       _log('typedData no local account for addr=$address');
       await wcRespondErr(
@@ -987,12 +1407,7 @@ class WalletConnectService {
       'signAccount=$signAccountIndex uiAccount=${appState.wallet?.selectedAccount}',
     );
 
-    var responded = false;
-    Future<void> respondOnce(Future<void> Function() fn) async {
-      if (responded) return;
-      responded = true;
-      await fn();
-    }
+    final respondOnce = _respondOnce('typedData', req);
 
     showSignMessageModal(
       context: context,
@@ -1081,6 +1496,19 @@ class WalletConnectService {
     final from = txParams[kParamFrom]?.toString();
     if (await _rejectIfUnauthorized(req: req, address: from)) return;
 
+    final signAccountIndex =
+        from == null ? null : _evmAccountIndexForAddress(appState, from);
+    if (signAccountIndex == null) {
+      _log('tx no local account for addr=$from');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4100),
+        message: 'Requested address not in wallet',
+      );
+      return;
+    }
+
     final mbToken = nativeEvmToken(appState);
     if (mbToken == null) {
       _log('tx no native EVM token');
@@ -1114,15 +1542,10 @@ class WalletConnectService {
 
     _log(
       'tx show modal method=${req.method} to=$to value=$valueAmount '
-      'broadcast=${!isSignOnly}',
+      'broadcast=${!isSignOnly} signAccount=$signAccountIndex',
     );
 
-    var responded = false;
-    Future<void> respondOnce(Future<void> Function() fn) async {
-      if (responded) return;
-      responded = true;
-      await fn();
-    }
+    final respondOnce = _respondOnce('ethSendTransaction', req);
 
     showConfirmTransactionModal(
       context: context,
@@ -1130,6 +1553,7 @@ class WalletConnectService {
       to: to,
       token: mbToken,
       amount: amountStr,
+      accountIndex: signAccountIndex,
       onConfirm: (tx) async {
         await respondOnce(() async {
           if (isSignOnly) {
@@ -1298,12 +1722,7 @@ class WalletConnectService {
 
     if (!context.mounted) return;
 
-    var responded = false;
-    Future<void> respondOnce(Future<void> Function() fn) async {
-      if (responded) return;
-      responded = true;
-      await fn();
-    }
+    final respondOnce = _respondOnce('switchChain', req);
 
     showSwitchChainNetworkModal(
       context: context,
@@ -1472,12 +1891,7 @@ class WalletConnectService {
 
     if (!context.mounted) return;
 
-    var responded = false;
-    Future<void> respondOnce(Future<void> Function() fn) async {
-      if (responded) return;
-      responded = true;
-      await fn();
-    }
+    final respondOnce = _respondOnce('addChain', req);
 
     showAddChainModal(
       context: context,

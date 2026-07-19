@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:bearby/ledger/ledger_view_controller.dart';
 import 'package:bearby/mixins/gas_eip1559.dart';
 import 'package:bearby/config/storage_keys.dart';
-import 'package:bearby/config/walletconnect.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/local_storage.dart';
@@ -131,8 +130,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return accounts.elementAtOrNull(index);
   }
 
-  BigInt get accountBalanceKey =>
-      addressToHash(addr: account?.addr ?? '');
+  BigInt get accountBalanceKey => addressToHash(addr: account?.addr ?? '');
 
   int get selectedWallet => _selectedWallet;
 
@@ -293,21 +291,9 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  static String _wcCaip2(String ns, NetworkConfigInfo ch) {
-    final id = ch.chainId.toInt();
-    switch (ns) {
-      case 'bip122':
-        return kBtcCaip2ByChainId[id] ?? kBtcCaip2ByChainId[0]!;
-      case 'solana':
-        return kSolanaCaip2ByChainId[id] ?? 'solana:${ch.chainId}';
-      case 'eip155':
-        return 'eip155:$id';
-      case 'tron':
-        return 'tron:${ch.chainId}';
-      default:
-        return '$ns:${ch.chainId}';
-    }
-  }
+  static String _wcCaip2(String ns, NetworkConfigInfo ch) =>
+      WalletConnectService.instance.caip2ForProvider(ns, ch) ??
+      '$ns:${ch.chainId}';
 
   static String? _wcNamespaceForSlip44(int slip44) {
     switch (slip44) {

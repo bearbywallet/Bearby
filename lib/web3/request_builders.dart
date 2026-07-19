@@ -21,7 +21,8 @@ BigInt? parseHexBigInt(dynamic v) {
 }
 
 /// Build [TransactionRequestEVM] from a JSON-RPC tx object map.
-TransactionRequestEVM buildEvmTransactionRequest(Map<String, dynamic> txParams) {
+TransactionRequestEVM buildEvmTransactionRequest(
+    Map<String, dynamic> txParams) {
   final from = txParams[kParamFrom]?.toString();
   final to = txParams[kParamTo]?.toString();
   final value = txParams[kParamValue]?.toString();
@@ -64,15 +65,22 @@ TransactionRequestEVM buildEvmTransactionRequest(Map<String, dynamic> txParams) 
   );
 }
 
-/// Native EVM token on the selected wallet, or null if missing.
-FTokenInfo? nativeEvmToken(AppState appState) {
-  try {
-    return appState.wallet?.tokens
-        .firstWhere((t) => t.addrType == kEvmAddressType && t.native);
-  } catch (_) {
-    return null;
+/// Native token of the given address type on the selected wallet, or null.
+FTokenInfo? _nativeTokenOfType(AppState appState, int addrType) {
+  final tokens = appState.wallet?.tokens ?? const [];
+  for (final t in tokens) {
+    if (t.addrType == addrType && t.native) return t;
   }
+  return null;
 }
+
+/// Native EVM token on the selected wallet, or null if missing.
+FTokenInfo? nativeEvmToken(AppState appState) =>
+    _nativeTokenOfType(appState, kEvmAddressType);
+
+/// Native Tron token on the selected wallet, or null if missing.
+FTokenInfo? nativeTronToken(AppState appState) =>
+    _nativeTokenOfType(appState, kTronAddressType);
 
 /// Wei amount from a hex/decimal `value` field.
 BigInt evmValueAmount(String? value) {
