@@ -730,14 +730,35 @@ where
         send_json(sink, &ack).await?;
 
         let params: IrnSubscriptionParams =
-            serde_json::from_value(v.get("params").cloned().unwrap_or(Value::Null))
-                .map_err(WcError::from)?;
-        let _ = inbound_tx
+            match serde_json::from_value(v.get("params").cloned().unwrap_or(Value::Null)) {
+                Ok(p) => p,
+                Err(e) => {
+                    #[cfg(debug_assertions)]
+                    eprintln!("[wc] irn_subscription parse_err: {e}");
+                    return Err(WcError::from(e));
+                }
+            };
+        let topic = params.data.topic;
+        let msg_len = params.data.message.len();
+        let topic_short = topic.get(..12).unwrap_or(topic.as_str()).to_owned();
+        #[cfg(debug_assertions)]
+        eprintln!("[wc] irn_subscription topic={topic_short} msg_len={msg_len}");
+        if inbound_tx
             .send(Inbound {
-                topic: params.data.topic,
+                topic,
                 message: params.data.message,
             })
-            .await;
+            .await
+            .is_err()
+        {
+            #[cfg(debug_assertions)]
+            eprintln!(
+                "[wc] irn_subscription DROPPED topic={topic_short} (inbound channel closed)"
+            );
+        }
+    } else {
+        #[cfg(debug_assertions)]
+        eprintln!("[wc] relay inbound method={method} (ignored)");
     }
     Ok(())
 }

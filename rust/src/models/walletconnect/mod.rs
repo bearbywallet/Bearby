@@ -12,6 +12,7 @@ pub mod relay;
 pub mod relay_auth;
 pub mod rpc;
 pub mod session;
+pub(crate) mod sign;
 pub mod store;
 
 pub use ffi::{

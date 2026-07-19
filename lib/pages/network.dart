@@ -8,6 +8,7 @@ import 'package:bearby/config/storage_keys.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
@@ -209,6 +210,12 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
       // Match account path: sync local state first so home rebuilds with new chain/tokens.
       await appState.syncData();
+
+      try {
+        await WalletConnectService.instance.notifyActiveNetwork(appState);
+      } catch (e) {
+        debugPrint('select net wc notify: $e');
+      }
 
       if (_popOnSelect && mounted) {
         context.go(AppRoutes.home);

@@ -146,50 +146,89 @@ impl WcEngine {
 
     async fn dispatch_loop(self: Arc<Self>, mut rx: mpsc::Receiver<Inbound>) {
         while let Some(inbound) = rx.recv().await {
+            let t = topic_short(&inbound.topic).to_owned();
+            let msg_len = inbound.message.len();
+            wc_log!("dispatch inbound topic={t} envelope_len={msg_len}");
             if let Err(e) = self.dispatch(inbound).await {
+                wc_log!("dispatch error topic={t}: {e}");
                 let _ = self.event_tx.send(WcEvent::Error(e.to_string())).await;
             }
         }
     }
 
     async fn dispatch(&self, inbound: Inbound) -> Result<(), WcError> {
-        let sym_key = self.key_for_topic(&inbound.topic).await?;
-        let opened = crypto::open(&sym_key, &inbound.message)?;
+        let topic = inbound.topic.as_str();
+        let sym_key = match self.key_for_topic(topic).await {
+            Ok(k) => k,
+            Err(e) => {
+                wc_log!(
+                    "dispatch no_key topic={} err={e}",
+                    topic_short(topic)
+                );
+                return Err(e);
+            }
+        };
+        let opened = match crypto::open(&sym_key, &inbound.message) {
+            Ok(o) => o,
+            Err(e) => {
+                wc_log!(
+                    "dispatch decrypt_fail topic={} err={e}",
+                    topic_short(topic)
+                );
+                return Err(e);
+            }
+        };
         // Request has "method"; response does not.
         match serde_json::from_slice::<RpcRequest>(&opened.plaintext) {
-            Ok(req) if !req.method.is_empty() => match req.method.as_str() {
-                "wc_sessionPropose" => self.on_propose(&inbound.topic, req).await,
-                "wc_sessionRequest" => self.on_request(&inbound.topic, req).await,
-                "wc_sessionDelete" => self.on_delete(&inbound.topic, req).await,
-                "wc_sessionPing" => {
-                    self.respond_ok(
-                        &inbound.topic,
-                        req.id,
-                        SESSION_PING.res_tag,
-                        SESSION_PING.res_ttl,
-                        true,
-                    )
-                    .await
+            Ok(req) if !req.method.is_empty() => {
+                wc_log!(
+                    "dispatch req id={} method={} topic={}",
+                    req.id,
+                    req.method,
+                    topic_short(topic)
+                );
+                match req.method.as_str() {
+                    "wc_sessionPropose" => self.on_propose(topic, req).await,
+                    "wc_sessionRequest" => self.on_request(topic, req).await,
+                    "wc_sessionDelete" => self.on_delete(topic, req).await,
+                    "wc_sessionPing" => {
+                        self.respond_ok(
+                            topic,
+                            req.id,
+                            SESSION_PING.res_tag,
+                            SESSION_PING.res_ttl,
+                            true,
+                        )
+                        .await
+                    }
+                    "wc_sessionUpdate" => self.on_update(topic, req).await,
+                    "wc_sessionExtend" => self.on_extend(topic, req).await,
+                    "wc_sessionEvent" => self.on_event(topic, req).await,
+                    // Tags for unknown methods: use session-request response tags as a
+                    // generic envelope (relay only cares about tag for routing priority).
+                    // Pairing-topic unknowns are rare after settle.
+                    other => {
+                        wc_log!("dispatch unsupported method={other} id={}", req.id);
+                        self.respond_err(
+                            topic,
+                            req.id,
+                            10001,
+                            "unsupported method",
+                            SESSION_REQUEST.res_tag,
+                            SESSION_REQUEST.res_ttl,
+                        )
+                        .await
+                    }
                 }
-                "wc_sessionUpdate" => self.on_update(&inbound.topic, req).await,
-                "wc_sessionExtend" => self.on_extend(&inbound.topic, req).await,
-                "wc_sessionEvent" => self.on_event(&inbound.topic, req).await,
-                // Tags for unknown methods: use session-request response tags as a
-                // generic envelope (relay only cares about tag for routing priority).
-                // Pairing-topic unknowns are rare after settle.
-                _ => {
-                    self.respond_err(
-                        &inbound.topic,
-                        req.id,
-                        10001,
-                        "unsupported method",
-                        SESSION_REQUEST.res_tag,
-                        SESSION_REQUEST.res_ttl,
-                    )
-                    .await
-                }
-            },
-            _ => self.on_response(&inbound.topic, &opened.plaintext).await,
+            }
+            _ => {
+                wc_log!(
+                    "dispatch response topic={} plain_len={}",
+                    topic_short(topic),
+                    opened.plaintext.len()
+                );
+                self.on_response(topic, &opened.plaintext).await
+            }
         }
     }
 
@@ -425,16 +464,67 @@ impl WcEngine {
     // ── Session request ───────────────────────────────────────────────────
 
     async fn on_request(&self, topic: &str, req: RpcRequest) -> Result<(), WcError> {
-        let params: SessionRequestParams = serde_json::from_str(req.params.get())?;
+        let params: SessionRequestParams = match serde_json::from_str(req.params.get()) {
+            Ok(p) => p,
+            Err(e) => {
+                wc_log!(
+                    "session_request parse_err id={} topic={} err={e}",
+                    req.id,
+                    topic_short(topic)
+                );
+                return Err(e.into());
+            }
+        };
+        let method = params.request.method.clone();
+        let chain_id = params.chain_id.clone();
+        let params_preview = {
+            let raw = params.request.params.get();
+            let n = raw.chars().count().min(120);
+            let mut s: String = raw.chars().take(n).collect();
+            if raw.chars().count() > n {
+                s.push('…');
+            }
+            s
+        };
+        wc_log!(
+            "session_request id={} topic={} chain={chain_id} method={method} params={params_preview}",
+            req.id,
+            topic_short(topic),
+        );
+
         let peer = {
             let state = self.state.lock().await;
-            let session = state
-                .sessions
-                .get(topic)
-                .ok_or_else(|| WcError::SessionNotFound(topic.to_owned()))?;
-            if !session.supports_chain(&params.chain_id)
-                || !session.supports_method(&params.chain_id, &params.request.method)
-            {
+            let session = match state.sessions.get(topic) {
+                Some(s) => s,
+                None => {
+                    wc_log!(
+                        "session_request no_session id={} topic={}",
+                        req.id,
+                        topic_short(topic)
+                    );
+                    return Err(WcError::SessionNotFound(topic.to_owned()));
+                }
+            };
+            let chain_ok = session.supports_chain(&chain_id);
+            let method_ok = session.supports_method(&chain_id, &method);
+            if !chain_ok || !method_ok {
+                let ns = chain_id.split_once(':').map(|(n, _)| n).unwrap_or("?");
+                let settled_methods = session
+                    .namespaces
+                    .get(ns)
+                    .map(|s| s.methods.as_slice())
+                    .unwrap_or(&[]);
+                let n_accounts = session
+                    .namespaces
+                    .get(ns)
+                    .map(|s| s.accounts.len())
+                    .unwrap_or(0);
+                wc_log!(
+                    "session_request REJECT unauthorized id={} chain={chain_id} \
+                     method={method} chain_ok={chain_ok} method_ok={method_ok} \
+                     ns={ns} accounts={n_accounts} methods={settled_methods:?}",
+                    req.id,
+                );
                 drop(state);
                 return self
                     .respond_err(
@@ -449,6 +539,11 @@ impl WcEngine {
             }
             session.peer_meta.clone()
         };
+
+        wc_log!(
+            "session_request emit id={} method={method} chain={chain_id}",
+            req.id
+        );
         let _ = self
             .event_tx
             .send(WcEvent::Request {
@@ -716,9 +811,22 @@ impl WcEngine {
         // Settle ack (tag 1103): result true → acknowledged
         let resp: RpcResponseWire = match serde_json::from_slice(plaintext) {
             Ok(r) => r,
-            Err(_) => return Ok(()),
+            Err(e) => {
+                wc_log!(
+                    "on_response parse_skip topic={} err={e}",
+                    topic_short(topic)
+                );
+                return Ok(());
+            }
         };
-        if resp.error.is_some() {
+        if let Some(err) = &resp.error {
+            wc_log!(
+                "on_response error id={} topic={} code={} msg={}",
+                resp.id,
+                topic_short(topic),
+                err.code,
+                err.message
+            );
             return Ok(());
         }
         let mut state = self.state.lock().await;
@@ -727,13 +835,30 @@ impl WcEngine {
                 s.acknowledged = true;
                 store::save_to_core(&self.storage, &state)?;
                 drop(state);
+                wc_log!(
+                    "settle_ack id={} topic={}",
+                    resp.id,
+                    topic_short(topic)
+                );
                 let _ = self
                     .event_tx
                     .send(WcEvent::SessionSettled {
                         topic: topic.to_owned(),
                     })
                     .await;
+            } else {
+                wc_log!(
+                    "on_response already_acked id={} topic={}",
+                    resp.id,
+                    topic_short(topic)
+                );
             }
+        } else {
+            wc_log!(
+                "on_response no_session id={} topic={}",
+                resp.id,
+                topic_short(topic)
+            );
         }
         Ok(())
     }

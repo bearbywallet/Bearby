@@ -8,6 +8,7 @@ import 'package:bearby/src/rust/models/transactions/tron.dart';
 
 class ParsedEvmReceipt {
   final String? transactionHash;
+  final String? signedTransaction;
   final BigInt? nonce;
   final String? sender;
   final String? recipient;
@@ -27,6 +28,7 @@ class ParsedEvmReceipt {
 
   ParsedEvmReceipt({
     this.transactionHash,
+    this.signedTransaction,
     this.nonce,
     this.sender,
     this.recipient,
@@ -48,6 +50,7 @@ class ParsedEvmReceipt {
   factory ParsedEvmReceipt.fromJson(Map<String, dynamic> json) {
     return ParsedEvmReceipt(
       transactionHash: json['transactionHash'] as String?,
+      signedTransaction: json['signedTransaction'] as String?,
       nonce: _parseBigInt(json['nonce']),
       sender: json['from'] as String?,
       recipient: json['to'] as String?,
@@ -262,6 +265,9 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
         scillaReceipt?.transactionHash ??
         '';
   }
+
+  /// EIP-2718 signed raw tx (`0x…`) when present — used by WC eth_signTransaction.
+  String? get signedEvmTransaction => evmReceipt?.signedTransaction;
 
   String? get icon => metadata.icon;
   String? get title => metadata.title;

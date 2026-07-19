@@ -1,33 +1,34 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kDebugMode, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart'
-    show PlatformInt64Util;
+    show PlatformInt64Util, Uint16List, Uint64List;
 import 'package:provider/provider.dart';
 
+import 'package:bearby/config/ftokens.dart';
 import 'package:bearby/config/walletconnect.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/eip712.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
+import 'package:bearby/modals/add_chain.dart';
 import 'package:bearby/modals/app_connect.dart';
 import 'package:bearby/modals/sign_message.dart';
+import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
+import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/api/walletconnect.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
-import 'package:bearby/src/rust/models/transactions/base_token.dart';
-import 'package:bearby/src/rust/models/transactions/evm.dart';
-import 'package:bearby/src/rust/models/transactions/request.dart';
-import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/src/rust/models/walletconnect/ffi.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/utils/utils.dart';
+import 'package:bearby/web3/request_builders.dart';
 
 /// Thin Flutter facade over the Rust WalletConnect engine.
 ///
@@ -359,6 +360,11 @@ class WalletConnectService {
     void addNs(WcNamespaceInfo ns, {required bool required}) {
       if (!seen.add(ns.key)) return;
 
+      if (!required && ns.key == 'bip122') {
+        _log('skip ns=bip122: optional (AppKit default chain = sort().first)');
+        return;
+      }
+
       final slip44 = _slip44ForNamespace(ns.key);
       if (slip44 == null) {
         _log('skip ns=${ns.key}: unsupported namespace');
@@ -595,9 +601,161 @@ class WalletConnectService {
     return addr.startsWith('0x') ? addr.substring(2) : addr;
   }
 
+  /// True if [address] appears as the address segment of any CAIP-10 account
+  /// on the session (eip155:1:0xabc → 0xabc), case-insensitive.
+  Future<bool> _sessionOwnsAddress(String topic, String address) async {
+    final needle = address.toLowerCase();
+    if (needle.isEmpty) return false;
+    List<WcSessionInfo> sessions;
+    try {
+      sessions = await wcSessions();
+    } catch (e) {
+      _log('sessionOwnsAddress sessions: $e');
+      return false;
+    }
+    for (final s in sessions) {
+      if (s.topic != topic) continue;
+      for (final acc in s.accounts) {
+        final parts = acc.split(':');
+        final addr = parts.isNotEmpty ? parts.last : acc;
+        if (addr.toLowerCase() == needle) return true;
+      }
+      final preview = s.accounts.length > 6
+          ? '${s.accounts.take(6).join(', ')}…(+${s.accounts.length - 6})'
+          : s.accounts.join(', ');
+      _log(
+        'sessionOwnsAddress miss addr=$address '
+        'topic=${topic.length > 12 ? topic.substring(0, 12) : topic}… '
+        'accounts=[$preview]',
+      );
+      return false;
+    }
+    _log(
+      'sessionOwnsAddress no session topic='
+      '${topic.length > 12 ? topic.substring(0, 12) : topic}… '
+      'sessions=${sessions.length}',
+    );
+    return false;
+  }
+
+  String _preview(String? raw, [int max = 96]) {
+    if (raw == null) return 'null';
+    if (raw.length <= max) return raw;
+    return '${raw.substring(0, max)}…';
+  }
+
+  /// Extract EVM signer address from WC params by method.
+  String? _evmSignerFromParams(String method, dynamic params) {
+    if (params is! List || params.isEmpty) return null;
+    // personal_sign: [data, address]
+    // eth_sign / eth_signTypedData*: [address, data]
+    if (method == 'personal_sign') {
+      if (params.length < 2) return null;
+      return params[1]?.toString();
+    }
+    return params[0]?.toString();
+  }
+
+  BigInt? _evmAccountIndexForAddress(AppState appState, String address) {
+    final w = appState.wallet;
+    if (w == null) return null;
+    final needle = address.toLowerCase();
+    if (needle.isEmpty) return null;
+
+    final slipOrder = <int>[
+      if (w.slip44 == kEthereumSlip44 || w.slip44 == kZilliqaSlip44) w.slip44,
+      kEthereumSlip44,
+      kZilliqaSlip44,
+    ];
+    final seen = <int>{};
+    for (final slip in slipOrder) {
+      if (!seen.add(slip)) continue;
+      final byBip = w.accounts[slip];
+      if (byBip == null || byBip.isEmpty) continue;
+      final list = byBip[44] ?? byBip.values.first;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].addr.toLowerCase() == needle) {
+          return BigInt.from(i);
+        }
+      }
+    }
+    return null;
+  }
+
+  Future<void> notifyActiveNetwork(AppState appState) async {
+    if (!_started) return;
+    final ch = appState.chain;
+    final acc = appState.account;
+    if (ch == null || acc == null) {
+      _log('notifyActiveNetwork skip: no chain/account');
+      return;
+    }
+    final ns = ch.slip44 == kEthereumSlip44 || ch.slip44 == kZilliqaSlip44
+        ? 'eip155'
+        : ch.slip44 == kSolanaSlip44
+            ? 'solana'
+            : ch.slip44 == kTronSlip44
+                ? 'tron'
+                : ch.slip44 == kBitcoinlip44
+                    ? 'bip122'
+                    : null;
+    if (ns == null) {
+      _log('notifyActiveNetwork skip: unsupported slip44=${ch.slip44}');
+      return;
+    }
+    final id = ch.chainId.toInt();
+    final caip2 = ns == 'bip122'
+        ? (kBtcCaip2ByChainId[id] ?? kBtcCaip2ByChainId[0]!)
+        : ns == 'solana'
+            ? (kSolanaCaip2ByChainId[id] ?? 'solana:${ch.chainId}')
+            : ns == 'eip155'
+                ? 'eip155:$id'
+                : '$ns:${ch.chainId}';
+    _log('notifyActiveNetwork caip2=$caip2 addr=${acc.addr}');
+    await onChainChanged(caip2: caip2);
+    await onAccountsChanged(address: acc.addr, caip2: caip2);
+  }
+
+  Future<bool> _rejectIfUnauthorized({
+    required WcRequestInfo req,
+    required String? address,
+  }) async {
+    if (address == null || address.isEmpty) {
+      _log('auth missing address method=${req.method}');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Missing signer address',
+      );
+      return true;
+    }
+    final ok = await _sessionOwnsAddress(req.topic, address);
+    if (ok) return false;
+    _log(
+      'auth reject method=${req.method} addr=$address '
+      'topic=${req.topic.length > 12 ? req.topic.substring(0, 12) : req.topic}…',
+    );
+    await wcRespondErr(
+      topic: req.topic,
+      id: req.id,
+      code: PlatformInt64Util.from(4100),
+      message: 'Unauthorized address',
+    );
+    return true;
+  }
+
   Future<void> _routeRequest(WcRequestInfo req) async {
+    final method = req.method;
+    _log(
+      'route id=${req.id} method=$method chain=${req.chainId} '
+      'topic=${req.topic.length > 12 ? req.topic.substring(0, 12) : req.topic}… '
+      'params=${_preview(req.paramsJson)}',
+    );
+
     final context = _ctx;
     if (context == null || !context.mounted) {
+      _log('route abort UI unavailable id=${req.id} method=$method');
       await wcRespondErr(
         topic: req.topic,
         id: req.id,
@@ -607,7 +765,6 @@ class WalletConnectService {
       return;
     }
 
-    final method = req.method;
     switch (method) {
       case 'personal_sign':
       case 'eth_sign':
@@ -619,7 +776,12 @@ class WalletConnectService {
       case 'eth_sendTransaction':
       case 'eth_signTransaction':
         await _handleSendTransaction(context, req);
+      case 'wallet_switchEthereumChain':
+        await _handleSwitchEthereumChain(context, req);
+      case 'wallet_addEthereumChain':
+        await _handleAddEthereumChain(context, req);
       default:
+        _log('route unsupported id=${req.id} method=$method');
         await wcRespondErr(
           topic: req.topic,
           id: req.id,
@@ -633,43 +795,126 @@ class WalletConnectService {
     BuildContext context,
     WcRequestInfo req,
   ) async {
+    _log(
+      'signMessage enter method=${req.method} id=${req.id} '
+      'chain=${req.chainId}',
+    );
+    dynamic params;
     String? message;
     try {
-      final params = jsonDecode(req.paramsJson);
+      params = jsonDecode(req.paramsJson);
       if (params is List && params.isNotEmpty) {
-        // personal_sign: [data, address] · eth_sign: [address, data]
         if (req.method == 'eth_sign' && params.length >= 2) {
           message = params[1]?.toString();
         } else {
           message = params[0]?.toString();
         }
       }
-    } catch (_) {
+      _log(
+        'signMessage params kind=${params.runtimeType} '
+        'len=${params is List ? params.length : '-'} '
+        'raw=${_preview(req.paramsJson)}',
+      );
+    } catch (e) {
+      _log('signMessage params jsonDecode failed: $e');
       message = req.paramsJson;
+      params = null;
     }
 
-    if (!context.mounted) return;
+    final address = _evmSignerFromParams(req.method, params);
+    _log('signMessage signer addr=$address');
+    if (await _rejectIfUnauthorized(req: req, address: address)) return;
+
+    final displayMessage = message == null
+        ? null
+        : (req.method == 'personal_sign'
+            ? decodePersonalSignMessage(message)
+            : message);
+
+    if (!context.mounted) {
+      _log('signMessage abort unmounted id=${req.id}');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5000),
+        message: 'Wallet UI unavailable',
+      );
+      return;
+    }
+
+    final appState = context.read<AppState>();
+    final w = appState.wallet;
+    final signAccountIndex = address == null
+        ? null
+        : _evmAccountIndexForAddress(appState, address);
+    if (signAccountIndex == null) {
+      _log(
+        'signMessage no local account for addr=$address '
+        'uiSlip44=${w?.slip44} uiAccount=${w?.selectedAccount}',
+      );
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4100),
+        message: 'Requested address not in wallet',
+      );
+      return;
+    }
+    _log(
+      'signMessage show modal method=${req.method} '
+      'msgLen=${displayMessage?.length ?? 0} '
+      'display=${_preview(displayMessage)} addr=$address '
+      'signAccount=$signAccountIndex '
+      'uiWallet="${w?.walletName}" uiSlip44=${w?.slip44} '
+      'uiAccount=${w?.selectedAccount} uiAddr=${appState.account?.addr}',
+    );
+
+    var responded = false;
+    Future<void> respondOnce(Future<void> Function() fn) async {
+      if (responded) {
+        _log('signMessage respondOnce skip (already responded) id=${req.id}');
+        return;
+      }
+      responded = true;
+      try {
+        await fn();
+      } catch (e) {
+        _log('signMessage respondOnce error id=${req.id}: $e');
+      }
+    }
 
     showSignMessageModal(
       context: context,
-      message: message,
+      message: displayMessage,
       appTitle: req.peerName,
       appIcon: req.peerIcon ?? '',
+      accountIndex: signAccountIndex,
       onMessageSigned: (pubkey, sig) async {
-        await wcRespondOk(
-          topic: req.topic,
-          id: req.id,
-          resultJson: jsonEncode(sig),
-        );
+        await respondOnce(() async {
+          _log(
+            'signMessage ok method=${req.method} id=${req.id} '
+            'sigLen=${sig.length} sig=${_preview(sig, 22)} '
+            'pubkey=${_preview(pubkey, 18)}',
+          );
+          await wcRespondOk(
+            topic: req.topic,
+            id: req.id,
+            resultJson: jsonEncode(sig),
+          );
+          _log('signMessage wcRespondOk done id=${req.id}');
+        });
         if (context.mounted) Navigator.of(context).pop();
       },
       onDismiss: () async {
-        await wcRespondErr(
-          topic: req.topic,
-          id: req.id,
-          code: PlatformInt64Util.from(5000),
-          message: 'User rejected',
-        );
+        await respondOnce(() async {
+          _log('signMessage reject/dismiss method=${req.method} id=${req.id}');
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
       },
     );
   }
@@ -678,15 +923,16 @@ class WalletConnectService {
     BuildContext context,
     WcRequestInfo req,
   ) async {
+    _log('typedData method=${req.method} id=${req.id}');
     TypedDataEip712? typed;
+    dynamic paramsDecoded;
     try {
-      final params = jsonDecode(req.paramsJson);
-      // eth_signTypedData_v4: [address, typedDataObject|string]
+      paramsDecoded = jsonDecode(req.paramsJson);
       dynamic raw;
-      if (params is List && params.length >= 2) {
-        raw = params[1];
+      if (paramsDecoded is List && paramsDecoded.length >= 2) {
+        raw = paramsDecoded[1];
       } else {
-        raw = params;
+        raw = paramsDecoded;
       }
       if (raw is String) {
         typed = TypedDataEip712.fromJsonString(raw);
@@ -696,7 +942,7 @@ class WalletConnectService {
         typed = TypedDataEip712.fromJson(Map<String, dynamic>.from(raw));
       }
     } catch (e) {
-      debugPrint('wc typedData parse: $e');
+      _log('typedData parse: $e');
       await wcRespondErr(
         topic: req.topic,
         id: req.id,
@@ -716,28 +962,65 @@ class WalletConnectService {
       return;
     }
 
+    final address = _evmSignerFromParams(req.method, paramsDecoded);
+    if (await _rejectIfUnauthorized(req: req, address: address)) return;
+
     if (!context.mounted) return;
+
+    final appState = context.read<AppState>();
+    final signAccountIndex = address == null
+        ? null
+        : _evmAccountIndexForAddress(appState, address);
+    if (signAccountIndex == null) {
+      _log('typedData no local account for addr=$address');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4100),
+        message: 'Requested address not in wallet',
+      );
+      return;
+    }
+
+    _log(
+      'typedData show modal method=${req.method} addr=$address '
+      'signAccount=$signAccountIndex uiAccount=${appState.wallet?.selectedAccount}',
+    );
+
+    var responded = false;
+    Future<void> respondOnce(Future<void> Function() fn) async {
+      if (responded) return;
+      responded = true;
+      await fn();
+    }
 
     showSignMessageModal(
       context: context,
       typedData: typed,
       appTitle: req.peerName.isEmpty ? 'Sign Typed Data' : req.peerName,
       appIcon: req.peerIcon ?? '',
+      accountIndex: signAccountIndex,
       onMessageSigned: (pubkey, sig) async {
-        await wcRespondOk(
-          topic: req.topic,
-          id: req.id,
-          resultJson: jsonEncode(sig),
-        );
+        await respondOnce(() async {
+          _log('typedData ok method=${req.method} sigLen=${sig.length}');
+          await wcRespondOk(
+            topic: req.topic,
+            id: req.id,
+            resultJson: jsonEncode(sig),
+          );
+        });
         if (context.mounted) Navigator.of(context).pop();
       },
       onDismiss: () async {
-        await wcRespondErr(
-          topic: req.topic,
-          id: req.id,
-          code: PlatformInt64Util.from(5000),
-          message: 'User rejected',
-        );
+        await respondOnce(() async {
+          _log('typedData reject method=${req.method}');
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
       },
     );
   }
@@ -746,6 +1029,12 @@ class WalletConnectService {
     BuildContext context,
     WcRequestInfo req,
   ) async {
+    final isSignOnly = req.method == 'eth_signTransaction';
+    _log(
+      'tx method=${req.method} id=${req.id} signOnly=$isSignOnly '
+      'chain=${req.chainId}',
+    );
+
     final appState = Provider.of<AppState>(context, listen: false);
 
     Map<String, dynamic>? txParams;
@@ -757,6 +1046,7 @@ class WalletConnectService {
         txParams = Map<String, dynamic>.from(params);
       }
     } catch (e) {
+      _log('tx bad params: $e');
       await wcRespondErr(
         topic: req.topic,
         id: req.id,
@@ -771,65 +1061,29 @@ class WalletConnectService {
         topic: req.topic,
         id: req.id,
         code: PlatformInt64Util.from(5002),
-        message: 'Invalid parameters for eth_sendTransaction',
+        message: 'Invalid parameters for ${req.method}',
       );
       return;
     }
 
-    final from = txParams['from'] as String?;
-    final to = txParams['to'] as String?;
-    final value = txParams['value'] as String?;
-    final dataHex = txParams['data']?.toString();
-
-    BigInt? parseHexBig(dynamic v) {
-      if (v == null) return null;
-      final s = v.toString().replaceFirst(RegExp(r'^0x'), '');
-      if (s.isEmpty) return BigInt.zero;
-      return BigInt.tryParse(s, radix: 16);
-    }
-
-    final gasLimit = parseHexBig(txParams['gas'] ?? txParams['gasLimit']);
-    final maxFeePerGas = parseHexBig(txParams['maxFeePerGas']);
-    final maxPriorityFeePerGas = parseHexBig(txParams['maxPriorityFeePerGas']);
-    final gasPrice = parseHexBig(txParams['gasPrice']);
-    final chainId = parseHexBig(txParams['chainId']);
-
-    Uint8List? data;
-    if (dataHex != null && dataHex.isNotEmpty && dataHex != '0x') {
-      try {
-        data = Uint8List.fromList(
-          hexToBytes(dataHex.replaceFirst(RegExp(r'^0x'), '')),
-        );
-      } catch (_) {
-        data = null;
+    // Prefer embedded tx chainId; else inject from WC session request CAIP-2 (eip155:N).
+    if (txParams[kParamChainId] == null && txParams['chain_id'] == null) {
+      final parts = req.chainId.split(':');
+      if (parts.length >= 2 && parts[0] == 'eip155') {
+        final n = int.tryParse(parts[1]);
+        if (n != null) {
+          txParams[kParamChainId] = '0x${n.toRadixString(16)}';
+          _log('tx injected chainId from req.chainId=${req.chainId}');
+        }
       }
     }
 
-    final evmRequest = TransactionRequestEVM(
-      nonce: null,
-      from: from,
-      to: to,
-      value: value,
-      gasLimit: gasLimit,
-      data: data,
-      maxFeePerGas: maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFeePerGas,
-      gasPrice: gasPrice,
-      chainId: chainId,
-      accessList: null,
-      blobVersionedHashes: null,
-      maxFeePerBlobGas: null,
-    );
+    final from = txParams[kParamFrom]?.toString();
+    if (await _rejectIfUnauthorized(req: req, address: from)) return;
 
-    FTokenInfo? mbToken;
-    try {
-      mbToken = appState.wallet?.tokens
-          .firstWhere((t) => t.addrType == kEvmAddressType && t.native);
-    } catch (_) {
-      mbToken = null;
-    }
-
+    final mbToken = nativeEvmToken(appState);
     if (mbToken == null) {
+      _log('tx no native EVM token');
       await wcRespondErr(
         topic: req.topic,
         id: req.id,
@@ -839,32 +1093,17 @@ class WalletConnectService {
       return;
     }
 
-    final valueAmount = value != null && value != '0x' && value != '0x0'
-        ? (parseHexBig(value) ?? BigInt.zero)
-        : BigInt.zero;
-
-    final tokenInfo = BaseTokenInfo(
-      value: valueAmount.toString(),
-      symbol: mbToken.symbol,
-      decimals: mbToken.decimals,
-    );
-
-    final metadata = TransactionMetadataInfo(
-      chainHash: appState.chain?.chainHash ?? BigInt.zero,
-      hash: null,
-      info: null,
+    final transactionRequest = buildEvmTransactionRequestInfo(
+      txParams: txParams,
+      appState: appState,
+      broadcast: !isSignOnly,
+      nativeToken: mbToken,
+      title: req.peerName.isEmpty ? null : req.peerName,
       icon: req.peerIcon,
-      title: req.peerName.isEmpty ? 'EVM Transaction' : req.peerName,
-      signer: appState.account?.addr,
-      tokenInfo: tokenInfo,
-      broadcast: req.method == 'eth_sendTransaction',
     );
 
-    final transactionRequest = TransactionRequestInfo(
-      metadata: metadata,
-      scilla: null,
-      evm: evmRequest,
-    );
+    final to = txParams[kParamTo]?.toString() ?? '';
+    final valueAmount = evmValueAmount(txParams[kParamValue]?.toString());
 
     if (!context.mounted) return;
 
@@ -873,8 +1112,11 @@ class WalletConnectService {
       decimals: mbToken.decimals,
     ).toString();
 
-    // transfer.dart calls onDismiss after onConfirm and on sheet close —
-    // guard so we only respond once.
+    _log(
+      'tx show modal method=${req.method} to=$to value=$valueAmount '
+      'broadcast=${!isSignOnly}',
+    );
+
     var responded = false;
     Future<void> respondOnce(Future<void> Function() fn) async {
       if (responded) return;
@@ -885,20 +1127,42 @@ class WalletConnectService {
     showConfirmTransactionModal(
       context: context,
       tx: transactionRequest,
-      to: to ?? '',
+      to: to,
       token: mbToken,
       amount: amountStr,
       onConfirm: (tx) async {
-        final hash = tx.transactionHash;
         await respondOnce(() async {
-          if (hash.isEmpty) {
-            await wcRespondErr(
+          if (isSignOnly) {
+            final raw = tx.signedEvmTransaction;
+            if (raw == null || raw.isEmpty) {
+              _log('tx signOnly missing signedTransaction');
+              await wcRespondErr(
+                topic: req.topic,
+                id: req.id,
+                code: PlatformInt64Util.from(5004),
+                message: 'Missing signed transaction payload',
+              );
+              return;
+            }
+            _log('tx signOnly ok rawLen=${raw.length}');
+            await wcRespondOk(
               topic: req.topic,
               id: req.id,
-              code: PlatformInt64Util.from(5004),
-              message: 'Transaction failed',
+              resultJson: jsonEncode(raw),
             );
           } else {
+            final hash = tx.transactionHash;
+            if (hash.isEmpty) {
+              _log('tx send missing hash');
+              await wcRespondErr(
+                topic: req.topic,
+                id: req.id,
+                code: PlatformInt64Util.from(5004),
+                message: 'Transaction failed',
+              );
+              return;
+            }
+            _log('tx send ok hash=$hash');
             await wcRespondOk(
               topic: req.topic,
               id: req.id,
@@ -909,6 +1173,344 @@ class WalletConnectService {
         if (context.mounted) Navigator.of(context).pop();
       },
       onDismiss: () async {
+        await respondOnce(() async {
+          _log('tx reject method=${req.method}');
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
+      },
+    );
+  }
+
+  NetworkConfigInfo _networkWithRpc(NetworkConfigInfo base, List<String> rpc) {
+    return NetworkConfigInfo(
+      name: base.name,
+      logo: base.logo,
+      chain: base.chain,
+      shortName: base.shortName,
+      rpc: rpc,
+      features: base.features,
+      chainId: base.chainId,
+      chainIds: base.chainIds,
+      slip44: base.slip44,
+      diffBlockTime: base.diffBlockTime,
+      chainHash: base.chainHash,
+      ens: base.ens,
+      explorers: base.explorers,
+      fallbackEnabled: base.fallbackEnabled,
+      testnet: base.testnet,
+      ftokens: base.ftokens,
+    );
+  }
+
+  Future<void> _handleSwitchEthereumChain(
+    BuildContext context,
+    WcRequestInfo req,
+  ) async {
+    _log('switchChain id=${req.id}');
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    BigInt chainId;
+    try {
+      final params = jsonDecode(req.paramsJson);
+      if (params is! List || params.isEmpty || params[0] is! Map) {
+        await wcRespondErr(
+          topic: req.topic,
+          id: req.id,
+          code: PlatformInt64Util.from(5002),
+          message: 'Invalid parameters for wallet_switchEthereumChain',
+        );
+        return;
+      }
+      final chainParams = Map<String, dynamic>.from(params[0] as Map);
+      final raw = chainParams[kParamChainId] ?? chainParams['chain_id'];
+      if (raw == null) {
+        await wcRespondErr(
+          topic: req.topic,
+          id: req.id,
+          code: PlatformInt64Util.from(5002),
+          message: 'Missing chainId',
+        );
+        return;
+      }
+      final s = raw.toString().replaceFirst(RegExp(r'^0[xX]'), '');
+      chainId = BigInt.parse(s, radix: 16);
+    } catch (e) {
+      _log('switchChain parse: $e');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Invalid chainId: $e',
+      );
+      return;
+    }
+
+    NetworkConfigInfo? target;
+    for (final p in appState.state.providers) {
+      if (p.slip44 == kBitcoinlip44) continue;
+      if (p.chainId == chainId &&
+          !(p.slip44 == kZilliqaSlip44 && p.chainId == kZilliqaChainId)) {
+        target = p;
+        break;
+      }
+    }
+
+    if (target == null) {
+      try {
+        final mainnetJson = await rootBundle.loadString(kMainnetChainsPath);
+        final testnetJson = await rootBundle.loadString(kTestnetChainsPath);
+        final (mainnetChains, testnetChains) = await getNetworks(
+          mainnetJson: mainnetJson,
+          testnetJson: testnetJson,
+        );
+        for (final chain in [...mainnetChains, ...testnetChains]) {
+          if (chain.chainId == chainId &&
+              !(chain.slip44 == kZilliqaSlip44 &&
+                  chain.chainId == kZilliqaChainId)) {
+            target = chain;
+            break;
+          }
+        }
+        if (target != null) {
+          await addProvider(providerConfig: target);
+          await appState.syncData();
+        }
+      } catch (e) {
+        _log('switchChain catalog: $e');
+      }
+    }
+
+    if (target == null) {
+      _log('switchChain unrecognized chainId=$chainId');
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(4902),
+        message: 'Unrecognized chain ID',
+      );
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    var responded = false;
+    Future<void> respondOnce(Future<void> Function() fn) async {
+      if (responded) return;
+      responded = true;
+      await fn();
+    }
+
+    showSwitchChainNetworkModal(
+      context: context,
+      selectedChainId: chainId,
+      filtersBySlip44: const [kEthereumSlip44, kZilliqaSlip44],
+      onNetworkSelected: () async {
+        // Modal already emits WC chainChanged + accountsChanged.
+        _log('switchChain ok chainId=$chainId');
+        await respondOnce(() async {
+          await wcRespondOk(
+            topic: req.topic,
+            id: req.id,
+            resultJson: 'null',
+          );
+        });
+      },
+      onReject: () async {
+        _log('switchChain reject');
+        await respondOnce(() async {
+          await wcRespondErr(
+            topic: req.topic,
+            id: req.id,
+            code: PlatformInt64Util.from(5000),
+            message: 'User rejected',
+          );
+        });
+      },
+    );
+  }
+
+  Future<void> _handleAddEthereumChain(
+    BuildContext context,
+    WcRequestInfo req,
+  ) async {
+    _log('addChain id=${req.id}');
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    Map<String, dynamic> chainParams;
+    try {
+      final params = jsonDecode(req.paramsJson);
+      if (params is! List || params.isEmpty || params[0] is! Map) {
+        await wcRespondErr(
+          topic: req.topic,
+          id: req.id,
+          code: PlatformInt64Util.from(5002),
+          message: 'Invalid parameters for wallet_addEthereumChain',
+        );
+        return;
+      }
+      chainParams = Map<String, dynamic>.from(params[0] as Map);
+    } catch (e) {
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Invalid addChain params: $e',
+      );
+      return;
+    }
+
+    if (!chainParams.containsKey(kParamChainId) ||
+        !chainParams.containsKey(kParamChainName) ||
+        !chainParams.containsKey(kParamNativeCurrency) ||
+        !chainParams.containsKey(kParamRpcUrls)) {
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'Missing required chain fields',
+      );
+      return;
+    }
+
+    final rpcUrls = (chainParams[kParamRpcUrls] as List<dynamic>)
+        .where(
+            (url) => url is String && url.toString().startsWith(kHttpsProtocol))
+        .cast<String>()
+        .toList();
+    if (rpcUrls.isEmpty) {
+      await wcRespondErr(
+        topic: req.topic,
+        id: req.id,
+        code: PlatformInt64Util.from(5002),
+        message: 'No valid HTTPS rpcUrls',
+      );
+      return;
+    }
+
+    final nativeCurrency =
+        Map<String, dynamic>.from(chainParams[kParamNativeCurrency] as Map);
+    final chainId = BigInt.parse(
+      chainParams[kParamChainId].toString().replaceFirst(RegExp(r'^0[xX]'), ''),
+      radix: 16,
+    );
+    final explorers =
+        ((chainParams[kParamBlockExplorerUrls] as List?) ?? const [])
+            .map((url) => ExplorerInfo(
+                  name: kDefaultExplorerName,
+                  url: url.toString(),
+                  standard: kDefaultExplorerStandard,
+                ))
+            .toList();
+    final symbol = nativeCurrency[kParamSymbol]?.toString() ?? 'ETH';
+    final name = nativeCurrency[kParamName]?.toString() ?? 'Ether';
+
+    NetworkConfigInfo? foundChain;
+    if (appState.state.providers.any((c) => c.chainId == chainId)) {
+      final chain =
+          appState.state.providers.firstWhere((c) => c.chainId == chainId);
+      final mergedRpc = {...chain.rpc, ...rpcUrls}.toList();
+      foundChain = _networkWithRpc(chain, mergedRpc);
+    } else {
+      try {
+        final mainnetJson = await rootBundle.loadString(kMainnetChainsPath);
+        final testnetJson = await rootBundle.loadString(kTestnetChainsPath);
+        final (mainnetChains, _) = await getNetworks(
+          mainnetJson: mainnetJson,
+          testnetJson: testnetJson,
+        );
+        if (mainnetChains.any((c) => c.chainId == chainId)) {
+          final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
+          final mergedRpc = {...chain.rpc, ...rpcUrls}.toList();
+          foundChain = _networkWithRpc(chain, mergedRpc);
+        }
+      } catch (e) {
+        _log('addChain catalog: $e');
+      }
+    }
+
+    final logo =
+        'https://static.cx.metamask.io/api/v1/tokenIcons/$chainId/$zeroEVM.png';
+
+    foundChain ??= NetworkConfigInfo(
+      ftokens: [
+        FTokenInfo(
+          logo: logo,
+          name: name,
+          symbol: symbol,
+          decimals: kDefaultEvmDecimals,
+          addr: zeroEVM,
+          addrType: kEvmAddressType,
+          balances: {},
+          rate: 0,
+          default_: false,
+          native: true,
+          chainHash: BigInt.zero,
+        )
+      ],
+      name: chainParams[kParamChainName].toString(),
+      logo: logo,
+      chain: chainParams[kParamChainName].toString(),
+      shortName: symbol,
+      rpc: rpcUrls,
+      features: Uint16List.fromList(kDefaultEvmFeatures),
+      chainId: chainId,
+      chainIds: Uint64List.fromList([chainId, 0]),
+      slip44: kEthereumSlip44,
+      diffBlockTime: BigInt.zero,
+      chainHash: BigInt.zero,
+      explorers: explorers,
+      fallbackEnabled: true,
+      testnet: name.toLowerCase().contains(kTestnetIdentifier),
+    );
+
+    foundChain = _networkWithRpc(foundChain, foundChain.rpc.toSet().toList());
+
+    if (!context.mounted) return;
+
+    var responded = false;
+    Future<void> respondOnce(Future<void> Function() fn) async {
+      if (responded) return;
+      responded = true;
+      await fn();
+    }
+
+    showAddChainModal(
+      context: context,
+      title: req.peerName,
+      appIcon: req.peerIcon ?? '',
+      chain: foundChain,
+      onConfirm: (selectedRpc) async {
+        try {
+          final updated = _networkWithRpc(foundChain!, selectedRpc);
+          await createOrUpdateChain(providerConfig: updated);
+          await appState.syncData();
+          _log('addChain ok chainId=$chainId');
+          await respondOnce(() async {
+            await wcRespondOk(
+              topic: req.topic,
+              id: req.id,
+              resultJson: 'null',
+            );
+          });
+        } catch (e) {
+          _log('addChain error: $e');
+          await respondOnce(() async {
+            await wcRespondErr(
+              topic: req.topic,
+              id: req.id,
+              code: PlatformInt64Util.from(5000),
+              message: e.toString(),
+            );
+          });
+        }
+      },
+      onReject: () async {
+        _log('addChain reject');
         await respondOnce(() async {
           await wcRespondErr(
             topic: req.topic,

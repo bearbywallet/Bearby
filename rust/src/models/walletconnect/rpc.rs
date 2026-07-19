@@ -230,6 +230,8 @@ pub struct ProposedNamespace {
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 #[serde(crate = "zilpay::serde")]
 pub struct SettledNamespace {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub chains: Vec<String>,
     pub accounts: Vec<String>,
     pub methods: Vec<String>,
     pub events: Vec<String>,

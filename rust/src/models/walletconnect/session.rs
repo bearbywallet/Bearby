@@ -126,6 +126,16 @@ mod tests {
 
     fn settled(accounts: &[&str], methods: &[&str], events: &[&str]) -> SettledNamespace {
         SettledNamespace {
+            chains: accounts
+                .iter()
+                .filter_map(|a| {
+                    let mut it = a.splitn(3, ':');
+                    match (it.next(), it.next(), it.next()) {
+                        (Some(ns), Some(r), Some(_)) => Some(format!("{ns}:{r}")),
+                        _ => None,
+                    }
+                })
+                .collect(),
             accounts: accounts.iter().map(|s| (*s).to_owned()).collect(),
             methods: methods.iter().map(|s| (*s).to_owned()).collect(),
             events: events.iter().map(|s| (*s).to_owned()).collect(),

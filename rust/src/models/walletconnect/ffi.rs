@@ -178,9 +178,21 @@ impl From<WcEvent> for WcEventInfo {
 
 impl From<WcNamespaceApproval> for (String, SettledNamespace) {
     fn from(a: WcNamespaceApproval) -> Self {
+        let mut chains = Vec::new();
+        for acc in &a.accounts {
+            let mut it = acc.splitn(3, ':');
+            let (Some(ns), Some(reference), Some(_)) = (it.next(), it.next(), it.next()) else {
+                continue;
+            };
+            let caip2 = format!("{ns}:{reference}");
+            if !chains.iter().any(|c| c == &caip2) {
+                chains.push(caip2);
+            }
+        }
         (
             a.key,
             SettledNamespace {
+                chains,
                 accounts: a.accounts,
                 methods: a.methods,
                 events: a.events,

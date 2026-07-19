@@ -30,6 +30,16 @@ pub enum WcError {
     Namespace(&'static str),
     #[error("unauthorized chain or method")]
     Unauthorized,
+    /// The dApp requested a WC method we do not support (e.g. an unmapped
+    /// namespace or an unimplemented handler).
+    #[error("unsupported method: {0}")]
+    UnsupportedMethod(String),
+    /// Required parameters were missing or had the wrong shape.
+    #[error("bad params: {0}")]
+    BadParams(&'static str),
+    /// A cryptographic signing primitive returned an error.
+    #[error("signing error: {0}")]
+    Signing(String),
 }
 
 #[frb(ignore)]

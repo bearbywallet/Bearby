@@ -27,6 +27,8 @@ const List<String> kWcEip155Methods = [
   'eth_signTypedData_v4',
   'eth_sendTransaction',
   'eth_signTransaction',
+  'wallet_switchEthereumChain',
+  'wallet_addEthereumChain',
 ];
 
 const List<String> kWcSolanaMethods = [

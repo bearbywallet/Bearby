@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 
@@ -34,7 +36,12 @@ String decodePersonalSignMessage(String dataToSign) {
   try {
     if (dataToSign.startsWith('0x')) {
       final bytes = hexToBytes(dataToSign.substring(2));
-      return String.fromCharCodes(bytes);
+      try {
+        return utf8.decode(bytes);
+      } catch (_) {
+        // Not valid UTF-8 — keep original hex so Rust can hex-decode on sign.
+        return dataToSign;
+      }
     }
     return dataToSign;
   } catch (e) {

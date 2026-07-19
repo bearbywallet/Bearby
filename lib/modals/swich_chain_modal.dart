@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/swipe_button.dart';
-import 'package:bearby/config/walletconnect.dart';
-import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/services/walletconnect_service.dart';
@@ -200,40 +198,8 @@ class _SwitchChainNetworkContentState
                         await appState.refreshBalancesAndRates(
                           walletIndex: appState.selectedWalletIndex,
                         );
-                        // WalletConnect dApps need chainChanged + accounts on the new chain.
-                        final ch = appState.chain;
-                        final acc = appState.account;
-                        if (ch != null && acc != null) {
-                          final ns = ch.slip44 == kEthereumSlip44 ||
-                                  ch.slip44 == kZilliqaSlip44
-                              ? 'eip155'
-                              : ch.slip44 == kSolanaSlip44
-                                  ? 'solana'
-                                  : ch.slip44 == kTronSlip44
-                                      ? 'tron'
-                                      : ch.slip44 == kBitcoinlip44
-                                          ? 'bip122'
-                                          : null;
-                          if (ns != null) {
-                            final id = ch.chainId.toInt();
-                            final caip2 = ns == 'bip122'
-                                ? (kBtcCaip2ByChainId[id] ??
-                                    kBtcCaip2ByChainId[0]!)
-                                : ns == 'solana'
-                                    ? (kSolanaCaip2ByChainId[id] ??
-                                        'solana:${ch.chainId}')
-                                    : ns == 'eip155'
-                                        ? 'eip155:$id'
-                                        : '$ns:${ch.chainId}';
-                            await WalletConnectService.instance
-                                .onChainChanged(caip2: caip2);
-                            await WalletConnectService.instance
-                                .onAccountsChanged(
-                              address: acc.addr,
-                              caip2: caip2,
-                            );
-                          }
-                        }
+                        await WalletConnectService.instance
+                            .notifyActiveNetwork(appState);
                       } catch (e) {
                         debugPrint("selectAccountsChain: $e");
                       }

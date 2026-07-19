@@ -94,7 +94,9 @@ pub(crate) async fn sign_and_broadcast_one(
             zil_tx.chain_id = chain.config.chain_ids[1] as u16;
         }
         TransactionRequest::Ethereum((eth_tx, _)) => {
-            eth_tx.chain_id = Some(chain.config.chain_id());
+            if eth_tx.chain_id.is_none() {
+                eth_tx.chain_id = Some(chain.config.chain_id());
+            }
         }
         _ => {}
     }
@@ -298,7 +300,9 @@ pub async fn encode_tx_rlp(
                 chunks_bytes: Vec::new(),
             }),
             TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
-                tx_eth.chain_id = Some(chain.config.chain_id());
+                if tx_eth.chain_id.is_none() {
+                    tx_eth.chain_id = Some(chain.config.chain_id());
+                }
                 let derivation =
                     DerivationPath::with_index(slip44, (0, 0, account.account_type.value()));
                 let ledger_path = derivation.get_path().trim_start_matches("m/").to_string();
