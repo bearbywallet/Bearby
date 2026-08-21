@@ -7,7 +7,7 @@ import Foundation
 
 import app_links
 import device_info_plus
-import file_picker
+import file_picker_darwin
 import flutter_inappwebview_macos
 import local_auth_darwin
 import mobile_scanner
