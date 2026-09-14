@@ -76,3 +76,6 @@ build/
 
 flutter_*.png
 flutter_jank_metrics_*.json
+
+# rlm analysis sandbox cache
+.rlm/

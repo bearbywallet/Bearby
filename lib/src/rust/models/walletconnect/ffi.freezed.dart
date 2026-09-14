@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'ffi.dart';
@@ -9,6 +9,7 @@ part of 'ffi.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -342,7 +343,9 @@ class WcEventInfo_Proposal extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, field0);
+  int get hashCode {
+    return Object.hash(runtimeType, field0);
+  }
 
   @override
   String toString() {
@@ -406,7 +409,9 @@ class WcEventInfo_Request extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, field0);
+  int get hashCode {
+    return Object.hash(runtimeType, field0);
+  }
 
   @override
   String toString() {
@@ -472,7 +477,9 @@ class WcEventInfo_SessionSettled extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, topic);
+  int get hashCode {
+    return Object.hash(runtimeType, topic);
+  }
 
   @override
   String toString() {
@@ -541,7 +548,9 @@ class WcEventInfo_SessionDeleted extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, topic, message);
+  int get hashCode {
+    return Object.hash(runtimeType, topic, message);
+  }
 
   @override
   String toString() {
@@ -622,7 +631,9 @@ class WcEventInfo_SessionEvent extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, topic, chainId, name, data);
+  int get hashCode {
+    return Object.hash(runtimeType, topic, chainId, name, data);
+  }
 
   @override
   String toString() {
@@ -743,7 +754,9 @@ class WcEventInfo_Error extends WcEventInfo {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, message);
+  int get hashCode {
+    return Object.hash(runtimeType, message);
+  }
 
   @override
   String toString() {
