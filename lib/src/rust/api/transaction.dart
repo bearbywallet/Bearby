@@ -147,20 +147,6 @@ Future<TransactionRequestInfo> updateTxWithParams(
 TransactionRequestTron parseTronTransaction({required String json}) =>
     RustLib.instance.api.crateApiTransactionParseTronTransaction(json: json);
 
-/// Serialize a TransactionRequestTron back to JSON for dApp response.
-String tronTransactionToJson({required TransactionRequestTron tx}) =>
-    RustLib.instance.api.crateApiTransactionTronTransactionToJson(tx: tx);
-
-/// WalletConnect `tron_signTransaction` result built from the receipt of the
-/// transaction that was actually signed (raw_data may differ from the dApp's
-/// original if block ref was refreshed).
-String tronSignedTxToWcJson(
-        {required String rawDataHex,
-        required String txId,
-        required String signature}) =>
-    RustLib.instance.api.crateApiTransactionTronSignedTxToWcJson(
-        rawDataHex: rawDataHex, txId: txId, signature: signature);
-
 class Eip712Hashes {
   final Uint8List domainSeparator;
   final Uint8List hashStructMessage;

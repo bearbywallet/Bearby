@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'router.dart';
 import 'services/deep_link_service.dart';
-import 'services/walletconnect_service.dart';
 import 'state/app_state.dart';
 
 class BearbyApp extends StatefulWidget {
@@ -28,7 +27,6 @@ class _BearbyAppState extends State<BearbyApp> {
     super.initState();
     _router = createRouter(widget.appState, navigatorKey: _navKey);
     _deepLinkService.initialize(_router, widget.appState);
-    WalletConnectService.instance.navigatorKey = _navKey;
   }
 
   @override

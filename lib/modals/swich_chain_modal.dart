@@ -5,7 +5,6 @@ import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/swipe_button.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
-import 'package:bearby/services/walletconnect_service.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -198,8 +197,6 @@ class _SwitchChainNetworkContentState
                         await appState.refreshBalancesAndRates(
                           walletIndex: appState.selectedWalletIndex,
                         );
-                        await WalletConnectService.instance
-                            .notifyActiveNetwork(appState);
                       } catch (e) {
                         debugPrint("selectAccountsChain: $e");
                       }

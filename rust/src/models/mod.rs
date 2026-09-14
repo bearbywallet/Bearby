@@ -14,4 +14,3 @@ pub mod settings;
 pub mod stake;
 pub mod transactions;
 pub mod wallet;
-pub mod walletconnect;
