@@ -1,6 +1,5 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button.dart';
@@ -15,6 +14,7 @@ import 'package:bearby/components/image_cache.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -65,12 +65,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
   Future<void> _loadChains() async {
     try {
-      final String mainnetJsonData =
-          await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final String testnetJsonData =
-          await rootBundle.loadString('assets/chains/testnet-chains.json');
-      final (mainnetChains, _) = await getNetworks(
-          mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+      final (mainnetChains, _) = await loadBundledNetworks();
 
       final storedProviders = await getProviders();
 

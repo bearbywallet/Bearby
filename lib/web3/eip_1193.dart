@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -25,6 +24,7 @@ import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/web3/message.dart';
 import 'dart:developer' as dev;
 
@@ -1370,12 +1370,7 @@ class Web3EIP1193Handler {
 
         foundChain = chain;
       } else {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, _) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, _) = await loadBundledNetworks();
 
         if (mainnetChains.any((c) => c.chainId == chainId)) {
           final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
@@ -1549,12 +1544,7 @@ class Web3EIP1193Handler {
       }
 
       if (targetNetwork == null) {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, testnetChains) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, testnetChains) = await loadBundledNetworks();
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&

@@ -16,13 +16,13 @@ import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/src/rust/api/transaction.dart' as rust_api;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
 
@@ -701,12 +701,7 @@ class TronWeb3Handler {
       }
 
       if (targetNetwork == null) {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, testnetChains) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, testnetChains) = await loadBundledNetworks();
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&

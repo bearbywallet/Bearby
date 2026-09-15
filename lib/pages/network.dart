@@ -1,6 +1,5 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/smart_input.dart';
@@ -12,6 +11,7 @@ import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
@@ -90,14 +90,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
 
     try {
       final storedProviders = await getProviders();
-      final String mainnetJsonData =
-          await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final String testnetJsonData =
-          await rootBundle.loadString('assets/chains/testnet-chains.json');
-      final (mainnetChains, testnetChains) = await getNetworks(
-        mainnetJson: mainnetJsonData,
-        testnetJson: testnetJsonData,
-      );
+      final (mainnetChains, testnetChains) = await loadBundledNetworks();
 
       if (!mounted) return;
       setState(() {
