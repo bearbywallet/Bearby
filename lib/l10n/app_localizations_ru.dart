@@ -314,24 +314,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangePageTabBuySell => 'Купить/Продать';
 
   @override
-  String get whitebirdOrdersTitle => 'Открытые ордера';
-
-  @override
-  String get whitebirdOrdersEmpty => 'Нет открытых ордеров WhiteBird';
-
-  @override
-  String get whitebirdOrdersComplete => 'Завершить оплату';
-
-  @override
-  String get whitebirdOrdersCancel => 'Отменить ордер';
-
-  @override
-  String get whitebirdOrdersExpires => 'истекает';
-
-  @override
-  String get whitebirdOrdersWrongNetwork => 'Переключитесь на сеть ордера, чтобы завершить оплату';
-
-  @override
   String get exchangeSettingsPriceProtection => 'Защита цены';
 
   @override

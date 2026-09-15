@@ -162,7 +162,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
         plunderSwap: (_) => false,
         zilSwap: (_) => false,
         sunSwap: (_) => false,
-        whiteBird: (_) => false,
       );
 
   // Derived from the two assets — no stored duplication.

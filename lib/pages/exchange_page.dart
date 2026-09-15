@@ -13,23 +13,13 @@ import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
-import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/exchange_confirm.dart';
 import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/modals/select_exchange_token.dart';
 import 'package:bearby/modals/swap_settings.dart';
-import 'package:bearby/modals/transfer.dart';
-import 'package:bearby/modals/whitebird_orders_modal.dart';
-import 'package:bearby/pages/whitebird_sdk_page.dart';
 import 'package:bearby/router.dart';
-import 'package:bearby/services/whitebird_orders.dart';
-import 'package:bearby/services/whitebird_session.dart';
-import 'package:bearby/src/rust/api/exchange/whitebird.dart';
-import 'package:bearby/src/rust/api/transaction.dart';
 import 'package:bearby/src/rust/models/exchange.dart';
-import 'package:bearby/src/rust/models/exchange/whitebird.dart';
-import 'package:bearby/src/rust/models/exchange/whitebird/orders.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/state/exchange_state.dart';
@@ -59,8 +49,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   String? _recipientOverride;
   bool _firstFrameDone = false;
   bool _wasVisible = false;
-  List<WhiteBirdOpenOrder> _openOrders = const [];
-  bool _whiteBirdFlowActive = false;
 
   @override
   void initState() {
@@ -136,7 +124,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   Future<void> _bootstrap({ExchangeAsset? initialFrom}) {
     final walletIndex = _appState.selectedWalletIndexOrNull;
     if (walletIndex == null) return Future.value();
-    unawaited(_refreshOpenOrders());
     return _exchangeState.bootstrap(
       walletIndex: walletIndex,
       accountIndex: _appState.wallet?.selectedAccount ?? BigInt.zero,
@@ -145,38 +132,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  bool get _isTestnet => _appState.chain?.testnet ?? true;
-
-  /// Open PROCESSING WhiteBird orders — fetched only when a session exists.
-  /// Local dismissal hides only non-actionable orders; a sell awaiting its
-  /// deposit is WhiteBird's single active order and always stays visible.
-  Future<List<WhiteBirdOpenOrder>> _fetchOpenOrders() async {
-    final session = WhiteBirdSession(_appState.storage);
-    await session.ensureLoaded();
-    if (!session.hasSession) return const [];
-    final externalId = await session.ensureExternalClientId();
-    final orders = await whitebirdOpenOrders(
-      isTestnet: _isTestnet,
-      externalClientId: externalId,
-      clientId: session.clientId,
-    );
-    final learnedClientId =
-        orders.where((o) => o.clientId.isNotEmpty).firstOrNull?.clientId;
-    if (learnedClientId != null) await session.saveClientId(learnedClientId);
-    final dismissed = session.dismissedOrderIds;
-    return orders
-        .where((o) => o.awaitingDeposit || !dismissed.contains(o.orderId))
-        .toList(growable: false);
-  }
-
-  Future<void> _refreshOpenOrders() async {
-    try {
-      final orders = await _fetchOpenOrders();
-      if (mounted) setState(() => _openOrders = orders);
-    } catch (e) {
-      debugPrint('[ExchangePage] open orders fetch failed: $e');
-    }
-  }
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
@@ -258,16 +213,11 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     if (_amount.endsWith('.')) return false;
     final amountWei = toDecimalsWei(_amount, from.token.decimals);
     if (amountWei <= BigInt.zero) return false;
-    // Fiat buy: the user pays off-wallet inside the WhiteBird SDK — no balance gate.
-    if (_isFiatAsset(from)) return true;
     final balance = BigInt.tryParse(
             from.token.balances[_appState.accountBalanceKey] ?? '') ??
         BigInt.zero;
     return amountWei <= balance;
   }
-
-  static bool _isFiatAsset(ExchangeAsset asset) =>
-      asset.providers.any((p) => p.whiteBirdMeta?.isFiat ?? false);
 
   void _handleSwap(ExchangeState state) {
     if (!_canSwap(state)) return;
@@ -275,26 +225,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final to = state.toAsset;
     final provider = state.selectedProvider;
     if (from == null || to == null || provider == null) return;
-
-    final wbMeta = provider.whiteBirdMeta;
-    if (wbMeta != null) {
-      unawaited(_handleWhiteBirdSwap(from, to, wbMeta));
-      return;
-    }
-
-    final supported = provider.whenOrNull(
-          relay: (_) => true,
-          uniswap: (_) => true,
-          pancakeSwap: (_) => true,
-          plunderSwap: (_) => true,
-          zilSwap: (_) => true,
-          sunSwap: (_) => true,
-        ) ??
-        false;
-    if (!supported) {
-      _showError('Unsupported provider');
-      return;
-    }
 
     final defaultRecipient = provider.common.accountAddr;
     final destination = (provider.supportsCustomRecipient && _recipientOverride != null)
@@ -313,267 +243,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         if (mounted) context.go(AppRoutes.history);
       },
       onDismiss: () => _btnController.reset(),
-    );
-  }
-
-  /// Fiat↔crypto order via the WhiteBird SDK.
-  ///
-  /// One webview covers everything: the session is created on the Bearby
-  /// proxy first (no user tokens needed), then the SDK handles login/KYC if
-  /// required and continues straight into the exchange. Sells intercept
-  /// `onOrderCreated` to run the wallet transfer confirm on top of the SDK's
-  /// deposit screen; buys complete fully inside the SDK.
-  Future<void> _handleWhiteBirdSwap(
-    ExchangeAsset from,
-    ExchangeAsset to,
-    WhiteBirdMeta fromMeta,
-  ) async {
-    // The flow awaits network before any UI blocks taps — a second press
-    // would push a second SDK page (and a second transfer confirm).
-    if (_whiteBirdFlowActive) return;
-    _whiteBirdFlowActive = true;
-    try {
-      final toMeta =
-          to.providers.map((p) => p.whiteBirdMeta).nonNulls.firstOrNull;
-      if (toMeta == null) {
-        _showError('WhiteBird route is missing on the target asset');
-        return;
-      }
-
-      final session = WhiteBirdSession(_appState.storage);
-      await session.ensureLoaded();
-      final externalId = await session.ensureExternalClientId();
-
-      // A sell still waiting for its deposit blocks a new order — WhiteBird
-      // keeps one active order per client and the SDK resumes it (without
-      // firing onOrderCreated) instead of creating a fresh one. Route the
-      // user to the open-orders modal to finish it.
-      final open = await _fetchOpenOrders();
-      if (mounted) setState(() => _openOrders = open);
-      final awaiting =
-          open.where((o) => o.awaitingDeposit).toList(growable: false);
-      if (awaiting.isNotEmpty) {
-        if (mounted) _showOrdersModal(awaiting);
-        return;
-      }
-
-      final isSell = !fromMeta.isFiat;
-      final cryptoMeta = isSell ? fromMeta : toMeta;
-      final amountHuman = _amount;
-      final info = await whitebirdCreateSession(
-        isTestnet: _isTestnet,
-        fromCode: fromMeta.assetCode,
-        toCode: toMeta.assetCode,
-        fromAmount: amountHuman,
-        destinationCryptoAddress: cryptoMeta.common.accountAddr,
-        externalClientId: externalId,
-      );
-      if (!mounted) return;
-
-      final done = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (_) => WhiteBirdSdkPage(
-            isTestnet: _isTestnet,
-            externalClientId: externalId,
-            clientId: session.clientId,
-            accessToken: session.accessToken,
-            refreshToken: session.refreshToken,
-            sessionId: info.sessionId,
-            currencyFrom: fromMeta.assetCode,
-            currencyTo: toMeta.assetCode,
-            currencyAmount: amountHuman,
-            cryptoWallet: isSell ? null : cryptoMeta.common.accountAddr,
-            // The order's own asset/amount win: WhiteBird may have resumed an
-            // older active order whose values differ from the typed ones.
-            onDepositReady: isSell
-                ? (deposit) => _confirmDepositTransfer(
-                      (deposit.fromAsset.isNotEmpty
-                              ? _assetForWbCode(deposit.fromAsset)
-                              : null) ??
-                          from,
-                      deposit.amountHuman.isNotEmpty
-                          ? deposit.amountHuman
-                          : amountHuman,
-                      deposit.depositAddress,
-                    )
-                : null,
-          ),
-        ),
-      );
-
-      unawaited(_refreshOpenOrders());
-      if (done == true && mounted) context.go(AppRoutes.history);
-    } catch (e) {
-      debugPrint('[ExchangePage] whitebird swap failed: $e');
-      if (mounted) _showError(e.toString());
-    } finally {
-      _whiteBirdFlowActive = false;
-      _btnController.reset();
-    }
-  }
-
-  /// Wallet transfer confirm for a WhiteBird sell deposit. Returns `true`
-  /// once the transaction is signed and broadcast.
-  Future<bool> _confirmDepositTransfer(
-    ExchangeAsset from,
-    String amountHuman,
-    String depositAddress,
-  ) async {
-    final wallet = _appState.wallet;
-    if (wallet == null || depositAddress.isEmpty) return false;
-    final token = from.token;
-    final tx = await createTokenTransfer(
-      params: TokenTransferParamsInfo(
-        walletIndex: _appState.selectedWalletIndex,
-        accountIndex: wallet.selectedAccount,
-        token: token,
-        amount: toDecimalsWei(amountHuman, token.decimals).toString(),
-        recipient: depositAddress,
-        icon: processTokenLogo(
-          token: token,
-          shortName: _appState.chain?.shortName ?? '',
-          theme: _appState.currentTheme.value,
-        ),
-      ),
-    );
-    if (!mounted) return false;
-
-    final completer = Completer<bool>();
-    showConfirmTransactionModal(
-      context: context,
-      tx: tx,
-      to: depositAddress,
-      amount: amountHuman,
-      token: token,
-      onConfirm: (_) {
-        if (!completer.isCompleted) completer.complete(true);
-        // The confirm sheet never pops itself — close it so the SDK behind
-        // it resurfaces and the user can watch the order progress.
-        Navigator.of(context).pop();
-      },
-      onDismiss: () {
-        if (!completer.isCompleted) completer.complete(false);
-      },
-    );
-    return completer.future;
-  }
-
-  ExchangeAsset? _assetForWbCode(String code) {
-    for (final asset in _exchangeState.payAssets) {
-      final meta =
-          asset.providers.map((p) => p.whiteBirdMeta).nonNulls.firstOrNull;
-      if (meta != null && !meta.isFiat && meta.assetCode == code) return asset;
-    }
-    return null;
-  }
-
-  /// Order amounts arrive as human decimals — normalize with a fixed display
-  /// precision and render through the standard formatter.
-  String _formatWbAmount(String amountHuman, String code) {
-    const displayDecimals = 6;
-    final (formatted, _) = formatingAmount(
-      amount: toDecimalsWei(amountHuman, displayDecimals),
-      symbol: code,
-      decimals: displayDecimals,
-      rate: 0,
-      appState: _appState,
-    );
-    return formatted;
-  }
-
-  /// "Complete" action from the open-orders modal: send the crypto the order
-  /// is still waiting for, then jump to history.
-  Future<bool> _completeOpenOrder(WhiteBirdOpenOrder order) async {
-    final l10n = AppLocalizations.of(context);
-    final deposit = order.depositAddress;
-    if (deposit == null || deposit.isEmpty) return false;
-    final asset = _assetForWbCode(order.fromAsset);
-    if (asset == null) {
-      if (l10n != null) _showError(l10n.whitebirdOrdersWrongNetwork);
-      return false;
-    }
-    try {
-      final done =
-          await _confirmDepositTransfer(asset, order.fromAmount, deposit);
-      if (done) {
-        unawaited(_refreshOpenOrders());
-        if (mounted) context.go(AppRoutes.history);
-      }
-      return done;
-    } catch (e) {
-      debugPrint('[ExchangePage] complete order failed: $e');
-      if (mounted) _showError(e.toString());
-      return false;
-    }
-  }
-
-  /// Close an order card locally: WhiteBird has no cancel API, the order
-  /// simply expires server-side — we stop showing it.
-  Future<List<WhiteBirdOpenOrder>> _dismissOpenOrder(
-      WhiteBirdOpenOrder order) async {
-    final session = WhiteBirdSession(_appState.storage);
-    await session.dismissOrder(order.orderId);
-    final orders = await _fetchOpenOrders();
-    if (mounted) setState(() => _openOrders = orders);
-    return orders;
-  }
-
-  /// Cancel the order server-side with the user's WhiteBird JWT — the same
-  /// call the SDK's own cancel button makes. Returns the refreshed list.
-  Future<List<WhiteBirdOpenOrder>> _cancelOpenOrder(
-      WhiteBirdOpenOrder order) async {
-    final session = WhiteBirdSession(_appState.storage);
-    await session.ensureLoaded();
-    final token = session.accessToken;
-    if (token == null || token.isEmpty) {
-      return _openOrders;
-    }
-    try {
-      await whitebirdRejectOrder(
-        isTestnet: _isTestnet,
-        orderId: order.orderId,
-        accessToken: token,
-      );
-    } catch (e) {
-      debugPrint('[ExchangePage] order reject failed: $e');
-      if (mounted) _showError(e.toString());
-    }
-    final orders = await _fetchOpenOrders();
-    if (mounted) setState(() => _openOrders = orders);
-    return orders;
-  }
-
-  void _showOrdersModal([List<WhiteBirdOpenOrder>? orders]) {
-    final items = orders ?? _openOrders;
-    if (items.isEmpty) return;
-    showWhiteBirdOrdersModal(
-      context: context,
-      orders: items,
-      onComplete: _completeOpenOrder,
-      onDismiss: _dismissOpenOrder,
-      onCancel: _cancelOpenOrder,
-      formatAmount: _formatWbAmount,
-    );
-  }
-
-  void _showError(String message) {
-    final theme = _appState.currentTheme;
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: theme.cardBackground,
-        title: Text('Error',
-            style: theme.titleMedium.copyWith(color: theme.textPrimary)),
-        content:
-            Text(message, style: theme.bodyLarge.copyWith(color: theme.danger)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('OK',
-                style: theme.button.copyWith(color: theme.primaryPurple)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -697,7 +366,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (_openOrders.isNotEmpty) _buildOrdersButton(theme),
           const Spacer(),
           GestureDetector(
             onTap: () {
@@ -720,51 +388,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Top-left open-orders icon with a badge counting PROCESSING WhiteBird orders.
-  Widget _buildOrdersButton(AppTheme theme) {
-    final count = _openOrders.length;
-    return GestureDetector(
-      onTap: _showOrdersModal,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AppIconView(
-              icon: AppIcon.history,
-              size: 22,
-              color: count > 0 ? theme.primaryPurple : theme.textSecondary,
-            ),
-            if (count > 0)
-              Positioned(
-                right: -6,
-                top: -6,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: theme.danger,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  constraints: const BoxConstraints(minWidth: 16),
-                  child: Text(
-                    '$count',
-                    textAlign: TextAlign.center,
-                    style: theme.caption.copyWith(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }

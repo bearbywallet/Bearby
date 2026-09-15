@@ -9,7 +9,6 @@ import 'exchange/plunderswap.dart';
 import 'exchange/relay.dart';
 import 'exchange/sunswap.dart';
 import 'exchange/uniswap.dart';
-import 'exchange/whitebird.dart';
 import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
@@ -62,9 +61,6 @@ sealed class ExchangeProvider with _$ExchangeProvider {
   const factory ExchangeProvider.sunSwap(
     SunSwapMeta field0,
   ) = ExchangeProvider_SunSwap;
-  const factory ExchangeProvider.whiteBird(
-    WhiteBirdMeta field0,
-  ) = ExchangeProvider_WhiteBird;
 }
 
 /// Display metadata composed on the Dart side and threaded into every tx built for a swap.

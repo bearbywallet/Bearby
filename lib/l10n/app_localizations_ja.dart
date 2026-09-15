@@ -311,24 +311,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangePageTabBuySell => '売買';
 
   @override
-  String get whitebirdOrdersTitle => '未完了の注文';
-
-  @override
-  String get whitebirdOrdersEmpty => '未完了のWhiteBird注文はありません';
-
-  @override
-  String get whitebirdOrdersComplete => '支払いを完了';
-
-  @override
-  String get whitebirdOrdersCancel => '注文をキャンセル';
-
-  @override
-  String get whitebirdOrdersExpires => '期限';
-
-  @override
-  String get whitebirdOrdersWrongNetwork => '支払いを完了するには注文のネットワークに切り替えてください';
-
-  @override
   String get exchangeSettingsPriceProtection => '価格保護';
 
   @override
