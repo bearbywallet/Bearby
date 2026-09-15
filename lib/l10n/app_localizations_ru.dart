@@ -12,34 +12,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'Bearby Кошелек';
 
   @override
-  String get initialPagerestoreZilPay => 'Восстановить ZilPay 1.0!';
-
-  @override
   String get initialPagegetStarted => 'Начать';
-
-  @override
-  String get restoreRKStorageTitle => 'Перенос ZilPay 1.0 в 2.0';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'Аккаунты для переноса в ZilPay 2.0. Введите пароль.';
-
-  @override
-  String get restoreRKStoragePasswordHint => 'Пароль';
-
-  @override
-  String get restoreRKStorageEnterPassword => 'Введите пароль';
-
-  @override
-  String get restoreRKStorageErrorPrefix => 'Ошибка:';
-
-  @override
-  String get restoreRKStorageRestoreButton => 'Восстановить';
-
-  @override
-  String get restoreRKStorageSkipButton => 'Пропустить';
-
-  @override
-  String get accountItemBalanceLabel => 'Баланс:';
 
   @override
   String get sendTokenPageTitle => 'Отправить';
@@ -139,9 +112,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get walletPageDeleteWallet => 'Удалить кошелек';
-
-  @override
-  String get walletPageBiometricReason => 'Включить биометрическую аутентификацию';
 
   @override
   String get networkPageTitle => '';
@@ -272,22 +242,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get secretPhraseGeneratorPageNextButton => 'Далее';
 
   @override
-  String get homePageErrorTitle => 'Нет сигнала';
-
-  @override
   String get homePageReceiveButton => 'Получить';
 
   @override
   String get homePageSendButton => 'Отправить';
-
-  @override
-  String get homePageExchangeButton => 'Обмен';
-
-  @override
-  String get exchangePageTitle => 'Обмен';
-
-  @override
-  String get exchangePagePay => 'Вы платите';
 
   @override
   String get exchangePageGet => 'Вы получаете';
@@ -299,19 +257,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exchangePageConfirm => 'Подтвердить';
 
   @override
-  String get exchangePageComingSoon => 'Скоро';
-
-  @override
   String get exchangePageNoAssets => 'В этой сети нет активов для обмена';
 
   @override
   String get exchangePageTabSwap => 'Обмен';
-
-  @override
-  String get exchangePageTabLimit => 'Лимит';
-
-  @override
-  String get exchangePageTabBuySell => 'Купить/Продать';
 
   @override
   String get exchangeSettingsPriceProtection => 'Защита цены';
@@ -401,19 +350,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revealSecretKeySubmitButton => 'Отправить';
 
   @override
-  String get revealSecretKeyDoneButton => 'Готово';
-
-  @override
-  String get revealSecretKeyScamAlertTitle => 'ВНИМАНИЕ МОШЕННИЧЕСТВО';
-
-  @override
   String get revealSecretKeyScamAlertMessage => 'Никогда не делитесь своим секретным ключом с кем-либо. Никогда не вводите его на каких-либо сайтах.';
-
-  @override
-  String get revealSecretKeySecurityTimer => 'Таймер безопасности';
-
-  @override
-  String get revealSecretKeyRevealAfter => 'Ваш секретный ключ будет раскрыт через:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => 'Поиск';
@@ -428,15 +365,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => 'Далее';
-
-  @override
-  String get setupNetworkSettingsPageChainIdLabel => 'ID цепи:';
-
-  @override
-  String get setupNetworkSettingsPageTokenLabel => 'Токен:';
-
-  @override
-  String get setupNetworkSettingsPageExplorerLabel => 'Обозреватель:';
 
   @override
   String get appearanceSettingsPageTitle => 'Настройки внешнего вида';
@@ -475,9 +403,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appearanceSettingsPageLightModeDescription => 'Всегда использовать светлую тему, независимо от настроек устройства.';
 
   @override
-  String get loginPageBiometricReason => 'Пожалуйста, пройдите аутентификацию';
-
-  @override
   String loginPageWalletTitle(Object index) {
     return 'Кошелек $index';
   }
@@ -504,9 +429,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => 'Приватный ключ';
 
   @override
-  String get secretKeyRestorePageBackupLabel => 'Я сделал резервную копию моего секретного ключа';
-
-  @override
   String get secretKeyRestorePageNextButton => 'Далее';
 
   @override
@@ -527,20 +449,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqa Legacy';
 
   @override
-  String get addAccountPageBiometricReason => 'Пройдите аутентификацию для создания нового аккаунта';
-
-  @override
-  String addAccountPageBiometricError(Object error) {
-    return 'Ошибка биометрической аутентификации: $error';
-  }
-
-  @override
   String addAccountPageIndexExists(Object index) {
     return 'Аккаунт с индексом $index уже существует';
   }
-
-  @override
-  String get addAccountPageBiometricFailed => 'Биометрическая аутентификация не удалась';
 
   @override
   String addAccountPageCreateFailed(Object error) {
@@ -629,16 +540,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => 'неверный пароль, ошибка:';
 
   @override
-  String get revealSecretPhraseRevealAfter => 'Ваша секретная фраза будет раскрыта через:';
-
-  @override
   String get revealSecretPhraseSubmitButton => 'Отправить';
 
   @override
   String get revealSecretPhraseDoneButton => 'Готово';
-
-  @override
-  String get revealSecretPhraseScamAlertTitle => 'ВНИМАНИЕ МОШЕННИЧЕСТВО';
 
   @override
   String get revealSecretPhraseScamAlertDescription => 'Никогда не делитесь своей секретной фразой с кем-либо. Никогда не вводите её на каких-либо сайтах.';
@@ -774,9 +679,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get passwordSetupPageCreateButton => 'Создать пароль';
-
-  @override
-  String get passwordSetupPageAuthReason => 'Пожалуйста, пройдите аутентификацию для быстрого доступа';
 
   @override
   String get passwordSetupPageSeedType => 'Seed';
@@ -920,9 +822,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get currencyConversionEngineTitle => 'Источник курсов валют';
 
   @override
-  String get currencyConversionEngineDescription => 'Источник получения курсов валют';
-
-  @override
   String get currencyConversionEngineSelectorTitle => 'Выбрать источник курсов валют';
 
   @override
@@ -1001,9 +900,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get argonSettingsModalContentSecretHint => 'Введите секрет (опционально)';
 
   @override
-  String get argonSettingsModalContentConfirmButton => 'Подтвердить';
-
-  @override
   String get confirmTransactionContentPasswordHint => 'Пароль';
 
   @override
@@ -1016,13 +912,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => 'Нет активного аккаунта';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer => 'Не удалось загрузить детали перевода';
-
-  @override
   String get confirmTransactionAdvancedGasButtonText => 'Расширенные';
-
-  @override
-  String get authReason => 'Пожалуйста, пройдите аутентификацию';
 
   @override
   String get addChainModalContentWarning => 'Остерегайтесь сетевых мошенничеств и рисков безопасности.';
@@ -1068,9 +958,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tokenSelectModalContentSearchHint => 'Поиск';
-
-  @override
-  String get signMessageModalContentAuthReason => 'Пожалуйста, авторизуйтесь для подписи сообщения';
 
   @override
   String signMessageModalContentFailedToSign(Object error) {
@@ -1195,9 +1082,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmPasswordModalButton => 'Подтвердить';
 
   @override
-  String get qrScannerModalContentTitle => 'Сканировать';
-
-  @override
   String get qrScannerModalContentCameraInitError => 'Ошибка инициализации камеры:';
 
   @override
@@ -1237,9 +1121,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chainInfoModalContentFallbackEnabledLabel => 'Включен резервный режим';
 
   @override
-  String get chainInfoModalContentDecimalsLabel => 'Десятичные знаки';
-
-  @override
   String get chainInfoModalContentRpcNodesTitle => 'RPC-узлы';
 
   @override
@@ -1259,12 +1140,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get switchChainNetworkContentButton => 'Переключить сеть';
-
-  @override
-  String get switchChainNetworkContentTestnetLabel => 'Тестовая сеть';
-
-  @override
-  String get switchChainNetworkContentIdLabel => 'ID:';
 
   @override
   String get watchAssetModalContentTitle => 'Добавить предложенный токен';
@@ -1671,13 +1546,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get unstakeButton => 'Отозвать';
 
   @override
-  String get aprLabel => 'APR';
-
-  @override
   String get commissionLabel => 'Комиссия';
-
-  @override
-  String get stakedAmount => 'Заблокировано';
 
   @override
   String get rewardsAvailable => 'Награды';
@@ -1692,9 +1561,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get claimableIn => 'Доступно через';
 
   @override
-  String get blocks => 'блоков';
-
-  @override
   String get unbondingPeriod => 'Период отвязки';
 
   @override
@@ -1702,9 +1568,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get version => 'Версия';
-
-  @override
-  String get rewardsProgressTitle => 'Прогресс награждения';
 
   @override
   String get ledgerConnectPageTitle => 'Подключить Ledger';
@@ -1776,9 +1639,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get durationNotAvailable => 'Н/Д';
-
-  @override
-  String get nodes => 'узлы';
 
   @override
   String get manageTokensPageTitle => 'Токены';
@@ -1907,33 +1767,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get web3ErrorChainNotAdded => 'Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain.';
 
   @override
-  String get bipPurposeSetupPageTitle => 'Биткоин Адрес';
-
-  @override
-  String get bip86Name => 'BIP86 (Taproot)';
-
-  @override
-  String get bip86Description => 'P2TR - Адреса начинаются с bc1p';
-
-  @override
-  String get bip84Name => 'BIP84 (Native SegWit)';
-
-  @override
-  String get bip84Description => 'P2WPKH - Адреса начинаются с bc1q';
-
-  @override
-  String get bip49Name => 'BIP49 (SegWit)';
-
-  @override
-  String get bip49Description => 'P2WPKH-nested-in-P2SH - Адреса начинаются с 3';
-
-  @override
-  String get bip44Name => 'BIP44 (Legacy)';
-
-  @override
-  String get bip44Description => 'P2PKH - Адреса начинаются с 1';
-
-  @override
   String get addNetworkPageTitle => 'Добавить сеть';
 
   @override
@@ -1968,15 +1801,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get addNetworkPageErrorRequired => 'Заполните все обязательные поля';
-
-  @override
-  String get addNetworkPageErrorInvalidRpc => 'Введите корректный RPC URL';
-
-  @override
-  String get addNetworkPageErrorInvalidChainId => 'Введите корректный ID цепочки';
-
-  @override
-  String get addNetworkPageSuccess => 'Сеть успешно добавлена';
 
   @override
   String get qrCodeUnrecognizedError => 'QR-код не распознан. Используйте поддерживаемый формат.';

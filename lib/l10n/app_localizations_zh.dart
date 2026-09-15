@@ -12,34 +12,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appTitle => 'Bearby 钱包';
 
   @override
-  String get initialPagerestoreZilPay => '恢复 ZilPay 1.0！';
-
-  @override
   String get initialPagegetStarted => '开始使用';
-
-  @override
-  String get restoreRKStorageTitle => '将 ZilPay 1.0 迁移至 2.0';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => '要迁移到 ZilPay 2.0 的账户。请输入密码。';
-
-  @override
-  String get restoreRKStoragePasswordHint => '密码';
-
-  @override
-  String get restoreRKStorageEnterPassword => '请输入密码';
-
-  @override
-  String get restoreRKStorageErrorPrefix => '错误：';
-
-  @override
-  String get restoreRKStorageRestoreButton => '恢复';
-
-  @override
-  String get restoreRKStorageSkipButton => '跳过';
-
-  @override
-  String get accountItemBalanceLabel => '余额：';
 
   @override
   String get sendTokenPageTitle => '发送';
@@ -139,9 +112,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get walletPageDeleteWallet => '删除钱包';
-
-  @override
-  String get walletPageBiometricReason => '启用生物识别认证';
 
   @override
   String get networkPageTitle => '';
@@ -269,22 +239,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretPhraseGeneratorPageNextButton => '下一步';
 
   @override
-  String get homePageErrorTitle => '无信号';
-
-  @override
   String get homePageReceiveButton => '接收';
 
   @override
   String get homePageSendButton => '发送';
-
-  @override
-  String get homePageExchangeButton => '兑换';
-
-  @override
-  String get exchangePageTitle => '兑换';
-
-  @override
-  String get exchangePagePay => '支付';
 
   @override
   String get exchangePageGet => '获得';
@@ -296,19 +254,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exchangePageConfirm => '确认';
 
   @override
-  String get exchangePageComingSoon => '即将';
-
-  @override
   String get exchangePageNoAssets => '此网络上没有可兑换的资产';
 
   @override
   String get exchangePageTabSwap => '兑换';
-
-  @override
-  String get exchangePageTabLimit => '限价';
-
-  @override
-  String get exchangePageTabBuySell => '买卖';
 
   @override
   String get exchangeSettingsPriceProtection => '价格保护';
@@ -398,19 +347,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretKeySubmitButton => '提交';
 
   @override
-  String get revealSecretKeyDoneButton => '完成';
-
-  @override
-  String get revealSecretKeyScamAlertTitle => '诈骗警告';
-
-  @override
   String get revealSecretKeyScamAlertMessage => '绝不与任何人分享您的私钥。绝不在任何网站上输入。';
-
-  @override
-  String get revealSecretKeySecurityTimer => '安全计时器';
-
-  @override
-  String get revealSecretKeyRevealAfter => '您的私钥将在以下时间后显示:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => '搜索';
@@ -425,15 +362,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '下一步';
-
-  @override
-  String get setupNetworkSettingsPageChainIdLabel => '链 ID：';
-
-  @override
-  String get setupNetworkSettingsPageTokenLabel => '代币：';
-
-  @override
-  String get setupNetworkSettingsPageExplorerLabel => '浏览器：';
 
   @override
   String get appearanceSettingsPageTitle => '外观设置';
@@ -472,9 +400,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceSettingsPageLightModeDescription => '始终启用浅色主题，无论设备设置如何。';
 
   @override
-  String get loginPageBiometricReason => '请进行认证';
-
-  @override
   String loginPageWalletTitle(Object index) {
     return '钱包 $index';
   }
@@ -501,9 +426,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => '私钥';
 
   @override
-  String get secretKeyRestorePageBackupLabel => '我已备份我的私钥';
-
-  @override
   String get secretKeyRestorePageNextButton => '下一步';
 
   @override
@@ -524,20 +446,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqa 传统';
 
   @override
-  String get addAccountPageBiometricReason => '认证以创建新账户';
-
-  @override
-  String addAccountPageBiometricError(Object error) {
-    return '生物识别认证失败：$error';
-  }
-
-  @override
   String addAccountPageIndexExists(Object index) {
     return '索引为 $index 的账户已存在';
   }
-
-  @override
-  String get addAccountPageBiometricFailed => '生物识别认证失败';
 
   @override
   String addAccountPageCreateFailed(Object error) {
@@ -626,16 +537,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => '密码无效，错误：';
 
   @override
-  String get revealSecretPhraseRevealAfter => '您的助记词将在以下时间后显示:';
-
-  @override
   String get revealSecretPhraseSubmitButton => '提交';
 
   @override
   String get revealSecretPhraseDoneButton => '完成';
-
-  @override
-  String get revealSecretPhraseScamAlertTitle => '诈骗警告';
 
   @override
   String get revealSecretPhraseScamAlertDescription => '绝不与任何人分享您的助记词。绝不在任何网站上输入。';
@@ -771,9 +676,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passwordSetupPageCreateButton => '创建密码';
-
-  @override
-  String get passwordSetupPageAuthReason => '请认证以启用快速访问';
 
   @override
   String get passwordSetupPageSeedType => '种子';
@@ -917,9 +819,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currencyConversionEngineTitle => '货币引擎';
 
   @override
-  String get currencyConversionEngineDescription => '获取货币汇率的引擎';
-
-  @override
   String get currencyConversionEngineSelectorTitle => '选择货币引擎';
 
   @override
@@ -998,9 +897,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get argonSettingsModalContentSecretHint => '输入密钥（可选）';
 
   @override
-  String get argonSettingsModalContentConfirmButton => '确认';
-
-  @override
   String get confirmTransactionContentPasswordHint => '密码';
 
   @override
@@ -1013,13 +909,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => '无活动账户';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer => '加载转账详情失败';
-
-  @override
   String get confirmTransactionAdvancedGasButtonText => '高级';
-
-  @override
-  String get authReason => '请进行认证';
 
   @override
   String get addChainModalContentWarning => '警惕网络诈骗和安全风险。';
@@ -1065,9 +955,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tokenSelectModalContentSearchHint => '搜索';
-
-  @override
-  String get signMessageModalContentAuthReason => '请进行身份验证以签署消息';
 
   @override
   String signMessageModalContentFailedToSign(Object error) {
@@ -1192,9 +1079,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmPasswordModalButton => '确认';
 
   @override
-  String get qrScannerModalContentTitle => '扫描';
-
-  @override
   String get qrScannerModalContentCameraInitError => '相机初始化错误：';
 
   @override
@@ -1234,9 +1118,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chainInfoModalContentFallbackEnabledLabel => '启用回退';
 
   @override
-  String get chainInfoModalContentDecimalsLabel => '小数位';
-
-  @override
   String get chainInfoModalContentRpcNodesTitle => 'RPC 节点';
 
   @override
@@ -1256,12 +1137,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get switchChainNetworkContentButton => '切换网络';
-
-  @override
-  String get switchChainNetworkContentTestnetLabel => '测试网';
-
-  @override
-  String get switchChainNetworkContentIdLabel => 'ID：';
 
   @override
   String get watchAssetModalContentTitle => '添加建议的代币';
@@ -1662,13 +1537,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unstakeButton => '取消质押';
 
   @override
-  String get aprLabel => '年化率';
-
-  @override
   String get commissionLabel => '佣金';
-
-  @override
-  String get stakedAmount => '已质押';
 
   @override
   String get rewardsAvailable => '可用奖励';
@@ -1683,9 +1552,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get claimableIn => '可领取于';
 
   @override
-  String get blocks => '区块';
-
-  @override
   String get unbondingPeriod => '解绑期';
 
   @override
@@ -1693,9 +1559,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get version => '版本';
-
-  @override
-  String get rewardsProgressTitle => '收益进度';
 
   @override
   String get ledgerConnectPageTitle => '连接 Ledger';
@@ -1767,9 +1630,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get durationNotAvailable => '不适用';
-
-  @override
-  String get nodes => '节点';
 
   @override
   String get manageTokensPageTitle => '代币';
@@ -1898,33 +1758,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get web3ErrorChainNotAdded => '请求的链尚未添加。请先使用 wallet_addEthereumChain。';
 
   @override
-  String get bipPurposeSetupPageTitle => '比特币地址';
-
-  @override
-  String get bip86Name => 'BIP86 (Taproot)';
-
-  @override
-  String get bip86Description => 'P2TR - 以bc1p开头的地址';
-
-  @override
-  String get bip84Name => 'BIP84 (Native SegWit)';
-
-  @override
-  String get bip84Description => 'P2WPKH - 以bc1q开头的地址';
-
-  @override
-  String get bip49Name => 'BIP49 (SegWit)';
-
-  @override
-  String get bip49Description => 'P2WPKH-nested-in-P2SH - 以3开头的地址';
-
-  @override
-  String get bip44Name => 'BIP44 (Legacy)';
-
-  @override
-  String get bip44Description => 'P2PKH - 以1开头的地址';
-
-  @override
   String get addNetworkPageTitle => '添加网络';
 
   @override
@@ -1959,15 +1792,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addNetworkPageErrorRequired => '请填写所有必填字段';
-
-  @override
-  String get addNetworkPageErrorInvalidRpc => '请输入有效的 RPC URL';
-
-  @override
-  String get addNetworkPageErrorInvalidChainId => '请输入有效的链 ID';
-
-  @override
-  String get addNetworkPageSuccess => '网络添加成功';
 
   @override
   String get qrCodeUnrecognizedError => '无法识别二维码，请使用支持的格式。';

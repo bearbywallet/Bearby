@@ -12,34 +12,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appTitle => 'Bearby 지갑';
 
   @override
-  String get initialPagerestoreZilPay => 'ZilPay 1.0 복원!';
-
-  @override
   String get initialPagegetStarted => '시작하기';
-
-  @override
-  String get restoreRKStorageTitle => 'ZilPay 1.0에서 2.0으로 마이그레이션';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0으로 마이그레이션할 계정. 비밀번호 입력.';
-
-  @override
-  String get restoreRKStoragePasswordHint => '비밀번호';
-
-  @override
-  String get restoreRKStorageEnterPassword => '비밀번호 입력';
-
-  @override
-  String get restoreRKStorageErrorPrefix => '오류:';
-
-  @override
-  String get restoreRKStorageRestoreButton => '복원';
-
-  @override
-  String get restoreRKStorageSkipButton => '건너뛰기';
-
-  @override
-  String get accountItemBalanceLabel => '잔액:';
 
   @override
   String get sendTokenPageTitle => '보내기';
@@ -139,9 +112,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get walletPageDeleteWallet => '지갑 삭제';
-
-  @override
-  String get walletPageBiometricReason => '생체 인증 활성화';
 
   @override
   String get networkPageTitle => '';
@@ -269,22 +239,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretPhraseGeneratorPageNextButton => '다음';
 
   @override
-  String get homePageErrorTitle => '신호 없음';
-
-  @override
   String get homePageReceiveButton => '수신';
 
   @override
   String get homePageSendButton => '보내기';
-
-  @override
-  String get homePageExchangeButton => '교환';
-
-  @override
-  String get exchangePageTitle => '교환';
-
-  @override
-  String get exchangePagePay => '보낼 금액';
 
   @override
   String get exchangePageGet => '받을 금액';
@@ -296,19 +254,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exchangePageConfirm => '확인';
 
   @override
-  String get exchangePageComingSoon => '곧';
-
-  @override
   String get exchangePageNoAssets => '이 네트워크에서 교환 가능한 자산이 없습니다';
 
   @override
   String get exchangePageTabSwap => '스왑';
-
-  @override
-  String get exchangePageTabLimit => '지정가';
-
-  @override
-  String get exchangePageTabBuySell => '구매/판매';
 
   @override
   String get exchangeSettingsPriceProtection => '가격 보호';
@@ -398,19 +347,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretKeySubmitButton => '제출';
 
   @override
-  String get revealSecretKeyDoneButton => '완료';
-
-  @override
-  String get revealSecretKeyScamAlertTitle => '사기 경고';
-
-  @override
   String get revealSecretKeyScamAlertMessage => '비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
-
-  @override
-  String get revealSecretKeySecurityTimer => '보안 타이머';
-
-  @override
-  String get revealSecretKeyRevealAfter => '비밀 키 공개 시간:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => '검색';
@@ -425,15 +362,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '다음';
-
-  @override
-  String get setupNetworkSettingsPageChainIdLabel => '체인 ID:';
-
-  @override
-  String get setupNetworkSettingsPageTokenLabel => '토큰:';
-
-  @override
-  String get setupNetworkSettingsPageExplorerLabel => '탐색기:';
 
   @override
   String get appearanceSettingsPageTitle => '모양 설정';
@@ -472,9 +400,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appearanceSettingsPageLightModeDescription => '기기 설정과 상관없이 라이트 테마 항상 활성화.';
 
   @override
-  String get loginPageBiometricReason => '인증하세요';
-
-  @override
   String loginPageWalletTitle(Object index) {
     return '지갑 $index';
   }
@@ -501,9 +426,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => '개인 키';
 
   @override
-  String get secretKeyRestorePageBackupLabel => '비밀 키 백업 완료';
-
-  @override
   String get secretKeyRestorePageNextButton => '다음';
 
   @override
@@ -524,20 +446,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqa 레거시';
 
   @override
-  String get addAccountPageBiometricReason => '새 계정 생성 인증';
-
-  @override
-  String addAccountPageBiometricError(Object error) {
-    return '생체 인증 실패: $error';
-  }
-
-  @override
   String addAccountPageIndexExists(Object index) {
     return '인덱스 $index 계정 이미 존재';
   }
-
-  @override
-  String get addAccountPageBiometricFailed => '생체 인증 실패';
 
   @override
   String addAccountPageCreateFailed(Object error) {
@@ -626,16 +537,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => '잘못된 비밀번호, 오류:';
 
   @override
-  String get revealSecretPhraseRevealAfter => '비밀 구문 공개 시간:';
-
-  @override
   String get revealSecretPhraseSubmitButton => '제출';
 
   @override
   String get revealSecretPhraseDoneButton => '완료';
-
-  @override
-  String get revealSecretPhraseScamAlertTitle => '사기 경고';
 
   @override
   String get revealSecretPhraseScamAlertDescription => '비밀 구문을 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
@@ -771,9 +676,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get passwordSetupPageCreateButton => '비밀번호 생성';
-
-  @override
-  String get passwordSetupPageAuthReason => '빠른 액세스 활성화 인증';
 
   @override
   String get passwordSetupPageSeedType => '시드';
@@ -917,9 +819,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currencyConversionEngineTitle => '통화 엔진';
 
   @override
-  String get currencyConversionEngineDescription => '통화 환율 가져오기 엔진';
-
-  @override
   String get currencyConversionEngineSelectorTitle => '통화 엔진 선택';
 
   @override
@@ -998,9 +897,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get argonSettingsModalContentSecretHint => '비밀 입력 (선택)';
 
   @override
-  String get argonSettingsModalContentConfirmButton => '확인';
-
-  @override
   String get confirmTransactionContentPasswordHint => '비밀번호';
 
   @override
@@ -1013,13 +909,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => '활성 계정 없음';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer => '전송 세부 정보 로드 실패';
-
-  @override
   String get confirmTransactionAdvancedGasButtonText => '고급 설정';
-
-  @override
-  String get authReason => '인증하세요';
 
   @override
   String get addChainModalContentWarning => '네트워크 사기 및 보안 위험 주의.';
@@ -1065,9 +955,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tokenSelectModalContentSearchHint => '검색';
-
-  @override
-  String get signMessageModalContentAuthReason => '메시지 서명 인증';
 
   @override
   String signMessageModalContentFailedToSign(Object error) {
@@ -1192,9 +1079,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmPasswordModalButton => '확인';
 
   @override
-  String get qrScannerModalContentTitle => '스캔';
-
-  @override
   String get qrScannerModalContentCameraInitError => '카메라 초기화 오류:';
 
   @override
@@ -1234,9 +1118,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chainInfoModalContentFallbackEnabledLabel => '폴백 활성화';
 
   @override
-  String get chainInfoModalContentDecimalsLabel => '소수점';
-
-  @override
   String get chainInfoModalContentRpcNodesTitle => 'RPC 노드';
 
   @override
@@ -1256,12 +1137,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get switchChainNetworkContentButton => '네트워크 전환';
-
-  @override
-  String get switchChainNetworkContentTestnetLabel => '테스트넷';
-
-  @override
-  String get switchChainNetworkContentIdLabel => 'ID:';
 
   @override
   String get watchAssetModalContentTitle => '제안 토큰 추가';
@@ -1662,13 +1537,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unstakeButton => '언스테이크';
 
   @override
-  String get aprLabel => 'APR';
-
-  @override
   String get commissionLabel => '수수료';
-
-  @override
-  String get stakedAmount => '스테이크됨';
 
   @override
   String get rewardsAvailable => '보상';
@@ -1683,9 +1552,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get claimableIn => '청구 가능 시간';
 
   @override
-  String get blocks => '블록';
-
-  @override
   String get unbondingPeriod => '언본딩 기간';
 
   @override
@@ -1693,9 +1559,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get version => '버전';
-
-  @override
-  String get rewardsProgressTitle => '보상 진행';
 
   @override
   String get ledgerConnectPageTitle => 'Ledger 연결';
@@ -1767,9 +1630,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get durationNotAvailable => 'N/A';
-
-  @override
-  String get nodes => '노드';
 
   @override
   String get manageTokensPageTitle => '토큰';
@@ -1898,33 +1758,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get web3ErrorChainNotAdded => '요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.';
 
   @override
-  String get bipPurposeSetupPageTitle => '비트코인 주소';
-
-  @override
-  String get bip86Name => 'BIP86 (Taproot)';
-
-  @override
-  String get bip86Description => 'P2TR - bc1p로 시작하는 주소';
-
-  @override
-  String get bip84Name => 'BIP84 (Native SegWit)';
-
-  @override
-  String get bip84Description => 'P2WPKH - bc1q로 시작하는 주소';
-
-  @override
-  String get bip49Name => 'BIP49 (SegWit)';
-
-  @override
-  String get bip49Description => 'P2WPKH-nested-in-P2SH - 3으로 시작하는 주소';
-
-  @override
-  String get bip44Name => 'BIP44 (Legacy)';
-
-  @override
-  String get bip44Description => 'P2PKH - 1로 시작하는 주소';
-
-  @override
   String get addNetworkPageTitle => '네트워크 추가';
 
   @override
@@ -1959,15 +1792,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get addNetworkPageErrorRequired => '모든 필수 항목을 입력하세요';
-
-  @override
-  String get addNetworkPageErrorInvalidRpc => '유효한 RPC URL을 입력하세요';
-
-  @override
-  String get addNetworkPageErrorInvalidChainId => '유효한 체인 ID를 입력하세요';
-
-  @override
-  String get addNetworkPageSuccess => '네트워크가 추가되었습니다';
 
   @override
   String get qrCodeUnrecognizedError => 'QR 코드를 인식할 수 없습니다. 지원되는 형식을 사용하세요.';
