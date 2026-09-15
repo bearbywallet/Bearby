@@ -18,6 +18,32 @@ import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 
+// Minimal GuardedTransport double for the shared-guard regression tests.
+class _GuardedFakeTransport extends GuardedTransport {
+  int inFlight = 0;
+  int maxConcurrent = 0;
+
+  @override
+  DeviceModel? get deviceModel => null;
+
+  @override
+  void setScrambleKey(String key) {}
+
+  @override
+  Future<Uint8List> exchange(Uint8List apdu) {
+    return guardedExchange(() async {
+      inFlight += 1;
+      maxConcurrent = inFlight > maxConcurrent ? inFlight : maxConcurrent;
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      inFlight -= 1;
+      return Uint8List.fromList([0x90, 0x00]);
+    });
+  }
+
+  @override
+  Future<void> close() => guardedClose(() async {});
+}
+
 // ---------------------------------------------------------------------------
 // Fake transport: records every APDU, replays a canned response.
 // ---------------------------------------------------------------------------
@@ -205,5 +231,62 @@ void main() {
     expect(a.toString(), contains('LedgerAccount'),
         reason: 'default-trait rule: toString() must exist');
     expect(a.toString(), contains('zils1aaaa'));
+  });
+
+  // -------------------------------------------------------------------------
+  // 7) REAL: GuardedTransport shared guard (was copy-pasted 4x).
+  //    Concurrent exchanges must fail with TransportRaceCondition, and any
+  //    exchange started after guardedClose() must fail with
+  //    DisconnectedDeviceDuringOperationException (the pre-refactor race).
+  // -------------------------------------------------------------------------
+  test('REAL: GuardedTransport resets after a rejected concurrent exchange',
+      () async {
+    final t = _GuardedFakeTransport();
+
+    // 1) a normal exchange passes and never overlaps anything
+    await t.exchange(Uint8List.fromList([0x01]));
+    expect(t.maxConcurrent, 1);
+
+    // 2) concurrent one is rejected...
+    final first = t.exchange(Uint8List.fromList([0x02]));
+    await expectLater(
+      t.exchange(Uint8List.fromList([0x03])),
+      throwsA(isA<TransportRaceCondition>()),
+    );
+    await first;
+
+    // 3) ...but the guard state resets: the next exchange succeeds.
+    await t.exchange(Uint8List.fromList([0x04]));
+    expect(t.maxConcurrent, 1,
+        reason: 'no two exchanges ever ran at the same time');
+  });
+
+  test('REAL: GuardedTransport rejects concurrent second exchange', () async {
+    final t = _GuardedFakeTransport();
+
+    // Start one exchange and hold it via a slow responder.
+    final first = t.exchange(Uint8List.fromList([0x01]));
+
+    await expectLater(
+      t.exchange(Uint8List.fromList([0x02])),
+      throwsA(isA<TransportRaceCondition>()),
+      reason: 'a second exchange while one is in flight must throw '
+              'instead of silently queueing/corrupting the APDU stream',
+    );
+    await first;
+  });
+
+  test('REAL: GuardedTransport rejects exchange after close (race fix)',
+      () async {
+    final t = _GuardedFakeTransport();
+    await t.exchange(Uint8List.fromList([0x01]));
+    await t.close();
+
+    await expectLater(
+      t.exchange(Uint8List.fromList([0x02])),
+      throwsA(isA<DisconnectedDeviceDuringOperationException>()),
+      reason: 'before the refactor, close() vs new exchange raced: the '
+              'closed flag did not exist. Now late callers fail fast.',
+    );
   });
 }
