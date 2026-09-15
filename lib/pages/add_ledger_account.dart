@@ -430,7 +430,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     );
   }
 
-  Widget _buildSingleAccountCard(AppTheme theme, LedgerAccount account) {
+  Widget _buildSingleAccountCard(
+      AppTheme theme, AppLocalizations l10n, LedgerAccount account) {
     if (_isBtcFlow) {
       final btcChain = _btcChains[account.index];
       if (btcChain == null) return const SizedBox();
@@ -478,7 +479,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Account ${account.index + 1}",
+                  l10n.ledgerAccountTitle(account.index + 1),
                   style: theme.bodyLarge.copyWith(color: theme.textPrimary),
                 ),
                 const SizedBox(height: 2),
@@ -581,7 +582,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                                 _buildWalletInfoCard(appState, l10n),
                                 ..._accounts.entries.map((entry) => Padding(
                                   padding: const EdgeInsets.only(top: 16),
-                                  child: _buildSingleAccountCard(theme, entry.value),
+                                  child: _buildSingleAccountCard(
+                                      theme, l10n, entry.value),
                                 )),
                                 const SizedBox(height: 80),
                               ],

@@ -1828,4 +1828,21 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Устарело для Bitcoin. Используйте BIP39.';
+
+  @override
+  String get errorDialogTitle => 'Ошибка';
+
+  @override
+  String get stakingDelegatedLabel => 'Делегировано';
+
+  @override
+  String get stakingClaimableLabel => 'Доступно к получению';
+
+  @override
+  String get tokenSelectModalSelectButton => 'Выбрать';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return 'Аккаунт $index';
+  }
 }

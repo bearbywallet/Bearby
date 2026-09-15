@@ -645,5 +645,10 @@
   },
   "@aboutPageAuthorValue": {
     "description": "Value for author info on AboutPage"
-  }
+  },
+  "errorDialogTitle": "오류",
+  "stakingDelegatedLabel": "위임됨",
+  "stakingClaimableLabel": "청구 가능",
+  "tokenSelectModalSelectButton": "선택",
+  "ledgerAccountTitle": "계정 {index}"
 }

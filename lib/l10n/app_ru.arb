@@ -657,5 +657,10 @@
   },
   "@aboutPageAuthorValue": {
     "description": "Value for author info on AboutPage"
-  }
+  },
+  "errorDialogTitle": "Ошибка",
+  "stakingDelegatedLabel": "Делегировано",
+  "stakingClaimableLabel": "Доступно к получению",
+  "tokenSelectModalSelectButton": "Выбрать",
+  "ledgerAccountTitle": "Аккаунт {index}"
 }

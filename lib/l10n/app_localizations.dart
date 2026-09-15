@@ -3586,6 +3586,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deprecated for Bitcoin. Use BIP39 instead.'**
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle;
+
+  /// Title of an error dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get errorDialogTitle;
+
+  /// Label for a delegated staking position.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegated'**
+  String get stakingDelegatedLabel;
+
+  /// Label for claimable staking rewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Claimable'**
+  String get stakingClaimableLabel;
+
+  /// Button that selects an item.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get tokenSelectModalSelectButton;
+
+  /// Title of a Ledger account card with its index.
+  ///
+  /// In en, this message translates to:
+  /// **'Account {index}'**
+  String ledgerAccountTitle(int index);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

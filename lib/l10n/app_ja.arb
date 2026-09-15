@@ -660,5 +660,10 @@
   },
   "@aboutPageAuthorValue": {
     "description": "Value for author info on AboutPage"
-  }
+  },
+  "errorDialogTitle": "エラー",
+  "stakingDelegatedLabel": "デリゲート済み",
+  "stakingClaimableLabel": "請求可能",
+  "tokenSelectModalSelectButton": "選択",
+  "ledgerAccountTitle": "アカウント {index}"
 }

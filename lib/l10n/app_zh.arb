@@ -645,5 +645,10 @@
   },
   "@aboutPageAuthorValue": {
     "description": "Value for author info on AboutPage"
-  }
+  },
+  "errorDialogTitle": "错误",
+  "stakingDelegatedLabel": "已委托",
+  "stakingClaimableLabel": "可领取",
+  "tokenSelectModalSelectButton": "选择",
+  "ledgerAccountTitle": "账户 {index}"
 }

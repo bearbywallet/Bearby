@@ -1819,4 +1819,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoin 网络已弃用。请使用 BIP39。';
+
+  @override
+  String get errorDialogTitle => '错误';
+
+  @override
+  String get stakingDelegatedLabel => '已委托';
+
+  @override
+  String get stakingClaimableLabel => '可领取';
+
+  @override
+  String get tokenSelectModalSelectButton => '选择';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return '账户 $index';
+  }
 }

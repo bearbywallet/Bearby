@@ -1819,4 +1819,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoinでは非推奨です。BIP39を使用してください。';
+
+  @override
+  String get errorDialogTitle => 'エラー';
+
+  @override
+  String get stakingDelegatedLabel => 'デリゲート済み';
+
+  @override
+  String get stakingClaimableLabel => '請求可能';
+
+  @override
+  String get tokenSelectModalSelectButton => '選択';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return 'アカウント $index';
+  }
 }

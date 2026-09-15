@@ -1819,4 +1819,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoin에서 사용 중단됨. BIP39를 사용하세요.';
+
+  @override
+  String get errorDialogTitle => '오류';
+
+  @override
+  String get stakingDelegatedLabel => '위임됨';
+
+  @override
+  String get stakingClaimableLabel => '청구 가능';
+
+  @override
+  String get tokenSelectModalSelectButton => '선택';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return '계정 $index';
+  }
 }

@@ -49,12 +49,13 @@ mixin _StakeFlowHelpers {
   }
 
   void _showErrorDialog(BuildContext context, AppState appState, Object e) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: appState.currentTheme.cardBackground,
         title: Text(
-          "Error",
+          l10n.errorDialogTitle,
           style: appState.currentTheme.bodyLarge
               .copyWith(color: appState.currentTheme.textPrimary),
         ),
@@ -678,7 +679,7 @@ class _DelegatedAmountDisplay extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Delegated',
+              l10n.stakingDelegatedLabel,
               style: theme.labelSmall.copyWith(
                 color: theme.textSecondary,
                 fontSize: 10,
@@ -787,7 +788,7 @@ class _ClaimableAmountCard extends StatelessWidget
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Claimable',
+                  l10n.stakingClaimableLabel,
                   style: theme.caption.copyWith(
                     color: theme.textSecondary,
                     fontSize: 9,

@@ -1822,4 +1822,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Deprecated for Bitcoin. Use BIP39 instead.';
+
+  @override
+  String get errorDialogTitle => 'Error';
+
+  @override
+  String get stakingDelegatedLabel => 'Delegated';
+
+  @override
+  String get stakingClaimableLabel => 'Claimable';
+
+  @override
+  String get tokenSelectModalSelectButton => 'Select';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return 'Account $index';
+  }
 }

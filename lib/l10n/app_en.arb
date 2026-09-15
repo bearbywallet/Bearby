@@ -2349,5 +2349,30 @@
   "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Deprecated for Bitcoin. Use BIP39 instead.",
   "@restoreWalletOptionsPrivateKeyDeprecatedSubtitle": {
     "description": "Subtitle for Private Key restore option when Bitcoin network is selected"
+  },
+  "errorDialogTitle": "Error",
+  "@errorDialogTitle": {
+    "description": "Title of an error dialog."
+  },
+  "stakingDelegatedLabel": "Delegated",
+  "@stakingDelegatedLabel": {
+    "description": "Label for a delegated staking position."
+  },
+  "stakingClaimableLabel": "Claimable",
+  "@stakingClaimableLabel": {
+    "description": "Label for claimable staking rewards."
+  },
+  "tokenSelectModalSelectButton": "Select",
+  "@tokenSelectModalSelectButton": {
+    "description": "Button that selects an item."
+  },
+  "ledgerAccountTitle": "Account {index}",
+  "@ledgerAccountTitle": {
+    "description": "Title of a Ledger account card with its index.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
   }
 }
