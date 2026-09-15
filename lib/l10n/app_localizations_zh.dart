@@ -957,7 +957,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => '搜索';
 
   @override
-  String signMessageModalContentFailedToSign(Object error) {
+  String signMessageModalContentFailedToSign(String error) {
     return '签名失败：$error';
   }
 

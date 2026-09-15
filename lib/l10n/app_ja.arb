@@ -645,5 +645,20 @@
         "type": "int"
       }
     }
+  },
+  "@aboutPageAppDescription": {
+    "description": "Description text below app name on AboutPage"
+  },
+  "@aboutPageAppInfoTitle": {
+    "description": "Title for application info section on AboutPage"
+  },
+  "@aboutPageAppName": {
+    "description": "Application name displayed in logo section on AboutPage"
+  },
+  "@aboutPageAuthorLabel": {
+    "description": "Label for author info on AboutPage"
+  },
+  "@aboutPageAuthorValue": {
+    "description": "Value for author info on AboutPage"
   }
 }

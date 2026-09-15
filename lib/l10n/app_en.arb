@@ -1194,7 +1194,12 @@
   },
   "signMessageModalContentFailedToSign": "Failed to sign: {error}",
   "@signMessageModalContentFailedToSign": {
-    "description": "Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
+    "description": "Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "signMessageModalContentTitle": "Sign Message",
   "@signMessageModalContentTitle": {
@@ -1418,7 +1423,9 @@
   },
   "chainInfoModalContentSwipeToDelete": "Delete network",
   "chainConfigPageAdvancedButton": "Advanced",
-  "@chainConfigPageAdvancedButton": {"description": "Text for the Advanced expand button on the chain config page"},
+  "@chainConfigPageAdvancedButton": {
+    "description": "Text for the Advanced expand button on the chain config page"
+  },
   "@chainInfoModalContentSwipeToDelete": {
     "description": "Text displayed on the swipe button for deleting a network in the ChainInfoModalContent modal."
   },

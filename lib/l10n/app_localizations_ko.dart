@@ -957,7 +957,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => '검색';
 
   @override
-  String signMessageModalContentFailedToSign(Object error) {
+  String signMessageModalContentFailedToSign(String error) {
     return '서명 실패: $error';
   }
 

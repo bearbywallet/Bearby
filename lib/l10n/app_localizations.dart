@@ -1935,7 +1935,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Failed to sign: {error}'**
-  String signMessageModalContentFailedToSign(Object error);
+  String signMessageModalContentFailedToSign(String error);
 
   /// Title text for the SignMessageModalContent modal.
   ///

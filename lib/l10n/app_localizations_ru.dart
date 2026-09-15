@@ -960,7 +960,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => 'Поиск';
 
   @override
-  String signMessageModalContentFailedToSign(Object error) {
+  String signMessageModalContentFailedToSign(String error) {
     return 'Не удалось подписать: $error';
   }
 
