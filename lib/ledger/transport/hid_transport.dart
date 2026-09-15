@@ -13,14 +13,10 @@ class DescriptorEvent {
   DescriptorEvent(this.type, this.descriptor);
 }
 
-class HidTransport extends Transport {
+class HidTransport extends GuardedTransport {
   final String _id;
   @override
   final DeviceModel? deviceModel;
-
-  Completer<void>? _exchangeBusyPromise;
-  Timer? _unresponsiveTimer;
-  final _eventController = StreamController<TransportEvent>.broadcast();
 
   static const _channel = MethodChannel('ledger.com/hid');
   static const _eventChannel = EventChannel('ledger.com/hid/events');
@@ -38,8 +34,6 @@ class HidTransport extends Transport {
   HidTransport._(this._id, int productId)
       : deviceModel = Devices.identifyUSBProductId(productId);
 
-  @override
-  Stream<TransportEvent> get events => _eventController.stream;
 
   static Future<bool> isSupported() async => true;
 
@@ -116,39 +110,13 @@ class HidTransport extends Transport {
     });
   }
 
-  Future<T> _exchangeAtomic<T>(Future<T> Function() f) async {
-    if (_exchangeBusyPromise != null) {
-      throw TransportRaceCondition(
-          'An action was already pending on the Ledger device.');
-    }
-
-    final completer = Completer<void>();
-    _exchangeBusyPromise = completer;
-
-    bool unresponsiveReached = false;
-    _unresponsiveTimer = Timer(const Duration(seconds: 15), () {
-      unresponsiveReached = true;
-      _eventController.add(TransportEvent.unresponsive);
-    });
-
-    try {
-      final res = await f();
-      if (unresponsiveReached) {
-        _eventController.add(TransportEvent.responsive);
-      }
-      return res;
-    } finally {
-      _unresponsiveTimer?.cancel();
-      completer.complete();
-      _exchangeBusyPromise = null;
-    }
-  }
+  Future<T> _exchangeAtomic<T>(Future<T> Function() f) =>
+      guardedExchange(f, unresponsiveAfter: const Duration(seconds: 15));
 
   @override
   Future<void> close() async {
-    await _exchangeBusyPromise?.future;
-    await _channel.invokeMethod('closeDevice', {'deviceId': _id});
-    await _eventController.close();
+    await guardedClose(
+        () => _channel.invokeMethod('closeDevice', {'deviceId': _id}));
   }
 
   @override

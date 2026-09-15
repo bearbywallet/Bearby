@@ -6,19 +6,13 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 
-class RustHidTransport extends Transport {
+class RustHidTransport extends GuardedTransport {
   final String _connectionId;
   @override
   final DeviceModel? deviceModel;
 
-  Completer<void>? _exchangeBusyPromise;
-  Timer? _unresponsiveTimer;
-  final _eventController = StreamController<TransportEvent>.broadcast();
-
   RustHidTransport(this._connectionId, this.deviceModel);
 
-  @override
-  Stream<TransportEvent> get events => _eventController.stream;
 
   static Future<List<DiscoveredDevice>> list() async {
     final devices = await ledgerHidList();
@@ -37,7 +31,7 @@ class RustHidTransport extends Transport {
 
   @override
   Future<Uint8List> exchange(Uint8List apdu) async {
-    return _exchangeAtomic(() async {
+    return guardedExchange(() async {
       try {
         final result = await ledgerHidExchange(
           connectionId: _connectionId,
@@ -47,42 +41,13 @@ class RustHidTransport extends Transport {
       } catch (e) {
         throw DisconnectedDeviceDuringOperationException(e.toString());
       }
-    });
-  }
-
-  Future<T> _exchangeAtomic<T>(Future<T> Function() f) async {
-    if (_exchangeBusyPromise != null) {
-      throw TransportRaceCondition(
-          'An action was already pending on the Ledger device.');
-    }
-
-    final completer = Completer<void>();
-    _exchangeBusyPromise = completer;
-
-    bool unresponsiveReached = false;
-    _unresponsiveTimer = Timer(const Duration(seconds: 15), () {
-      unresponsiveReached = true;
-      _eventController.add(TransportEvent.unresponsive);
-    });
-
-    try {
-      final res = await f();
-      if (unresponsiveReached) {
-        _eventController.add(TransportEvent.responsive);
-      }
-      return res;
-    } finally {
-      _unresponsiveTimer?.cancel();
-      completer.complete();
-      _exchangeBusyPromise = null;
-    }
+    }, unresponsiveAfter: const Duration(seconds: 15));
   }
 
   @override
   Future<void> close() async {
-    await _exchangeBusyPromise?.future;
-    await ledgerHidClose(connectionId: _connectionId);
-    await _eventController.close();
+    await guardedClose(
+        () => ledgerHidClose(connectionId: _connectionId));
   }
 
   @override

@@ -6,18 +6,13 @@ import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 
-class RustBleTransport extends Transport {
+class RustBleTransport extends GuardedTransport {
   final String _connectionId;
   @override
   final DeviceModel? deviceModel;
 
-  Completer<void>? _exchangeBusyPromise;
-  final _eventController = StreamController<TransportEvent>.broadcast();
-
   RustBleTransport(this._connectionId, this.deviceModel);
 
-  @override
-  Stream<TransportEvent> get events => _eventController.stream;
 
   static Future<List<DiscoveredDevice>> scan() async {
     final devices = await ledgerBleScan();
@@ -48,29 +43,12 @@ class RustBleTransport extends Transport {
     });
   }
 
-  Future<T> _exchangeAtomic<T>(Future<T> Function() f) async {
-    if (_exchangeBusyPromise != null) {
-      throw TransportRaceCondition(
-          'An action was already pending on the Ledger device.');
-    }
-
-    final completer = Completer<void>();
-    _exchangeBusyPromise = completer;
-
-    try {
-      final res = await f();
-      return res;
-    } finally {
-      completer.complete();
-      _exchangeBusyPromise = null;
-    }
-  }
+  Future<T> _exchangeAtomic<T>(Future<T> Function() f) =>
+      guardedExchange(f);
 
   @override
   Future<void> close() async {
-    await _exchangeBusyPromise?.future;
-    await ledgerBleClose(connectionId: _connectionId);
-    await _eventController.close();
+    await guardedClose(() => ledgerBleClose(connectionId: _connectionId));
   }
 
   @override
