@@ -650,5 +650,17 @@
   "stakingDelegatedLabel": "위임됨",
   "stakingClaimableLabel": "청구 가능",
   "tokenSelectModalSelectButton": "선택",
-  "ledgerAccountTitle": "계정 {index}"
+  "ledgerAccountTitle": "계정 {index}",
+  "@aboutPageBuildDateLabel": {
+    "description": "Label for build date on AboutPage"
+  },
+  "@aboutPageBuildDateValue": {
+    "description": "Value for build date on AboutPage"
+  },
+  "@aboutPageDeveloperTitle": {
+    "description": "Title for developer section on AboutPage"
+  },
+  "@aboutPageLegalTitle": {
+    "description": "Title for legal section on AboutPage"
+  }
 }

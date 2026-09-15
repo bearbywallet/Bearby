@@ -665,5 +665,17 @@
   "stakingDelegatedLabel": "デリゲート済み",
   "stakingClaimableLabel": "請求可能",
   "tokenSelectModalSelectButton": "選択",
-  "ledgerAccountTitle": "アカウント {index}"
+  "ledgerAccountTitle": "アカウント {index}",
+  "@aboutPageBuildDateLabel": {
+    "description": "Label for build date on AboutPage"
+  },
+  "@aboutPageBuildDateValue": {
+    "description": "Value for build date on AboutPage"
+  },
+  "@aboutPageDeveloperTitle": {
+    "description": "Title for developer section on AboutPage"
+  },
+  "@aboutPageLegalTitle": {
+    "description": "Title for legal section on AboutPage"
+  }
 }
