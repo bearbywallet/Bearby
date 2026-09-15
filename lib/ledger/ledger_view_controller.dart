@@ -365,7 +365,7 @@ class LedgerViewController extends ChangeNotifier {
     );
   }
 
-  Future<String> signMesage({
+  Future<String> signMessage({
     required String message,
     required AccountInfo account,
     required BigInt walletIndex,
@@ -412,7 +412,9 @@ class LedgerViewController extends ChangeNotifier {
       );
       sig = sigBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     } else {
-      throw "Invalid slip44";
+      // Effective Dart: only throw Error/Exception subtypes - a bare String
+      // throw would bypass `on Exception` handlers and crash the app.
+      throw ArgumentError.value(slip44, 'slip44', 'unsupported BIP-44 coin type');
     }
 
     return sig;

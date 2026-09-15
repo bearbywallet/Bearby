@@ -151,7 +151,7 @@ class TronWeb3Handler {
     switch (tronMethod) {
       case Web3EIP1193Method.tronSign:
       case Web3EIP1193Method.ethSendTransaction:
-        await _handlhSendTransaction(message, context, appState);
+        await _handleSendTransaction(message, context, appState);
         break;
       case Web3EIP1193Method.ethChainId:
         await _handleChainId(message, appState);
@@ -227,7 +227,7 @@ class TronWeb3Handler {
     }
   }
 
-  Future<void> _handlhSendTransaction(
+  Future<void> _handleSendTransaction(
     ZilPayWeb3Message message,
     BuildContext context,
     AppState appState,

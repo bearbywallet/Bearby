@@ -172,7 +172,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         }
 
         if (widget.message != null) {
-          final sig = await appState.ledgerViewController.signMesage(
+          final sig = await appState.ledgerViewController.signMessage(
             message: widget.message!,
             account: account,
             walletIndex: appState.selectedWalletIndex,
