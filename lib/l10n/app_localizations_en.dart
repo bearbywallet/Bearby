@@ -114,7 +114,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletPageDeleteWallet => 'Delete Wallet';
 
   @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => 'Networks';
 
   @override
   String get networkPageSearchHint => 'Search';

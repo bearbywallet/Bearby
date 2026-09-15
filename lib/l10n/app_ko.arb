@@ -34,7 +34,7 @@
   "walletPageManageConnections": "연결 관리",
   "walletPageBackup": "백업",
   "walletPageDeleteWallet": "지갑 삭제",
-  "networkPageTitle": "",
+  "networkPageTitle": "네트워크",
   "networkPageSearchHint": "검색",
   "networkPageAddError": "네트워크 추가 실패: ",
   "receivePageTitle": "수신",

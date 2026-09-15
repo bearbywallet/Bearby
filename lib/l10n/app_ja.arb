@@ -34,7 +34,7 @@
   "walletPageManageConnections": "接続の管理",
   "walletPageBackup": "バックアップ",
   "walletPageDeleteWallet": "ウォレットを削除",
-  "networkPageTitle": "",
+  "networkPageTitle": "ネットワーク",
   "networkPageSearchHint": "検索",
   "networkPageAddError": "ネットワークの追加に失敗: ",
   "receivePageTitle": "受信",

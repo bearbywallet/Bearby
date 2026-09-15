@@ -114,7 +114,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get walletPageDeleteWallet => '지갑 삭제';
 
   @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => '네트워크';
 
   @override
   String get networkPageSearchHint => '검색';

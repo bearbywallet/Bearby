@@ -114,7 +114,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get walletPageDeleteWallet => 'Удалить кошелек';
 
   @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => 'Сети';
 
   @override
   String get networkPageSearchHint => 'Поиск';

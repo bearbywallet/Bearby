@@ -114,7 +114,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get walletPageDeleteWallet => 'ウォレットを削除';
 
   @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => 'ネットワーク';
 
   @override
   String get networkPageSearchHint => '検索';

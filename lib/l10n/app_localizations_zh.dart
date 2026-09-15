@@ -114,7 +114,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get walletPageDeleteWallet => '删除钱包';
 
   @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => '网络';
 
   @override
   String get networkPageSearchHint => '搜索';

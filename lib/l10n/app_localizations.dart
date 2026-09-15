@@ -314,7 +314,7 @@ abstract class AppLocalizations {
   /// Title for the NetworkPage (empty as per original implementation)
   ///
   /// In en, this message translates to:
-  /// **''**
+  /// **'Networks'**
   String get networkPageTitle;
 
   /// Hint text for search input on NetworkPage

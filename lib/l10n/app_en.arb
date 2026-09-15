@@ -139,7 +139,7 @@
   "@walletPageDeleteWallet": {
     "description": "Text for delete wallet button on WalletPage"
   },
-  "networkPageTitle": "",
+  "networkPageTitle": "Networks",
   "@networkPageTitle": {
     "description": "Title for the NetworkPage (empty as per original implementation)"
   },

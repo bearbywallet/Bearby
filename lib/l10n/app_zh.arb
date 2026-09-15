@@ -34,7 +34,7 @@
   "walletPageManageConnections": "管理连接",
   "walletPageBackup": "备份",
   "walletPageDeleteWallet": "删除钱包",
-  "networkPageTitle": "",
+  "networkPageTitle": "网络",
   "networkPageSearchHint": "搜索",
   "networkPageAddError": "添加网络失败：",
   "receivePageTitle": "接收",

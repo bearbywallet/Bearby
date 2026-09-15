@@ -34,7 +34,7 @@
   "walletPageManageConnections": "Управление подключениями",
   "walletPageBackup": "Резервная копия",
   "walletPageDeleteWallet": "Удалить кошелек",
-  "networkPageTitle": "",
+  "networkPageTitle": "Сети",
   "networkPageSearchHint": "Поиск",
   "networkPageAddError": "Не удалось добавить сеть: ",
   "receivePageTitle": "Получить",
