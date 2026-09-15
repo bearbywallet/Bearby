@@ -55,5 +55,13 @@ void main() {
           reason: 'only verify_bip39 (variant with bip39 arg) may parse '
               'chain args inline');
     });
+
+    test('dead near-copy of the argon settings modal stays deleted', () {
+      // lib/modals/argon2.dart (showArgonSettingsModal, 223 lines) had zero
+      // callers/imports; it was a stale copy of encryption_settings.dart.
+      expect(File('lib/modals/argon2.dart').existsSync(), isFalse,
+          reason: 'do not resurrect the dead copy - extend '
+              'lib/modals/encryption_settings.dart instead');
+    });
   });
 }
