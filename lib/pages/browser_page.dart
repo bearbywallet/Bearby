@@ -69,8 +69,12 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   Future<void> _loadEvmScript() async {
-    final src = await rootBundle.loadString('assets/.evm_inject.js');
-    if (mounted) setState(() => _evmInjectScript = src);
+    try {
+      final src = await rootBundle.loadString('assets/.evm_inject.js');
+      if (mounted) setState(() => _evmInjectScript = src);
+    } catch (e) {
+      debugPrint('_loadEvmScript: $e');
+    }
   }
 
   void _handleChainChange() {

@@ -46,13 +46,17 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   }
 
   Future<void> _loadTestnetPreference() async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final enabled =
-        await appState.storage.get_(key: StorageKeys.testnetEnabled);
-    if (mounted) {
-      setState(() {
-        isTestnet = enabled == 'true';
-      });
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final enabled =
+          await appState.storage.get_(key: StorageKeys.testnetEnabled);
+      if (mounted) {
+        setState(() {
+          isTestnet = enabled == 'true';
+        });
+      }
+    } catch (e) {
+      debugPrint('_loadTestnetPreference: $e');
     }
   }
 

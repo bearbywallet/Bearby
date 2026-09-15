@@ -49,12 +49,16 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
   }
 
   Future<void> _regenerateKeys() async {
-    KeyPairInfo keyPair = await genKeypair();
-    if (!mounted) return;
-    setState(() {
-      _hasBackupWords = false;
-      _keyPair = keyPair;
-    });
+    try {
+      KeyPairInfo keyPair = await genKeypair();
+      if (!mounted) return;
+      setState(() {
+        _hasBackupWords = false;
+        _keyPair = keyPair;
+      });
+    } catch (e) {
+      debugPrint('_regenerateKeys: $e');
+    }
   }
 
   @override
