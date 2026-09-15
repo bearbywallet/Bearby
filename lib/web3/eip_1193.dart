@@ -173,44 +173,19 @@ class Web3EIP1193Handler {
     required String type,
     required String uuid,
     Map<String, dynamic>? payload,
-    dynamic result,
+    Object? result,
     Web3EIP1193ErrorCode? errorCode,
     String? errorMessage,
-  }) async {
-    final responsePayload = {
-      if (payload != null) ...payload,
-      if (result != null) 'result': result,
-      if (errorCode != null && errorMessage != null)
-        'error': {'code': errorCode.code, 'message': errorMessage},
-    };
-
-    final response = ZilPayWeb3Message(
+  }) {
+    return sendWeb3Response(
+      webViewController: webViewController,
       type: type,
       uuid: uuid,
-      payload: responsePayload,
-    ).toJson();
-
-    final jsResponse = jsonEncode(response);
-    final jsCode = '''
-    (function() {
-      const responseData = $jsResponse;
-      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
-        const handler = window.__bearby_response_handlers["$uuid"];
-        handler(responseData);
-        delete window.__bearby_response_handlers["$uuid"];
-      } else {
-        window.dispatchEvent(new MessageEvent('message', { 
-          data: responseData
-        }));
-      }
-    })();
-    ''';
-
-    try {
-      await webViewController.evaluateJavascript(source: jsCode);
-    } catch (e) {
-      debugPrint("evaluateJavascript error: $e");
-    }
+      payload: payload,
+      result: result,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+    );
   }
 
   void _returnError(

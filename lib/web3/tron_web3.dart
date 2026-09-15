@@ -88,43 +88,18 @@ class TronWeb3Handler {
   Future<void> _sendResponse({
     required String type,
     required String uuid,
-    dynamic result,
+    Object? result,
     TronWeb3ErrorCode? errorCode,
     String? errorMessage,
-  }) async {
-    final responsePayload = <String, dynamic>{
-      if (result != null) 'result': result,
-      if (errorCode != null && errorMessage != null)
-        'error': {'code': errorCode.code, 'message': errorMessage},
-    };
-
-    final response = ZilPayWeb3Message(
+  }) {
+    return sendWeb3Response(
+      webViewController: webViewController,
       type: type,
       uuid: uuid,
-      payload: responsePayload,
-    ).toJson();
-
-    final jsonResponse = jsonEncode(response);
-    final jsCode = '''
-    (function() {
-      const responseData = $jsonResponse;
-      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
-        const handler = window.__bearby_response_handlers["$uuid"];
-        handler(responseData);
-        delete window.__bearby_response_handlers["$uuid"];
-      } else {
-        window.dispatchEvent(new MessageEvent('message', {
-          data: responseData
-        }));
-      }
-    })();
-    ''';
-
-    try {
-      await webViewController.evaluateJavascript(source: jsCode);
-    } catch (e) {
-      debugPrint("evaluateJavascript error: $e");
-    }
+      result: result,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+    );
   }
 
   void _returnError(

@@ -1,3 +1,8 @@
+import 'package:bearby/web3/web3_response.dart';
+
+export 'package:bearby/web3/web3_response.dart'
+    show Web3ErrorCode, sendWeb3Response;
+
 enum Web3EIP1193Method {
   ethRequestAccounts('eth_requestAccounts'),
   ethAccounts('eth_accounts'),
@@ -55,7 +60,7 @@ enum Web3EIP1193Method {
   }
 }
 
-enum Web3EIP1193ErrorCode {
+enum Web3EIP1193ErrorCode implements Web3ErrorCode {
   userRejectedRequest(4001),
   unauthorized(4100),
   unsupportedMethod(4200),
@@ -65,6 +70,8 @@ enum Web3EIP1193ErrorCode {
   chainNotAdded(4902),
   invalidInput(-32000),
   resourceUnavailable(-32002);
+
+  @override
 
   final int code;
   const Web3EIP1193ErrorCode(this.code);
