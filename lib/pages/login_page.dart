@@ -98,6 +98,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         await _completeAuthentication(walletIndex);
         return true;
       }
+      if (!mounted) return false;
       setState(() => _errorMessage = 'Session authentication failed');
     } catch (e) {
       debugPrint("session $e");
@@ -142,6 +143,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       }
     }
 
+    if (!mounted) return false;
     setState(() => _errorMessage = 'Invalid password');
     return false;
   }

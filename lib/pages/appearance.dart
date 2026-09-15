@@ -33,6 +33,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Future<void> _handleThemeSelection(int index) async {
     final stateProvider = Provider.of<AppState>(context, listen: false);
     await stateProvider.setAppearancesCode(index, compactNumbers);
+    if (!mounted) return;
     setState(() {
       selectedThemeIndex = index;
     });
@@ -42,6 +43,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Future<void> _handleCompactNumbersChange(bool value) async {
     final stateProvider = Provider.of<AppState>(context, listen: false);
     await stateProvider.setAppearancesCode(selectedThemeIndex, value);
+    if (!mounted) return;
     setState(() {
       compactNumbers = value;
     });

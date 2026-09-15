@@ -205,6 +205,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
 
   Future<void> _handleCopy(String text) async {
     await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
     setState(() {
       _isCopied = true;
     });
@@ -221,6 +222,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
   void _regenerateMnemonicWords() async {
     String words = await genBip39Words(count: _count);
 
+    if (!mounted) return;
     setState(() {
       _mnemonicWords = words.split(" ");
       _hasBackupWords = false;

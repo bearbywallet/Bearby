@@ -75,6 +75,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
         .map((e) => Currency(e.key, "${e.value} ${codeToRate[e.key] ?? ''}"))
         .toList();
 
+    if (!mounted) return;
     setState(() {
       _currencies = currenciesList;
       _filteredCurrencies = currenciesList;

@@ -77,6 +77,7 @@ class _WalletPageState extends State<WalletPage> {
     try {
       final methods = await getBiometricType();
 
+      if (!mounted) return;
       setState(() {
         _authMethods = methods;
         _biometricsAvailable = methods.isNotEmpty && methods.first != "none";

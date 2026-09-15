@@ -115,6 +115,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
     await _appState.ledgerViewController.open(device);
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -200,6 +201,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       appState.ledgerViewController.disconnect();
       appState.ledgerViewController.scan();
 
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
       });

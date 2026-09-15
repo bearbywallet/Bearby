@@ -329,6 +329,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
         final alreadyInDeleted = _deletedTokens
             .any((t) => t.addr.toLowerCase() == token.addr.toLowerCase());
         if (!alreadyInDeleted) {
+          if (!mounted) return;
           setState(() {
             _deletedTokens.add(token);
           });
@@ -340,6 +341,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
           walletIndex: appState.selectedWalletIndex,
         );
 
+        if (!mounted) return;
         setState(() {
           _deletedTokens.removeWhere(
               (t) => t.addr.toLowerCase() == token.addr.toLowerCase());
@@ -348,6 +350,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
 
         if (_foundToken != null &&
             _foundToken!.addr.toLowerCase() == token.addr.toLowerCase()) {
+          if (!mounted) return;
           setState(() {
             _foundToken = null;
             _searchController.clear();

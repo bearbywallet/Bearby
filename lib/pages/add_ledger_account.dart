@@ -214,6 +214,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         appState.setSelectedWallet(currentWalletIndex);
         await appState.startTrackHistoryWorker();
         _createBtnController.success();
+        if (!mounted) return;
         setState(() {
           _loading = false;
         });
@@ -252,6 +253,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         await appState.syncData();
         _createBtnController.success();
 
+        if (!mounted) return;
         setState(() {
           _loading = false;
         });
@@ -399,6 +401,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                             );
                           }
 
+                          if (!mounted) return;
                           setState(() {
                             _accounts[account.index] = account;
                             if (btcChain != null) {

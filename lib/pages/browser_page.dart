@@ -405,6 +405,7 @@ class _BrowserPageState extends State<BrowserPage>
 
               final canGoBack = await controller.canGoBack();
               final canGoForward = await controller.canGoForward();
+              if (!mounted) return;
               setState(() {
                 _isLoading = false;
                 _currentUrl = url.toString();
@@ -424,6 +425,7 @@ class _BrowserPageState extends State<BrowserPage>
             onUpdateVisitedHistory: (controller, url, androidIsReload) async {
               final canGoBack = await controller.canGoBack();
               final canGoForward = await controller.canGoForward();
+              if (!mounted) return;
               setState(() {
                 _currentUrl = url.toString();
                 _searchController.text = url.toString();

@@ -50,6 +50,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
 
   Future<void> _regenerateKeys() async {
     KeyPairInfo keyPair = await genKeypair();
+    if (!mounted) return;
     setState(() {
       _hasBackupWords = false;
       _keyPair = keyPair;
@@ -198,10 +199,12 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
 
   Future<void> _handleCopy(String address) async {
     await Clipboard.setData(ClipboardData(text: address));
+    if (!mounted) return;
     setState(() {
       isCopied = true;
     });
     await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
     setState(() {
       isCopied = false;
     });

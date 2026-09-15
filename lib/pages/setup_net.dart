@@ -69,6 +69,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
       final storedProviders = await getProviders();
 
+      if (!mounted) return;
       setState(() {
         networks = _appendUniqueNetworks(storedProviders, mainnetChains);
         selectedNetwork ??= networks.isNotEmpty ? networks.first : null;
