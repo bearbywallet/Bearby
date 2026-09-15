@@ -24,14 +24,11 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
-import 'package:bearby/src/rust/models/transactions/base_token.dart';
-import 'package:bearby/src/rust/models/transactions/evm.dart';
-import 'package:bearby/src/rust/models/transactions/request.dart';
-import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/web3/message.dart';
 import 'dart:developer' as dev;
 
+import 'package:bearby/web3/request_builders.dart';
 import 'package:bearby/web3/web3_utils.dart';
 
 extension NetworkConfigInfoExtension on NetworkConfigInfo {
@@ -749,70 +746,7 @@ class Web3EIP1193Handler {
         );
       }
 
-      String? title = await webViewController.getTitle();
-
-      final BigInt? chainId = txParams[kParamChainId] != null
-          ? BigInt.parse(
-              txParams[kParamChainId].toString().replaceFirst(kHexPrefix, ''),
-              radix: kHexRadix)
-          : null;
-      final BigInt? gasLimit = txParams[kParamGas] != null
-          ? BigInt.parse(
-              txParams[kParamGas].toString().replaceFirst(kHexPrefix, ''),
-              radix: kHexRadix)
-          : null;
-      final BigInt? maxFeePerGas = txParams[kParamMaxFeePerGas] != null
-          ? BigInt.parse(
-              txParams[kParamMaxFeePerGas]
-                  .toString()
-                  .replaceFirst(kHexPrefix, ''),
-              radix: kHexRadix)
-          : null;
-      final BigInt? maxPriorityFeePerGas =
-          txParams[kParamMaxPriorityFeePerGas] != null
-              ? BigInt.parse(
-                  txParams[kParamMaxPriorityFeePerGas]
-                      .toString()
-                      .replaceFirst(kHexPrefix, ''),
-                  radix: kHexRadix)
-              : null;
-      final BigInt? gasPrice = txParams[kParamGasPrice] != null
-          ? BigInt.parse(
-              txParams[kParamGasPrice].toString().replaceFirst(kHexPrefix, ''),
-              radix: kHexRadix)
-          : null;
-      final String? value = txParams[kParamValue] as String?;
-      final String? to = txParams[kParamTo] as String?;
-
-      final Uint8List? data = txParams[kParamData] != null
-          ? Uint8List.fromList(hexToBytes(
-              txParams[kParamData].toString().replaceFirst(kHexPrefix, '')))
-          : null;
-
-      final evmRequest = TransactionRequestEVM(
-        nonce: null,
-        from: from,
-        to: to,
-        value: value,
-        gasLimit: gasLimit,
-        data: data,
-        maxFeePerGas: maxFeePerGas,
-        maxPriorityFeePerGas: maxPriorityFeePerGas,
-        gasPrice: gasPrice,
-        chainId: chainId,
-        accessList: null,
-        blobVersionedHashes: null,
-        maxFeePerBlobGas: null,
-      );
-
-      FTokenInfo? mbToken;
-      try {
-        mbToken = appState.wallet?.tokens
-            .firstWhere((t) => t.addrType == kEvmAddressType && t.native);
-      } catch (e) {
-        mbToken = null;
-      }
-
+      final mbToken = nativeEvmToken(appState);
       if (mbToken == null) {
         _removeActiveRequest(method);
         return _returnError(
@@ -822,33 +756,17 @@ class Web3EIP1193Handler {
         );
       }
 
-      final BigInt valueAmount = value != null && value != kHexZero
-          ? BigInt.parse(value.replaceFirst(kHexPrefix, ''), radix: kHexRadix)
-          : BigInt.zero;
-
-      final tokenInfo = BaseTokenInfo(
-        value: valueAmount.toString(),
-        symbol: mbToken.symbol,
-        decimals: mbToken.decimals,
-      );
-
-      final signer = appState.account;
-      final metadata = TransactionMetadataInfo(
-        chainHash: appState.chain?.chainHash ?? BigInt.zero,
-        hash: null,
-        info: null,
-        icon: message.icon,
-        title: title ?? "EVM Transaction",
-        signer: signer?.addr,
-        tokenInfo: tokenInfo,
+      String? title = await webViewController.getTitle();
+      final transactionRequest = buildEvmTransactionRequestInfo(
+        txParams: txParams,
+        appState: appState,
         broadcast: true,
+        nativeToken: mbToken,
+        title: title,
+        icon: message.icon,
       );
-
-      final transactionRequest = TransactionRequestInfo(
-        metadata: metadata,
-        scilla: null,
-        evm: evmRequest,
-      );
+      final to = txParams[kParamTo] as String?;
+      final valueAmount = evmValueAmount(txParams[kParamValue]?.toString());
 
       if (appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {

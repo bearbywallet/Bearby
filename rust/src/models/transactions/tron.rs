@@ -1,9 +1,30 @@
 use flutter_rust_bridge::frb;
 pub use zilpay::errors::tx::TransactionErrors;
 pub use zilpay::proto::tron_tx::{
-    TronWebContract, TronWebParameter, TronWebRawData, TronWebTransaction,
+    TronTransactionReceipt, TronWebContract, TronWebParameter, TronWebRawData, TronWebTransaction,
 };
 use zilpay::serde_json;
+
+/// FFI mirror of core `TronTransactionReceipt` (history path).
+/// Byte fields are hex-encoded strings for FRB/Dart.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TransactionTron {
+    pub raw_data_bytes: String,
+    pub tx_id: String,
+    pub signature: String,
+    pub owner_address: String,
+}
+
+impl From<TronTransactionReceipt> for TransactionTron {
+    fn from(value: TronTransactionReceipt) -> Self {
+        Self {
+            raw_data_bytes: zilpay::alloy::hex::encode(value.raw_data_bytes),
+            tx_id: zilpay::alloy::hex::encode(value.tx_id),
+            signature: zilpay::alloy::hex::encode(value.signature),
+            owner_address: value.owner_address.auto_format(),
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TronVoteInfo {

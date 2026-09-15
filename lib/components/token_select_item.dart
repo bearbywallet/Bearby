@@ -91,7 +91,12 @@ class TokenSelectItem extends StatelessWidget {
                       ),
                       for (final icon in providerIcons) ...[
                         const SizedBox(width: 6),
-                        SvgPicture.asset(icon, width: 16, height: 16),
+                        SvgPicture.asset(
+                          icon,
+                          width: 16,
+                          height: 16,
+                          fit: BoxFit.contain,
+                        ),
                       ],
                     ],
                   ),

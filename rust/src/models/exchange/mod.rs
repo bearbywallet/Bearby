@@ -498,7 +498,10 @@ impl ExchangeProvider {
         match self {
             Self::Uniswap(m) => Some(m.resolve()),
             Self::PancakeSwap(m) => Some(m.resolve()),
-            Self::Relay(_) | Self::PlunderSwap(_) | Self::ZilSwap(_) | Self::SunSwap(_) => None,
+            Self::Relay(_)
+            | Self::PlunderSwap(_)
+            | Self::ZilSwap(_)
+            | Self::SunSwap(_) => None,
         }
     }
 
@@ -512,7 +515,7 @@ impl ExchangeProvider {
             Self::PlunderSwap(_) => Some(EagerGate::Plunder),
             Self::SunSwap(_) => Some(EagerGate::Sun),
             Self::Relay(_) => Some(EagerGate::Relay),
-            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) => None,
+            Self::Uniswap(_) | Self::PancakeSwap(_) | Self::ZilSwap(_) => None
         }
     }
 }

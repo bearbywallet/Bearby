@@ -70,10 +70,16 @@ fn build_accounts_entries(
     accounts: &[AccountV2],
     wallet_type: &WalletTypes,
     slip44: u32,
+    skip_index: Option<usize>,
 ) -> Vec<Entry> {
+    let visible = accounts
+        .iter()
+        .enumerate()
+        .filter(move |(index, _)| Some(*index) != skip_index)
+        .map(|(_, acc)| acc);
+
     if slip44 == ZILLIQA && !matches!(wallet_type, WalletTypes::Ledger(_)) {
-        accounts
-            .iter()
+        visible
             .flat_map(|acc| {
                 if let Ok((legacy, eth)) = acc.get_zilliqa_addr_pair() {
                     vec![
@@ -94,8 +100,7 @@ fn build_accounts_entries(
             })
             .collect()
     } else {
-        accounts
-            .iter()
+        visible
             .map(|acc| Entry {
                 name: acc.name.clone(),
                 address: acc.addr.auto_format(),
@@ -133,7 +138,8 @@ pub async fn get_addresses_for_chain(chain_hash: u64) -> Result<Vec<Category>, S
                     .get(&slip44)
                     .and_then(|bip_map| bip_map.get(&resolve_bip))?;
 
-                let entries = build_accounts_entries(accounts, &data.wallet_type, slip44);
+                let entries =
+                    build_accounts_entries(accounts, &data.wallet_type, slip44, None);
                 if entries.is_empty() {
                     return None;
                 }
@@ -183,7 +189,12 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
             .get(&selected_slip44)
             .and_then(|bip_map| bip_map.get(&selected_bip))
             .map(|accounts| {
-                build_accounts_entries(accounts, &wallet_data.wallet_type, selected_slip44)
+                build_accounts_entries(
+                    accounts,
+                    &wallet_data.wallet_type,
+                    selected_slip44,
+                    Some(wallet_data.selected_account),
+                )
             })
             .unwrap_or_default();
 
@@ -225,7 +236,12 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
                     .get(&selected_slip44)
                     .and_then(|bip_map| bip_map.get(&resolve_bip))?;
 
-                let entries = build_accounts_entries(accounts, &data.wallet_type, selected_slip44);
+                let entries = build_accounts_entries(
+                    accounts,
+                    &data.wallet_type,
+                    selected_slip44,
+                    None,
+                );
                 if entries.is_empty() {
                     return None;
                 }

@@ -259,8 +259,12 @@ pub fn bootstrap_exchange_providers(
                 continue;
             }
             let key = (token.chain_hash, token.addr.to_hash(), addr_prefix);
-            let mut providers =
-                make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
+            let mut providers = make_providers(
+                addr_prefix,
+                slip_44,
+                chain_id,
+                token.chain_hash,
+            );
             scope_providers(&mut providers, token.chain_hash);
             let halted = resolve_halted(&providers, slip_44, chain_id);
             let names = provider_names(&providers);
@@ -311,8 +315,12 @@ pub fn bootstrap_exchange_providers(
                     let Some(&(slip_44, chain_id)) = chain_meta.get(&token.chain_hash) else {
                         continue;
                     };
-                    let mut providers =
-                        make_providers(addr_prefix, slip_44, chain_id, token.chain_hash);
+                    let mut providers = make_providers(
+                        addr_prefix,
+                        slip_44,
+                        chain_id,
+                        token.chain_hash,
+                    );
                     scope_providers(&mut providers, token.chain_hash);
                     let halted = resolve_halted(&providers, slip_44, chain_id);
                     let names = provider_names(&providers);

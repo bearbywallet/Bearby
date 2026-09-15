@@ -34,6 +34,7 @@ void showConfirmTransactionModal({
   required String amount,
   required FTokenInfo token,
   ColorsInfo? colors,
+  BigInt? accountIndex,
   required Function(HistoricalTransactionInfo) onConfirm,
   VoidCallback? onDismiss,
 }) {
@@ -51,6 +52,7 @@ void showConfirmTransactionModal({
       amount: amount,
       to: to,
       colors: colors,
+      accountIndex: accountIndex,
       onConfirm: (tx) {
         onConfirm(tx);
         if (onDismiss != null) {
@@ -71,6 +73,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
   final FTokenInfo token;
   final String amount;
   final ColorsInfo? colors;
+  final BigInt? accountIndex;
   final Function(HistoricalTransactionInfo) onConfirm;
 
   const _ConfirmTransactionContent({
@@ -79,6 +82,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
     required this.to,
     required this.token,
     this.colors,
+    this.accountIndex,
     required this.onConfirm,
   });
 
@@ -106,6 +110,11 @@ class _ConfirmTransactionContentState
   bool get isScilla => widget.tx.scilla != null;
   bool get isBTC => widget.tx.btc != null;
   bool get isTron => widget.tx.tron != null;
+
+  BigInt get _signAccountIndex =>
+      widget.accountIndex ??
+      context.read<AppState>().wallet?.selectedAccount ??
+      BigInt.zero;
 
   BigInt _getValueForOption(GasFeeOption option, RequiredTxParamsInfo params) {
     switch (option) {
@@ -211,7 +220,7 @@ class _ConfirmTransactionContentState
       final gas = await caclGasFee(
         params: _currentTx,
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: _signAccountIndex,
       );
 
       if (!mounted) return;
@@ -271,7 +280,7 @@ class _ConfirmTransactionContentState
     AppState appState,
     TransactionRequestInfo tx,
   ) async {
-    final accountIndex = appState.wallet!.selectedAccount.toInt();
+    final accountIndex = _signAccountIndex.toInt();
     final sig = await appState.ledgerViewController.signTransaction(
       transaction: tx,
       walletIndex: appState.selectedWallet,
@@ -300,7 +309,7 @@ class _ConfirmTransactionContentState
   ) async {
     final wallet = appState.wallet!;
     final walletIndex = appState.selectedWalletIndex;
-    final accountIndex = wallet.selectedAccount;
+    final accountIndex = _signAccountIndex;
     HistoricalTransactionInfo history;
 
     if (wallet.authType != "none") {

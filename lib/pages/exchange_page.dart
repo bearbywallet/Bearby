@@ -26,8 +26,6 @@ import 'package:bearby/state/exchange_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 
-enum _OrderType { swap, buySell }
-
 class ExchangePage extends StatefulWidget {
   const ExchangePage({super.key});
 
@@ -44,7 +42,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       RoundedLoadingButtonController();
   Timer? _quoteTimer;
 
-  _OrderType _orderType = _OrderType.swap;
   String _amount = '0';
   bool _hasDecimalPoint = false;
   BigInt? _lastChainHash;
@@ -134,6 +131,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       initialFrom: initialFrom ?? _nativeInitialAsset(),
     );
   }
+
 
   void _scheduleQuote() {
     _quoteTimer?.cancel();
@@ -228,20 +226,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final provider = state.selectedProvider;
     if (from == null || to == null || provider == null) return;
 
-    final supported = provider.whenOrNull(
-          relay: (_) => true,
-          uniswap: (_) => true,
-          pancakeSwap: (_) => true,
-          plunderSwap: (_) => true,
-          zilSwap: (_) => true,
-          sunSwap: (_) => true,
-        ) ??
-        false;
-    if (!supported) {
-      _showError('Unsupported provider');
-      return;
-    }
-
     final defaultRecipient = provider.common.accountAddr;
     final destination = (provider.supportsCustomRecipient && _recipientOverride != null)
         ? _recipientOverride!
@@ -259,27 +243,6 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         if (mounted) context.go(AppRoutes.history);
       },
       onDismiss: () => _btnController.reset(),
-    );
-  }
-
-  void _showError(String message) {
-    final theme = _appState.currentTheme;
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: theme.cardBackground,
-        title: Text('Error',
-            style: theme.titleMedium.copyWith(color: theme.textPrimary)),
-        content:
-            Text(message, style: theme.bodyLarge.copyWith(color: theme.danger)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('OK',
-                style: theme.button.copyWith(color: theme.primaryPurple)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -308,7 +271,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                   const SizedBox(height: 8),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: padding),
-                    child: _buildTabs(theme, l10n, exchange),
+                    child: _buildHeader(theme, exchange),
                   ),
                   Expanded(child: _buildBody(theme, l10n, padding, exchange)),
                 ],
@@ -397,35 +360,12 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildTabs(
-      AppTheme theme, AppLocalizations l10n, ExchangeState state) {
-    Widget tab(String label, _OrderType type, bool enabled) {
-      final selected = _orderType == type;
-      return GestureDetector(
-        onTap: enabled ? () => setState(() => _orderType = type) : null,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 18),
-          child: Text(
-            label,
-            style: theme.titleSmall.copyWith(
-              color: selected
-                  ? theme.textPrimary
-                  : theme.textSecondary.withValues(alpha: enabled ? 1.0 : 0.5),
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            ),
-          ),
-        ),
-      );
-    }
-
+  Widget _buildHeader(AppTheme theme, ExchangeState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          tab(l10n.exchangePageTabSwap, _OrderType.swap, true),
-          tab(l10n.exchangePageTabBuySell, _OrderType.buySell, false),
           const Spacer(),
           GestureDetector(
             onTap: () {

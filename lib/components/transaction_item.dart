@@ -5,6 +5,7 @@ import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/history_amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/mixins/transaction_token.dart';
@@ -30,10 +31,36 @@ class HistoryItem extends StatefulWidget {
 
 class _HistoryItemState extends State<HistoryItem>
     with SingleTickerProviderStateMixin, PressableAnimationMixin {
+  HistoryAmountView? _view;
+  String _formattedDate = '';
+
   @override
   void initState() {
     super.initState();
     initPressAnimation();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _recompute();
+  }
+
+  @override
+  void didUpdateWidget(covariant HistoryItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _recompute();
+  }
+
+  /// Keeps `build()` free of amount/token resolution: recomputed only when
+  /// the widget or its inherited dependencies change.
+  void _recompute() {
+    final state = Provider.of<AppState>(context, listen: false);
+    _view = resolveHistoryAmount(
+      transaction: widget.transaction,
+      appState: state,
+    );
+    _formattedDate = _formatDateTime();
   }
 
   @override
@@ -108,89 +135,75 @@ class _HistoryItemState extends State<HistoryItem>
     return '$day.$month.$year $hour:$minute';
   }
 
-  Widget _buildAmountWithPrice(AppState appState) {
-    final theme = appState.currentTheme;
+  String _flowLabel(AppLocalizations l10n, TxFlow flow) {
+    return switch (flow) {
+      TxFlow.incoming => l10n.historyItemReceived,
+      TxFlow.outgoing => l10n.historyItemSent,
+      TxFlow.neutral => l10n.transactionDetailsModal_transaction,
+    };
+  }
 
-    if (widget.transaction.isSignedMessage) {
-      final signedMsg = widget.transaction.parsedSignedMessage;
-      if (signedMsg == null) {
-        return const SizedBox.shrink();
-      }
+  Widget _buildTitle(
+    AppTheme theme,
+    AppLocalizations l10n,
+    HistoryAmountView view,
+  ) {
+    final title = widget.transaction.title ?? _flowLabel(l10n, view.flow);
 
-      String displayContent;
-      if (signedMsg.isTypedData) {
-        final domainName = signedMsg.domainName ?? '';
-        final primaryType = signedMsg.primaryType ?? '';
-        displayContent =
-            domainName.isNotEmpty ? '$domainName - $primaryType' : primaryType;
-      } else {
-        final decoded = signedMsg.decodedMessage;
-        displayContent =
-            decoded.length > 50 ? '${decoded.substring(0, 50)}...' : decoded;
-      }
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            displayContent.isNotEmpty ? displayContent : 'Signed Message',
+    return Row(
+      children: [
+        Flexible(
+          child: Text(
+            title,
             style: theme.bodyText1.copyWith(
               color: theme.textPrimary,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+              fontWeight: FontWeight.w500,
             ),
             overflow: TextOverflow.ellipsis,
-            maxLines: 2,
+          ),
+        ),
+        if (view.status != TransactionStatusInfo.success) ...[
+          const SizedBox(width: 6),
+          Text(
+            '· ${widget.transaction.status.name.toUpperCase()}',
+            style: theme.caption.copyWith(
+              color: _getStatusColor(theme),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
-      );
+      ],
+    );
+  }
+
+  Widget _buildSignedMessageContent(AppState appState) {
+    final theme = appState.currentTheme;
+    final signedMsg = widget.transaction.parsedSignedMessage;
+    if (signedMsg == null) {
+      return const SizedBox.shrink();
     }
 
-    final token = resolveTransactionToken(
-      transaction: widget.transaction,
-      appState: appState,
-    );
-    final baseToken = appState.wallet?.tokens.first;
+    String displayContent;
+    if (signedMsg.isTypedData) {
+      final domainName = signedMsg.domainName ?? '';
+      final primaryType = signedMsg.primaryType ?? '';
+      displayContent =
+          domainName.isNotEmpty ? '$domainName - $primaryType' : primaryType;
+    } else {
+      final decoded = signedMsg.decodedMessage;
+      displayContent =
+          decoded.length > 50 ? '${decoded.substring(0, 50)}...' : decoded;
+    }
 
-    final amount = BigInt.tryParse(
-            widget.transaction.tokenInfo?.value ?? widget.transaction.amount) ??
-        BigInt.zero;
-
-    final decimals = (widget.transaction.tokenInfo?.decimals ??
-            token?.decimals ??
-            baseToken?.decimals) ??
-        1;
-
-    final symbol = (widget.transaction.tokenInfo?.symbol ??
-            token?.symbol ??
-            baseToken?.symbol) ??
-        "";
-
-    final rate = token?.rate ?? baseToken?.rate ?? 0;
-
-    final (formattedValue, convertedValue) = formatingAmount(
-      amount: amount,
-      symbol: symbol,
-      decimals: decimals,
-      rate: rate,
-      appState: appState,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(formattedValue,
-            style: theme.bodyText1.copyWith(
-                color: theme.textPrimary,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5),
-            overflow: TextOverflow.ellipsis),
-        if (convertedValue.isNotEmpty && convertedValue != '0')
-          const SizedBox(height: 2),
-        Text(convertedValue,
-            style: theme.bodyText2
-                .copyWith(color: theme.textSecondary.withValues(alpha: 0.7))),
-      ],
+    return Text(
+      displayContent.isNotEmpty ? displayContent : 'Signed Message',
+      style: theme.bodyText1.copyWith(
+        color: theme.textPrimary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5,
+      ),
+      overflow: TextOverflow.ellipsis,
+      maxLines: 2,
     );
   }
 
@@ -228,14 +241,14 @@ class _HistoryItemState extends State<HistoryItem>
       );
     }
 
-    final baseToken = appState.wallet?.tokens.firstWhere(
-      (t) => t.addrType == appState.account?.addrType,
-      orElse: () => appState.wallet!.tokens.first,
-    );
-
-    if (baseToken == null) {
+    final tokens = appState.wallet?.tokens;
+    if (tokens == null || tokens.isEmpty) {
       return const SizedBox.shrink();
     }
+    final baseToken = tokens.firstWhere(
+      (t) => t.addrType == appState.account?.addrType,
+      orElse: () => tokens.first,
+    );
 
     final decimals =
         widget.transaction.chainType == "EVM" ? 18 : baseToken.decimals;
@@ -268,12 +281,137 @@ class _HistoryItemState extends State<HistoryItem>
     );
   }
 
+  Widget _buildBottomRow(AppState appState, AppLocalizations l10n) {
+    final theme = appState.currentTheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          _formattedDate,
+          style: theme.bodyText2.copyWith(
+            color: theme.textSecondary.withValues(alpha: 0.7),
+          ),
+        ),
+        _buildFeeWithPrice(appState, l10n),
+      ],
+    );
+  }
+
+  Widget _buildTransferBody(
+    AppState appState,
+    AppLocalizations l10n,
+    HistoryAmountView view,
+  ) {
+    final theme = appState.currentTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildIcon(appState),
+            const SizedBox(width: 12),
+            Expanded(child: _buildTitle(theme, l10n, view)),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  view.signedNative,
+                  style: theme.bodyText1.copyWith(
+                    color: historyAmountColor(
+                      flow: view.flow,
+                      status: view.status,
+                      theme: theme,
+                    ),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (view.fiat.isNotEmpty && view.fiat != '0') ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    view.fiat,
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _buildBottomRow(appState, l10n),
+      ],
+    );
+  }
+
+  Widget _buildSignedMessageBody(AppState appState, AppLocalizations l10n) {
+    final theme = appState.currentTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                            color:
+                                _getStatusColor(theme).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Text(
+                            widget.transaction.status.name.toUpperCase(),
+                            style: theme.caption.copyWith(
+                                color: _getStatusColor(theme),
+                                fontWeight: FontWeight.w600)),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                            widget.transaction.title ??
+                                l10n.transactionDetailsModal_transaction,
+                            style: theme.bodyText1.copyWith(
+                                color:
+                                    theme.textPrimary.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSignedMessageContent(appState),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            _buildIcon(appState),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _buildBottomRow(appState, l10n),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) {
+      return const SizedBox.shrink();
+    }
     final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final view = _view;
 
     return Column(
       children: [
@@ -282,70 +420,9 @@ class _HistoryItemState extends State<HistoryItem>
           enableHover: true,
           child: Padding(
             padding: EdgeInsets.all(adaptivePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                    color: _getStatusColor(theme)
-                                        .withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12)),
-                                child: Text(
-                                    widget.transaction.status.name
-                                        .toUpperCase(),
-                                    style: theme.caption.copyWith(
-                                        color: _getStatusColor(theme),
-                                        fontWeight: FontWeight.w600)),
-                              ),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                    widget.transaction.title ??
-                                        l10n
-                                            .transactionDetailsModal_transaction,
-                                    style: theme.bodyText1.copyWith(
-                                        color: theme.textPrimary
-                                            .withValues(alpha: 0.7),
-                                        fontWeight: FontWeight.w500),
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          _buildAmountWithPrice(state),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    _buildIcon(state),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _formatDateTime(),
-                      style: theme.bodyText2.copyWith(
-                        color: theme.textSecondary.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    _buildFeeWithPrice(state, l10n),
-                  ],
-                ),
-              ],
-            ),
+            child: view == null
+                ? _buildSignedMessageBody(state, l10n)
+                : _buildTransferBody(state, l10n, view),
           ),
         ),
         if (widget.showDivider)

@@ -94,7 +94,9 @@ pub(crate) async fn sign_and_broadcast_one(
             zil_tx.chain_id = chain.config.chain_ids[1] as u16;
         }
         TransactionRequest::Ethereum((eth_tx, _)) => {
-            eth_tx.chain_id = Some(chain.config.chain_id());
+            if eth_tx.chain_id.is_none() {
+                eth_tx.chain_id = Some(chain.config.chain_id());
+            }
         }
         _ => {}
     }
@@ -298,7 +300,9 @@ pub async fn encode_tx_rlp(
                 chunks_bytes: Vec::new(),
             }),
             TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
-                tx_eth.chain_id = Some(chain.config.chain_id());
+                if tx_eth.chain_id.is_none() {
+                    tx_eth.chain_id = Some(chain.config.chain_id());
+                }
                 let derivation =
                     DerivationPath::with_index(slip44, (0, 0, account.account_type.value()));
                 let ledger_path = derivation.get_path().trim_start_matches("m/").to_string();
@@ -625,15 +629,19 @@ pub async fn update_tx_with_params(
     let params: RequiredTxParams = params.into();
     let balance: U256 = balance.parse().unwrap_or_default();
 
-    if let TransactionRequest::Tron((ref mut tron_tx, _)) = tx {
-        let core = handle()?;
-        let provider = core
-            .get_provider(chain_hash)
-            .map_err(ServiceError::BackgroundError)?;
-        provider
-            .tron_fill_block_ref(tron_tx)
-            .await
-            .map_err(ServiceError::NetworkErrors)?;
+    if let TransactionRequest::Tron((ref mut tron_tx, ref metadata)) = tx {
+        // Refresh block ref only for wallet-built txs; dApp sign-only
+        // requests (broadcast=false) must keep the dApp's exact raw_data.
+        if metadata.broadcast {
+            let core = handle()?;
+            let provider = core
+                .get_provider(chain_hash)
+                .map_err(ServiceError::BackgroundError)?;
+            provider
+                .tron_fill_block_ref(tron_tx)
+                .await
+                .map_err(ServiceError::NetworkErrors)?;
+        }
     }
 
     update_tx_from_params(&mut tx, params, balance).map_err(ServiceError::TransactionErrors)?;
@@ -648,16 +656,6 @@ pub fn parse_tron_transaction(json: String) -> Result<TransactionRequestTron, St
     let tron_web: TronWebTransaction = zilpay::serde_json::from_str(&json)
         .map_err(|e| format!("Invalid Tron transaction JSON: {e}"))?;
     Ok(TransactionRequestTron::from(tron_web))
-}
-
-/// Serialize a TransactionRequestTron back to JSON for dApp response.
-#[frb(sync)]
-pub fn tron_transaction_to_json(tx: TransactionRequestTron) -> Result<String, String> {
-    let tron_web: TronWebTransaction = tx
-        .try_into()
-        .map_err(|e: zilpay::errors::tx::TransactionErrors| e.to_string())?;
-    zilpay::serde_json::to_string(&tron_web)
-        .map_err(|e| format!("Failed to serialize Tron transaction: {e}"))
 }
 
 #[cfg(test)]

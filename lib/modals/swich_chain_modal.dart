@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/network_card.dart';
 import 'package:bearby/components/swipe_button.dart';
-import 'package:bearby/modals/confirm_password.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/src/rust/api/provider.dart';
@@ -195,6 +194,9 @@ class _SwitchChainNetworkContentState
                           chainHash: _selectedNetwork!.chainHash,
                         );
                         await appState.syncData();
+                        await appState.refreshBalancesAndRates(
+                          walletIndex: appState.selectedWalletIndex,
+                        );
                       } catch (e) {
                         debugPrint("selectAccountsChain: $e");
                       }

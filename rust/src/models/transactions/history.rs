@@ -1,5 +1,7 @@
 use super::btc::{BitcoinMetadataInfo, TransactionBitcoin};
+use super::solana::TransactionSolana;
 pub use super::transaction_metadata::TransactionMetadataInfo;
+use super::tron::TransactionTron;
 use zilpay::history::status::TransactionStatus;
 pub use zilpay::history::transaction::HistoricalTransaction;
 
@@ -27,8 +29,8 @@ pub struct HistoricalTransactionInfo {
     pub evm: Option<String>,
     pub scilla: Option<String>,
     pub btc: Option<TransactionBitcoin>,
-    pub tron: Option<String>,
-    pub solana: Option<String>,
+    pub tron: Option<TransactionTron>,
+    pub solana: Option<TransactionSolana>,
     pub signed_message: Option<String>,
     pub timestamp: u64,
 }
@@ -49,8 +51,8 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                 let meta = BitcoinMetadataInfo::from(meta);
                 TransactionBitcoin::from_tx_with_utxos(tx, &meta.witness_utxos, network)
             }),
-            tron: value.tron,
-            solana: value.solana,
+            tron: value.tron.map(Into::into),
+            solana: value.solana.map(Into::into),
             evm: value.evm,
             scilla: value.scilla,
             signed_message: value.signed_message,

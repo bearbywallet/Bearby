@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'tron.dart';
@@ -9,6 +9,7 @@ part of 'tron.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -673,7 +674,9 @@ class TronContractValue_TransferContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress, toAddress, amount);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, toAddress, amount);
+  }
 
   @override
   String toString() {
@@ -771,8 +774,10 @@ class TronContractValue_TriggerSmartContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress, contractAddress,
-      callValue, data, callTokenValue, tokenId);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, contractAddress, callValue,
+        data, callTokenValue, tokenId);
+  }
 
   @override
   String toString() {
@@ -881,8 +886,9 @@ class TronContractValue_FreezeBalanceV2Contract extends TronContractValue {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, ownerAddress, frozenBalance, resource);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, frozenBalance, resource);
+  }
 
   @override
   String toString() {
@@ -962,7 +968,9 @@ class TronContractValue_WithdrawBalanceContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress);
+  }
 
   @override
   String toString() {
@@ -1041,8 +1049,9 @@ class TronContractValue_UnfreezeBalanceV2Contract extends TronContractValue {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, ownerAddress, unfreezeBalance, resource);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, unfreezeBalance, resource);
+  }
 
   @override
   String toString() {
@@ -1126,7 +1135,9 @@ class TronContractValue_WithdrawExpireUnfreezeContract
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress);
+  }
 
   @override
   String toString() {
@@ -1216,8 +1227,10 @@ class TronContractValue_DelegateResourceContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress, resource, balance,
-      receiverAddress, lock, lockPeriod);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, resource, balance,
+        receiverAddress, lock, lockPeriod);
+  }
 
   @override
   String toString() {
@@ -1331,8 +1344,10 @@ class TronContractValue_UnDelegateResourceContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, ownerAddress, resource, balance, receiverAddress);
+  int get hashCode {
+    return Object.hash(
+        runtimeType, ownerAddress, resource, balance, receiverAddress);
+  }
 
   @override
   String toString() {
@@ -1423,7 +1438,9 @@ class TronContractValue_CancelAllUnfreezeV2Contract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress);
+  }
 
   @override
   String toString() {
@@ -1505,8 +1522,9 @@ class TronContractValue_TransferAssetContract extends TronContractValue {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, assetName, ownerAddress, toAddress, amount);
+  int get hashCode {
+    return Object.hash(runtimeType, assetName, ownerAddress, toAddress, amount);
+  }
 
   @override
   String toString() {
@@ -1572,7 +1590,7 @@ class _$TronContractValue_TransferAssetContractCopyWithImpl<$Res>
 class TronContractValue_VoteWitnessContract extends TronContractValue {
   const TronContractValue_VoteWitnessContract(
       {required this.ownerAddress,
-      required final List<TronVoteInfo> votes,
+      required List<TronVoteInfo> votes,
       required this.support})
       : _votes = votes,
         super._();
@@ -1603,13 +1621,15 @@ class TronContractValue_VoteWitnessContract extends TronContractValue {
             other is TronContractValue_VoteWitnessContract &&
             (identical(other.ownerAddress, ownerAddress) ||
                 other.ownerAddress == ownerAddress) &&
-            const DeepCollectionEquality().equals(other._votes, _votes) &&
+            const DeepCollectionEquality().equals(other.votes, _votes) &&
             (identical(other.support, support) || other.support == support));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress,
-      const DeepCollectionEquality().hash(_votes), support);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress,
+        const DeepCollectionEquality().hash(_votes), support);
+  }
 
   @override
   String toString() {
@@ -1692,7 +1712,9 @@ class TronContractValue_AccountCreateContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress, accountAddress);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, accountAddress);
+  }
 
   @override
   String toString() {
@@ -1770,7 +1792,9 @@ class TronContractValue_AccountUpdateContract extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress, accountName);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress, accountName);
+  }
 
   @override
   String toString() {
@@ -1848,7 +1872,9 @@ class TronContractValue_AccountPermissionUpdateContract
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, ownerAddress);
+  int get hashCode {
+    return Object.hash(runtimeType, ownerAddress);
+  }
 
   @override
   String toString() {
@@ -1922,7 +1948,9 @@ class TronContractValue_Unknown extends TronContractValue {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, typeUrl, valueJson);
+  int get hashCode {
+    return Object.hash(runtimeType, typeUrl, valueJson);
+  }
 
   @override
   String toString() {

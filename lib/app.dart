@@ -20,11 +20,12 @@ class BearbyApp extends StatefulWidget {
 class _BearbyAppState extends State<BearbyApp> {
   late final GoRouter _router;
   final _deepLinkService = DeepLinkService();
+  final _navKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
-    _router = createRouter(widget.appState);
+    _router = createRouter(widget.appState, navigatorKey: _navKey);
     _deepLinkService.initialize(_router, widget.appState);
   }
 

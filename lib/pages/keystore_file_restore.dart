@@ -223,13 +223,11 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       final l10n = AppLocalizations.of(context)!;
       final result = await FilePicker.pickFiles(type: FileType.any);
 
-      if (result == null ||
-          result.files.isEmpty ||
-          result.files.first.path == null) {
+      if (result.isEmpty || result.first.path == null) {
         return;
       }
 
-      final path = result.files.first.path!;
+      final path = result.first.path!;
       if (!path.toLowerCase().endsWith('.zp')) {
         setState(() => _errorMessage = l10n.keystoreRestoreExtError);
         return;

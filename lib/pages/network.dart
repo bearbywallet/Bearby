@@ -197,7 +197,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     return sortedNetworks;
   }
 
-  void _handleNetworkSelect(NetworkItem networkItem) async {
+  Future<void> _handleNetworkSelect(NetworkItem networkItem) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final config = networkItem.configInfo;
 
@@ -207,11 +207,17 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         chainHash: config.chainHash,
       );
 
+      // Match account path: sync local state first so home rebuilds with new chain/tokens.
+      await appState.syncData();
+
       if (_popOnSelect && mounted) {
         context.go(AppRoutes.home);
       }
 
-      await appState.syncData();
+      // Same as WalletHeaderModal._selectWallet after account change.
+      await appState.refreshBalancesAndRates(
+        walletIndex: appState.selectedWalletIndex,
+      );
     } catch (e) {
       debugPrint("select net: $e");
     }

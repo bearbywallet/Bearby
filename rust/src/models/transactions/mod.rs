@@ -5,5 +5,6 @@ pub mod evm;
 pub mod history;
 pub mod request;
 pub mod scilla;
+pub mod solana;
 pub mod transaction_metadata;
 pub mod tron;

@@ -14,6 +14,7 @@ import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/addr.dart';
 import 'package:bearby/mixins/amount.dart';
+import 'package:bearby/mixins/history_amount.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/mixins/transaction_share.dart';
 import 'package:bearby/mixins/transaction_token.dart';
@@ -372,13 +373,15 @@ class _AmountCard extends StatelessWidget {
   final AppState appState;
   final AppTheme theme;
   final AppLocalizations l10n;
+  /// Resolved at construction so `build()` stays free of amount formatting.
+  final HistoryAmountView? view;
 
-  const _AmountCard({
+  _AmountCard({
     required this.transaction,
     required this.appState,
     required this.theme,
     required this.l10n,
-  });
+  }) : view = resolveHistoryAmount(transaction: transaction, appState: appState);
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +395,7 @@ class _AmountCard extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    final (amount, fiat) = _formatAmount();
+    final view = this.view;
     final btc = transaction.btcReceipt;
 
     return Padding(
@@ -406,14 +409,22 @@ class _AmountCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  amount,
-                  style: theme.titleMedium.copyWith(color: theme.textPrimary),
+                  view?.signedNative ?? '',
+                  style: theme.titleMedium.copyWith(
+                    color: view == null
+                        ? theme.textPrimary
+                        : historyAmountColor(
+                            flow: view.flow,
+                            status: view.status,
+                            theme: theme,
+                          ),
+                  ),
                 ),
-                if (fiat.isNotEmpty && fiat != '0')
+                if (view != null && view.fiat.isNotEmpty && view.fiat != '0')
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
                     child: Text(
-                      fiat,
+                      view.fiat,
                       style:
                           theme.bodyText2.copyWith(color: theme.textSecondary),
                     ),
@@ -457,24 +468,6 @@ class _AmountCard extends StatelessWidget {
     );
   }
 
-  (String, String) _formatAmount() {
-    final token = resolveTransactionToken(
-      transaction: transaction,
-      appState: appState,
-    );
-    final amount =
-        BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
-            BigInt.zero;
-    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
-    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? '';
-    return formatingAmount(
-      amount: amount,
-      symbol: symbol,
-      decimals: decimals,
-      rate: token?.rate ?? 0,
-      appState: appState,
-    );
-  }
 }
 
 class _StatusBadge extends StatelessWidget {

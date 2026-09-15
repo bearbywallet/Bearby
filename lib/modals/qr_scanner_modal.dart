@@ -49,6 +49,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   String? _lastScannedCode;
   DateTime? _lastScanTime;
   bool _permissionError = false;
+  bool _completed = false;
   static const Duration _scanCooldown = Duration(milliseconds: 1000);
 
   @override
@@ -95,7 +96,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   }
 
   void _onBarcodeDetected(BarcodeCapture capture) {
-    if (!mounted) return;
+    if (!mounted || _completed) return;
 
     final barcodes = capture.barcodes;
     if (barcodes.isEmpty) return;
@@ -104,27 +105,33 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     if (code == null || code.isEmpty) return;
 
     final now = DateTime.now();
-
+    final lastTime = _lastScanTime;
     if (_lastScannedCode == code &&
-        _lastScanTime != null &&
-        now.difference(_lastScanTime!) < _scanCooldown) {
+        lastTime != null &&
+        now.difference(lastTime) < _scanCooldown) {
       return;
     }
 
     _lastScannedCode = code;
     _lastScanTime = now;
-
-    HapticFeedback.selectionClick();
-    widget.onScanned(code);
+    _finish(code);
   }
 
   Future<void> _onPaste() async {
+    if (_completed) return;
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     final text = data?.text?.trim();
     if (text == null || text.isEmpty || !mounted) return;
+    _finish(text);
+  }
+
+  /// Detect and paste share one path: close scanner, then deliver payload.
+  void _finish(String code) {
+    if (!mounted || _completed) return;
+    _completed = true;
     HapticFeedback.selectionClick();
     Navigator.pop(context);
-    widget.onScanned(text);
+    widget.onScanned(code);
   }
 
   @override

@@ -4,7 +4,7 @@ class AdaptiveSize {
   static const double _smallScreenThreshold = 400.0;
   static const double _baseWidth = 340.0;
   static const double _minScale = 0.85;
-  static const double _maxScale = 3.0;
+  static const double _maxScale = 1.2;
 
   static double getScaleFactor(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;

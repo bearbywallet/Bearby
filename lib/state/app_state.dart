@@ -127,8 +127,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return accounts.elementAtOrNull(index);
   }
 
-  BigInt get accountBalanceKey =>
-      addressToHash(addr: account?.addr ?? '');
+  BigInt get accountBalanceKey => addressToHash(addr: account?.addr ?? '');
 
   int get selectedWallet => _selectedWallet;
 

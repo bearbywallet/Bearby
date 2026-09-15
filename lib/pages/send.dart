@@ -15,6 +15,7 @@ import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/preprocess_url.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/modals/select_address.dart';
 import 'package:bearby/modals/select_token.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/src/rust/api/transaction.dart';
@@ -320,6 +321,18 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
 
       _initialized = true;
       unawaited(_resolveScannedTokenAddress(argTokenAddress));
+
+      // No recipient yet (deep-link/QR can prefill) → open picker on entry.
+      if (_address == null || _address!.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          if (_address != null && _address!.isNotEmpty) return;
+          showAddressSelectModal(
+            context: context,
+            onAddressSelected: updateAddress,
+          );
+        });
+      }
     }
   }
 

@@ -3,6 +3,10 @@ import 'package:bearby/config/ftokens.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/state/app_state.dart';
 
+/// Integer percent of a raw (wei) balance: 25 → balance * 25 / 100.
+BigInt percentOfBalance({required BigInt balance, required int percent}) =>
+    balance * BigInt.from(percent) ~/ BigInt.from(100);
+
 BigInt toDecimalsWei(String amount, int decimals) {
   try {
     final (value, dec) = toWei(value: amount, decimals: decimals);

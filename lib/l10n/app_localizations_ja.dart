@@ -42,10 +42,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountItemBalanceLabel => '残高:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => '送信';
 
   @override
   String get sendTokenPageSubmitButton => '送信';
+
+  @override
+  String get amountChipClear => 'クリア';
+
+  @override
+  String get amountChipMax => '最大';
 
   @override
   String get aboutPageTitle => 'アプリについて';
@@ -512,9 +518,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39インデックス';
 
   @override
-  String get addAccountPageUseBiometrics => '生体認証を使用';
-
-  @override
   String get addAccountPagePasswordHint => 'パスワード';
 
   @override
@@ -540,6 +543,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'アカウントの作成に失敗: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'アカウント追加';
+
+  @override
+  String get addAccountPageCreateButton => '作成';
 
   @override
   String get addressBookPageTitle => 'アドレス帳';
@@ -582,6 +591,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get historyPageSearchHint => 'トランザクションを検索...';
+
+  @override
+  String get historyItemReceived => '受取';
+
+  @override
+  String get historyItemSent => '送金';
 
   @override
   String get notificationsSettingsPageTitle => '通知';
@@ -1105,13 +1120,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteWalletModalSubmit => '送信';
 
   @override
-  String get addressSelectModalContentTitle => 'アドレスを選択';
+  String get addressSelectModalContentTitle => '受取人を選択';
 
   @override
   String get addressSelectModalContentSearchHint => '検索 / アドレス / ENS';
 
   @override
   String get addressSelectModalContentUnknown => '不明';
+
+  @override
+  String get addressSelectModalContentEmpty => '連絡先がありません — アドレスを貼り付けるかQRコードをスキャンしてください';
+
+  @override
+  String get walletCardPasteOrScan => 'アドレスを貼り付けるかQRをスキャン';
 
   @override
   String get addressSelectModalContentMyAccounts => 'マイアカウント';

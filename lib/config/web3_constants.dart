@@ -16,6 +16,7 @@ final BigInt kZilliqaChainId = BigInt.one;
 // Address types
 const int kScillaAddressType = 0;
 const int kEvmAddressType = 1;
+const int kTronAddressType = 4;
 
 // JSON-RPC
 const String kJsonRpcVersion = '2.0';

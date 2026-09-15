@@ -42,10 +42,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountItemBalanceLabel => 'Баланс:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => 'Отправить';
 
   @override
   String get sendTokenPageSubmitButton => 'Отправить';
+
+  @override
+  String get amountChipClear => 'Сброс';
+
+  @override
+  String get amountChipMax => 'Макс';
 
   @override
   String get aboutPageTitle => 'О приложении';
@@ -515,9 +521,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 индекс';
 
   @override
-  String get addAccountPageUseBiometrics => 'Использовать биометрию';
-
-  @override
   String get addAccountPagePasswordHint => 'Пароль';
 
   @override
@@ -543,6 +546,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'Не удалось создать аккаунт: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'Новый аккаунт';
+
+  @override
+  String get addAccountPageCreateButton => 'Создать';
 
   @override
   String get addressBookPageTitle => 'Адресная книга';
@@ -585,6 +594,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get historyPageSearchHint => 'Поиск транзакций...';
+
+  @override
+  String get historyItemReceived => 'Получено';
+
+  @override
+  String get historyItemSent => 'Отправлено';
 
   @override
   String get notificationsSettingsPageTitle => 'Уведомления';
@@ -1108,13 +1123,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteWalletModalSubmit => 'Удалить';
 
   @override
-  String get addressSelectModalContentTitle => 'Выберите адрес';
+  String get addressSelectModalContentTitle => 'Выберите получателя';
 
   @override
   String get addressSelectModalContentSearchHint => 'Поиск / Адрес / ENS';
 
   @override
   String get addressSelectModalContentUnknown => 'Неизвестно';
+
+  @override
+  String get addressSelectModalContentEmpty => 'Пока нет сохранённых контактов — вставьте адрес или отсканируйте QR-код';
+
+  @override
+  String get walletCardPasteOrScan => 'Вставьте адрес или отсканируйте QR';
 
   @override
   String get addressSelectModalContentMyAccounts => 'Мои аккаунты';

@@ -336,5 +336,36 @@ mod btc_wallet_tests {
         assert_eq!(token.symbol, "TRX");
         assert_eq!(token.chain_hash, tron_chain_hash);
         assert!(token.native);
+
+        // Retry with the same index must be a no-op, not a duplicate.
+        add_next_bip39_account(AddNextBip39AccountParams {
+            wallet_index: 0,
+            account_index: 1,
+            name: "Retry".to_string(),
+            passphrase: String::new(),
+            password: Some(PASSWORD.to_string()),
+        })
+        .await
+        .unwrap();
+
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+        for &slip44 in &[BITCOIN, ETHEREUM, TRON, SOLANA, ZILLIQA] {
+            let bip = DerivationPath::default_bip(slip44);
+            let accounts = wallet
+                .accounts
+                .get(&slip44)
+                .and_then(|m| m.get(&bip))
+                .unwrap_or_else(|| panic!("missing accounts for slip44 {slip44}"));
+            assert_eq!(
+                accounts.len(),
+                2,
+                "slip44 {slip44} must not gain duplicates on retry"
+            );
+            assert_eq!(
+                accounts[1].name, "Acc 1",
+                "retry must not overwrite the account"
+            );
+        }
     }
 }

@@ -167,17 +167,29 @@ abstract class AppLocalizations {
   /// **'Balance:'**
   String get accountItemBalanceLabel;
 
-  /// Title for the SendTokenPage (currently empty as per original code)
+  /// Title for the SendTokenPage app bar
   ///
   /// In en, this message translates to:
-  /// **''**
+  /// **'Send'**
   String get sendTokenPageTitle;
 
   /// Text for the submit button on SendTokenPage
   ///
   /// In en, this message translates to:
-  /// **'Submit'**
+  /// **'Send'**
   String get sendTokenPageSubmitButton;
+
+  /// Short label (max ~5 chars) for the chip that clears the amount in TokenAmountCard (was 0%)
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get amountChipClear;
+
+  /// Short label (max ~5 chars) for the chip that fills the full balance in TokenAmountCard (100%)
+  ///
+  /// In en, this message translates to:
+  /// **'MAX'**
+  String get amountChipMax;
 
   /// Title for the AboutPage
   ///
@@ -638,7 +650,7 @@ abstract class AppLocalizations {
   /// No description provided for @exchangePageConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Confirm'**
+  /// **'Swap'**
   String get exchangePageConfirm;
 
   /// No description provided for @exchangePageComingSoon.
@@ -1061,12 +1073,6 @@ abstract class AppLocalizations {
   /// **'BIP39 Index'**
   String get addAccountPageBip39Index;
 
-  /// Label for the biometrics option on the Add Account page
-  ///
-  /// In en, this message translates to:
-  /// **'Use Biometrics'**
-  String get addAccountPageUseBiometrics;
-
   /// Hint text for the password input field on the Add Account page
   ///
   /// In en, this message translates to:
@@ -1108,6 +1114,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to create account: {error}'**
   String addAccountPageCreateFailed(Object error);
+
+  /// Title for the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Add Account'**
+  String get addAccountPageTitle;
+
+  /// Text for the create button on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get addAccountPageCreateButton;
 
   /// Title for the Address Book page
   ///
@@ -1180,6 +1198,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search transactions...'**
   String get historyPageSearchHint;
+
+  /// History card title for an incoming transfer
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get historyItemReceived;
+
+  /// History card title for an outgoing transfer
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get historyItemSent;
 
   /// Title displayed in the app bar of the NotificationsSettingsPage component
   ///
@@ -2222,7 +2252,7 @@ abstract class AppLocalizations {
   /// Title text for the AddressSelectModalContent modal.
   ///
   /// In en, this message translates to:
-  /// **'Select Address'**
+  /// **'Select recipient'**
   String get addressSelectModalContentTitle;
 
   /// Hint text for the search input field in the AddressSelectModalContent modal.
@@ -2236,6 +2266,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get addressSelectModalContentUnknown;
+
+  /// Shown in the recipient modal when there are no accounts, contacts, or wallets to list.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved contacts yet — paste an address or scan a QR code'**
+  String get addressSelectModalContentEmpty;
+
+  /// Placeholder subtitle on the recipient card in SendTokenPage before an address is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste address or scan QR'**
+  String get walletCardPasteOrScan;
 
   /// Section title for the 'My Accounts' list in the AddressSelectModalContent modal.
   ///

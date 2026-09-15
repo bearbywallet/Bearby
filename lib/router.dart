@@ -151,8 +151,12 @@ String? _globalRedirect(
   return null;
 }
 
-GoRouter createRouter(AppState appState) {
+GoRouter createRouter(
+  AppState appState, {
+  GlobalKey<NavigatorState>? navigatorKey,
+}) {
   return GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: AppRoutes.home,
     refreshListenable: appState,
     redirect: (context, state) => _globalRedirect(context, state, appState),

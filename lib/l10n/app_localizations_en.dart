@@ -42,10 +42,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountItemBalanceLabel => 'Balance:';
 
   @override
-  String get sendTokenPageTitle => '';
+  String get sendTokenPageTitle => 'Send';
 
   @override
-  String get sendTokenPageSubmitButton => 'Submit';
+  String get sendTokenPageSubmitButton => 'Send';
+
+  @override
+  String get amountChipClear => 'Clear';
+
+  @override
+  String get amountChipMax => 'MAX';
 
   @override
   String get aboutPageTitle => 'About';
@@ -288,7 +294,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangePageRecipientTitle => 'Select recipient';
 
   @override
-  String get exchangePageConfirm => 'Confirm';
+  String get exchangePageConfirm => 'Swap';
 
   @override
   String get exchangePageComingSoon => 'Soon';
@@ -513,9 +519,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAccountPageBip39Index => 'BIP39 Index';
 
   @override
-  String get addAccountPageUseBiometrics => 'Use Biometrics';
-
-  @override
   String get addAccountPagePasswordHint => 'Password';
 
   @override
@@ -541,6 +544,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String addAccountPageCreateFailed(Object error) {
     return 'Failed to create account: $error';
   }
+
+  @override
+  String get addAccountPageTitle => 'Add Account';
+
+  @override
+  String get addAccountPageCreateButton => 'Create';
 
   @override
   String get addressBookPageTitle => 'Address Book';
@@ -583,6 +592,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get historyPageSearchHint => 'Search transactions...';
+
+  @override
+  String get historyItemReceived => 'Received';
+
+  @override
+  String get historyItemSent => 'Sent';
 
   @override
   String get notificationsSettingsPageTitle => 'Notifications';
@@ -1106,13 +1121,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteWalletModalSubmit => 'Destroy';
 
   @override
-  String get addressSelectModalContentTitle => 'Select Address';
+  String get addressSelectModalContentTitle => 'Select recipient';
 
   @override
   String get addressSelectModalContentSearchHint => 'Search / Address / ENS';
 
   @override
   String get addressSelectModalContentUnknown => 'Unknown';
+
+  @override
+  String get addressSelectModalContentEmpty => 'No saved contacts yet — paste an address or scan a QR code';
+
+  @override
+  String get walletCardPasteOrScan => 'Paste address or scan QR';
 
   @override
   String get addressSelectModalContentMyAccounts => 'My Accounts';

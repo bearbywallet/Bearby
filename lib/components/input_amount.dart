@@ -2,6 +2,7 @@ import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/src/rust/api/utils.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
@@ -9,13 +10,13 @@ import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
 
 /// Shared token amount card: amount display, token selector and a balance row with
-/// 25% / 50% / 100% chips. Presentational only — the caller supplies the [token] and
+/// Clear / 25% / 50% / 75% / MAX chips. Presentational only — the caller supplies the [token] and
 /// [balance] and reacts to [onAmountChanged] (chips) and [onTokenTap] (selector).
 ///
 /// The amount renders at a fixed [AppTheme.displayLarge] size and scrolls
 /// horizontally when it overflows, auto-scrolling to keep the newest digit visible.
 class TokenAmountCard extends StatefulWidget {
-  static const List<int> _percentOptions = <int>[0, 25, 50, 100];
+  static const List<int> _percentOptions = <int>[0, 25, 50, 75, 100];
 
   final String amount;
   final FTokenInfo token;
@@ -72,16 +73,23 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
   }
 
   void _setPercent(int percent) {
-    final portion =
-        widget.balance * BigInt.from(percent) ~/ BigInt.from(100);
+    final portion = percentOfBalance(balance: widget.balance, percent: percent);
     widget.onAmountChanged(
         fromWei(value: portion.toString(), decimals: widget.token.decimals));
   }
+
+  String _percentLabel(int percent, AppLocalizations? l10n) =>
+      switch (percent) {
+        0 => l10n?.amountChipClear ?? 'Clear',
+        100 => l10n?.amountChipMax ?? 'MAX',
+        _ => '$percent%',
+      };
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context, listen: false);
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context);
     final bigAmount = toDecimalsWei(widget.amount, widget.token.decimals);
 
     return Container(
@@ -98,7 +106,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         children: [
           _buildAmountRow(context, theme, bigAmount, appState),
           const SizedBox(height: 8),
-          _buildBalanceRow(theme, bigAmount),
+          _buildBalanceRow(theme, bigAmount, l10n),
         ],
       ),
     );
@@ -227,7 +235,11 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
   }
 
-  Widget _buildBalanceRow(AppTheme theme, BigInt currentAmount) {
+  Widget _buildBalanceRow(
+    AppTheme theme,
+    BigInt currentAmount,
+    AppLocalizations? l10n,
+  ) {
     final bool isExceeded = currentAmount > widget.balance;
 
     return Row(
@@ -253,8 +265,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           ),
         ),
         const SizedBox(width: 12),
-        ...List<Widget>.generate(
-            TokenAmountCard._percentOptions.length * 2 - 1, (index) {
+        ...List<Widget>.generate(TokenAmountCard._percentOptions.length * 2 - 1,
+            (index) {
           if (index.isOdd) {
             return const SizedBox(width: 8);
           }
@@ -262,7 +274,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           final percent = TokenAmountCard._percentOptions[index ~/ 2];
           return _percentChip(
             theme,
-            percent,
+            _percentLabel(percent, l10n),
             _isPercentActive(percent, currentAmount),
             () => _setPercent(percent),
           );
@@ -280,14 +292,13 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       return false;
     }
 
-    final portion =
-        widget.balance * BigInt.from(percent) ~/ BigInt.from(100);
-    return currentAmount == portion;
+    return currentAmount ==
+        percentOfBalance(balance: widget.balance, percent: percent);
   }
 
   Widget _percentChip(
     AppTheme theme,
-    int percent,
+    String label,
     bool isActive,
     VoidCallback onTap,
   ) {
@@ -307,14 +318,14 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         decoration: BoxDecoration(
           color: backgroundColor,
           border: Border.all(color: borderColor),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          '$percent%',
+          label,
           style: theme.labelSmall.copyWith(
             color: textColor,
             fontWeight: FontWeight.w600,

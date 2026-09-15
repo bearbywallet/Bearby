@@ -23,6 +23,7 @@ void showSignMessageModal({
   required String appTitle,
   required String appIcon,
   ColorsInfo? colors,
+  BigInt? accountIndex,
   required Function(String, String) onMessageSigned,
   VoidCallback? onDismiss,
 }) {
@@ -40,6 +41,7 @@ void showSignMessageModal({
       appTitle: appTitle,
       appIcon: appIcon,
       colors: colors,
+      accountIndex: accountIndex,
       onMessageSigned: onMessageSigned,
       onDismiss: onDismiss,
     ),
@@ -52,6 +54,7 @@ class _SignMessageModalContent extends StatefulWidget {
   final String appTitle;
   final String appIcon;
   final ColorsInfo? colors;
+  final BigInt? accountIndex;
   final Function(String, String) onMessageSigned;
   final VoidCallback? onDismiss;
 
@@ -61,6 +64,7 @@ class _SignMessageModalContent extends StatefulWidget {
     this.message,
     this.typedData,
     this.colors,
+    this.accountIndex,
     required this.onMessageSigned,
     this.onDismiss,
   });
@@ -118,7 +122,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     try {
       final wallet = appState.wallet!;
       final walletIndex = appState.selectedWalletIndex;
-      final accountIndex = wallet.selectedAccount;
+      final accountIndex = widget.accountIndex ?? wallet.selectedAccount;
 
       if (widget.typedData != null) {
         final typedDataJson = jsonEncode(widget.typedData!.toJson());
