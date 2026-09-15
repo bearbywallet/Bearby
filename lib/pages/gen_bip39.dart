@@ -8,6 +8,7 @@ import 'package:bearby/components/mnemonic_word_input.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/wor_count_selector.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/backup_confirmation_modal.dart';
 import 'package:bearby/src/rust/api/methods.dart';
@@ -27,7 +28,7 @@ class SecretPhraseGeneratorPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   List<String> _mnemonicWords = [];
   var _count = 24;
   bool _hasBackupWords = false;
@@ -43,18 +44,11 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (_chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   @override

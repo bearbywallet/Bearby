@@ -7,6 +7,7 @@ import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/hex_key.dart';
 import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/modals/backup_confirmation_modal.dart';
 import 'package:bearby/src/rust/api/methods.dart';
@@ -25,7 +26,7 @@ class SecretKeyGeneratorPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
   bool _hasBackupWords = false;
   bool isCopied = false;
@@ -40,18 +41,11 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (_chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   Future<void> _regenerateKeys() async {
