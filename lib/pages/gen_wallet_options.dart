@@ -6,6 +6,7 @@ import 'package:bearby/components/view_item.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -20,24 +21,17 @@ class GenWalletOptionsPage extends StatefulWidget {
 }
 
 class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   NetworkConfigInfo? _chain;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (chain != null && _chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   @override

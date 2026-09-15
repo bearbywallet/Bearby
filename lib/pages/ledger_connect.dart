@@ -8,6 +8,7 @@ import 'package:bearby/ledger/ledger_view_controller.dart';
 import 'package:bearby/ledger/models/discovered_device.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -22,7 +23,7 @@ class LedgerConnectPage extends StatefulWidget {
 }
 
 class _LedgerConnectPageState extends State<LedgerConnectPage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   NetworkConfigInfo? _chain;
   late final AppState _appState;
 
@@ -41,18 +42,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (_chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:bearby/components/hex_key.dart';
 import 'package:bearby/components/smart_input.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -24,7 +25,7 @@ class SecretKeyRestorePage extends StatefulWidget {
 }
 
 class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   final TextEditingController _privateKeyController = TextEditingController();
   String? _errorMessage;
   bool _isValidating = false;
@@ -34,18 +35,11 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (_chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   @override

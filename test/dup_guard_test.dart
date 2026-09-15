@@ -33,27 +33,33 @@ void main() {
           isTrue, reason: 'mixin owns the parsing');
 
       // The verbatim block must not be re-copied into pages.
-      // verify_bip39 keeps a custom variant (extra `bip39` argument) — 1 hit.
-      final pages = <String>[
-        'lib/pages/gen_bip39.dart',
-        'lib/pages/restore_bip39.dart',
-        'lib/pages/sk_gen.dart',
-        'lib/pages/verify_bip39.dart',
-      ];
+      // verify_bip39 (extra `bip39` argument) and password_setup (multi-arg:
+      // bip39/keys/ignore_checksum) keep custom variants — 0 raw copies here.
+      final pages = <String, bool>{
+        'lib/pages/gen_bip39.dart': false,
+        'lib/pages/restore_bip39.dart': false,
+        'lib/pages/sk_gen.dart': false,
+        'lib/pages/gen_wallet_options.dart': false,
+        'lib/pages/new_wallet_options.dart': false,
+        'lib/pages/wallet_restore_options.dart': false,
+        'lib/pages/ledger_connect.dart': false,
+        'lib/pages/restore_sk.dart': false,
+        'lib/pages/verify_bip39.dart': true,
+        'lib/pages/password_setup.dart': true,
+      };
       var rawCopies = 0;
-      for (final p in pages) {
-        final src = _read(p);
+      for (final entry in pages.entries) {
+        final src = _read(entry.key);
         if (src.contains("args?['chain'] as NetworkConfigInfo?")) {
-          rawCopies += 1;
-        }
-        if (p != 'lib/pages/verify_bip39.dart') {
+          if (!entry.value) rawCopies += 1;
+        } else if (!entry.value) {
           expect(src.contains('bootstrapChainArg('), isTrue,
-              reason: '$p must use the shared mixin');
+              reason: '${entry.key} must use the shared mixin');
         }
       }
-      expect(rawCopies, 1,
-          reason: 'only verify_bip39 (variant with bip39 arg) may parse '
-              'chain args inline');
+      expect(rawCopies, 0,
+          reason: 'chain-arg parsing must live only in ChainRouteArgsMixin '
+              'and the two documented variants');
     });
 
     test('dead near-copy of the argon settings modal stays deleted', () {

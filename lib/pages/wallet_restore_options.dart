@@ -7,6 +7,7 @@ import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
 import 'package:bearby/mixins/status_bar.dart';
+import 'package:bearby/mixins/chain_route_args.dart';
 import 'package:bearby/modals/qr_scanner_modal.dart';
 import 'package:bearby/src/rust/api/methods.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
@@ -25,24 +26,17 @@ class RestoreWalletOptionsPage extends StatefulWidget {
 }
 
 class _RestoreWalletOptionsPageState extends State<RestoreWalletOptionsPage>
-    with StatusBarMixin {
+    with StatusBarMixin, ChainRouteArgsMixin {
   NetworkConfigInfo? _chain;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-
-    if (chain == null && _chain == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.pushReplacement(AppRoutes.netSetup);
-      });
-    } else if (_chain == null) {
+    bootstrapChainArg(_chain, (chain) {
       setState(() {
         _chain = chain;
       });
-    }
+    });
   }
 
   void _handleBip39Restore(BuildContext context) {
