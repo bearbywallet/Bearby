@@ -449,7 +449,14 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     AppState appState,
   ) async {
-    final chain = appState.chain!;
+    final chain = appState.chain;
+    if (chain == null) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'No active chain',
+      );
+    }
     final chainIdHex = '$kHexPrefix${chain.chainId.toRadixString(kHexRadix)}';
 
     _sendResponse(

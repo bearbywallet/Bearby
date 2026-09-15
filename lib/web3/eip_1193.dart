@@ -367,7 +367,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -604,7 +605,8 @@ class Web3EIP1193Handler {
       final messageContent =
           isPersonalSign ? decodePersonalSignMessage(dataToSign) : dataToSign;
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -750,7 +752,8 @@ class Web3EIP1193Handler {
       final to = txParams[kParamTo] as String?;
       final valueAmount = evmValueAmount(txParams[kParamValue]?.toString());
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -926,7 +929,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1105,7 +1109,8 @@ class Web3EIP1193Handler {
         );
       }
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1230,7 +1235,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1518,7 +1524,8 @@ class Web3EIP1193Handler {
         radix: kHexRadix,
       );
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,

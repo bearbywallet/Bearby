@@ -125,9 +125,17 @@ class ZilPayLegacyHandler {
       return null;
     }
 
+    // Wallet may be absent during startup/disconnect windows; without it we
+    // cannot resolve the account address -> report 'not connected'.
+    final selectedAccount = appState.wallet?.selectedAccount;
+    if (selectedAccount == null) {
+      isConnected = false;
+      return null;
+    }
+
     final (bech32, base16) = await zilliqaGetBech32Base16Address(
       walletIndex: appState.selectedWalletIndex,
-      accountIndex: appState.wallet!.selectedAccount,
+      accountIndex: selectedAccount,
     );
 
     isConnected = true;
@@ -136,6 +144,10 @@ class ZilPayLegacyHandler {
   }
 
   Future<void> sendData(AppState appState) async {
+    // Without a loaded chain the dapp cannot be served any meaningful data.
+    final chain = appState.chain;
+    if (chain == null) return;
+
     await appState.syncConnections();
     final account = await _getAccountIfConnected(appState);
 
@@ -143,7 +155,7 @@ class ZilPayLegacyHandler {
       type: ZilliqaLegacyMessages.getWalletData,
       payload: {
         'account': account,
-        'http': appState.chain!.rpc.first,
+        'http': chain.rpc.first,
         'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
         'isConnect': account != null,
         'isEnable': true,
@@ -204,11 +216,17 @@ class ZilPayLegacyHandler {
     try {
       final appState = Provider.of<AppState>(context, listen: false);
 
-      if (appState.account?.addrType == kEvmAddressType &&
+      final account = appState.account;
+      if (account == null) {
+        // Caught by the catch below and reported to the dapp as a rejection.
+        throw StateError('wallet is not loaded');
+      }
+
+      if (account.addrType == kEvmAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
-          accountIndex: appState.wallet!.selectedAccount,
+          accountIndex: account.index,
         );
         await appState.syncData();
       }
@@ -225,15 +243,15 @@ class ZilPayLegacyHandler {
       final code = message.payload['code'] as String? ?? "";
       final data = message.payload['data'] as String? ?? "";
       final title = message.payload['title'] as String? ?? "";
-      final account = appState.account!;
 
-      if (appState.chain == null) {
+      final chain = appState.chain;
+      if (chain == null) {
         // Bare-String throws bypass `on Exception` handlers downstream.
         throw StateError('chain is not loaded');
       }
 
-      final chainHash = appState.chain!.chainHash;
-      final chainId = appState.chain!.chainIds.last;
+      final chainHash = chain.chainHash;
+      final chainId = chain.chainIds.last;
       final nonce = BigInt.zero;
 
       final scillaRequest = TransactionRequestScilla(
@@ -270,7 +288,7 @@ class ZilPayLegacyHandler {
                 value: (ftAmount ?? BigInt.zero).toString(),
                 decimals: ftMeta.decimals)
             .toString();
-        recipient = toAddress!;
+        recipient = toAddress ?? toAddr;
         tokenInfo = BaseTokenInfo(
           value: tokenAmount,
           symbol: ftMeta.symbol,
@@ -299,7 +317,7 @@ class ZilPayLegacyHandler {
       if (account.addrType == kEvmAddressType) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
-          accountIndex: appState.wallet!.selectedAccount,
+          accountIndex: account.index,
         );
         await appState.syncData();
       }
@@ -363,12 +381,20 @@ class ZilPayLegacyHandler {
     final icon = message.payload['icon'] as String? ?? '';
 
     final appState = Provider.of<AppState>(context, listen: false);
-    final account = appState.account!;
+    final account = appState.account;
+    if (account == null) {
+      _sendResponse(
+        type: ZilliqaLegacyMessages.responseToDapp,
+        payload: {'reject': 'wallet is not loaded'},
+        uuid: message.uuid,
+      );
+      return;
+    }
 
     if (account.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: account.index,
       );
       await appState.syncData();
     }
@@ -416,16 +442,20 @@ class ZilPayLegacyHandler {
   ) async {
     await appState.syncConnections();
 
+    // Connection flows need a wallet; without one the dapp cannot be served.
+    if (appState.wallet == null) return;
+
     final webUrl = await webViewController.getUrl();
     final currentDomain = Uri.parse(webUrl.toString()).host;
 
     final isAlreadyConnected =
         Web3Utils.findConnected(currentDomain, appState.connections);
 
+    final wallet = appState.wallet;
     if (isAlreadyConnected != null) {
       final (bech32, base16) = await zilliqaGetBech32Base16Address(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: wallet!.selectedAccount,
       );
 
       await _sendResponse(
@@ -438,10 +468,11 @@ class ZilPayLegacyHandler {
       return;
     }
 
-    if (appState.account?.addrType == kEvmAddressType) {
+    final account = appState.account;
+    if (account?.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: account!.index,
       );
       await appState.syncData();
     }
@@ -482,6 +513,16 @@ class ZilPayLegacyHandler {
         Map<String, String>? account;
 
         if (selectedIndices.isNotEmpty) {
+          final selectedAccount = appState.wallet?.selectedAccount;
+          if (selectedAccount == null) {
+            _sendResponse(
+              type: ZilliqaLegacyMessages.responseToDapp,
+              payload: {'reject': 'wallet is not loaded'},
+              uuid: message.uuid,
+            );
+            return;
+          }
+
           await createUpdateConnection(
             walletIndex: appState.selectedWalletIndex,
             conn: connectionInfo,
@@ -491,7 +532,7 @@ class ZilPayLegacyHandler {
 
           final (bech32, base16) = await zilliqaGetBech32Base16Address(
             walletIndex: appState.selectedWalletIndex,
-            accountIndex: appState.wallet!.selectedAccount,
+            accountIndex: selectedAccount,
           );
 
           account = {"base16": base16, "bech32": bech32};
