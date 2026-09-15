@@ -189,7 +189,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           );
           widget.onMessageSigned(account.pubKey ?? account.addr, sig);
         } else {
-          throw "invalid message";
+          throw StateError('no message payload to sign');
         }
       } else {
         await _signMessageNative(appState);

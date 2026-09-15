@@ -249,7 +249,10 @@ class LedgerViewController extends ChangeNotifier {
 
       return sig.toHexString();
     } else {
-      throw "Invlid slip44";
+      // Bare-String throws bypass `on Exception` handlers and crash the app
+      // (Effective Dart: only throw Error/Exception subtypes).
+      throw ArgumentError.value(
+          slip44, 'slip44', 'unsupported coin type for EIP-712 signing');
     }
   }
 
@@ -354,7 +357,8 @@ class LedgerViewController extends ChangeNotifier {
 
       return Uint8List.fromList(finalized.psbtBytes);
     } else {
-      throw "invalid tx";
+      throw ArgumentError.value(
+          bipPurpose, 'bipPurpose', 'unsupported purpose for BTC signing');
     }
   }
 

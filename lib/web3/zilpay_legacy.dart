@@ -228,7 +228,8 @@ class ZilPayLegacyHandler {
       final account = appState.account!;
 
       if (appState.chain == null) {
-        throw "Fail load chain";
+        // Bare-String throws bypass `on Exception` handlers downstream.
+        throw StateError('chain is not loaded');
       }
 
       final chainHash = appState.chain!.chainHash;

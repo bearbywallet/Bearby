@@ -143,7 +143,11 @@ class Web3Utils {
           }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      // Best-effort enrichment: the base tx preview (recipient + amount
+      // unknown -> placeholder) still renders without this metadata.
+      debugPrint('parseScillaTransferData: $e');
+    }
 
     return (toAddress, tokenAmount, tokenInfo, teg);
   }
