@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/async_qrcode.dart';
@@ -15,6 +14,7 @@ import 'package:bearby/components/wallet_card.dart';
 import 'package:bearby/config/settings.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
+import 'package:bearby/mixins/reveal_secret.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
@@ -31,11 +31,9 @@ class RevealSecretKey extends StatefulWidget {
   State<RevealSecretKey> createState() => _RevealSecretKeyState();
 }
 
-class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
-  bool _isCopied = false;
+class _RevealSecretKeyState extends State<RevealSecretKey>
+    with StatusBarMixin, RevealSecretMixin {
   bool _isAuthenticated = false;
-  bool _isTimerActive = false;
-  bool _canShowKey = false;
   bool _isLoadingKey = false;
   bool _obscurePassword = true;
   bool _hasError = false;
@@ -46,8 +44,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   /// List index into [AppState.accounts] — same convention as [WalletInfo.selectedAccount].
   int? _selectedListIndex;
 
-  Timer? _countdownTimer;
-  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   /// Cached keys keyed by list index — avoids re-fetching on switch.
   final Map<int, KeyPairInfo> _keyCache = <int, KeyPairInfo>{};
@@ -57,7 +53,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
+    disposeRevealSecret();
     _passwordController.dispose();
     _password = null;
     _keyCache.clear();
@@ -65,27 +61,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   }
 
   void _startCountdown() {
-    setState(() {
-      _isTimerActive = true;
-      _remainingTime = SecuritySettings.revealDelaySeconds;
-    });
-
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      if (_remainingTime > 0) {
-        setState(() => _remainingTime--);
-        return;
-      }
-      timer.cancel();
-      setState(() {
-        _canShowKey = true;
-        _isTimerActive = false;
-      });
-      _loadKeyForSelected();
-    });
+    startCountdown(onCompleted: _loadKeyForSelected);
   }
 
   Future<void> _onPasswordSubmit(BigInt walletIndex) async {
@@ -133,20 +109,20 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
 
     setState(() {
       _selectedListIndex = listIndex;
-      _isCopied = false;
+      setCopied(false);
       _keys = _keyCache[listIndex];
       _hasError = false;
       _errorMessage = null;
     });
 
-    if (!_canShowKey) return;
+    if (!canShowSecret) return;
     await _loadKeyForSelected();
   }
 
   Future<void> _loadKeyForSelected() async {
     final listIndex = _selectedListIndex;
     final password = _password;
-    if (listIndex == null || password == null || !_canShowKey) return;
+    if (listIndex == null || password == null || !canShowSecret) return;
 
     final cached = _keyCache[listIndex];
     if (cached != null) {
@@ -185,14 +161,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
     }
   }
 
-  Future<void> _handleCopy(String key) async {
-    if (key.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: key));
-    if (!mounted) return;
-    setState(() => _isCopied = true);
-    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
-    if (mounted) setState(() => _isCopied = false);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +170,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final accounts = state.accounts;
     final sk = _keys?.sk;
-    final canCopy = _canShowKey && sk != null && sk.isNotEmpty;
+    final canCopy = canShowSecret && sk != null && sk.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -222,12 +190,12 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                 onBackPressed: () => Navigator.pop(context),
                 actionIcon: canCopy
                     ? AppIconView(
-                        icon: _isCopied ? AppIcon.check : AppIcon.copy,
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
                         size: 24,
                         color: theme.textPrimary,
                       )
                     : null,
-                onActionPressed: canCopy ? () => _handleCopy(sk) : null,
+                onActionPressed: canCopy ? () => handleCopy(sk) : null,
               ),
             ),
             Expanded(
@@ -263,12 +231,12 @@ class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
                       selectedIndex: _selectedListIndex,
                       onSelect: _selectAccount,
                     ),
-                    if (_isTimerActive && !_canShowKey)
+                    if (isTimerActive && !canShowSecret)
                       RevealSecurityTimer(
                         theme: theme,
-                        remainingSeconds: _remainingTime,
+                        remainingSeconds: remainingTime,
                       ),
-                    if (_canShowKey)
+                    if (canShowSecret)
                       _KeySection(
                         theme: theme,
                         state: state,
