@@ -105,7 +105,22 @@ class TypedDataEip712 {
   }
 
   static TypedDataEip712 fromJsonString(String jsonStr) {
-    final decoded = jsonDecode(jsonStr);
-    return TypedDataEip712.fromJson(decoded as Map<String, dynamic>);
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(jsonStr);
+    } on FormatException catch (e) {
+      throw FormatException(
+        'Invalid EIP-712 typed data JSON: ${e.message}',
+        jsonStr,
+      );
+    }
+    if (decoded is! Map<String, Object?>) {
+      throw ArgumentError.value(
+        decoded,
+        'jsonStr',
+        'EIP-712 typed data must be a JSON object',
+      );
+    }
+    return TypedDataEip712.fromJson(decoded.cast<String, dynamic>());
   }
 }

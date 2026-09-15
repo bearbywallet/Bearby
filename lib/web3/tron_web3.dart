@@ -574,7 +574,7 @@ class TronWeb3Handler {
 
         final isTronMethod =
             method == Web3EIP1193Method.tronRequestAccounts.value;
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: isTronMethod ? {'code': 200, 'message': 'OK'} : addresses,
@@ -605,7 +605,7 @@ class TronWeb3Handler {
         onConfirm: (selectedIndices) async {
           try {
             if (selectedIndices.isEmpty) {
-              return _sendResponse(
+              return await _sendResponse(
                 type: kBearbyResponseType,
                 uuid: message.uuid,
                 result: <void>[],

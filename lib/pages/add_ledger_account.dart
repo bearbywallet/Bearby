@@ -50,8 +50,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   String _errorMessage = '';
   bool _createWallet = true;
   NetworkConfigInfo? _network;
-  Map<int, LedgerAccount> _accounts = {};
-  Map<int, Map<int, AddressChainInfo>> _btcChains = {};
+  final Map<int, LedgerAccount> _accounts = {};
+  final Map<int, Map<int, AddressChainInfo>> _btcChains = {};
   bool _initialized = false;
   late final LedgerViewController _ledger;
 

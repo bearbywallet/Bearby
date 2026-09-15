@@ -383,7 +383,7 @@ class Web3EIP1193Handler {
           appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: addresses,
@@ -422,7 +422,7 @@ class Web3EIP1193Handler {
         onConfirm: (selectedIndices) async {
           try {
             if (selectedIndices.isEmpty) {
-              return _sendResponse(
+              return await _sendResponse(
                 type: kBearbyResponseType,
                 uuid: message.uuid,
                 result: <void>[],
@@ -493,7 +493,14 @@ class Web3EIP1193Handler {
     ZilPayWeb3Message message,
     AppState appState,
   ) async {
-    final chain = appState.chain!;
+    final chain = appState.chain;
+    if (chain == null) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'No active chain',
+      );
+    }
     final chainIdHex = '$kHexPrefix${chain.chainId.toRadixString(kHexRadix)}';
 
     _sendResponse(
@@ -834,7 +841,7 @@ class Web3EIP1193Handler {
           Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: [],
@@ -923,7 +930,7 @@ class Web3EIP1193Handler {
       if (connection != null &&
           appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: {
@@ -1239,7 +1246,7 @@ class Web3EIP1193Handler {
 
       if (tokenExists == true) {
         _removeActiveRequest(method);
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: true,

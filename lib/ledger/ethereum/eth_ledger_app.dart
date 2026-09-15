@@ -141,6 +141,10 @@ class EthLedgerApp {
     required Uint8List message,
     int slip44 = 60,
   }) async {
+    if (message.isEmpty) {
+      throw ArgumentError('Message cannot be empty.');
+    }
+
     final paths = await _getPaths(slip44: slip44, index: index);
 
     int offset = 0;
