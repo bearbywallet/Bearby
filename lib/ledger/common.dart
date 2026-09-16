@@ -17,8 +17,14 @@ class LedgerAccount {
       (other is LedgerAccount &&
           runtimeType == other.runtimeType &&
           publicKey == other.publicKey &&
+          address == other.address &&
           index == other.index);
 
   @override
-  int get hashCode => Object.hash(publicKey, index);
+  int get hashCode => Object.hash(publicKey, address, index);
+
+  @override
+  String toString() =>
+      'LedgerAccount(index: $index, address: $address, '
+      'publicKey: ${publicKey == null ? "null" : "0x…"})';
 }

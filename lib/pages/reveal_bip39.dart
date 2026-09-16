@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/async_qrcode.dart';
@@ -14,6 +13,7 @@ import 'package:bearby/components/reveal_security_timer.dart';
 import 'package:bearby/config/settings.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/qrcode.dart';
+import 'package:bearby/mixins/reveal_secret.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/src/rust/api/auth.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
@@ -29,49 +29,25 @@ class RevealSecretPhrase extends StatefulWidget {
 }
 
 class _RevealSecretPhraseState extends State<RevealSecretPhrase>
-    with StatusBarMixin {
-  bool _isCopied = false;
+    with StatusBarMixin, RevealSecretMixin {
   bool _isAuthenticated = false;
-  bool _isTimerActive = false;
-  bool _canShowPhrase = false;
   bool _obscurePassword = true;
   bool _hasError = false;
   String? _errorMessage;
   String? _seedPhrase;
-  Timer? _countdownTimer;
-  int _remainingTime = SecuritySettings.revealDelaySeconds;
 
   final _passwordController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
+    disposeRevealSecret();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _startCountdown() {
-    setState(() {
-      _isTimerActive = true;
-      _remainingTime = SecuritySettings.revealDelaySeconds;
-    });
-
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      if (_remainingTime > 0) {
-        setState(() => _remainingTime--);
-        return;
-      }
-      timer.cancel();
-      setState(() {
-        _canShowPhrase = true;
-        _isTimerActive = false;
-      });
-    });
+    startCountdown();
   }
 
   Future<void> _onPasswordSubmit(BigInt walletIndex) async {
@@ -115,14 +91,6 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
     }
   }
 
-  Future<void> _handleCopy(String phrase) async {
-    if (phrase.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: phrase));
-    if (!mounted) return;
-    setState(() => _isCopied = true);
-    await Future<void>.delayed(SecuritySettings.copyFeedbackDuration);
-    if (mounted) setState(() => _isCopied = false);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +99,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
     final l10n = AppLocalizations.of(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final phrase = _seedPhrase;
-    final canCopy = _canShowPhrase && phrase != null && phrase.isNotEmpty;
+    final canCopy = canShowSecret && phrase != null && phrase.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -151,12 +119,12 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                 onBackPressed: () => Navigator.pop(context),
                 actionIcon: canCopy
                     ? AppIconView(
-                        icon: _isCopied ? AppIcon.check : AppIcon.copy,
+                        icon: isCopied ? AppIcon.check : AppIcon.copy,
                         size: 24,
                         color: theme.textPrimary,
                       )
                     : null,
-                onActionPressed: canCopy ? () => _handleCopy(phrase) : null,
+                onActionPressed: canCopy ? () => handleCopy(phrase) : null,
               ),
             ),
             Expanded(
@@ -191,14 +159,14 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                         },
                       ),
                     if (_isAuthenticated &&
-                        _isTimerActive &&
-                        !_canShowPhrase)
+                        isTimerActive &&
+                        !canShowSecret)
                       RevealSecurityTimer(
                         theme: theme,
-                        remainingSeconds: _remainingTime,
+                        remainingSeconds: remainingTime,
                       ),
                     if (_isAuthenticated &&
-                        _canShowPhrase &&
+                        canShowSecret &&
                         phrase != null) ...[
                       _buildQrCode(theme, state, phrase, adaptivePadding),
                       _PhraseGrid(phrase: phrase, theme: theme),

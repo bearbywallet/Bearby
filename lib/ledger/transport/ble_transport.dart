@@ -13,21 +13,16 @@ class BleDescriptorEvent {
   BleDescriptorEvent(this.type, this.descriptor);
 }
 
-class BleTransport extends Transport {
+class BleTransport extends GuardedTransport {
   final String _id;
   @override
   final DeviceModel? deviceModel;
-
-  Completer<void>? _exchangeBusyPromise;
-  final _eventController = StreamController<TransportEvent>.broadcast();
 
   static const _channel = MethodChannel('ledger.com/ble');
   static const _eventChannel = EventChannel('ledger.com/ble/events');
 
   BleTransport(this._id, this.deviceModel);
 
-  @override
-  Stream<TransportEvent> get events => _eventController.stream;
 
   static Future<bool> isSupported() =>
       _channel.invokeMethod<bool>('isSupported').then((v) => v ?? false);
@@ -91,29 +86,13 @@ class BleTransport extends Transport {
     });
   }
 
-  Future<T> _exchangeAtomic<T>(Future<T> Function() f) async {
-    if (_exchangeBusyPromise != null) {
-      throw TransportRaceCondition(
-          'An action was already pending on the Ledger device.');
-    }
-
-    final completer = Completer<void>();
-    _exchangeBusyPromise = completer;
-
-    try {
-      final res = await f();
-      return res;
-    } finally {
-      completer.complete();
-      _exchangeBusyPromise = null;
-    }
-  }
+  Future<T> _exchangeAtomic<T>(Future<T> Function() f) =>
+      guardedExchange(f);
 
   @override
   Future<void> close() async {
-    await _exchangeBusyPromise?.future;
-    await _channel.invokeMethod('closeDevice', {'deviceId': _id});
-    await _eventController.close();
+    await guardedClose(
+        () => _channel.invokeMethod('closeDevice', {'deviceId': _id}));
   }
 
   @override

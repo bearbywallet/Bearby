@@ -229,6 +229,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
 
       final path = result.first.path!;
       if (!path.toLowerCase().endsWith('.zp')) {
+        if (!mounted) return;
         setState(() => _errorMessage = l10n.keystoreRestoreExtError);
         return;
       }
@@ -237,6 +238,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
       final keystoreFile = await _parseKeystoreFile(file);
 
       if (keystoreFile == null) {
+        if (!mounted) return;
         setState(() => _errorMessage = 'Failed to parse keystore file');
         return;
       }

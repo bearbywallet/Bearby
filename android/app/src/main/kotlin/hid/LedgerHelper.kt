@@ -36,7 +36,7 @@ object LedgerHelper {
             firstPacket.write(0x00)
         }
         val firstBytes = firstPacket.toByteArray()
-        android.util.Log.d("LedgerHelper", "First packet: size=${firstBytes.size}, header=${firstBytes.take(7).joinToString(" ") { "%02x".format(it) }}")
+        android.util.Log.d("LedgerHelper", "First packet: size=${firstBytes.size}")
         output.write(firstBytes)
 
         // Subsequent packets

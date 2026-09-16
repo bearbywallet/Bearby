@@ -115,6 +115,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
     await _appState.ledgerViewController.open(device);
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -172,7 +173,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         }
 
         if (widget.message != null) {
-          final sig = await appState.ledgerViewController.signMesage(
+          final sig = await appState.ledgerViewController.signMessage(
             message: widget.message!,
             account: account,
             walletIndex: appState.selectedWalletIndex,
@@ -189,7 +190,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           );
           widget.onMessageSigned(account.pubKey ?? account.addr, sig);
         } else {
-          throw "invalid message";
+          throw StateError('no message payload to sign');
         }
       } else {
         await _signMessageNative(appState);
@@ -200,6 +201,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       appState.ledgerViewController.disconnect();
       appState.ledgerViewController.scan();
 
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
       });

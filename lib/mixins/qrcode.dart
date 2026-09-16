@@ -127,10 +127,14 @@ Map<String, String> parseQRSecretData(String qrData) {
 
   final params = parts[1].split('&');
   for (final param in params) {
-    final keyValue = param.split('=');
-    if (keyValue.length == 2) {
-      if (keyValue[0] == 'seed') result['seed'] = keyValue[1];
-      if (keyValue[0] == 'key') result['key'] = keyValue[1];
+    // Split at the FIRST '=' only: values may themselves contain '='
+    // (e.g. base64 padding). param.split('=') used to drop such values.
+    final sep = param.indexOf('=');
+    if (sep != -1) {
+      final key = param.substring(0, sep);
+      final value = param.substring(sep + 1);
+      if (key == 'seed') result['seed'] = value;
+      if (key == 'key') result['key'] = value;
     }
   }
 
@@ -225,9 +229,11 @@ Map<String, String?> parseCryptoUrl(String url) {
   final params = queryString.split('&');
 
   for (final param in params) {
-    final keyValue = param.split('=');
-    if (keyValue.length == 2) {
-      result[keyValue[0]] = keyValue[1];
+    // Split at the FIRST '=' only: values may themselves contain '='
+    // (e.g. base64-encoded calldata). param.split('=') used to drop them.
+    final sep = param.indexOf('=');
+    if (sep != -1) {
+      result[param.substring(0, sep)] = param.substring(sep + 1);
     }
   }
 

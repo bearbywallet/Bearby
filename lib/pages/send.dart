@@ -474,7 +474,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
         builder: (context) => AlertDialog(
           backgroundColor: appState.currentTheme.cardBackground,
           title: Text(
-            "Error",
+            AppLocalizations.of(context)!.errorDialogTitle,
             style: appState.currentTheme.titleMedium.copyWith(
               color: appState.currentTheme.textPrimary,
             ),

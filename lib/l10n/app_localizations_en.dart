@@ -12,34 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Bearby Wallet';
 
   @override
-  String get initialPagerestoreZilPay => 'Restore ZilPay 1.0!';
-
-  @override
   String get initialPagegetStarted => 'Get Started';
-
-  @override
-  String get restoreRKStorageTitle => 'Migrate ZilPay 1.0 to 2.0';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'Accounts to migrate to ZilPay 2.0. Enter password.';
-
-  @override
-  String get restoreRKStoragePasswordHint => 'Password';
-
-  @override
-  String get restoreRKStorageEnterPassword => 'Enter password';
-
-  @override
-  String get restoreRKStorageErrorPrefix => 'Error:';
-
-  @override
-  String get restoreRKStorageRestoreButton => 'Restore';
-
-  @override
-  String get restoreRKStorageSkipButton => 'Skip';
-
-  @override
-  String get accountItemBalanceLabel => 'Balance:';
 
   @override
   String get sendTokenPageTitle => 'Send';
@@ -141,10 +114,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletPageDeleteWallet => 'Delete Wallet';
 
   @override
-  String get walletPageBiometricReason => 'Enable biometric authentication';
-
-  @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => 'Networks';
 
   @override
   String get networkPageSearchHint => 'Search';
@@ -270,22 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretPhraseGeneratorPageNextButton => 'Next';
 
   @override
-  String get homePageErrorTitle => 'No signal';
-
-  @override
   String get homePageReceiveButton => 'Receive';
 
   @override
   String get homePageSendButton => 'Send';
-
-  @override
-  String get homePageExchangeButton => 'Exchange';
-
-  @override
-  String get exchangePageTitle => 'Exchange';
-
-  @override
-  String get exchangePagePay => 'You pay';
 
   @override
   String get exchangePageGet => 'You get';
@@ -297,19 +255,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exchangePageConfirm => 'Swap';
 
   @override
-  String get exchangePageComingSoon => 'Soon';
-
-  @override
   String get exchangePageNoAssets => 'No swappable assets on this network';
 
   @override
   String get exchangePageTabSwap => 'Swap';
-
-  @override
-  String get exchangePageTabLimit => 'Limit';
-
-  @override
-  String get exchangePageTabBuySell => 'Buy/Sell';
 
   @override
   String get exchangeSettingsPriceProtection => 'Price Protection';
@@ -399,19 +348,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretKeySubmitButton => 'Submit';
 
   @override
-  String get revealSecretKeyDoneButton => 'Done';
-
-  @override
-  String get revealSecretKeyScamAlertTitle => 'SCAM ALERT';
-
-  @override
   String get revealSecretKeyScamAlertMessage => 'Never share your secret key with anyone. Never input it on any website.';
-
-  @override
-  String get revealSecretKeySecurityTimer => 'Security Timer';
-
-  @override
-  String get revealSecretKeyRevealAfter => 'Your secret key will be revealed after:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => 'Search';
@@ -426,15 +363,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => 'Next';
-
-  @override
-  String get setupNetworkSettingsPageChainIdLabel => 'Chain ID:';
-
-  @override
-  String get setupNetworkSettingsPageTokenLabel => 'Token:';
-
-  @override
-  String get setupNetworkSettingsPageExplorerLabel => 'Explorer:';
 
   @override
   String get appearanceSettingsPageTitle => 'Appearance Settings';
@@ -473,9 +401,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettingsPageLightModeDescription => 'Keep the light theme enabled at all times, regardless of your device settings.';
 
   @override
-  String get loginPageBiometricReason => 'Please authenticate';
-
-  @override
   String loginPageWalletTitle(Object index) {
     return 'Wallet $index';
   }
@@ -502,9 +427,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => 'Private Key';
 
   @override
-  String get secretKeyRestorePageBackupLabel => 'I have backed up my secret key';
-
-  @override
   String get secretKeyRestorePageNextButton => 'Next';
 
   @override
@@ -525,20 +447,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqa Legacy';
 
   @override
-  String get addAccountPageBiometricReason => 'Authenticate to create a new account';
-
-  @override
-  String addAccountPageBiometricError(Object error) {
-    return 'Biometric authentication failed: $error';
-  }
-
-  @override
   String addAccountPageIndexExists(Object index) {
     return 'Account with index $index already exists';
   }
-
-  @override
-  String get addAccountPageBiometricFailed => 'Biometric authentication failed';
 
   @override
   String addAccountPageCreateFailed(Object error) {
@@ -627,16 +538,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => 'invalid password, error:';
 
   @override
-  String get revealSecretPhraseRevealAfter => 'Your seed phrase will be revealed after:';
-
-  @override
   String get revealSecretPhraseSubmitButton => 'Submit';
 
   @override
   String get revealSecretPhraseDoneButton => 'Done';
-
-  @override
-  String get revealSecretPhraseScamAlertTitle => 'SCAM ALERT';
 
   @override
   String get revealSecretPhraseScamAlertDescription => 'Never share your secret phrase with anyone. Never input it on any website.';
@@ -772,9 +677,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordSetupPageCreateButton => 'Create Password';
-
-  @override
-  String get passwordSetupPageAuthReason => 'Please authenticate to enable quick access';
 
   @override
   String get passwordSetupPageSeedType => 'Seed';
@@ -918,9 +820,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currencyConversionEngineTitle => 'Currency Engine';
 
   @override
-  String get currencyConversionEngineDescription => 'Engine for fetching currency rates';
-
-  @override
   String get currencyConversionEngineSelectorTitle => 'Select Currency Engine';
 
   @override
@@ -999,9 +898,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get argonSettingsModalContentSecretHint => 'Enter secret (optional)';
 
   @override
-  String get argonSettingsModalContentConfirmButton => 'Confirm';
-
-  @override
   String get confirmTransactionContentPasswordHint => 'Password';
 
   @override
@@ -1014,13 +910,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => 'No active account';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer => 'Failed to load transfer details';
-
-  @override
   String get confirmTransactionAdvancedGasButtonText => 'Advanced';
-
-  @override
-  String get authReason => 'Please authenticate';
 
   @override
   String get addChainModalContentWarning => 'Beware of network scams and security risks.';
@@ -1068,10 +958,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => 'Search';
 
   @override
-  String get signMessageModalContentAuthReason => 'Please authenticate to sign the message';
-
-  @override
-  String signMessageModalContentFailedToSign(Object error) {
+  String signMessageModalContentFailedToSign(String error) {
     return 'Failed to sign: $error';
   }
 
@@ -1193,9 +1080,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPasswordModalButton => 'Confirm';
 
   @override
-  String get qrScannerModalContentTitle => 'Scan';
-
-  @override
   String get qrScannerModalContentCameraInitError => 'Camera initialization error:';
 
   @override
@@ -1235,9 +1119,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chainInfoModalContentFallbackEnabledLabel => 'Fallback Enabled';
 
   @override
-  String get chainInfoModalContentDecimalsLabel => 'Decimals';
-
-  @override
   String get chainInfoModalContentRpcNodesTitle => 'RPC Nodes';
 
   @override
@@ -1257,12 +1138,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get switchChainNetworkContentButton => 'Switch Network';
-
-  @override
-  String get switchChainNetworkContentTestnetLabel => 'Testnet';
-
-  @override
-  String get switchChainNetworkContentIdLabel => 'ID:';
 
   @override
   String get watchAssetModalContentTitle => 'Add suggested token';
@@ -1665,13 +1540,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unstakeButton => 'Unstake';
 
   @override
-  String get aprLabel => 'APR';
-
-  @override
   String get commissionLabel => 'Commission';
-
-  @override
-  String get stakedAmount => 'Staked';
 
   @override
   String get rewardsAvailable => 'Rewards';
@@ -1686,9 +1555,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get claimableIn => 'Claimable in';
 
   @override
-  String get blocks => 'blocks';
-
-  @override
   String get unbondingPeriod => 'Unbonding Period';
 
   @override
@@ -1696,9 +1562,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get version => 'Version';
-
-  @override
-  String get rewardsProgressTitle => 'Rewards Progress';
 
   @override
   String get ledgerConnectPageTitle => 'Connect Ledger';
@@ -1770,9 +1633,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get durationNotAvailable => 'N/A';
-
-  @override
-  String get nodes => 'nodes';
 
   @override
   String get manageTokensPageTitle => 'Tokens';
@@ -1901,33 +1761,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get web3ErrorChainNotAdded => 'The requested chain has not been added. Use wallet_addEthereumChain first.';
 
   @override
-  String get bipPurposeSetupPageTitle => 'Bitcoin Address';
-
-  @override
-  String get bip86Name => 'BIP86 (Taproot)';
-
-  @override
-  String get bip86Description => 'P2TR - Addresses starting with bc1p';
-
-  @override
-  String get bip84Name => 'BIP84 (Native SegWit)';
-
-  @override
-  String get bip84Description => 'P2WPKH - Addresses starting with bc1q';
-
-  @override
-  String get bip49Name => 'BIP49 (SegWit)';
-
-  @override
-  String get bip49Description => 'P2WPKH-nested-in-P2SH - Addresses starting with 3';
-
-  @override
-  String get bip44Name => 'BIP44 (Legacy)';
-
-  @override
-  String get bip44Description => 'P2PKH - Addresses starting with 1';
-
-  @override
   String get addNetworkPageTitle => 'Add Network';
 
   @override
@@ -1964,15 +1797,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNetworkPageErrorRequired => 'Please fill in all required fields';
 
   @override
-  String get addNetworkPageErrorInvalidRpc => 'Please enter a valid RPC URL';
-
-  @override
-  String get addNetworkPageErrorInvalidChainId => 'Please enter a valid Chain ID';
-
-  @override
-  String get addNetworkPageSuccess => 'Network added successfully';
-
-  @override
   String get qrCodeUnrecognizedError => 'QR code not recognized. Please use a supported format.';
 
   @override
@@ -1998,4 +1822,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Deprecated for Bitcoin. Use BIP39 instead.';
+
+  @override
+  String get errorDialogTitle => 'Error';
+
+  @override
+  String get stakingDelegatedLabel => 'Delegated';
+
+  @override
+  String get stakingClaimableLabel => 'Claimable';
+
+  @override
+  String get tokenSelectModalSelectButton => 'Select';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return 'Account $index';
+  }
 }

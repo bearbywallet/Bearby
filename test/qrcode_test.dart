@@ -744,4 +744,33 @@ void main() {
       }
     });
   });
+
+  // ── regression: values containing '=' (base64 padding) ────────────────────
+  // param.split('=') + length == 2 silently DROPS any value that itself
+  // contains '='. The bug used to exist in BOTH parsers (verified red before
+  // the split-at-first-'=' fix).
+  group('param values containing "=" (base64 padding regression)', () {
+    test('parseCryptoUrl keeps base64-padded data param', () {
+      final result = parseCryptoUrl('ETH:$_evmAddress?data=QUJDRA==&amount=1');
+      expect(result['data'], 'QUJDRA==',
+          reason: 'split must happen at the FIRST "=" only');
+      expect(result['amount'], '1');
+      expect(result['address'], _evmAddress);
+    });
+
+    test('parseQRSecretData keeps base64-padded key value', () {
+      final result = parseQRSecretData('ETH:?key=QUJDRA==');
+      expect(result['key'], 'QUJDRA==',
+          reason: 'split must happen at the FIRST "=" only');
+    });
+
+    test('both parsers keep empty values and drop segments without "="', () {
+      // Documented current contract: 'amount=' yields 'amount': ''.
+      expect(parseCryptoUrl('ETH:$_evmAddress?novalue&amount='), {
+        'chain': 'ETH',
+        'address': _evmAddress,
+        'amount': '',
+      });
+    });
+  });
 }

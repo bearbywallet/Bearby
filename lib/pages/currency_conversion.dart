@@ -65,22 +65,27 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
   }
 
   Future<void> _loadData() async {
-    final state = Provider.of<AppState>(context, listen: false);
-    final currenciesTickets = await getCurrenciesTickets();
-    final availableCodes = currenciesTickets.map((p) => p.$1).toSet();
-    final codeToRate = {for (final pair in currenciesTickets) pair.$1: pair.$2};
+    try {
+      final state = Provider.of<AppState>(context, listen: false);
+      final currenciesTickets = await getCurrenciesTickets();
+      final availableCodes = currenciesTickets.map((p) => p.$1).toSet();
+      final codeToRate = {for (final pair in currenciesTickets) pair.$1: pair.$2};
 
-    final currenciesList = _currencyNames.entries
-        .where((e) => availableCodes.contains(e.key))
-        .map((e) => Currency(e.key, "${e.value} ${codeToRate[e.key] ?? ''}"))
-        .toList();
+      final currenciesList = _currencyNames.entries
+          .where((e) => availableCodes.contains(e.key))
+          .map((e) => Currency(e.key, "${e.value} ${codeToRate[e.key] ?? ''}"))
+          .toList();
 
-    setState(() {
-      _currencies = currenciesList;
-      _filteredCurrencies = currenciesList;
-      _selectedCurrency = state.wallet?.settings.currencyConvert ?? 'btc';
-      _selectedEngine = state.wallet?.settings.ratesApiOptions ?? 0;
-    });
+      if (!mounted) return;
+      setState(() {
+        _currencies = currenciesList;
+        _filteredCurrencies = currenciesList;
+        _selectedCurrency = state.wallet?.settings.currencyConvert ?? 'btc';
+        _selectedEngine = state.wallet?.settings.ratesApiOptions ?? 0;
+      });
+    } catch (e) {
+      debugPrint('_loadData: $e');
+    }
   }
 
   void _filterCurrencies(String query) {
@@ -99,12 +104,16 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
     final appState = Provider.of<AppState>(context, listen: false);
     setState(() => _selectedCurrency = currency.code);
 
-    await setRateFetcher(
-      walletIndex: appState.selectedWalletIndex,
-      currency: currency.code,
-    );
-    await appState.syncRates(force: true);
-    await appState.syncData();
+    try {
+      await setRateFetcher(
+        walletIndex: appState.selectedWalletIndex,
+        currency: currency.code,
+      );
+      await appState.syncRates(force: true);
+      await appState.syncData();
+    } catch (e) {
+      debugPrint('_selectCurrency: $e');
+    }
   }
 
   Future<void> _selectEngine(int index) async {

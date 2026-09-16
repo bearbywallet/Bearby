@@ -78,6 +78,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
         name,
       );
 
+      if (!mounted) return;
       setState(() {
         isBackupCreated = true;
         backupFilePath = docPath;
@@ -138,6 +139,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
         final file = File(outputPath);
         await file.writeAsBytes(keystoreBytes!);
 
+        if (!mounted) return;
         setState(() {
           backupFilePath = outputPath;
         });
@@ -158,6 +160,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
           final file = File(outputPath);
           await file.writeAsBytes(keystoreBytes!);
 
+          if (!mounted) return;
           setState(() {
             backupFilePath = outputPath;
           });

@@ -127,17 +127,22 @@ class _ManageTokensPageState extends State<ManageTokensPage>
   Future<void> _loadDeletedTokens() async {
     if (_currentChainHash == null) return;
 
-    final appState = Provider.of<AppState>(context, listen: false);
-    final cacheKey = StorageKeys.deletedTokensCacheKey(_currentChainHash!);
-    final cachedData = await appState.storage.get_(key: cacheKey);
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final cacheKey = StorageKeys.deletedTokensCacheKey(_currentChainHash!);
+      final cachedData = await appState.storage.get_(key: cacheKey);
 
-    if (cachedData != null && mounted) {
-      final List<dynamic> decoded = jsonDecode(cachedData);
-      setState(() {
-        _deletedTokens = decoded
-            .map((item) => FTokenInfoJsonExtension.fromJson(item))
-            .toList();
-      });
+      if (cachedData != null && mounted) {
+        final List<dynamic> decoded = jsonDecode(cachedData);
+        setState(() {
+          _deletedTokens = decoded
+              .map((item) => FTokenInfoJsonExtension.fromJson(item))
+              .toList();
+        });
+      }
+    } catch (e) {
+      // Corrupt cache must not break the manage-tokens page.
+      debugPrint('_loadDeletedTokens: $e');
     }
   }
 
@@ -329,6 +334,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
         final alreadyInDeleted = _deletedTokens
             .any((t) => t.addr.toLowerCase() == token.addr.toLowerCase());
         if (!alreadyInDeleted) {
+          if (!mounted) return;
           setState(() {
             _deletedTokens.add(token);
           });
@@ -340,6 +346,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
           walletIndex: appState.selectedWalletIndex,
         );
 
+        if (!mounted) return;
         setState(() {
           _deletedTokens.removeWhere(
               (t) => t.addr.toLowerCase() == token.addr.toLowerCase());
@@ -348,6 +355,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
 
         if (_foundToken != null &&
             _foundToken!.addr.toLowerCase() == token.addr.toLowerCase()) {
+          if (!mounted) return;
           setState(() {
             _foundToken = null;
             _searchController.clear();

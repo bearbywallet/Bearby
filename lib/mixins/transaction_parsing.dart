@@ -6,6 +6,15 @@ import 'package:bearby/src/rust/models/transactions/base_token.dart';
 import 'package:bearby/src/rust/models/transactions/solana.dart';
 import 'package:bearby/src/rust/models/transactions/tron.dart';
 
+/// Parses JSON numbers that may arrive as [int] or as decimal / 0x-prefixed
+/// [String] into a [BigInt]. Returns `null` for absent or unparseable values.
+BigInt? _parseBigInt(Object? value) {
+  if (value == null) return null;
+  if (value is int) return BigInt.from(value);
+  if (value is String) return BigInt.tryParse(value);
+  return null;
+}
+
 class ParsedEvmReceipt {
   final String? transactionHash;
   final String? signedTransaction;
@@ -70,7 +79,7 @@ class ParsedEvmReceipt {
     );
   }
 
-  static int? _parseStatus(dynamic value) {
+  static int? _parseStatus(Object? value) {
     if (value == null) return null;
     if (value is int) return value;
     if (value is String) {
@@ -78,13 +87,6 @@ class ParsedEvmReceipt {
       if (value == kHexZero) return 0;
       return int.tryParse(value);
     }
-    return null;
-  }
-
-  static BigInt? _parseBigInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return BigInt.from(value);
-    if (value is String) return BigInt.tryParse(value);
     return null;
   }
 }
@@ -133,13 +135,6 @@ class ParsedScillaReceipt {
       sig: json['signature'] as String?,
       error: json['error'] as String?,
     );
-  }
-
-  static BigInt? _parseBigInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return BigInt.from(value);
-    if (value is String) return BigInt.tryParse(value);
-    return null;
   }
 }
 

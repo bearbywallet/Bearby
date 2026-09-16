@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -25,6 +24,7 @@ import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/web3/message.dart';
 import 'dart:developer' as dev;
 
@@ -173,44 +173,19 @@ class Web3EIP1193Handler {
     required String type,
     required String uuid,
     Map<String, dynamic>? payload,
-    dynamic result,
+    Object? result,
     Web3EIP1193ErrorCode? errorCode,
     String? errorMessage,
-  }) async {
-    final responsePayload = {
-      if (payload != null) ...payload,
-      if (result != null) 'result': result,
-      if (errorCode != null && errorMessage != null)
-        'error': {'code': errorCode.code, 'message': errorMessage},
-    };
-
-    final response = ZilPayWeb3Message(
+  }) {
+    return sendWeb3Response(
+      webViewController: webViewController,
       type: type,
       uuid: uuid,
-      payload: responsePayload,
-    ).toJson();
-
-    final jsResponse = jsonEncode(response);
-    final jsCode = '''
-    (function() {
-      const responseData = $jsResponse;
-      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
-        const handler = window.__bearby_response_handlers["$uuid"];
-        handler(responseData);
-        delete window.__bearby_response_handlers["$uuid"];
-      } else {
-        window.dispatchEvent(new MessageEvent('message', { 
-          data: responseData
-        }));
-      }
-    })();
-    ''';
-
-    try {
-      await webViewController.evaluateJavascript(source: jsCode);
-    } catch (e) {
-      debugPrint("evaluateJavascript error: $e");
-    }
+      payload: payload,
+      result: result,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+    );
   }
 
   void _returnError(
@@ -383,7 +358,7 @@ class Web3EIP1193Handler {
           appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
 
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: addresses,
@@ -392,7 +367,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -422,7 +398,7 @@ class Web3EIP1193Handler {
         onConfirm: (selectedIndices) async {
           try {
             if (selectedIndices.isEmpty) {
-              return _sendResponse(
+              return await _sendResponse(
                 type: kBearbyResponseType,
                 uuid: message.uuid,
                 result: <void>[],
@@ -493,7 +469,14 @@ class Web3EIP1193Handler {
     ZilPayWeb3Message message,
     AppState appState,
   ) async {
-    final chain = appState.chain!;
+    final chain = appState.chain;
+    if (chain == null) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'No active chain',
+      );
+    }
     final chainIdHex = '$kHexPrefix${chain.chainId.toRadixString(kHexRadix)}';
 
     _sendResponse(
@@ -622,7 +605,8 @@ class Web3EIP1193Handler {
       final messageContent =
           isPersonalSign ? decodePersonalSignMessage(dataToSign) : dataToSign;
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -768,7 +752,8 @@ class Web3EIP1193Handler {
       final to = txParams[kParamTo] as String?;
       final valueAmount = evmValueAmount(txParams[kParamValue]?.toString());
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -834,7 +819,7 @@ class Web3EIP1193Handler {
           Web3Utils.findConnected(currentDomain, appState.connections);
 
       if (connection == null) {
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: [],
@@ -923,7 +908,7 @@ class Web3EIP1193Handler {
       if (connection != null &&
           appState.accounts.length == connection.accountIndexes.length) {
         _removeActiveRequest(method);
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: {
@@ -944,7 +929,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1123,7 +1109,8 @@ class Web3EIP1193Handler {
         );
       }
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1239,7 +1226,7 @@ class Web3EIP1193Handler {
 
       if (tokenExists == true) {
         _removeActiveRequest(method);
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: true,
@@ -1248,7 +1235,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1388,12 +1376,7 @@ class Web3EIP1193Handler {
 
         foundChain = chain;
       } else {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, _) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, _) = await loadBundledNetworks();
 
         if (mainnetChains.any((c) => c.chainId == chainId)) {
           final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
@@ -1541,7 +1524,8 @@ class Web3EIP1193Handler {
         radix: kHexRadix,
       );
 
-      if (appState.account?.addrType == kScillaAddressType &&
+      if (appState.wallet != null &&
+          appState.account?.addrType == kScillaAddressType &&
           appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: appState.selectedWalletIndex,
@@ -1567,12 +1551,7 @@ class Web3EIP1193Handler {
       }
 
       if (targetNetwork == null) {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, testnetChains) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, testnetChains) = await loadBundledNetworks();
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&

@@ -221,17 +221,22 @@ class BleTransport(private val context: Context, private val device: BluetoothDe
     private suspend fun write(data: ByteArray) = writeMutex.withLock {
         val gatt = this.gatt ?: throw DeviceNotConnectedException()
         val characteristic = writeCharacteristic ?: throw CharacteristicNotFoundException("Write")
-        Log.d("BleTransport", "Writing data: ${data.joinToString("") { "%02x".format(it) }}")
+        // Raw APDU bytes are sensitive (signed payloads) - log sizes only.
+        Log.d("BleTransport", "Writing ${data.size} bytes")
 
         suspendCancellableCoroutine { continuation ->
             writeContinuation = continuation
 
+            fun failWrite(message: String) {
+                val cont = writeContinuation
+                writeContinuation = null
+                cont?.resumeWithException(WriteFailedException(message))
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val result = gatt.writeCharacteristic(characteristic, data, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
                 if (result != BluetoothGatt.GATT_SUCCESS) {
-                    val cont = writeContinuation
-                    writeContinuation = null
-                    cont?.resumeWithException(WriteFailedException("writeCharacteristic returned status $result"))
+                    failWrite("writeCharacteristic returned status $result")
                 }
             } else {
                 @Suppress("DEPRECATION")
@@ -239,9 +244,7 @@ class BleTransport(private val context: Context, private val device: BluetoothDe
                 characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 @Suppress("DEPRECATION")
                 if (!gatt.writeCharacteristic(characteristic)) {
-                    val cont = writeContinuation
-                    writeContinuation = null
-                    cont?.resumeWithException(WriteFailedException("writeCharacteristic returned false"))
+                    failWrite("writeCharacteristic returned false")
                 }
             }
 

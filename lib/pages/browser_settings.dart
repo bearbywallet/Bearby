@@ -58,49 +58,53 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
     });
   }
 
-  Future<void> _toggleCache(AppState appState, bool enabled) async {
+  /// Single persistence path for every settings toggle (the four wrappers
+  /// below used to be four verbatim copies of this body - DRY).
+  Future<void> _toggle(
+    AppState appState,
+    BrowserSettingsInfo Function(BrowserSettingsInfo settings, bool enabled)
+        apply,
+    bool enabled, {
+    required String label,
+  }) async {
     try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(cacheEnabled: enabled);
+      final BrowserSettingsInfo newSettings =
+          apply(appState.state.browserSettings, enabled);
       await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
-      debugPrint("Error toggling cache: $e");
+      debugPrint("Error toggling $label: $e");
     }
   }
 
-  Future<void> _toggleCookies(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(cookiesEnabled: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling cookies: $e");
-    }
-  }
+  Future<void> _toggleCache(AppState appState, bool enabled) => _toggle(
+        appState,
+        (settings, value) => settings.copyWith(cacheEnabled: value),
+        enabled,
+        label: 'cache',
+      );
 
-  Future<void> _toggleDoNotTrack(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(doNotTrack: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling do not track: $e");
-    }
-  }
+  Future<void> _toggleCookies(AppState appState, bool enabled) => _toggle(
+        appState,
+        (settings, value) => settings.copyWith(cookiesEnabled: value),
+        enabled,
+        label: 'cookies',
+      );
 
-  Future<void> _toggleIncognitoMode(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(incognitoMode: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling incognito mode: $e");
-    }
-  }
+  Future<void> _toggleDoNotTrack(AppState appState, bool enabled) => _toggle(
+        appState,
+        (settings, value) => settings.copyWith(doNotTrack: value),
+        enabled,
+        label: 'do not track',
+      );
+
+  Future<void> _toggleIncognitoMode(AppState appState, bool enabled) =>
+      _toggle(
+        appState,
+        (settings, value) => settings.copyWith(incognitoMode: value),
+        enabled,
+        label: 'incognito mode',
+      );
 
   Future<void> _clearCookies(AppState appState) async {
     final String operation = 'cookies';

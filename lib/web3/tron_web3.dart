@@ -16,13 +16,13 @@ import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/src/rust/api/transaction.dart' as rust_api;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
 
@@ -88,43 +88,18 @@ class TronWeb3Handler {
   Future<void> _sendResponse({
     required String type,
     required String uuid,
-    dynamic result,
+    Object? result,
     TronWeb3ErrorCode? errorCode,
     String? errorMessage,
-  }) async {
-    final responsePayload = <String, dynamic>{
-      if (result != null) 'result': result,
-      if (errorCode != null && errorMessage != null)
-        'error': {'code': errorCode.code, 'message': errorMessage},
-    };
-
-    final response = ZilPayWeb3Message(
+  }) {
+    return sendWeb3Response(
+      webViewController: webViewController,
       type: type,
       uuid: uuid,
-      payload: responsePayload,
-    ).toJson();
-
-    final jsonResponse = jsonEncode(response);
-    final jsCode = '''
-    (function() {
-      const responseData = $jsonResponse;
-      if (window.__bearby_response_handlers && window.__bearby_response_handlers["$uuid"]) {
-        const handler = window.__bearby_response_handlers["$uuid"];
-        handler(responseData);
-        delete window.__bearby_response_handlers["$uuid"];
-      } else {
-        window.dispatchEvent(new MessageEvent('message', {
-          data: responseData
-        }));
-      }
-    })();
-    ''';
-
-    try {
-      await webViewController.evaluateJavascript(source: jsCode);
-    } catch (e) {
-      debugPrint("evaluateJavascript error: $e");
-    }
+      result: result,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+    );
   }
 
   void _returnError(
@@ -176,7 +151,7 @@ class TronWeb3Handler {
     switch (tronMethod) {
       case Web3EIP1193Method.tronSign:
       case Web3EIP1193Method.ethSendTransaction:
-        await _handlhSendTransaction(message, context, appState);
+        await _handleSendTransaction(message, context, appState);
         break;
       case Web3EIP1193Method.ethChainId:
         await _handleChainId(message, appState);
@@ -252,7 +227,7 @@ class TronWeb3Handler {
     }
   }
 
-  Future<void> _handlhSendTransaction(
+  Future<void> _handleSendTransaction(
     ZilPayWeb3Message message,
     BuildContext context,
     AppState appState,
@@ -474,7 +449,14 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     AppState appState,
   ) async {
-    final chain = appState.chain!;
+    final chain = appState.chain;
+    if (chain == null) {
+      return _returnError(
+        message.uuid,
+        TronWeb3ErrorCode.internalError,
+        'No active chain',
+      );
+    }
     final chainIdHex = '$kHexPrefix${chain.chainId.toRadixString(kHexRadix)}';
 
     _sendResponse(
@@ -574,7 +556,7 @@ class TronWeb3Handler {
 
         final isTronMethod =
             method == Web3EIP1193Method.tronRequestAccounts.value;
-        return _sendResponse(
+        return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
           result: isTronMethod ? {'code': 200, 'message': 'OK'} : addresses,
@@ -605,7 +587,7 @@ class TronWeb3Handler {
         onConfirm: (selectedIndices) async {
           try {
             if (selectedIndices.isEmpty) {
-              return _sendResponse(
+              return await _sendResponse(
                 type: kBearbyResponseType,
                 uuid: message.uuid,
                 result: <void>[],
@@ -726,12 +708,7 @@ class TronWeb3Handler {
       }
 
       if (targetNetwork == null) {
-        final String mainnetJsonData =
-            await rootBundle.loadString(kMainnetChainsPath);
-        final String testnetJsonData =
-            await rootBundle.loadString(kTestnetChainsPath);
-        final (mainnetChains, testnetChains) = await getNetworks(
-            mainnetJson: mainnetJsonData, testnetJson: testnetJsonData);
+        final (mainnetChains, testnetChains) = await loadBundledNetworks();
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&

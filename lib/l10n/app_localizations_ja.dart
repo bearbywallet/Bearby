@@ -12,34 +12,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appTitle => 'Bearby ウォレット';
 
   @override
-  String get initialPagerestoreZilPay => 'ZilPay 1.0を復元!';
-
-  @override
   String get initialPagegetStarted => '始める';
-
-  @override
-  String get restoreRKStorageTitle => 'ZilPay 1.0から2.0への移行';
-
-  @override
-  String get restoreRKStorageAccountsPrompt => 'ZilPay 2.0に移行するアカウント。パスワードを入力してください。';
-
-  @override
-  String get restoreRKStoragePasswordHint => 'パスワード';
-
-  @override
-  String get restoreRKStorageEnterPassword => 'パスワードを入力';
-
-  @override
-  String get restoreRKStorageErrorPrefix => 'エラー:';
-
-  @override
-  String get restoreRKStorageRestoreButton => '復元';
-
-  @override
-  String get restoreRKStorageSkipButton => 'スキップ';
-
-  @override
-  String get accountItemBalanceLabel => '残高:';
 
   @override
   String get sendTokenPageTitle => '送信';
@@ -141,10 +114,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get walletPageDeleteWallet => 'ウォレットを削除';
 
   @override
-  String get walletPageBiometricReason => '生体認証を有効にする';
-
-  @override
-  String get networkPageTitle => '';
+  String get networkPageTitle => 'ネットワーク';
 
   @override
   String get networkPageSearchHint => '検索';
@@ -269,22 +239,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretPhraseGeneratorPageNextButton => '次へ';
 
   @override
-  String get homePageErrorTitle => '信号なし';
-
-  @override
   String get homePageReceiveButton => '受信';
 
   @override
   String get homePageSendButton => '送信';
-
-  @override
-  String get homePageExchangeButton => '交換';
-
-  @override
-  String get exchangePageTitle => '交換';
-
-  @override
-  String get exchangePagePay => '支払う';
 
   @override
   String get exchangePageGet => '受け取る';
@@ -296,19 +254,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exchangePageConfirm => '確認';
 
   @override
-  String get exchangePageComingSoon => '近日';
-
-  @override
   String get exchangePageNoAssets => 'このネットワークに交換可能な資産がありません';
 
   @override
   String get exchangePageTabSwap => 'スワップ';
-
-  @override
-  String get exchangePageTabLimit => '指値';
-
-  @override
-  String get exchangePageTabBuySell => '売買';
 
   @override
   String get exchangeSettingsPriceProtection => '価格保護';
@@ -398,19 +347,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretKeySubmitButton => '送信';
 
   @override
-  String get revealSecretKeyDoneButton => '完了';
-
-  @override
-  String get revealSecretKeyScamAlertTitle => '詐欺警告';
-
-  @override
   String get revealSecretKeyScamAlertMessage => '秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
-
-  @override
-  String get revealSecretKeySecurityTimer => 'セキュリティタイマー';
-
-  @override
-  String get revealSecretKeyRevealAfter => '秘密鍵は次の時間後に表示されます:';
 
   @override
   String get setupNetworkSettingsPageSearchHint => '検索';
@@ -425,15 +362,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '次へ';
-
-  @override
-  String get setupNetworkSettingsPageChainIdLabel => 'チェーンID:';
-
-  @override
-  String get setupNetworkSettingsPageTokenLabel => 'トークン:';
-
-  @override
-  String get setupNetworkSettingsPageExplorerLabel => 'エクスプローラー:';
 
   @override
   String get appearanceSettingsPageTitle => '外観設定';
@@ -472,9 +400,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appearanceSettingsPageLightModeDescription => 'デバイス設定に関係なく、常にライトテーマを有効にします。';
 
   @override
-  String get loginPageBiometricReason => '認証してください';
-
-  @override
   String loginPageWalletTitle(Object index) {
     return 'ウォレット $index';
   }
@@ -501,9 +426,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretKeyRestorePageKeyTitle => 'プライベートキー';
 
   @override
-  String get secretKeyRestorePageBackupLabel => '秘密鍵をバックアップしました';
-
-  @override
   String get secretKeyRestorePageNextButton => '次へ';
 
   @override
@@ -524,20 +446,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addAccountPageZilliqaLegacy => 'Zilliqaレガシー';
 
   @override
-  String get addAccountPageBiometricReason => '新しいアカウントを作成するために認証';
-
-  @override
-  String addAccountPageBiometricError(Object error) {
-    return '生体認証に失敗: $error';
-  }
-
-  @override
   String addAccountPageIndexExists(Object index) {
     return 'インデックス$indexのアカウントはすでに存在します';
   }
-
-  @override
-  String get addAccountPageBiometricFailed => '生体認証に失敗しました';
 
   @override
   String addAccountPageCreateFailed(Object error) {
@@ -626,16 +537,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => '無効なパスワード、エラー:';
 
   @override
-  String get revealSecretPhraseRevealAfter => 'シードフレーズは次の時間後に表示されます:';
-
-  @override
   String get revealSecretPhraseSubmitButton => '送信';
 
   @override
   String get revealSecretPhraseDoneButton => '完了';
-
-  @override
-  String get revealSecretPhraseScamAlertTitle => '詐欺警告';
 
   @override
   String get revealSecretPhraseScamAlertDescription => '秘密フレーズを他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
@@ -771,9 +676,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get passwordSetupPageCreateButton => 'パスワードを作成';
-
-  @override
-  String get passwordSetupPageAuthReason => 'クイックアクセスを有効にするために認証してください';
 
   @override
   String get passwordSetupPageSeedType => 'シード';
@@ -917,9 +819,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currencyConversionEngineTitle => '通貨エンジン';
 
   @override
-  String get currencyConversionEngineDescription => '通貨レートを取得するエンジン';
-
-  @override
   String get currencyConversionEngineSelectorTitle => '通貨エンジンを選択';
 
   @override
@@ -998,9 +897,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get argonSettingsModalContentSecretHint => '秘密を入力（任意）';
 
   @override
-  String get argonSettingsModalContentConfirmButton => '確認';
-
-  @override
   String get confirmTransactionContentPasswordHint => 'パスワード';
 
   @override
@@ -1013,13 +909,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmTransactionContentNoActiveAccount => 'アクティブなアカウントがありません';
 
   @override
-  String get confirmTransactionContentFailedLoadTransfer => '送金詳細の読み込みに失敗';
-
-  @override
   String get confirmTransactionAdvancedGasButtonText => '詳細設定';
-
-  @override
-  String get authReason => '認証してください';
 
   @override
   String get addChainModalContentWarning => 'ネットワーク詐欺とセキュリティリスクに注意してください。';
@@ -1067,10 +957,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => '検索';
 
   @override
-  String get signMessageModalContentAuthReason => 'メッセージに署名するために認証してください';
-
-  @override
-  String signMessageModalContentFailedToSign(Object error) {
+  String signMessageModalContentFailedToSign(String error) {
     return '署名に失敗しました: $error';
   }
 
@@ -1192,9 +1079,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmPasswordModalButton => '確認';
 
   @override
-  String get qrScannerModalContentTitle => 'スキャン';
-
-  @override
   String get qrScannerModalContentCameraInitError => 'カメラ初期化エラー:';
 
   @override
@@ -1234,9 +1118,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chainInfoModalContentFallbackEnabledLabel => 'フォールバック有効';
 
   @override
-  String get chainInfoModalContentDecimalsLabel => '小数点';
-
-  @override
   String get chainInfoModalContentRpcNodesTitle => 'RPCノード';
 
   @override
@@ -1256,12 +1137,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get switchChainNetworkContentButton => 'ネットワークを切り替え';
-
-  @override
-  String get switchChainNetworkContentTestnetLabel => 'テストネット';
-
-  @override
-  String get switchChainNetworkContentIdLabel => 'ID:';
 
   @override
   String get watchAssetModalContentTitle => '提案されたトークンを追加';
@@ -1662,13 +1537,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unstakeButton => 'アンステーク';
 
   @override
-  String get aprLabel => 'APR';
-
-  @override
   String get commissionLabel => '手数料';
-
-  @override
-  String get stakedAmount => 'ステーク済み';
 
   @override
   String get rewardsAvailable => '報酬';
@@ -1683,9 +1552,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get claimableIn => '請求可能まで';
 
   @override
-  String get blocks => 'ブロック';
-
-  @override
   String get unbondingPeriod => 'アンボンディング期間';
 
   @override
@@ -1693,9 +1559,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get version => 'バージョン';
-
-  @override
-  String get rewardsProgressTitle => '報酬の進捗';
 
   @override
   String get ledgerConnectPageTitle => 'Ledgerに接続';
@@ -1767,9 +1630,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get durationNotAvailable => '適用外';
-
-  @override
-  String get nodes => 'ノード';
 
   @override
   String get manageTokensPageTitle => 'トークン';
@@ -1898,33 +1758,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get web3ErrorChainNotAdded => 'リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。';
 
   @override
-  String get bipPurposeSetupPageTitle => 'ビットコインアドレス';
-
-  @override
-  String get bip86Name => 'BIP86 (Taproot)';
-
-  @override
-  String get bip86Description => 'P2TR - bc1pで始まるアドレス';
-
-  @override
-  String get bip84Name => 'BIP84 (Native SegWit)';
-
-  @override
-  String get bip84Description => 'P2WPKH - bc1qで始まるアドレス';
-
-  @override
-  String get bip49Name => 'BIP49 (SegWit)';
-
-  @override
-  String get bip49Description => 'P2WPKH-nested-in-P2SH - 3で始まるアドレス';
-
-  @override
-  String get bip44Name => 'BIP44 (Legacy)';
-
-  @override
-  String get bip44Description => 'P2PKH - 1で始まるアドレス';
-
-  @override
   String get addNetworkPageTitle => 'ネットワークを追加';
 
   @override
@@ -1961,15 +1794,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addNetworkPageErrorRequired => 'すべての必須項目を入力してください';
 
   @override
-  String get addNetworkPageErrorInvalidRpc => '有効なRPC URLを入力してください';
-
-  @override
-  String get addNetworkPageErrorInvalidChainId => '有効なチェーンIDを入力してください';
-
-  @override
-  String get addNetworkPageSuccess => 'ネットワークが追加されました';
-
-  @override
   String get qrCodeUnrecognizedError => 'QRコードを認識できません。サポートされているフォーマットを使用してください。';
 
   @override
@@ -1995,4 +1819,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle => 'Bitcoinでは非推奨です。BIP39を使用してください。';
+
+  @override
+  String get errorDialogTitle => 'エラー';
+
+  @override
+  String get stakingDelegatedLabel => 'デリゲート済み';
+
+  @override
+  String get stakingClaimableLabel => '請求可能';
+
+  @override
+  String get tokenSelectModalSelectButton => '選択';
+
+  @override
+  String ledgerAccountTitle(int index) {
+    return 'アカウント $index';
+  }
 }

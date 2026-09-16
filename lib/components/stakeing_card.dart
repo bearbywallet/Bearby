@@ -21,6 +21,64 @@ import 'package:bearby/utils/stake_formatters.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
 
+/// Shared flow helpers for the staking cards. `_ensureCorrectChain`,
+/// `_navigateToHistory` and `_showErrorDialog` used to be copy-pasted into
+/// every staking widget class; they now live exactly once (DRY).
+mixin _StakeFlowHelpers {
+  FinalOutputInfo get stake;
+
+  Future<void> _ensureCorrectChain(
+    AppState appState,
+    BigInt walletIndex,
+    BigInt accountIndex,
+  ) async {
+    final isScilla = stake.tag == "scilla";
+    final isEVM = stake.tag == 'evm';
+    final addrType = appState.account?.addrType;
+
+    if ((isScilla && addrType == 1) || (isEVM && addrType == 0)) {
+      await zilliqaSwapChain(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+      );
+    }
+  }
+
+  void _navigateToHistory(BuildContext context) {
+    context.go(AppRoutes.history);
+  }
+
+  void _showErrorDialog(BuildContext context, AppState appState, Object e) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: appState.currentTheme.cardBackground,
+        title: Text(
+          l10n.errorDialogTitle,
+          style: appState.currentTheme.bodyLarge
+              .copyWith(color: appState.currentTheme.textPrimary),
+        ),
+        content: Text(
+          e.toString(),
+          style: appState.currentTheme.bodyLarge
+              .copyWith(color: appState.currentTheme.danger),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              "OK",
+              style: appState.currentTheme.bodyLarge
+                  .copyWith(color: appState.currentTheme.primaryPurple),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class StakingPoolCard extends StatelessWidget {
   final FinalOutputInfo stake;
 
@@ -335,7 +393,9 @@ class _PendingWithdrawalsHeader extends StatelessWidget {
   }
 }
 
-class _PendingWithdrawalItem extends StatelessWidget {
+class _PendingWithdrawalItem extends StatelessWidget
+    with _StakeFlowHelpers {
+  @override
   final FinalOutputInfo stake;
   final PendingWithdrawalInfo item;
   final AppTheme theme;
@@ -456,23 +516,6 @@ class _PendingWithdrawalItem extends StatelessWidget {
     }
   }
 
-  Future<void> _ensureCorrectChain(
-    AppState appState,
-    BigInt walletIndex,
-    BigInt accountIndex,
-  ) async {
-    final isScilla = stake.tag == "scilla";
-    final isEVM = stake.tag == 'evm';
-    final addrType = appState.account?.addrType;
-
-    if ((isScilla && addrType == 1) || (isEVM && addrType == 0)) {
-      await zilliqaSwapChain(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-      );
-    }
-  }
-
   Future<TransactionRequestInfo> _buildClaimTx(
     BigInt walletIndex,
     BigInt accountIndex,
@@ -492,38 +535,6 @@ class _PendingWithdrawalItem extends StatelessWidget {
     );
   }
 
-  void _navigateToHistory(BuildContext context) {
-    context.go(AppRoutes.history);
-  }
-
-  void _showErrorDialog(BuildContext context, AppState appState, Object e) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: appState.currentTheme.cardBackground,
-        title: Text(
-          "Error",
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.textPrimary),
-        ),
-        content: Text(
-          e.toString(),
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.danger),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              "OK",
-              style: appState.currentTheme.bodyLarge
-                  .copyWith(color: appState.currentTheme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _WithdrawalProgress extends StatelessWidget {
@@ -668,7 +679,7 @@ class _DelegatedAmountDisplay extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Delegated',
+              l10n.stakingDelegatedLabel,
               style: theme.labelSmall.copyWith(
                 color: theme.textSecondary,
                 fontSize: 10,
@@ -730,7 +741,9 @@ class _DelegatedAmountDisplay extends StatelessWidget {
   }
 }
 
-class _ClaimableAmountCard extends StatelessWidget {
+class _ClaimableAmountCard extends StatelessWidget
+    with _StakeFlowHelpers {
+  @override
   final FinalOutputInfo stake;
   final AppTheme theme;
   final AppLocalizations l10n;
@@ -775,7 +788,7 @@ class _ClaimableAmountCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Claimable',
+                  l10n.stakingClaimableLabel,
                   style: theme.caption.copyWith(
                     color: theme.textSecondary,
                     fontSize: 9,
@@ -849,34 +862,6 @@ class _ClaimableAmountCard extends StatelessWidget {
     }
   }
 
-  void _showErrorDialog(BuildContext context, AppState appState, Object e) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: appState.currentTheme.cardBackground,
-        title: Text(
-          "Error",
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.textPrimary),
-        ),
-        content: Text(
-          e.toString(),
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.danger),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              "OK",
-              style: appState.currentTheme.bodyLarge
-                  .copyWith(color: appState.currentTheme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _LiquidStakingInfo extends StatelessWidget {
@@ -1099,7 +1084,9 @@ class _CompactStatItem extends StatelessWidget {
   }
 }
 
-class _ClaimRewardsButton extends StatelessWidget {
+class _ClaimRewardsButton extends StatelessWidget
+    with _StakeFlowHelpers {
+  @override
   final FinalOutputInfo stake;
   final AppTheme theme;
   final AppLocalizations l10n;
@@ -1205,23 +1192,6 @@ class _ClaimRewardsButton extends StatelessWidget {
     }
   }
 
-  Future<void> _ensureCorrectChain(
-    AppState appState,
-    BigInt walletIndex,
-    BigInt accountIndex,
-  ) async {
-    final isScilla = stake.tag == "scilla";
-    final isEVM = stake.tag == 'evm';
-    final addrType = appState.account?.addrType;
-
-    if ((isScilla && addrType == 1) || (isEVM && addrType == 0)) {
-      await zilliqaSwapChain(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-      );
-    }
-  }
-
   Future<TransactionRequestInfo> _buildClaimRewardsTx(
     BigInt walletIndex,
     BigInt accountIndex,
@@ -1241,41 +1211,11 @@ class _ClaimRewardsButton extends StatelessWidget {
     );
   }
 
-  void _navigateToHistory(BuildContext context) {
-    context.go(AppRoutes.history);
-  }
-
-  void _showErrorDialog(BuildContext context, AppState appState, Object e) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: appState.currentTheme.cardBackground,
-        title: Text(
-          "Error",
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.textPrimary),
-        ),
-        content: Text(
-          e.toString(),
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.danger),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              "OK",
-              style: appState.currentTheme.bodyLarge
-                  .copyWith(color: appState.currentTheme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class _ActionButtons extends StatelessWidget {
+class _ActionButtons extends StatelessWidget
+    with _StakeFlowHelpers {
+  @override
   final FinalOutputInfo stake;
   final AppTheme theme;
   final AppLocalizations l10n;
@@ -1391,55 +1331,6 @@ class _ActionButtons extends StatelessWidget {
     }
   }
 
-  Future<void> _ensureCorrectChain(
-    AppState appState,
-    BigInt walletIndex,
-    BigInt accountIndex,
-  ) async {
-    final isScilla = stake.tag == "scilla";
-    final isEVM = stake.tag == 'evm';
-    final addrType = appState.account?.addrType;
-
-    if ((isScilla && addrType == 1) || (isEVM && addrType == 0)) {
-      await zilliqaSwapChain(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-      );
-    }
-  }
-
-  void _navigateToHistory(BuildContext context) {
-    context.go(AppRoutes.history);
-  }
-
-  void _showErrorDialog(BuildContext context, AppState appState, Object e) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: appState.currentTheme.cardBackground,
-        title: Text(
-          "Error",
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.textPrimary),
-        ),
-        content: Text(
-          e.toString(),
-          style: appState.currentTheme.bodyLarge
-              .copyWith(color: appState.currentTheme.danger),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              "OK",
-              style: appState.currentTheme.bodyLarge
-                  .copyWith(color: appState.currentTheme.primaryPurple),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _TokenAmount extends StatelessWidget {

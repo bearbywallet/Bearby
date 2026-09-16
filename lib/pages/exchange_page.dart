@@ -327,7 +327,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
                 ),
               ),
               if (to == null)
-                _buildEmptyGetCard(theme, state)
+                _buildEmptyGetCard(theme, l10n, state)
               else
                 _buildGetCard(theme, l10n, to, state),
               const SizedBox(height: 8),
@@ -473,7 +473,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     return '1 ${from.token.symbol} ≈ $rateAmount ${to.token.symbol}';
   }
 
-  Widget _buildEmptyGetCard(AppTheme theme, ExchangeState state) {
+  Widget _buildEmptyGetCard(
+      AppTheme theme, AppLocalizations l10n, ExchangeState state) {
     final outs = state.outAssets;
     return Container(
       padding: const EdgeInsets.all(14),
@@ -487,6 +488,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         children: [
           _buildEmptyTokenSelector(
             theme,
+            l10n,
             outs.isNotEmpty
                 ? () => showExchangeTokenSelectModal(
                       context: context,
@@ -653,7 +655,8 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildEmptyTokenSelector(AppTheme theme, VoidCallback? onTap) {
+  Widget _buildEmptyTokenSelector(
+      AppTheme theme, AppLocalizations l10n, VoidCallback? onTap) {
     final enabled = onTap != null;
     return GestureDetector(
       onTap: onTap,
@@ -670,7 +673,7 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Select',
+              l10n.tokenSelectModalSelectButton,
               style: theme.bodyText1.copyWith(
                 color: enabled
                     ? theme.textPrimary

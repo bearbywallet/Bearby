@@ -39,22 +39,30 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   }
 
   Future<void> _initPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    if (mounted) {
-      setState(() {
-        _packageInfo = info;
-      });
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _packageInfo = info;
+        });
+      }
+    } catch (e) {
+      debugPrint('_initPackageInfo: $e');
     }
   }
 
   Future<void> _loadTestnetPreference() async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final enabled =
-        await appState.storage.get_(key: StorageKeys.testnetEnabled);
-    if (mounted) {
-      setState(() {
-        _testnetEnabled = enabled == 'true';
-      });
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final enabled =
+          await appState.storage.get_(key: StorageKeys.testnetEnabled);
+      if (mounted) {
+        setState(() {
+          _testnetEnabled = enabled == 'true';
+        });
+      }
+    } catch (e) {
+      debugPrint('_loadTestnetPreference: $e');
     }
   }
 

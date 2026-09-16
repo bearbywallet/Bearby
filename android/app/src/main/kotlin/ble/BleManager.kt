@@ -87,6 +87,10 @@ class BleManager(private val context: Context) {
     }
 
     fun stopScan() {
+        // Was an empty no-op: the scan kept running until the Dart-side
+        // callbackFlow was cancelled. Stop the radio scan explicitly so both
+        // platforms behave the same (parity with BleManager.swift.stopScan).
+        bleScanner?.stopScan()
     }
 
     suspend fun open(deviceId: String) {

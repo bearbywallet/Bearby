@@ -3,45 +3,9 @@
   "@appTitle": {
     "description": "The title of the application"
   },
-  "initialPagerestoreZilPay": "Restore ZilPay 1.0!",
-  "@initialPagerestoreZilPay": {
-    "description": "Button text to restore from ZilPay 1.0"
-  },
   "initialPagegetStarted": "Get Started",
   "@initialPagegetStarted": {
     "description": "Button text to begin using the app"
-  },
-  "restoreRKStorageTitle": "Migrate ZilPay 1.0 to 2.0",
-  "@restoreRKStorageTitle": {
-    "description": "Title for the RestoreRKStorage page showing wallet migration"
-  },
-  "restoreRKStorageAccountsPrompt": "Accounts to migrate to ZilPay 2.0. Enter password.",
-  "@restoreRKStorageAccountsPrompt": {
-    "description": "Prompt text instructing user to enter password for account migration on RestoreRKStorage page"
-  },
-  "restoreRKStoragePasswordHint": "Password",
-  "@restoreRKStoragePasswordHint": {
-    "description": "Hint text for password input field on RestoreRKStorage page"
-  },
-  "restoreRKStorageEnterPassword": "Enter password",
-  "@restoreRKStorageEnterPassword": {
-    "description": "Error message when password field is empty on RestoreRKStorage page"
-  },
-  "restoreRKStorageErrorPrefix": "Error:",
-  "@restoreRKStorageErrorPrefix": {
-    "description": "Prefix for error messages on RestoreRKStorage page"
-  },
-  "restoreRKStorageRestoreButton": "Restore",
-  "@restoreRKStorageRestoreButton": {
-    "description": "Text for restore button on RestoreRKStorage page"
-  },
-  "restoreRKStorageSkipButton": "Skip",
-  "@restoreRKStorageSkipButton": {
-    "description": "Text for skip button on RestoreRKStorage page"
-  },
-  "accountItemBalanceLabel": "Balance:",
-  "@accountItemBalanceLabel": {
-    "description": "Label for balance display in AccountItem widget"
   },
   "sendTokenPageTitle": "Send",
   "@sendTokenPageTitle": {
@@ -175,11 +139,7 @@
   "@walletPageDeleteWallet": {
     "description": "Text for delete wallet button on WalletPage"
   },
-  "walletPageBiometricReason": "Enable biometric authentication",
-  "@walletPageBiometricReason": {
-    "description": "Reason text for biometric authentication prompt on WalletPage"
-  },
-  "networkPageTitle": "",
+  "networkPageTitle": "Networks",
   "@networkPageTitle": {
     "description": "Title for the NetworkPage (empty as per original implementation)"
   },
@@ -343,23 +303,13 @@
   "@secretPhraseGeneratorPageNextButton": {
     "description": "Text for next button on SecretPhraseGeneratorPage"
   },
-  "homePageErrorTitle": "No signal",
-  "@homePageErrorTitle": {
-    "description": "Label displayed when shows error on home page"
-  },
   "homePageReceiveButton": "Receive",
   "homePageSendButton": "Send",
-  "homePageExchangeButton": "Exchange",
-  "exchangePageTitle": "Exchange",
-  "exchangePagePay": "You pay",
   "exchangePageGet": "You get",
   "exchangePageRecipientTitle": "Select recipient",
   "exchangePageConfirm": "Swap",
-  "exchangePageComingSoon": "Soon",
   "exchangePageNoAssets": "No swappable assets on this network",
   "exchangePageTabSwap": "Swap",
-  "exchangePageTabLimit": "Limit",
-  "exchangePageTabBuySell": "Buy/Sell",
   "exchangeSettingsPriceProtection": "Price Protection",
   "exchangeSettingsReset": "Reset",
   "exchangeSettingsSave": "Save",
@@ -420,25 +370,9 @@
   "@revealSecretKeySubmitButton": {
     "description": "Text for submit button on RevealSecretKey page"
   },
-  "revealSecretKeyDoneButton": "Done",
-  "@revealSecretKeyDoneButton": {
-    "description": "Text for done button after revealing secret key on RevealSecretKey page"
-  },
-  "revealSecretKeyScamAlertTitle": "SCAM ALERT",
-  "@revealSecretKeyScamAlertTitle": {
-    "description": "Title for scam alert section on RevealSecretKey page"
-  },
   "revealSecretKeyScamAlertMessage": "Never share your secret key with anyone. Never input it on any website.",
   "@revealSecretKeyScamAlertMessage": {
     "description": "Message content for scam alert section on RevealSecretKey page"
-  },
-  "revealSecretKeySecurityTimer": "Security Timer",
-  "@revealSecretKeySecurityTimer": {
-    "description": "Title for security timer display on RevealSecretKey page"
-  },
-  "revealSecretKeyRevealAfter": "Your secret key will be revealed after:",
-  "@revealSecretKeyRevealAfter": {
-    "description": "Message explaining the reveal delay on RevealSecretKey page"
   },
   "setupNetworkSettingsPageSearchHint": "Search",
   "@setupNetworkSettingsPageSearchHint": {
@@ -458,18 +392,6 @@
   "setupNetworkSettingsPageNextButton": "Next",
   "@setupNetworkSettingsPageNextButton": {
     "description": "Text for Next button on SetupNetworkSettingsPage"
-  },
-  "setupNetworkSettingsPageChainIdLabel": "Chain ID:",
-  "@setupNetworkSettingsPageChainIdLabel": {
-    "description": "Label prefix for Chain ID in network item on SetupNetworkSettingsPage"
-  },
-  "setupNetworkSettingsPageTokenLabel": "Token:",
-  "@setupNetworkSettingsPageTokenLabel": {
-    "description": "Label prefix for Token in network item on SetupNetworkSettingsPage"
-  },
-  "setupNetworkSettingsPageExplorerLabel": "Explorer:",
-  "@setupNetworkSettingsPageExplorerLabel": {
-    "description": "Label prefix for Explorer in network item on SetupNetworkSettingsPage"
   },
   "appearanceSettingsPageTitle": "Appearance Settings",
   "@appearanceSettingsPageTitle": {
@@ -519,10 +441,6 @@
   "@appearanceSettingsPageLightModeDescription": {
     "description": "Description for the Light Mode theme option"
   },
-  "loginPageBiometricReason": "Please authenticate",
-  "@loginPageBiometricReason": {
-    "description": "Reason text for biometric authentication prompt on the Login page"
-  },
   "loginPageWalletTitle": "Wallet {index}",
   "@loginPageWalletTitle": {
     "description": "Default title for a wallet item when no custom name is provided on the Login page",
@@ -558,10 +476,6 @@
   "@secretKeyRestorePageKeyTitle": {
     "description": "Title for the private key display section on the Secret Key Restore page"
   },
-  "secretKeyRestorePageBackupLabel": "I have backed up my secret key",
-  "@secretKeyRestorePageBackupLabel": {
-    "description": "Label for the backup confirmation checkbox on the Secret Key Restore page"
-  },
   "secretKeyRestorePageNextButton": "Next",
   "@secretKeyRestorePageNextButton": {
     "description": "Text for the Next button on the Secret Key Restore page"
@@ -589,27 +503,12 @@
   "@addAccountPageZilliqaLegacy": {
     "description": "Label for the Zilliqa Legacy switch on the Add Account page"
   },
-  "addAccountPageBiometricReason": "Authenticate to create a new account",
-  "@addAccountPageBiometricReason": {
-    "description": "Reason text for biometric authentication prompt on the Add Account page"
-  },
-  "addAccountPageBiometricError": "Biometric authentication failed: {error}",
-  "@addAccountPageBiometricError": {
-    "description": "Error message for biometric authentication failure on the Add Account page",
-    "placeholders": {
-      "error": {}
-    }
-  },
   "addAccountPageIndexExists": "Account with index {index} already exists",
   "@addAccountPageIndexExists": {
     "description": "Error message when an account with the given index already exists on the Add Account page",
     "placeholders": {
       "index": {}
     }
-  },
-  "addAccountPageBiometricFailed": "Biometric authentication failed",
-  "@addAccountPageBiometricFailed": {
-    "description": "Error message when biometric authentication fails on the Add Account page"
   },
   "addAccountPageCreateFailed": "Failed to create account: {error}",
   "@addAccountPageCreateFailed": {
@@ -733,10 +632,6 @@
   "@revealSecretPhraseInvalidPassword": {
     "description": "Error message prefix shown when password validation fails in the RevealSecretPhrase component"
   },
-  "revealSecretPhraseRevealAfter": "Your seed phrase will be revealed after:",
-  "@revealSecretPhraseRevealAfter": {
-    "description": "the label for wait until time done, and secret phrase reveal"
-  },
   "revealSecretPhraseSubmitButton": "Submit",
   "@revealSecretPhraseSubmitButton": {
     "description": "Text on the submit button in the RevealSecretPhrase component"
@@ -744,10 +639,6 @@
   "revealSecretPhraseDoneButton": "Done",
   "@revealSecretPhraseDoneButton": {
     "description": "Text on the done button displayed after revealing the secret phrase in the RevealSecretPhrase component"
-  },
-  "revealSecretPhraseScamAlertTitle": "SCAM ALERT",
-  "@revealSecretPhraseScamAlertTitle": {
-    "description": "Title of the scam alert section in the RevealSecretPhrase component"
   },
   "revealSecretPhraseScamAlertDescription": "Never share your secret phrase with anyone. Never input it on any website.",
   "@revealSecretPhraseScamAlertDescription": {
@@ -928,10 +819,6 @@
   "passwordSetupPageCreateButton": "Create Password",
   "@passwordSetupPageCreateButton": {
     "description": "Text on the create password button in the PasswordSetupPage component"
-  },
-  "passwordSetupPageAuthReason": "Please authenticate to enable quick access",
-  "@passwordSetupPageAuthReason": {
-    "description": "Reason text displayed during biometric authentication in the PasswordSetupPage component"
   },
   "passwordSetupPageSeedType": "Seed",
   "@passwordSetupPageSeedType": {
@@ -1121,10 +1008,6 @@
   "@currencyConversionEngineTitle": {
     "description": "Title for the currency engine selection"
   },
-  "currencyConversionEngineDescription": "Engine for fetching currency rates",
-  "@currencyConversionEngineDescription": {
-    "description": "Description for the currency engine selection"
-  },
   "currencyConversionEngineSelectorTitle": "Select Currency Engine",
   "@currencyConversionEngineSelectorTitle": {
     "description": "Title for the currency engine selector modal"
@@ -1229,10 +1112,6 @@
   "@argonSettingsModalContentSecretHint": {
     "description": "Hint text for secret input field in ArgonSettingsModalContent"
   },
-  "argonSettingsModalContentConfirmButton": "Confirm",
-  "@argonSettingsModalContentConfirmButton": {
-    "description": "Text for confirm button in ArgonSettingsModalContent"
-  },
   "confirmTransactionContentPasswordHint": "Password",
   "@confirmTransactionContentPasswordHint": {
     "description": "Hint text for the password input field in the ConfirmTransactionContent modal."
@@ -1249,17 +1128,9 @@
   "@confirmTransactionContentNoActiveAccount": {
     "description": "Error message thrown when no active account is found in the ConfirmTransactionContent modal."
   },
-  "confirmTransactionContentFailedLoadTransfer": "Failed to load transfer details",
-  "@confirmTransactionContentFailedLoadTransfer": {
-    "description": "Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal."
-  },
   "confirmTransactionAdvancedGasButtonText": "Advanced",
   "@confirmTransactionAdvancedGasButtonText": {
     "description": "Text displayed on the advanced gas-settings button in the ConfirmTransactionContent modal."
-  },
-  "authReason": "Please authenticate",
-  "@authReason": {
-    "description": "Reason text displayed during authentication prompt in the ConfirmTransactionContent modal."
   },
   "addChainModalContentWarning": "Beware of network scams and security risks.",
   "@addChainModalContentWarning": {
@@ -1321,13 +1192,14 @@
   "@tokenSelectModalContentSearchHint": {
     "description": "Hint text for the search input field in the TokenSelectModalContent modal."
   },
-  "signMessageModalContentAuthReason": "Please authenticate to sign the message",
-  "@signMessageModalContentAuthReason": {
-    "description": "Reason text for authentication prompt in the SignMessageModalContent modal."
-  },
   "signMessageModalContentFailedToSign": "Failed to sign: {error}",
   "@signMessageModalContentFailedToSign": {
-    "description": "Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
+    "description": "Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "signMessageModalContentTitle": "Sign Message",
   "@signMessageModalContentTitle": {
@@ -1485,10 +1357,6 @@
   "@confirmPasswordModalButton": {
     "description": "Text on the button to confirm the password in the ConfirmPasswordModal modal."
   },
-  "qrScannerModalContentTitle": "Scan",
-  "@qrScannerModalContentTitle": {
-    "description": "Title text for the QRScannerModalContent modal."
-  },
   "qrScannerModalContentCameraInitError": "Camera initialization error:",
   "@qrScannerModalContentCameraInitError": {
     "description": "Prefix for error message when camera initialization fails in the QRScannerModalContent modal."
@@ -1541,10 +1409,6 @@
   "@chainInfoModalContentFallbackEnabledLabel": {
     "description": "Label for the fallback enabled switch in the network information section of the ChainInfoModalContent modal."
   },
-  "chainInfoModalContentDecimalsLabel": "Decimals",
-  "@chainInfoModalContentDecimalsLabel": {
-    "description": "Label for the decimals field in the first token section of the ChainInfoModalContent modal."
-  },
   "chainInfoModalContentRpcNodesTitle": "RPC Nodes",
   "@chainInfoModalContentRpcNodesTitle": {
     "description": "Title text for the RPC nodes section in the ChainInfoModalContent modal."
@@ -1559,7 +1423,9 @@
   },
   "chainInfoModalContentSwipeToDelete": "Delete network",
   "chainConfigPageAdvancedButton": "Advanced",
-  "@chainConfigPageAdvancedButton": {"description": "Text for the Advanced expand button on the chain config page"},
+  "@chainConfigPageAdvancedButton": {
+    "description": "Text for the Advanced expand button on the chain config page"
+  },
   "@chainInfoModalContentSwipeToDelete": {
     "description": "Text displayed on the swipe button for deleting a network in the ChainInfoModalContent modal."
   },
@@ -1570,14 +1436,6 @@
   "switchChainNetworkContentButton": "Switch Network",
   "@switchChainNetworkContentButton": {
     "description": "Text on the swipe button to confirm network switch in the SwitchChainNetworkContent modal."
-  },
-  "switchChainNetworkContentTestnetLabel": "Testnet",
-  "@switchChainNetworkContentTestnetLabel": {
-    "description": "Label displayed next to a testnet network name in the SwitchChainNetworkContent modal."
-  },
-  "switchChainNetworkContentIdLabel": "ID:",
-  "@switchChainNetworkContentIdLabel": {
-    "description": "Label prefix for the chain ID in the network details row of the SwitchChainNetworkContent modal."
   },
   "watchAssetModalContentTitle": "Add suggested token",
   "@watchAssetModalContentTitle": {
@@ -2096,17 +1954,9 @@
   "@unstakeButton": {
     "description": "Text for the unstake button"
   },
-  "aprLabel": "APR",
-  "@aprLabel": {
-    "description": "Label for APR in the staking pool card"
-  },
   "commissionLabel": "Commission",
   "@commissionLabel": {
     "description": "Label for Commission in the staking pool card"
-  },
-  "stakedAmount": "Staked",
-  "@stakedAmount": {
-    "description": "Label for the amount of tokens staked by user"
   },
   "rewardsAvailable": "Rewards",
   "@rewardsAvailable": {
@@ -2124,10 +1974,6 @@
   "@claimableIn": {
     "description": "Text indicating the time remaining until something is claimable"
   },
-  "blocks": "blocks",
-  "@blocks": {
-    "description": "Plural form of the word block, used for blockchain blocks count"
-  },
   "unbondingPeriod": "Unbonding Period",
   "@unbondingPeriod": {
     "description": "Label for the unbonding period"
@@ -2139,10 +1985,6 @@
   "version": "Version",
   "@version": {
     "description": "Label for the contract or validator version"
-  },
-  "rewardsProgressTitle": "Rewards Progress",
-  "@rewardsProgressTitle": {
-    "description": "This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake."
   },
   "ledgerConnectPageTitle": "Connect Ledger",
   "@ledgerConnectPageTitle": {
@@ -2246,7 +2088,6 @@
   "durationMinute": "m",
   "durationLessThanAMinute": "< 1m",
   "durationNotAvailable": "N/A",
-  "nodes": "nodes",
   "manageTokensPageTitle": "Tokens",
   "@manageTokensPageTitle": {
     "description": "Title for the Manage Tokens page"
@@ -2425,42 +2266,6 @@
   "@web3ErrorChainNotAdded": {
     "description": "Error when trying to switch to a chain that hasn't been added"
   },
-  "bipPurposeSetupPageTitle": "Bitcoin Address",
-  "@bipPurposeSetupPageTitle": {
-    "description": "Title for the BIP purpose setup page"
-  },
-  "bip86Name": "BIP86 (Taproot)",
-  "@bip86Name": {
-    "description": "Name for BIP86 address type"
-  },
-  "bip86Description": "P2TR - Addresses starting with bc1p",
-  "@bip86Description": {
-    "description": "Description for BIP86 address type"
-  },
-  "bip84Name": "BIP84 (Native SegWit)",
-  "@bip84Name": {
-    "description": "Name for BIP84 address type"
-  },
-  "bip84Description": "P2WPKH - Addresses starting with bc1q",
-  "@bip84Description": {
-    "description": "Description for BIP84 address type"
-  },
-  "bip49Name": "BIP49 (SegWit)",
-  "@bip49Name": {
-    "description": "Name for BIP49 address type"
-  },
-  "bip49Description": "P2WPKH-nested-in-P2SH - Addresses starting with 3",
-  "@bip49Description": {
-    "description": "Description for BIP49 address type"
-  },
-  "bip44Name": "BIP44 (Legacy)",
-  "@bip44Name": {
-    "description": "Name for BIP44 address type"
-  },
-  "bip44Description": "P2PKH - Addresses starting with 1",
-  "@bip44Description": {
-    "description": "Description for BIP44 address type"
-  },
   "addNetworkPageTitle": "Add Network",
   "@addNetworkPageTitle": {
     "description": "Title for the AddNetworkPage"
@@ -2509,18 +2314,6 @@
   "@addNetworkPageErrorRequired": {
     "description": "Error when required fields are empty on AddNetworkPage"
   },
-  "addNetworkPageErrorInvalidRpc": "Please enter a valid RPC URL",
-  "@addNetworkPageErrorInvalidRpc": {
-    "description": "Error when RPC URL is invalid on AddNetworkPage"
-  },
-  "addNetworkPageErrorInvalidChainId": "Please enter a valid Chain ID",
-  "@addNetworkPageErrorInvalidChainId": {
-    "description": "Error when Chain ID is invalid on AddNetworkPage"
-  },
-  "addNetworkPageSuccess": "Network added successfully",
-  "@addNetworkPageSuccess": {
-    "description": "Success message after adding a network on AddNetworkPage"
-  },
   "qrCodeUnrecognizedError": "QR code not recognized. Please use a supported format.",
   "@qrCodeUnrecognizedError": {
     "description": "Error when QR code format is not recognized during wallet restore"
@@ -2556,5 +2349,30 @@
   "restoreWalletOptionsPrivateKeyDeprecatedSubtitle": "Deprecated for Bitcoin. Use BIP39 instead.",
   "@restoreWalletOptionsPrivateKeyDeprecatedSubtitle": {
     "description": "Subtitle for Private Key restore option when Bitcoin network is selected"
+  },
+  "errorDialogTitle": "Error",
+  "@errorDialogTitle": {
+    "description": "Title of an error dialog."
+  },
+  "stakingDelegatedLabel": "Delegated",
+  "@stakingDelegatedLabel": {
+    "description": "Label for a delegated staking position."
+  },
+  "stakingClaimableLabel": "Claimable",
+  "@stakingClaimableLabel": {
+    "description": "Label for claimable staking rewards."
+  },
+  "tokenSelectModalSelectButton": "Select",
+  "@tokenSelectModalSelectButton": {
+    "description": "Button that selects an item."
+  },
+  "ledgerAccountTitle": "Account {index}",
+  "@ledgerAccountTitle": {
+    "description": "Title of a Ledger account card with its index.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
   }
 }

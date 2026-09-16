@@ -177,6 +177,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
           );
         }
         _btnController.reset();
+        if (!mounted) return;
         setState(() {
           _errorMessage = l10n.addAccountPageCreateFailed(
               'account $_bip39Index not visible after sync');

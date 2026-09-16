@@ -107,65 +107,11 @@ abstract class AppLocalizations {
   /// **'Bearby Wallet'**
   String get appTitle;
 
-  /// Button text to restore from ZilPay 1.0
-  ///
-  /// In en, this message translates to:
-  /// **'Restore ZilPay 1.0!'**
-  String get initialPagerestoreZilPay;
-
   /// Button text to begin using the app
   ///
   /// In en, this message translates to:
   /// **'Get Started'**
   String get initialPagegetStarted;
-
-  /// Title for the RestoreRKStorage page showing wallet migration
-  ///
-  /// In en, this message translates to:
-  /// **'Migrate ZilPay 1.0 to 2.0'**
-  String get restoreRKStorageTitle;
-
-  /// Prompt text instructing user to enter password for account migration on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Accounts to migrate to ZilPay 2.0. Enter password.'**
-  String get restoreRKStorageAccountsPrompt;
-
-  /// Hint text for password input field on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get restoreRKStoragePasswordHint;
-
-  /// Error message when password field is empty on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Enter password'**
-  String get restoreRKStorageEnterPassword;
-
-  /// Prefix for error messages on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Error:'**
-  String get restoreRKStorageErrorPrefix;
-
-  /// Text for restore button on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Restore'**
-  String get restoreRKStorageRestoreButton;
-
-  /// Text for skip button on RestoreRKStorage page
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get restoreRKStorageSkipButton;
-
-  /// Label for balance display in AccountItem widget
-  ///
-  /// In en, this message translates to:
-  /// **'Balance:'**
-  String get accountItemBalanceLabel;
 
   /// Title for the SendTokenPage app bar
   ///
@@ -365,16 +311,10 @@ abstract class AppLocalizations {
   /// **'Delete Wallet'**
   String get walletPageDeleteWallet;
 
-  /// Reason text for biometric authentication prompt on WalletPage
-  ///
-  /// In en, this message translates to:
-  /// **'Enable biometric authentication'**
-  String get walletPageBiometricReason;
-
   /// Title for the NetworkPage (empty as per original implementation)
   ///
   /// In en, this message translates to:
-  /// **''**
+  /// **'Networks'**
   String get networkPageTitle;
 
   /// Hint text for search input on NetworkPage
@@ -599,12 +539,6 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get secretPhraseGeneratorPageNextButton;
 
-  /// Label displayed when shows error on home page
-  ///
-  /// In en, this message translates to:
-  /// **'No signal'**
-  String get homePageErrorTitle;
-
   /// No description provided for @homePageReceiveButton.
   ///
   /// In en, this message translates to:
@@ -616,24 +550,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get homePageSendButton;
-
-  /// No description provided for @homePageExchangeButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Exchange'**
-  String get homePageExchangeButton;
-
-  /// No description provided for @exchangePageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Exchange'**
-  String get exchangePageTitle;
-
-  /// No description provided for @exchangePagePay.
-  ///
-  /// In en, this message translates to:
-  /// **'You pay'**
-  String get exchangePagePay;
 
   /// No description provided for @exchangePageGet.
   ///
@@ -653,12 +569,6 @@ abstract class AppLocalizations {
   /// **'Swap'**
   String get exchangePageConfirm;
 
-  /// No description provided for @exchangePageComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon'**
-  String get exchangePageComingSoon;
-
   /// No description provided for @exchangePageNoAssets.
   ///
   /// In en, this message translates to:
@@ -670,18 +580,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swap'**
   String get exchangePageTabSwap;
-
-  /// No description provided for @exchangePageTabLimit.
-  ///
-  /// In en, this message translates to:
-  /// **'Limit'**
-  String get exchangePageTabLimit;
-
-  /// No description provided for @exchangePageTabBuySell.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy/Sell'**
-  String get exchangePageTabBuySell;
 
   /// No description provided for @exchangeSettingsPriceProtection.
   ///
@@ -845,35 +743,11 @@ abstract class AppLocalizations {
   /// **'Submit'**
   String get revealSecretKeySubmitButton;
 
-  /// Text for done button after revealing secret key on RevealSecretKey page
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get revealSecretKeyDoneButton;
-
-  /// Title for scam alert section on RevealSecretKey page
-  ///
-  /// In en, this message translates to:
-  /// **'SCAM ALERT'**
-  String get revealSecretKeyScamAlertTitle;
-
   /// Message content for scam alert section on RevealSecretKey page
   ///
   /// In en, this message translates to:
   /// **'Never share your secret key with anyone. Never input it on any website.'**
   String get revealSecretKeyScamAlertMessage;
-
-  /// Title for security timer display on RevealSecretKey page
-  ///
-  /// In en, this message translates to:
-  /// **'Security Timer'**
-  String get revealSecretKeySecurityTimer;
-
-  /// Message explaining the reveal delay on RevealSecretKey page
-  ///
-  /// In en, this message translates to:
-  /// **'Your secret key will be revealed after:'**
-  String get revealSecretKeyRevealAfter;
 
   /// Hint text for search input on SetupNetworkSettingsPage
   ///
@@ -898,24 +772,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next'**
   String get setupNetworkSettingsPageNextButton;
-
-  /// Label prefix for Chain ID in network item on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Chain ID:'**
-  String get setupNetworkSettingsPageChainIdLabel;
-
-  /// Label prefix for Token in network item on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Token:'**
-  String get setupNetworkSettingsPageTokenLabel;
-
-  /// Label prefix for Explorer in network item on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Explorer:'**
-  String get setupNetworkSettingsPageExplorerLabel;
 
   /// Title for the Appearance Settings page
   ///
@@ -989,12 +845,6 @@ abstract class AppLocalizations {
   /// **'Keep the light theme enabled at all times, regardless of your device settings.'**
   String get appearanceSettingsPageLightModeDescription;
 
-  /// Reason text for biometric authentication prompt on the Login page
-  ///
-  /// In en, this message translates to:
-  /// **'Please authenticate'**
-  String get loginPageBiometricReason;
-
   /// Default title for a wallet item when no custom name is provided on the Login page
   ///
   /// In en, this message translates to:
@@ -1043,12 +893,6 @@ abstract class AppLocalizations {
   /// **'Private Key'**
   String get secretKeyRestorePageKeyTitle;
 
-  /// Label for the backup confirmation checkbox on the Secret Key Restore page
-  ///
-  /// In en, this message translates to:
-  /// **'I have backed up my secret key'**
-  String get secretKeyRestorePageBackupLabel;
-
   /// Text for the Next button on the Secret Key Restore page
   ///
   /// In en, this message translates to:
@@ -1085,29 +929,11 @@ abstract class AppLocalizations {
   /// **'Zilliqa Legacy'**
   String get addAccountPageZilliqaLegacy;
 
-  /// Reason text for biometric authentication prompt on the Add Account page
-  ///
-  /// In en, this message translates to:
-  /// **'Authenticate to create a new account'**
-  String get addAccountPageBiometricReason;
-
-  /// Error message for biometric authentication failure on the Add Account page
-  ///
-  /// In en, this message translates to:
-  /// **'Biometric authentication failed: {error}'**
-  String addAccountPageBiometricError(Object error);
-
   /// Error message when an account with the given index already exists on the Add Account page
   ///
   /// In en, this message translates to:
   /// **'Account with index {index} already exists'**
   String addAccountPageIndexExists(Object index);
-
-  /// Error message when biometric authentication fails on the Add Account page
-  ///
-  /// In en, this message translates to:
-  /// **'Biometric authentication failed'**
-  String get addAccountPageBiometricFailed;
 
   /// Error message when account creation fails on the Add Account page
   ///
@@ -1265,12 +1091,6 @@ abstract class AppLocalizations {
   /// **'invalid password, error:'**
   String get revealSecretPhraseInvalidPassword;
 
-  /// the label for wait until time done, and secret phrase reveal
-  ///
-  /// In en, this message translates to:
-  /// **'Your seed phrase will be revealed after:'**
-  String get revealSecretPhraseRevealAfter;
-
   /// Text on the submit button in the RevealSecretPhrase component
   ///
   /// In en, this message translates to:
@@ -1282,12 +1102,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get revealSecretPhraseDoneButton;
-
-  /// Title of the scam alert section in the RevealSecretPhrase component
-  ///
-  /// In en, this message translates to:
-  /// **'SCAM ALERT'**
-  String get revealSecretPhraseScamAlertTitle;
 
   /// Description text in the scam alert section of the RevealSecretPhrase component
   ///
@@ -1558,12 +1372,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Password'**
   String get passwordSetupPageCreateButton;
-
-  /// Reason text displayed during biometric authentication in the PasswordSetupPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Please authenticate to enable quick access'**
-  String get passwordSetupPageAuthReason;
 
   /// Type label used in wallet name generation for seed-based wallets in the PasswordSetupPage component
   ///
@@ -1847,12 +1655,6 @@ abstract class AppLocalizations {
   /// **'Currency Engine'**
   String get currencyConversionEngineTitle;
 
-  /// Description for the currency engine selection
-  ///
-  /// In en, this message translates to:
-  /// **'Engine for fetching currency rates'**
-  String get currencyConversionEngineDescription;
-
   /// Title for the currency engine selector modal
   ///
   /// In en, this message translates to:
@@ -2009,12 +1811,6 @@ abstract class AppLocalizations {
   /// **'Enter secret (optional)'**
   String get argonSettingsModalContentSecretHint;
 
-  /// Text for confirm button in ArgonSettingsModalContent
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm'**
-  String get argonSettingsModalContentConfirmButton;
-
   /// Hint text for the password input field in the ConfirmTransactionContent modal.
   ///
   /// In en, this message translates to:
@@ -2039,23 +1835,11 @@ abstract class AppLocalizations {
   /// **'No active account'**
   String get confirmTransactionContentNoActiveAccount;
 
-  /// Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load transfer details'**
-  String get confirmTransactionContentFailedLoadTransfer;
-
   /// Text displayed on the advanced gas-settings button in the ConfirmTransactionContent modal.
   ///
   /// In en, this message translates to:
   /// **'Advanced'**
   String get confirmTransactionAdvancedGasButtonText;
-
-  /// Reason text displayed during authentication prompt in the ConfirmTransactionContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Please authenticate'**
-  String get authReason;
 
   /// Warning text displayed at the bottom of the AddChainModalContent modal to alert users about potential risks.
   ///
@@ -2147,17 +1931,11 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get tokenSelectModalContentSearchHint;
 
-  /// Reason text for authentication prompt in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Please authenticate to sign the message'**
-  String get signMessageModalContentAuthReason;
-
   /// Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
   ///
   /// In en, this message translates to:
   /// **'Failed to sign: {error}'**
-  String signMessageModalContentFailedToSign(Object error);
+  String signMessageModalContentFailedToSign(String error);
 
   /// Title text for the SignMessageModalContent modal.
   ///
@@ -2393,12 +2171,6 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get confirmPasswordModalButton;
 
-  /// Title text for the QRScannerModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan'**
-  String get qrScannerModalContentTitle;
-
   /// Prefix for error message when camera initialization fails in the QRScannerModalContent modal.
   ///
   /// In en, this message translates to:
@@ -2477,12 +2249,6 @@ abstract class AppLocalizations {
   /// **'Fallback Enabled'**
   String get chainInfoModalContentFallbackEnabledLabel;
 
-  /// Label for the decimals field in the first token section of the ChainInfoModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Decimals'**
-  String get chainInfoModalContentDecimalsLabel;
-
   /// Title text for the RPC nodes section in the ChainInfoModalContent modal.
   ///
   /// In en, this message translates to:
@@ -2524,18 +2290,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch Network'**
   String get switchChainNetworkContentButton;
-
-  /// Label displayed next to a testnet network name in the SwitchChainNetworkContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Testnet'**
-  String get switchChainNetworkContentTestnetLabel;
-
-  /// Label prefix for the chain ID in the network details row of the SwitchChainNetworkContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'ID:'**
-  String get switchChainNetworkContentIdLabel;
 
   /// Title text for the WatchAssetModalContent modal.
   ///
@@ -3305,23 +3059,11 @@ abstract class AppLocalizations {
   /// **'Unstake'**
   String get unstakeButton;
 
-  /// Label for APR in the staking pool card
-  ///
-  /// In en, this message translates to:
-  /// **'APR'**
-  String get aprLabel;
-
   /// Label for Commission in the staking pool card
   ///
   /// In en, this message translates to:
   /// **'Commission'**
   String get commissionLabel;
-
-  /// Label for the amount of tokens staked by user
-  ///
-  /// In en, this message translates to:
-  /// **'Staked'**
-  String get stakedAmount;
 
   /// Label for the rewards available to claim
   ///
@@ -3347,12 +3089,6 @@ abstract class AppLocalizations {
   /// **'Claimable in'**
   String get claimableIn;
 
-  /// Plural form of the word block, used for blockchain blocks count
-  ///
-  /// In en, this message translates to:
-  /// **'blocks'**
-  String get blocks;
-
   /// Label for the unbonding period
   ///
   /// In en, this message translates to:
@@ -3370,12 +3106,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version'**
   String get version;
-
-  /// This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake.
-  ///
-  /// In en, this message translates to:
-  /// **'Rewards Progress'**
-  String get rewardsProgressTitle;
 
   /// The title of the Ledger Connect page.
   ///
@@ -3490,12 +3220,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'N/A'**
   String get durationNotAvailable;
-
-  /// No description provided for @nodes.
-  ///
-  /// In en, this message translates to:
-  /// **'nodes'**
-  String get nodes;
 
   /// Title for the Manage Tokens page
   ///
@@ -3737,60 +3461,6 @@ abstract class AppLocalizations {
   /// **'The requested chain has not been added. Use wallet_addEthereumChain first.'**
   String get web3ErrorChainNotAdded;
 
-  /// Title for the BIP purpose setup page
-  ///
-  /// In en, this message translates to:
-  /// **'Bitcoin Address'**
-  String get bipPurposeSetupPageTitle;
-
-  /// Name for BIP86 address type
-  ///
-  /// In en, this message translates to:
-  /// **'BIP86 (Taproot)'**
-  String get bip86Name;
-
-  /// Description for BIP86 address type
-  ///
-  /// In en, this message translates to:
-  /// **'P2TR - Addresses starting with bc1p'**
-  String get bip86Description;
-
-  /// Name for BIP84 address type
-  ///
-  /// In en, this message translates to:
-  /// **'BIP84 (Native SegWit)'**
-  String get bip84Name;
-
-  /// Description for BIP84 address type
-  ///
-  /// In en, this message translates to:
-  /// **'P2WPKH - Addresses starting with bc1q'**
-  String get bip84Description;
-
-  /// Name for BIP49 address type
-  ///
-  /// In en, this message translates to:
-  /// **'BIP49 (SegWit)'**
-  String get bip49Name;
-
-  /// Description for BIP49 address type
-  ///
-  /// In en, this message translates to:
-  /// **'P2WPKH-nested-in-P2SH - Addresses starting with 3'**
-  String get bip49Description;
-
-  /// Name for BIP44 address type
-  ///
-  /// In en, this message translates to:
-  /// **'BIP44 (Legacy)'**
-  String get bip44Name;
-
-  /// Description for BIP44 address type
-  ///
-  /// In en, this message translates to:
-  /// **'P2PKH - Addresses starting with 1'**
-  String get bip44Description;
-
   /// Title for the AddNetworkPage
   ///
   /// In en, this message translates to:
@@ -3863,24 +3533,6 @@ abstract class AppLocalizations {
   /// **'Please fill in all required fields'**
   String get addNetworkPageErrorRequired;
 
-  /// Error when RPC URL is invalid on AddNetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a valid RPC URL'**
-  String get addNetworkPageErrorInvalidRpc;
-
-  /// Error when Chain ID is invalid on AddNetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a valid Chain ID'**
-  String get addNetworkPageErrorInvalidChainId;
-
-  /// Success message after adding a network on AddNetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Network added successfully'**
-  String get addNetworkPageSuccess;
-
   /// Error when QR code format is not recognized during wallet restore
   ///
   /// In en, this message translates to:
@@ -3934,6 +3586,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deprecated for Bitcoin. Use BIP39 instead.'**
   String get restoreWalletOptionsPrivateKeyDeprecatedSubtitle;
+
+  /// Title of an error dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get errorDialogTitle;
+
+  /// Label for a delegated staking position.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegated'**
+  String get stakingDelegatedLabel;
+
+  /// Label for claimable staking rewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Claimable'**
+  String get stakingClaimableLabel;
+
+  /// Button that selects an item.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get tokenSelectModalSelectButton;
+
+  /// Title of a Ledger account card with its index.
+  ///
+  /// In en, this message translates to:
+  /// **'Account {index}'**
+  String ledgerAccountTitle(int index);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -116,8 +116,11 @@ class ZilliqaLedgerApp {
       throw ArgumentError('Hash length is invalid');
     }
 
-    if (hashBytes.length > _hashByteLen) {
-      hashBytes = hashBytes.sublist(0, _hashByteLen);
+    if (hashBytes.length != _hashByteLen) {
+      throw ArgumentError(
+        'Hash length must be exactly $_hashByteLen bytes, '
+        'got ${hashBytes.length}.',
+      );
     }
 
     final payload = Uint8List.fromList([...indexBytes, ...hashBytes]);

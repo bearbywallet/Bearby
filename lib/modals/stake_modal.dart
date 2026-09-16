@@ -591,7 +591,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
         builder: (context) => AlertDialog(
           backgroundColor: appState.currentTheme.cardBackground,
           title: Text(
-            "Error",
+            AppLocalizations.of(context)!.errorDialogTitle,
             style: appState.currentTheme.bodyText1
                 .copyWith(color: appState.currentTheme.textPrimary),
           ),

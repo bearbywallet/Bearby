@@ -197,6 +197,7 @@ class _ConfirmTransactionContentState
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
     final appState = context.read<AppState>();
     await appState.ledgerViewController.open(device);
+    if (!mounted) return;
     setState(() {});
   }
 
