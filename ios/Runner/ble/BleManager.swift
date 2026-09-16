@@ -129,7 +129,7 @@ class BleManager: NSObject, CBCentralManagerDelegate {
     
     func exchange(deviceId: String, apdu: Data) async throws -> Data {
         Self.logger.info("Exchange started for device: \(deviceId)")
-        Self.logger.info("APDU data (\(apdu.count) bytes): \(apdu.map { String(format: "%02x", $0) }.joined())")
+        Self.logger.info("APDU data: \(apdu.count) bytes (hex dump omitted: sensitive payload)")
         
         guard let uuid = UUID(uuidString: deviceId), let transport = transports[uuid] else {
             Self.logger.error("Transport not found for device: \(deviceId)")
@@ -139,7 +139,7 @@ class BleManager: NSObject, CBCentralManagerDelegate {
         do {
             let response = try await transport.exchange(apdu: apdu)
             Self.logger.info("Exchange completed successfully for device: \(deviceId)")
-            Self.logger.info("Response data (\(response.count) bytes): \(response.map { String(format: "%02x", $0) }.joined())")
+            Self.logger.info("Response data: \(response.count) bytes (hex dump omitted: sensitive payload)")
             return response
         } catch {
             Self.logger.error("Exchange failed for device \(deviceId): \(error.localizedDescription)")

@@ -225,7 +225,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
         }
 
         if let value = characteristic.value {
-            Self.logger.info("Received data (\(value.count) bytes): \(value.prefix(20).map { String(format: "%02x", $0) }.joined())\(value.count > 20 ? "..." : "")")
+            Self.logger.info("Received \(value.count) bytes")
             notificationStreamController.continuation.yield(value)
         } else {
             Self.logger.warning("Received notification with no data")
@@ -244,7 +244,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
         Self.logger.info("Initial MTU set to: \(self.mtuSize)")
 
         let inferMtuCommand = Data([0x08, 0, 0, 0, 0])
-        Self.logger.info("Sending MTU inference command: \(inferMtuCommand.map { String(format: "%02x", $0) }.joined())")
+        Self.logger.info("Sending MTU inference command (\(inferMtuCommand.count) bytes)")
 
         try await withTimeout(5.0) {
             Self.logger.info("Setting up MTU response listener...")
@@ -256,7 +256,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
 
                 Self.logger.info("Listening for MTU response...")
                 for try await value in self.notificationStream {
-                    Self.logger.info("Received notification during MTU inference (\(value.count) bytes): \(value.prefix(10).map { String(format: "%02x", $0) }.joined())")
+                    Self.logger.info("Received notification during MTU inference: \(value.count) bytes")
                     if value.count > 5 && value[0] == 0x08 {
                         Self.logger.info("Found MTU response packet")
                         return value
@@ -288,7 +288,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
 
     func exchange(apdu: Data) async throws -> Data {
         Self.logger.info("Starting APDU exchange...")
-        Self.logger.info("APDU to send (\(apdu.count) bytes): \(apdu.map { String(format: "%02x", $0) }.joined())")
+        Self.logger.info("APDU to send: \(apdu.count) bytes")
         Self.logger.info("Using MTU size: \(self.mtuSize)")
 
         return try await withTimeout(120.0) {
@@ -298,7 +298,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
             let responseTask = Task {
                 Self.logger.info("Waiting for APDU response...")
                 for try await data in responseStream {
-                    Self.logger.info("Received APDU response (\(data.count) bytes): \(data.map { String(format: "%02x", $0) }.joined())")
+                    Self.logger.info("Received APDU response: \(data.count) bytes")
                     return data
                 }
                 Self.logger.error("No response received during exchange")
@@ -311,7 +311,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
                     Self.logger.error("Transport deallocated during send")
                     throw BleError.notConnected("Transport deallocated")
                 }
-                Self.logger.info("Writing chunk (\(data.count) bytes): \(data.map { String(format: "%02x", $0) }.joined())")
+                Self.logger.info("Writing chunk: \(data.count) bytes")
                 try await self.write(data: data, withResponse: true)
                 Self.logger.info("Chunk written successfully")
             }, apdu: apdu, mtuSize: self.mtuSize)
@@ -327,7 +327,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
 
     private func write(data: Data, withResponse: Bool) async throws {
         Self.logger.info("Writing data (with response: \(withResponse))")
-        Self.logger.info("Data (\(data.count) bytes): \(data.map { String(format: "%02x", $0) }.joined())")
+        Self.logger.info("Data: \(data.count) bytes")
 
         guard let characteristic = writeCharacteristic else {
             Self.logger.error("Write characteristic not available")

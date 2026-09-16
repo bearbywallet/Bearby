@@ -16,7 +16,7 @@ suspend fun sendApdu(
     val firstChunkPayloadSize = mtuSize - 5
     val subsequentChunkPayloadSize = mtuSize - 3
 
-    if (firstChunkPayloadSize <= 0) {
+    if (firstChunkPayloadSize <= 0 || subsequentChunkPayloadSize <= 0) {
         throw IllegalArgumentException("MTU size is too small")
     }
 
@@ -58,7 +58,10 @@ fun receiveApdu(rawFlow: Flow<ByteArray>): Flow<ByteArray> = flow {
 
     rawFlow
         .transform { value ->
-            if (value.isEmpty() || value[0] != TAG_ID) return@transform
+            // Mirrors the iOS guard: malformed frames (short/MTU-truncated)
+            // must be skipped instead of crashing the collection with a
+            // negative-size ByteArray / BufferUnderflowException.
+            if (value.size < 3 || value[0] != TAG_ID) return@transform
 
             val buffer = ByteBuffer.wrap(value)
             buffer.get()
@@ -69,6 +72,7 @@ fun receiveApdu(rawFlow: Flow<ByteArray>): Flow<ByteArray> = flow {
             }
 
             val chunkData = if (chunkIndex == 0) {
+                if (value.size < 5) return@transform
                 notifiedDataLength = buffer.short.toInt() and 0xFFFF
                 ByteArray(value.size - 5).also { buffer.get(it) }
             } else {

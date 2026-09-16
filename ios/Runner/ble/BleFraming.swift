@@ -4,14 +4,18 @@ import os.log
 private let TAG_ID: UInt8 = 0x05
 private let logger = Logger(subsystem: "com.zilpay.ble", category: "BleFraming")
 
+/// Debug hex dump. Sensitive-data rule: raw APDU bytes (which contain signed
+/// payloads) must NEVER reach the unified log - only sizes/counts are logged.
+private func hexPreview(_ data: Data, limit: Int = 20) -> String {
+    data.prefix(limit).map { String(format: "%02x", $0) }.joined()
+}
+
 func sendApdu(
     write: @escaping (Data) async throws -> Void,
     apdu: Data,
     mtuSize: Int
 ) async throws {
-    logger.info("Starting APDU send process...")
-    logger.info("APDU size: \(apdu.count) bytes, MTU: \(mtuSize)")
-    logger.info("Full APDU: \(apdu.map { String(format: "%02x", $0) }.joined())")
+    logger.info("Starting APDU send: \(apdu.count) bytes, MTU \(mtuSize)")
     
     let firstChunkPayloadSize = mtuSize - 5
     let subsequentChunkPayloadSize = mtuSize - 3
@@ -48,16 +52,15 @@ func sendApdu(
         let chunkData = apdu.subdata(in: offset..<offset + size)
         buffer.append(chunkData)
         
-        logger.info("  Chunk data (\(buffer.count) bytes): \(buffer.map { String(format: "%02x", $0) }.joined())")
+        logger.debug("Chunk \(sequence) (\(buffer.count) bytes): \(hexPreview(buffer))")
         
         try await write(buffer)
-        logger.info("  Chunk \(sequence + 1) sent successfully")
         
         offset += size
         sequence += 1
     }
     
-    logger.info("APDU send completed - sent \(sequence) chunks")
+    logger.info("APDU send completed - \(sequence) chunks")
 }
 
 func receiveApdu(
@@ -75,7 +78,7 @@ func receiveApdu(
             
             do {
                 for try await value in notificationStream {
-                    logger.info("Received raw data (\(value.count) bytes): \(value.prefix(20).map { String(format: "%02x", $0) }.joined())\(value.count > 20 ? "..." : "")")
+                    logger.debug("Raw notification (\(value.count) bytes): \(hexPreview(value))")
                     
                     guard !value.isEmpty, value[0] == TAG_ID else {
                         logger.info("Skipping - invalid TAG_ID or empty data")
@@ -108,7 +111,7 @@ func receiveApdu(
                         chunkData = value.subdata(in: 3..<value.count)
                     }
                     
-                    logger.info("Chunk \(chunkIndex + 1) payload (\(chunkData.count) bytes): \(chunkData.prefix(20).map { String(format: "%02x", $0) }.joined())\(chunkData.count > 20 ? "..." : "")")
+                    logger.debug("Chunk \(chunkIndex) payload (\(chunkData.count) bytes): \(hexPreview(chunkData))")
                     
                     notifiedIndex += 1
                     notifiedData.append(chunkData)
@@ -121,8 +124,8 @@ func receiveApdu(
                     }
                     
                     if notifiedData.count == notifiedDataLength {
-                        logger.info("APDU receive completed successfully")
-                        logger.info("Complete APDU (\(notifiedData.count) bytes): \(notifiedData.map { String(format: "%02x", $0) }.joined())")
+                        logger.info("APDU receive completed (\(notifiedData.count) bytes)")
+                        // Full-APDU hex logging removed: signature payloads are sensitive.
                         continuation.yield(notifiedData)
                         continuation.finish()
                         return
@@ -145,8 +148,6 @@ extension Data {
             logger.warning("Data too short for UInt16 conversion: \(self.count) bytes")
             return 0
         }
-        let value = self.withUnsafeBytes { $0.load(as: UInt16.self) }.bigEndian
-        logger.debug("Converted bytes \(self.map { String(format: "%02x", $0) }.joined()) to UInt16: \(value)")
-        return value
+        return self.withUnsafeBytes { $0.load(as: UInt16.self) }.bigEndian
     }
 }
