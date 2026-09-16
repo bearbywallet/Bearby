@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/view_item.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
 import 'package:bearby/mixins/chain_route_args.dart';
+import 'package:bearby/components/wallet_options_shell.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/state/app_state.dart';
@@ -38,71 +37,37 @@ class _GenWalletOptionsPageState extends State<GenWalletOptionsPage>
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    if (_chain == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+    final chain = _chain;
+    if (chain == null) {
+      return const WalletOptionsShell(title: '', loading: true);
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        toolbarHeight: 0,
-        systemOverlayStyle: getSystemUiOverlayStyle(context),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: CustomAppBar(
-                    title: l10n.genWalletOptionsTitle,
-                    onBackPressed: () => context.pop(),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    child: ListView(
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        WalletListItem(
-                          title: l10n.genWalletOptionsBIP39Title,
-                          subtitle: l10n.genWalletOptionsBIP39Subtitle,
-                          icon: AppIconView(
-                            icon: AppIcon.document,
-                            size: 35,
-                            color: theme.primaryPurple,
-                          ),
-                          onTap: () => context.push(AppRoutes.genBip39, extra: {'chain': _chain}),
-                        ),
-                        WalletListItem(
-                          title: l10n.genWalletOptionsPrivateKeyTitle,
-                          subtitle: l10n.genWalletOptionsPrivateKeySubtitle,
-                          disabled: _chain!.slip44 == kBitcoinlip44,
-                          icon: AppIconView(
-                            icon: AppIcon.bincode,
-                            size: 35,
-                            color: theme.primaryPurple,
-                          ),
-                          onTap: () => context.push(AppRoutes.genSk, extra: {'chain': _chain}),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    return WalletOptionsShell(
+      title: l10n.genWalletOptionsTitle,
+      options: [
+        WalletListItem(
+          title: l10n.genWalletOptionsBIP39Title,
+          subtitle: l10n.genWalletOptionsBIP39Subtitle,
+          icon: AppIconView(
+            icon: AppIcon.document,
+            size: 35,
+            color: theme.primaryPurple,
           ),
+          onTap: () => context.push(AppRoutes.genBip39, extra: {'chain': chain}),
         ),
-      ),
+        WalletListItem(
+          title: l10n.genWalletOptionsPrivateKeyTitle,
+          subtitle: l10n.genWalletOptionsPrivateKeySubtitle,
+          disabled: chain.slip44 == kBitcoinlip44,
+          icon: AppIconView(
+            icon: AppIcon.bincode,
+            size: 35,
+            color: theme.primaryPurple,
+          ),
+          onTap: () => context.push(AppRoutes.genSk, extra: {'chain': chain}),
+        ),
+      ],
     );
   }
 }
