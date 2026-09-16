@@ -79,3 +79,6 @@ flutter_jank_metrics_*.json
 
 # rlm analysis sandbox cache
 .rlm/
+
+# agent plan files
+.zcode/
