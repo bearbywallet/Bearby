@@ -1578,43 +1578,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transactionHistoryDescription => '在地址簿中显示来自交易历史的地址。';
 
   @override
-  String get zilStakePageTitle => 'Zilliqa 质押';
-
-  @override
-  String get noStakingPoolsFound => '未找到质押池';
-
-  @override
-  String get stakingErrorTitle => '加载质押池失败';
-
-  @override
-  String get stakingErrorRetry => '重试';
-
-  @override
-  String get claimButton => '领取';
-
-  @override
-  String get stakeButton => '质押';
-
-  @override
-  String get unstakeButton => '取消质押';
-
-  @override
-  String get commissionLabel => '佣金';
-
-  @override
-  String get rewardsAvailable => '可用奖励';
-
-  @override
-  String get pendingWithdrawals => '待处理提款';
-
-  @override
   String get amount => '数量';
-
-  @override
-  String get claimableIn => '可领取于';
-
-  @override
-  String get unbondingPeriod => '解绑期';
 
   @override
   String get currentBlock => '当前区块';
@@ -1884,12 +1848,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorDialogTitle => '错误';
-
-  @override
-  String get stakingDelegatedLabel => '已委托';
-
-  @override
-  String get stakingClaimableLabel => '可领取';
 
   @override
   String get tokenSelectModalSelectButton => '选择';

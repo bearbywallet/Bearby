@@ -1578,43 +1578,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get transactionHistoryDescription => '주소록에 거래 내역 주소 표시.';
 
   @override
-  String get zilStakePageTitle => 'Zilliqa 스테이킹';
-
-  @override
-  String get noStakingPoolsFound => '스테이킹 풀 없음';
-
-  @override
-  String get stakingErrorTitle => '스테이킹 풀 로드 실패';
-
-  @override
-  String get stakingErrorRetry => '재시도';
-
-  @override
-  String get claimButton => '청구';
-
-  @override
-  String get stakeButton => '스테이크';
-
-  @override
-  String get unstakeButton => '언스테이크';
-
-  @override
-  String get commissionLabel => '수수료';
-
-  @override
-  String get rewardsAvailable => '보상';
-
-  @override
-  String get pendingWithdrawals => '대기 인출';
-
-  @override
   String get amount => '금액';
-
-  @override
-  String get claimableIn => '청구 가능 시간';
-
-  @override
-  String get unbondingPeriod => '언본딩 기간';
 
   @override
   String get currentBlock => '현재 블록';
@@ -1884,12 +1848,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get errorDialogTitle => '오류';
-
-  @override
-  String get stakingDelegatedLabel => '위임됨';
-
-  @override
-  String get stakingClaimableLabel => '청구 가능';
 
   @override
   String get tokenSelectModalSelectButton => '선택';

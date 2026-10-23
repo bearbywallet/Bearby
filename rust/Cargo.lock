@@ -1485,6 +1485,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
+name = "base64"
+version = "0.23.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
+
+[[package]]
 name = "base64-simd"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1505,6 +1511,12 @@ name = "bech32"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32637268377fc7b10a8c6d51de3e7fba1ce5dd371a96e342b34e6078db558e7f"
+
+[[package]]
+name = "bech32"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efbd3e1070bbdf4cd88a75264e18e8a26f7cb5c6949eadf0ceb85fb159cf08f8"
 
 [[package]]
 name = "bigdecimal"
@@ -1557,7 +1569,7 @@ checksum = "9cf93e61f2dbc3e3c41234ca26a65e2c0b0975c52e0f069ab9893ebbede584d3"
 dependencies = [
  "base58ck",
  "base64 0.21.7",
- "bech32",
+ "bech32 0.11.1",
  "bitcoin-internals",
  "bitcoin-io",
  "bitcoin-units",
@@ -1645,7 +1657,7 @@ checksum = "b79834656f71332577234b50bfc009996f7449e0c056884e6a02492ded0ca2f3"
 dependencies = [
  "arrayref",
  "arrayvec",
- "constant_time_eq 0.4.2",
+ "constant_time_eq",
 ]
 
 [[package]]
@@ -2133,12 +2145,6 @@ dependencies = [
  "quote",
  "unicode-xid",
 ]
-
-[[package]]
-name = "constant_time_eq"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
 
 [[package]]
 name = "constant_time_eq"
@@ -2855,9 +2861,9 @@ dependencies = [
 
 [[package]]
 name = "fast_qr"
-version = "0.13.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f5ea9788036fedaf55f43a2db0ba01eedf47d26fd6852f01e5cf51952571d57"
+checksum = "aafa8088286fa3903718197ceb03dac70f8b4763748fbdca1e431a5a7217a09e"
 dependencies = [
  "resvg",
 ]
@@ -4431,7 +4437,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "async-trait",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bitcoin",
  "bs58",
  "config",
@@ -5278,8 +5284,8 @@ name = "proto"
 version = "0.1.0"
 dependencies = [
  "alloy",
- "base64 0.22.1",
- "bech32",
+ "base64 0.23.1",
+ "bech32 0.12.0",
  "bincode",
  "bitcoin",
  "bs58",
@@ -5947,13 +5953,14 @@ dependencies = [
 
 [[package]]
 name = "rust-argon2"
-version = "2.1.0"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d9848531d60c9cbbcf9d166c885316c24bc0e2a9d3eba0956bb6cbbd79bc6e8"
+checksum = "8ae76b7506744d254fd0eb2c0ff5c5d108201ccbb083111ac04a44eeda105680"
 dependencies = [
- "base64 0.21.7",
+ "base64 0.22.1",
  "blake2b_simd",
- "constant_time_eq 0.3.1",
+ "constant_time_eq",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -9256,7 +9263,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "background",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bitcoin",
  "bs58",
  "cache",
@@ -9303,7 +9310,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "background",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bitcoin",
  "bs58",
  "cache",

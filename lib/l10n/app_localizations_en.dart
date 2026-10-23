@@ -1581,43 +1581,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionHistoryDescription => 'Show addresses from transaction history in the address book.';
 
   @override
-  String get zilStakePageTitle => 'Zilliqa Staking';
-
-  @override
-  String get noStakingPoolsFound => 'No Staking Pools Found';
-
-  @override
-  String get stakingErrorTitle => 'Failed to Load Staking Pools';
-
-  @override
-  String get stakingErrorRetry => 'Retry';
-
-  @override
-  String get claimButton => 'Claim';
-
-  @override
-  String get stakeButton => 'Stake';
-
-  @override
-  String get unstakeButton => 'Unstake';
-
-  @override
-  String get commissionLabel => 'Commission';
-
-  @override
-  String get rewardsAvailable => 'Rewards';
-
-  @override
-  String get pendingWithdrawals => 'Pending Withdrawals';
-
-  @override
   String get amount => 'Amount';
-
-  @override
-  String get claimableIn => 'Claimable in';
-
-  @override
-  String get unbondingPeriod => 'Unbonding Period';
 
   @override
   String get currentBlock => 'Current Block';
@@ -1887,12 +1851,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDialogTitle => 'Error';
-
-  @override
-  String get stakingDelegatedLabel => 'Delegated';
-
-  @override
-  String get stakingClaimableLabel => 'Claimable';
 
   @override
   String get tokenSelectModalSelectButton => 'Select';

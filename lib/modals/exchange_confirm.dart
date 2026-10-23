@@ -332,7 +332,6 @@ class _ExchangeConfirmContentState extends State<_ExchangeConfirmContent> {
   }
 
   /// Refresh balances, close the sheet, then hand navigation back to the opener.
-  /// Mirrors the completion pattern used in stake_modal.dart.
   Future<void> _completeAndExit(AppState appState) async {
     await appState.syncData();
     if (!mounted) return;

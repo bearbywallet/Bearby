@@ -318,17 +318,6 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      TileButton(
-                        icon: AppIconView(
-                          icon: AppIcon.anchorSimple,
-                          size: iconSizeTileButton,
-                          color: theme.primaryPurple,
-                        ),
-                        title: "Stake",
-                        onPressed: () => context.push(AppRoutes.zilStake),
-                        backgroundColor: theme.cardBackground,
-                        textColor: theme.primaryPurple,
-                      ),
                       if (!appState.wallet!.walletType
                           .contains(WalletType.ledger.name)) ...[
                         SizedBox(width: adaptivePaddingCard),

@@ -1578,43 +1578,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get transactionHistoryDescription => 'アドレス帳に取引履歴からのアドレスを表示します。';
 
   @override
-  String get zilStakePageTitle => 'Zilliqa ステーキング';
-
-  @override
-  String get noStakingPoolsFound => 'ステーキングプールが見つかりません';
-
-  @override
-  String get stakingErrorTitle => 'ステーキングプールの読み込みに失敗しました';
-
-  @override
-  String get stakingErrorRetry => '再試行';
-
-  @override
-  String get claimButton => '請求';
-
-  @override
-  String get stakeButton => 'ステーク';
-
-  @override
-  String get unstakeButton => 'アンステーク';
-
-  @override
-  String get commissionLabel => '手数料';
-
-  @override
-  String get rewardsAvailable => '報酬';
-
-  @override
-  String get pendingWithdrawals => '保留中の出金';
-
-  @override
   String get amount => '量';
-
-  @override
-  String get claimableIn => '請求可能まで';
-
-  @override
-  String get unbondingPeriod => 'アンボンディング期間';
 
   @override
   String get currentBlock => '現在のブロック';
@@ -1884,12 +1848,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorDialogTitle => 'エラー';
-
-  @override
-  String get stakingDelegatedLabel => 'デリゲート済み';
-
-  @override
-  String get stakingClaimableLabel => '請求可能';
 
   @override
   String get tokenSelectModalSelectButton => '選択';

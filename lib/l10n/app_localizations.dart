@@ -3125,83 +3125,11 @@ abstract class AppLocalizations {
   /// **'Show addresses from transaction history in the address book.'**
   String get transactionHistoryDescription;
 
-  /// Title for the Zilliqa Staking page
-  ///
-  /// In en, this message translates to:
-  /// **'Zilliqa Staking'**
-  String get zilStakePageTitle;
-
-  /// Message displayed when no staking pools are available
-  ///
-  /// In en, this message translates to:
-  /// **'No Staking Pools Found'**
-  String get noStakingPoolsFound;
-
-  /// Title displayed when staking pools fail to load
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to Load Staking Pools'**
-  String get stakingErrorTitle;
-
-  /// Button text to retry loading staking pools
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get stakingErrorRetry;
-
-  /// Text for the claim rewards button
-  ///
-  /// In en, this message translates to:
-  /// **'Claim'**
-  String get claimButton;
-
-  /// Text for the stake button
-  ///
-  /// In en, this message translates to:
-  /// **'Stake'**
-  String get stakeButton;
-
-  /// Text for the unstake button
-  ///
-  /// In en, this message translates to:
-  /// **'Unstake'**
-  String get unstakeButton;
-
-  /// Label for Commission in the staking pool card
-  ///
-  /// In en, this message translates to:
-  /// **'Commission'**
-  String get commissionLabel;
-
-  /// Label for the rewards available to claim
-  ///
-  /// In en, this message translates to:
-  /// **'Rewards'**
-  String get rewardsAvailable;
-
-  /// Title for the pending withdrawals section
-  ///
-  /// In en, this message translates to:
-  /// **'Pending Withdrawals'**
-  String get pendingWithdrawals;
-
   /// Label for the amount in a transaction or a list
   ///
   /// In en, this message translates to:
   /// **'Amount'**
   String get amount;
-
-  /// Text indicating the time remaining until something is claimable
-  ///
-  /// In en, this message translates to:
-  /// **'Claimable in'**
-  String get claimableIn;
-
-  /// Label for the unbonding period
-  ///
-  /// In en, this message translates to:
-  /// **'Unbonding Period'**
-  String get unbondingPeriod;
 
   /// Label for the current blockchain block number
   ///
@@ -3700,18 +3628,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get errorDialogTitle;
-
-  /// Label for a delegated staking position.
-  ///
-  /// In en, this message translates to:
-  /// **'Delegated'**
-  String get stakingDelegatedLabel;
-
-  /// Label for claimable staking rewards.
-  ///
-  /// In en, this message translates to:
-  /// **'Claimable'**
-  String get stakingClaimableLabel;
 
   /// Button that selects an item.
   ///

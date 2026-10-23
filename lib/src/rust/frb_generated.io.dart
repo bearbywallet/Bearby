@@ -19,7 +19,6 @@ import 'api/methods.dart';
 import 'api/provider.dart';
 import 'api/qrcode.dart';
 import 'api/settings.dart';
-import 'api/stake.dart';
 import 'api/token.dart';
 import 'api/transaction.dart';
 import 'api/utils.dart';
@@ -47,7 +46,6 @@ import 'models/notification.dart';
 import 'models/provider.dart';
 import 'models/qrcode.dart';
 import 'models/settings.dart';
-import 'models/stake.dart';
 import 'models/transactions/access_list.dart';
 import 'models/transactions/base_token.dart';
 import 'models/transactions/btc.dart';
@@ -216,16 +214,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ExchangeTxDisplay dco_decode_box_autoadd_exchange_tx_display(dynamic raw);
 
   @protected
-  double dco_decode_box_autoadd_f_32(dynamic raw);
-
-  @protected
-  double dco_decode_box_autoadd_f_64(dynamic raw);
-
-  @protected
   FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw);
-
-  @protected
-  FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
@@ -368,9 +357,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo dco_decode_f_token_info(dynamic raw);
 
   @protected
-  FinalOutputInfo dco_decode_final_output_info(dynamic raw);
-
-  @protected
   FinalizedBtcTx dco_decode_finalized_btc_tx(dynamic raw);
 
   @protected
@@ -435,9 +421,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
 
   @protected
-  List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw);
-
-  @protected
   List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
       dynamic raw);
 
@@ -456,10 +439,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
-
-  @protected
-  List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(
-      dynamic raw);
 
   @protected
   Uint16List dco_decode_list_prim_u_16_strict(dynamic raw);
@@ -564,15 +543,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CowOrderInfo? dco_decode_opt_box_autoadd_cow_order_info(dynamic raw);
 
   @protected
-  double? dco_decode_opt_box_autoadd_f_32(dynamic raw);
-
-  @protected
-  double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
-
-  @protected
-  FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
-
-  @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
   @protected
@@ -631,9 +601,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PancakeMeta dco_decode_pancake_meta(dynamic raw);
-
-  @protected
-  PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
   @protected
   PlunderCfg dco_decode_plunder_cfg(dynamic raw);
@@ -980,17 +947,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  double sse_decode_box_autoadd_f_32(SseDeserializer deserializer);
-
-  @protected
-  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
-
-  @protected
   FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer);
-
-  @protected
-  FinalOutputInfo sse_decode_box_autoadd_final_output_info(
-      SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
@@ -1147,9 +1104,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
   @protected
-  FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer);
-
-  @protected
   FinalizedBtcTx sse_decode_finalized_btc_tx(SseDeserializer deserializer);
 
   @protected
@@ -1224,10 +1178,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
 
   @protected
-  List<FinalOutputInfo> sse_decode_list_final_output_info(
-      SseDeserializer deserializer);
-
-  @protected
   List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
       SseDeserializer deserializer);
 
@@ -1249,10 +1199,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<NetworkConfigInfo> sse_decode_list_network_config_info(
-      SseDeserializer deserializer);
-
-  @protected
-  List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1372,16 +1318,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer);
-
-  @protected
-  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
-
-  @protected
-  FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
-      SseDeserializer deserializer);
-
-  @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
@@ -1445,10 +1381,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PancakeMeta sse_decode_pancake_meta(SseDeserializer deserializer);
-
-  @protected
-  PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
-      SseDeserializer deserializer);
 
   @protected
   PlunderCfg sse_decode_plunder_cfg(SseDeserializer deserializer);
@@ -1817,18 +1749,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ExchangeTxDisplay self, SseSerializer serializer);
 
   @protected
-  void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
-
-  @protected
   void sse_encode_box_autoadd_f_token_info(
       FTokenInfo self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_final_output_info(
-      FinalOutputInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_i_64(
@@ -1993,10 +1915,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_final_output_info(
-      FinalOutputInfo self, SseSerializer serializer);
-
-  @protected
   void sse_encode_finalized_btc_tx(
       FinalizedBtcTx self, SseSerializer serializer);
 
@@ -2074,10 +1992,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<FTokenInfo> self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_final_output_info(
-      List<FinalOutputInfo> self, SseSerializer serializer);
-
-  @protected
   void sse_encode_list_historical_transaction_info(
       List<HistoricalTransactionInfo> self, SseSerializer serializer);
 
@@ -2100,10 +2014,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_network_config_info(
       List<NetworkConfigInfo> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_pending_withdrawal_info(
-      List<PendingWithdrawalInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_16_strict(
@@ -2229,16 +2139,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       CowOrderInfo? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_f_token_info(
-      FTokenInfo? self, SseSerializer serializer);
-
-  @protected
   void sse_encode_opt_box_autoadd_i_64(
       PlatformInt64? self, SseSerializer serializer);
 
@@ -2302,10 +2202,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_pancake_meta(PancakeMeta self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_pending_withdrawal_info(
-      PendingWithdrawalInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_plunder_cfg(PlunderCfg self, SseSerializer serializer);

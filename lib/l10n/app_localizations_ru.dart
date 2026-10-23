@@ -1587,43 +1587,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get transactionHistoryDescription => 'Показывать адреса из истории транзакций';
 
   @override
-  String get zilStakePageTitle => 'Стейкинг Zilliqa';
-
-  @override
-  String get noStakingPoolsFound => 'Пулы для стейкинга не найдены';
-
-  @override
-  String get stakingErrorTitle => 'Не удалось загрузить пулы стейкинга';
-
-  @override
-  String get stakingErrorRetry => 'Повторить';
-
-  @override
-  String get claimButton => 'Забрать';
-
-  @override
-  String get stakeButton => 'Стейкать';
-
-  @override
-  String get unstakeButton => 'Отозвать';
-
-  @override
-  String get commissionLabel => 'Комиссия';
-
-  @override
-  String get rewardsAvailable => 'Награды';
-
-  @override
-  String get pendingWithdrawals => 'Ожидающие выводы';
-
-  @override
   String get amount => 'Сумма';
-
-  @override
-  String get claimableIn => 'Доступно через';
-
-  @override
-  String get unbondingPeriod => 'Период отвязки';
 
   @override
   String get currentBlock => 'Текущий блок';
@@ -1893,12 +1857,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorDialogTitle => 'Ошибка';
-
-  @override
-  String get stakingDelegatedLabel => 'Делегировано';
-
-  @override
-  String get stakingClaimableLabel => 'Доступно к получению';
 
   @override
   String get tokenSelectModalSelectButton => 'Выбрать';

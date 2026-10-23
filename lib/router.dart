@@ -45,7 +45,6 @@ import 'pages/sk_gen.dart';
 import 'pages/verify_bip39.dart';
 import 'pages/wallet.dart';
 import 'pages/wallet_restore_options.dart';
-import 'pages/zil_stake.dart';
 
 abstract class AppRoutes {
   static const home               = '/';
@@ -86,7 +85,6 @@ abstract class AppRoutes {
   static const restoreSk          = '/restore_sk';
   static const keystoreFileRestore = '/keystore_file_restore';
   static const addLedgerAccount   = '/add_ledger_account';
-  static const zilStake           = '/zil_stake';
   static const ledgerConnect      = '/ledger_connect';
 }
 
@@ -122,7 +120,6 @@ const _setupRoutes = <String>{
   AppRoutes.keystoreBackup,
   AppRoutes.keystoreFileRestore,
   AppRoutes.addLedgerAccount,
-  AppRoutes.zilStake,
   AppRoutes.settings,
   AppRoutes.manageTokens,
 };
@@ -241,7 +238,6 @@ GoRouter createRouter(
       GoRoute(path: AppRoutes.revealSk,      builder: (_, __) => const RevealSecretKey()),
       GoRoute(path: AppRoutes.revealBip39,   builder: (_, __) => const RevealSecretPhrase()),
       GoRoute(path: AppRoutes.send,          builder: (_, __) => const SendTokenPage()),
-      GoRoute(path: AppRoutes.zilStake,      builder: (_, __) => const ZilStakePage()),
       GoRoute(path: AppRoutes.addNetwork,    builder: (_, __) => const AddNetworkPage()),
 
       GoRoute(path: AppRoutes.netSetup,          builder: (_, __) => const SetupNetworkSettingsPage()),

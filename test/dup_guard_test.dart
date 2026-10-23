@@ -9,24 +9,6 @@ String _read(String path) => File(path).readAsStringSync();
 
 void main() {
   group('DRY guards: shared widgets & flow helpers', () {
-    test('stakeing_card: flow helpers are defined exactly once', () {
-      final src = _read('lib/components/stakeing_card.dart');
-
-      for (final helper in [
-        'Future<void> _ensureCorrectChain(',
-        'void _navigateToHistory(',
-        'void _showErrorDialog(',
-      ]) {
-        expect(
-          helper.allMatches(src).length,
-          1,
-          reason: '$helper was copy-pasted into 3-4 widget classes before; '
-              'it must stay defined only inside _StakeFlowHelpers',
-        );
-      }
-      expect(src.contains('mixin _StakeFlowHelpers'), isTrue);
-    });
-
     test('chain route-args bootstrap lives only in the mixin', () {
       final mixinSrc = _read('lib/mixins/chain_route_args.dart');
       expect(mixinSrc.contains("args?['chain'] as NetworkConfigInfo?"),

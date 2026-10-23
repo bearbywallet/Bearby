@@ -1972,57 +1972,9 @@
   "@transactionHistoryDescription": {
     "description": "Description for the toggle that enables displaying transaction history addresses in the address book."
   },
-  "zilStakePageTitle": "Zilliqa Staking",
-  "@zilStakePageTitle": {
-    "description": "Title for the Zilliqa Staking page"
-  },
-  "noStakingPoolsFound": "No Staking Pools Found",
-  "@noStakingPoolsFound": {
-    "description": "Message displayed when no staking pools are available"
-  },
-  "stakingErrorTitle": "Failed to Load Staking Pools",
-  "@stakingErrorTitle": {
-    "description": "Title displayed when staking pools fail to load"
-  },
-  "stakingErrorRetry": "Retry",
-  "@stakingErrorRetry": {
-    "description": "Button text to retry loading staking pools"
-  },
-  "claimButton": "Claim",
-  "@claimButton": {
-    "description": "Text for the claim rewards button"
-  },
-  "stakeButton": "Stake",
-  "@stakeButton": {
-    "description": "Text for the stake button"
-  },
-  "unstakeButton": "Unstake",
-  "@unstakeButton": {
-    "description": "Text for the unstake button"
-  },
-  "commissionLabel": "Commission",
-  "@commissionLabel": {
-    "description": "Label for Commission in the staking pool card"
-  },
-  "rewardsAvailable": "Rewards",
-  "@rewardsAvailable": {
-    "description": "Label for the rewards available to claim"
-  },
-  "pendingWithdrawals": "Pending Withdrawals",
-  "@pendingWithdrawals": {
-    "description": "Title for the pending withdrawals section"
-  },
   "amount": "Amount",
   "@amount": {
     "description": "Label for the amount in a transaction or a list"
-  },
-  "claimableIn": "Claimable in",
-  "@claimableIn": {
-    "description": "Text indicating the time remaining until something is claimable"
-  },
-  "unbondingPeriod": "Unbonding Period",
-  "@unbondingPeriod": {
-    "description": "Label for the unbonding period"
   },
   "currentBlock": "Current Block",
   "@currentBlock": {
@@ -2399,14 +2351,6 @@
   "errorDialogTitle": "Error",
   "@errorDialogTitle": {
     "description": "Title of an error dialog."
-  },
-  "stakingDelegatedLabel": "Delegated",
-  "@stakingDelegatedLabel": {
-    "description": "Label for a delegated staking position."
-  },
-  "stakingClaimableLabel": "Claimable",
-  "@stakingClaimableLabel": {
-    "description": "Label for claimable staking rewards."
   },
   "tokenSelectModalSelectButton": "Select",
   "@tokenSelectModalSelectButton": {

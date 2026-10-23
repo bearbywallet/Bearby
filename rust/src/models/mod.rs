@@ -11,6 +11,5 @@ pub mod notification;
 pub mod provider;
 pub mod qrcode;
 pub mod settings;
-pub mod stake;
 pub mod transactions;
 pub mod wallet;
