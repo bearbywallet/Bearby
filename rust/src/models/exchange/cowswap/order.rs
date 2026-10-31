@@ -405,6 +405,121 @@ pub fn order_cancellation_typed_data_json(
     .to_string()
 }
 
+/// CoW Protocol Explorer URL (`https://explorer.cow.fi/.../orders/<order_uid>`) for *chain_id*.
+#[frb(ignore)]
+pub fn cow_explorer_order_url(chain_id: u64, order_uid: &str) -> String {
+    let prefix = match chain_id {
+        1 => "",
+        100 => "/gc",
+        137 => "/pol",
+        42161 => "/arb1",
+        8453 => "/base",
+        43114 => "/avax",
+        56 => "/bnb",
+        10 => "/opt",
+        59144 => "/linea",
+        11155111 => "/sepolia",
+        _ => "",
+    };
+    format!("https://explorer.cow.fi{prefix}/orders/{order_uid}")
+}
+
+fn parse_u64_json(val: Option<&zilpay::serde_json::Value>) -> Option<u64> {
+    let v = val?;
+    if let Some(n) = v.as_u64() {
+        return Some(n);
+    }
+    let s = v.as_str()?.trim();
+    if let Some(hex_str) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        u64::from_str_radix(hex_str, 16).ok()
+    } else {
+        s.parse::<u64>().ok()
+    }
+}
+
+/// Enriches a stored `signed_message` JSON string with `cowOrderUid` and `cowExplorerUrl`
+/// when the signed payload is a CoW Protocol (`Gnosis Protocol`) EIP-712 `Order` or `OrderCancellations`.
+#[frb(ignore)]
+pub fn enrich_cow_signed_message(
+    msg: &str,
+    fallback_chain_id: u64,
+    fallback_signer: Option<&str>,
+) -> String {
+    use zilpay::alloy::dyn_abi::eip712::TypedData;
+    use zilpay::serde_json::Value;
+
+    let Ok(Value::Object(mut root)) = zilpay::serde_json::from_str::<Value>(msg) else {
+        return msg.to_string();
+    };
+
+    let typed_data_val = match root.get("typedData") {
+        Some(Value::Object(_)) => root.get("typedData").cloned(),
+        Some(Value::String(s)) => zilpay::serde_json::from_str::<Value>(s).ok(),
+        _ => None,
+    };
+    let Some(typed_data) = typed_data_val else {
+        return msg.to_string();
+    };
+
+    let domain = typed_data.get("domain");
+    let domain_name = domain
+        .and_then(|d| d.get("name"))
+        .and_then(|v| v.as_str());
+    if domain_name != Some(DOMAIN_NAME) {
+        return msg.to_string();
+    }
+
+    let chain_id = parse_u64_json(domain.and_then(|d| d.get("chainId")))
+        .filter(|&id| id > 0)
+        .unwrap_or(fallback_chain_id);
+
+    let primary_type = typed_data.get("primaryType").and_then(|v| v.as_str());
+    let message = typed_data.get("message");
+
+    let order_uid = match primary_type {
+        Some("Order") => {
+            let Ok(td) = zilpay::serde_json::from_value::<TypedData>(typed_data.clone()) else {
+                return msg.to_string();
+            };
+            let Ok(digest) = td.eip712_signing_hash() else {
+                return msg.to_string();
+            };
+            let signer_str = root
+                .get("signer")
+                .and_then(|v| v.as_str())
+                .or(fallback_signer)
+                .or_else(|| message.and_then(|m| m.get("receiver")).and_then(|v| v.as_str()));
+            let Some(owner) = signer_str.and_then(|s| Address::from_str(s.trim()).ok()) else {
+                return msg.to_string();
+            };
+            let Some(valid_to) = parse_u64_json(message.and_then(|m| m.get("validTo")))
+                .and_then(|n| u32::try_from(n).ok())
+            else {
+                return msg.to_string();
+            };
+            pack_order_uid(digest, owner, valid_to)
+        }
+        Some("OrderCancellations") => {
+            let Some(uid) = message
+                .and_then(|m| m.get("orderUids"))
+                .and_then(|v| v.as_array())
+                .and_then(|arr| arr.first())
+                .and_then(|v| v.as_str())
+                .filter(|s| !s.is_empty())
+            else {
+                return msg.to_string();
+            };
+            uid.to_string()
+        }
+        _ => return msg.to_string(),
+    };
+
+    let explorer_url = cow_explorer_order_url(chain_id, &order_uid);
+    root.insert("cowOrderUid".to_string(), Value::String(order_uid));
+    root.insert("cowExplorerUrl".to_string(), Value::String(explorer_url));
+    zilpay::serde_json::to_string(&Value::Object(root)).unwrap_or_else(|_| msg.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -541,5 +656,44 @@ mod tests {
         // slippage_cut = 2_297_761_987 * 50 / 10_000 = 11_488_809
         // order_buy_amount = 2_297_761_987 - 11_488_809 = 2_286_273_178
         assert_eq!(computed.order_buy_amount, U256::from(2_286_273_178u64));
+    }
+
+    #[test]
+    fn enrich_cow_signed_message_populates_order_uid_and_explorer_url() {
+        let app_data = build_cow_app_data(Some(AppFeeConfig::default_fee()));
+        let signer = "0xce106C000000000000000000000000000000dd87";
+        let valid_to = 1_776_759_999u32;
+        let td_str = order_typed_data_json(
+            42161,
+            GPV2_SETTLEMENT,
+            "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+            "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+            signer,
+            "10000000",
+            "3000000000000000",
+            valid_to,
+            &app_data.app_data_hash,
+        );
+        let td_val: zilpay::serde_json::Value = zilpay::serde_json::from_str(&td_str).unwrap();
+        let stored = json!({
+            "type": "eth_signTypedData_v4",
+            "typedData": td_val,
+            "signature": "0x1234",
+            "pubKey": "02abcd",
+            "signer": signer,
+        })
+        .to_string();
+
+        let enriched = enrich_cow_signed_message(&stored, 42161, Some(signer));
+        let parsed: zilpay::serde_json::Value = zilpay::serde_json::from_str(&enriched).unwrap();
+        let uid = parsed["cowOrderUid"].as_str().expect("cowOrderUid present");
+        let url = parsed["cowExplorerUrl"].as_str().expect("cowExplorerUrl present");
+
+        assert_eq!(uid.len(), 2 + 112);
+        assert_eq!(url, format!("https://explorer.cow.fi/arb1/orders/{uid}"));
+
+        // Non-CoW messages remain untouched
+        let plain = r#"{"type":"personal_sign","message":"hello","signature":"0x00","signer":"0x01"}"#;
+        assert_eq!(enrich_cow_signed_message(plain, 1, None), plain);
     }
 }

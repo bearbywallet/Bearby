@@ -145,6 +145,8 @@ class ParsedSignedMessage {
   final String? pubKey;
   final String? signer;
   final Map<String, dynamic>? typedData;
+  final String? cowOrderUid;
+  final String? cowExplorerUrl;
 
   ParsedSignedMessage({
     this.type,
@@ -153,6 +155,8 @@ class ParsedSignedMessage {
     this.pubKey,
     this.signer,
     this.typedData,
+    this.cowOrderUid,
+    this.cowExplorerUrl,
   });
 
   factory ParsedSignedMessage.fromJson(Map<String, dynamic> json) {
@@ -163,6 +167,8 @@ class ParsedSignedMessage {
       pubKey: json['pubKey'] as String?,
       signer: json['signer'] as String?,
       typedData: json['typedData'] as Map<String, dynamic>?,
+      cowOrderUid: json['cowOrderUid'] as String?,
+      cowExplorerUrl: json['cowExplorerUrl'] as String?,
     );
   }
 
@@ -237,6 +243,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
   }
 
   bool get isSignedMessage => signedMessage != null;
+  String? get cowExplorerUrl => parsedSignedMessage?.cowExplorerUrl;
   bool get isEvmTransaction => evm != null;
   bool get isScillaTransaction => scilla != null;
   bool get isBtcTransaction => btc != null;

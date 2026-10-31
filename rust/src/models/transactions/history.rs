@@ -44,6 +44,16 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
             .and_then(|s| s.get_bitcoin_network().ok())
             .unwrap_or(zilpay::bitcoin::Network::Bitcoin);
 
+        let fallback_chain_hash = value.metadata.chain_hash;
+        let fallback_signer = value.metadata.signer.as_ref().map(|s| s.auto_format());
+        let signed_message = value.signed_message.map(|msg| {
+            crate::models::exchange::cowswap::order::enrich_cow_signed_message(
+                &msg,
+                fallback_chain_hash,
+                fallback_signer.as_deref(),
+            )
+        });
+
         Self {
             status: value.status.into(),
             metadata: value.metadata.into(),
@@ -55,7 +65,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
             solana: value.solana.map(Into::into),
             evm: value.evm,
             scilla: value.scilla,
-            signed_message: value.signed_message,
+            signed_message,
             timestamp: value.timestamp,
         }
     }

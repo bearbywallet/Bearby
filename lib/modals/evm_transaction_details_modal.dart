@@ -427,6 +427,37 @@ class EvmTransactionDetailsModal extends StatelessWidget {
     double bottomPadding,
   ) {
     final theme = appState.currentTheme;
+    if (transaction.isSignedMessage) {
+      final cowUrl = transaction.cowExplorerUrl;
+      if (cowUrl == null || cowUrl.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: padding,
+          vertical: 16,
+        ),
+        decoration: BoxDecoration(
+          color: theme.background.withValues(alpha: 0.8),
+          border: Border(
+            top: BorderSide(color: theme.modalBorder, width: 1),
+          ),
+        ),
+        child: SafeArea(
+          bottom: true,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildCowExplorerButton(cowUrl, theme),
+              const SizedBox(width: 4),
+              _buildShareUrlButton(cowUrl, 'CoW Explorer', theme),
+            ],
+          ),
+        ),
+      );
+    }
+
     final chain = appState.getChain(transaction.chainHash);
     final explorers = chain?.explorers ?? [];
 
@@ -460,6 +491,37 @@ class EvmTransactionDetailsModal extends StatelessWidget {
     );
   }
 
+  Widget _buildCowExplorerButton(String url, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () async {
+          final Uri uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryPurple.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.primaryPurple.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: const AsyncImage(
+            url: 'assets/icons/cowswap.svg',
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildShareButton(AppState appState, AppTheme theme) {
     final ({String name, String url})? explorer = firstExplorer(
       appState,
@@ -467,12 +529,20 @@ class EvmTransactionDetailsModal extends StatelessWidget {
       transaction.transactionHash,
     );
     if (explorer == null) return const SizedBox.shrink();
+    return _buildShareUrlButton(explorer.url, explorer.name, theme);
+  }
+
+  Widget _buildShareUrlButton(
+    String url,
+    String explorerName,
+    AppTheme theme,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: InkWell(
         onTap: () => shareTransactionQr(
-          url: explorer.url,
-          explorerName: explorer.name,
+          url: url,
+          explorerName: explorerName,
           color: theme.primaryPurple,
         ),
         child: Container(
