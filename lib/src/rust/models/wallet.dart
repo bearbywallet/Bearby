@@ -9,6 +9,143 @@ import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'settings.dart';
 
+class Bip39ChainBalanceInfo {
+  final String chainName;
+  final BigInt chainHash;
+  final int slip44;
+  final String addr;
+  final String symbol;
+  final String balance;
+  final int decimals;
+  final int txCount;
+
+  const Bip39ChainBalanceInfo({
+    required this.chainName,
+    required this.chainHash,
+    required this.slip44,
+    required this.addr,
+    required this.symbol,
+    required this.balance,
+    required this.decimals,
+    required this.txCount,
+  });
+
+  @override
+  int get hashCode =>
+      chainName.hashCode ^
+      chainHash.hashCode ^
+      slip44.hashCode ^
+      addr.hashCode ^
+      symbol.hashCode ^
+      balance.hashCode ^
+      decimals.hashCode ^
+      txCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Bip39ChainBalanceInfo &&
+          runtimeType == other.runtimeType &&
+          chainName == other.chainName &&
+          chainHash == other.chainHash &&
+          slip44 == other.slip44 &&
+          addr == other.addr &&
+          symbol == other.symbol &&
+          balance == other.balance &&
+          decimals == other.decimals &&
+          txCount == other.txCount;
+}
+
+class Bip39DiscoveredAccountInfo {
+  final int index;
+  final String addr;
+  final String? legacyAddr;
+  final String balance;
+  final int decimals;
+  final String symbol;
+  final int txCount;
+  final bool hasActivity;
+  final List<Bip39ChainBalanceInfo> chainBalances;
+
+  const Bip39DiscoveredAccountInfo({
+    required this.index,
+    required this.addr,
+    this.legacyAddr,
+    required this.balance,
+    required this.decimals,
+    required this.symbol,
+    required this.txCount,
+    required this.hasActivity,
+    required this.chainBalances,
+  });
+
+  @override
+  int get hashCode =>
+      index.hashCode ^
+      addr.hashCode ^
+      legacyAddr.hashCode ^
+      balance.hashCode ^
+      decimals.hashCode ^
+      symbol.hashCode ^
+      txCount.hashCode ^
+      hasActivity.hashCode ^
+      chainBalances.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Bip39DiscoveredAccountInfo &&
+          runtimeType == other.runtimeType &&
+          index == other.index &&
+          addr == other.addr &&
+          legacyAddr == other.legacyAddr &&
+          balance == other.balance &&
+          decimals == other.decimals &&
+          symbol == other.symbol &&
+          txCount == other.txCount &&
+          hasActivity == other.hasActivity &&
+          chainBalances == other.chainBalances;
+}
+
+class Bip39ScanChunkResultInfo {
+  final List<Bip39DiscoveredAccountInfo> accounts;
+  final int scannedFrom;
+  final int scannedTo;
+  final int totalTarget;
+  final int cachedCount;
+  final String? networkError;
+
+  const Bip39ScanChunkResultInfo({
+    required this.accounts,
+    required this.scannedFrom,
+    required this.scannedTo,
+    required this.totalTarget,
+    required this.cachedCount,
+    this.networkError,
+  });
+
+  @override
+  int get hashCode =>
+      accounts.hashCode ^
+      scannedFrom.hashCode ^
+      scannedTo.hashCode ^
+      totalTarget.hashCode ^
+      cachedCount.hashCode ^
+      networkError.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Bip39ScanChunkResultInfo &&
+          runtimeType == other.runtimeType &&
+          accounts == other.accounts &&
+          scannedFrom == other.scannedFrom &&
+          scannedTo == other.scannedTo &&
+          totalTarget == other.totalTarget &&
+          cachedCount == other.cachedCount &&
+          networkError == other.networkError;
+}
+
 class WalletInfo {
   final String walletType;
   final String walletName;

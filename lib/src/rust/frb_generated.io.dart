@@ -160,6 +160,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw);
 
   @protected
+  Bip39ChainBalanceInfo dco_decode_bip_39_chain_balance_info(dynamic raw);
+
+  @protected
+  Bip39DiscoveredAccountInfo dco_decode_bip_39_discovered_account_info(
+      dynamic raw);
+
+  @protected
+  Bip39ScanChunkResultInfo dco_decode_bip_39_scan_chunk_result_info(
+      dynamic raw);
+
+  @protected
   BitcoinMetadataInfo dco_decode_bitcoin_metadata_info(dynamic raw);
 
   @protected
@@ -395,6 +406,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(
       dynamic raw);
+
+  @protected
+  List<Bip39ChainBalanceInfo> dco_decode_list_bip_39_chain_balance_info(
+      dynamic raw);
+
+  @protected
+  List<Bip39DiscoveredAccountInfo>
+      dco_decode_list_bip_39_discovered_account_info(dynamic raw);
 
   @protected
   List<BtcAddressEntryInfo> dco_decode_list_btc_address_entry_info(dynamic raw);
@@ -883,6 +902,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Bip39ChainBalanceInfo sse_decode_bip_39_chain_balance_info(
+      SseDeserializer deserializer);
+
+  @protected
+  Bip39DiscoveredAccountInfo sse_decode_bip_39_discovered_account_info(
+      SseDeserializer deserializer);
+
+  @protected
+  Bip39ScanChunkResultInfo sse_decode_bip_39_scan_chunk_result_info(
+      SseDeserializer deserializer);
+
+  @protected
   BitcoinMetadataInfo sse_decode_bitcoin_metadata_info(
       SseDeserializer deserializer);
 
@@ -1147,6 +1178,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
       SseDeserializer deserializer);
+
+  @protected
+  List<Bip39ChainBalanceInfo> sse_decode_list_bip_39_chain_balance_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<Bip39DiscoveredAccountInfo>
+      sse_decode_list_bip_39_discovered_account_info(
+          SseDeserializer deserializer);
 
   @protected
   List<BtcAddressEntryInfo> sse_decode_list_btc_address_entry_info(
@@ -1685,6 +1725,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Bip39AddWalletParams self, SseSerializer serializer);
 
   @protected
+  void sse_encode_bip_39_chain_balance_info(
+      Bip39ChainBalanceInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bip_39_discovered_account_info(
+      Bip39DiscoveredAccountInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bip_39_scan_chunk_result_info(
+      Bip39ScanChunkResultInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_bitcoin_metadata_info(
       BitcoinMetadataInfo self, SseSerializer serializer);
 
@@ -1960,6 +2012,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_address_book_entry_info(
       List<AddressBookEntryInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_bip_39_chain_balance_info(
+      List<Bip39ChainBalanceInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_bip_39_discovered_account_info(
+      List<Bip39DiscoveredAccountInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_btc_address_entry_info(

@@ -2,7 +2,92 @@ use std::collections::HashMap;
 
 use super::{account::AccountInfo, ftoken::FTokenInfo, settings::WalletSettingsInfo};
 pub use zilpay::wallet::Wallet;
-use zilpay::{errors::wallet::WalletErrors, wallet::wallet_storage::StorageOperations};
+use zilpay::{
+    background::bg_wallet::{
+        Bip39ChainBalance, Bip39DiscoveredAccount, Bip39ScanChunkResult,
+    },
+    errors::wallet::WalletErrors,
+    wallet::wallet_storage::StorageOperations,
+};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Bip39ChainBalanceInfo {
+    pub chain_name: String,
+    pub chain_hash: u64,
+    pub slip44: u32,
+    pub addr: String,
+    pub symbol: String,
+    pub balance: String,
+    pub decimals: u8,
+    pub tx_count: u32,
+}
+
+impl From<Bip39ChainBalance> for Bip39ChainBalanceInfo {
+    fn from(value: Bip39ChainBalance) -> Self {
+        Self {
+            chain_name: value.chain_name,
+            chain_hash: value.chain_hash,
+            slip44: value.slip44,
+            addr: value.addr,
+            symbol: value.symbol,
+            balance: value.balance,
+            decimals: value.decimals,
+            tx_count: value.tx_count,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Bip39DiscoveredAccountInfo {
+    pub index: u32,
+    pub addr: String,
+    pub legacy_addr: Option<String>,
+    pub balance: String,
+    pub decimals: u8,
+    pub symbol: String,
+    pub tx_count: u32,
+    pub has_activity: bool,
+    pub chain_balances: Vec<Bip39ChainBalanceInfo>,
+}
+
+impl From<Bip39DiscoveredAccount> for Bip39DiscoveredAccountInfo {
+    fn from(value: Bip39DiscoveredAccount) -> Self {
+        Self {
+            index: value.index,
+            addr: value.addr,
+            legacy_addr: value.legacy_addr,
+            balance: value.balance,
+            decimals: value.decimals,
+            symbol: value.symbol,
+            tx_count: value.tx_count,
+            has_activity: value.has_activity,
+            chain_balances: value.chain_balances.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Bip39ScanChunkResultInfo {
+    pub accounts: Vec<Bip39DiscoveredAccountInfo>,
+    pub scanned_from: u32,
+    pub scanned_to: u32,
+    pub total_target: u32,
+    pub cached_count: u32,
+    pub network_error: Option<String>,
+}
+
+impl From<Bip39ScanChunkResult> for Bip39ScanChunkResultInfo {
+    fn from(value: Bip39ScanChunkResult) -> Self {
+        Self {
+            accounts: value.accounts.into_iter().map(Into::into).collect(),
+            scanned_from: value.scanned_from,
+            scanned_to: value.scanned_to,
+            total_target: value.total_target,
+            cached_count: value.cached_count,
+            network_error: value.network_error,
+        }
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub struct WalletInfo {

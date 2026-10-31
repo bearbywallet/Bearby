@@ -8,6 +8,7 @@ import '../models/account.dart';
 import '../models/btc_chain.dart';
 import '../models/ftoken.dart';
 import '../models/keypair.dart';
+import '../models/provider.dart';
 import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -149,6 +150,38 @@ Future<String> restoreFromKeystore(
         keystoreBytes: keystoreBytes,
         password: password,
         biometricType: biometricType);
+
+Future<Bip39DiscoveredAccountInfo> deriveBip39FirstAccount(
+        {required String mnemonicStr,
+        required String passphrase,
+        required bool mnemonicCheck,
+        required NetworkConfigInfo primaryChain,
+        required List<NetworkConfigInfo> chains}) =>
+    RustLib.instance.api.crateApiWalletDeriveBip39FirstAccount(
+        mnemonicStr: mnemonicStr,
+        passphrase: passphrase,
+        mnemonicCheck: mnemonicCheck,
+        primaryChain: primaryChain,
+        chains: chains);
+
+Future<Bip39ScanChunkResultInfo> scanBip39AccountsChunk(
+        {required String mnemonicStr,
+        required String passphrase,
+        required bool mnemonicCheck,
+        required NetworkConfigInfo primaryChain,
+        required List<NetworkConfigInfo> chains,
+        required int startIndex,
+        required int count,
+        required int totalTarget}) =>
+    RustLib.instance.api.crateApiWalletScanBip39AccountsChunk(
+        mnemonicStr: mnemonicStr,
+        passphrase: passphrase,
+        mnemonicCheck: mnemonicCheck,
+        primaryChain: primaryChain,
+        chains: chains,
+        startIndex: startIndex,
+        count: count,
+        totalTarget: totalTarget);
 
 class AddNextBip39AccountParams {
   final BigInt walletIndex;

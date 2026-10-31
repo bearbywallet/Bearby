@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bearby/components/biometric_switch.dart';
+import 'package:bearby/components/bip39_discovery_section.dart';
 import 'package:bearby/components/custom_app_bar.dart';
 import 'package:bearby/components/glass_message.dart';
 import 'package:provider/provider.dart';
@@ -22,8 +23,10 @@ import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/keypair.dart';
 import 'package:bearby/src/rust/models/provider.dart';
 import 'package:bearby/src/rust/models/settings.dart';
+import 'package:bearby/src/rust/models/wallet.dart';
 import 'package:bearby/state/app_state.dart' show AppState;
 import 'package:bearby/l10n/app_localizations.dart';
+import 'package:bearby/utils/networks_loader.dart';
 import 'package:bearby/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bearby/router.dart';
@@ -37,6 +40,9 @@ class PasswordSetupPage extends StatefulWidget {
 
 class _PasswordSetupPageState extends State<PasswordSetupPage>
     with StatusBarMixin {
+  static const int _kTotalScanAccounts = 250;
+  static const int _kScanChunkSize = 50;
+
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
@@ -53,6 +59,12 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
   bool _disabled = false;
   bool _walletNameInitialized = false;
   bool _updatedArgs = false;
+
+  List<Bip39DiscoveredAccountInfo> _discoveredAccounts = [];
+  List<NetworkConfigInfo> _scanChains = [];
+  bool _isScanningAccounts = false;
+  int _scannedAccountsCount = 0;
+  Future<void>? _scanFuture;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -94,6 +106,14 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
         _updatedArgs = true;
       });
+
+      if (bip39 != null && chain != null) {
+        _scanFuture = _startAccountDiscovery(
+          mnemonicWords: List<String>.from(bip39),
+          chain: chain,
+          mnemonicCheck: !(bypassChecksumValidation ?? false),
+        );
+      }
     }
 
     if (!_walletNameInitialized) {
@@ -141,6 +161,25 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     return "$networkName #$walletNumber ($type)";
   }
 
+  bool get _isFormValid {
+    final name = _walletNameController.text.trim();
+    final pwd = _passwordController.text;
+    final confirm = _confirmPasswordController.text;
+    return name.isNotEmpty &&
+        name.length <= 32 &&
+        pwd.length >= 6 &&
+        pwd == confirm;
+  }
+
+  void _handleInputSubmit(String _) {
+    if (_disabled) return;
+    if (_isFormValid) {
+      _createWallet();
+    } else {
+      _validatePasswords();
+    }
+  }
+
   bool _validatePasswords() {
     if (_walletNameController.text.trim().isEmpty) {
       setState(() {
@@ -182,6 +221,145 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     return true;
   }
 
+  Future<List<NetworkConfigInfo>> _resolveSupportedScanChains(
+    NetworkConfigInfo primaryChain,
+  ) async {
+    final Map<BigInt, NetworkConfigInfo> byHash = {
+      primaryChain.chainHash: primaryChain,
+    };
+
+    try {
+      final stored = await getProviders();
+      for (final p in stored) {
+        if ((p.testnet ?? false) == (primaryChain.testnet ?? false)) {
+          byHash.putIfAbsent(p.chainHash, () => p);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading stored providers for scan: $e");
+    }
+
+    if (primaryChain.testnet != true) {
+      try {
+        final (mainnetChains, _) = await loadBundledNetworks();
+        for (final net in mainnetChains) {
+          byHash.putIfAbsent(net.chainHash, () => net);
+        }
+      } catch (e) {
+        debugPrint("Error loading bundled networks for scan: $e");
+      }
+    }
+
+    return byHash.values.toList();
+  }
+
+  Future<void> _startAccountDiscovery({
+    required List<String> mnemonicWords,
+    required NetworkConfigInfo chain,
+    required bool mnemonicCheck,
+  }) async {
+    final mnemonicStr = mnemonicWords.join(' ');
+    if (mnemonicStr.trim().isEmpty) return;
+
+    if (mounted) {
+      setState(() {
+        _isScanningAccounts = true;
+        _scannedAccountsCount = 0;
+      });
+    }
+
+    try {
+      final firstAccount = await deriveBip39FirstAccount(
+        mnemonicStr: mnemonicStr,
+        passphrase: "",
+        mnemonicCheck: mnemonicCheck,
+        primaryChain: chain,
+        chains: [chain],
+      );
+      if (mounted) {
+        setState(() {
+          _discoveredAccounts = [firstAccount];
+        });
+      }
+    } catch (e) {
+      debugPrint("Error deriving first BIP39 account: $e");
+    }
+
+    final scanChains = await _resolveSupportedScanChains(chain);
+    _scanChains = scanChains;
+
+    try {
+      final cachedFirst = await deriveBip39FirstAccount(
+        mnemonicStr: mnemonicStr,
+        passphrase: "",
+        mnemonicCheck: mnemonicCheck,
+        primaryChain: chain,
+        chains: scanChains,
+      );
+      if (mounted) {
+        setState(() {
+          _discoveredAccounts = [cachedFirst];
+        });
+      }
+    } catch (_) {}
+
+    final Map<int, Bip39DiscoveredAccountInfo> byIndex = {
+      for (final acc in _discoveredAccounts) acc.index: acc,
+    };
+
+    int completedScanned = 0;
+    final List<Future<void>> chunkFutures = [];
+
+    for (int start = 0;
+        start < _kTotalScanAccounts;
+        start += _kScanChunkSize) {
+      final chunkStart = start;
+      chunkFutures.add(() async {
+        try {
+          final chunkRes = await scanBip39AccountsChunk(
+            mnemonicStr: mnemonicStr,
+            passphrase: "",
+            mnemonicCheck: mnemonicCheck,
+            primaryChain: chain,
+            chains: scanChains,
+            startIndex: chunkStart,
+            count: _kScanChunkSize,
+            totalTarget: _kTotalScanAccounts,
+          );
+
+          for (final acc in chunkRes.accounts) {
+            if (acc.index == 0 || acc.hasActivity) {
+              byIndex[acc.index] = acc;
+            }
+          }
+
+          completedScanned = (completedScanned +
+                  (chunkRes.scannedTo - chunkRes.scannedFrom))
+              .clamp(0, _kTotalScanAccounts);
+
+          final sorted = byIndex.values.toList()
+            ..sort((a, b) => a.index.compareTo(b.index));
+
+          if (!mounted) return;
+          setState(() {
+            _discoveredAccounts = sorted;
+            _scannedAccountsCount = completedScanned;
+          });
+        } catch (e) {
+          debugPrint("Error scanning BIP39 chunk at $chunkStart: $e");
+        }
+      }());
+    }
+
+    await Future.wait(chunkFutures);
+
+    if (mounted) {
+      setState(() {
+        _isScanningAccounts = false;
+      });
+    }
+  }
+
   void _createWallet() async {
     setState(() {
       _errorMessage = null;
@@ -194,20 +372,44 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
     }
 
     try {
+      FocusScope.of(context).unfocus();
       final l10n = AppLocalizations.of(context)!;
+      _btnController.start();
+
+      if (_scanFuture != null) {
+        await _scanFuture;
+      }
+      if (!mounted) return;
+
       final BigInt? chainHash;
       List<NetworkConfigInfo> chains = await getProviders();
+      final existingHashes = chains.map((c) => c.chainHash).toSet();
       final matches = chains
           .where((chain) => chain.chainHash == _chain!.chainHash)
           .toList();
 
       if (matches.isEmpty) {
         chainHash = await addProvider(providerConfig: _chain!);
+        existingHashes.add(chainHash);
       } else {
         chainHash = matches.first.chainHash;
       }
 
-      _btnController.start();
+      final activeChainHashes = <BigInt>{};
+      for (final acc in _discoveredAccounts) {
+        for (final cb in acc.chainBalances) {
+          activeChainHashes.add(cb.chainHash);
+        }
+      }
+      for (final net in _scanChains) {
+        if (activeChainHashes.contains(net.chainHash) &&
+            !existingHashes.contains(net.chainHash)) {
+          try {
+            await addProvider(providerConfig: net);
+            existingHashes.add(net.chainHash);
+          } catch (_) {}
+        }
+      }
 
       String biometricType = "none";
       if (_useDeviceAuth && _authMethods.isNotEmpty) {
@@ -233,10 +435,19 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
           _chain?.slip44 == kBitcoinlip44 ? kBip86Purpose : kBip44Purpose;
 
       if (_bip39List != null) {
+        final accountsToRestore = _discoveredAccounts.isNotEmpty
+            ? _discoveredAccounts
+                .map((acc) => (
+                      BigInt.from(acc.index),
+                      l10n.addAccountPageDefaultName(acc.index),
+                    ))
+                .toList()
+            : [(BigInt.zero, l10n.addAccountPageDefaultName(0))];
+
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
-          accounts: [(BigInt.zero, l10n.addAccountPageDefaultName(0))],
+          accounts: accountsToRestore,
           passphrase: "",
           walletName: _walletNameController.text,
           biometricType: biometricType,
@@ -273,10 +484,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       await _appState.syncData();
 
       if (_zilLegacy && _chain?.slip44 == kZilliqaSlip44) {
-        await zilliqaSwapChain(
-          walletIndex: _appState.selectedWalletIndex,
-          accountIndex: _appState.wallet!.selectedAccount,
-        );
+        final totalAccs = _appState.wallet?.accounts.length ?? 0;
+        for (int i = 0; i < totalAccs; i++) {
+          await zilliqaSwapChain(
+            walletIndex: _appState.selectedWalletIndex,
+            accountIndex: BigInt.from(i),
+          );
+        }
         await _appState.syncData();
       }
 
@@ -355,15 +569,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 16),
-                          Text(
-                            AppLocalizations.of(context)!
-                                .passwordSetupPageSubtitle,
-                            style: theme.titleLarge.copyWith(
-                              color: theme.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: adaptivePadding),
+                          const SizedBox(height: 8),
                           Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
@@ -392,11 +598,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             focusedBorderColor: theme.primaryPurple,
                             disabled: _disabled,
                             onChanged: (value) {
-                              if (_errorMessage != null) {
-                                setState(() {
-                                  _errorMessage = null;
-                                });
-                              }
+                              setState(() {
+                                _errorMessage = null;
+                              });
                             },
                           ),
                           SizedBox(height: adaptivePadding),
@@ -412,12 +616,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             disabled: _disabled,
                             obscureText: _obscurePassword,
                             rightIcon: AppIconState.passwordVisibility(obscured: _obscurePassword),
+                            onSubmitted: _handleInputSubmit,
                             onChanged: (value) {
-                              if (_errorMessage != null) {
-                                setState(() {
-                                  _errorMessage = null;
-                                });
-                              }
+                              setState(() {
+                                _errorMessage = null;
+                              });
                             },
                             onRightIconTap: () {
                               setState(() {
@@ -437,6 +640,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             obscureText: _obscureConfirmPassword,
                             rightIcon: AppIconState.passwordVisibility(obscured: _obscureConfirmPassword),
+                            onSubmitted: _handleInputSubmit,
                             onRightIconTap: () {
                               setState(() {
                                 _obscureConfirmPassword =
@@ -444,11 +648,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               });
                             },
                             onChanged: (value) {
-                              if (_errorMessage != null) {
-                                setState(() {
-                                  _errorMessage = null;
-                                });
-                              }
+                              setState(() {
+                                _errorMessage = null;
+                              });
                             },
                           ),
                           const SizedBox(height: 8),
@@ -511,7 +713,16 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                                 setState(() => _useDeviceAuth = value);
                               },
                             ),
-                          SizedBox(height: 80),
+                          if (_bip39List != null)
+                            Bip39DiscoverySection(
+                              accounts: _discoveredAccounts,
+                              primaryChain: _chain,
+                              scanChains: _scanChains,
+                              isScanning: _isScanningAccounts,
+                              scannedCount: _scannedAccountsCount,
+                              totalTarget: _kTotalScanAccounts,
+                            ),
+                          const SizedBox(height: 32),
                         ],
                       ),
                     ),
@@ -520,15 +731,20 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                     width: double.infinity,
                     padding: EdgeInsets.only(bottom: adaptivePadding),
                     child: RoundedLoadingButton(
-                      color: theme.primaryPurple,
+                      color: _isFormValid
+                          ? theme.primaryPurple
+                          : theme.primaryPurple.withValues(alpha: 0.35),
                       valueColor: theme.buttonText,
                       controller: _btnController,
-                      onPressed: _createWallet,
+                      onPressed:
+                          (_isFormValid && !_disabled) ? _createWallet : null,
                       child: Text(
                         AppLocalizations.of(context)!
                             .passwordSetupPageCreateButton,
                         style: theme.titleSmall.copyWith(
-                          color: theme.buttonText,
+                          color: _isFormValid
+                              ? theme.buttonText
+                              : theme.buttonText.withValues(alpha: 0.5),
                         ),
                       ),
                     ),

@@ -27,14 +27,16 @@ pub use zilpay::{
 use crate::models::btc_chain::AddressChainInfo;
 use crate::models::ftoken::FTokenInfo;
 use crate::models::keypair::KeyPairInfo;
+use crate::models::provider::NetworkConfigInfo;
 use crate::models::settings::WalletSettingsInfo;
 use crate::utils::helpers::{
     handle, mutate_core, mutate_core_async, secretkey_from_provider, with_wallet,
 };
 use crate::{
-    models::wallet::WalletInfo,
+    models::wallet::{Bip39DiscoveredAccountInfo, Bip39ScanChunkResultInfo, WalletInfo},
     utils::{errors::ServiceError, helpers::with_service},
 };
+use zilpay::background::bg_wallet::Bip39ScanChunkParams;
 
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     with_service(|core| {
@@ -597,3 +599,73 @@ pub async fn restore_from_keystore(
 
     Ok(wallet_address)
 }
+
+pub async fn derive_bip39_first_account(
+    mnemonic_str: String,
+    passphrase: String,
+    mnemonic_check: bool,
+    primary_chain: NetworkConfigInfo,
+    chains: Vec<NetworkConfigInfo>,
+) -> Result<Bip39DiscoveredAccountInfo, String> {
+    let core = handle().map_err(String::from)?;
+    let primary_config =
+        ChainConfig::try_from(primary_chain).map_err(ServiceError::NetworkErrors)?;
+    let chain_configs: Vec<ChainConfig> = chains
+        .into_iter()
+        .map(ChainConfig::try_from)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(ServiceError::NetworkErrors)?;
+    let mnemonic_secret = SecretString::new(mnemonic_str.into());
+    let passphrase_secret = SecretString::new(passphrase.into());
+
+    let account = core
+        .derive_bip39_first_account(
+            &mnemonic_secret,
+            &passphrase_secret,
+            mnemonic_check,
+            &primary_config,
+            &chain_configs,
+        )
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(account.into())
+}
+
+pub async fn scan_bip39_accounts_chunk(
+    mnemonic_str: String,
+    passphrase: String,
+    mnemonic_check: bool,
+    primary_chain: NetworkConfigInfo,
+    chains: Vec<NetworkConfigInfo>,
+    start_index: u32,
+    count: u32,
+    total_target: u32,
+) -> Result<Bip39ScanChunkResultInfo, String> {
+    let core = handle().map_err(String::from)?;
+    let primary_config =
+        ChainConfig::try_from(primary_chain).map_err(ServiceError::NetworkErrors)?;
+    let chain_configs: Vec<ChainConfig> = chains
+        .into_iter()
+        .map(ChainConfig::try_from)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(ServiceError::NetworkErrors)?;
+    let mnemonic_secret = SecretString::new(mnemonic_str.into());
+    let passphrase_secret = SecretString::new(passphrase.into());
+
+    let res = core
+        .scan_bip39_accounts_chunk(Bip39ScanChunkParams {
+            mnemonic_str: &mnemonic_secret,
+            passphrase: &passphrase_secret,
+            mnemonic_check,
+            primary_chain: &primary_config,
+            chains: &chain_configs,
+            start_index,
+            count,
+            total_target,
+        })
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(res.into())
+}
+
