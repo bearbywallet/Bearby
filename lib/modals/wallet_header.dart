@@ -1,20 +1,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:bearby/components/hover_icon.dart';
 import 'package:bearby/components/app_icon.dart';
+import 'package:bearby/components/tile_button.dart';
 import 'package:bearby/components/wallet_card.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/wallet_type.dart';
+import 'package:bearby/router.dart';
 import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/wallet.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
-import 'package:go_router/go_router.dart';
-import 'package:bearby/router.dart';
 
 void showWalletModal({
   required BuildContext context,
+  VoidCallback? onManageAccount,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -36,94 +39,149 @@ class _WalletModalContent extends StatefulWidget {
 }
 
 class _WalletModalContentState extends State<_WalletModalContent> {
+  bool _isDeleting = false;
+
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
-    if (appState.wallet == null) return const SizedBox.shrink();
+    return Consumer<AppState>(
+      builder: (context, appState, _) {
+        final wallet = appState.wallet;
+        if (wallet == null) return const SizedBox.shrink();
 
-    return PopScope(
-      child: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! > 0) Navigator.pop(context);
-        },
-        child: RepaintBoundary(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      appState.currentTheme.cardBackground
-                          .withValues(alpha: 0.85),
-                      appState.currentTheme.cardBackground
-                          .withValues(alpha: 0.95),
-                    ],
-                  ),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border(
-                    top: BorderSide(
-                      color: appState.currentTheme.textSecondary
-                          .withValues(alpha: 0.2),
-                      width: 1.5,
+        final theme = appState.currentTheme;
+
+        return PopScope(
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if ((details.primaryVelocity ?? 0) > 0) {
+                Navigator.pop(context);
+              }
+            },
+            child: RepaintBoundary(
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          theme.cardBackground.withValues(alpha: 0.88),
+                          theme.cardBackground.withValues(alpha: 0.96),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(24),
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.textSecondary.withValues(alpha: 0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.primaryPurple.withValues(alpha: 0.12),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
+                    child: _buildMainContent(context, appState, theme, wallet),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: appState.currentTheme.primaryPurple
-                          .withValues(alpha: 0.15),
-                      blurRadius: 30,
-                      spreadRadius: 0,
-                    ),
-                  ],
                 ),
-                child: _buildMainContent(appState),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildMainContent(AppState appState) {
-    final theme = appState.currentTheme;
+  Widget _buildMainContent(
+    BuildContext context,
+    AppState appState,
+    AppTheme theme,
+    WalletInfo wallet,
+  ) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final wallet = appState.wallet!;
+    final accounts = appState.accounts;
+    final selected = wallet.selectedAccount;
+    final isSecretKey = wallet.walletType.contains(WalletType.SecretKey.name);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHandle(theme),
-        _buildHeader(appState, theme, wallet),
-        Consumer<AppState>(
-          builder: (_, state, __) {
-            final accounts = state.accounts;
-            final selected = state.wallet?.selectedAccount ?? BigInt.zero;
-            return ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight: MediaQuery.sizeOf(context).height * 0.5),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                itemCount: accounts.length,
-                padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding, vertical: adaptivePadding),
-                itemBuilder: (_, index) => WalletCard(
-                  account: accounts.elementAt(index),
-                  onTap: () => _selectWallet(index),
-                  isSelected: selected == BigInt.from(index),
-                ),
+        _buildHeader(theme, wallet),
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.symmetric(
+                horizontal: adaptivePadding,
+                vertical: 6,
               ),
-            );
-          },
+              itemCount: accounts.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (_, index) {
+                final account = accounts[index];
+                final isSelected = selected == BigInt.from(index);
+                final canDelete =
+                    !isSecretKey && accounts.length > 1 && index > 0;
+
+                final card = WalletCard(
+                  key: ValueKey('wallet_acc_${index}_${account.addr}'),
+                  account: account,
+                  isSelected: isSelected,
+                  onTap: () => _selectWallet(index),
+                  onDelete:
+                      canDelete ? () => _deleteAccountAt(index) : null,
+                );
+
+                if (!canDelete) {
+                  return card;
+                }
+
+                return Dismissible(
+                  key: ValueKey('dismiss_acc_${index}_${account.addr}'),
+                  direction: DismissDirection.endToStart,
+                  confirmDismiss: (_) async {
+                    await _deleteAccountAt(index);
+                    return false;
+                  },
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: theme.danger.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: theme.danger.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: AppIconView(
+                      icon: AppIcon.minus,
+                      color: theme.danger,
+                      size: 18,
+                    ),
+                  ),
+                  child: card,
+                );
+              },
+            ),
+          ),
         ),
-        if (!wallet.walletType.contains(WalletType.SecretKey.name))
-          _buildBottomActions(theme, appState),
+        const SizedBox(height: 8),
+        if (!isSecretKey)
+          _buildBottomActions(context, theme, appState, wallet),
         SizedBox(height: MediaQuery.paddingOf(context).bottom),
       ],
     );
@@ -133,7 +191,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     return Container(
       width: 48,
       height: 5,
-      margin: const EdgeInsets.symmetric(vertical: 16),
+      margin: const EdgeInsets.only(top: 14, bottom: 10),
       decoration: BoxDecoration(
         color: theme.textSecondary.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(3),
@@ -141,9 +199,53 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     );
   }
 
-  Widget _buildBottomActions(AppTheme theme, AppState appState) {
+  Widget _buildHeader(AppTheme theme, WalletInfo wallet) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        children: [
+          TileButton(
+            icon: AppIconView(
+              icon: AppIcon.lock,
+              color: theme.primaryPurple,
+              size: 24,
+            ),
+            onPressed: () {
+              _lockWallet();
+              Navigator.pop(context);
+            },
+            backgroundColor: theme.primaryPurple.withValues(alpha: 0.15),
+            textColor: theme.primaryPurple,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            wallet.walletName,
+            style: theme.titleLarge.copyWith(
+              color: theme.textSecondary,
+              shadows: [
+                Shadow(
+                  blurRadius: 8.0,
+                  color: theme.primaryPurple.withValues(alpha: 0.2),
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActions(
+    BuildContext context,
+    AppTheme theme,
+    AppState appState,
+    WalletInfo wallet,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
-      height: 64,
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         border: Border(
@@ -152,77 +254,53 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          HoverIcon(
-            icon: AppIcon.plus,
-            color: theme.textPrimary,
-            size: 40,
-            onTap: () {
-              if (appState.wallet!.walletType
-                  .contains(WalletType.ledger.name)) {
-                context.push(AppRoutes.addLedgerAccount, extra: {
-                  "createWallet": false,
-                  "chain": appState.chain,
-                });
-              } else {
-                context.push(AppRoutes.addAccount);
-              }
-            },
-          ),
-          if (appState.wallet!.selectedAccount != BigInt.zero)
-            HoverIcon(
-              icon: AppIcon.minus,
-              color: theme.danger,
-              size: 40,
-              onTap: _deleteSelectedAccount,
+      child: Center(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            final isLedger =
+                wallet.walletType.contains(WalletType.ledger.name);
+            final chain = appState.chain;
+            Navigator.pop(context);
+            if (isLedger) {
+              context.push(AppRoutes.addLedgerAccount, extra: {
+                "createWallet": false,
+                "chain": chain,
+              });
+            } else {
+              context.push(AppRoutes.addAccount);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            decoration: BoxDecoration(
+              color: theme.primaryPurple.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.primaryPurple.withValues(alpha: 0.35),
+              ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(AppState appState, AppTheme theme, WalletInfo wallet) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: _lockWallet,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.primaryPurple.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: theme.primaryPurple.withValues(alpha: 0.25),
-                  width: 1.5,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppIconView(
+                  icon: AppIcon.plus,
+                  color: theme.primaryPurple,
+                  size: 18,
                 ),
-              ),
-              child: AppIconView(
-                icon: AppIcon.lock,
-                size: 22,
-                color: theme.primaryPurple,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            wallet.walletName,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              shadows: [
-                Shadow(
-                  color: theme.primaryPurple.withValues(alpha: 0.3),
-                  blurRadius: 8,
+                const SizedBox(width: 8),
+                Text(
+                  l10n.addAccountPageTitle,
+                  style: theme.bodyText2.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -234,13 +312,23 @@ class _WalletModalContentState extends State<_WalletModalContent> {
 
   Future<void> _selectWallet(int index) async {
     final appState = Provider.of<AppState>(context, listen: false);
+    final currentSelected = appState.wallet?.selectedAccount;
+    final target = BigInt.from(index);
+
+    HapticFeedback.selectionClick();
+    if (mounted) {
+      Navigator.pop(context);
+    }
+
+    if (currentSelected == target) {
+      return;
+    }
+
     try {
       await appState.updateSelectedAccount(
         appState.selectedWalletIndex,
-        BigInt.from(index),
+        target,
       );
-      if (mounted) Navigator.pop(context);
-
       await appState.refreshBalancesAndRates(
         walletIndex: appState.selectedWalletIndex,
       );
@@ -249,16 +337,22 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     }
   }
 
-  Future<void> _deleteSelectedAccount() async {
+  Future<void> _deleteAccountAt(int index) async {
+    if (_isDeleting || index <= 0) {
+      return;
+    }
     final appState = Provider.of<AppState>(context, listen: false);
+    _isDeleting = true;
     try {
       await deleteAccount(
         walletIndex: appState.selectedWalletIndex,
-        accountIndex: appState.wallet!.selectedAccount,
+        accountIndex: BigInt.from(index),
       );
-      await appState.syncData();
+      await appState.syncWalletState();
     } catch (e) {
       debugPrint("try remove account: $e");
+    } finally {
+      _isDeleting = false;
     }
   }
 }
