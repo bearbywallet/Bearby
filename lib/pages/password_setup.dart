@@ -497,16 +497,17 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
       await _appState.startTrackHistoryWorker();
 
       _appState.setSelectedWallet(_appState.wallets.length - 1);
-      _btnController.success();
-
-      if (!mounted) return;
       _bip39List?.zeroize();
       if (_keys != null) {
         _keys = _keys!.zeroize();
       }
+
+      if (!mounted) return;
+      _btnController.success();
       context.go(AppRoutes.home);
     } catch (e) {
       debugPrint(e.toString());
+      if (!mounted) return;
       setState(() {
         _disabled = false;
         _errorMessage = e.toString();

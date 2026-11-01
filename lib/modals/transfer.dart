@@ -110,6 +110,7 @@ class _ConfirmTransactionContentState
   bool get isScilla => widget.tx.scilla != null;
   bool get isBTC => widget.tx.btc != null;
   bool get isTron => widget.tx.tron != null;
+  bool get isSolana => widget.tx.solana != null;
 
   BigInt get _signAccountIndex =>
       widget.accountIndex ??
@@ -418,7 +419,7 @@ class _ConfirmTransactionContentState
                             timeDiffBlock:
                                 appState.chain?.diffBlockTime.toInt() ?? 10,
                             txParamsInfo: _txParamsInfo,
-                            isFeeFixed: isBTC || isTron,
+                            isFeeFixed: isBTC || isTron || isSolana,
                             isBTC: isBTC,
                             disabled: _isDisabled,
                             onGasOptionChanged: (option, selectedValue) async {
@@ -444,7 +445,7 @@ class _ConfirmTransactionContentState
                             textColor: textColor,
                             secondaryColor: secondaryColor,
                           ),
-                          if (!isBTC)
+                          if (!isBTC && !isSolana && !isTron)
                             Align(
                               alignment: Alignment.centerRight,
                               child: InkWell(

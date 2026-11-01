@@ -82,6 +82,153 @@ FTokenInfo? nativeEvmToken(AppState appState) =>
 FTokenInfo? nativeTronToken(AppState appState) =>
     _nativeTokenOfType(appState, kTronAddressType);
 
+/// Native Solana token on the selected wallet, or null if missing.
+FTokenInfo? nativeSolanaToken(AppState appState) =>
+    _nativeTokenOfType(appState, kSolanaAddressType);
+
+(int, int)? _decodeCompactU16(Uint8List bytes, int startOffset) {
+  int value = 0;
+  int shift = 0;
+  int offset = startOffset;
+  for (int i = 0; i < 3; i++) {
+    if (offset >= bytes.length) return null;
+    final b = bytes[offset++];
+    value |= (b & 0x7f) << shift;
+    if ((b & 0x80) == 0) {
+      return (value, offset);
+    }
+    shift += 7;
+  }
+  return null;
+}
+
+bool _isValidSolanaMessage(Uint8List msg, {int? expectedSigCount}) {
+  if (msg.length < 40) return false;
+  final isV0 = (msg[0] & 0x80) != 0;
+  if (isV0 && msg[0] != 0x80) return false;
+  int offset = isV0 ? 1 : 0;
+  if (offset + 3 > msg.length) return false;
+
+  final numRequiredSignatures = msg[offset];
+  final numReadonlySigned = msg[offset + 1];
+  final numReadonlyUnsigned = msg[offset + 2];
+  offset += 3;
+
+  if (numRequiredSignatures == 0) return false;
+  if (expectedSigCount != null && numRequiredSignatures != expectedSigCount) {
+    return false;
+  }
+
+  final ak = _decodeCompactU16(msg, offset);
+  if (ak == null) return false;
+  final numKeys = ak.$1;
+  offset = ak.$2;
+
+  if (numKeys < numRequiredSignatures ||
+      numReadonlySigned > numRequiredSignatures ||
+      numReadonlyUnsigned > (numKeys - numRequiredSignatures)) {
+    return false;
+  }
+
+  offset += numKeys * 32 + 32;
+  if (offset > msg.length) return false;
+
+  final ix = _decodeCompactU16(msg, offset);
+  if (ix == null) return false;
+  final numIx = ix.$1;
+  offset = ix.$2;
+
+  for (int i = 0; i < numIx; i++) {
+    if (offset >= msg.length) return false;
+    offset += 1; // programIdIndex
+    final acct = _decodeCompactU16(msg, offset);
+    if (acct == null) return false;
+    offset = acct.$2 + acct.$1;
+    if (offset > msg.length) return false;
+    final data = _decodeCompactU16(msg, offset);
+    if (data == null) return false;
+    offset = data.$2 + data.$1;
+    if (offset > msg.length) return false;
+  }
+
+  if (isV0) {
+    final atl = _decodeCompactU16(msg, offset);
+    if (atl == null) return false;
+    final numAtl = atl.$1;
+    offset = atl.$2;
+    for (int i = 0; i < numAtl; i++) {
+      offset += 32;
+      if (offset > msg.length) return false;
+      final w = _decodeCompactU16(msg, offset);
+      if (w == null) return false;
+      offset = w.$2 + w.$1;
+      if (offset > msg.length) return false;
+      final r = _decodeCompactU16(msg, offset);
+      if (r == null) return false;
+      offset = r.$2 + r.$1;
+      if (offset > msg.length) return false;
+    }
+  }
+
+  return offset == msg.length;
+}
+
+/// Strips the wire transaction signature table if [rawTxBytes] is a full
+/// serialized Solana transaction (`shortvec(sigCount) + sigCount*64 + message`),
+/// returning the bare Solana message bytes expected by `SolanaTransaction`.
+Uint8List normalizeSolanaMessageBytes(Uint8List rawTxBytes) {
+  if (_isValidSolanaMessage(rawTxBytes)) {
+    return rawTxBytes;
+  }
+  final sigHeader = _decodeCompactU16(rawTxBytes, 0);
+  if (sigHeader != null && sigHeader.$1 > 0 && sigHeader.$1 <= 32) {
+    final msgOffset = sigHeader.$2 + sigHeader.$1 * 64;
+    if (msgOffset < rawTxBytes.length) {
+      final candidate = Uint8List.sublistView(rawTxBytes, msgOffset);
+      if (_isValidSolanaMessage(candidate, expectedSigCount: sigHeader.$1) ||
+          _isValidSolanaMessage(candidate)) {
+        return Uint8List.fromList(candidate);
+      }
+    }
+  }
+  return rawTxBytes;
+}
+
+/// Full [TransactionRequestInfo] for Solana confirm-transfer modal.
+TransactionRequestInfo buildSolanaTransactionRequestInfo({
+  required Uint8List rawTxBytes,
+  required AppState appState,
+  required bool broadcast,
+  required FTokenInfo nativeToken,
+  String? title,
+  String? icon,
+}) {
+  final normalizedMessage = normalizeSolanaMessageBytes(rawTxBytes);
+  final tokenInfo = BaseTokenInfo(
+    value: '0',
+    symbol: nativeToken.symbol,
+    decimals: nativeToken.decimals,
+  );
+  final metadata = TransactionMetadataInfo(
+    chainHash: appState.chain?.chainHash ?? BigInt.zero,
+    hash: null,
+    info: null,
+    icon: icon,
+    title: (title == null || title.isEmpty) ? kSolanaTransactionTitle : title,
+    signer: appState.account?.addr,
+    tokenInfo: tokenInfo,
+    broadcast: broadcast,
+  );
+  return TransactionRequestInfo(
+    metadata: metadata,
+    scilla: null,
+    evm: null,
+    tron: null,
+    btc: null,
+    solana: normalizedMessage,
+  );
+}
+
 /// Wei amount from a hex/decimal `value` field.
 BigInt evmValueAmount(String? value) {
   if (value == null ||

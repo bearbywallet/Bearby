@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -308,6 +309,64 @@ class Web3EIP1193Handler {
           await _handleWalletSwitchEthereumChain(message, context, appState);
           break;
 
+        case Web3EIP1193Method.solanaConnect:
+        case Web3EIP1193Method.solanaRequestAccounts:
+        case Web3EIP1193Method.solanaAccounts:
+          await _handleSolanaConnect(
+            message,
+            context,
+            appState,
+            forceTrustedOnly: evmMethod == Web3EIP1193Method.solanaAccounts,
+          );
+          break;
+
+        case Web3EIP1193Method.solanaDisconnect:
+          await _handleSolanaDisconnect(message, appState);
+          break;
+
+        case Web3EIP1193Method.solanaSignTransaction:
+          await _handleSolanaSignTransaction(
+            message,
+            context,
+            appState,
+            broadcast: false,
+          );
+          break;
+
+        case Web3EIP1193Method.solanaSignAndSendTransaction:
+          await _handleSolanaSignTransaction(
+            message,
+            context,
+            appState,
+            broadcast: true,
+          );
+          break;
+
+        case Web3EIP1193Method.solanaSignAllTransactions:
+          await _handleSolanaSignAllTransactions(message, context, appState);
+          break;
+
+        case Web3EIP1193Method.solanaSignMessage:
+        case Web3EIP1193Method.solanaSignIn:
+          await _handleSolanaSignMessage(message, context, appState);
+          break;
+
+        case Web3EIP1193Method.walletCreateSession:
+          await _handleWalletCreateSession(message, context, appState);
+          break;
+
+        case Web3EIP1193Method.walletGetSession:
+          await _handleWalletGetSession(message, appState);
+          break;
+
+        case Web3EIP1193Method.walletRevokeSession:
+          await _handleSolanaDisconnect(message, appState);
+          break;
+
+        case Web3EIP1193Method.walletInvokeMethod:
+          await _handleWalletInvokeMethod(message, context, appState);
+          break;
+
         default:
           final l10n = AppLocalizations.of(context);
           _returnError(
@@ -345,6 +404,10 @@ class Web3EIP1193Handler {
     _addActiveRequest(method);
 
     try {
+      if (appState.chain?.slip44 == kSolanaSlip44) {
+        await _ensureEvmChain(appState);
+      }
+
       await appState.syncConnections();
       final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
@@ -1619,6 +1682,881 @@ class Web3EIP1193Handler {
         Web3EIP1193ErrorCode.internalError,
         'Error processing wallet_switchEthereumChain: $e',
       );
+    }
+  }
+
+  Future<void> _ensureEvmChain(AppState appState) async {
+    if (appState.chain?.slip44 == kEthereumSlip44 ||
+        appState.chain?.slip44 == kZilliqaSlip44) {
+      return;
+    }
+
+    NetworkConfigInfo? targetNetwork;
+    for (final provider in appState.state.providers) {
+      if (provider.slip44 == kEthereumSlip44 && !(provider.testnet ?? false)) {
+        targetNetwork = provider;
+        break;
+      }
+    }
+    targetNetwork ??= appState.state.providers
+        .cast<NetworkConfigInfo?>()
+        .firstWhere((p) => p?.slip44 == kEthereumSlip44, orElse: () => null);
+
+    if (targetNetwork == null) {
+      final (mainnetChains, _) = await loadBundledNetworks();
+      for (final chain in mainnetChains) {
+        if (chain.slip44 == kEthereumSlip44) {
+          targetNetwork = chain;
+          break;
+        }
+      }
+      if (targetNetwork != null) {
+        await addProvider(providerConfig: targetNetwork);
+        await appState.syncData();
+      }
+    }
+
+    if (targetNetwork != null) {
+      await selectAccountsChain(
+        walletIndex: appState.selectedWalletIndex,
+        chainHash: targetNetwork.chainHash,
+      );
+      await appState.syncData();
+    }
+  }
+
+  Future<bool> _ensureSolanaChain(AppState appState) async {
+    if (appState.chain?.slip44 == kSolanaSlip44) {
+      return true;
+    }
+
+    NetworkConfigInfo? targetNetwork;
+    for (final provider in appState.state.providers) {
+      if (provider.slip44 == kSolanaSlip44 && !(provider.testnet ?? false)) {
+        targetNetwork = provider;
+        break;
+      }
+    }
+    targetNetwork ??= appState.state.providers
+        .cast<NetworkConfigInfo?>()
+        .firstWhere((p) => p?.slip44 == kSolanaSlip44, orElse: () => null);
+
+    if (targetNetwork == null) {
+      final (mainnetChains, _) = await loadBundledNetworks();
+      for (final chain in mainnetChains) {
+        if (chain.slip44 == kSolanaSlip44) {
+          targetNetwork = chain;
+          break;
+        }
+      }
+      if (targetNetwork != null) {
+        await addProvider(providerConfig: targetNetwork);
+        await appState.syncData();
+        for (final provider in appState.state.providers) {
+          if (provider.slip44 == kSolanaSlip44) {
+            targetNetwork = provider;
+            break;
+          }
+        }
+      }
+    }
+
+    if (targetNetwork == null) {
+      return false;
+    }
+
+    await selectAccountsChain(
+      walletIndex: appState.selectedWalletIndex,
+      chainHash: targetNetwork.chainHash,
+    );
+    await appState.syncData();
+    return appState.chain?.slip44 == kSolanaSlip44;
+  }
+
+  Future<void> _handleSolanaConnect(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState, {
+    bool forceTrustedOnly = false,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final method = message.payload['method'] as String;
+
+    bool onlyIfTrusted = forceTrustedOnly;
+    final params = message.payload['params'];
+    if (params is List && params.isNotEmpty && params[0] is Map) {
+      final map = params[0] as Map;
+      onlyIfTrusted =
+          onlyIfTrusted || map['onlyIfTrusted'] == true || map['silent'] == true;
+    } else if (params is Map) {
+      onlyIfTrusted = onlyIfTrusted ||
+          params['onlyIfTrusted'] == true ||
+          params['silent'] == true;
+    }
+
+    if (!onlyIfTrusted && _isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        l10n?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    if (!onlyIfTrusted) {
+      _addActiveRequest(method);
+    }
+
+    try {
+      await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
+      final connection = Web3Utils.findConnected(
+        currentDomain,
+        appState.connections,
+      );
+
+      if (onlyIfTrusted) {
+        if (connection == null || appState.chain?.slip44 != kSolanaSlip44) {
+          return _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.unauthorized,
+            l10n?.web3ErrorNotConnected ?? '',
+          );
+        }
+        final addresses = await _getWalletAddresses(appState);
+        if (addresses.isEmpty) {
+          return _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.unauthorized,
+            l10n?.web3ErrorNotConnected ?? '',
+          );
+        }
+        return await _sendResponse(
+          type: kBearbyResponseType,
+          uuid: message.uuid,
+          result: {'publicKey': addresses.first},
+        );
+      }
+
+      final switched = await _ensureSolanaChain(appState);
+      if (!switched) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.chainNotAdded,
+          l10n?.web3ErrorChainNotAdded ?? '',
+        );
+      }
+
+      final addresses = await _getWalletAddresses(appState);
+
+      if (connection != null && addresses.isNotEmpty) {
+        _removeActiveRequest(method);
+        return await _sendResponse(
+          type: kBearbyResponseType,
+          uuid: message.uuid,
+          result: {'publicKey': addresses.first},
+        );
+      }
+
+      String? title = await webViewController.getTitle();
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showAppConnectModal(
+        context: context,
+        title: message.title ?? '',
+        uuid: message.uuid,
+        iconUrl: message.icon ?? '',
+        onReject: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            l10n?.web3ErrorUserRejectedRequest ?? '',
+          );
+          _removeActiveRequest(method);
+        },
+        onConfirm: (selectedIndices) async {
+          try {
+            if (selectedIndices.isEmpty || addresses.isEmpty) {
+              _removeActiveRequest(method);
+              return _returnError(
+                message.uuid,
+                Web3EIP1193ErrorCode.userRejectedRequest,
+                l10n?.web3ErrorUserRejectedRequest ?? '',
+              );
+            }
+
+            final accountIndexes = Uint64List.fromList(selectedIndices);
+            final connectionInfo = ConnectionInfo(
+              domain: currentDomain,
+              accountIndexes: accountIndexes,
+              favicon: message.icon,
+              title: title ?? '',
+              description: message.description,
+              lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+              canReadAccounts: true,
+              canRequestSignatures: true,
+              canSuggestTokens: false,
+              canSuggestTransactions: true,
+            );
+
+            await createUpdateConnection(
+              walletIndex: appState.selectedWalletIndex,
+              conn: connectionInfo,
+            );
+            await appState.syncConnections();
+
+            final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            final pubKey =
+                connectedAddr.isNotEmpty ? connectedAddr.first : addresses.first;
+
+            await _sendResponse(
+              type: kBearbyResponseType,
+              uuid: message.uuid,
+              result: {'publicKey': pubKey},
+            );
+          } catch (e) {
+            _returnError(
+              message.uuid,
+              Web3EIP1193ErrorCode.internalError,
+              '$e',
+            );
+          } finally {
+            _removeActiveRequest(method);
+          }
+        },
+      );
+    } catch (e) {
+      if (!onlyIfTrusted) {
+        _removeActiveRequest(method);
+      }
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        '$e',
+      );
+    }
+  }
+
+  Future<void> _handleSolanaDisconnect(
+    ZilPayWeb3Message message,
+    AppState appState,
+  ) async {
+    await _sendResponse(
+      type: kBearbyResponseType,
+      uuid: message.uuid,
+      result: true,
+    );
+  }
+
+  String _formatSolanaMessagePayload(String hexMsg) {
+    final cleanHex =
+        hexMsg.startsWith('0x') || hexMsg.startsWith('0X') ? hexMsg.substring(2) : hexMsg;
+    try {
+      final bytes = hexToBytes(cleanHex);
+      final decoded = utf8.decode(bytes);
+      final hasDisallowedControl = decoded.runes.any(
+        (r) => (r < 0x20 && r != 0x09 && r != 0x0A && r != 0x0D) || r == 0x7F,
+      );
+      final looksLikeHex = decoded.startsWith('0x') || decoded.startsWith('0X');
+      final looksLikeSingleBase58Token =
+          !decoded.contains(RegExp(r'\s')) && decoded.length >= 44;
+
+      if (!hasDisallowedControl && !looksLikeHex && !looksLikeSingleBase58Token) {
+        return decoded;
+      }
+    } catch (_) {
+      // Binary payload — fall back to 0x-prefixed hex so Rust decodes raw bytes
+    }
+    return '0x$cleanHex';
+  }
+
+  Future<void> _handleSolanaSignMessage(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        l10n?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+
+    try {
+      await _ensureSolanaChain(appState);
+      await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
+      final connection = Web3Utils.findConnected(
+        currentDomain,
+        appState.connections,
+      );
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'];
+      String? rawHex;
+      if (params is List && params.isNotEmpty) {
+        final first = params[0];
+        if (first is Map) {
+          rawHex = first['message'] as String?;
+        } else if (first is String) {
+          rawHex = first;
+        }
+      } else if (params is Map) {
+        rawHex = params['message'] as String?;
+      }
+
+      if (rawHex == null || rawHex.isEmpty) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          l10n?.web3ErrorMissingParam('message') ?? '',
+        );
+      }
+
+      final messageContent = _formatSolanaMessagePayload(rawHex);
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showSignMessageModal(
+        context: context,
+        message: messageContent,
+        onMessageSigned: (pubkey, sig) async {
+          _removeActiveRequest(method);
+          await _sendResponse(
+            type: kBearbyResponseType,
+            uuid: message.uuid,
+            result: {
+              'signature': sig,
+              'publicKey': appState.account?.addr ?? pubkey,
+            },
+          );
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        },
+        onDismiss: () {
+          _removeActiveRequest(method);
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            l10n?.web3ErrorUserRejected ?? '',
+          );
+        },
+        appTitle: message.title ?? '',
+        appIcon: message.icon ?? '',
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        '$e',
+      );
+    }
+  }
+
+  Future<void> _handleSolanaSignTransaction(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState, {
+    required bool broadcast,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        l10n?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+
+    try {
+      await _ensureSolanaChain(appState);
+      await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
+      final connection = Web3Utils.findConnected(
+        currentDomain,
+        appState.connections,
+      );
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'];
+      String? txHex;
+      if (params is List && params.isNotEmpty) {
+        final first = params[0];
+        if (first is Map) {
+          txHex = first['transaction'] as String?;
+        } else if (first is String) {
+          txHex = first;
+        }
+      } else if (params is Map) {
+        txHex = params['transaction'] as String?;
+      }
+
+      if (txHex == null || txHex.isEmpty) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          l10n?.web3ErrorMissingParam('transaction') ?? '',
+        );
+      }
+
+      final cleanHex =
+          txHex.startsWith('0x') || txHex.startsWith('0X') ? txHex.substring(2) : txHex;
+      final rawTxBytes = Uint8List.fromList(hexToBytes(cleanHex));
+      final nativeToken = nativeSolanaToken(appState);
+      if (nativeToken == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.internalError,
+          l10n?.web3ErrorNoNativeToken ?? '',
+        );
+      }
+
+      final transactionRequest = buildSolanaTransactionRequestInfo(
+        rawTxBytes: rawTxBytes,
+        appState: appState,
+        broadcast: broadcast,
+        nativeToken: nativeToken,
+        title: message.title,
+        icon: message.icon,
+      );
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: transactionRequest,
+        to: appState.account?.addr ?? '',
+        token: nativeToken,
+        amount: '0',
+        onConfirm: (tx) async {
+          _removeActiveRequest(method);
+          if (broadcast) {
+            await _sendResponse(
+              type: kBearbyResponseType,
+              uuid: message.uuid,
+              result: {
+                'signature': tx.solana?.txId ?? tx.transactionHash,
+              },
+            );
+          } else {
+            await _sendResponse(
+              type: kBearbyResponseType,
+              uuid: message.uuid,
+              result: {
+                'signature': tx.solana?.signature ?? '',
+                'message': tx.solana?.message ?? '',
+                'publicKey': appState.account?.addr ?? '',
+                'txId': tx.solana?.txId ?? tx.transactionHash,
+              },
+            );
+          }
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        },
+        onDismiss: () {
+          _removeActiveRequest(method);
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            l10n?.web3ErrorUserRejectedRequest ?? '',
+          );
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        '$e',
+      );
+    }
+  }
+
+  Future<void> _handleSolanaSignAllTransactions(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        l10n?.web3ErrorRequestInProgress ?? '',
+      );
+    }
+
+    _addActiveRequest(method);
+
+    try {
+      await _ensureSolanaChain(appState);
+      await appState.syncConnections();
+      final currentDomain = await _getCurrentDomain();
+      final connection = Web3Utils.findConnected(
+        currentDomain,
+        appState.connections,
+      );
+
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          l10n?.web3ErrorNotConnected ?? '',
+        );
+      }
+
+      final params = message.payload['params'];
+      List<dynamic>? rawList;
+      if (params is List && params.isNotEmpty) {
+        final first = params[0];
+        if (first is Map && first['transactions'] is List) {
+          rawList = first['transactions'] as List<dynamic>;
+        } else if (first is List) {
+          rawList = first;
+        }
+      } else if (params is Map && params['transactions'] is List) {
+        rawList = params['transactions'] as List<dynamic>;
+      }
+
+      if (rawList == null || rawList.isEmpty) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          l10n?.web3ErrorMissingParam('transactions') ?? '',
+        );
+      }
+
+      final nativeToken = nativeSolanaToken(appState);
+      if (nativeToken == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.internalError,
+          l10n?.web3ErrorNoNativeToken ?? '',
+        );
+      }
+
+      final List<Map<String, dynamic>> signedResults = [];
+
+      for (final item in rawList) {
+        final txHex = item as String;
+        final cleanHex =
+            txHex.startsWith('0x') || txHex.startsWith('0X') ? txHex.substring(2) : txHex;
+        final rawTxBytes = Uint8List.fromList(hexToBytes(cleanHex));
+
+        final transactionRequest = buildSolanaTransactionRequestInfo(
+          rawTxBytes: rawTxBytes,
+          appState: appState,
+          broadcast: false,
+          nativeToken: nativeToken,
+          title: message.title,
+          icon: message.icon,
+        );
+
+        if (!context.mounted) {
+          _removeActiveRequest(method);
+          return;
+        }
+
+        final completer = Completer<Map<String, dynamic>?>();
+        showConfirmTransactionModal(
+          context: context,
+          tx: transactionRequest,
+          to: appState.account?.addr ?? '',
+          token: nativeToken,
+          amount: '0',
+          onConfirm: (tx) {
+            if (!completer.isCompleted) {
+              completer.complete({
+                'signature': tx.solana?.signature ?? '',
+                'message': tx.solana?.message ?? '',
+                'publicKey': appState.account?.addr ?? '',
+                'txId': tx.solana?.txId ?? tx.transactionHash,
+              });
+            }
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
+          },
+          onDismiss: () {
+            if (!completer.isCompleted) {
+              completer.complete(null);
+            }
+          },
+        );
+
+        final res = await completer.future;
+        if (res == null) {
+          _removeActiveRequest(method);
+          return _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            l10n?.web3ErrorUserRejectedRequest ?? '',
+          );
+        }
+        signedResults.add(res);
+      }
+
+      _removeActiveRequest(method);
+      await _sendResponse(
+        type: kBearbyResponseType,
+        uuid: message.uuid,
+        result: {'transactions': signedResults},
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        '$e',
+      );
+    }
+  }
+
+  Map<String, dynamic> _buildCaip25SolanaSession(String address) {
+    const mainnetScope = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
+    return {
+      'sessionScopes': {
+        mainnetScope: {
+          'accounts': ['$mainnetScope:$address'],
+          'methods': [
+            'signAndSendTransaction',
+            'signTransaction',
+            'signMessage',
+            'signIn',
+          ],
+          'notifications': ['accountsChanged'],
+          'credentials': <dynamic>[],
+        },
+      },
+    };
+  }
+
+  Future<void> _handleWalletCreateSession(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    await _ensureSolanaChain(appState);
+    await appState.syncConnections();
+    final currentDomain = await _getCurrentDomain();
+    final connection = Web3Utils.findConnected(
+      currentDomain,
+      appState.connections,
+    );
+    final addresses = await _getWalletAddresses(appState);
+
+    if (connection != null && addresses.isNotEmpty) {
+      return await _sendResponse(
+        type: kBearbyResponseType,
+        uuid: message.uuid,
+        result: _buildCaip25SolanaSession(addresses.first),
+      );
+    }
+
+    String? title = await webViewController.getTitle();
+    if (!context.mounted) return;
+
+    showAppConnectModal(
+      context: context,
+      title: message.title ?? '',
+      uuid: message.uuid,
+      iconUrl: message.icon ?? '',
+      onReject: () {
+        _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.userRejectedRequest,
+          l10n?.web3ErrorUserRejectedRequest ?? '',
+        );
+      },
+      onConfirm: (selectedIndices) async {
+        if (selectedIndices.isEmpty || addresses.isEmpty) {
+          return _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            l10n?.web3ErrorUserRejectedRequest ?? '',
+          );
+        }
+        final accountIndexes = Uint64List.fromList(selectedIndices);
+        final connectionInfo = ConnectionInfo(
+          domain: currentDomain,
+          accountIndexes: accountIndexes,
+          favicon: message.icon,
+          title: title ?? '',
+          description: message.description,
+          lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+          canReadAccounts: true,
+          canRequestSignatures: true,
+          canSuggestTokens: false,
+          canSuggestTransactions: true,
+        );
+        await createUpdateConnection(
+          walletIndex: appState.selectedWalletIndex,
+          conn: connectionInfo,
+        );
+        await appState.syncConnections();
+        final connectedAddr = filterByIndexes(addresses, accountIndexes);
+        final pubKey =
+            connectedAddr.isNotEmpty ? connectedAddr.first : addresses.first;
+        await _sendResponse(
+          type: kBearbyResponseType,
+          uuid: message.uuid,
+          result: _buildCaip25SolanaSession(pubKey),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleWalletGetSession(
+    ZilPayWeb3Message message,
+    AppState appState,
+  ) async {
+    await appState.syncConnections();
+    final currentDomain = await _getCurrentDomain();
+    final connection = Web3Utils.findConnected(
+      currentDomain,
+      appState.connections,
+    );
+    if (connection == null || appState.chain?.slip44 != kSolanaSlip44) {
+      return await _sendResponse(
+        type: kBearbyResponseType,
+        uuid: message.uuid,
+        result: {'sessionScopes': <String, dynamic>{}},
+      );
+    }
+    final addresses = await _getWalletAddresses(appState);
+    if (addresses.isEmpty) {
+      return await _sendResponse(
+        type: kBearbyResponseType,
+        uuid: message.uuid,
+        result: {'sessionScopes': <String, dynamic>{}},
+      );
+    }
+    await _sendResponse(
+      type: kBearbyResponseType,
+      uuid: message.uuid,
+      result: _buildCaip25SolanaSession(addresses.first),
+    );
+  }
+
+  Future<void> _handleWalletInvokeMethod(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final params = message.payload['params'];
+    final map = (params is List && params.isNotEmpty && params[0] is Map)
+        ? params[0] as Map
+        : (params is Map ? params : const {});
+    final request = map['request'] as Map? ?? const {};
+    final innerMethod = request['method'] as String? ?? '';
+    final innerParams = request['params'];
+
+    final syntheticPayload = <String, dynamic>{
+      ...message.payload,
+      'params': innerParams is List ? innerParams : [innerParams],
+    };
+
+    switch (innerMethod) {
+      case 'signAndSendTransaction':
+        syntheticPayload['method'] = Web3EIP1193Method.solanaSignAndSendTransaction.value;
+        return _handleSolanaSignTransaction(
+          ZilPayWeb3Message(
+            type: message.type,
+            uuid: message.uuid,
+            payload: syntheticPayload,
+            icon: message.icon,
+            title: message.title,
+            description: message.description,
+          ),
+          context,
+          appState,
+          broadcast: true,
+        );
+      case 'signTransaction':
+        syntheticPayload['method'] = Web3EIP1193Method.solanaSignTransaction.value;
+        return _handleSolanaSignTransaction(
+          ZilPayWeb3Message(
+            type: message.type,
+            uuid: message.uuid,
+            payload: syntheticPayload,
+            icon: message.icon,
+            title: message.title,
+            description: message.description,
+          ),
+          context,
+          appState,
+          broadcast: false,
+        );
+      case 'signMessage':
+      case 'signIn':
+        syntheticPayload['method'] = Web3EIP1193Method.solanaSignMessage.value;
+        return _handleSolanaSignMessage(
+          ZilPayWeb3Message(
+            type: message.type,
+            uuid: message.uuid,
+            payload: syntheticPayload,
+            icon: message.icon,
+            title: message.title,
+            description: message.description,
+          ),
+          context,
+          appState,
+        );
+      default:
+        return _proxyRpcRequest(
+          method: innerMethod,
+          uuid: message.uuid,
+          params: innerParams is List ? innerParams : null,
+          chainHash: appState.chain?.chainHash ?? BigInt.zero,
+        );
     }
   }
 }

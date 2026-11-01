@@ -14,7 +14,7 @@ pub use zilpay::{
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
 };
 
-use zilpay::proto::solana_tx::SolanaTransaction;
+use zilpay::proto::solana_tx::{normalize_solana_message, SolanaTransaction};
 
 use super::btc::BitcoinMetadataInfo;
 use super::btc::TransactionBitcoin;
@@ -64,10 +64,9 @@ impl TryFrom<TransactionRequestInfo> for TransactionRequest {
             let tx_req = TransactionRequest::Tron((req_tron_tx, value.metadata.into()));
             Ok(tx_req)
         } else if let Some(solana_msg) = value.solana {
+            let message = normalize_solana_message(&solana_msg).unwrap_or(solana_msg);
             let tx_req = TransactionRequest::Solana((
-                SolanaTransaction {
-                    message: solana_msg,
-                },
+                SolanaTransaction { message },
                 value.metadata.into(),
             ));
             Ok(tx_req)

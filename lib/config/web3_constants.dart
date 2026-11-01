@@ -16,6 +16,7 @@ final BigInt kZilliqaChainId = BigInt.one;
 // Address types
 const int kScillaAddressType = 0;
 const int kEvmAddressType = 1;
+const int kSolanaAddressType = 3;
 const int kTronAddressType = 4;
 
 // JSON-RPC
@@ -58,6 +59,7 @@ const int kDefaultExplorerStandard = 0;
 
 // Transaction EVM
 const String kEvmTransactionTitle = 'EVM Transaction';
+const String kSolanaTransactionTitle = 'Solana Transaction';
 
 // Sign message titles
 const String kSignMessageTitle = 'Sign Message';

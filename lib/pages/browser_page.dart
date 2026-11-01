@@ -172,7 +172,9 @@ class _BrowserPageState extends State<BrowserPage>
     _eip1193Handler = null;
     _tronHandler = null;
 
-    if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
+    if (slip44 == kEthereumSlip44 ||
+        slip44 == kZilliqaSlip44 ||
+        slip44 == kSolanaSlip44) {
       _eip1193Handler = Web3EIP1193Handler(
         webViewController: _webViewController!,
         appState: appState,
@@ -239,7 +241,8 @@ class _BrowserPageState extends State<BrowserPage>
   Future<void> _initializeZilPayInjection(AppState appState) async {
     try {
       if (appState.chain?.slip44 == kEthereumSlip44 ||
-          appState.chain?.slip44 == kZilliqaSlip44) {
+          appState.chain?.slip44 == kZilliqaSlip44 ||
+          appState.chain?.slip44 == kSolanaSlip44) {
         await _webViewController?.injectJavascriptFileFromAsset(
             assetFilePath: 'assets/.evm_inject.js');
       }
@@ -337,7 +340,9 @@ class _BrowserPageState extends State<BrowserPage>
             initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
             initialUserScripts: UnmodifiableListView([
               if (_evmInjectScript != null &&
-                  (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44))
+                  (slip44 == kEthereumSlip44 ||
+                      slip44 == kZilliqaSlip44 ||
+                      slip44 == kSolanaSlip44))
                 UserScript(
                   source: _evmInjectScript!,
                   injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,

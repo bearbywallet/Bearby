@@ -36,6 +36,22 @@ enum Web3EIP1193Method {
   walletScanQRCode('wallet_scanQRCode'),
   ethGetEncryptionPublicKey('eth_getEncryptionPublicKey'),
   ethDecrypt('eth_decrypt'),
+  web3ClientVersion('web3_clientVersion'),
+
+  // SOLANA & MULTICHAIN (CAIP-25 / CAIP-27)
+  solanaConnect('solana_connect'),
+  solanaRequestAccounts('solana_requestAccounts'),
+  solanaAccounts('solana_accounts'),
+  solanaDisconnect('solana_disconnect'),
+  solanaSignTransaction('solana_signTransaction'),
+  solanaSignAllTransactions('solana_signAllTransactions'),
+  solanaSignAndSendTransaction('solana_signAndSendTransaction'),
+  solanaSignMessage('solana_signMessage'),
+  solanaSignIn('solana_signIn'),
+  walletCreateSession('wallet_createSession'),
+  walletGetSession('wallet_getSession'),
+  walletRevokeSession('wallet_revokeSession'),
+  walletInvokeMethod('wallet_invokeMethod'),
 
   // TRON
   getInitProviderData('getInitProviderData'),
