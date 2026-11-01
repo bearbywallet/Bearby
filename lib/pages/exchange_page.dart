@@ -306,6 +306,15 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     final l10n = AppLocalizations.of(context)!;
     final padding = AdaptiveSize.getAdaptivePadding(context, 16);
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600 && screenWidth < 960;
+    final isDesktop = screenWidth >= 960;
+    final double maxWidth = isDesktop
+        ? 920.0
+        : isTablet
+            ? 760.0
+            : 480.0;
+
     return Scaffold(
       backgroundColor: theme.background,
       appBar: AppBar(
@@ -318,10 +327,10 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
+            constraints: BoxConstraints(maxWidth: maxWidth),
             child: Consumer<ExchangeState>(
               builder: (context, exchange, _) =>
-                  _buildBody(theme, l10n, padding, exchange),
+                  _buildBody(theme, l10n, padding, exchange, screenWidth),
             ),
           ),
         ),
@@ -329,8 +338,13 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     );
   }
 
-  Widget _buildBody(AppTheme theme, AppLocalizations l10n, double padding,
-      ExchangeState state) {
+  Widget _buildBody(
+    AppTheme theme,
+    AppLocalizations l10n,
+    double padding,
+    ExchangeState state,
+    double screenWidth,
+  ) {
     final from = state.fromAsset;
     final to = state.toAsset;
     if (!state.loadingAssets && (state.assetsError != null || from == null)) {
@@ -347,6 +361,34 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
     }
     if (from == null) return const Center(child: CircularProgressIndicator());
 
+    final isTwoColumn = screenWidth >= 720;
+
+    final cardsColumn = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildSectionLabel(theme, l10n.exchangePagePay),
+        _buildPayCard(theme, from),
+        _buildFlipRow(theme, l10n, state),
+        if (to == null)
+          _buildEmptyGetCard(theme, l10n, state)
+        else
+          _buildGetCard(theme, l10n, to, state),
+      ],
+    );
+
+    final keypadColumn = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        NumberKeyboard(
+          onKeyPressed: (value) => _onKeyPress(value.toString()),
+          onBackspace: _onBackspace,
+          onDotPress: () => _onKeyPress('.'),
+        ),
+        const SizedBox(height: 8),
+        _buildSwapButton(theme, l10n, state),
+      ],
+    );
+
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(
         physics: const BouncingScrollPhysics(),
@@ -356,26 +398,55 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
         physics: const AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              _buildSectionLabel(theme, l10n.exchangePagePay),
-              _buildPayCard(theme, from),
-              _buildFlipRow(theme, l10n, state),
-              if (to == null)
-                _buildEmptyGetCard(theme, l10n, state)
-              else
-                _buildGetCard(theme, l10n, to, state),
-              const SizedBox(height: 8),
-              NumberKeyboard(
-                onKeyPressed: (value) => _onKeyPress(value.toString()),
-                onBackspace: _onBackspace,
-                onDotPress: () => _onKeyPress('.'),
-              ),
-              _buildSwapButton(theme, l10n, state),
-              const SizedBox(height: 16),
-            ],
-          ),
+          child: isTwoColumn
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 28),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 11,
+                        child: cardsColumn,
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        flex: 9,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 24),
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    theme.textPrimary.withValues(alpha: 0.08),
+                                width: 1.1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: keypadColumn,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    cardsColumn,
+                    const SizedBox(height: 8),
+                    keypadColumn,
+                    const SizedBox(height: 28),
+                  ],
+                ),
         ),
       ),
     );
@@ -398,16 +469,23 @@ class _ExchangePageState extends State<ExchangePage> with StatusBarMixin {
   }
 
   BoxDecoration _cardDecoration(AppTheme theme) => BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(theme.cardBackground, theme.primaryPurple, 0.05)!,
+            theme.cardBackground,
+          ],
+        ),
       );
 
   /// Matches the outline [TokenAmountCard] draws for itself on the pay side.
   BoxDecoration _getCardDecoration(AppTheme theme) =>
       _cardDecoration(theme).copyWith(
         border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.2),
-          width: 1.5,
+          color: theme.textPrimary.withValues(alpha: 0.08),
+          width: 1.2,
         ),
       );
 

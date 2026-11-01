@@ -459,9 +459,14 @@ class _BrowserPageState extends State<BrowserPage>
         ? theme.textSecondary.withValues(alpha: 0.5)
         : Colors.white.withValues(alpha: 0.5);
 
-    return Center(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth >= 600;
+
+    return Align(
+      alignment: Alignment.center,
+      heightFactor: 1.0,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 450),
+        constraints: BoxConstraints(maxWidth: isWide ? 560 : 450),
         child: Container(
           height: 48,
           decoration: BoxDecoration(
@@ -566,10 +571,14 @@ class _BrowserPageState extends State<BrowserPage>
     final searchEngineIndex = appState.state.browserSettings.searchEngineIndex;
     final searchEngine = baseSearchEngines[searchEngineIndex];
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth >= 600;
 
-    return Center(
+    return Align(
+      alignment: Alignment.center,
+      heightFactor: 1.0,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 450),
+        constraints: BoxConstraints(maxWidth: isWide ? 560 : 450),
         child: ListenableBuilder(
           listenable: _searchController,
           builder: (context, _) => GlassSearchBar(
@@ -601,14 +610,23 @@ class _BrowserPageState extends State<BrowserPage>
       );
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600 && screenWidth < 960;
+    final isDesktop = screenWidth >= 960;
+    final double maxWidth = isDesktop
+        ? 920.0
+        : isTablet
+            ? 760.0
+            : double.infinity;
+
     return SingleChildScrollView(
-      padding: padding.copyWith(top: 32, bottom: 16),
+      padding: padding.copyWith(top: 24, bottom: 96),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 450),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
+            spacing: 14,
+            runSpacing: 14,
             alignment: WrapAlignment.center,
             children: connections.map((connection) {
               final url = 'https://${connection.domain}';

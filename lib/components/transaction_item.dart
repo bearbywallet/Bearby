@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/token_avatar.dart';
 import 'package:bearby/l10n/app_localizations.dart';
-import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/amount.dart';
 import 'package:bearby/mixins/history_amount.dart';
 import 'package:bearby/mixins/pressable_animation.dart';
@@ -317,23 +316,32 @@ class _HistoryItemState extends State<HistoryItem>
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  view.signedNative,
-                  style: theme.bodyText1.copyWith(
-                    color: historyAmountColor(
-                      flow: view.flow,
-                      status: view.status,
-                      theme: theme,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 185),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      view.signedNative,
+                      style: theme.bodyText1.copyWith(
+                        color: historyAmountColor(
+                          flow: view.flow,
+                          status: view.status,
+                          theme: theme,
+                        ),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    fontWeight: FontWeight.w600,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (view.fiat.isNotEmpty && view.fiat != '0') ...[
                   const SizedBox(height: 2),
                   Text(
                     view.fiat,
-                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                    style: theme.caption.copyWith(
+                      color: theme.textSecondary.withValues(alpha: 0.82),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ],
@@ -410,24 +418,57 @@ class _HistoryItemState extends State<HistoryItem>
     }
     final state = Provider.of<AppState>(context, listen: false);
     final theme = state.currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final view = _view;
+    final accent = view != null
+        ? historyAmountColor(
+            flow: view.flow,
+            status: view.status,
+            theme: theme,
+          )
+        : _getStatusColor(theme);
 
-    return Column(
-      children: [
-        buildPressable(
-          onTap: widget.onTap,
-          enableHover: true,
-          child: Padding(
-            padding: EdgeInsets.all(adaptivePadding),
-            child: view == null
-                ? _buildSignedMessageBody(state, l10n)
-                : _buildTransferBody(state, l10n, view),
+    return Padding(
+      padding: EdgeInsets.only(bottom: widget.showDivider ? 10 : 4),
+      child: buildPressable(
+        onTap: widget.onTap,
+        enableHover: true,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color.lerp(
+                  theme.cardBackground,
+                  accent,
+                  isHovered ? 0.12 : 0.05,
+                )!,
+                theme.cardBackground,
+              ],
+            ),
+            border: Border.all(
+              color: isHovered
+                  ? accent.withValues(alpha: 0.45)
+                  : theme.textPrimary.withValues(alpha: 0.07),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isHovered ? 0.14 : 0.05),
+                blurRadius: isHovered ? 12 : 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
+          child: view == null
+              ? _buildSignedMessageBody(state, l10n)
+              : _buildTransferBody(state, l10n, view),
         ),
-        if (widget.showDivider)
-          Container(height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
-      ],
+      ),
     );
   }
 }
