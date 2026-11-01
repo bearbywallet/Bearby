@@ -585,6 +585,7 @@ class _HomePageState extends State<HomePage> with StatusBarMixin {
     }
 
     return SafeArea(
+      bottom: false,
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),

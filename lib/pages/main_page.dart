@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:bearby/components/app_icon.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import '../components/bottom_nav_bar.dart';
 import '../state/app_state.dart';
 
@@ -68,6 +69,8 @@ class MainPageState extends State<MainPage> {
       statusBarBrightness: statusBarBrightness,
     );
 
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       extendBody: true,
       body: SafeArea(
@@ -85,10 +88,22 @@ class MainPageState extends State<MainPage> {
       bottomNavigationBar: SafeArea(
         child: CustomBottomNavigationBar(
           items: [
-            const CustomBottomNavigationBarItem(icon: AppIcon.wallet),
-            const CustomBottomNavigationBarItem(icon: AppIcon.history),
-            const CustomBottomNavigationBarItem(icon: AppIcon.exchange),
-            const CustomBottomNavigationBarItem(icon: AppIcon.compass),
+            CustomBottomNavigationBarItem(
+              icon: AppIcon.wallet,
+              label: l10n?.notificationsSettingsPageWalletPrefix,
+            ),
+            CustomBottomNavigationBarItem(
+              icon: AppIcon.history,
+              label: l10n?.addressSelectModalContentHistory,
+            ),
+            CustomBottomNavigationBarItem(
+              icon: AppIcon.exchange,
+              label: l10n?.exchangePageTabSwap,
+            ),
+            CustomBottomNavigationBarItem(
+              icon: AppIcon.compass,
+              label: l10n?.settingsPageBrowser,
+            ),
           ],
           currentIndex: widget.shell.currentIndex,
           onTap: _onItemTapped,
