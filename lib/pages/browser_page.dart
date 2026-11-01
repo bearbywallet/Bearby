@@ -1,12 +1,12 @@
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:bearby/components/browser_control_bar.dart';
 import 'package:bearby/components/hover_icon.dart';
 import 'package:bearby/components/app_icon.dart';
 import 'package:bearby/components/image_cache.dart';
@@ -17,7 +17,6 @@ import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/mixins/adaptive_size.dart';
 import 'package:bearby/mixins/status_bar.dart';
-import 'package:bearby/modals/browser_action_modal.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
@@ -100,36 +99,6 @@ class _BrowserPageState extends State<BrowserPage>
     super.dispose();
   }
 
-  void _showBrowserMenu() {
-    final isConnected =
-        _legacyHandler?.isConnected ?? _eip1193Handler?.isConnected ?? false;
-    final appState = Provider.of<AppState>(context, listen: false);
-
-    showBrowserActionModal(
-      context: context,
-      isConnected: isConnected,
-      urlBarTop: appState.browserUrlBarTop,
-      onUrlBarPositionChanged: (value) => appState.setBrowserUrlBarTop(value),
-      onRefresh: () => _webViewController?.reload(),
-      onCopyLink: () async {
-        final url = await _webViewController?.getUrl();
-        if (url != null) {
-          await Clipboard.setData(ClipboardData(text: url.toString()));
-        }
-      },
-      onShare: () async {
-        final url = await _webViewController?.getUrl();
-        if (url != null) {
-          SharePlus.instance.share(
-            ShareParams(
-              text: _currentUrl,
-            ),
-          );
-        }
-      },
-    );
-  }
-
   void _handleSearch(String value) {
     if (value.isEmpty) return;
 
@@ -162,18 +131,33 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   void _openWebView(String url) {
+    final wasVisible = _isWebViewVisible;
     setState(() {
       _currentUrl = url;
       _searchController.text = url;
       _isWebViewVisible = true;
     });
+    if (wasVisible && _webViewController != null) {
+      _webViewController!.loadUrl(
+        urlRequest: URLRequest(url: WebUri(url)),
+      );
+    }
   }
 
   bool isDomainName(String input) {
-    final domainPart = input.split(':')[0];
+    if (input.contains(' ')) return false;
+    final hostPart = input
+        .split('/')
+        .first
+        .split('?')
+        .first
+        .split('#')
+        .first
+        .split(':')
+        .first;
     final domainRegex = RegExp(
         r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$');
-    return domainRegex.hasMatch(domainPart);
+    return domainRegex.hasMatch(hostPart);
   }
 
   void _setupJavaScriptHandlers() {
@@ -292,11 +276,9 @@ class _BrowserPageState extends State<BrowserPage>
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
+    final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final urlBarTop = appState.browserUrlBarTop && _isWebViewVisible;
-    final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -324,14 +306,7 @@ class _BrowserPageState extends State<BrowserPage>
               ],
             ),
           ),
-          if (_isWebViewVisible)
-            Positioned(
-              top: urlBarTop ? topPadding + 8 : null,
-              bottom: !urlBarTop ? bottomPadding + 8 : null,
-              left: 8,
-              right: 8,
-              child: _buildBrowserControls(theme),
-            ),
+          if (_isWebViewVisible) _buildBrowserControls(appState),
           if (!_isWebViewVisible)
             Positioned(
               bottom: bottomPadding + 8,
@@ -443,126 +418,64 @@ class _BrowserPageState extends State<BrowserPage>
     );
   }
 
-  Widget _buildBrowserControls(AppTheme theme) {
-    final isDark = theme.value == "Dark";
-    final glassColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.4);
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.2)
-        : Colors.white.withValues(alpha: 0.3);
-    final shadowColor = isDark
-        ? Colors.black.withValues(alpha: 0.15)
-        : Colors.black.withValues(alpha: 0.2);
-    final iconColor = isDark ? theme.textPrimary : Colors.white;
-    final iconDisabledColor = isDark
-        ? theme.textSecondary.withValues(alpha: 0.5)
-        : Colors.white.withValues(alpha: 0.5);
+  Widget _buildBrowserControls(AppState appState) {
+    final isConnected = _legacyHandler?.isConnected ??
+        _eip1193Handler?.isConnected ??
+        _tronHandler?.isConnected ??
+        false;
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWide = screenWidth >= 600;
-
-    return Align(
-      alignment: Alignment.center,
-      heightFactor: 1.0,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: isWide ? 560 : 450),
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: glassColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: borderColor,
-              width: 1.5,
+    return BrowserControlBar(
+      controller: _searchController,
+      onSubmitted: _handleSearch,
+      currentUrl: _currentUrl,
+      canGoBack: _canGoBack,
+      canGoForward: _canGoForward,
+      isLoading: _isLoading,
+      progress: _progress,
+      isConnected: isConnected,
+      urlBarTop: appState.browserUrlBarTop,
+      onBack: () => _webViewController?.goBack(),
+      onForward: () => _webViewController?.goForward(),
+      onRefresh: () => _webViewController?.reload(),
+      onCopyLink: () async {
+        final url = await _webViewController?.getUrl();
+        final text = url?.toString() ?? _currentUrl;
+        if (text.isNotEmpty) {
+          await Clipboard.setData(ClipboardData(text: text));
+        }
+      },
+      onShare: () async {
+        final url = await _webViewController?.getUrl();
+        final text = url?.toString() ?? _currentUrl;
+        if (text.isNotEmpty) {
+          SharePlus.instance.share(
+            ShareParams(
+              text: text,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(23),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Row(
-                children: [
-                  HoverIcon(
-                    icon: AppIcon.arrowLeft,
-                    onTap:
-                        _canGoBack ? () => _webViewController?.goBack() : () {},
-                    color: _canGoBack ? iconColor : iconDisabledColor,
-                    size: 24,
-                  ),
-                  HoverIcon(
-                    icon: AppIcon.arrowRight,
-                    onTap: _canGoForward
-                        ? () => _webViewController?.goForward()
-                        : () {},
-                    color: _canGoForward ? iconColor : iconDisabledColor,
-                    size: 24,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onSubmitted: _handleSearch,
-                      style: theme.bodyText1.copyWith(
-                        color: isDark ? theme.textPrimary : Colors.white,
-                        fontSize: 14,
-                      ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                      autocorrect: false,
-                      enableSuggestions: false,
-                    ),
-                  ),
-                  HoverIcon(
-                    icon: AppIcon.dots,
-                    onTap: _showBrowserMenu,
-                    color: iconColor,
-                    size: 24,
-                  ),
-                  HoverIcon(
-                    icon: AppIcon.close,
-                    onTap: () async {
-                      setState(() {
-                        _isWebViewVisible = false;
-                        _searchController.text = "";
-                        _searchController.clear();
-                      });
+          );
+        }
+      },
+      onUrlBarPositionChanged: (value) => appState.setBrowserUrlBarTop(value),
+      onClose: () {
+        setState(() {
+          _isWebViewVisible = false;
+          _webViewController = null;
+          _searchController.text = "";
+          _searchController.clear();
+        });
 
-                      try {
-                        _legacyHandler?.dispose();
-                      } catch (e) {
-                        //
-                      }
+        try {
+          _legacyHandler?.dispose();
+        } catch (_) {}
 
-                      try {
-                        _eip1193Handler?.dispose();
-                      } catch (e) {
-                        //
-                      }
-                      try {
-                        _tronHandler?.dispose();
-                      } catch (e) {
-                        //
-                      }
-                    },
-                    color: iconColor,
-                    size: 24,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+        try {
+          _eip1193Handler?.dispose();
+        } catch (_) {}
+
+        try {
+          _tronHandler?.dispose();
+        } catch (_) {}
+      },
     );
   }
 
