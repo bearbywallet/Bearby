@@ -28,6 +28,9 @@ class BleManager(private val context: Context) {
     private val bleScanner by lazy { bluetoothAdapter?.bluetoothLeScanner }
     private val transports = ConcurrentHashMap<String, BleTransport>()
 
+    @Volatile
+    private var activeScanCallback: ScanCallback? = null
+
     private fun checkPermissions(): Boolean {
         val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
@@ -81,16 +84,20 @@ class BleManager(private val context: Context) {
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .build()
 
+            activeScanCallback = scanCallback
             bleScanner?.startScan(filters, settings, scanCallback)
-            awaitClose { bleScanner?.stopScan(scanCallback) }
+            awaitClose {
+                bleScanner?.stopScan(scanCallback)
+                activeScanCallback = null
+            }
         }
     }
 
     fun stopScan() {
-        // Was an empty no-op: the scan kept running until the Dart-side
-        // callbackFlow was cancelled. Stop the radio scan explicitly so both
-        // platforms behave the same (parity with BleManager.swift.stopScan).
-        bleScanner?.stopScan()
+        // Stop the radio scan explicitly so both platforms behave the same
+        // (parity with BleManager.swift.stopScan). Android's stopScan requires
+        // the callback that started the scan.
+        activeScanCallback?.let { bleScanner?.stopScan(it) }
     }
 
     suspend fun open(deviceId: String) {
