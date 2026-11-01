@@ -41,6 +41,19 @@ Future<void> addLedgerAccount(
 Future<Uint32List> ledgerSplitPath({required String path}) =>
     RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
 
+Future<String> ledgerSolanaPubkeyToAddress({required List<int> pubkey}) =>
+    RustLib.instance.api
+        .crateApiLedgerLedgerSolanaPubkeyToAddress(pubkey: pubkey);
+
+Future<Uint8List> ledgerSolanaPrepareOffchainMessage(
+        {required List<int> message,
+        Uint8List? signerPubkey,
+        String? signerAddress}) =>
+    RustLib.instance.api.crateApiLedgerLedgerSolanaPrepareOffchainMessage(
+        message: message,
+        signerPubkey: signerPubkey,
+        signerAddress: signerAddress);
+
 class LedgerParamsInput {
   final List<(int, String)> pubKeys;
   final BigInt walletIndex;

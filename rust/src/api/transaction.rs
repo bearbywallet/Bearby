@@ -133,7 +133,7 @@ pub async fn send_signed_transactions(
     sig: Vec<u8>,
     btc_rotate_xpub: Option<String>,
 ) -> Result<HistoricalTransactionInfo, String> {
-    let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+    let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
     let wallet_index = wallet_index as usize;
     let account_index = account_index as usize;
 
@@ -153,20 +153,33 @@ pub async fn send_signed_transactions(
     let sender_account = wallet_data
         .get_account(account_index)
         .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+    if let TransactionRequest::Solana((_, ref mut metadata)) = tx {
+        if metadata.signer.is_none() {
+            metadata.signer = Some(sender_account.addr.clone());
+        }
+    }
     let signed_tx = tx
         .with_signature(sig, sender_account.pub_key.as_ref())
         .map_err(ServiceError::TransactionErrors)?;
 
-    let receipt = core
-        .broadcast_signed_transactions(wallet_index, vec![signed_tx])
-        .await
-        .map_err(ServiceError::BackgroundError)?
-        .into_iter()
-        .next()
-        .map(|v| v.into())
-        .ok_or(ServiceError::TransactionErrors(
-            zilpay::errors::tx::TransactionErrors::InvalidTxHash,
-        ))?;
+    let receipt = if signed_tx.get_metadata().broadcast {
+        core.broadcast_signed_transactions(wallet_index, vec![signed_tx])
+            .await
+            .map_err(ServiceError::BackgroundError)?
+            .into_iter()
+            .next()
+            .map(|v| v.into())
+            .ok_or(ServiceError::TransactionErrors(
+                zilpay::errors::tx::TransactionErrors::InvalidTxHash,
+            ))?
+    } else {
+        let history = HistoricalTransaction::from_transaction_receipt(signed_tx)
+            .map_err(ServiceError::TransactionErrors)?;
+        wallet
+            .add_history(std::slice::from_ref(&history))
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        history.into()
+    };
 
     let is_btc = matches!(sender_account.addr, Address::Secp256k1Bitcoin(_));
     let is_btc_bip = wallet_data.bip == DerivationPath::BIP84_PURPOSE

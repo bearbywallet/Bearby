@@ -8,15 +8,18 @@
 // When a PROOF/MIRROR test goes green after a bugfix, update the test.
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:bearby/ledger/common.dart';
 import 'package:bearby/ledger/ethereum/eth_ledger_app.dart';
 import 'package:bearby/ledger/models/device_model.dart';
+import 'package:bearby/ledger/solana/solana_ledger_app.dart';
 import 'package:bearby/ledger/transport/exceptions.dart';
 import 'package:bearby/ledger/transport/transport.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
+import 'package:bearby/src/rust/frb_generated.dart';
+import 'package:bearby/utils/utils.dart';
 
 // Minimal GuardedTransport double for the shared-guard regression tests.
 class _GuardedFakeTransport extends GuardedTransport {
@@ -288,5 +291,172 @@ void main() {
       reason: 'before the refactor, close() vs new exchange raced: the '
               'closed flag did not exist. Now late callers fail fast.',
     );
+  });
+
+  test('REAL: SolanaLedgerApp.getAppConfiguration parses 5-byte response',
+      () async {
+    final fake = FakeTransport(
+      responder: (_) => _withSw([0x01, 0x00, 0x01, 0x04, 0x02]),
+    );
+    final app = SolanaLedgerApp(fake);
+    final config = await app.getAppConfiguration();
+    expect(config, isNotNull);
+    expect(config!.blindSigningEnabled, isTrue);
+    expect(config.pubkeyDisplayMode, equals('long'));
+    expect(config.version, equals('1.4.2'));
+    expect(
+      fake.sentApdus.single,
+      equals(Uint8List.fromList([0xe0, 0x04, 0x00, 0x00, 0x00])),
+    );
+  });
+
+  test('REAL: SolanaLedgerApp validates negative indices and empty payloads',
+      () async {
+    final fake = FakeTransport();
+    final app = SolanaLedgerApp(fake);
+
+    expect(
+      SolanaLedgerApp.defaultDerivationPath(0),
+      equals("44'/501'/0'/0'"),
+    );
+    expect(
+      () => SolanaLedgerApp.defaultDerivationPath(-1),
+      throwsA(isA<ArgumentError>()),
+    );
+    await expectLater(
+      app.getAddress(index: -1),
+      throwsA(isA<ArgumentError>()),
+    );
+    await expectLater(
+      app.signTransaction(index: 0, txBytes: Uint8List(0)),
+      throwsA(isA<ArgumentError>()),
+    );
+    await expectLater(
+      app.signOffchainMessage(index: 0, message: Uint8List(0)),
+      throwsA(isA<ArgumentError>()),
+    );
+    await expectLater(
+      app.signPersonalMessage(index: 0, message: ''),
+      throwsA(isA<ArgumentError>()),
+    );
+    expect(fake.sentApdus, isEmpty);
+  });
+
+  group('REAL FFI: SolanaLedgerApp matches @ledgerhq/hw-app-solana vectors',
+      () {
+    var ffiReady = false;
+
+    setUpAll(() async {
+      final dylibFile = File('rust/target/debug/librust_lib_zilpay.dylib');
+      if (dylibFile.existsSync()) {
+        await RustLib.init(
+          externalLibrary: ExternalLibrary.open(dylibFile.path),
+        );
+        ffiReady = true;
+      }
+    });
+
+    test('getAddress matches ledgerjs hw-app-solana APDU and base58 address',
+        () async {
+      if (!ffiReady) return;
+
+      final pubKeyBytes = hexToBytes(
+        '4d65a10662b9759d62bb59048366705454654cf4f9b4b3525cf314429e46c691',
+      );
+      final fake = FakeTransport(
+        responder: (_) => _withSw(pubKeyBytes),
+      );
+      final app = SolanaLedgerApp(fake);
+
+      final account = await app.getAddress(
+        index: 26,
+        path: "44'/501'/26/0/0",
+      );
+
+      expect(
+        bytesToHex(fake.sentApdus.single),
+        equals(
+          'e005000015058000002c800001f58000001a8000000080000000',
+        ),
+      );
+      expect(
+        account.publicKey,
+        equals(
+          '4d65a10662b9759d62bb59048366705454654cf4f9b4b3525cf314429e46c691',
+        ),
+      );
+      expect(account.address, isNotEmpty);
+      expect(account.index, equals(26));
+    });
+
+    test(
+        'signPersonalMessage builds 85-byte V0 offchain header with signer pubkey',
+        () async {
+      if (!ffiReady) return;
+
+      const pkHex =
+          '4d65a10662b9759d62bb59048366705454654cf4f9b4b3525cf314429e46c691';
+      const sigHex =
+          '8c28fb3eed7ccd6fb8ee3dde3dc0fb8e3fb3ca16df4339eb7fb3ca16df4339eb'
+          '8c28fb3eed7ccd6fb8ee3dde3dc0fb8e3fb3ca16df4339eb7fb3ca16df4339eb';
+      final fake = FakeTransport(
+        responder: (_) => _withSw(hexToBytes(sigHex)),
+      );
+      final app = SolanaLedgerApp(fake);
+
+      final sig = await app.signPersonalMessage(
+        index: 26,
+        message: 'Long Off-Chain Test Message.',
+        path: "44'/501'/26/0/0",
+        signerPubkey: hexToBytes(pkHex),
+      );
+
+      expect(
+        bytesToHex(fake.sentApdus.single),
+        equals(
+          'e007010087'
+          '01058000002c800001f58000001a8000000080000000'
+          'ff736f6c616e61206f6666636861696e'
+          '00'
+          '0000000000000000000000000000000000000000000000000000000000000000'
+          '00'
+          '01'
+          '$pkHex'
+          '1c00'
+          '4c6f6e67204f66662d436861696e2054657374204d6573736167652e',
+        ),
+      );
+      expect(sig, equals(sigHex));
+    });
+
+    test('signTransaction chunks oversized payload with P2_MORE & P2_EXTEND',
+        () async {
+      if (!ffiReady) return;
+
+      final expectedSig = Uint8List.fromList(List<int>.filled(64, 0xab));
+      var callCount = 0;
+      final fake = FakeTransport(
+        responder: (apdu) {
+          callCount += 1;
+          final p2 = apdu[3];
+          if ((p2 & 0x02) != 0) {
+            return Uint8List.fromList([0x90, 0x00]);
+          }
+          return _withSw(expectedSig);
+        },
+      );
+      final app = SolanaLedgerApp(fake);
+
+      final bigTx = Uint8List.fromList(List<int>.generate(600, (i) => i & 0xff));
+      final sig = await app.signTransaction(index: 0, txBytes: bigTx);
+
+      expect(sig, equals(expectedSig));
+      expect(callCount, equals(3));
+      expect(fake.sentApdus[0][1], equals(0x06));
+      expect(fake.sentApdus[0][2], equals(0x01));
+      expect(fake.sentApdus[0][3], equals(0x02)); // P2_MORE
+      expect(fake.sentApdus[1][3], equals(0x03)); // P2_EXTEND | P2_MORE
+      expect(fake.sentApdus[2][3], equals(0x01)); // P2_EXTEND
+    });
   });
 }

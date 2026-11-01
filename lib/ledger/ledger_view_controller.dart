@@ -15,6 +15,7 @@ import 'package:bearby/ledger/transport/hid_transport.dart';
 import 'package:bearby/ledger/transport/rust_ble_transport.dart';
 import 'package:bearby/ledger/transport/rust_hid_transport.dart';
 import 'package:bearby/ledger/transport/transport.dart';
+import 'package:bearby/ledger/solana/solana_ledger_app.dart';
 import 'package:bearby/ledger/tron/tron_ledger_app.dart';
 import 'package:bearby/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:bearby/mixins/eip712.dart';
@@ -43,6 +44,7 @@ enum LedgerAppType {
   ethereum,
   tron,
   bitcoin,
+  solana,
 }
 
 class LedgerAppDetectionError implements Exception {
@@ -81,8 +83,11 @@ class LedgerViewController extends ChangeNotifier {
   bool get isEthApp => _detectedAppType == LedgerAppType.ethereum;
   bool get isTronApp => _detectedAppType == LedgerAppType.tron;
   bool get isBtcApp => _detectedAppType == LedgerAppType.bitcoin;
+  bool get isSolanaApp => _detectedAppType == LedgerAppType.solana;
   BtcLedgerApp? get btcApp =>
       _connectedTransport == null ? null : BtcLedgerApp(_connectedTransport!);
+  SolanaLedgerApp? get solanaApp =>
+      _connectedTransport == null ? null : SolanaLedgerApp(_connectedTransport!);
 
   Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
@@ -356,6 +361,14 @@ class LedgerViewController extends ChangeNotifier {
       );
 
       return Uint8List.fromList(finalized.psbtBytes);
+    } else if (transaction.solana != null) {
+      final solanaApp = SolanaLedgerApp(_connectedTransport!);
+      return await solanaApp.signTransactionRequest(
+        transaction: transaction,
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        ledgerIndex: account.index.toInt(),
+      );
     } else {
       throw ArgumentError.value(
           bipPurpose, 'bipPurpose', 'unsupported purpose for BTC signing');
@@ -415,6 +428,13 @@ class LedgerViewController extends ChangeNotifier {
         index: account.index.toInt(),
       );
       sig = sigBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    } else if (slip44 == kSolanaSlip44) {
+      final solanaApp = SolanaLedgerApp(_connectedTransport!);
+      sig = await solanaApp.signPersonalMessage(
+        index: account.index.toInt(),
+        message: message,
+        signerAddress: account.addr,
+      );
     } else {
       // Effective Dart: only throw Error/Exception subtypes - a bare String
       // throw would bypass `on Exception` handlers and crash the app.
@@ -461,6 +481,19 @@ class LedgerViewController extends ChangeNotifier {
     } catch (_) {}
 
     try {
+      final solanaApp = SolanaLedgerApp(_connectedTransport!);
+      final config = await solanaApp.getAppConfiguration();
+      if (config != null) {
+        final account = await solanaApp.getAddress(index: 0);
+        if (account.address.isNotEmpty) {
+          _detectedAppType = LedgerAppType.solana;
+          notifyListeners();
+          return LedgerAppType.solana;
+        }
+      }
+    } catch (_) {}
+
+    try {
       final ethApp = EthLedgerApp(_connectedTransport!);
       final config = await ethApp.getAppConfiguration();
       if (config != null) {
@@ -473,7 +506,7 @@ class LedgerViewController extends ChangeNotifier {
     _detectedAppType = LedgerAppType.unknown;
     notifyListeners();
     throw LedgerAppDetectionError(
-        'Failed to detect Ledger app. Please open Zilliqa, Ethereum, Tron, or Bitcoin app on your Ledger device.');
+        'Failed to detect Ledger app. Please open Zilliqa, Ethereum, Tron, Bitcoin, or Solana app on your Ledger device.');
   }
 
   Future<List<LedgerAccount>> getAccounts({
@@ -510,6 +543,10 @@ class LedgerViewController extends ChangeNotifier {
         indices: indices,
         bipPurpose: bipPurpose,
       );
+    } else if (_detectedAppType == LedgerAppType.solana &&
+        slip44 == kSolanaSlip44) {
+      final solanaApp = SolanaLedgerApp(_connectedTransport!);
+      accounts = await solanaApp.getAccounts(indices: indices);
     } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       accounts = await evmApp.getAccounts(

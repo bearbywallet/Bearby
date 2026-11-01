@@ -17,6 +17,7 @@ import 'package:bearby/modals/swich_chain_modal.dart';
 import 'package:bearby/modals/transfer.dart';
 import 'package:bearby/modals/watch_asset_modal.dart';
 import 'package:bearby/src/rust/api/connections.dart';
+import 'package:bearby/src/rust/api/ledger.dart';
 import 'package:bearby/src/rust/api/provider.dart';
 import 'package:bearby/src/rust/api/token.dart';
 import 'package:bearby/src/rust/api/utils.dart';
@@ -24,8 +25,10 @@ import 'package:bearby/src/rust/api/wallet.dart';
 import 'package:bearby/src/rust/models/connection.dart';
 import 'package:bearby/src/rust/models/ftoken.dart';
 import 'package:bearby/src/rust/models/provider.dart';
+import 'package:bearby/mixins/wallet_type.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/utils/networks_loader.dart';
+import 'package:bearby/utils/utils.dart' show bytesToHex;
 import 'package:bearby/web3/message.dart';
 import 'dart:developer' as dev;
 
@@ -2044,12 +2047,31 @@ class Web3EIP1193Handler {
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           _removeActiveRequest(method);
+          final rawHexStr = rawHex ?? '';
+          final cleanRawHex =
+              rawHexStr.startsWith('0x') || rawHexStr.startsWith('0X')
+                  ? rawHexStr.substring(2)
+                  : rawHexStr;
+          var signedMessageHex = cleanRawHex;
+          final isLedger = appState.wallet?.walletType
+                  .contains(WalletType.ledger.name) ??
+              false;
+          if (isLedger && cleanRawHex.isNotEmpty) {
+            try {
+              final offchainBytes = await ledgerSolanaPrepareOffchainMessage(
+                message: hexToBytes(cleanRawHex),
+                signerAddress: appState.account?.addr ?? pubkey,
+              );
+              signedMessageHex = bytesToHex(offchainBytes);
+            } catch (_) {}
+          }
           await _sendResponse(
             type: kBearbyResponseType,
             uuid: message.uuid,
             result: {
               'signature': sig,
               'publicKey': appState.account?.addr ?? pubkey,
+              'signedMessage': signedMessageHex,
             },
           );
           if (context.mounted) {

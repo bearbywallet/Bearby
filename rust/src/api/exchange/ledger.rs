@@ -103,7 +103,9 @@ pub async fn finalize_exchange_swap(
             display.out_token,
         )
         .await?;
-    if provider.is_relay() && finalized.tron.is_some() {
+    if provider.is_relay()
+        && (finalized.tron.is_some() || finalized.solana.is_some() || finalized.btc.is_some())
+    {
         return Ok(finalized);
     }
     if finalized.evm.is_none() && finalized.scilla.is_none() && finalized.cow_order.is_some() {
@@ -144,6 +146,9 @@ pub async fn estimate_swap_base_nonce(
         zilpay::proto::address::Address::Secp256k1Sha256(_) => {
             estimate_zil_params(&core, chain_hash, &signer).await?
         }
+        zilpay::proto::address::Address::Ed25519Solana(_)
+        | zilpay::proto::address::Address::Secp256k1Tron(_)
+        | zilpay::proto::address::Address::Secp256k1Bitcoin(_) => return Ok(0),
         _ => estimate_fast_params(&core, chain_hash, &signer).await?,
     };
 
