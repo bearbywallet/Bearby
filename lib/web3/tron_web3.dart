@@ -475,7 +475,7 @@ class TronWeb3Handler {
           );
           _removeActiveRequest(method);
         },
-        appTitle: "",
+        appTitle: message.title ?? '',
         appIcon: message.icon ?? '',
       );
     } catch (e) {
@@ -1109,7 +1109,7 @@ class TronWeb3Handler {
           );
           _removeActiveRequest(method);
         },
-        appTitle: '',
+        appTitle: message.title ?? '',
         appIcon: message.icon ?? '',
       );
     } catch (e) {
