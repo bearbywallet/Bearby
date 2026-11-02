@@ -19,7 +19,7 @@ dependencies:
   local_auth: ^3.0.0
   device_info_plus: ^13.1.0
   package_info_plus: ^10.1.0
-  permission_handler: ^13.0.1
+  permission_handler: ^12.0.1
   url_launcher: ^6.3.2
   mobile_scanner: ^7.0.1
   share_plus: ^13.1.0
@@ -29,6 +29,7 @@ dependencies:
   go_router: ^18.0.1
   intl: ^0.20.2
   freezed_annotation: ^3.1.0
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
@@ -42,6 +43,7 @@ dev_dependencies:
 
 flutter:
   generate: true
+  uses-material-design: true
   assets:
     - assets/icons/
     - assets/imgs/
