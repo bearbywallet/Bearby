@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.20'
     }
 }
 
@@ -26,7 +26,7 @@ subprojects {
     configurations.all {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'org.jetbrains.kotlin') {
-                details.useVersion "2.3.0"
+                details.useVersion "2.3.20"
             }
         }
     }

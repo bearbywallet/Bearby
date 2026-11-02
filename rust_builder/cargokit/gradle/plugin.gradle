@@ -57,26 +57,28 @@ abstract class CargoKitBuildTask extends DefaultTask {
         def rootProjectDir = project.rootProject.projectDir
         
         if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-            project.exec {
-                commandLine 'chmod', '+x', path
-            }
+            new File(path.toString()).setExecutable(true)
         }
-        
-        project.exec {
-            executable path
-            args "build-gradle"
-            environment "CARGOKIT_ROOT_PROJECT_DIR", rootProjectDir
-            environment "CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/build_tool"
-            environment "CARGOKIT_MANIFEST_DIR", manifestDir
-            environment "CARGOKIT_CONFIGURATION", buildMode
-            environment "CARGOKIT_TARGET_TEMP_DIR", buildDir
-            environment "CARGOKIT_OUTPUT_DIR", outputDir
-            environment "CARGOKIT_NDK_VERSION", ndkVersion
-            environment "CARGOKIT_SDK_DIR", sdkDirectory
-            environment "CARGOKIT_COMPILE_SDK_VERSION", compileSdkVersion
-            environment "CARGOKIT_MIN_SDK_VERSION", minSdkVersion
-            environment "CARGOKIT_TARGET_PLATFORMS", targetPlatforms.join(",")
-            environment "CARGOKIT_JAVA_HOME", System.properties['java.home']
+
+        // project.exec was removed in Gradle 9; use ProcessBuilder instead.
+        def pb = new ProcessBuilder([path.toString(), "build-gradle"])
+        def env = pb.environment()
+        env.put("CARGOKIT_ROOT_PROJECT_DIR", rootProjectDir.toString())
+        env.put("CARGOKIT_TOOL_TEMP_DIR", "${buildDir}/build_tool".toString())
+        env.put("CARGOKIT_MANIFEST_DIR", manifestDir.toString())
+        env.put("CARGOKIT_CONFIGURATION", buildMode.toString())
+        env.put("CARGOKIT_TARGET_TEMP_DIR", buildDir.toString())
+        env.put("CARGOKIT_OUTPUT_DIR", outputDir.toString())
+        env.put("CARGOKIT_NDK_VERSION", ndkVersion.toString())
+        env.put("CARGOKIT_SDK_DIR", sdkDirectory.toString())
+        env.put("CARGOKIT_COMPILE_SDK_VERSION", compileSdkVersion.toString())
+        env.put("CARGOKIT_MIN_SDK_VERSION", minSdkVersion.toString())
+        env.put("CARGOKIT_TARGET_PLATFORMS", targetPlatforms.join(","))
+        env.put("CARGOKIT_JAVA_HOME", System.properties['java.home'].toString())
+        pb.inheritIO()
+        def exitCode = pb.start().waitFor()
+        if (exitCode != 0) {
+            throw new GradleException("cargokit build-gradle failed with exit code ${exitCode}")
         }
     }
 }
