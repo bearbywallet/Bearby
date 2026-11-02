@@ -13,6 +13,12 @@ class MnemonicWordInput extends StatefulWidget {
   final MnemonicValidation validation;
   final double opacity;
   final Function(int, String)? onChanged;
+  final bool compact;
+  final bool isActive;
+  final bool obscureWhenUnfocused;
+  final VoidCallback? onTap;
+  final ValueChanged<int>? onFocusIndex;
+  final ValueChanged<int>? onNextRequested;
 
   const MnemonicWordInput({
     super.key,
@@ -23,6 +29,12 @@ class MnemonicWordInput extends StatefulWidget {
     this.isEditable = false,
     this.hasError = false,
     this.validation = MnemonicValidation.none,
+    this.compact = false,
+    this.isActive = false,
+    this.obscureWhenUnfocused = true,
+    this.onTap,
+    this.onFocusIndex,
+    this.onNextRequested,
   });
 
   @override
@@ -34,6 +46,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
   late FocusNode _focusNode;
   bool _shouldUpdateText = true;
   bool _isObscured = true;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -41,15 +54,22 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
     _controller = TextEditingController(text: widget.word);
     _focusNode = FocusNode();
     _focusNode.addListener(_handleFocusChange);
-    _isObscured = widget.isEditable;
+    _isObscured = widget.isEditable && widget.obscureWhenUnfocused;
   }
 
   void _handleFocusChange() {
+    final focused = _focusNode.hasFocus;
+    if (focused) {
+      widget.onFocusIndex?.call(widget.index - 1);
+    }
     if (widget.isEditable) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
-            _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
+            _hasFocus = focused;
+            _isObscured = widget.obscureWhenUnfocused &&
+                !focused &&
+                _controller.text.isNotEmpty;
           });
         }
       });
@@ -64,8 +84,23 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
 
     if (shouldForceUpdate) {
       _controller.text = widget.word;
-      _isObscured =
-          widget.isEditable && !_focusNode.hasFocus && widget.word.isNotEmpty;
+      _controller.selection = TextSelection.collapsed(
+        offset: _controller.text.length,
+      );
+      _isObscured = widget.isEditable &&
+          widget.obscureWhenUnfocused &&
+          !_focusNode.hasFocus &&
+          widget.word.isNotEmpty;
+    }
+
+    if (widget.isActive && !oldWidget.isActive && widget.isEditable) {
+      if (!_focusNode.hasFocus) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && widget.isActive && !_focusNode.hasFocus) {
+            _focusNode.requestFocus();
+          }
+        });
+      }
     }
     _shouldUpdateText = true;
   }
@@ -80,6 +115,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
 
   Color _getBorderColor(AppTheme theme) {
     if (widget.hasError) return theme.danger;
+    if (_hasFocus || widget.isActive) return theme.primaryPurple;
     switch (widget.validation) {
       case MnemonicValidation.valid:
         return theme.success;
@@ -94,7 +130,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
     if (widget.hasError) return theme.danger;
     switch (widget.validation) {
       case MnemonicValidation.valid:
-        return theme.success;
+        return theme.textPrimary;
       case MnemonicValidation.invalid:
         return theme.danger;
       case MnemonicValidation.none:
@@ -106,9 +142,90 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final textColor = _getTextColor(theme);
-    final hasValidation =
-        widget.hasError || widget.validation != MnemonicValidation.none;
-    final borderColor = hasValidation ? _getBorderColor(theme) : null;
+    final activeOrFocused = _hasFocus || widget.isActive;
+    final hasValidation = widget.hasError ||
+        activeOrFocused ||
+        widget.validation != MnemonicValidation.none;
+    final borderColor = _getBorderColor(theme);
+
+    if (widget.compact) {
+      return GestureDetector(
+        onTap: widget.onTap ??
+            (widget.isEditable ? () => _focusNode.requestFocus() : null),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 10),
+          decoration: BoxDecoration(
+            color: theme.cardBackground.withValues(alpha: 0.75 * widget.opacity),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: activeOrFocused
+                  ? theme.primaryPurple.withValues(alpha: 0.8)
+                  : widget.hasError
+                      ? theme.danger.withValues(alpha: 0.7)
+                      : Colors.transparent,
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            children: [
+              Text(
+                '${widget.index}',
+                style: theme.caption.copyWith(
+                  color: widget.hasError
+                      ? theme.danger
+                      : activeOrFocused
+                          ? theme.primaryPurple
+                          : theme.textSecondary.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(width: 7),
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textInputAction: TextInputAction.next,
+                  style: theme.bodyText2.copyWith(
+                    color: textColor,
+                    fontSize: 13.5,
+                  ),
+                  enabled: widget.isEditable,
+                  obscureText: _isObscured,
+                  enableInteractiveSelection: true,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onSubmitted: (_) {
+                    widget.onNextRequested?.call(widget.index - 1);
+                  },
+                  onChanged: (value) {
+                    _shouldUpdateText = false;
+                    if (widget.isEditable) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          setState(() {
+                            _isObscured = widget.obscureWhenUnfocused &&
+                                !_focusNode.hasFocus &&
+                                value.isNotEmpty;
+                          });
+                        }
+                      });
+                    }
+                    widget.onChanged?.call(widget.index, value);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -116,7 +233,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
         color: theme.cardBackground.withValues(alpha: 0.8 * widget.opacity),
         borderRadius: BorderRadius.circular(12),
         border: hasValidation
-            ? Border.all(color: borderColor!.withValues(alpha: 0.6), width: 1)
+            ? Border.all(color: borderColor.withValues(alpha: 0.6), width: 1)
             : null,
       ),
       child: Row(
@@ -145,7 +262,9 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mounted) {
                       setState(() {
-                        _isObscured = !_focusNode.hasFocus && value.isNotEmpty;
+                        _isObscured = widget.obscureWhenUnfocused &&
+                            !_focusNode.hasFocus &&
+                            value.isNotEmpty;
                       });
                     }
                   });

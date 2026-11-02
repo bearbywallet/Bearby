@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/components/modal_drag_handle.dart';
+import 'package:bearby/l10n/app_localizations.dart';
 import 'package:bearby/state/app_state.dart';
 import 'package:bearby/theme/app_theme.dart';
-import 'package:bearby/l10n/app_localizations.dart';
 
 void showBackupConfirmationModal({
   required BuildContext context,
@@ -70,83 +71,69 @@ class _BackupConfirmationContentState
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border.all(color: theme.modalBorder, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+        border: Border(
+          top: BorderSide(
+            color: theme.modalBorder.withValues(alpha: 0.4),
+            width: 1,
           ),
-        ],
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 16),
-            decoration: BoxDecoration(
-              color: theme.modalBorder,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.backupConfirmationContentTitle,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.danger.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.danger, width: 1),
-              ),
-              child: Text(
-                l10n.backupConfirmationWarning,
-                style: TextStyle(
-                  color: theme.danger,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(child: ModalDragHandle(theme: theme)),
+              const SizedBox(height: 14),
+              Text(
+                l10n.backupConfirmationContentTitle,
+                textAlign: TextAlign.center,
+                style: theme.subtitle1.copyWith(
+                  color: theme.textPrimary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+              const SizedBox(height: 10),
+              Text(
+                l10n.backupConfirmationWarning,
+                textAlign: TextAlign.center,
+                style: theme.bodyText2.copyWith(
+                  color: theme.danger,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _ConfirmationItem(
+                text: l10n.backupConfirmationContentWrittenDown,
+                isConfirmed: _confirmations['writtenDown']!,
+                onConfirmed: (value) =>
+                    _updateConfirmation('writtenDown', value),
+                theme: theme,
+              ),
+              _ConfirmationItem(
+                text: l10n.backupConfirmationContentSafelyStored,
+                isConfirmed: _confirmations['safelyStored']!,
+                onConfirmed: (value) =>
+                    _updateConfirmation('safelyStored', value),
+                theme: theme,
+              ),
+              _ConfirmationItem(
+                text: l10n.backupConfirmationContentWontLose,
+                isConfirmed: _confirmations['wontLose']!,
+                onConfirmed: (value) => _updateConfirmation('wontLose', value),
+                theme: theme,
+              ),
+              _ConfirmationItem(
+                text: l10n.backupConfirmationContentNotShare,
+                isConfirmed: _confirmations['notShare']!,
+                onConfirmed: (value) => _updateConfirmation('notShare', value),
+                theme: theme,
+              ),
+            ],
           ),
-          _ConfirmationItem(
-            text: l10n.backupConfirmationContentWrittenDown,
-            isConfirmed: _confirmations['writtenDown']!,
-            onConfirmed: (value) => _updateConfirmation('writtenDown', value),
-            theme: theme,
-          ),
-          _ConfirmationItem(
-            text: l10n.backupConfirmationContentSafelyStored,
-            isConfirmed: _confirmations['safelyStored']!,
-            onConfirmed: (value) => _updateConfirmation('safelyStored', value),
-            theme: theme,
-          ),
-          _ConfirmationItem(
-            text: l10n.backupConfirmationContentWontLose,
-            isConfirmed: _confirmations['wontLose']!,
-            onConfirmed: (value) => _updateConfirmation('wontLose', value),
-            theme: theme,
-          ),
-          _ConfirmationItem(
-            text: l10n.backupConfirmationContentNotShare,
-            isConfirmed: _confirmations['notShare']!,
-            onConfirmed: (value) => _updateConfirmation('notShare', value),
-            theme: theme,
-          ),
-          const SizedBox(height: 24),
-        ],
+        ),
       ),
     );
   }
@@ -167,26 +154,31 @@ class _ConfirmationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: CheckboxListTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+    return Material(
+      color: Colors.transparent,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
         ),
-        tileColor: isConfirmed
-            ? theme.background
-            : theme.background.withValues(alpha: 0.2),
-        title: Text(
-          text,
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 16,
+        child: CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          title: Text(
+            text,
+            style: theme.bodyText2.copyWith(
+              color: isConfirmed ? theme.textPrimary : theme.textSecondary,
+            ),
+          ),
+          value: isConfirmed,
+          onChanged: (value) => onConfirmed(value ?? false),
+          controlAffinity: ListTileControlAffinity.leading,
+          activeColor: theme.primaryPurple,
+          checkboxShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        value: isConfirmed,
-        onChanged: (value) => onConfirmed(value!),
-        controlAffinity: ListTileControlAffinity.leading,
-        activeColor: theme.primaryPurple,
       ),
     );
   }

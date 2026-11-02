@@ -46,6 +46,7 @@ flutter:
     - assets/icons/
     - assets/imgs/
     - assets/chains/
+    - assets/wordlists/
     - assets/.zilpay_legacy_inject.js
     - assets/.evm_inject.js
     - assets/.tron_inject.js
