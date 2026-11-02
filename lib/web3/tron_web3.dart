@@ -16,7 +16,7 @@ import 'package:bearby/src/rust/models/transactions/request.dart';
 import 'package:bearby/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:bearby/src/rust/api/transaction.dart' as rust_api;
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/web3_constants.dart';
@@ -27,7 +27,7 @@ import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/web3_utils.dart';
 
 class TronWeb3Handler {
-  final InAppWebViewController webViewController;
+  final WebviewPlusController webViewController;
   final AppState appState;
   bool isConnected = false;
 
@@ -135,7 +135,7 @@ class TronWeb3Handler {
     })();
     ''';
     try {
-      await webViewController.evaluateJavascript(source: jsCode);
+      await webViewController.evaluateJavascript(jsCode);
     } catch (e) {
       debugPrint("TRON notification error: $e");
     }

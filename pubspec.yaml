@@ -23,7 +23,7 @@ dependencies:
   url_launcher: ^6.3.2
   mobile_scanner: ^7.0.1
   share_plus: ^13.1.0
-  flutter_inappwebview: ^6.1.5
+  webview_plus: ^0.9.4
   file_picker: ^13.0.0
   app_links: ^7.0.0
   go_router: ^18.0.1

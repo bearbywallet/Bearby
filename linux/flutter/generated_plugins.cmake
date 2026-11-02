@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links_linux
   url_launcher_linux
+  webview_plus
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

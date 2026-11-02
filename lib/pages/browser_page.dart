@@ -1,9 +1,10 @@
-import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
+// ignore: implementation_imports
+import 'package:webview_plus/src/webview_plus_user_script.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:bearby/components/browser_control_bar.dart';
@@ -23,6 +24,7 @@ import 'package:bearby/theme/app_theme.dart';
 import 'package:bearby/web3/eip_1193.dart';
 import 'package:bearby/web3/message.dart';
 import 'package:bearby/web3/tron_web3.dart';
+import 'package:bearby/web3/web3_response.dart';
 import 'package:bearby/web3/zilpay_legacy.dart';
 
 class BrowserPage extends StatefulWidget {
@@ -38,11 +40,10 @@ class _BrowserPageState extends State<BrowserPage>
   final GlobalKey<GlassSearchBarState> _searchBarKey =
       GlobalKey<GlassSearchBarState>();
 
-  InAppWebViewController? _webViewController;
+  WebviewPlusController? _webViewController;
   ZilPayLegacyHandler? _legacyHandler;
   Web3EIP1193Handler? _eip1193Handler;
   TronWeb3Handler? _tronHandler;
-  CookieManager? _cookieManager;
 
   bool _isWebViewVisible = false;
   String _currentUrl = '';
@@ -53,26 +54,36 @@ class _BrowserPageState extends State<BrowserPage>
   int? _lastKnownSlip44;
   AppState? _appState;
   String? _evmInjectScript;
+  String? _tronInjectScript;
+  String? _zilpayLegacyInjectScript;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _cookieManager = CookieManager.instance();
     final appState = Provider.of<AppState>(context, listen: false);
     _appState = appState;
     appState.syncConnections();
     _lastKnownSlip44 = appState.chain?.slip44;
     appState.addListener(_handleChainChange);
-    _loadEvmScript();
+    _loadInjectScripts();
   }
 
-  Future<void> _loadEvmScript() async {
+  Future<void> _loadInjectScripts() async {
     try {
-      final src = await rootBundle.loadString('assets/.evm_inject.js');
-      if (mounted) setState(() => _evmInjectScript = src);
+      final evm = await rootBundle.loadString('assets/.evm_inject.js');
+      final tron = await rootBundle.loadString('assets/.tron_inject.js');
+      final scilla =
+          await rootBundle.loadString('assets/.zilpay_legacy_inject.js');
+      if (mounted) {
+        setState(() {
+          _evmInjectScript = evm;
+          _tronInjectScript = tron;
+          _zilpayLegacyInjectScript = scilla;
+        });
+      }
     } catch (e) {
-      debugPrint('_loadEvmScript: $e');
+      debugPrint('_loadInjectScripts: $e');
     }
   }
 
@@ -81,9 +92,15 @@ class _BrowserPageState extends State<BrowserPage>
     final newSlip44 = _appState!.chain?.slip44;
 
     if (newSlip44 != _lastKnownSlip44 && _webViewController != null) {
+      final prevSlip44 = _lastKnownSlip44;
       _lastKnownSlip44 = newSlip44;
-      _setupJavaScriptHandlers();
-      _initializeZilPayInjection(_appState!);
+      final bothUseEip1193 = (prevSlip44 == kEthereumSlip44 ||
+              prevSlip44 == kSolanaSlip44) &&
+          (newSlip44 == kEthereumSlip44 || newSlip44 == kSolanaSlip44);
+      if (!bothUseEip1193) {
+        _setupJavaScriptHandlers();
+        _initializeZilPayInjection(_appState!);
+      }
     }
   }
 
@@ -95,7 +112,6 @@ class _BrowserPageState extends State<BrowserPage>
     _legacyHandler?.dispose();
     _eip1193Handler?.dispose();
     _tronHandler?.dispose();
-    _webViewController?.dispose();
     super.dispose();
   }
 
@@ -138,9 +154,7 @@ class _BrowserPageState extends State<BrowserPage>
       _isWebViewVisible = true;
     });
     if (wasVisible && _webViewController != null) {
-      _webViewController!.loadUrl(
-        urlRequest: URLRequest(url: WebUri(url)),
-      );
+      _webViewController!.loadUrl(url);
     }
   }
 
@@ -243,18 +257,20 @@ class _BrowserPageState extends State<BrowserPage>
       if (appState.chain?.slip44 == kEthereumSlip44 ||
           appState.chain?.slip44 == kZilliqaSlip44 ||
           appState.chain?.slip44 == kSolanaSlip44) {
-        await _webViewController?.injectJavascriptFileFromAsset(
-            assetFilePath: 'assets/.evm_inject.js');
+        final evm = _evmInjectScript ??
+            await rootBundle.loadString('assets/.evm_inject.js');
+        await _webViewController?.evaluateJavascript(evm);
       }
       if (appState.chain?.slip44 == kZilliqaSlip44) {
-        String scilla =
+        final scilla = _zilpayLegacyInjectScript ??
             await rootBundle.loadString('assets/.zilpay_legacy_inject.js');
-        await _webViewController?.evaluateJavascript(source: scilla);
+        await _webViewController?.evaluateJavascript(scilla);
         await _legacyHandler?.sendData(appState);
       }
       if (appState.chain?.slip44 == kTronSlip44) {
-        await _webViewController?.injectJavascriptFileFromAsset(
-            assetFilePath: 'assets/.tron_inject.js');
+        final tron = _tronInjectScript ??
+            await rootBundle.loadString('assets/.tron_inject.js');
+        await _webViewController?.evaluateJavascript(tron);
       }
     } catch (e) {
       debugPrint("Injection Error: $e");
@@ -262,18 +278,12 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   void _applyPrivacySettings(
-      AppState appState, InAppWebViewController controller) {
+      AppState appState, WebviewPlusController controller) {
     if (!appState.state.browserSettings.cookiesEnabled) {
-      _cookieManager?.deleteAllCookies();
+      WebviewCacheManager.clearCookies();
     }
     if (appState.state.browserSettings.incognitoMode) {
-      InAppWebViewController.clearAllCache();
-      try {
-        controller.clearHistory();
-      } catch (_) {
-        // clearHistory can fail on macOS if the webview's
-        // back-forward list is not yet initialized during onLoadStart.
-      }
+      WebviewCacheManager.clearCache();
     }
   }
 
@@ -336,41 +346,47 @@ class _BrowserPageState extends State<BrowserPage>
             minHeight: 2,
           ),
         Expanded(
-          child: InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
-            initialUserScripts: UnmodifiableListView([
-              if (_evmInjectScript != null &&
-                  (slip44 == kEthereumSlip44 ||
-                      slip44 == kZilliqaSlip44 ||
-                      slip44 == kSolanaSlip44))
-                UserScript(
-                  source: _evmInjectScript!,
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-                  contentWorld: ContentWorld.PAGE,
-                ),
-            ]),
-            initialSettings: InAppWebViewSettings(
+          child: WebviewWidget(
+            initialUrl: _currentUrl,
+            initialSettings: WebviewSettings(
               javaScriptEnabled: true,
               safeBrowsingEnabled: false,
-              userAgent:
-                  appState.state.browserSettings.doNotTrack ? 'DNT:1' : null,
-              useHybridComposition: true,
+              androidPlatformViewType:
+                  AndroidPlatformViewType.hybridComposition,
               supportZoom: true,
-              useOnLoadResource: true,
-              verticalScrollBarEnabled: false,
-              horizontalScrollBarEnabled: false,
+              hideNativeScrollbars: true,
               transparentBackground: false,
               javaScriptCanOpenWindowsAutomatically: false,
-              supportMultipleWindows: false,
               cacheEnabled: appState.state.browserSettings.cacheEnabled,
-              clearCache: !appState.state.browserSettings.cacheEnabled,
+              incognito: appState.state.browserSettings.incognitoMode,
+              thirdPartyCookiesEnabled:
+                  appState.state.browserSettings.cookiesEnabled,
               mediaPlaybackRequiresUserGesture:
                   !appState.state.browserSettings.allowAutoPlay,
               allowsInlineMediaPlayback:
                   appState.state.browserSettings.allowAutoPlay,
-              forceDark: appState.currentTheme.value == "Dark"
-                  ? ForceDark.ON
-                  : ForceDark.OFF,
+              forceDarkMode: appState.currentTheme.value == "Dark",
+              initialUserScripts: [
+                if (_evmInjectScript != null &&
+                    (slip44 == kEthereumSlip44 ||
+                        slip44 == kZilliqaSlip44 ||
+                        slip44 == kSolanaSlip44))
+                  UserScript(
+                    source: _evmInjectScript!,
+                    injectionTime: UserScriptInjectionTime.atDocumentStart,
+                  ),
+                if (_zilpayLegacyInjectScript != null &&
+                    slip44 == kZilliqaSlip44)
+                  UserScript(
+                    source: _zilpayLegacyInjectScript!,
+                    injectionTime: UserScriptInjectionTime.atDocumentStart,
+                  ),
+                if (_tronInjectScript != null && slip44 == kTronSlip44)
+                  UserScript(
+                    source: _tronInjectScript!,
+                    injectionTime: UserScriptInjectionTime.atDocumentStart,
+                  ),
+              ],
             ),
             onWebViewCreated: (controller) {
               _webViewController = controller;
@@ -400,13 +416,10 @@ class _BrowserPageState extends State<BrowserPage>
 
               _legacyHandler?.handleStartBlockWorker(appState);
             },
-            onConsoleMessage: (_, msg) {
-              // print(msg);
-            },
             onProgressChanged: (controller, progress) {
               setState(() => _progress = progress / 100);
             },
-            onUpdateVisitedHistory: (controller, url, androidIsReload) async {
+            onPageCommitVisible: (controller, url) async {
               final canGoBack = await controller.canGoBack();
               final canGoForward = await controller.canGoForward();
               if (!mounted) return;

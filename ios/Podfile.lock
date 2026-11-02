@@ -1,37 +1,20 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_inappwebview_ios (0.0.1):
-    - Flutter
-    - flutter_inappwebview_ios/Core (= 0.0.1)
-    - OrderedSet (~> 6.0.3)
-  - flutter_inappwebview_ios/Core (0.0.1):
-    - Flutter
-    - OrderedSet (~> 6.0.3)
-  - OrderedSet (6.0.3)
   - rust_lib_zilpay (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
-
-SPEC REPOS:
-  trunk:
-    - OrderedSet
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  flutter_inappwebview_ios:
-    :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
   rust_lib_zilpay:
     :path: ".symlinks/plugins/rust_lib_zilpay/ios"
 
 SPEC CHECKSUMS:
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
-  flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
-  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
   rust_lib_zilpay: c1c8e95f8f1a7815cb3f51142cbdaf40bd269582
 
 PODFILE CHECKSUM: 9bdb5b6ca9d8e684bd1835b3709bed4899cc88ea

@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:bearby/web3/web3_response.dart';
 import 'package:bearby/config/web3_constants.dart';
 import 'package:bearby/mixins/transaction_parsing.dart';
 import 'package:bearby/modals/sign_message.dart';
@@ -51,7 +52,7 @@ class ZilPayLegacyTransactionParam {
 }
 
 class ZilPayLegacyHandler {
-  final InAppWebViewController webViewController;
+  final WebviewPlusController webViewController;
   final AppState appState;
   StreamSubscription<BlockEvent>? _blockStreamSubscription;
   String? _lastKnownAddress;
@@ -102,7 +103,7 @@ class ZilPayLegacyHandler {
     final jsonString = jsonEncode(response);
     try {
       await webViewController.evaluateJavascript(
-        source: '''
+        '''
         window.dispatchEvent(new MessageEvent('message', { 
           data: $jsonString
         }));

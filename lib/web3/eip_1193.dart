@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/config/eip1193.dart';
@@ -76,11 +76,13 @@ extension NetworkConfigInfoExtension on NetworkConfigInfo {
 }
 
 class Web3EIP1193Handler {
-  final InAppWebViewController webViewController;
+  final WebviewPlusController webViewController;
   final Set<String> _activeRequests = {};
   final AppState appState;
   String? _lastKnownAddress;
+  int? _lastKnownAccountIndex;
   BigInt? _lastKnownChainId;
+  BigInt? _lastEvmChainHash;
   bool isConnected = false;
 
   Web3EIP1193Handler({
@@ -88,7 +90,13 @@ class Web3EIP1193Handler {
     required this.appState,
   }) {
     _lastKnownAddress = appState.account?.addr;
-    _lastKnownChainId = appState.chain?.chainId;
+    _lastKnownAccountIndex = appState.wallet?.selectedAccount.toInt();
+    final chain = appState.chain;
+    if (chain != null &&
+        (chain.slip44 == kEthereumSlip44 || chain.slip44 == kZilliqaSlip44)) {
+      _lastKnownChainId = chain.chainId;
+      _lastEvmChainHash = chain.chainHash;
+    }
     appState.addListener(_handleAppStateChange);
   }
 
@@ -126,17 +134,43 @@ class Web3EIP1193Handler {
 
     final newAccount = appState.account;
     final newChain = appState.chain;
+    final selectedIdx = appState.wallet?.selectedAccount.toInt();
 
-    if (newAccount != null && newAccount.addr != _lastKnownAddress) {
-      _lastKnownAddress = newAccount.addr;
-      final addresses = await _getWalletAddresses(appState);
-      await _sendNotification(
-        eventName: kAccountsChangedEvent,
-        data: addresses,
-      );
+    if (newChain != null &&
+        (newChain.slip44 == kEthereumSlip44 ||
+            newChain.slip44 == kZilliqaSlip44)) {
+      _lastEvmChainHash = newChain.chainHash;
     }
 
-    if (newChain != null && newChain.chainId != _lastKnownChainId) {
+    if ((newAccount != null && newAccount.addr != _lastKnownAddress) ||
+        (selectedIdx != null && selectedIdx != _lastKnownAccountIndex)) {
+      _lastKnownAddress = newAccount?.addr;
+      _lastKnownAccountIndex = selectedIdx;
+      final evmAddresses = await _getWalletAddresses(appState);
+      if (evmAddresses.isNotEmpty) {
+        final primaryEvm = _primaryAddress(evmAddresses, null, appState);
+        await _sendNotification(
+          eventName: kAccountsChangedEvent,
+          data: [
+            primaryEvm,
+            ...evmAddresses.where((a) => a != primaryEvm),
+          ],
+        );
+      }
+      final solanaAddresses = await _getSolanaAddresses(appState);
+      if (solanaAddresses.isNotEmpty) {
+        final primarySol = _primaryAddress(solanaAddresses, null, appState);
+        await _sendNotification(
+          eventName: 'solanaAccountChanged',
+          data: primarySol,
+        );
+      }
+    }
+
+    if (newChain != null &&
+        (newChain.slip44 == kEthereumSlip44 ||
+            newChain.slip44 == kZilliqaSlip44) &&
+        newChain.chainId != _lastKnownChainId) {
       _lastKnownChainId = newChain.chainId;
       final chainIdHex =
           '$kHexPrefix${newChain.chainId.toRadixString(kHexRadix)}';
@@ -167,7 +201,7 @@ class Web3EIP1193Handler {
     })();
     ''';
     try {
-      await webViewController.evaluateJavascript(source: jsCode);
+      await webViewController.evaluateJavascript(jsCode);
     } catch (e) {
       debugPrint("EIP-1193 notification error: $e");
     }
@@ -205,27 +239,117 @@ class Web3EIP1193Handler {
     );
   }
 
+  NetworkConfigInfo? _getEvmChain(AppState appState) {
+    final current = appState.chain;
+    if (current != null &&
+        (current.slip44 == kEthereumSlip44 ||
+            current.slip44 == kZilliqaSlip44)) {
+      _lastEvmChainHash = current.chainHash;
+      return current;
+    }
+    if (_lastEvmChainHash != null) {
+      for (final p in appState.state.providers) {
+        if (p.chainHash == _lastEvmChainHash) {
+          return p;
+        }
+      }
+    }
+    for (final p in appState.state.providers) {
+      if (p.slip44 == kEthereumSlip44 && !(p.testnet ?? false)) {
+        return p;
+      }
+    }
+    for (final p in appState.state.providers) {
+      if (p.slip44 == kEthereumSlip44) {
+        return p;
+      }
+    }
+    return current;
+  }
+
+  List<String> _connectedAddressesWithSelectedFirst(
+    List<String> addresses,
+    Uint64List indexes,
+    AppState appState,
+  ) {
+    final connected = filterByIndexes(addresses, indexes);
+    final selectedIdx = appState.wallet?.selectedAccount.toInt();
+    if (selectedIdx != null &&
+        selectedIdx >= 0 &&
+        selectedIdx < addresses.length) {
+      final selectedAddr = addresses[selectedIdx];
+      if (connected.contains(selectedAddr)) {
+        return [
+          selectedAddr,
+          ...connected.where((a) => a != selectedAddr),
+        ];
+      }
+    }
+    return connected;
+  }
+
+  String _primaryAddress(
+    List<String> addresses,
+    Uint64List? indexes,
+    AppState appState,
+  ) {
+    if (indexes != null && indexes.isNotEmpty) {
+      final connected =
+          _connectedAddressesWithSelectedFirst(addresses, indexes, appState);
+      if (connected.isNotEmpty) {
+        return connected.first;
+      }
+    }
+    final selectedIdx = appState.wallet?.selectedAccount.toInt();
+    if (selectedIdx != null &&
+        selectedIdx >= 0 &&
+        selectedIdx < addresses.length) {
+      return addresses[selectedIdx];
+    }
+    return addresses.first;
+  }
+
   Future<List<String>> _getWalletAddresses(AppState appState) async {
-    List<String> addresses = [];
-    final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
-
     if (appState.chain?.slip44 == kZilliqaSlip44) {
-      addresses = await getZilEthChecksumAddresses(
+      return await getZilEthChecksumAddresses(
           walletIndex: appState.selectedWalletIndex);
-    } else {
-      addresses = (appState.accounts).map((a) => a.addr).toList();
     }
-
-    if (selectedAccountIndex != null &&
-        selectedAccountIndex >= 0 &&
-        selectedAccountIndex < addresses.length) {
-      isConnected = false;
-      return [addresses[selectedAccountIndex]];
+    if (appState.chain?.slip44 == kEthereumSlip44) {
+      return (appState.accounts).map((a) => a.addr).toList();
     }
+    final bipMap = appState.wallet?.accounts[kEthereumSlip44];
+    if (bipMap != null && bipMap.isNotEmpty) {
+      final list = bipMap[appState.wallet?.bip] ?? bipMap.values.first;
+      if (list.isNotEmpty) {
+        return list.map((a) => a.addr).toList();
+      }
+    }
+    return (appState.accounts).map((a) => a.addr).toList();
+  }
 
-    isConnected = true;
-
-    return addresses;
+  Future<List<String>> _getSolanaAddresses(AppState appState) async {
+    final bipMap = appState.wallet?.accounts[kSolanaSlip44];
+    if (bipMap != null && bipMap.isNotEmpty) {
+      final list = bipMap[appState.wallet?.bip] ?? bipMap.values.first;
+      if (list.isNotEmpty) {
+        return list.map((a) => a.addr).toList();
+      }
+    }
+    if (appState.chain?.slip44 == kSolanaSlip44) {
+      return (appState.accounts).map((a) => a.addr).toList();
+    }
+    final prevChainHash = appState.chain?.chainHash;
+    final switched = await _ensureSolanaChain(appState);
+    if (!switched) return [];
+    final addrs = (appState.accounts).map((a) => a.addr).toList();
+    if (prevChainHash != null && prevChainHash != appState.chain?.chainHash) {
+      await selectAccountsChain(
+        walletIndex: appState.selectedWalletIndex,
+        chainHash: prevChainHash,
+      );
+      await appState.syncData();
+    }
+    return addrs;
   }
 
   Future<void> handleWeb3EIP1193Message(
@@ -234,6 +358,10 @@ class Web3EIP1193Handler {
   ) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final chain = appState.chain;
+    if (chain != null &&
+        (chain.slip44 == kEthereumSlip44 || chain.slip44 == kZilliqaSlip44)) {
+      _lastEvmChainHash = chain.chainHash;
+    }
 
     try {
       final method = message.payload['method'] as String?;
@@ -281,11 +409,12 @@ class Web3EIP1193Handler {
         case Web3EIP1193Method.ethGetStorageAt:
         case Web3EIP1193Method.ethGasPrice:
         case Web3EIP1193Method.ethGetTransactionCount:
+          final evmChain = _getEvmChain(appState);
           await _proxyRpcRequest(
             method: evmMethod.value,
             uuid: message.uuid,
             params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
+            chainHash: evmChain?.chainHash ?? BigInt.zero,
           );
           break;
 
@@ -419,15 +548,20 @@ class Web3EIP1193Handler {
       );
 
       final addresses = await _getWalletAddresses(appState);
+      final connectedAddr = _connectedAddressesWithSelectedFirst(
+        addresses,
+        connection?.accountIndexes ?? Uint64List(0),
+        appState,
+      );
 
-      if (connection != null &&
-          appState.accounts.length == connection.accountIndexes.length) {
+      if (connection != null && connectedAddr.isNotEmpty) {
+        isConnected = true;
         _removeActiveRequest(method);
 
         return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
-          result: addresses,
+          result: connectedAddr,
         );
       }
 
@@ -491,7 +625,11 @@ class Web3EIP1193Handler {
             );
             await appState.syncConnections();
 
-            final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            final connectedAddr = _connectedAddressesWithSelectedFirst(
+              addresses,
+              accountIndexes,
+              appState,
+            );
             _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
@@ -521,8 +659,12 @@ class Web3EIP1193Handler {
     final connection =
         Web3Utils.findConnected(currentDomain, appState.connections);
     final addresses = await _getWalletAddresses(appState);
-    final connectedAddr =
-        filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
+    final connectedAddr = _connectedAddressesWithSelectedFirst(
+      addresses,
+      connection?.accountIndexes ?? Uint64List(0),
+      appState,
+    );
+    isConnected = connectedAddr.isNotEmpty;
 
     _sendResponse(
       type: kBearbyResponseType,
@@ -535,7 +677,7 @@ class Web3EIP1193Handler {
     ZilPayWeb3Message message,
     AppState appState,
   ) async {
-    final chain = appState.chain;
+    final chain = _getEvmChain(appState);
     if (chain == null) {
       return _returnError(
         message.uuid,
@@ -622,6 +764,7 @@ class Web3EIP1193Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      await _ensureEvmChain(appState);
       final currentDomain = await _getCurrentDomain();
       final connection =
           Web3Utils.findConnected(currentDomain, appState.connections);
@@ -742,6 +885,7 @@ class Web3EIP1193Handler {
     final l10n = AppLocalizations.of(context);
 
     try {
+      await _ensureEvmChain(appState);
       final currentDomain = await _getCurrentDomain();
       final connection = Web3Utils.findConnected(
         currentDomain,
@@ -893,8 +1037,11 @@ class Web3EIP1193Handler {
       }
 
       final addresses = await _getWalletAddresses(appState);
-      final connectedAddr =
-          filterByIndexes(addresses, connection.accountIndexes);
+      final connectedAddr = _connectedAddressesWithSelectedFirst(
+        addresses,
+        connection.accountIndexes,
+        appState,
+      );
 
       _sendResponse(
         type: kBearbyResponseType,
@@ -970,9 +1117,14 @@ class Web3EIP1193Handler {
         appState.connections,
       );
       final addresses = await _getWalletAddresses(appState);
+      final connectedAddr = _connectedAddressesWithSelectedFirst(
+        addresses,
+        connection?.accountIndexes ?? Uint64List(0),
+        appState,
+      );
 
-      if (connection != null &&
-          appState.accounts.length == connection.accountIndexes.length) {
+      if (connection != null && connectedAddr.isNotEmpty) {
+        isConnected = true;
         _removeActiveRequest(method);
         return await _sendResponse(
           type: kBearbyResponseType,
@@ -984,7 +1136,7 @@ class Web3EIP1193Handler {
                 kCaveatsKey: [
                   {
                     kTypeKey: kFilterResponseType,
-                    kValueKey: addresses,
+                    kValueKey: connectedAddr,
                   }
                 ],
               }
@@ -1054,7 +1206,11 @@ class Web3EIP1193Handler {
             );
             await appState.syncConnections();
 
-            final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            final connectedAddr = _connectedAddressesWithSelectedFirst(
+              addresses,
+              accountIndexes,
+              appState,
+            );
             _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
@@ -1147,6 +1303,7 @@ class Web3EIP1193Handler {
       TypedDataEip712 typedDataeip712;
 
       try {
+        await _ensureEvmChain(appState);
         typedDataeip712 = TypedDataEip712.fromJsonString(rawTypedData);
       } catch (e) {
         debugPrint("parse eip712 $e");
@@ -1691,14 +1848,25 @@ class Web3EIP1193Handler {
   Future<void> _ensureEvmChain(AppState appState) async {
     if (appState.chain?.slip44 == kEthereumSlip44 ||
         appState.chain?.slip44 == kZilliqaSlip44) {
+      _lastEvmChainHash = appState.chain?.chainHash;
       return;
     }
 
     NetworkConfigInfo? targetNetwork;
-    for (final provider in appState.state.providers) {
-      if (provider.slip44 == kEthereumSlip44 && !(provider.testnet ?? false)) {
-        targetNetwork = provider;
-        break;
+    if (_lastEvmChainHash != null) {
+      for (final provider in appState.state.providers) {
+        if (provider.chainHash == _lastEvmChainHash) {
+          targetNetwork = provider;
+          break;
+        }
+      }
+    }
+    if (targetNetwork == null) {
+      for (final provider in appState.state.providers) {
+        if (provider.slip44 == kEthereumSlip44 && !(provider.testnet ?? false)) {
+          targetNetwork = provider;
+          break;
+        }
       }
     }
     targetNetwork ??= appState.state.providers
@@ -1818,14 +1986,14 @@ class Web3EIP1193Handler {
       );
 
       if (onlyIfTrusted) {
-        if (connection == null || appState.chain?.slip44 != kSolanaSlip44) {
+        if (connection == null) {
           return _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.unauthorized,
             l10n?.web3ErrorNotConnected ?? '',
           );
         }
-        final addresses = await _getWalletAddresses(appState);
+        final addresses = await _getSolanaAddresses(appState);
         if (addresses.isEmpty) {
           return _returnError(
             message.uuid,
@@ -1833,15 +2001,17 @@ class Web3EIP1193Handler {
             l10n?.web3ErrorNotConnected ?? '',
           );
         }
+        final pubKey =
+            _primaryAddress(addresses, connection.accountIndexes, appState);
         return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
-          result: {'publicKey': addresses.first},
+          result: {'publicKey': pubKey},
         );
       }
 
-      final switched = await _ensureSolanaChain(appState);
-      if (!switched) {
+      final addresses = await _getSolanaAddresses(appState);
+      if (addresses.isEmpty) {
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,
@@ -1850,14 +2020,14 @@ class Web3EIP1193Handler {
         );
       }
 
-      final addresses = await _getWalletAddresses(appState);
-
       if (connection != null && addresses.isNotEmpty) {
         _removeActiveRequest(method);
+        final pubKey =
+            _primaryAddress(addresses, connection.accountIndexes, appState);
         return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
-          result: {'publicKey': addresses.first},
+          result: {'publicKey': pubKey},
         );
       }
 
@@ -1912,9 +2082,8 @@ class Web3EIP1193Handler {
             );
             await appState.syncConnections();
 
-            final connectedAddr = filterByIndexes(addresses, accountIndexes);
             final pubKey =
-                connectedAddr.isNotEmpty ? connectedAddr.first : addresses.first;
+                _primaryAddress(addresses, accountIndexes, appState);
 
             await _sendResponse(
               type: kBearbyResponseType,
@@ -2406,20 +2575,21 @@ class Web3EIP1193Handler {
     AppState appState,
   ) async {
     final l10n = AppLocalizations.of(context);
-    await _ensureSolanaChain(appState);
     await appState.syncConnections();
     final currentDomain = await _getCurrentDomain();
     final connection = Web3Utils.findConnected(
       currentDomain,
       appState.connections,
     );
-    final addresses = await _getWalletAddresses(appState);
+    final addresses = await _getSolanaAddresses(appState);
 
     if (connection != null && addresses.isNotEmpty) {
+      final pubKey =
+          _primaryAddress(addresses, connection.accountIndexes, appState);
       return await _sendResponse(
         type: kBearbyResponseType,
         uuid: message.uuid,
-        result: _buildCaip25SolanaSession(addresses.first),
+        result: _buildCaip25SolanaSession(pubKey),
       );
     }
 
@@ -2464,9 +2634,7 @@ class Web3EIP1193Handler {
           conn: connectionInfo,
         );
         await appState.syncConnections();
-        final connectedAddr = filterByIndexes(addresses, accountIndexes);
-        final pubKey =
-            connectedAddr.isNotEmpty ? connectedAddr.first : addresses.first;
+        final pubKey = _primaryAddress(addresses, accountIndexes, appState);
         await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
@@ -2486,14 +2654,14 @@ class Web3EIP1193Handler {
       currentDomain,
       appState.connections,
     );
-    if (connection == null || appState.chain?.slip44 != kSolanaSlip44) {
+    if (connection == null) {
       return await _sendResponse(
         type: kBearbyResponseType,
         uuid: message.uuid,
         result: {'sessionScopes': <String, dynamic>{}},
       );
     }
-    final addresses = await _getWalletAddresses(appState);
+    final addresses = await _getSolanaAddresses(appState);
     if (addresses.isEmpty) {
       return await _sendResponse(
         type: kBearbyResponseType,
@@ -2501,10 +2669,12 @@ class Web3EIP1193Handler {
         result: {'sessionScopes': <String, dynamic>{}},
       );
     }
+    final pubKey =
+        _primaryAddress(addresses, connection.accountIndexes, appState);
     await _sendResponse(
       type: kBearbyResponseType,
       uuid: message.uuid,
-      result: _buildCaip25SolanaSession(addresses.first),
+      result: _buildCaip25SolanaSession(pubKey),
     );
   }
 

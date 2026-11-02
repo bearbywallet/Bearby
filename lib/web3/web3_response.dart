@@ -1,9 +1,31 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
 
 import 'package:bearby/web3/message.dart';
+
+extension WebviewPlusControllerMetadata on WebviewPlusController {
+  Future<Uri?> getUrl() async {
+    try {
+      final raw = await evaluateJavascript('window.location.href');
+      if (raw is String && raw.isNotEmpty) {
+        return Uri.tryParse(raw);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<String?> getTitle() async {
+    try {
+      final raw = await evaluateJavascript('document.title');
+      if (raw is String) {
+        return raw;
+      }
+    } catch (_) {}
+    return null;
+  }
+}
 
 /// Common shape of the chain-specific 1193 error-code enums
 /// ([Web3EIP1193ErrorCode], [TronWeb3ErrorCode]) — both carry the
@@ -18,7 +40,7 @@ abstract interface class Web3ErrorCode {
 ///
 /// Used to be copy-pasted in `eip_1193.dart` and `tron_web3.dart` (DRY).
 Future<void> sendWeb3Response({
-  required InAppWebViewController webViewController,
+  required WebviewPlusController webViewController,
   required String type,
   required String uuid,
   Map<String, dynamic>? payload,
@@ -61,7 +83,7 @@ Future<void> sendWeb3Response({
     ''';
 
   try {
-    await webViewController.evaluateJavascript(source: jsCode);
+    await webViewController.evaluateJavascript(jsCode);
   } catch (e) {
     debugPrint("evaluateJavascript error: $e");
   }

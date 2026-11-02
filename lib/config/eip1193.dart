@@ -1,7 +1,7 @@
 import 'package:bearby/web3/web3_response.dart';
 
 export 'package:bearby/web3/web3_response.dart'
-    show Web3ErrorCode, sendWeb3Response;
+    show Web3ErrorCode, WebviewPlusControllerMetadata, sendWeb3Response;
 
 enum Web3EIP1193Method {
   ethRequestAccounts('eth_requestAccounts'),

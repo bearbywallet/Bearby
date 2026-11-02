@@ -1,6 +1,6 @@
 import 'package:bearby/components/app_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_plus/webview_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:bearby/components/button_item.dart';
 import 'package:bearby/components/custom_app_bar.dart';
@@ -110,8 +110,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
     final String operation = 'cookies';
     try {
       _setLoading(operation, true);
-      await CookieManager.instance().deleteAllCookies();
-      await CookieManager.instance().removeSessionCookies();
+      await WebviewCacheManager.clearCookies();
       await appState.syncData();
     } catch (e) {
       debugPrint("Error clearing cookies: $e");
@@ -124,7 +123,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
     final String operation = 'cache';
     try {
       _setLoading(operation, true);
-      await InAppWebViewController.clearAllCache();
+      await WebviewCacheManager.clearCache();
       await appState.syncData();
     } catch (e) {
       debugPrint("Error clearing cache: $e");
@@ -137,29 +136,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
     final String operation = 'localStorage';
     try {
       _setLoading(operation, true);
-      final headlessWebView = HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: WebUri("about:blank")),
-        onLoadStop: (controller, url) async {
-          try {
-            await controller.evaluateJavascript(
-                source: "localStorage.clear();");
-            await controller.evaluateJavascript(
-                source: "sessionStorage.clear();");
-            await controller.evaluateJavascript(source: """
-            if (window.indexedDB) {
-              window.indexedDB.deleteDatabase('all');
-            }
-          """);
-
-            await controller.clearHistory();
-          } catch (e) {
-            debugPrint("Error in JavaScript execution: $e");
-          }
-        },
-      );
-
-      await headlessWebView.run();
-      await Future<void>.delayed(const Duration(milliseconds: 800));
+      await WebviewCacheManager.clearAllData();
       await appState.syncData();
     } catch (e) {
       debugPrint("Error clearing localStorage: $e");

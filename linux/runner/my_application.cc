@@ -69,12 +69,27 @@ static void my_application_activate(GApplication* application) {
 
   FlView* view = fl_view_new(project);
   GdkRGBA background_color;
-  // Background defaults to black, override it here if necessary, e.g. #00000000
-  // for transparent.
-  gdk_rgba_parse(&background_color, "#000000");
+  // Transparent FlView background so webview_plus can place the native
+  // WebKitWebView underneath the FlView inside a GtkOverlay.
+  gdk_rgba_parse(&background_color, "#00000000");
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
-  gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
+
+  GtkWidget* overlay = gtk_overlay_new();
+  GtkWidget* backdrop = gtk_fixed_new();
+  gtk_container_add(GTK_CONTAINER(overlay), backdrop);
+  gtk_overlay_add_overlay(GTK_OVERLAY(overlay), GTK_WIDGET(view));
+  gtk_widget_show(backdrop);
+  gtk_widget_show(overlay);
+  gtk_container_add(GTK_CONTAINER(window), overlay);
+
+  GtkCssProvider* css = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(css, "window { background-color: #000000; }",
+                                  -1, nullptr);
+  gtk_style_context_add_provider_for_screen(
+      gdk_screen_get_default(), GTK_STYLE_PROVIDER(css),
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref(css);
 
   // Show the window when Flutter renders.
   // Requires the view to be realized so we can start rendering.
