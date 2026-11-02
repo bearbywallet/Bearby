@@ -56,6 +56,21 @@ class TronWeb3Handler {
     return url.host;
   }
 
+  Map<String, dynamic>? _buildNodeConfig(
+    NetworkConfigInfo? chain,
+    String chainIdHex,
+  ) {
+    if (chain == null || chain.rpc.isEmpty) return null;
+    final rpcUrl = chain.rpc.first;
+    return {
+      'fullNode': rpcUrl,
+      'solidityNode': rpcUrl,
+      'eventServer': rpcUrl,
+      'chainId': chainIdHex,
+      'chain': chain.name,
+    };
+  }
+
   void _handleAppStateChange() async {
     try {
       await webViewController.getUrl();
@@ -67,21 +82,50 @@ class TronWeb3Handler {
     final newAccount = appState.account;
     final newChain = appState.chain;
 
-    if (newAccount != null && newAccount.addr != _lastKnownAddress) {
+    final accountChanged =
+        newAccount != null && newAccount.addr != _lastKnownAddress;
+    final chainChanged =
+        newChain != null && newChain.chainId.toString() != _lastKnownChainId;
+
+    if (!accountChanged && !chainChanged) return;
+
+    if (accountChanged) {
       _lastKnownAddress = newAccount.addr;
-      final addresses = await _getWalletAddresses(appState);
-      await _sendNotification(
-        eventName: kAccountsChangedEvent,
-        data: addresses,
-      );
+    }
+    if (chainChanged) {
+      _lastKnownChainId = newChain.chainId.toString();
     }
 
-    if (newChain != null && newChain.chainId.toString() != _lastKnownChainId) {
-      _lastKnownChainId = newChain.chainId.toString();
-      await _sendNotification(
-        eventName: kChainChangedEvent,
-        data: {'chainId': newChain.chainId.toString()},
+    try {
+      final currentDomain = await _getCurrentDomain();
+      final connection = Web3Utils.findConnected(
+        currentDomain,
+        appState.connections,
       );
+      final addresses = await _getWalletAddresses(appState);
+      final connectedAddresses = connection != null
+          ? Web3Utils.filterByIndexes(addresses, connection.accountIndexes)
+          : <String>[];
+      final isAuth = connection != null &&
+          newAccount != null &&
+          connectedAddresses.any(
+            (addr) => addr.toLowerCase() == newAccount.addr.toLowerCase(),
+          );
+      final chainIdHex = '0x${(newChain?.chainId ?? BigInt.zero).toRadixString(16)}';
+
+      await _sendNotification(
+        eventName: 'dataChanged',
+        data: {
+          'address': isAuth ? newAccount.addr : null,
+          'name': isAuth ? newAccount.name : null,
+          'type': 0,
+          'isAuth': isAuth,
+          'chainId': chainIdHex,
+          'node': _buildNodeConfig(newChain, chainIdHex),
+        },
+      );
+    } catch (e) {
+      debugPrint("TRON state change notification error: $e");
     }
   }
 
@@ -541,17 +585,29 @@ class TronWeb3Handler {
       );
 
       final addresses = await _getWalletAddresses(appState);
+      final connectedAddresses = connection != null
+          ? Web3Utils.filterByIndexes(addresses, connection.accountIndexes)
+          : <String>[];
+      final activeAddr = appState.account?.addr;
+      final isAlreadyConnected = connection != null &&
+          connectedAddresses.isNotEmpty &&
+          (activeAddr == null ||
+              connectedAddresses.any(
+                (addr) => addr.toLowerCase() == activeAddr.toLowerCase(),
+              ));
 
-      if (connection != null &&
-          appState.accounts.length == connection.accountIndexes.length) {
+      if (isAlreadyConnected) {
         _removeActiveRequest(method);
+        final resolvedAddr = activeAddr ?? connectedAddresses.first;
+        final chainIdHex = '0x${appState.chain?.chainId.toRadixString(16)}';
 
         await _sendNotification(eventName: 'dataChanged', data: {
-          'address': addresses.first,
+          'address': resolvedAddr,
           'name': appState.account?.name,
           'type': 0,
           'isAuth': true,
-          'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
+          'chainId': chainIdHex,
+          'node': _buildNodeConfig(appState.chain, chainIdHex),
         });
 
         final isTronMethod =
@@ -559,7 +615,12 @@ class TronWeb3Handler {
         return await _sendResponse(
           type: kBearbyResponseType,
           uuid: message.uuid,
-          result: isTronMethod ? {'code': 200, 'message': 'OK'} : addresses,
+          result: isTronMethod
+              ? {'code': 200, 'message': 'OK', 'address': resolvedAddr}
+              : [
+                  resolvedAddr,
+                  ...connectedAddresses.where((a) => a != resolvedAddr),
+                ],
         );
       }
 
@@ -615,22 +676,33 @@ class TronWeb3Handler {
             await appState.syncConnections();
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            final activeAddr = appState.account?.addr;
+            final primaryAddr = (activeAddr != null &&
+                    connectedAddr.any(
+                      (a) => a.toLowerCase() == activeAddr.toLowerCase(),
+                    ))
+                ? activeAddr
+                : connectedAddr.first;
             final isTronMethod =
                 method == Web3EIP1193Method.tronRequestAccounts.value;
+            final chainIdHex =
+                '0x${appState.chain?.chainId.toRadixString(16)}';
 
             await _sendNotification(eventName: 'dataChanged', data: {
-              'address': connectedAddr.first,
+              'address': primaryAddr,
               'name': appState.account?.name,
               'type': 0,
               'isAuth': true,
-              'chainId': '0x${appState.chain?.chainId.toRadixString(16)}',
+              'chainId': chainIdHex,
+              'node': _buildNodeConfig(appState.chain, chainIdHex),
             });
 
             await _sendResponse(
               type: kBearbyResponseType,
               uuid: message.uuid,
-              result:
-                  isTronMethod ? {'code': 200, 'message': 'OK'} : connectedAddr,
+              result: isTronMethod
+                  ? {'code': 200, 'message': 'OK', 'address': primaryAddr}
+                  : connectedAddr,
             );
           } finally {
             _removeActiveRequest(method);
@@ -783,16 +855,6 @@ class TronWeb3Handler {
     ZilPayWeb3Message message,
     BuildContext context,
   ) async {
-    if (_isRequestActive(Web3EIP1193Method.getInitProviderData.value)) {
-      return _returnError(
-        message.uuid,
-        TronWeb3ErrorCode.resourceUnavailable,
-        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
-      );
-    }
-
-    _addActiveRequest(Web3EIP1193Method.getInitProviderData.value);
-
     try {
       final appState = Provider.of<AppState>(context, listen: false);
       await appState.syncConnections();
@@ -811,7 +873,6 @@ class TronWeb3Handler {
       }
 
       if (account == null || chain == null) {
-        _removeActiveRequest(Web3EIP1193Method.getInitProviderData.value);
         return _returnError(
           message.uuid,
           TronWeb3ErrorCode.unauthorized,
@@ -838,6 +899,7 @@ class TronWeb3Handler {
           'type': 0,
           'isAuth': isAuth,
           'chainId': chainIdHex,
+          'node': _buildNodeConfig(chain, chainIdHex),
         },
       );
     } catch (e) {
@@ -847,8 +909,6 @@ class TronWeb3Handler {
         TronWeb3ErrorCode.internalError,
         'Error processing getInitProviderData: $e',
       );
-    } finally {
-      _removeActiveRequest(Web3EIP1193Method.getInitProviderData.value);
     }
   }
 
